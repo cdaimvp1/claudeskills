@@ -120,11 +120,12 @@ Drafting outbound communications that are NOT this skill's primary requested del
 # Version
 - **Suite:** v10.6.6
 - **Skill:** Comment Cleanup
-- **Version:** 1.0.1
-- **Last Updated:** June 2, 2026
+- **Version:** 1.1.0
+- **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation)
 - **Changelog:**
+  - v1.1.0 (July 2026): Reworked around two named modes tied to trigger phrases - Mode A Return to Supplier (renamed from the informal "routine cleanup for a supplier handoff" case) and Mode B Finalize for Signature (renamed from "Finalize for Execution"; same boundary banner, same higher-stakes job). Extended `audience_kernel.py` with a `mode` parameter (`mode_action()`), a fourth action (`REDACT`, for accepting a redline/tracked change into the body under Mode B), and a `RedlineAttrs` shape so redlines get the same kernel-backed, refuse-rather-than-guess decision comments already had (see `finalize_comment_action()`, `redline_finalize_action()` - both additive, `strip_action()` itself is unchanged). Added the Interactive Walk-Through for REVIEW items (comment-by-comment / redline-by-redline) and split the Step 3 safety gate into "auto-apply CLEAR, walk through REVIEW" (new default) vs an explicit, warned "apply everything autonomously" option, since the old undifferentiated "apply all" masked which items were actually uncertain.
   - v1.0.1 (June 2026): Reconciled the SHORTEN threshold to 3 sentences to match lilly-contract-review (the integrating skill). Reworded the "undo" guardrail to stop claiming a persistence or rollback mechanism this skill does not have. Scoped the read-only posture to M365 mutations (local cleaned-file output and the original-never-overwritten rule are explicit). Changelog corrected (suite-wide guardrails note relabeled; G1-G10; duplicate v1.0 line removed). Added Suite stamp.
   - v1.0 (May 2026): Initial release. Standalone comment quality control for any commented DOCX, with a propose-then-approve safety gate.
 
@@ -150,36 +151,63 @@ You are a **Document Quality Analyst**. Your job is to review comments in a Word
    - "Sending to supplier" → strip all internal-only and SME escalation comments, keep supplier-facing
    - "Internal review" → keep all comments
    - "Leadership summary" → strip detailed comments, keep high-level only
+
+   The two most common cases above ("sending to supplier" and, separately, "the document is fully negotiated and about to be signed") are now primary named modes with their own trigger phrases, interactive walk-through, and redline handling - see "Mode Selection" below. "Internal review" and "Leadership summary" remain supported exactly as documented here, outside the two named modes.
 3. **Specific concerns** -- "comments are too long", "remove the ones about [topic]", etc.
 
 ## Mode Selection
 
-This skill runs in one of two modes. Pick based on what the user actually asked for; do not blend them.
+This skill runs against one of TWO NAMED MODES whenever the request specifies (or clearly implies) a destination or a finality. Pick based on what the user actually asked for; do not blend them; do not assume the higher-stakes one.
 
-- **Routine Comment Cleanup (default, lower-stakes).** Use for "clean up the comments", "too many comments", "reduce the comments", "comments are too verbose", "strip internal comments", "prepare these comments for the supplier", etc. Only comments are touched (consolidate, shorten, remove, reclassify). The document's contract/body text is never altered. Full workflow below under "Workflow."
-- **Finalize for Execution (higher-stakes).** Use only for the specific triggers listed under the "Finalize for Execution" heading below ("finalize this for signature", "produce a clean copy", "accept the agreed changes and clean it up", "make this execution-ready"). This mode DOES alter the document's body text (it accepts already-agreed tracked changes) and prepares the document for actual execution/signature. Read the boundary notice under that heading before running it: it is a materially different, higher-stakes job and must not be conflated with routine cleanup.
+- **Mode A: Return to Supplier (default, lower-stakes).** Trigger phrases: "clean up the comments", "too many comments", "reduce the comments", "comments are too verbose", "strip internal comments", "prepare these comments for the supplier", "return this to the supplier", "send this back to the supplier". Goal: strip internal-only comments and redlines, keep supplier-facing ones. Only comments (and, where flagged, redline-adjacent commentary) are touched - consolidate, shorten, remove, reclassify, audience-strip. The document's contract/body text is never altered; tracked changes are left exactly as-is. Full workflow below under "Workflow."
+- **Mode B: Finalize for Signature (higher-stakes).** Trigger phrases: "finalize this for signature", "produce a clean copy", "accept the agreed changes and clean it up", "make this execution-ready". Goal: final cleanup of the ENTIRE document (comments AND tracked changes) to make it execution-ready. This mode DOES alter the document's body text (it accepts already-agreed tracked changes) and prepares the document for actual execution/signature. Read the boundary notice under the "HIGHER-STAKES MODE: Finalize for Signature" heading below before running it: it is a materially different, higher-stakes job and must not be conflated with Mode A.
 
-If a request is ambiguous between the two (for example "clean this up before we send it," with no mention of signature or execution), default to Routine Comment Cleanup and separately ask the user whether they also want Finalize for Execution's tracked-change acceptance. Do not assume the higher-stakes mode.
+If a request is ambiguous between the two (for example "clean this up before we send it," with no mention of signature or execution), default to Mode A (Return to Supplier) and separately ask the user whether they also want Mode B's tracked-change acceptance. If a request names neither a destination nor a finality (e.g. a bare "clean up the comments" with no stated recipient), run the Step 2 hygiene checks that do not depend on audience (consolidation, removal, shortening, strategy-leak) and skip the audience-strip step entirely - there is nothing to strip an item FOR without a mode or an audience. A free-text audience outside these two modes ("internal review", "leadership summary", "legal") is still supported exactly as documented in Optional Inputs item 2, via `strip_action()` directly (see Kernel Wiring below); it is simply not one of the two primary named modes.
 
 ## Kernel Wiring (G11, HARD RULE)
 
-This skill vendors `audience_kernel.py` verbatim in its own directory (`comment-cleanup-1c344a/audience_kernel.py`). The following decision MUST be produced by calling the kernel, never by model judgment or prose:
+This skill vendors `audience_kernel.py` verbatim in its own directory (`comment-cleanup-1c344a/audience_kernel.py`). The following decisions MUST be produced by calling the kernel, never by model judgment or prose:
 
 | Decision | Kernel function | Where it appears |
 |---|---|---|
-| Keep / strip / review call for one comment, given its classification (Supplier-Facing / Internal-Only / SME Escalation / Hard Stop / Unclassified) and the document's target audience | `strip_action(comment_attrs, audience)` | Step 2 "AUDIENCE-INAPPROPRIATE candidates"; Step 3 "AUDIENCE STRIP" section of the Hygiene Report |
+| Keep / strip / redact / review call for one comment or one redline, given the active mode (Return to Supplier / Finalize for Signature) | `mode_action(item_attrs, mode, scope=...)` | Primary entry point for both modes; Step 2 "AUDIENCE-INAPPROPRIATE candidates", Step 3 "AUDIENCE STRIP" section of the Hygiene Report, and the Finalize workflow's Steps 3-4 |
+| Keep / strip / review call for one comment, given its classification and a free-text audience (legacy path, outside the two named modes) | `strip_action(comment_attrs, audience)` | Used directly when the user names an audience other than "supplier" tied to Mode A / Mode B (e.g. "internal review", "leadership summary") |
+| Keep / strip / review call for one comment under Finalize for Signature specifically | `finalize_comment_action(comment_attrs)` (called internally by `mode_action` - do not call directly) | Finalize workflow Step 4 |
+| Redact (accept-into-body) / review call for one redline under Finalize for Signature | `redline_finalize_action(redline_attrs, scope)` (called internally by `mode_action` - do not call directly) | Finalize workflow Steps 3-4 |
 
-Call `strip_action()` once per comment whenever an audience has been specified (Optional Inputs item 2). Do not hand-decide keep/strip in prose and do not re-derive the audience-strip rule from memory - call the kernel and use its returned `action` verbatim in the Hygiene Report row for that comment.
+Call `mode_action()` once per comment or redline whenever Mode A or Mode B is active (per Mode Selection above). Do not hand-decide keep/strip/redact in prose and do not re-derive the audience-strip or accept-into-body rules from memory - call the kernel and use its returned `action` verbatim in the Hygiene Report / change summary row for that item. For the legacy free-text-audience path outside the two named modes, call `strip_action()` directly instead.
 
-If the kernel is missing or fails to import, STOP and report the failure; do not fall back to deciding audience-strip in prose. A keep/strip call that did not come from calling `strip_action()` is invalid and must not be presented as a proposed action in the Hygiene Report.
+If the kernel is missing or fails to import, STOP and report the failure; do not fall back to deciding audience-strip or accept-into-body in prose. A keep/strip/redact call that did not come from calling the kernel is invalid and must not be presented as a proposed action in the Hygiene Report or change summary.
 
 **Per the kernel's SAFETY-CRITICAL design (do not override in prose):**
-- An internal-only comment (tagged, or content-inferred per Step 1's content-inference rule) can never resolve to KEEP when the audience is a supplier. If `strip_action()` returns `STRIP` for such a comment, it goes in the AUDIENCE STRIP list; it must never be silently left in.
-- When `strip_action()` returns `action == "REVIEW"` (`needs_review == True`), do NOT guess keep or strip for that comment. Surface it to the user, using the kernel's `reason` and `missing_input` fields to explain exactly what is missing (an unrecognized classification, an unrecognized audience, or an unclassified comment with no decisive content signal), and let the user's safety-gate choice (apply all / walk through each / by category / skip) resolve it like any other proposed action.
+- An internal-only comment or redline (tagged, or content-inferred per Step 1's content-inference rule) can never resolve to KEEP when the goal is a supplier audience, in EITHER mode. If the kernel returns `STRIP` for such an item, it goes in the AUDIENCE STRIP list (Mode A) or the strip list (Mode B Step 4); it must never be silently left in.
+- A tracked change that is still open or disputed, or that is linked to an unresolved Hard Stop, can never resolve to `REDACT` (accepted into the body) under Mode B, regardless of scope.
+- When the kernel returns `action == "REVIEW"` (`needs_review == True`), for a comment OR a redline, do NOT guess an action for that item. Route it to the interactive per-item walk-through below, using the kernel's `reason` and `missing_input` fields to explain exactly what is missing (an unrecognized classification, an unrecognized mode/scope, an unclassified comment with no decisive content signal, or a redline that is unresolved, disputed, or Hard-Stop-linked).
+- CLEAR actions (KEEP, STRIP, REDACT) are auto-appliable per the active mode, subject to the safety-gate choice the user makes at Step 3. REVIEW items are never auto-applied under the default or "walk through each" gate choices - only the explicit, warned "apply everything autonomously" choice touches them without a per-item confirmation (see Step 3).
+
+## Interactive Walk-Through for REVIEW Items (both modes)
+
+Whenever `mode_action()` (or `strip_action()` on the legacy path) returns `REVIEW` for a comment or a redline, and the user has not chosen the autonomous-apply-all path (see Step 3), present that item on its own, one at a time, using this template:
+
+```
+ITEM [N] of [Total needing review] -- [Comment | Redline], [Section reference]
+Current: [Full comment text, or the redline's before/after text for a tracked change]
+Why this needs a decision: [the kernel's `reason` field, in plain language]
+What would resolve it automatically next time: [the kernel's `missing_input` field, if present]
+Suggested default (not a kernel decision - your call): [Claude's own read, clearly labeled as a
+  suggestion, drawn from the surrounding Hygiene Analysis criteria - e.g. "reads as a genuine
+  strategy leak, suggest STRIP" or "status is ambiguous in the file, suggest leaving as-is"]
+
+Your decision? (keep / strip / redact-accept / skip / edit)
+```
+
+If the user says "edit", accept their revised text (for a comment) or their resolution note (for a redline) and apply that instead. Work through every REVIEW item before moving to Step 5's final output; do not silently drop any of them from the walk-through.
+
+This loop is the mechanism that fulfills the Guardrails' "never auto-delete" rule for exactly the items where SKILL.md itself, and therefore the kernel, does not state a rule - it is not optional scaffolding, it is how genuinely unclear items get resolved safely.
 
 ## Workflow
 
-*Mode: Routine Comment Cleanup (default; lower-stakes). This workflow edits comments only -- consolidate, shorten, remove, reclassify. It never touches contract/document body text. Contrast with the higher-stakes "Finalize for Execution" mode below; see "Mode Selection" above.*
+*Covers Mode A (Return to Supplier) and generic, no-mode comment hygiene (default; lower-stakes). This workflow edits comments only -- consolidate, shorten, remove, reclassify, audience-strip. It never touches contract/document body text or accepts tracked changes. Contrast with the higher-stakes "Finalize for Signature" mode below; see "Mode Selection" above.*
 
 ### TOOL SELECTION (MANDATORY, per Execution Guardrails G1)
 
@@ -243,10 +271,12 @@ Present the findings to the user. **Do not apply any changes yet.**
 
 Tag every proposed action with a confidence tier (per Operating Rule 3), shown as a leading marker on each line: **High** (an exact duplicate, an empty comment, a clear "looks fine" non-actionable note, or an unambiguous internal-only tag bound for a supplier), **Medium** (a likely consolidation or a probable strategy leak that depends on reading intent), **Low** (a judgment call where the comment could reasonably stay). This lets the user trust the High items for "apply all" and scrutinize the Low items in "walk through each." Removal and strategy-leak proposals especially must carry a tier so the user can calibrate how closely to review them.
 
+For AUDIENCE STRIP rows specifically (Mode A and Mode B), the tag is not a judgment call - it is the kernel's own action: rows where `mode_action()` returned a CLEAR action (KEEP, STRIP, or REDACT) are labeled **(CLEAR)**; rows where it returned REVIEW are labeled **(NEEDS REVIEW)** and routed to the Interactive Walk-Through above, never auto-applied under the default gate choice.
+
 ```
 COMMENT HYGIENE REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total Comments: [N]
+Total Comments: [N]      Mode: [Return to Supplier | Finalize for Signature | none]
 
 PROPOSED ACTIONS:
 
@@ -266,9 +296,11 @@ STRATEGY LEAKS ([N] comments):
   [L1] (Medium) [Section]: "[Problematic phrase]" → [Proposed fix: reclassify or rewrite]
   [L2] ...
 
-AUDIENCE STRIP ([N] comments - based on [audience]):
-  [A1] [Section]: [Classification] comment not appropriate for [audience]
-  [A2] ...
+AUDIENCE STRIP - comments and redlines ([N] items - mode: [mode]):
+  [A1] (CLEAR - STRIP) [Section]: [Classification] comment not appropriate for this mode
+  [A2] (CLEAR - REDACT) [Section]: redline [status] - accepted into final body
+  [A3] (NEEDS REVIEW) [Section]: [kernel `reason`, short form] - see Interactive Walk-Through
+  ...
 
 UNCHANGED ([N] comments pass all checks)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -278,10 +310,43 @@ Then ask:
 
 > "Here's what I'd recommend. How would you like to proceed?"
 >
-> 1. **Apply all** -- execute every proposed change
-> 2. **Walk through each** -- I'll present each change individually for your approval
-> 3. **Apply by category** -- choose which categories to apply (e.g., "apply all removals and consolidations, skip the rest")
-> 4. **Skip** -- keep everything as-is
+> 1. **Auto-apply CLEAR, walk through REVIEW (RECOMMENDED / default)** -- apply every kernel CLEAR action automatically, then walk through each NEEDS REVIEW item individually per the Interactive Walk-Through above
+> 2. **Walk through every item** -- present every proposed change individually for approval, CLEAR and NEEDS REVIEW alike (slowest, most thorough)
+> 3. **Apply by category** -- choose which categories to apply (e.g., "apply all removals and consolidations, skip the rest"); NEEDS REVIEW items within an applied category still go through the walk-through
+> 4. **Apply everything autonomously, including NEEDS REVIEW items** -- see the warning below before offering or accepting this option
+> 5. **Skip** -- keep everything as-is
+
+--------------------------------------------------------------------
+WARNING -- OPTION 4 IS RARELY ADVISABLE (READ BEFORE OFFERING IT)
+
+Option 4 applies every proposed action, INCLUDING items the kernel
+itself could not resolve (NEEDS REVIEW), with no per-item
+confirmation. NEEDS REVIEW items exist specifically because
+SKILL.md's own rules do not decide them - an unrecognized
+classification, a genuinely ambiguous comment, or (Mode B) a redline
+that is open, disputed, or tied to an unresolved Hard Stop. Applying
+these autonomously means a possible supplier-facing leak, an
+unconfirmed term baked into signed text, or a stripped Hard Stop
+could go through unseen.
+
+This is ESPECIALLY risky in Mode B (Finalize for Signature): the
+output is meant to be signed, so an autonomously-resolved NEEDS
+REVIEW redline can put the wrong terms in front of a signature.
+
+If the user nonetheless chooses option 4, apply this documented,
+disclosed tie-break (never a silent guess) to every NEEDS REVIEW
+item, and say plainly that this tie-break was used:
+- Comments (either mode): default to STRIP. Leaving an uncertain
+  comment's content in front of the next reader is the worse
+  direction if the uncertainty was actually a leak; removing a
+  comment the reader did not strictly need is the lesser harm.
+- Redlines (Mode B): default to NOT accepting (leave the tracked
+  change open, unresolved, out of the clean copy). Baking an
+  unconfirmed change into signed text is the worse direction than
+  leaving it flagged as still open.
+Never use this tie-break silently under any other option - it exists
+only because the user explicitly accepted the no-confirmation path.
+--------------------------------------------------------------------
 
 ### Step 4: Execute Approved Changes
 
@@ -311,7 +376,7 @@ Audience-stripped: [N]
 
 Save the cleaned DOCX and present it.
 
-If the user chose "walk through each" (option 2), present changes one at a time:
+If the user chose "walk through every item" (option 2), present every proposed change one at a time, CLEAR and NEEDS REVIEW alike:
 > "Comment [N] of [Total] -- [Section reference]
 > 
 > Current: [Full comment text]
@@ -320,46 +385,55 @@ If the user chose "walk through each" (option 2), present changes one at a time:
 >
 > Apply this change? (yes / no / edit)"
 
+If the user chose option 1 (the default), CLEAR items were already auto-applied under that gate choice; only the NEEDS REVIEW items still need a decision - use the "Interactive Walk-Through for REVIEW Items" template above for those, not this shorter one (it includes the kernel's `reason` and `missing_input`, which this one does not).
+
 If the user says "edit", accept their revised text and apply that instead.
 
-## HIGHER-STAKES MODE: Finalize for Execution (clean copy)
+## HIGHER-STAKES MODE: Finalize for Signature (clean copy)
 
 --------------------------------------------------------------------
 BOUNDARY NOTICE -- READ BEFORE USING THIS MODE
-This is NOT routine comment cleanup. It is a distinct, materially
-higher-stakes job that happens to live in the same skill file. Do
-not run it, and do not let a user's routine cleanup request drift
-into it, without recognizing the difference below.
+This is NOT Mode A (Return to Supplier) or generic comment cleanup.
+It is a distinct, materially higher-stakes job that happens to live
+in the same skill file. Do not run it, and do not let a Mode A or
+no-mode cleanup request drift into it, without recognizing the
+difference below.
 
 WHAT THIS MODE DOES: accepts already-agreed tracked changes into the
 document's operative body text, strips comments, and produces a
 signature-ready clean DOCX plus a change summary of what was
 accepted, what was stripped, and what is still open.
 
-WHY IT IS HIGHER-STAKES: routine comment cleanup (see "Workflow"
-above) only ever edits comments and never touches contract language.
-This mode DOES change the operative contract text (by accepting
-tracked changes), and its output is meant to be signed. An error
-here can put the wrong terms in front of a signature.
+WHY IT IS HIGHER-STAKES: Mode A / generic comment cleanup (see
+"Workflow" above) only ever edits comments and never touches
+contract language. This mode DOES change the operative contract text
+(by accepting tracked changes), and its output is meant to be
+signed. An error here can put the wrong terms in front of a
+signature.
 
 CONFIRMATIONS THIS MODE REQUIRES (non-negotiable, cannot be skipped
 or inferred):
 - Step 2's scope confirmation is a blocking input (Suite Interaction
   Protocol S5): STOP and WAIT for the user to choose (a) all
   mutually-agreed changes, (b) only Lilly-accepted items, or (c)
-  walk through each, before accepting anything.
-- The same comment-removal approval gate as routine cleanup (apply
-  all / walk through each / by category / skip) still applies to
-  every comment this mode strips.
+  walk through each, before accepting anything. This scope is what
+  the kernel's `redline_finalize_action(redline_attrs, scope)` needs
+  as its `scope` argument (SCOPE_ALL_AGREED / SCOPE_LILLY_ACCEPTED_ONLY
+  / SCOPE_WALK_THROUGH_EACH) - it cannot run without it.
+- The same comment/redline approval gate as Mode A (auto-apply CLEAR
+  + walk through REVIEW / walk through every item / by category /
+  apply everything autonomously with the mandatory warning / skip)
+  still applies to every item this mode strips or accepts.
 
 WHAT THIS MODE MUST NEVER DO AUTONOMOUSLY:
-- Never auto-accept a tracked change that is still open or disputed
-  -- list it and ask (Step 3).
+- Never auto-accept a tracked change that is still open or disputed,
+  or one linked to an unresolved Hard Stop -- the kernel returns
+  REVIEW for these; list it and ask (Step 3, Interactive Walk-Through).
 - Never add, rewrite, or otherwise modify substantive contract
   terms; it only accepts changes both sides already agreed to.
 - Never present the document as execution-ready while an unresolved
   Hard Stop remains -- surface it and stop (Step 6).
-- Never enter this mode from a routine-cleanup trigger; only run it
+- Never enter this mode from a Mode A or no-mode trigger; only run it
   on its own explicit triggers below.
 --------------------------------------------------------------------
 
@@ -367,9 +441,9 @@ Triggers: "finalize this for signature", "produce a clean copy", "accept the agr
 
 Workflow (read the .docx with `unpack.py` per G1 so tracked changes and authorship are preserved):
 1. **Inventory** all tracked changes and comments (author, type, classification).
-2. **Confirm scope, then STOP and WAIT** (per Suite Interaction Protocol S5: this is a blocking input). Ask, as tappable options: "Accept which changes? (a) all changes both sides have agreed, (b) only Lilly-accepted items, (c) walk through each." Do not accept anything until the user chooses.
-3. **Accept the agreed tracked changes** into the body. Do NOT silently accept changes that were still open or disputed; list any you are unsure about and ask.
-4. **Strip all internal-only and SME comments**, and any remaining supplier-facing comments the user does not want in the executed copy. Per the Guardrails below, NEVER alter substantive contract language while cleaning; cleaning removes comments and applies agreed tracked changes only, it does not rewrite terms.
+2. **Confirm scope, then STOP and WAIT** (per Suite Interaction Protocol S5: this is a blocking input). Ask, as tappable options: "Accept which changes? (a) all changes both sides have agreed, (b) only Lilly-accepted items, (c) walk through each." Do not accept anything until the user chooses. This becomes the `scope` argument passed to the kernel for every redline (see Kernel Wiring).
+3. **Accept the agreed tracked changes** into the body by calling `mode_action(redline_attrs, MODE_FINALIZE_FOR_SIGNATURE, scope=...)` for each tracked change and using its returned action verbatim (`REDACT` = accept into the body; `REVIEW` = route to the Interactive Walk-Through, never auto-accepted). Do NOT silently accept changes that were still open or disputed; list any you are unsure about and ask.
+4. **Strip all internal-only and SME comments**, and any remaining supplier-facing comments the user does not want in the executed copy, by calling `mode_action(comment_attrs, MODE_FINALIZE_FOR_SIGNATURE)` for each comment. A `REVIEW` result (this is expected for most remaining supplier-facing comments, since SKILL.md does not state an unconditional keep for the signed copy) goes through the Interactive Walk-Through, not an assumed keep or strip. Per the Guardrails below, NEVER alter substantive contract language while cleaning; cleaning removes comments and applies agreed tracked changes only, it does not rewrite terms.
 5. **Produce two outputs:** the clean execution-ready DOCX (no tracked changes, no internal/SME comments), and a **change summary** (what was accepted, what was stripped, anything left open that still needs resolution before signature).
 6. **Flag blockers:** if any Hard Stop (red) is unresolved, do NOT present the document as execution-ready; surface the open Hard Stop and stop.
 
@@ -387,7 +461,7 @@ This mode never fabricates or modifies contract terms; it only applies already-a
 
 - **State plainly what you are doing, up front.** Before proposing anything, tell the user in one or two sentences what this pass does and does not do: "I will propose consolidating, shortening, removing non-actionable comments, and (for a supplier handoff) stripping internal-only and SME comments. I will not change any substantive supplier-facing position, and I will not delete anything until you approve." The user should never be surprised by what changed.
 - **Only ever remove what a supplier should not see or what carries no value.** Removal is limited to: internal-only (🟣) and SME (🔵) comments when preparing a supplier handoff, strategy leaks, exact duplicates, and purely non-actionable observations ("looks fine"). **NEVER remove or weaken a substantive supplier-facing position, a reason the supplier needs, a clarification request, or any 🔴 Hard Stop.** Consolidating or shortening must preserve the full substantive content; if shortening would drop a reason or a citation, do not shorten it.
-- **Never auto-delete.** Every deletion or edit requires explicit user approval via the safety gate (apply all / walk through each / by category / skip). When the audience is "supplier," show the exact list of internal/SME comments to be stripped and require one-tap confirmation.
+- **Never auto-delete.** Every deletion, edit, or redline acceptance requires explicit user approval via the safety gate (auto-apply CLEAR + walk through REVIEW / walk through every item / by category / apply everything autonomously with the mandatory warning / skip). When the goal is Mode A (Return to Supplier) or a "supplier" audience, show the exact list of internal/SME comments to be stripped and require one-tap confirmation. A REVIEW item is never resolved without either the Interactive Walk-Through or the user's explicit, warned choice of the autonomous-apply option.
 - **Never modify Hard Stop comments** (🔴). Always preserved regardless of category.
 - **Preserve comment threading.** If a comment has replies, do not remove the parent without also addressing the replies.
 - **Track what was removed.** The cleanup report is the record; if asked "what did you remove?", show it.

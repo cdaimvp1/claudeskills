@@ -1,57 +1,110 @@
 """
 roster_kernel.py
-Lilly Procurement Skills - Workflow Map Roster-Source Cascade Kernel
+Lilly Procurement Skills - Workflow Map Participant-Classification Kernel
 
-Stdlib-only Python module implementing the stakeholder-roster SOURCE PRECEDENCE
-decision that workflow-map-1c344a/SKILL.md already specifies in prose (Skill
-Version 1.2, June 2026, "### Step 3: Stakeholder roster" -> "Source priority:").
-This is a NON-NUMERIC decision kernel: it does not compute anything, it chooses
-which ALREADY-CLASSIFIED roster source wins, deterministically, so that choice
-is never made ad hoc by model judgment at generation time.
+Stdlib-only Python module implementing the stakeholder-roster PARTICIPANT
+CLASSIFICATION decision that workflow-map-1c344a/SKILL.md specifies in prose
+(Skill Version 1.3, July 2026, "### Step 3: Stakeholder roster"). This is a
+NON-NUMERIC decision kernel: it does not compute anything, it deterministically
+LABELS each already-harvested participant by email domain, so that labeling is
+never made ad hoc by model judgment at generation time.
+
+REPLACES the prior v1.2 design (kept in version control history, not below).
+The old design chose which of four RANKED STATE-FILE SOURCES (field_guide_state
+Issue-scoped, field_guide_state project-scoped, legacy daily_digest_state,
+rfp-case-manager case file) "won" as the roster. That source-cascade is gone.
+Per Marc's design, the roster is now built from the ACTUAL PARTICIPANTS found
+on related emails, Teams chats, and calendar invites, plus Claude Project
+members/invitees (SKILL.md Step 3a documents that harvest; it is this skill's
+own M365 data-gathering, not this kernel's job). This kernel's job starts once
+that harvest exists: given the supplier's domain(s), classify every harvested
+participant by email domain, and split out the participants that need a human
+look before the roster is trusted.
+
+DIVISION OF LABOR (per Marc):
+  - The calling skill harvests participants (SKILL.md Step 3a: M365 comms/
+    calendar + Claude Project members/invitees) and marks, for each one,
+    whether it was seen in a supplier-side context. This kernel does no I/O,
+    no network calls, and no text/harvesting of its own.
+  - This kernel (classify_roster) deterministically labels each participant
+    and separates out the labels that need attention (flags) from the ones
+    that could not be labeled at all (needs_review). It performs no removal
+    and no approval.
+  - The user removes anyone who should not be on the roster (SKILL.md Step
+    3c). This kernel never removes a participant itself; it only labels and
+    surfaces, so the human decision is always visible and always made by a
+    human, never silently resolved by this kernel or by model prose.
+
+SAFETY JOB (the reason this kernel exists): never silently include an
+unexpected external party. A participant whose domain matches neither
+lilly.com nor a declared supplier domain is ALWAYS labeled
+FLAG_UNEXPECTED_EXTERNAL and ALWAYS appears in the returned `flags` list -
+there is no code path in classify_roster() that can fold that label into
+INTERNAL or EXPECTED_SUPPLIER, and no code path that can produce that label
+without it also landing in `flags`. See the self-test's "SAFETY-CRITICAL"
+section for a sweep that checks this holds across many inputs, and the
+"Kernel Wiring" section of SKILL.md for how the calling skill is required to
+surface `flags` before trusting the roster.
 
 Per the suite's "refuse rather than guess" rule (the same principle
-numeric_kernel.py documents for arithmetic): when NONE of the four sources
-SKILL.md names has a usable stakeholder roster, this kernel does not invent an
-owner or silently pick a source that lacks one. It returns the REVIEW outcome
-(chosen_source="REVIEW", roster=None, needs_review=True) and a trace showing
-exactly which tiers were checked and why each one did not qualify. Per SKILL.md
-Step 3 #5, the calling skill's own documented fallback for that REVIEW outcome
-is to render the checklist with `[OWNER?]` placeholders for the roles that
-matter for the present phases -- this kernel does not perform that fallback
-itself, it only refuses to fabricate a source or a roster.
+numeric_kernel.py documents for arithmetic, and the prior version of this
+kernel documented for source selection): a participant with no usable email
+address is not guessed into INTERNAL or EXPECTED_SUPPLIER or dropped - it is
+labeled REVIEW and returned in `needs_review`, per the design's own "no /
+unknown email -> REVIEW" outcome.
 
-Source (verbatim precedence, workflow-map-1c344a/SKILL.md, Step 3 "Source
-priority:"):
-  "1. If `issue_id` parameter was provided AND `field_guide_state.json` has
-      that Issue -> pull owners from the Issue's `owner` field and each child
-      Task's `owner` field. Highest priority.
-   2. If `field_guide_state.json` is present and has a stakeholder roster for
-      this project -> use it (cross-Issue search by `project` tag).
-   3. If legacy `daily_digest_state.json` is present and has a stakeholder
-      roster for this project -> use it.
-   4. If a case file (`_case_file.json` from rfp-case-manager) is present
-      with a stakeholder roster -> use it.
-   5. If none of the above -> produce the checklist with `[OWNER?]`
-      placeholders for the roles that matter for the present phases (e.g.,
-      Legal, Finance, TPRM, SAE, Requester, Vendor Contact)."
+Classification rules (verbatim from Marc's design, given the SUPPLIER's
+domain(s)):
+  1. lilly.com domain -> INTERNAL (Lilly).
+  2. domain matches the supplier domain -> EXPECTED_SUPPLIER.
+  3. a different external domain -> FLAG_UNEXPECTED_EXTERNAL (why is this
+     third party here).
+  4. a lilly.com address appearing within the supplier participant set / a
+     supplier context -> FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT (suppliers
+     sometimes use Lilly emails).
+  5. no / unknown email -> REVIEW.
 
-Only these four source names and this five-tier order are encoded below.
-Nothing here invents a new source, a new tie-break rule, or a new category:
-the four "chosen_source" values plus "REVIEW" are exactly the skill's own five
-outcomes (four sources that can win, one no-source outcome).
+Two modeling decisions this kernel makes that are NOT directly quoted in the
+one-line rules above, flagged explicitly (per this suite's convention of
+naming inferences rather than letting them pass as quoted rules):
+  - SUBDOMAIN MATCHING. "lilly.com domain" and "the supplier domain" are
+    matched as an exact match OR a proper subdomain (e.g. "eu.lilly.com"
+    counts as lilly.com; "it.acme.com" counts as a declared supplier domain
+    "acme.com"). This is a boundary-safe suffix check (requires the preceding
+    character to be a literal ".", so "notlilly.com" does NOT match
+    "lilly.com"). Judgment call: real Lilly and supplier mail commonly comes
+    from regional/functional subdomains; treating a subdomain as "a different
+    domain" would misfire FLAG_UNEXPECTED_EXTERNAL on legitimate internal or
+    supplier mail, which would erode trust in the flag and encourage users to
+    ignore it.
+  - MULTIPLE SUPPLIER DOMAINS. `supplier_domains` accepts one string or a
+    collection of strings, because a single supplier engagement can
+    legitimately span more than one domain (regional entities, recently
+    acquired subsidiaries). This does not add a new classification category;
+    it only lets "the supplier's domain" be one-or-many when the caller has
+    more than one to declare.
+
+Refusals (malformed CALLS, not data-availability questions - see KernelError
+subclasses below): participants not a list of Participant instances;
+supplier_domains empty, non-string, or overlapping with lilly.com's own
+domain family (ambiguous configuration - refusing to guess whether INTERNAL
+or EXPECTED_SUPPLIER should win); context provided but not a dict. A run with
+zero participants, or with every participant landing in REVIEW, is NOT a
+refusal-by-exception - it is the documented REVIEW/empty-roster outcome.
 
 See MAINTENANCE.md conventions in lilly-procurement-kernels-1c344a/ for the
 suite's shared kernel-authoring style; this module mirrors numeric_kernel.py's
-module-docstring / exception / self-test conventions for a decision (rather
-than arithmetic) kernel.
+and audience_kernel.py's module-docstring / exception / self-test conventions.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional, Sequence, Union
 
-SOURCE_VERSION = "workflow-map-1c344a SKILL.md, Skill Version 1.2 (June 2026), Step 3"
+SOURCE_VERSION = "workflow-map-1c344a SKILL.md, Skill Version 1.3 (July 2026), Step 3"
+
+LILLY_DOMAIN = "lilly.com"
 
 # ---------------------------------------------------------------------------
 # Exceptions
@@ -60,283 +113,412 @@ SOURCE_VERSION = "workflow-map-1c344a SKILL.md, Skill Version 1.2 (June 2026), S
 class KernelError(Exception):
     """Base class for every refusal raised by this kernel.
 
-    Reserved for malformed CALLS (wrong input shape) -- a programming error by
+    Reserved for malformed CALLS (wrong input shape) - a programming error by
     the caller, not a data-availability question. A run with zero usable
-    roster sources is NOT an error: it is the REVIEW outcome returned by
-    resolve_roster_source() (see module docstring), matching SKILL.md Step 3
-    #5's own documented "none of the above" case.
+    participants, or a roster that is entirely REVIEW, is NOT an error: see
+    the module docstring.
     """
 
 
-class InvalidSourcesError(KernelError):
-    """Raised when resolve_roster_source() is not given a RosterSources
-    instance. Refuses rather than guessing what shape an ad hoc dict/object
+class InvalidParticipantsError(KernelError):
+    """Raised when classify_roster() is not given a list/tuple of Participant
+    instances. Refuses rather than guessing what shape an ad hoc dict/object
     is meant to represent.
     """
 
 
+class InvalidSupplierDomainError(KernelError):
+    """Raised when supplier_domains is missing, empty, contains a non-string,
+    contains an unusable domain (no '.'), or overlaps with lilly.com's own
+    domain family. The last case is refused rather than resolved by picking
+    which rule (INTERNAL vs EXPECTED_SUPPLIER) should win for a domain that
+    is claimed as both Lilly's and the supplier's - that conflict is a data
+    error upstream, not a classification decision this kernel should invent.
+    """
+
+
+class InvalidContextError(KernelError):
+    """Raised when `context` is provided but is not a dict (or None)."""
+
+
 # ---------------------------------------------------------------------------
-# Source name constants (verbatim from SKILL.md Step 3, in cascade order)
+# Label constants (the five outcomes named in Marc's design; do not add,
+# rename, or re-scope any of these)
 # ---------------------------------------------------------------------------
 
-SOURCE_FIELD_GUIDE_ISSUE = "field_guide_state.json (Issue-scoped, issue_id)"
-SOURCE_FIELD_GUIDE_PROJECT = "field_guide_state.json (project-scoped, cross-Issue by project tag)"
-SOURCE_DAILY_DIGEST_LEGACY = "daily_digest_state.json (legacy)"
-SOURCE_CASE_FILE = "_case_file.json (rfp-case-manager)"
-SOURCE_REVIEW = "REVIEW"
+LABEL_INTERNAL = "INTERNAL"
+LABEL_EXPECTED_SUPPLIER = "EXPECTED_SUPPLIER"
+LABEL_FLAG_UNEXPECTED_EXTERNAL = "FLAG_UNEXPECTED_EXTERNAL"
+LABEL_FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT = "FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT"
+LABEL_REVIEW = "REVIEW"
 
-# Fixed precedence order, copied from SKILL.md Step 3's numbered list.
-# This ordering is the entire decision; it must never be re-sorted by caller
-# input order, roster size, recency, or any other signal SKILL.md does not
-# name.
-CASCADE_ORDER = (
-    SOURCE_FIELD_GUIDE_ISSUE,
-    SOURCE_FIELD_GUIDE_PROJECT,
-    SOURCE_DAILY_DIGEST_LEGACY,
-    SOURCE_CASE_FILE,
+ALL_LABELS = (
+    LABEL_INTERNAL,
+    LABEL_EXPECTED_SUPPLIER,
+    LABEL_FLAG_UNEXPECTED_EXTERNAL,
+    LABEL_FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT,
+    LABEL_REVIEW,
 )
 
+# The two labels that are "flags" in Marc's own naming (FLAG_ prefix): a
+# participant whose presence needs a human look before the roster is trusted.
+# REVIEW is a distinct concept (unclassifiable, not necessarily suspicious)
+# and is returned separately as `needs_review`, never mixed into `flags`.
+FLAG_LABELS = frozenset({
+    LABEL_FLAG_UNEXPECTED_EXTERNAL,
+    LABEL_FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT,
+})
+
 
 # ---------------------------------------------------------------------------
-# Facts / Decision shape
+# Input shape
 # ---------------------------------------------------------------------------
 
-@dataclass
-class RosterSources:
-    """Structured, already-classified inputs to resolve_roster_source().
+@dataclass(frozen=True)
+class Participant:
+    """One person harvested from related comms/calendar/Claude Project
+    (SKILL.md Step 3a). The calling skill populates this; this kernel does no
+    harvesting and no I/O.
 
-    Each field below is something the CALLING skill (workflow-map) is
-    expected to have already determined by reading its own available state
-    (Field Guide state, legacy digest state, case file) -- this kernel does
-    no file I/O and does not itself decide whether a given JSON blob "counts"
-    as having a roster; it only applies the fixed precedence over whatever
-    the caller reports.
-
-    Tier 1 (highest priority) is a COMPOUND condition per SKILL.md Step 3 #1
-    ("issue_id parameter was provided AND field_guide_state.json has that
-    Issue"), so it is modeled as two separate booleans rather than one
-    pre-folded flag, so the trace can show which half of the condition (if
-    either) failed:
-      issue_id_provided:     the issue_id parameter was supplied this run.
-      field_guide_has_issue: field_guide_state.json contains that specific
-                             Issue (only meaningful when issue_id_provided).
-      field_guide_issue_roster: the Issue's own `owner` field plus each child
-                             Task's `owner` field, per SKILL.md Step 3 #1.
-                             Only used when both booleans above are True.
-
-    Tiers 2-4 are each a single compound condition in SKILL.md ("<file> is
-    present and has a stakeholder roster for this project" / "... with a
-    stakeholder roster"), so each is one boolean ("<x>_present") plus the
-    roster payload it carries:
-      field_guide_project_present / field_guide_project_roster
-      daily_digest_present / daily_digest_roster
-      case_file_present / case_file_roster
-
-    Every "*_roster" field is treated by this kernel as an OPAQUE payload
-    (a dict, list, or whatever shape the calling skill already extracted for
-    that source). This kernel decides WHICH source wins, not how a roster is
-    shaped internally -- so it never inspects roster contents except to
-    confirm they are non-empty (see _has_content()).
+    identifier: display name and/or raw string identifying this person.
+        Required (never blank) so a REVIEW row is still human-readable even
+        with no email. Use whatever the harvest surfaced (a display name, or
+        the raw address if that is all there is).
+    email: the email address as harvested, if any. None, empty, or
+        whitespace-only counts as "no email" -> REVIEW, per Marc's design's
+        "no / unknown email" outcome. A malformed string (no '@', more than
+        one '@', an empty local or domain part, or a domain with no '.') also
+        counts as unknown -> REVIEW; this kernel does not attempt to repair
+        or guess a corrected address.
+    in_supplier_context: True iff this participant was harvested from at
+        least one source that is a SUPPLIER-SIDE context - an email thread,
+        Teams chat, or calendar invite that is correspondence WITH the
+        supplier (e.g. the supplier's own domain appears among the other
+        participants or the organizer of that same item) - rather than
+        purely-internal Lilly correspondence. This is what lets the kernel
+        tell "an @lilly.com person on an ordinary internal thread" (INTERNAL,
+        unremarkable) apart from "an @lilly.com address surfacing inside the
+        supplier's own participant set" (FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT
+        - suppliers sometimes provision people with lilly.com addresses, or a
+        Lilly person ended up inside the supplier-side roster; either way,
+        worth a human look). Populated by the calling skill's harvest step,
+        never guessed by this kernel. Defaults to False (ordinary internal
+        participant) when the harvest did not surface a supplier-side item
+        for this person.
+    sources: optional free-form provenance tuple (e.g. "email:thread-142",
+        "teams:chat-88", "calendar:invite-9", "claude_project:member") for
+        the audit trace. Never inspected for classification, only echoed
+        back for traceability.
     """
 
-    issue_id_provided: bool = False
-    field_guide_has_issue: bool = False
-    field_guide_issue_roster: Optional[Any] = None
+    identifier: str
+    email: Optional[str] = None
+    in_supplier_context: bool = False
+    sources: tuple = ()
 
-    field_guide_project_present: bool = False
-    field_guide_project_roster: Optional[Any] = None
 
-    daily_digest_present: bool = False
-    daily_digest_roster: Optional[Any] = None
+# ---------------------------------------------------------------------------
+# Output shape
+# ---------------------------------------------------------------------------
 
-    case_file_present: bool = False
-    case_file_roster: Optional[Any] = None
+@dataclass(frozen=True)
+class ClassifiedParticipant:
+    """One participant after classification.
+
+    label: one of ALL_LABELS.
+    domain: the lower-cased domain extracted from `email`, or None when the
+        participant landed in REVIEW because no usable email was found.
+    reason: human-readable explanation, always citing which rule produced
+        this label, so the decision is auditable per-participant.
+    needs_review: True iff label == LABEL_REVIEW (duplicated as its own
+        boolean, matching this suite's Decision.needs_review convention, so
+        callers can branch on it without a string comparison).
+    """
+
+    identifier: str
+    email: Optional[str]
+    domain: Optional[str]
+    label: str
+    reason: str
+    needs_review: bool
+    sources: tuple = ()
 
 
 @dataclass
-class RosterDecision:
-    """Kernel output: {chosen_source, roster, trace} plus a needs_review flag.
+class RosterClassification:
+    """Kernel output: the classified roster plus the flags.
 
-    chosen_source: one of SOURCE_FIELD_GUIDE_ISSUE / SOURCE_FIELD_GUIDE_PROJECT
-        / SOURCE_DAILY_DIGEST_LEGACY / SOURCE_CASE_FILE (a source won), or
-        SOURCE_REVIEW ("REVIEW", no source had a usable roster).
-    roster: the winning source's roster payload, passed through unchanged.
-        None whenever chosen_source == SOURCE_REVIEW.
-    trace: ordered, human-readable audit trail -- one line per tier
-        evaluated, stating why that tier did or did not win. Always fully
-        populated (even on REVIEW) so the decision is auditable end to end,
-        per the task's "record which source won" requirement.
-    needs_review: True iff chosen_source == SOURCE_REVIEW. Kept as a separate
-        boolean (in addition to the SOURCE_REVIEW sentinel) so callers can
-        branch on it without a string comparison, mirroring
-        frap_chain_kernel.py's Decision.needs_review convention.
-    source_version: which SKILL.md version/section this cascade traces to.
+    classified: every harvested participant, labeled, in the same order they
+        were passed in (deterministic; never re-sorted by label, name, or
+        anything else this kernel was not asked to sort by).
+    flags: the subset of `classified` whose label is in FLAG_LABELS
+        (FLAG_UNEXPECTED_EXTERNAL or FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT) -
+        exactly the participants Marc's design says need a human look before
+        the roster is trusted. Never includes REVIEW entries (see
+        `needs_review` below) and never omits a FLAG_* entry (see the
+        module's SAFETY JOB note).
+    needs_review: the subset of `classified` whose label is LABEL_REVIEW (no
+        usable email - unclassifiable, not necessarily suspicious).
+    counts: label -> count, for all five ALL_LABELS (present even when a
+        label's count is 0), so a caller can render a one-line summary
+        without recomputing it from `classified`.
+    trace: ordered, human-readable audit trail - one header line plus one
+        line per participant, so every label is traceable end to end.
+    source_version: which SKILL.md version/section this classification
+        traces to.
     """
 
-    chosen_source: Optional[str]
-    roster: Optional[Any]
+    classified: List[ClassifiedParticipant]
+    flags: List[ClassifiedParticipant]
+    needs_review: List[ClassifiedParticipant]
+    counts: Dict[str, int]
     trace: List[str] = field(default_factory=list)
-    needs_review: bool = False
     source_version: str = SOURCE_VERSION
 
 
-def _has_content(roster: Optional[Any]) -> bool:
-    """True iff `roster` is more than "absent" -- i.e. it is not None and,
-    for any container type that defines a length, that length is > 0.
+# ---------------------------------------------------------------------------
+# Internal helpers
+# ---------------------------------------------------------------------------
 
-    SKILL.md's own wording for every tier is "has A stakeholder roster", not
-    merely "the file exists" -- so a nominally-present source whose roster
-    payload is None, [], {}, or "" is treated as NOT carrying a usable
-    roster, and the cascade falls through to the next tier. This is a
-    direct reading of "has a stakeholder roster" (a roster with zero
-    entries is not "a roster"), not an invented extra criterion.
+def _normalize_domain_string(value: Any) -> Optional[str]:
+    """Lower-case, whitespace-trimmed, leading-'@'-tolerant normalization of
+    a single domain-like string. Returns None if `value` is not a usable
+    string (not a str, or empty/whitespace after trimming). Pure string
+    hygiene - never maps one domain onto a different one.
     """
-    if roster is None:
-        return False
-    if hasattr(roster, "__len__"):
-        return len(roster) > 0
-    return True
+    if not isinstance(value, str):
+        return None
+    v = value.strip().lower()
+    if v.startswith("@"):
+        v = v[1:]
+    return v or None
 
 
-def resolve_roster_source(sources: RosterSources) -> RosterDecision:
-    """Choose which stakeholder-roster SOURCE wins, per workflow-map-1c344a
-    SKILL.md Step 3's exact five-tier priority list (see module docstring).
+def _domain_matches(domain: str, base: str) -> bool:
+    """True iff `domain` IS `base`, or is a proper subdomain of `base`
+    (boundary-safe: requires a literal '.' immediately before `base`, so
+    "notlilly.com" does not match base "lilly.com"). See module docstring,
+    "SUBDOMAIN MATCHING" for why this is applied instead of exact-match only.
+    """
+    return domain == base or domain.endswith("." + base)
+
+
+def _extract_email_domain(email: Optional[str]) -> Optional[str]:
+    """Extract a usable, lower-cased domain from a harvested email address.
+
+    Returns None (meaning "no usable email" -> REVIEW) when `email` is not a
+    string, is blank, contains zero or more than one '@', has an empty local
+    or domain part, or has a domain with no '.'. This kernel does not attempt
+    to repair or guess a corrected address; it only recognizes a minimally
+    well-formed one.
+    """
+    if not isinstance(email, str):
+        return None
+    trimmed = email.strip()
+    if not trimmed or "@" not in trimmed:
+        return None
+    parts = trimmed.split("@")
+    if len(parts) != 2:
+        return None  # more than one '@' - malformed, refuse to guess
+    local, domain = parts
+    local = local.strip()
+    domain = domain.strip().lower()
+    if not local or not domain or "." not in domain:
+        return None
+    return domain
+
+
+def _normalize_supplier_domains(
+    supplier_domains: Union[str, Sequence[str]],
+) -> tuple:
+    """Validate and normalize `supplier_domains` into a non-empty tuple of
+    lower-cased domain strings. Raises InvalidSupplierDomainError for every
+    malformed-call case documented in that exception's docstring.
+    """
+    if isinstance(supplier_domains, str):
+        raw_list = [supplier_domains]
+    elif isinstance(supplier_domains, (list, tuple, set, frozenset)):
+        raw_list = list(supplier_domains)
+    else:
+        raise InvalidSupplierDomainError(
+            "supplier_domains must be a string or a list/tuple/set of "
+            f"strings, got {type(supplier_domains).__name__}. Refusing to "
+            "guess what shape an ad hoc object is meant to represent."
+        )
+
+    normalized: List[str] = []
+    for d in raw_list:
+        if not isinstance(d, str):
+            raise InvalidSupplierDomainError(
+                f"Every supplier domain must be a string, got "
+                f"{type(d).__name__}: {d!r}."
+            )
+        nd = _normalize_domain_string(d)
+        if not nd or "." not in nd:
+            raise InvalidSupplierDomainError(
+                f"supplier domain {d!r} is not a usable domain (empty, "
+                "whitespace-only, or missing a '.')."
+            )
+        normalized.append(nd)
+
+    if not normalized:
+        raise InvalidSupplierDomainError(
+            "supplier_domains must name at least one domain; refusing to "
+            "classify EXPECTED_SUPPLIER vs FLAG_UNEXPECTED_EXTERNAL with no "
+            "supplier domain to compare against."
+        )
+
+    for nd in normalized:
+        if _domain_matches(nd, LILLY_DOMAIN) or _domain_matches(LILLY_DOMAIN, nd):
+            raise InvalidSupplierDomainError(
+                f"supplier domain {nd!r} overlaps with Lilly's own domain "
+                f"({LILLY_DOMAIN}) - this is an ambiguous/likely-erroneous "
+                "configuration; refusing to guess whether INTERNAL or "
+                "EXPECTED_SUPPLIER should win for it."
+            )
+
+    return tuple(normalized)
+
+
+def _classify_one(participant: Participant, supplier_domains: tuple) -> ClassifiedParticipant:
+    """Classify a single Participant. Pure function: deterministic, no I/O."""
+    domain = _extract_email_domain(participant.email)
+
+    if domain is None:
+        label = LABEL_REVIEW
+        reason = (
+            "No usable email address (missing, blank, or malformed - e.g. "
+            "no '@', more than one '@', or no '.' in the domain part) - "
+            "cannot classify by domain. Per the design's 'no / unknown "
+            "email' outcome: REVIEW, never a guessed classification."
+        )
+    elif _domain_matches(domain, LILLY_DOMAIN):
+        if participant.in_supplier_context:
+            label = LABEL_FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT
+            reason = (
+                f"Domain '{domain}' is within {LILLY_DOMAIN}, but this "
+                "participant was harvested from a supplier-side context "
+                "(in_supplier_context=True). Suppliers sometimes provision "
+                "people with lilly.com addresses (or a Lilly person ended "
+                "up inside the supplier's own participant set) - flagged "
+                "for a human look, never silently folded into INTERNAL."
+            )
+        else:
+            label = LABEL_INTERNAL
+            reason = (
+                f"Domain '{domain}' is within {LILLY_DOMAIN} and was not "
+                "seen in a supplier-side context -> INTERNAL (Lilly)."
+            )
+    elif any(_domain_matches(domain, sd) for sd in supplier_domains):
+        label = LABEL_EXPECTED_SUPPLIER
+        reason = (
+            f"Domain '{domain}' matches a declared supplier domain "
+            f"({', '.join(supplier_domains)}) -> EXPECTED_SUPPLIER."
+        )
+    else:
+        label = LABEL_FLAG_UNEXPECTED_EXTERNAL
+        reason = (
+            f"Domain '{domain}' is external and matches neither "
+            f"{LILLY_DOMAIN} nor the declared supplier domain(s) "
+            f"({', '.join(supplier_domains)}) -> FLAG_UNEXPECTED_EXTERNAL. "
+            "Why is this third party here? Never silently included in the "
+            "confirmed roster."
+        )
+
+    return ClassifiedParticipant(
+        identifier=participant.identifier,
+        email=participant.email,
+        domain=domain,
+        label=label,
+        reason=reason,
+        needs_review=(label == LABEL_REVIEW),
+        sources=tuple(participant.sources),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def classify_roster(
+    participants: Sequence[Participant],
+    supplier_domains: Union[str, Sequence[str]],
+    context: Optional[dict] = None,
+) -> RosterClassification:
+    """Classify every harvested participant and split out the flags.
 
     Deterministic, pure function: no I/O, no network, no randomness. Given
-    the same RosterSources, always returns the same RosterDecision.
+    the same participants and supplier_domains, always returns the same
+    RosterClassification, in the same participant order.
 
-    Refuses (raises InvalidSourcesError) only for a malformed CALL (sources
-    is not a RosterSources instance). A well-formed call in which every tier
-    is absent/empty is NOT a refusal-by-exception; it is the documented
-    REVIEW outcome (see module docstring and SKILL.md Step 3 #5).
+    Args:
+        participants: a list/tuple of Participant instances, already
+            harvested by the calling skill (SKILL.md Step 3a). May be empty
+            (an empty harvest is not a malformed call; it yields an empty
+            RosterClassification).
+        supplier_domains: the supplier's domain, or a collection of the
+            supplier's domains (see module docstring, "MULTIPLE SUPPLIER
+            DOMAINS"). Must name at least one usable domain and must not
+            overlap with lilly.com's own domain family.
+        context: optional dict for readable output only (e.g.
+            {"supplier_name": "Acme Corp"}). Never consulted by the
+            classification rule itself - purely cosmetic annotation on the
+            trace. Pass None (default) when there is nothing to annotate.
+
+    Raises:
+        InvalidParticipantsError: `participants` is not a list/tuple, or
+            contains an item that is not a Participant instance.
+        InvalidSupplierDomainError: `supplier_domains` is missing, empty,
+            contains a non-string or unusable domain, or overlaps with
+            lilly.com's own domain family.
+        InvalidContextError: `context` is provided but is not a dict.
     """
-    if not isinstance(sources, RosterSources):
-        raise InvalidSourcesError(
-            f"resolve_roster_source() requires a RosterSources instance, got "
-            f"{type(sources).__name__}. Refusing to guess which fields an ad "
-            "hoc object is meant to represent."
+    if not isinstance(participants, (list, tuple)):
+        raise InvalidParticipantsError(
+            "participants must be a list or tuple of Participant instances, "
+            f"got {type(participants).__name__}. Refusing to guess what "
+            "shape an ad hoc object is meant to represent."
         )
+    for i, p in enumerate(participants):
+        if not isinstance(p, Participant):
+            raise InvalidParticipantsError(
+                f"participants[{i}] is not a Participant instance (got "
+                f"{type(p).__name__}). Refusing to guess its shape."
+            )
 
-    trace: List[str] = []
+    if context is not None and not isinstance(context, dict):
+        raise InvalidContextError(
+            f"context must be a dict or None, got {type(context).__name__}."
+        )
+    supplier_name = context.get("supplier_name") if isinstance(context, dict) else None
 
-    # --- Tier 1: field_guide_state.json, Issue-scoped (highest priority) ---
-    if not sources.issue_id_provided:
-        trace.append(
-            f"{SOURCE_FIELD_GUIDE_ISSUE}: not attempted (no issue_id "
-            "parameter was provided this run) - per SKILL.md Step 3 #1 this "
-            "tier requires issue_id AND a matching Issue; skip to tier 2."
-        )
-    elif not sources.field_guide_has_issue:
-        trace.append(
-            f"{SOURCE_FIELD_GUIDE_ISSUE}: issue_id was provided but "
-            "field_guide_state.json does not have that Issue - compound "
-            "condition in SKILL.md Step 3 #1 not satisfied; skip to tier 2."
-        )
-    elif not _has_content(sources.field_guide_issue_roster):
-        trace.append(
-            f"{SOURCE_FIELD_GUIDE_ISSUE}: Issue found but carries no owner "
-            "data (empty roster payload) - not usable; skip to tier 2."
-        )
-    else:
-        trace.append(
-            f"{SOURCE_FIELD_GUIDE_ISSUE}: issue_id provided, matching Issue "
-            "found, owner data present -> WINS (highest priority per "
-            "SKILL.md Step 3 #1)."
-        )
-        return RosterDecision(
-            chosen_source=SOURCE_FIELD_GUIDE_ISSUE,
-            roster=sources.field_guide_issue_roster,
-            trace=trace,
-            needs_review=False,
-        )
+    normalized_supplier_domains = _normalize_supplier_domains(supplier_domains)
 
-    # --- Tier 2: field_guide_state.json, project-scoped (cross-Issue) ------
-    if not sources.field_guide_project_present:
-        trace.append(
-            f"{SOURCE_FIELD_GUIDE_PROJECT}: not present (no stakeholder "
-            "roster for this project found via cross-Issue project-tag "
-            "search) - skip to tier 3."
-        )
-    elif not _has_content(sources.field_guide_project_roster):
-        trace.append(
-            f"{SOURCE_FIELD_GUIDE_PROJECT}: reported present but roster "
-            "payload is empty - not usable; skip to tier 3."
-        )
-    else:
-        trace.append(
-            f"{SOURCE_FIELD_GUIDE_PROJECT}: present with roster content -> "
-            "WINS (per SKILL.md Step 3 #2)."
-        )
-        return RosterDecision(
-            chosen_source=SOURCE_FIELD_GUIDE_PROJECT,
-            roster=sources.field_guide_project_roster,
-            trace=trace,
-            needs_review=False,
-        )
+    trace: List[str] = [
+        f"Supplier domain(s): {', '.join(normalized_supplier_domains)}"
+        + (f" (supplier: {supplier_name})" if supplier_name else "")
+        + f". Lilly domain: {LILLY_DOMAIN}. Participants to classify: "
+        f"{len(participants)}."
+    ]
 
-    # --- Tier 3: legacy daily_digest_state.json ----------------------------
-    if not sources.daily_digest_present:
-        trace.append(
-            f"{SOURCE_DAILY_DIGEST_LEGACY}: not present (no stakeholder "
-            "roster for this project found in the legacy state file) - "
-            "skip to tier 4."
-        )
-    elif not _has_content(sources.daily_digest_roster):
-        trace.append(
-            f"{SOURCE_DAILY_DIGEST_LEGACY}: reported present but roster "
-            "payload is empty - not usable; skip to tier 4."
-        )
-    else:
-        trace.append(
-            f"{SOURCE_DAILY_DIGEST_LEGACY}: present with roster content -> "
-            "WINS (per SKILL.md Step 3 #3)."
-        )
-        return RosterDecision(
-            chosen_source=SOURCE_DAILY_DIGEST_LEGACY,
-            roster=sources.daily_digest_roster,
-            trace=trace,
-            needs_review=False,
-        )
+    classified: List[ClassifiedParticipant] = []
+    for p in participants:
+        cp = _classify_one(p, normalized_supplier_domains)
+        classified.append(cp)
+        trace.append(f"{p.identifier} <{p.email or 'no email'}>: {cp.label} - {cp.reason}")
 
-    # --- Tier 4: rfp-case-manager _case_file.json --------------------------
-    if not sources.case_file_present:
-        trace.append(
-            f"{SOURCE_CASE_FILE}: not present (no stakeholder roster found "
-            "in the rfp-case-manager case file) - no source remains."
-        )
-    elif not _has_content(sources.case_file_roster):
-        trace.append(
-            f"{SOURCE_CASE_FILE}: reported present but roster payload is "
-            "empty - not usable; no source remains."
-        )
-    else:
-        trace.append(
-            f"{SOURCE_CASE_FILE}: present with roster content -> WINS "
-            "(per SKILL.md Step 3 #4)."
-        )
-        return RosterDecision(
-            chosen_source=SOURCE_CASE_FILE,
-            roster=sources.case_file_roster,
-            trace=trace,
-            needs_review=False,
-        )
+    flags = [c for c in classified if c.label in FLAG_LABELS]
+    needs_review = [c for c in classified if c.label == LABEL_REVIEW]
+    counts = {label: 0 for label in ALL_LABELS}
+    for c in classified:
+        counts[c.label] += 1
 
-    # --- No source had a usable roster: REVIEW, per SKILL.md Step 3 #5 ----
-    trace.append(
-        "No source (field_guide_state.json Issue-scoped, field_guide_state."
-        "json project-scoped, daily_digest_state.json, _case_file.json) had "
-        "a usable stakeholder roster. Returning REVIEW rather than "
-        "fabricating a source or an owner. Per SKILL.md Step 3 #5, the "
-        "calling skill's own documented fallback for this outcome is to "
-        "render the checklist with [OWNER?] placeholders for the roles "
-        "that matter for the present phases; this kernel does not perform "
-        "that rendering itself."
-    )
-    return RosterDecision(
-        chosen_source=SOURCE_REVIEW,
-        roster=None,
+    return RosterClassification(
+        classified=classified,
+        flags=flags,
+        needs_review=needs_review,
+        counts=counts,
         trace=trace,
-        needs_review=True,
     )
 
 
@@ -365,193 +547,282 @@ if __name__ == "__main__":
             _check(label, False, f"expected {exc_type.__name__}, got {type(e).__name__}: {e}")
 
     print("=" * 78)
-    print("GOLDEN CASES (each traces to workflow-map-1c344a SKILL.md Step 3's")
-    print("own numbered 'Source priority' list; no worked numeric example")
-    print("exists in SKILL.md for this decision, so these are direct")
-    print("precedence-order reproductions of the quoted rule, not a numeric")
-    print("golden value)")
+    print("GOLDEN CASES (each of Marc's five classification outcomes)")
     print("=" * 78)
 
-    demo_issue_roster = {"Requester": "A. Patel", "Legal": "J. Kim"}
-    demo_project_roster = {"Requester": "A. Patel"}
-    demo_digest_roster = {"Requester": "B. Chen"}
-    demo_case_file_roster = {"Requester": "C. Diaz"}
+    SUPPLIER_DOMAINS = ("acme.com",)
 
-    # --- Golden 1: Tier 1 wins outright when its compound condition holds --
-    d1 = resolve_roster_source(RosterSources(
-        issue_id_provided=True,
-        field_guide_has_issue=True,
-        field_guide_issue_roster=demo_issue_roster,
-    ))
+    # --- Golden 1: INTERNAL -------------------------------------------------
+    d1 = classify_roster(
+        [Participant("A. Patel", "a.patel@lilly.com")],
+        SUPPLIER_DOMAINS,
+    )
     _check(
-        "Tier 1 (Issue-scoped field_guide_state.json) wins when issue_id "
-        "provided AND the Issue is found with owner data "
-        "(SKILL.md Step 3 #1, 'Highest priority')",
-        d1.chosen_source == SOURCE_FIELD_GUIDE_ISSUE and d1.roster == demo_issue_roster
-        and d1.needs_review is False,
-        f"got chosen_source={d1.chosen_source!r}, roster={d1.roster}",
+        "lilly.com domain, not in supplier context -> INTERNAL",
+        d1.classified[0].label == LABEL_INTERNAL
+        and d1.flags == [] and d1.needs_review == [],
+        f"got label={d1.classified[0].label!r}",
     )
 
-    # --- Golden 2: Tier 1 beats every lower tier even when all are present -
-    d2 = resolve_roster_source(RosterSources(
-        issue_id_provided=True,
-        field_guide_has_issue=True,
-        field_guide_issue_roster=demo_issue_roster,
-        field_guide_project_present=True,
-        field_guide_project_roster=demo_project_roster,
-        daily_digest_present=True,
-        daily_digest_roster=demo_digest_roster,
-        case_file_present=True,
-        case_file_roster=demo_case_file_roster,
-    ))
+    # --- Golden 2: EXPECTED_SUPPLIER -----------------------------------------
+    d2 = classify_roster(
+        [Participant("J. Doe", "j.doe@acme.com")],
+        SUPPLIER_DOMAINS,
+    )
     _check(
-        "Tier 1 wins even when tiers 2, 3, and 4 are ALSO present "
-        "(precedence is fixed order, not availability count)",
-        d2.chosen_source == SOURCE_FIELD_GUIDE_ISSUE,
-        f"got chosen_source={d2.chosen_source!r}",
+        "domain matches supplier domain -> EXPECTED_SUPPLIER",
+        d2.classified[0].label == LABEL_EXPECTED_SUPPLIER
+        and d2.flags == [] and d2.needs_review == [],
+        f"got label={d2.classified[0].label!r}",
     )
 
-    # --- Golden 3: issue_id not provided -> falls through to Tier 2 --------
-    d3 = resolve_roster_source(RosterSources(
-        issue_id_provided=False,
-        field_guide_project_present=True,
-        field_guide_project_roster=demo_project_roster,
-    ))
+    # --- Golden 3: FLAG_UNEXPECTED_EXTERNAL ---------------------------------
+    d3 = classify_roster(
+        [Participant("X. Person", "x.person@randomvendor.com")],
+        SUPPLIER_DOMAINS,
+    )
     _check(
-        "Tier 2 (project-scoped field_guide_state.json) wins when issue_id "
-        "was not provided this run (SKILL.md Step 3 #2)",
-        d3.chosen_source == SOURCE_FIELD_GUIDE_PROJECT and d3.roster == demo_project_roster,
-        f"got chosen_source={d3.chosen_source!r}",
+        "different external domain -> FLAG_UNEXPECTED_EXTERNAL, and present "
+        "in `flags` (why is this third party here)",
+        d3.classified[0].label == LABEL_FLAG_UNEXPECTED_EXTERNAL
+        and d3.flags == [d3.classified[0]] and d3.needs_review == [],
+        f"got label={d3.classified[0].label!r}, flags={d3.flags}",
     )
 
-    # --- Golden 4: issue_id provided but no matching Issue -> Tier 2 -------
-    d4 = resolve_roster_source(RosterSources(
-        issue_id_provided=True,
-        field_guide_has_issue=False,
-        field_guide_project_present=True,
-        field_guide_project_roster=demo_project_roster,
-    ))
+    # --- Golden 4: FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT ---------------------
+    d4 = classify_roster(
+        [Participant("C. Contractor", "c.contractor@lilly.com", in_supplier_context=True)],
+        SUPPLIER_DOMAINS,
+    )
     _check(
-        "Tier 1's compound condition fails (issue_id given, but no matching "
-        "Issue) -> falls through to Tier 2, not a refusal",
-        d4.chosen_source == SOURCE_FIELD_GUIDE_PROJECT,
-        f"got chosen_source={d4.chosen_source!r}",
+        "lilly.com address seen in a supplier-side context -> "
+        "FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT, and present in `flags` "
+        "(suppliers sometimes use Lilly emails)",
+        d4.classified[0].label == LABEL_FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT
+        and d4.flags == [d4.classified[0]] and d4.needs_review == [],
+        f"got label={d4.classified[0].label!r}, flags={d4.flags}",
     )
 
-    # --- Golden 5: Tier 1 Issue found but empty roster -> Tier 2 -----------
-    d5 = resolve_roster_source(RosterSources(
-        issue_id_provided=True,
-        field_guide_has_issue=True,
-        field_guide_issue_roster={},  # Issue exists but carries no owner data
-        field_guide_project_present=True,
-        field_guide_project_roster=demo_project_roster,
-    ))
+    # --- Golden 5: REVIEW (no email) ----------------------------------------
+    d5 = classify_roster(
+        [Participant("Unknown Attendee", None)],
+        SUPPLIER_DOMAINS,
+    )
     _check(
-        "Tier 1 Issue found but with an EMPTY roster -> not usable, falls "
-        "through to Tier 2 ('has a stakeholder roster' requires content)",
-        d5.chosen_source == SOURCE_FIELD_GUIDE_PROJECT,
-        f"got chosen_source={d5.chosen_source!r}",
+        "no email -> REVIEW, present in `needs_review`, absent from `flags`",
+        d5.classified[0].label == LABEL_REVIEW and d5.classified[0].needs_review is True
+        and d5.needs_review == [d5.classified[0]] and d5.flags == [],
+        f"got label={d5.classified[0].label!r}",
     )
 
-    # --- Golden 6: Tiers 1-2 absent -> Tier 3 (legacy daily digest) wins ---
-    d6 = resolve_roster_source(RosterSources(
-        daily_digest_present=True,
-        daily_digest_roster=demo_digest_roster,
-        case_file_present=True,
-        case_file_roster=demo_case_file_roster,
-    ))
+    # --- Golden 5b: REVIEW (malformed email variants) -----------------------
+    for bad_email, why in [
+        ("", "blank string"),
+        ("   ", "whitespace-only"),
+        ("not-an-email", "no '@'"),
+        ("a@b@c.com", "more than one '@'"),
+        ("@lilly.com", "empty local part"),
+        ("person@", "empty domain part"),
+        ("person@nodot", "domain missing '.'"),
+    ]:
+        d = classify_roster([Participant("Bad Email Case", bad_email)], SUPPLIER_DOMAINS)
+        _check(
+            f"malformed email ({why}: {bad_email!r}) -> REVIEW",
+            d.classified[0].label == LABEL_REVIEW,
+            f"got label={d.classified[0].label!r}",
+        )
+
+    print()
+    print("=" * 78)
+    print("SUBDOMAIN AND MULTI-DOMAIN CASES (documented modeling decisions)")
+    print("=" * 78)
+
+    # --- Lilly subdomain -----------------------------------------------------
+    d6 = classify_roster(
+        [Participant("B. Chen", "b.chen@eu.lilly.com")],
+        SUPPLIER_DOMAINS,
+    )
     _check(
-        "Tier 3 (legacy daily_digest_state.json) wins over Tier 4 when both "
-        "are present but Tiers 1-2 are not (SKILL.md Step 3 #3 precedes #4)",
-        d6.chosen_source == SOURCE_DAILY_DIGEST_LEGACY and d6.roster == demo_digest_roster,
-        f"got chosen_source={d6.chosen_source!r}",
+        "lilly.com SUBDOMAIN (eu.lilly.com) -> INTERNAL",
+        d6.classified[0].label == LABEL_INTERNAL,
+        f"got label={d6.classified[0].label!r}",
     )
 
-    # --- Golden 7: only the case file is present -> Tier 4 wins ------------
-    d7 = resolve_roster_source(RosterSources(
-        case_file_present=True,
-        case_file_roster=demo_case_file_roster,
-    ))
+    # --- Supplier subdomain ---------------------------------------------------
+    d7 = classify_roster(
+        [Participant("K. Wu", "k.wu@it.acme.com")],
+        SUPPLIER_DOMAINS,
+    )
     _check(
-        "Tier 4 (rfp-case-manager _case_file.json) wins when it is the only "
-        "source present (SKILL.md Step 3 #4)",
-        d7.chosen_source == SOURCE_CASE_FILE and d7.roster == demo_case_file_roster,
-        f"got chosen_source={d7.chosen_source!r}",
+        "supplier domain SUBDOMAIN (it.acme.com under acme.com) -> "
+        "EXPECTED_SUPPLIER",
+        d7.classified[0].label == LABEL_EXPECTED_SUPPLIER,
+        f"got label={d7.classified[0].label!r}",
+    )
+
+    # --- Lookalike domain must NOT match (boundary safety) --------------------
+    d8 = classify_roster(
+        [Participant("Lookalike", "person@notlilly.com")],
+        SUPPLIER_DOMAINS,
+    )
+    _check(
+        "lookalike domain 'notlilly.com' does NOT match 'lilly.com' "
+        "(boundary-safe suffix check) -> FLAG_UNEXPECTED_EXTERNAL, not INTERNAL",
+        d8.classified[0].label == LABEL_FLAG_UNEXPECTED_EXTERNAL,
+        f"got label={d8.classified[0].label!r}",
+    )
+
+    # --- Multiple supplier domains (subsidiary) -------------------------------
+    d9 = classify_roster(
+        [Participant("M. Regional", "m@acme.co.uk")],
+        ("acme.com", "acme.co.uk"),
+    )
+    _check(
+        "second declared supplier domain (subsidiary) -> EXPECTED_SUPPLIER",
+        d9.classified[0].label == LABEL_EXPECTED_SUPPLIER,
+        f"got label={d9.classified[0].label!r}",
+    )
+
+    # --- Single string supplier_domains works the same as a 1-tuple ----------
+    d10a = classify_roster([Participant("J", "j@acme.com")], "acme.com")
+    d10b = classify_roster([Participant("J", "j@acme.com")], ("acme.com",))
+    _check(
+        "supplier_domains as a bare string behaves the same as a 1-tuple",
+        d10a.classified[0].label == d10b.classified[0].label == LABEL_EXPECTED_SUPPLIER,
+        f"got {d10a.classified[0].label!r} vs {d10b.classified[0].label!r}",
+    )
+
+    # --- Case-insensitivity ----------------------------------------------------
+    d11 = classify_roster(
+        [Participant("Upper", "PERSON@ACME.COM"), Participant("Upper2", "A.Patel@Lilly.COM")],
+        SUPPLIER_DOMAINS,
+    )
+    _check(
+        "domain comparison is case-insensitive",
+        d11.classified[0].label == LABEL_EXPECTED_SUPPLIER
+        and d11.classified[1].label == LABEL_INTERNAL,
+        f"got {[c.label for c in d11.classified]}",
     )
 
     print()
     print("=" * 78)
-    print("ABSTAIN / REVIEW CASE (SKILL.md Step 3 #5: 'If none of the above')")
+    print("SAFETY-CRITICAL: never silently include an unexpected external party")
     print("=" * 78)
 
-    # --- ABSTAIN: no source at all -> REVIEW, not a fabricated roster ------
-    d8 = resolve_roster_source(RosterSources())
+    # --- Sweep: assorted unexpected domains always FLAG + always in `flags` --
+    unexpected_domains = [
+        "randomvendor.com", "gmail.com", "outlook.com", "some-other-supplier.net",
+        "consultingfirm.io", "totallydifferent.org", "sub.randomvendor.com",
+    ]
+    sweep_ok = True
+    for dom in unexpected_domains:
+        d = classify_roster([Participant("Sweep", f"person@{dom}")], SUPPLIER_DOMAINS)
+        cp = d.classified[0]
+        if cp.label != LABEL_FLAG_UNEXPECTED_EXTERNAL or cp not in d.flags:
+            sweep_ok = False
     _check(
-        "resolve_roster_source: NO source available -> REVIEW "
-        "(chosen_source='REVIEW', roster=None, needs_review=True); the "
-        "calling skill's own [OWNER?]-placeholder fallback per SKILL.md "
-        "Step 3 #5 is NOT performed by this kernel",
-        d8.chosen_source == SOURCE_REVIEW and d8.roster is None and d8.needs_review is True,
-        f"got chosen_source={d8.chosen_source!r}, roster={d8.roster}, needs_review={d8.needs_review}",
+        "SAFETY-CRITICAL sweep: every unexpected external domain -> "
+        "FLAG_UNEXPECTED_EXTERNAL AND always present in `flags` (never "
+        "silently folded into INTERNAL/EXPECTED_SUPPLIER, never dropped)",
+        sweep_ok,
+        "",
+    )
+
+    # --- Full mixed-roster integration test: one of each of the 5 outcomes --
+    mixed_participants = [
+        Participant("Internal Person", "int@lilly.com"),
+        Participant("Supplier Person", "sup@acme.com"),
+        Participant("Unexpected Person", "who@thirdparty.com"),
+        Participant("Flagged Lilly Person", "flag@lilly.com", in_supplier_context=True),
+        Participant("No Email Person", None),
+    ]
+    d_mixed = classify_roster(mixed_participants, SUPPLIER_DOMAINS, context={"supplier_name": "Acme Corp"})
+    _check(
+        "mixed roster: classified preserves input order and length",
+        [c.identifier for c in d_mixed.classified] == [p.identifier for p in mixed_participants],
+        f"got order {[c.identifier for c in d_mixed.classified]}",
     )
     _check(
-        "REVIEW decision still carries a fully populated trace (all four "
-        "tiers explained), so the refusal itself is auditable",
-        len(d8.trace) == 5,  # 4 tier explanations + 1 final REVIEW line
-        f"trace had {len(d8.trace)} lines: {d8.trace}",
+        "mixed roster: exactly 2 flags (unexpected external + lilly-in-"
+        "supplier-context), exactly 1 needs_review (no email)",
+        len(d_mixed.flags) == 2 and len(d_mixed.needs_review) == 1,
+        f"flags={len(d_mixed.flags)}, needs_review={len(d_mixed.needs_review)}",
+    )
+    _check(
+        "mixed roster: counts dict tallies all 5 labels correctly (1 each)",
+        d_mixed.counts == {
+            LABEL_INTERNAL: 1,
+            LABEL_EXPECTED_SUPPLIER: 1,
+            LABEL_FLAG_UNEXPECTED_EXTERNAL: 1,
+            LABEL_FLAG_LILLY_EMAIL_IN_SUPPLIER_CONTEXT: 1,
+            LABEL_REVIEW: 1,
+        },
+        f"got counts={d_mixed.counts}",
+    )
+    _check(
+        "mixed roster: trace has 1 header line + 1 line per participant",
+        len(d_mixed.trace) == 1 + len(mixed_participants),
+        f"trace had {len(d_mixed.trace)} lines",
+    )
+
+    # --- Empty roster is not an error, not a fabricated participant ----------
+    d_empty = classify_roster([], SUPPLIER_DOMAINS)
+    _check(
+        "empty participants list -> empty classified/flags/needs_review, "
+        "not an error and not a fabricated participant",
+        d_empty.classified == [] and d_empty.flags == [] and d_empty.needs_review == [],
+        f"got classified={d_empty.classified}",
     )
 
     print()
     print("=" * 78)
-    print("NEGATIVE TESTS (must refuse / must not fabricate)")
+    print("NEGATIVE TESTS (must refuse a malformed call, not guess its shape)")
     print("=" * 78)
 
-    # --- Negative: all tiers present but every roster payload is empty ----
-    d9 = resolve_roster_source(RosterSources(
-        issue_id_provided=True,
-        field_guide_has_issue=True,
-        field_guide_issue_roster=[],
-        field_guide_project_present=True,
-        field_guide_project_roster=None,
-        daily_digest_present=True,
-        daily_digest_roster="",
-        case_file_present=True,
-        case_file_roster={},
-    ))
-    _check(
-        "All four tiers report 'present' but every roster payload is empty "
-        "-> still REVIEW, not a fabricated pick of an empty source",
-        d9.chosen_source == SOURCE_REVIEW and d9.needs_review is True,
-        f"got chosen_source={d9.chosen_source!r}",
-    )
-
-    # --- Negative: malformed call (wrong input shape) refuses via exception
     _check_raises(
-        "resolve_roster_source: refuses a plain dict instead of a "
-        "RosterSources instance (malformed call, not a data-availability "
-        "question)",
-        lambda: resolve_roster_source({"issue_id_provided": True}),
-        InvalidSourcesError,
+        "classify_roster: refuses participants that is not a list/tuple",
+        lambda: classify_roster({"not": "a list"}, SUPPLIER_DOMAINS),
+        InvalidParticipantsError,
     )
     _check_raises(
-        "resolve_roster_source: refuses None as the sources argument",
-        lambda: resolve_roster_source(None),
-        InvalidSourcesError,
+        "classify_roster: refuses a participants list containing a non-"
+        "Participant item (e.g. a plain dict)",
+        lambda: classify_roster([{"identifier": "X", "email": "x@acme.com"}], SUPPLIER_DOMAINS),
+        InvalidParticipantsError,
     )
-
-    # --- Negative: Tier 3 present with content should NOT win over Tier 2 --
-    d10 = resolve_roster_source(RosterSources(
-        field_guide_project_present=True,
-        field_guide_project_roster=demo_project_roster,
-        daily_digest_present=True,
-        daily_digest_roster=demo_digest_roster,
-    ))
-    _check(
-        "Tier 2 correctly outranks Tier 3 even though Tier 3's roster is "
-        "listed second in this call (order of precedence is fixed by the "
-        "kernel, not by argument order)",
-        d10.chosen_source == SOURCE_FIELD_GUIDE_PROJECT,
-        f"got chosen_source={d10.chosen_source!r}",
+    _check_raises(
+        "classify_roster: refuses empty supplier_domains (cannot classify "
+        "EXPECTED_SUPPLIER vs FLAG_UNEXPECTED_EXTERNAL with nothing to "
+        "compare against)",
+        lambda: classify_roster([Participant("X", "x@acme.com")], []),
+        InvalidSupplierDomainError,
+    )
+    _check_raises(
+        "classify_roster: refuses supplier_domains == 'lilly.com' (ambiguous "
+        "- overlaps with Lilly's own domain family)",
+        lambda: classify_roster([Participant("X", "x@acme.com")], "lilly.com"),
+        InvalidSupplierDomainError,
+    )
+    _check_raises(
+        "classify_roster: refuses a supplier subdomain of lilly.com (still "
+        "overlaps with Lilly's own domain family)",
+        lambda: classify_roster([Participant("X", "x@acme.com")], "vendor.lilly.com"),
+        InvalidSupplierDomainError,
+    )
+    _check_raises(
+        "classify_roster: refuses a non-string entry inside supplier_domains",
+        lambda: classify_roster([Participant("X", "x@acme.com")], ["acme.com", 12345]),
+        InvalidSupplierDomainError,
+    )
+    _check_raises(
+        "classify_roster: refuses a supplier domain with no '.' (e.g. 'acme')",
+        lambda: classify_roster([Participant("X", "x@acme.com")], "acme"),
+        InvalidSupplierDomainError,
+    )
+    _check_raises(
+        "classify_roster: refuses context that is not a dict",
+        lambda: classify_roster([Participant("X", "x@acme.com")], SUPPLIER_DOMAINS, context="Acme Corp"),
+        InvalidContextError,
     )
 
     print()
