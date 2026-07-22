@@ -1,0 +1,2898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Personal Command Center · Field Guide</title>
+<style>
+/* Lilly design tokens, inlined */
+/* ────────────────────────────────────────────────────────────────
+   Lilly Design System (LDS 3.0) - Colors & Type  [v2]
+   Extracted from:
+   - ux-lds/packages/tokens/tokens/figma-generated/Primitives.Mode 1.json
+   - ux-lds/packages/tokens/tokens/figma-generated/Style Tokens.Lilly.json
+   - ux-lds/packages/tokens/tokens/typography.json
+   - Figma files: "LDS 3.0 Foundations" + "LDS 3.0 Component Library"
+   ────────────────────────────────────────────────────────────────
+   Token naming mirrors the upstream `--lds-g-*` convention so code
+   lifted from the production monorepo drops in cleanly.
+─────────────────────────────────────────────────────────────── */
+
+/* ═══════ FONT FACES ═══════ */
+
+/* ═══════ PRIMITIVES: COLOR HUES (0-step = lightest, 100 = darkest) ═══════ */
+
+:root {
+  /* Neutral - the workhorse. Tuned slightly warmer than pure gray. */
+  --lds-g-color-neutral-000: #ffffff;
+  --lds-g-color-neutral-005: #f5f5f5;
+  --lds-g-color-neutral-010: #f0f0f0;
+  --lds-g-color-neutral-020: #e2e2e2;
+  --lds-g-color-neutral-030: #c5c5c5;
+  --lds-g-color-neutral-040: #afafaf;
+  --lds-g-color-neutral-050: #8a8a8a;
+  --lds-g-color-neutral-060: #6a6a6a;
+  --lds-g-color-neutral-070: #4f5050;
+  --lds-g-color-neutral-080: #3a3a3a;
+  --lds-g-color-neutral-090: #282828;
+  --lds-g-color-neutral-100: #191919; /* Lilly "Black" */
+  --lds-g-color-neutral-105: #111111;
+
+  /* Stone - cool slate for calm surfaces */
+  --lds-g-color-stone-005: #f3f7fa;
+  --lds-g-color-stone-010: #ebf2f7;
+  --lds-g-color-stone-020: #d8e4ec;
+  --lds-g-color-stone-030: #bbc7cf;
+  --lds-g-color-stone-040: #a5b1b9;
+  --lds-g-color-stone-050: #818c94;
+  --lds-g-color-stone-060: #606c73;
+  --lds-g-color-stone-070: #465158;
+  --lds-g-color-stone-080: #303b42;
+  --lds-g-color-stone-090: #1e2a30;
+  --lds-g-color-stone-100: #0f1b21;
+
+  /* Red - Lilly's signature brand hue */
+  --lds-g-color-red-005: #fbf5f4;
+  --lds-g-color-red-010: #f9eeed;
+  --lds-g-color-red-020: #ffdad4;
+  --lds-g-color-red-030: #f6b8ae;
+  --lds-g-color-red-040: #fd9485;
+  --lds-g-color-red-050: #f7513f;
+  --lds-g-color-red-060: #d31710;  /* ⬅︎ Lilly Red (core brand) */
+  --lds-g-color-red-070: #9f180f;
+  --lds-g-color-red-080: #6e1911;
+  --lds-g-color-red-090: #501009;
+  --lds-g-color-red-100: #3d0101;
+
+  /* Teal */
+  --lds-g-color-teal-005: #f0f8fc;
+  --lds-g-color-teal-010: #e5f3f9;
+  --lds-g-color-teal-020: #c3e9f6;
+  --lds-g-color-teal-030: #87d1e6;
+  --lds-g-color-teal-040: #4fbed9;
+  --lds-g-color-teal-050: #1899b3;
+  --lds-g-color-teal-060: #00758a;
+  --lds-g-color-teal-070: #0a5969;
+  --lds-g-color-teal-080: #05404c;
+  --lds-g-color-teal-090: #002c36;
+
+  /* Sage (brand green) */
+  --lds-g-color-sage-010: #e6f4f2;
+  --lds-g-color-sage-020: #beebe6;
+  --lds-g-color-sage-030: #81d5ce;
+  --lds-g-color-sage-040: #54c2b9;
+  --lds-g-color-sage-050: #299b93;
+  --lds-g-color-sage-060: #007773;
+  --lds-g-color-sage-070: #005a56;
+  --lds-g-color-sage-080: #02413d;
+  --lds-g-color-sage-090: #022d2c;
+
+  /* Green (semantic success) */
+  --lds-g-color-green-010: #d4e5f7;
+  --lds-g-color-green-020: #a9cdf2;
+  --lds-g-color-green-040: #4c86d9;
+  --lds-g-color-green-060: #0f3a85;
+  --lds-g-color-green-080: #082452;
+
+  /* Yellow (semantic warning) */
+  --lds-g-color-yellow-010: #f9f0e0;
+  --lds-g-color-yellow-040: #f4c003;
+  --lds-g-color-yellow-060: #846700;
+  --lds-g-color-yellow-080: #483700;
+
+  /* Orange */
+  --lds-g-color-orange-010: #fceee7;
+  --lds-g-color-orange-030: #fab88b;
+  --lds-g-color-orange-050: #fb984d;
+  --lds-g-color-orange-060: #a55500;
+  --lds-g-color-orange-080: #5b2d00;
+
+  /* Pink */
+  --lds-g-color-pink-020: #ffd8df;
+  --lds-g-color-pink-050: #f15082;
+  --lds-g-color-pink-060: #ce1562;
+  --lds-g-color-pink-080: #730932;
+
+  /* Purple */
+  --lds-g-color-purple-020: #eeddf9;
+  --lds-g-color-purple-050: #8c45d3;
+  --lds-g-color-purple-060: #6a32a2;
+  --lds-g-color-purple-080: #4d2475;
+
+  /* Blue */
+  --lds-g-color-blue-010: #edf1fd;
+  --lds-g-color-blue-020: #d4e3ff;
+  --lds-g-color-blue-030: #a4c9ff;
+  --lds-g-color-blue-050: #468ee0;
+  --lds-g-color-blue-060: #1b6cba;
+  --lds-g-color-blue-080: #003a6c;
+
+  /* Cyan */
+  --lds-g-color-cyan-040: #4bbbf3;
+  --lds-g-color-cyan-060: #00729e;
+  --lds-g-color-cyan-080: #003e57;
+
+  /* Transparent (used for inverse borders, scrims) */
+  --lds-g-color-transparent-white-010: rgb(255 255 255 / 0.08);
+  --lds-g-color-transparent-white-020: rgb(255 255 255 / 0.16);
+  --lds-g-color-transparent-white-030: rgb(255 255 255 / 0.28);
+  --lds-g-color-transparent-white-060: rgb(255 255 255 / 0.6);
+  --lds-g-color-transparent-black-010: rgb(0 0 0 / 0.06);
+  --lds-g-color-transparent-black-020: rgb(0 0 0 / 0.14);
+  --lds-g-color-transparent-black-040: rgb(0 0 0 / 0.36);
+  --lds-g-color-transparent-black-060: rgb(0 0 0 / 0.6);
+}
+
+/* ═══════ SEMANTIC TOKENS (Lilly theme, light mode) ═══════ */
+:root {
+  /* Surfaces */
+  --lds-g-color-surface-bright: var(--lds-g-color-neutral-000);     /* cards, sheets */
+  --lds-g-color-surface-dim:    var(--lds-g-color-neutral-005);     /* page bg */
+  --lds-g-color-surface-inverse: var(--lds-g-color-neutral-100);    /* black sections */
+  --lds-g-color-surface-container-1: var(--lds-g-color-neutral-000);
+  --lds-g-color-surface-container-2: var(--lds-g-color-neutral-010);
+  --lds-g-color-surface-container-3: var(--lds-g-color-neutral-020);
+  --lds-g-color-surface-container-inverse-1: var(--lds-g-color-neutral-100);
+  --lds-g-color-surface-container-inverse-2: var(--lds-g-color-neutral-090);
+
+  /* Text / icons ON surface */
+  --lds-g-color-on-surface-1: var(--lds-g-color-neutral-100);       /* headings */
+  --lds-g-color-on-surface-2: var(--lds-g-color-neutral-080);       /* body */
+  --lds-g-color-on-surface-3: var(--lds-g-color-neutral-060);       /* captions / muted */
+  --lds-g-color-on-surface-inverse-1: var(--lds-g-color-neutral-000);
+  --lds-g-color-on-surface-inverse-2: var(--lds-g-color-neutral-020);
+  --lds-g-color-on-surface-inverse-3: var(--lds-g-color-neutral-010);
+
+  /* Borders */
+  --lds-g-color-border-1: var(--lds-g-color-neutral-105);
+  --lds-g-color-border-2: var(--lds-g-color-neutral-060);
+  --lds-g-color-border-3: var(--lds-g-color-neutral-030);
+  --lds-g-color-border-4: var(--lds-g-color-neutral-010);
+  --lds-g-color-border-inverse-1: var(--lds-g-color-transparent-white-060);
+  --lds-g-color-border-inverse-3: var(--lds-g-color-transparent-white-020);
+
+  /* Accent (Lilly = Red; per-brand theme flips this) */
+  --lds-g-color-accent-1: var(--lds-g-color-red-060);               /* primary actions / links */
+  --lds-g-color-accent-2: var(--lds-g-color-red-070);
+  --lds-g-color-accent-3: var(--lds-g-color-blue-080);
+  --lds-g-color-accent-container-1: var(--lds-g-color-red-060);
+  --lds-g-color-on-accent-1: var(--lds-g-color-neutral-000);
+  --lds-g-color-border-accent-1: var(--lds-g-color-red-060);
+  --lds-g-color-accent-soft: var(--lds-g-color-red-010);
+  --lds-g-color-accent-soft-on: var(--lds-g-color-red-080);
+
+  /* Interactive states */
+  --lds-g-color-action-hover: var(--lds-g-color-red-070);
+  --lds-g-color-action-pressed: var(--lds-g-color-red-080);
+  --lds-g-color-focus-ring: var(--lds-g-color-blue-060);
+  --lds-g-color-disabled-surface: var(--lds-g-color-neutral-010);
+  --lds-g-color-disabled-on: var(--lds-g-color-neutral-040);
+
+  /* Status */
+  --lds-g-color-status-success: var(--lds-g-color-green-060);
+  --lds-g-color-status-success-soft: var(--lds-g-color-green-010);
+  --lds-g-color-status-warning: var(--lds-g-color-yellow-040);
+  --lds-g-color-status-warning-soft: var(--lds-g-color-yellow-010);
+  --lds-g-color-status-error: var(--lds-g-color-red-060);
+  --lds-g-color-status-error-soft: var(--lds-g-color-red-010);
+  --lds-g-color-status-info: var(--lds-g-color-blue-060);
+  --lds-g-color-status-info-soft: var(--lds-g-color-blue-010);
+}
+
+/* ═══════ FONT FAMILIES ═══════ */
+:root {
+  --lds-g-font-family-sans-serif: "Ringside", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --lds-g-font-family-sans-serif-wide: "Ringside Extra Wide", "Ringside", system-ui, sans-serif;
+  --lds-g-font-family-serif: "ITC Garamond Narrow", Georgia, "Times New Roman", serif;
+  --lds-g-font-family-mono: ui-monospace, "SF Mono", "Roboto Mono", "Overpass Mono", Menlo, monospace;
+}
+
+/* ═══════ TYPE SCALE (desktop-first; mobile-first values in media below) ═══════ */
+:root {
+  /* Weights */
+  --lds-g-font-weight-400: 400;
+  --lds-g-font-weight-900: 900;
+
+  /* Sizes */
+  --lds-g-font-size-neg-1: 0.875rem;  /* 14 */
+  --lds-g-font-size-0:     1rem;      /* 16 */
+  --lds-g-font-size-1:     1.125rem;  /* 18 */
+  --lds-g-font-size-2:     1.25rem;   /* 20 */
+  --lds-g-font-size-3:     1.5rem;    /* 24 */
+  --lds-g-font-size-4:     1.75rem;   /* 28 */
+  --lds-g-font-size-5:     2rem;      /* 32 */
+  --lds-g-font-size-6:     2.25rem;   /* 36 */
+  --lds-g-font-size-7:     2.5rem;    /* 40 */
+  --lds-g-font-size-8:     3rem;      /* 48 */
+  --lds-g-font-size-9:     3.5rem;    /* 56 */
+  --lds-g-font-size-10:    4rem;      /* 64 */
+  --lds-g-font-size-caption: 0.75rem; /* 12 */
+  --lds-g-font-size-eyebrow: 0.75rem; /* 12 wide */
+
+  /* Line heights (in rems, matching upstream scale) */
+  --lds-g-lh-3:  1.25rem;
+  --lds-g-lh-6:  1.5rem;
+  --lds-g-lh-9:  1.75rem;
+  --lds-g-lh-10: 2rem;
+  --lds-g-lh-11: 2.25rem;
+  --lds-g-lh-12: 2.5rem;
+  --lds-g-lh-15: 1.1;    /* display-tight */
+  --lds-g-lh-18: 1.15;
+  --lds-g-lh-19: 1.1;
+  --lds-g-lh-20: 1.04;
+
+  /* Letter spacing */
+  --lds-g-tracking-tight-1:   -0.01em;
+  --lds-g-tracking-tight-1-5: -0.015em;
+  --lds-g-tracking-tight-2:   -0.02em;
+  --lds-g-tracking-tight-2-5: -0.025em;
+  --lds-g-tracking-tight-4:   -0.04em;
+  --lds-g-tracking-tight-5:   -0.05em;
+  --lds-g-tracking-eyebrow:    0.04em; /* wide is its own flavor; small positive tracking feels right */
+}
+
+/* ═══════ SPACING (4px base unit) ═══════ */
+:root {
+  --lds-g-spacing-0:    0;
+  --lds-g-spacing-025:  0.125rem;   /* 2 */
+  --lds-g-spacing-050:  0.25rem;    /* 4 */
+  --lds-g-spacing-100:  0.5rem;     /* 8 */
+  --lds-g-spacing-150:  0.75rem;    /* 12 */
+  --lds-g-spacing-200:  1rem;       /* 16 */
+  --lds-g-spacing-300:  1.5rem;     /* 24 */
+  --lds-g-spacing-400:  2rem;       /* 32 */
+  --lds-g-spacing-500:  2.5rem;     /* 40 */
+  --lds-g-spacing-600:  3rem;       /* 48 */
+  --lds-g-spacing-800:  4rem;       /* 64 */
+  --lds-g-spacing-1000: 5rem;       /* 80 */
+  --lds-g-spacing-1200: 6rem;       /* 96 */
+  --lds-g-spacing-1600: 8rem;       /* 128 */
+}
+
+/* ═══════ RADIUS / ELEVATION / MOTION ═══════ */
+:root {
+  --lds-g-radius-0:   0;
+  --lds-g-radius-025: 2px;
+  --lds-g-radius-050: 4px;
+  --lds-g-radius-100: 8px;
+  --lds-g-radius-150: 12px;
+  --lds-g-radius-200: 16px;
+  --lds-g-radius-300: 24px;
+  --lds-g-radius-pill: 999px;
+
+  /* Shadow system - canonical tokens matching tokens.css */
+  --lds-g-shadow-bottom-1: 0px 2px 4px 0px rgba(52, 63, 65, 0.2);
+  --lds-g-shadow-bottom-2: 0px 2px 4px 0px rgba(52, 63, 65, 0.16), 0px 4px 6px 0px rgba(52, 63, 65, 0.1);
+  --lds-g-shadow-bottom-3: 0px 4px 8px 0px rgba(52, 63, 65, 0.04), 0px 8px 12px 0px rgba(52, 63, 65, 0.12);
+  --lds-g-shadow-bottom-4: 0px 4px 12px 0px rgba(52, 63, 65, 0.08), 0px 18px 28px 0px rgba(52, 63, 65, 0.12);
+  --lds-g-shadow-top-1: 0px -2px 4px 0px rgba(52, 63, 65, 0.2);
+  --lds-g-shadow-top-2: 0px -2px 4px 0px rgba(52, 63, 65, 0.16), 0px -4px 6px 0px rgba(52, 63, 65, 0.1);
+  --lds-g-shadow-top-3: 0px -4px 8px 0px rgba(52, 63, 65, 0.04), 0px -8px 12px 0px rgba(52, 63, 65, 0.12);
+  --lds-g-shadow-top-4: 0px -4px 12px 0px rgba(52, 63, 65, 0.08), 0px -18px 28px 0px rgba(52, 63, 65, 0.12);
+
+  /* Motion */
+  --lds-g-duration-xs: 80ms;
+  --lds-g-duration-s:  160ms;
+  --lds-g-duration-m:  240ms;
+  --lds-g-duration-l:  320ms;
+  --lds-g-duration-xl: 480ms;
+  --lds-g-easing-standard:     cubic-bezier(0.2, 0, 0, 1);
+  --lds-g-easing-emphasized:   cubic-bezier(0.3, 0, 0, 1);
+  --lds-g-easing-decelerated:  cubic-bezier(0, 0, 0, 1);
+  --lds-g-easing-accelerated:  cubic-bezier(0.3, 0, 1, 1);
+
+  /* Breakpoints (reference only - consume in @media) */
+  --lds-g-breakpoint-xs: 0;
+  --lds-g-breakpoint-sm: 768px;
+  --lds-g-breakpoint-md: 1024px;
+  --lds-g-breakpoint-lg: 1280px;
+  --lds-g-breakpoint-xl: 1600px;
+}
+
+/* ═══════ COMPOSITE TYPE STYLES ═══════ */
+/* Use these directly (class or mixin-style). Upstream packs these into
+   `--lds-g-typography-ringside-*-desktop` composite tokens; we split to
+   the parts so plain CSS can hit them. */
+
+.lds-text-display-1 {
+  font-family: var(--lds-g-font-family-sans-serif-wide);
+  font-weight: 900;
+  font-size: var(--lds-g-font-size-10);
+  line-height: var(--lds-g-lh-20);
+  letter-spacing: var(--lds-g-tracking-tight-5);
+}
+.lds-text-display-1-serif {
+  font-family: var(--lds-g-font-family-serif);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-10);
+  line-height: var(--lds-g-lh-20);
+  letter-spacing: var(--lds-g-tracking-tight-2-5);
+}
+.lds-text-display-2 {
+  font-family: var(--lds-g-font-family-sans-serif-wide);
+  font-weight: 900;
+  font-size: var(--lds-g-font-size-9);
+  line-height: var(--lds-g-lh-19);
+  letter-spacing: var(--lds-g-tracking-tight-4);
+}
+
+.lds-text-heading-1, h1 {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-9);
+  line-height: var(--lds-g-lh-19);
+  letter-spacing: var(--lds-g-tracking-tight-2-5);
+  color: var(--lds-g-color-on-surface-1);
+}
+.lds-text-heading-2, h2 {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-8);
+  line-height: var(--lds-g-lh-18);
+  letter-spacing: var(--lds-g-tracking-tight-2);
+  color: var(--lds-g-color-on-surface-1);
+}
+.lds-text-heading-3, h3 {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-6);
+  line-height: var(--lds-g-lh-12);
+  letter-spacing: var(--lds-g-tracking-tight-2);
+  color: var(--lds-g-color-on-surface-1);
+}
+.lds-text-heading-4, h4 {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-5);
+  line-height: var(--lds-g-lh-12);
+  letter-spacing: var(--lds-g-tracking-tight-2);
+  color: var(--lds-g-color-on-surface-1);
+}
+.lds-text-heading-5, h5 {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-4);
+  line-height: var(--lds-g-lh-11);
+  color: var(--lds-g-color-on-surface-1);
+}
+.lds-text-heading-6, h6 {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-3);
+  line-height: var(--lds-g-lh-9);
+  color: var(--lds-g-color-on-surface-1);
+}
+
+.lds-text-heading-1-serif { font-family: var(--lds-g-font-family-serif); }
+.lds-text-heading-2-serif { font-family: var(--lds-g-font-family-serif); }
+h1.serif, h2.serif, h3.serif, h4.serif { font-family: var(--lds-g-font-family-serif); }
+
+/* Heading "bold" and "wide" modifiers (per LDS mixin) */
+h1.bold, h2.bold, h3.bold, h4.bold, h5.bold, h6.bold { font-weight: 900; }
+h1.wide, h2.wide, h3.wide, h4.wide, h5.wide, h6.wide { font-family: var(--lds-g-font-family-sans-serif-wide); }
+
+/* Body / block */
+.lds-text-body-large {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-size: var(--lds-g-font-size-1);
+  line-height: 1.6;
+  color: var(--lds-g-color-on-surface-2);
+}
+.lds-text-body-medium, p, li, dd {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-size: var(--lds-g-font-size-0);
+  line-height: 1.6;
+  color: var(--lds-g-color-on-surface-2);
+  text-wrap: pretty;
+}
+.lds-text-body-small {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-size: var(--lds-g-font-size-neg-1);
+  line-height: 1.5;
+  color: var(--lds-g-color-on-surface-2);
+}
+
+/* Specials */
+.lds-text-special-caption {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-size: var(--lds-g-font-size-caption);
+  line-height: var(--lds-g-lh-3);
+  color: var(--lds-g-color-on-surface-3);
+}
+.lds-text-special-cta-button {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 900;
+  font-size: var(--lds-g-font-size-0);
+  line-height: 1.25;
+  letter-spacing: var(--lds-g-tracking-tight-1);
+}
+.lds-text-special-cta-text-link {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-weight: 900;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--lds-g-color-accent-1);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1.5px;
+}
+.lds-text-special-eyebrow {
+  font-family: var(--lds-g-font-family-sans-serif-wide);
+  font-weight: 400;
+  font-size: var(--lds-g-font-size-eyebrow);
+  line-height: 1.33;
+  letter-spacing: var(--lds-g-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--lds-g-color-accent-2);
+}
+
+/* Body text scale - mobile tightening */
+@media (max-width: 767px) {
+  .lds-text-display-1 { font-size: var(--lds-g-font-size-7); }
+  .lds-text-display-2 { font-size: var(--lds-g-font-size-6); }
+  h1, .lds-text-heading-1 { font-size: var(--lds-g-font-size-7); }
+  h2, .lds-text-heading-2 { font-size: var(--lds-g-font-size-6); }
+  h3, .lds-text-heading-3 { font-size: var(--lds-g-font-size-5); }
+  h4, .lds-text-heading-4 { font-size: var(--lds-g-font-size-4); }
+}
+
+/* ═══════ BRAND PALETTE TOKENS (brand-specific hues from Primitives) ═══════ */
+:root {
+  /* Zepbound - brand Green */
+  --lds-g-color-palette-zepbound-005: #f4fceb;
+  --lds-g-color-palette-zepbound-010: #e4f8cd;
+  --lds-g-color-palette-zepbound-020: #b7f485;
+  --lds-g-color-palette-zepbound-030: #79de00;
+  --lds-g-color-palette-zepbound-040: #59c21f;
+  --lds-g-color-palette-zepbound-050: #40a929;
+  --lds-g-color-palette-zepbound-060: #267e10;
+  --lds-g-color-palette-zepbound-070: #1d680c;
+  --lds-g-color-palette-zepbound-080: #104804;
+
+  /* Mounjaro - brand Purple */
+  --lds-g-color-palette-mounjaro-005: #fef4ff;
+  --lds-g-color-palette-mounjaro-010: #fbecff;
+  --lds-g-color-palette-mounjaro-020: #f1d9ff;
+  --lds-g-color-palette-mounjaro-030: #e0b6ff;
+  --lds-g-color-palette-mounjaro-040: #cc93fa;
+  --lds-g-color-palette-mounjaro-050: #af69e7;
+  --lds-g-color-palette-mounjaro-060: #8e49c5;
+  --lds-g-color-palette-mounjaro-070: #742dab;
+  --lds-g-color-palette-mounjaro-080: #5d0096;
+
+  /* Ebglyss - brand Blue (periwinkle) */
+  --lds-g-color-palette-ebglyss-005: #f7f6ff;
+  --lds-g-color-palette-ebglyss-010: #eff0ff;
+  --lds-g-color-palette-ebglyss-020: #e3e7ff;
+  --lds-g-color-palette-ebglyss-030: #bccaff;
+  --lds-g-color-palette-ebglyss-040: #a0b1ef;
+  --lds-g-color-palette-ebglyss-050: #7d8fca;
+  --lds-g-color-palette-ebglyss-060: #4d5f96;
+  --lds-g-color-palette-ebglyss-070: #38497f;
+  --lds-g-color-palette-ebglyss-080: #22346a;
+
+  /* Jaypirca - brand Magenta */
+  --lds-g-color-palette-jaypirca-005: #fff5f5;
+  --lds-g-color-palette-jaypirca-010: #ffecee;
+  --lds-g-color-palette-jaypirca-020: #ffe1e5;
+  --lds-g-color-palette-jaypirca-030: #ffc2ce;
+  --lds-g-color-palette-jaypirca-040: #ff8eaa;
+  --lds-g-color-palette-jaypirca-050: #f4447e;
+  --lds-g-color-palette-jaypirca-060: #d70061;
+  --lds-g-color-palette-jaypirca-070: #b70053;
+  --lds-g-color-palette-jaypirca-080: #7e0037;
+
+  /* Kisunla - brand Orange */
+  --lds-g-color-palette-kisunla-005: #fff5ec;
+  --lds-g-color-palette-kisunla-010: #fcf0e5;
+  --lds-g-color-palette-kisunla-020: #ffdcc5;
+  --lds-g-color-palette-kisunla-030: #ffba93;
+  --lds-g-color-palette-kisunla-040: #ff8500;
+  --lds-g-color-palette-kisunla-050: #e56b00;
+  --lds-g-color-palette-kisunla-060: #c25400;
+  --lds-g-color-palette-kisunla-070: #7c3300;
+  --lds-g-color-palette-kisunla-080: #632700;
+
+  /* Orforglipron - brand Electric Blueberry */
+  --lds-g-color-palette-orfo-005: #f6f5ff;
+  --lds-g-color-palette-orfo-010: #e6e7f6;
+  --lds-g-color-palette-orfo-020: #d0d6f4;
+  --lds-g-color-palette-orfo-030: #b5c5ff;
+  --lds-g-color-palette-orfo-040: #8da8ff;
+  --lds-g-color-palette-orfo-050: #527efb;
+  --lds-g-color-palette-orfo-060: #4971d0;
+  --lds-g-color-palette-orfo-070: #2b57b5;
+  --lds-g-color-palette-orfo-080: #07409e;
+}
+
+/* ═══════ BRAND THEME SWAPS ═══════
+   Apply data-lds-theme on any scope to swap accent/action.
+   Source: Color.Brands.{Brand} in Primitives.Mode 1.json */
+[data-lds-theme="zepbound"]  { --lds-g-color-accent-1: var(--lds-g-color-palette-zepbound-060);  --lds-g-color-accent-2: var(--lds-g-color-palette-zepbound-070);  --lds-g-color-accent-soft: var(--lds-g-color-palette-zepbound-020);  --lds-g-color-border-accent-1: var(--lds-g-color-palette-zepbound-060);  --lds-g-color-action-1: var(--lds-g-color-palette-zepbound-060);  --lds-g-color-action-2: var(--lds-g-color-palette-zepbound-070);  --lds-g-color-action-container-1: var(--lds-g-color-palette-zepbound-060); }
+[data-lds-theme="mounjaro"]  { --lds-g-color-accent-1: var(--lds-g-color-palette-mounjaro-060);  --lds-g-color-accent-2: var(--lds-g-color-palette-mounjaro-070);  --lds-g-color-accent-soft: var(--lds-g-color-palette-mounjaro-020);  --lds-g-color-border-accent-1: var(--lds-g-color-palette-mounjaro-060);  --lds-g-color-action-1: var(--lds-g-color-palette-mounjaro-060);  --lds-g-color-action-2: var(--lds-g-color-palette-mounjaro-070);  --lds-g-color-action-container-1: var(--lds-g-color-palette-mounjaro-060); }
+[data-lds-theme="ebglyss"]   { --lds-g-color-accent-1: var(--lds-g-color-palette-ebglyss-060);  --lds-g-color-accent-2: var(--lds-g-color-palette-ebglyss-070);  --lds-g-color-accent-soft: var(--lds-g-color-palette-ebglyss-020);  --lds-g-color-border-accent-1: var(--lds-g-color-palette-ebglyss-060);  --lds-g-color-action-1: var(--lds-g-color-palette-ebglyss-060);  --lds-g-color-action-2: var(--lds-g-color-palette-ebglyss-070);  --lds-g-color-action-container-1: var(--lds-g-color-palette-ebglyss-060); }
+[data-lds-theme="jaypirca"]  { --lds-g-color-accent-1: var(--lds-g-color-palette-jaypirca-060); --lds-g-color-accent-2: var(--lds-g-color-palette-jaypirca-070); --lds-g-color-accent-soft: var(--lds-g-color-palette-jaypirca-020); --lds-g-color-border-accent-1: var(--lds-g-color-palette-jaypirca-060); --lds-g-color-action-1: var(--lds-g-color-palette-jaypirca-060); --lds-g-color-action-2: var(--lds-g-color-palette-jaypirca-070); --lds-g-color-action-container-1: var(--lds-g-color-palette-jaypirca-060); }
+[data-lds-theme="kisunla"]   { --lds-g-color-accent-1: var(--lds-g-color-palette-kisunla-060);  --lds-g-color-accent-2: var(--lds-g-color-palette-kisunla-070);  --lds-g-color-accent-soft: var(--lds-g-color-palette-kisunla-020);  --lds-g-color-border-accent-1: var(--lds-g-color-palette-kisunla-060);  --lds-g-color-action-1: var(--lds-g-color-palette-kisunla-060);  --lds-g-color-action-2: var(--lds-g-color-palette-kisunla-070);  --lds-g-color-action-container-1: var(--lds-g-color-palette-kisunla-060); }
+[data-lds-theme="orfo"]      { --lds-g-color-accent-1: var(--lds-g-color-palette-orfo-060);     --lds-g-color-accent-2: var(--lds-g-color-palette-orfo-070);     --lds-g-color-accent-soft: var(--lds-g-color-palette-orfo-020);     --lds-g-color-border-accent-1: var(--lds-g-color-palette-orfo-060);     --lds-g-color-action-1: var(--lds-g-color-palette-orfo-060);     --lds-g-color-action-2: var(--lds-g-color-palette-orfo-070);     --lds-g-color-action-container-1: var(--lds-g-color-palette-orfo-060); }
+
+/* ═══════ BASE ═══════ */
+body {
+  font-family: var(--lds-g-font-family-sans-serif);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--lds-g-color-on-surface-2);
+  background: var(--lds-g-color-surface-dim);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+  .fg-io{display:inline-flex;gap:12px;margin-left:18px}
+  .fg-io-btn{font-family:var(--lds-g-font-family-mono);font-size:11px;letter-spacing:.02em;color:#9aa0a6;background:none;border:0;padding:0;cursor:pointer}
+  .fg-io-btn:hover{color:#fff;text-decoration:underline}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sacramento&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--lds-g-color-neutral-005);
+    color: var(--lds-g-color-on-surface-1);
+    font-family: var(--lds-g-font-family-sans-serif);
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  /* ───────── Board shell (the widget card) ───────── */
+  .fg {
+    width: 100%;
+    max-width: 1180px;
+    background: var(--lds-g-color-neutral-000);
+    border: 1px solid var(--lds-g-color-neutral-020);
+    border-radius: var(--lds-g-radius-150);
+    box-shadow: var(--lds-g-shadow-bottom-4);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 48px);
+  }
+
+  /* ───────── Top bar ───────── */
+  .fg-top {
+    flex: 0 0 auto;
+    background: var(--lds-g-color-neutral-100);
+    color: #fff;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 12px 22px 13px;
+  }
+  .fg-dino { font-size: 34px; line-height: 1; filter: saturate(1.1); }
+  .fg-word { display: flex; flex-direction: row; align-items: baseline; gap: 14px; flex: 0 0 auto; }
+  .fg-word b {
+    font-family: var(--lds-g-font-family-sans-serif-wide);
+    font-weight: 900;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    line-height: 1;
+    white-space: nowrap;
+    color: #fff;
+  }
+  .fg-word .fg-sub {
+    font-family: "Sacramento", cursive;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--lds-g-color-neutral-040);
+    letter-spacing: 0.01em;
+    text-transform: none;
+    white-space: nowrap;
+  }
+  .fg-div { width: 1px; height: 16px; background: rgba(255, 255, 255, 0.22); align-self: baseline; transform: translateY(2px); }
+  .fg-top-right {
+    margin-left: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+  }
+  .fg-clock, .fg-synced {
+    font-family: var(--lds-g-font-family-mono);
+    font-size: 11.5px;
+    color: var(--lds-g-color-neutral-040);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .fg-synced { display: inline-flex; align-items: center; gap: 7px; }
+  .synced-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--lds-g-color-green-040);
+    box-shadow: 0 0 0 3px rgba(76, 134, 217, 0.18);
+    flex: 0 0 auto;
+  }
+  .fg-ghost {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--lds-g-color-transparent-white-020);
+    color: var(--lds-g-color-neutral-020);
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 900;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .16s, border-color .16s, color .16s;
+    white-space: nowrap;
+  }
+  .fg-ghost:hover { background: var(--lds-g-color-transparent-white-010); color: #fff; border-color: var(--lds-g-color-transparent-white-030); }
+
+  /* ───────── Split body ───────── */
+  .fg-body { flex: 1 1 auto; display: flex; min-height: 0; }
+
+  /* Left rail */
+  .fg-rail {
+    flex: 0 0 322px;
+    border-right: 1px solid var(--lds-g-color-neutral-020);
+    background: var(--lds-g-color-neutral-005);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .fg-rail-head {
+    flex: 0 0 auto;
+    padding: 12px;
+    border-bottom: 1px solid var(--lds-g-color-neutral-020);
+  }
+  .mode-toggle {
+    display: flex;
+    gap: 4px;
+    background: var(--lds-g-color-neutral-010);
+    border: 1px solid var(--lds-g-color-neutral-020);
+    border-radius: 10px;
+    padding: 3px;
+  }
+  .mode-btn {
+    flex: 1;
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 900;
+    font-size: 12px;
+    padding: 8px 6px;
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--lds-g-color-on-surface-3);
+    transition: background .14s, color .14s;
+    white-space: nowrap;
+  }
+  .mode-btn:hover { color: var(--lds-g-color-on-surface-1); }
+  .mode-btn.is-on {
+    background: var(--lds-g-color-neutral-000);
+    color: var(--lds-g-color-red-070);
+    box-shadow: var(--lds-g-shadow-bottom-1);
+  }
+  .sort-row { display: flex; gap: 4px; margin-top: 8px; }
+  .sort-btn {
+    flex: 1;
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 700;
+    font-size: 11px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--lds-g-color-on-surface-3);
+    transition: background .14s, color .14s;
+  }
+  .sort-btn:hover { color: var(--lds-g-color-on-surface-1); }
+  .sort-btn.is-on { background: var(--lds-g-color-red-010); color: var(--lds-g-color-red-070); }
+  .fg-list { flex: 1 1 auto; overflow-y: auto; padding: 8px; }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    text-align: left;
+    appearance: none;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--lds-g-radius-100);
+    padding: 11px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .14s, border-color .14s;
+  }
+  .row + .row { margin-top: 2px; }
+  .row.is-staged { background: var(--lds-g-color-green-010); }
+  .row:hover { background: var(--lds-g-color-neutral-010); }
+  .row.is-active {
+    background: var(--lds-g-color-neutral-000);
+    border-color: var(--lds-g-color-neutral-020);
+    box-shadow: var(--lds-g-shadow-bottom-1);
+  }
+  .row.is-active::before {
+    content: "";
+    position: absolute;
+    left: -8px; top: 8px; bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--lds-g-color-red-060);
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; margin: 0 auto; }
+  .dot.high { background: var(--lds-g-color-red-060); }
+  .dot.med { background: transparent; border: 1.5px solid var(--lds-g-color-neutral-040); }
+  .row-main { min-width: 0; }
+  .row-id {
+    font-family: var(--lds-g-font-family-mono);
+    font-size: 10.5px;
+    color: var(--lds-g-color-on-surface-3);
+    letter-spacing: 0.02em;
+  }
+  .row-title {
+    font-size: 13.5px;
+    font-weight: 400;
+    color: var(--lds-g-color-on-surface-1);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row.is-active .row-title { font-weight: 900; }
+  .row-meta { font-size: 11px; line-height: 1.3; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--lds-g-color-on-surface-3); }
+  .m-due.soon { color: var(--lds-g-color-red-070); font-weight: 900; }
+  .m-due.set { color: var(--lds-g-color-on-surface-2); font-weight: 700; }
+  .m-due.none { color: var(--lds-g-color-neutral-040); }
+  .m-age { color: var(--lds-g-color-on-surface-3); }
+  .rsep { color: var(--lds-g-color-neutral-030); margin: 0 5px; }
+  .stagemark {
+    width: 17px; height: 17px;
+    border-radius: 50%;
+    background: var(--lds-g-color-green-060);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 900;
+    flex: 0 0 auto;
+    visibility: hidden;
+  }
+  .row.is-staged .stagemark { visibility: visible; }
+
+  .list-foot {
+    font-size: 11px;
+    color: var(--lds-g-color-on-surface-3);
+    padding: 14px 14px 6px;
+    line-height: 1.45;
+  }
+
+  /* Right panel */
+  .fg-panel { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .panel-scroll { flex: 1 1 auto; overflow-y: auto; padding: 26px 32px 22px; }
+  .panel-dock {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--lds-g-color-neutral-020);
+    background: var(--lds-g-color-neutral-000);
+    padding: 14px 32px 16px;
+  }
+  .panel-dock:empty { display: none; }
+  .panel-dock .zone { margin: 0; }
+  .panel-dock textarea.dir { min-height: 60px; }
+
+  .p-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
+  .p-idchip {
+    font-family: var(--lds-g-font-family-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--lds-g-color-on-surface-2);
+    background: var(--lds-g-color-neutral-010);
+    border: 1px solid var(--lds-g-color-neutral-020);
+    padding: 5px 10px;
+    border-radius: var(--lds-g-radius-050);
+    flex: 0 0 auto;
+    margin-top: 3px;
+  }
+  .p-titlewrap { min-width: 0; flex: 1 1 auto; }
+  .p-title {
+    font-size: 21px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--lds-g-color-on-surface-1);
+    margin: 0 0 8px;
+  }
+  .p-meta { font-size: 12px; line-height: 1.6; color: var(--lds-g-color-on-surface-3); }
+  .p-meta .psep { color: var(--lds-g-color-neutral-030); margin: 0 8px; }
+  .p-meta .pm-lbl { text-transform: uppercase; font-size: 9.5px; letter-spacing: 0.05em; color: var(--lds-g-color-neutral-040); font-weight: 700; margin-right: 5px; }
+  .pm-due.soon { color: var(--lds-g-color-red-070); font-weight: 900; }
+  .pm-prio.high { color: var(--lds-g-color-red-070); font-weight: 900; }
+  .pm-prio.med { color: var(--lds-g-color-on-surface-2); font-weight: 700; }
+
+  .p-idchip.date {
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 11px;
+    color: var(--lds-g-color-red-080);
+    background: var(--lds-g-color-red-010);
+    border-color: var(--lds-g-color-red-020);
+  }
+  .prep p { margin: 0 0 11px; font-size: 13px; line-height: 1.6; color: var(--lds-g-color-on-surface-2); }
+  .prep p:last-child { margin-bottom: 0; }
+  .prep strong { color: var(--lds-g-color-on-surface-1); font-weight: 900; }
+
+  /* Structured content: lead line, labeled groups, lists */
+  .zone-body .lead { margin: 0 0 12px; }
+  .zone-body .lead:last-child { margin-bottom: 0; }
+  .zone-body .grp {
+    font-weight: 900;
+    color: var(--lds-g-color-on-surface-1);
+    font-size: 12px;
+    letter-spacing: 0.01em;
+    margin: 16px 0 7px;
+  }
+  .zone-body ul, .zone-body ol { margin: 0; padding-left: 19px; }
+  .zone-body li { margin: 0 0 6px; font-size: 13px; line-height: 1.55; }
+  .zone-body li:last-child { margin-bottom: 0; }
+  .zone-body li strong, .zone-body .lead strong { color: var(--lds-g-color-on-surface-1); font-weight: 900; }
+  .zone-body .src { color: var(--lds-g-color-on-surface-3); font-weight: 700; }
+  .zone-body p { margin: 0 0 11px; font-size: 13px; line-height: 1.6; }
+  .zone-body p:last-child { margin-bottom: 0; }
+
+  /* Welcome / start panel */
+  .welcome { max-width: 640px; }
+  .welcome-dino { font-size: 48px; line-height: 1; margin-bottom: 14px; }
+  .welcome h1 {
+    font-family: var(--lds-g-font-family-serif);
+    font-size: 34px; line-height: 1.1; letter-spacing: -0.01em;
+    margin: 0 0 14px; color: var(--lds-g-color-on-surface-1);
+  }
+  .welcome > p { font-size: 15px; line-height: 1.65; color: var(--lds-g-color-on-surface-2); margin: 0 0 18px; }
+  .welcome-steps { display: flex; flex-direction: column; gap: 13px; margin: 24px 0 22px; }
+  .wstep { display: flex; gap: 13px; align-items: flex-start; }
+  .wstep > span {
+    flex: 0 0 25px; height: 25px; border-radius: 50%;
+    background: var(--lds-g-color-red-060); color: #fff;
+    font-weight: 900; font-size: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .wstep > div { font-size: 14px; line-height: 1.5; color: var(--lds-g-color-on-surface-2); }
+  .wstep b { color: var(--lds-g-color-on-surface-1); font-weight: 900; }
+  .welcome-hint {
+    font-size: 13px; color: var(--lds-g-color-on-surface-3);
+    border-top: 1px solid var(--lds-g-color-neutral-020);
+    padding-top: 16px; margin: 0;
+  }
+
+  .zone { margin-bottom: 22px; }
+  .zone-lbl {
+    font-family: var(--lds-g-font-family-sans-serif-wide);
+    font-weight: 900;
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--lds-g-color-on-surface-3);
+    margin: 0 0 9px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .zone-lbl::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--lds-g-color-neutral-020); }
+  .zone-body { font-size: 13px; line-height: 1.6; color: var(--lds-g-color-on-surface-2); }
+  .zone-body strong { color: var(--lds-g-color-on-surface-1); font-weight: 900; }
+
+  .rec {
+    background: var(--lds-g-color-red-005);
+    border: 1px solid var(--lds-g-color-red-020);
+    border-left: 3px solid var(--lds-g-color-red-060);
+    border-radius: var(--lds-g-radius-100);
+    padding: 15px 18px;
+  }
+  .rec .zone-body { color: var(--lds-g-color-on-surface-1); }
+
+  /* Direction zone */
+  .dir-lbl { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .staged-chip {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: var(--lds-g-color-green-060);
+    background: var(--lds-g-color-green-010);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .staged-chip.show { display: inline-flex; }
+  textarea.dir {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--lds-g-color-neutral-100);
+    background: var(--lds-g-color-neutral-000);
+    border: 1px solid var(--lds-g-color-neutral-030);
+    border-radius: var(--lds-g-radius-100);
+    padding: 13px 15px;
+    transition: border-color .16s, box-shadow .16s;
+  }
+  textarea.dir::placeholder { color: var(--lds-g-color-on-surface-3); }
+  textarea.dir:focus {
+    outline: none;
+    border: 1.5px solid var(--lds-g-color-red-060);
+    box-shadow: 0 0 0 4px var(--lds-g-color-red-010);
+  }
+  .dir-actions { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+  .btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: -0.005em;
+    padding: 11px 20px;
+    border-radius: 999px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: background .16s, color .16s, border-color .16s, transform .08s, opacity .16s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn--stage { background: var(--lds-g-color-neutral-100); color: #fff; }
+  .btn--stage:hover { background: var(--lds-g-color-neutral-090); }
+  .btn--stage:disabled { background: var(--lds-g-color-neutral-020); color: var(--lds-g-color-neutral-050); cursor: not-allowed; }
+  .btn--clear {
+    background: transparent;
+    color: var(--lds-g-color-on-surface-3);
+    border-color: transparent;
+    font-size: 13px;
+    padding: 11px 8px;
+  }
+  .btn--clear:hover { color: var(--lds-g-color-red-070); }
+  .btn--clear:disabled { opacity: 0; pointer-events: none; }
+
+  /* ───────── Submit bar ───────── */
+  .fg-foot {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--lds-g-color-neutral-020);
+    background: var(--lds-g-color-neutral-000);
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .foot-summary { font-size: 13px; color: var(--lds-g-color-on-surface-2); display: flex; align-items: center; gap: 9px; }
+  .foot-count {
+    font-family: var(--lds-g-font-family-mono);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--lds-g-color-red-080);
+    background: var(--lds-g-color-red-010);
+    border-radius: 999px;
+    padding: 3px 9px;
+    min-width: 22px;
+    text-align: center;
+  }
+  .foot-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .fg-pacer { position: relative; flex: 1 1 auto; min-width: 90px; height: 26px; align-self: center; }
+  .fg-pacer-dino { position: absolute; bottom: -2px; left: 0; font-size: 22px; line-height: 1; transform-origin: center bottom; }
+  .fg-roar {
+    position: absolute; bottom: 27px; left: 0;
+    color: var(--lds-g-color-neutral-100);
+    font-family: var(--lds-g-font-family-sans-serif); font-weight: 900; font-size: 11px;
+    letter-spacing: 0.02em;
+    opacity: 0; transition: opacity .2s, transform .2s; white-space: nowrap; pointer-events: none;
+    transform: translateY(6px);
+  }
+  .fg-roar.show { opacity: 1; }
+  .btn--resetall {
+    background: transparent;
+    color: var(--lds-g-color-on-surface-3);
+    font-size: 13px;
+    padding: 11px 14px;
+  }
+  .btn--resetall:hover { color: var(--lds-g-color-on-surface-1); }
+  .btn--resetall:disabled { opacity: .4; pointer-events: none; }
+  .btn--submit { background: var(--lds-g-color-red-060); color: #fff; padding: 13px 26px; font-size: 15px; }
+  .btn--submit:hover { background: var(--lds-g-color-red-070); }
+  .btn--submit:disabled { background: var(--lds-g-color-neutral-020); color: var(--lds-g-color-neutral-050); cursor: not-allowed; }
+
+  /* ───────── Submit preview overlay ───────── */
+  .scrim {
+    position: fixed; inset: 0;
+    background: var(--lds-g-color-transparent-black-060);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    z-index: 40;
+  }
+  .scrim.show { display: flex; }
+  .sheet {
+    width: 100%;
+    max-width: 660px;
+    max-height: 84vh;
+    background: var(--lds-g-color-neutral-000);
+    border-radius: var(--lds-g-radius-150);
+    box-shadow: var(--lds-g-shadow-bottom-4);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .sheet-head { padding: 22px 26px 16px; border-bottom: 1px solid var(--lds-g-color-neutral-020); }
+  .sheet-head h2 { font-size: 22px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .sheet-head p { font-size: 13.5px; color: var(--lds-g-color-on-surface-3); margin: 0; line-height: 1.5; }
+  .sheet-body { padding: 20px 26px; overflow-y: auto; }
+  .promptbox {
+    font-family: var(--lds-g-font-family-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--lds-g-color-on-surface-1);
+    background: var(--lds-g-color-neutral-005);
+    border: 1px solid var(--lds-g-color-neutral-020);
+    border-radius: var(--lds-g-radius-100);
+    padding: 18px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .promptbox .pid { color: var(--lds-g-color-red-070); font-weight: 700; }
+  .sheet-next {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--lds-g-color-on-surface-3);
+    margin: 14px 2px 0;
+  }
+  .sheet-foot { padding: 16px 26px; border-top: 1px solid var(--lds-g-color-neutral-020); display: flex; gap: 10px; align-items: center; }
+  .sheet-foot .note { font-size: 12px; color: var(--lds-g-color-on-surface-3); margin-right: auto; max-width: 320px; line-height: 1.4; }
+  .btn--copy { background: var(--lds-g-color-neutral-100); color: #fff; }
+  .btn--copy:hover { background: var(--lds-g-color-neutral-090); }
+  .btn--close { background: transparent; color: var(--lds-g-color-on-surface-2); border-color: var(--lds-g-color-neutral-030); }
+  .btn--close:hover { border-color: var(--lds-g-color-neutral-080); color: var(--lds-g-color-on-surface-1); }
+
+  /* Scrollbars */
+  .fg-list::-webkit-scrollbar, .panel-scroll::-webkit-scrollbar, .sheet-body::-webkit-scrollbar { width: 9px; }
+  .fg-list::-webkit-scrollbar-thumb, .panel-scroll::-webkit-scrollbar-thumb, .sheet-body::-webkit-scrollbar-thumb { background: var(--lds-g-color-neutral-030); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+
+  @media (max-width: 720px) {
+    body { padding: 0; }
+    .fg { max-height: 100vh; border-radius: 0; border: none; }
+    .fg-body { flex-direction: column; }
+    .fg-rail { flex: 0 0 auto; max-height: 38vh; border-right: none; border-bottom: 1px solid var(--lds-g-color-neutral-020); }
+  }
+
+  /* ========== Personal Command Center additions ========== */
+
+  /* Non-blocking data banner (shown when a run's update could not be read) */
+  .fg-banner {
+    flex: 0 0 auto;
+    background: var(--lds-g-color-yellow-010);
+    color: var(--lds-g-color-yellow-080);
+    border-bottom: 1px solid var(--lds-g-color-yellow-040);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 9px 22px;
+  }
+  .fg-banner[hidden] { display: none; }
+
+  /* KPI strip (deterministic counts over the projected graph) */
+  .fg-kpi {
+    flex: 0 0 auto;
+    display: flex;
+    background: var(--lds-g-color-neutral-000);
+    border-bottom: 1px solid var(--lds-g-color-neutral-020);
+    overflow-x: auto;
+  }
+  .kpi-tile {
+    flex: 1 1 0;
+    min-width: 92px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 16px;
+    border-right: 1px solid var(--lds-g-color-neutral-010);
+  }
+  .kpi-tile:last-child { border-right: none; }
+  .kpi-num { font-family: var(--lds-g-font-family-sans-serif); font-weight: 900; font-size: 22px; line-height: 1; color: var(--lds-g-color-on-surface-1); }
+  .kpi-lbl { font-size: 10px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--lds-g-color-on-surface-3); font-weight: 700; white-space: nowrap; }
+  .kpi--action .kpi-num { color: var(--lds-g-color-red-070); }
+  .kpi--waiting .kpi-num { color: var(--lds-g-color-blue-060); }
+  .kpi--warn .kpi-num { color: var(--lds-g-color-orange-060); }
+
+  /* Top-bar on-demand view buttons */
+  .fg-views { display: inline-flex; gap: 6px; }
+  .view-btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--lds-g-color-transparent-white-020);
+    color: var(--lds-g-color-neutral-020);
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 900;
+    font-size: 11.5px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .16s, color .16s, border-color .16s;
+  }
+  .view-btn:hover { background: var(--lds-g-color-transparent-white-010); color: #fff; }
+  .view-btn.is-on { background: #fff; color: var(--lds-g-color-neutral-100); border-color: #fff; }
+
+  /* Filter + lens bar (Issues lane only) */
+  .fg-filter { margin-top: 8px; display: none; }
+  .filter-search {
+    width: 100%;
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-size: 12.5px;
+    color: var(--lds-g-color-neutral-100);
+    background: var(--lds-g-color-neutral-000);
+    border: 1px solid var(--lds-g-color-neutral-030);
+    border-radius: 8px;
+    padding: 7px 10px;
+  }
+  .filter-search:focus { outline: none; border-color: var(--lds-g-color-red-060); box-shadow: 0 0 0 3px var(--lds-g-color-red-010); }
+  .filter-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .chip {
+    appearance: none;
+    border: 1px solid var(--lds-g-color-neutral-030);
+    background: var(--lds-g-color-neutral-000);
+    color: var(--lds-g-color-on-surface-2);
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 700;
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--lds-g-color-neutral-050); }
+  .chip.is-on { background: var(--lds-g-color-neutral-100); color: #fff; border-color: var(--lds-g-color-neutral-100); }
+  .filter-count { font-size: 10.5px; color: var(--lds-g-color-on-surface-3); margin-top: 7px; font-weight: 700; }
+
+  /* Confidence pill + abstention state */
+  .conf-pill {
+    font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 900;
+    font-size: 9.5px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 8px;
+  }
+  .conf-pill.high { background: var(--lds-g-color-blue-010); color: var(--lds-g-color-blue-080); }
+  .conf-pill.med { background: var(--lds-g-color-neutral-010); color: var(--lds-g-color-on-surface-2); }
+  .conf-pill.low { background: var(--lds-g-color-yellow-010); color: var(--lds-g-color-yellow-080); }
+  .abstain {
+    background: var(--lds-g-color-neutral-005);
+    border: 1px dashed var(--lds-g-color-neutral-030);
+    border-radius: var(--lds-g-radius-100);
+    padding: 14px 16px;
+  }
+  .abstain-head { margin: 0 0 8px; font-weight: 900; color: var(--lds-g-color-on-surface-1); font-size: 13px; }
+  .abstain-reason { margin: 0 0 8px; font-size: 12.5px; color: var(--lds-g-color-on-surface-2); }
+  .abstain-resolve { margin: 0; font-size: 12.5px; color: var(--lds-g-color-on-surface-2); }
+  .abstain-resolve strong { color: var(--lds-g-color-on-surface-1); }
+  .pm-renew { color: var(--lds-g-color-blue-060); font-weight: 900; }
+
+  /* Command home / Next best actions */
+  .home { max-width: 660px; }
+  .home-h { font-family: var(--lds-g-font-family-serif); font-size: 28px; line-height: 1.12; margin: 0 0 10px; color: var(--lds-g-color-on-surface-1); }
+  .home-sub { font-size: 13.5px; line-height: 1.6; color: var(--lds-g-color-on-surface-2); margin: 0 0 18px; }
+  .home-empty { font-size: 12.5px; color: var(--lds-g-color-on-surface-3); margin: 0; }
+  .nba-list { display: flex; flex-direction: column; gap: 6px; }
+  .nba-item {
+    display: grid; grid-template-columns: 12px 1fr auto; gap: 11px; align-items: center;
+    width: 100%; text-align: left; appearance: none; cursor: pointer;
+    background: var(--lds-g-color-neutral-000);
+    border: 1px solid var(--lds-g-color-neutral-020);
+    border-radius: var(--lds-g-radius-100);
+    padding: 11px 13px;
+  }
+  .nba-item:hover { border-color: var(--lds-g-color-neutral-040); background: var(--lds-g-color-neutral-005); }
+  .nba-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .nba-dot.high { background: var(--lds-g-color-red-060); }
+  .nba-dot.med { background: transparent; border: 1.5px solid var(--lds-g-color-neutral-040); }
+  .nba-main { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+  .nba-title { font-size: 13.5px; font-weight: 900; color: var(--lds-g-color-on-surface-1); }
+  .nba-why { display: flex; flex-wrap: wrap; gap: 5px; }
+  .why-chip { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--lds-g-color-neutral-010); color: var(--lds-g-color-on-surface-2); }
+  .why-chip.amber { background: var(--lds-g-color-yellow-010); color: var(--lds-g-color-yellow-080); }
+  .why-chip.red { background: var(--lds-g-color-red-010); color: var(--lds-g-color-red-080); }
+  .nba-party { font-size: 11px; color: var(--lds-g-color-on-surface-3); font-weight: 700; white-space: nowrap; }
+  .needs-signal {
+    appearance: none; cursor: pointer; display: block; width: 100%; text-align: left;
+    background: transparent; border: none; padding: 10px 2px 2px;
+    font-size: 12px; font-weight: 700; color: var(--lds-g-color-orange-060);
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .waiting-mini { display: flex; flex-direction: column; gap: 4px; }
+  .wm-item {
+    display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
+    width: 100%; text-align: left; appearance: none; cursor: pointer;
+    background: transparent; border: none; border-bottom: 1px solid var(--lds-g-color-neutral-010);
+    padding: 8px 2px;
+  }
+  .wm-item:hover .wm-title { color: var(--lds-g-color-red-070); }
+  .wm-title { font-size: 13px; color: var(--lds-g-color-on-surface-1); }
+  .wm-party { font-size: 11px; color: var(--lds-g-color-on-surface-3); font-weight: 700; white-space: nowrap; }
+
+  /* On-demand view header + back */
+  .view-head { margin-bottom: 18px; }
+  .view-back {
+    appearance: none; cursor: pointer; background: transparent; border: none;
+    color: var(--lds-g-color-on-surface-3); font-family: var(--lds-g-font-family-sans-serif);
+    font-weight: 900; font-size: 11.5px; padding: 0 0 8px;
+  }
+  .view-back:hover { color: var(--lds-g-color-on-surface-1); }
+  .view-back::before { content: "< "; }
+
+  /* Comms lane: river + topic flow */
+  .comms-svg-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--lds-g-color-neutral-020); border-radius: var(--lds-g-radius-100); background: var(--lds-g-color-neutral-000); }
+  .comms-svg { display: block; width: 100%; min-width: 520px; height: auto; }
+  .comms-lane { stroke: var(--lds-g-color-neutral-020); stroke-width: 1.5; }
+  .comms-lane-lbl { font-family: var(--lds-g-font-family-sans-serif); font-size: 10px; font-weight: 700; fill: var(--lds-g-color-on-surface-3); }
+  .comms-path { fill: none; stroke: var(--lds-g-color-neutral-030); stroke-width: 2; }
+  .comms-node { cursor: pointer; }
+  .comms-node:hover { stroke-width: 4; }
+  .comms-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+  .cl-item { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--lds-g-color-on-surface-2); font-weight: 700; }
+  .cl-dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; border: 3px solid; }
+  .flow-wrap { display: flex; flex-direction: column; gap: 9px; }
+  .flow-row { display: grid; grid-template-columns: 116px 1fr auto; gap: 12px; align-items: center; }
+  .flow-name { font-size: 12px; font-weight: 700; color: var(--lds-g-color-on-surface-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .flow-cells { display: flex; gap: 2px; }
+  .flow-cell { flex: 1 1 0; height: 16px; border-radius: 2px; background: var(--lds-g-color-blue-060); min-width: 4px; }
+  .flow-empty { font-size: 11px; color: var(--lds-g-color-on-surface-3); }
+  .flow-tempo { font-size: 10.5px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap; }
+  .flow-tempo.live { color: var(--lds-g-color-blue-060); }
+  .flow-tempo.stall { color: var(--lds-g-color-orange-060); }
+  .node-detail { background: var(--lds-g-color-neutral-005); border: 1px solid var(--lds-g-color-neutral-020); border-radius: var(--lds-g-radius-100); padding: 13px 15px; margin-bottom: 18px; }
+  .nd-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .nd-status { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.03em; border: 1.5px solid; border-radius: 999px; padding: 2px 9px; }
+  .nd-date { font-family: var(--lds-g-font-family-mono); font-size: 11px; color: var(--lds-g-color-on-surface-3); }
+  .nd-clear { margin-left: auto; appearance: none; cursor: pointer; background: transparent; border: none; font-weight: 900; font-size: 11px; color: var(--lds-g-color-on-surface-3); }
+  .nd-clear:hover { color: var(--lds-g-color-on-surface-1); }
+  .nd-label { margin: 0 0 5px; font-size: 13.5px; font-weight: 700; color: var(--lds-g-color-on-surface-1); }
+  .nd-cite { margin: 0; font-size: 11.5px; color: var(--lds-g-color-on-surface-3); font-family: var(--lds-g-font-family-mono); }
+
+  /* Renewals radar */
+  .rnw-list { display: flex; flex-direction: column; gap: 8px; }
+  .rnw-item { display: block; width: 100%; text-align: left; cursor: pointer; background: var(--lds-g-color-neutral-000); border: 1px solid var(--lds-g-color-neutral-020); border-left: 3px solid var(--lds-g-color-neutral-030); border-radius: var(--lds-g-radius-100); padding: 13px 15px; }
+  .rnw-item:hover { border-color: var(--lds-g-color-neutral-040); }
+  .rnw-item.overdue { border-left-color: var(--lds-g-color-red-060); background: var(--lds-g-color-red-005); }
+  .rnw-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .rnw-title { font-size: 14px; font-weight: 900; color: var(--lds-g-color-on-surface-1); }
+  .rnw-dte { font-family: var(--lds-g-font-family-mono); font-size: 12px; font-weight: 700; color: var(--lds-g-color-on-surface-2); white-space: nowrap; }
+  .rnw-dte.soon { color: var(--lds-g-color-orange-060); }
+  .rnw-dte.past { color: var(--lds-g-color-red-070); }
+  .rnw-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-size: 11.5px; color: var(--lds-g-color-on-surface-3); margin-bottom: 8px; }
+  .rnw-sep { color: var(--lds-g-color-neutral-030); }
+  .rnw-notice-bad { color: var(--lds-g-color-red-070); font-weight: 900; }
+  .auto-pill { font-size: 9.5px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 999px; }
+  .auto-pill.on { background: var(--lds-g-color-yellow-010); color: var(--lds-g-color-yellow-080); }
+  .auto-pill.off { background: var(--lds-g-color-neutral-010); color: var(--lds-g-color-on-surface-2); }
+  .rnw-rec { font-size: 12.5px; line-height: 1.55; color: var(--lds-g-color-on-surface-1); }
+  .rnw-rec p { margin: 0; font-size: 12.5px; }
+  .rnw-rec strong { font-weight: 900; }
+
+  /* My savings */
+  .sav-hero { display: flex; flex-direction: column; gap: 2px; margin-bottom: 14px; }
+  .sav-num { font-family: var(--lds-g-font-family-sans-serif); font-weight: 900; font-size: 40px; line-height: 1; color: var(--lds-g-color-on-surface-1); }
+  .sav-cap { font-size: 12.5px; color: var(--lds-g-color-on-surface-3); font-weight: 700; }
+  .sav-progress { margin-bottom: 20px; }
+  .sav-bar { height: 12px; background: var(--lds-g-color-neutral-010); border-radius: 999px; overflow: hidden; }
+  .sav-bar span { display: block; height: 100%; background: var(--lds-g-color-blue-060); border-radius: 999px; }
+  .sav-progress-lbl { font-size: 11.5px; color: var(--lds-g-color-on-surface-3); margin-top: 6px; font-weight: 700; }
+  .split-bar { display: flex; height: 22px; border-radius: 6px; overflow: hidden; border: 1px solid var(--lds-g-color-neutral-020); }
+  .split-ci { background: var(--lds-g-color-blue-060); }
+  .split-ca { background: var(--lds-g-color-stone-050); }
+  .split-legend { display: flex; gap: 18px; margin-top: 8px; font-size: 11.5px; color: var(--lds-g-color-on-surface-2); font-weight: 700; }
+  .split-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sl-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .sl-dot.ci { background: var(--lds-g-color-blue-060); }
+  .sl-dot.ca { background: var(--lds-g-color-stone-050); }
+  .pipeline { display: flex; flex-direction: column; gap: 2px; }
+  .pipe-item { display: grid; grid-template-columns: 12px 1fr auto auto; gap: 11px; align-items: center; padding: 9px 2px; border-bottom: 1px solid var(--lds-g-color-neutral-010); }
+  .pip { width: 9px; height: 9px; border-radius: 50%; }
+  .pip.committed { background: transparent; border: 1.5px solid var(--lds-g-color-neutral-040); }
+  .pip.pending { background: var(--lds-g-color-orange-050); }
+  .pip.achieved { background: var(--lds-g-color-blue-060); }
+  .pipe-name { font-size: 13px; color: var(--lds-g-color-on-surface-1); }
+  .pipe-amt { font-family: var(--lds-g-font-family-mono); font-size: 12px; font-weight: 700; color: var(--lds-g-color-on-surface-2); }
+  .pipe-status { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; color: var(--lds-g-color-on-surface-3); }
+  .sav-foot { font-size: 12px; color: var(--lds-g-color-on-surface-3); margin-top: 14px; }
+
+  /* Report card + bandwidth */
+  .rc-gpa { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+  .rc-gpa-num { font-family: var(--lds-g-font-family-sans-serif); font-weight: 900; font-size: 40px; line-height: 1; color: var(--lds-g-color-on-surface-1); }
+  .rc-gpa-cap { font-size: 12.5px; color: var(--lds-g-color-on-surface-3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+  .rc-list { display: flex; flex-direction: column; gap: 2px; }
+  .rc-item { display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; align-items: center; padding: 9px 2px; border-bottom: 1px solid var(--lds-g-color-neutral-010); }
+  .rc-grade { width: 26px; height: 26px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; color: #fff; }
+  .rc-grade.good { background: var(--lds-g-color-blue-060); }
+  .rc-grade.warn { background: var(--lds-g-color-orange-060); }
+  .rc-grade.bad { background: var(--lds-g-color-red-060); }
+  .rc-main { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+  .rc-name { font-size: 13px; color: var(--lds-g-color-on-surface-1); font-weight: 700; }
+  .rc-bar { height: 6px; background: var(--lds-g-color-neutral-010); border-radius: 999px; overflow: hidden; }
+  .rc-bar span { display: block; height: 100%; background: var(--lds-g-color-neutral-060); border-radius: 999px; }
+  .rc-val { font-family: var(--lds-g-font-family-mono); font-size: 11px; color: var(--lds-g-color-on-surface-3); white-space: nowrap; }
+  .bw-gauge { position: relative; height: 22px; background: var(--lds-g-color-neutral-010); border-radius: 6px; overflow: hidden; }
+  .bw-fill { display: block; height: 100%; border-radius: 6px 0 0 6px; }
+  .bw-fill.ok { background: var(--lds-g-color-blue-060); }
+  .bw-fill.over { background: var(--lds-g-color-orange-060); }
+  .bw-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--lds-g-color-neutral-100); }
+  .bw-lbl { font-size: 11.5px; color: var(--lds-g-color-on-surface-2); margin-top: 7px; font-weight: 700; }
+</style>
+</head>
+<body>
+  <main class="fg" id="fgRoot">
+    <!-- Top bar -->
+    <header class="fg-top">
+      <span class="fg-dino" aria-hidden="true">🦖</span>
+      <span class="fg-word">
+        <b>Personal Command Center</b>
+        <span class="fg-div" aria-hidden="true"></span>
+        <span class="fg-sub">Theo's Field Guide</span>
+      </span>
+      <div class="fg-top-right">
+        <span class="fg-views" id="fgViews"></span>
+        <span class="fg-synced" id="fgClock"><span class="synced-dot" aria-hidden="true"></span>Synced Jul 22, 9:12 AM CDT</span>
+      </div>
+    </header>
+
+    <!-- Non-blocking data banner -->
+    <div class="fg-banner" id="fgBanner" hidden></div>
+
+    <!-- KPI strip (deterministic work-graph counts) -->
+    <div class="fg-kpi" id="fgKpi" aria-label="Work graph summary"></div>
+
+    <!-- Split body -->
+    <div class="fg-body">
+      <!-- Left rail -->
+      <nav class="fg-rail" aria-label="Issues">
+        <div class="fg-rail-head">
+          <div class="mode-toggle" role="tablist">
+            <button class="mode-btn is-on" id="modeIssues" type="button" role="tab">Issues</button>
+            <button class="mode-btn" id="modeMeetings" type="button" role="tab">Meeting&nbsp;Prep</button>
+            <button class="mode-btn" id="modeComms" type="button" role="tab">Comms</button>
+          </div>
+          <div class="sort-row" id="sortRow">
+            <button class="sort-btn is-on" data-sort="priority" type="button">Priority</button>
+            <button class="sort-btn" data-sort="aged" type="button">Aged</button>
+            <button class="sort-btn" data-sort="new" type="button">Newest</button>
+          </div>
+          <div class="fg-filter" id="fgFilter">
+            <input class="filter-search" id="filterSearch" type="text" placeholder="Search issues" aria-label="Search issues" />
+            <div class="filter-chips" id="filterChips"></div>
+            <div class="filter-count" id="filterCount"></div>
+          </div>
+        </div>
+        <div class="fg-list" id="list" role="tablist"></div>
+      </nav>
+
+      <!-- Right panel -->
+      <section class="fg-panel" aria-live="polite">
+        <div class="panel-scroll" id="panel"></div>
+        <div class="panel-dock" id="dock"></div>
+      </section>
+    </div>
+
+    <!-- Submit bar -->
+    <footer class="fg-foot">
+      <div class="fg-pacer" id="fgPacer" aria-hidden="true">
+        <span class="fg-roar" id="fgRoar">Rawr!</span>
+        <span class="fg-pacer-dino" id="fgPacerDino">🦖</span>
+      </div>
+      <div class="foot-actions">
+        <button class="btn btn--resetall" id="btnResetAll" type="button" disabled>Clear all</button>
+        <button class="btn btn--submit" id="btnSubmit" type="button" disabled>Submit Actions</button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Submit preview overlay -->
+  <div class="scrim" id="scrim">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-head">
+        <h2 id="sheetTitle">One prompt, fired into chat</h2>
+        <p>This is the single consolidated message the board sends: every staged direction, tagged by issue, in one turn.</p>
+      </div>
+      <div class="sheet-body">
+        <div class="promptbox" id="promptBox"></div>
+        <p class="sheet-next">After you submit, the live Field Guide will: run these directions → update the work graph → re-pull mail, calendar &amp; chats → fold in anything new → hand back a refreshed board.</p>
+      </div>
+      <div class="sheet-foot">
+        <span class="note" id="sheetNote">In the live Field Guide this fires via <code>sendPrompt()</code>. Here it's previewed so you can see the payload.</span>
+        <button class="btn btn--close" id="btnCloseSheet" type="button">Close</button>
+        <button class="btn btn--copy" id="btnCopy" type="button">Copy prompt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PER-RUN DATA ISLAND  (theos-field-guide skill target)
+
+       The skill REPLACES the CONTENTS of this block with valid JSON
+       every run (the current view from the M365 scan). It is an inert
+       application/json island: a syntax error here is NOT executed by
+       the browser, so a malformed payload can never break the main
+       script or blank the board. The engine parses it with try/catch
+       (readDelta) and, on failure, degrades to the saved/stored board
+       with a non-blocking banner.
+
+       Contract: emit JSON (data), never JS (code). Frozen keys stay:
+       storage "theo.fieldguide.workgraph.v1", export "theo-workgraph.json".
+       Issue ids are deterministic slugs. Set meetings / comms / savings /
+       reportCard to null to keep whatever is stored; pass close:true on
+       an issue to drop it. All new fields are optional; absence hides
+       that surface. The seed below exercises every surface.
+  ============================================================ -->
+  <script type="application/json" id="fgData">
+{
+  "synced": "Jul 22, 9:12 AM CDT",
+  "today": "2026-07-22",
+  "issues": [
+    {
+      "id": "veeva/vault-crm-transition",
+      "title": "Veeva Vault CRM transition - commercial close",
+      "party": "Veeva",
+      "priority": "high",
+      "state": "action",
+      "topic": "Renewal",
+      "channel": "Email",
+      "confidence": "high",
+      "due": "Jul 25",
+      "dueSoon": true,
+      "opened": "Jul 8",
+      "age": "14d",
+      "unblocks": "steering review",
+      "state_md": "<p>The migration statement of work is agreed and the security exhibit cleared TPRM with no findings. Only the commercial terms remain: Veeva returned a redline on the volume tier and the termination-for-convenience window.</p>",
+      "rec_md": "<p><strong>Send the counter today.</strong> Accept the volume tier, hold the 90-day termination window, and ask for the migration credit in writing. This clears the Thursday steering review.</p>"
+    },
+    {
+      "id": "sap/rise-security-exhibit",
+      "title": "SAP RISE security exhibit - open questions",
+      "party": "SAP",
+      "priority": "high",
+      "state": "action",
+      "topic": "Security",
+      "channel": "Teams",
+      "confidence": "low",
+      "abstain": true,
+      "abstain_reason": "Waiting on the InfoSec reviewer's read of SAP's hosting-region answer. No dated commitment yet and the last Teams message is three days old.",
+      "abstain_resolve": "A yes or no from InfoSec on data-residency, or SAP naming the processing region in writing.",
+      "opened": "Jul 2",
+      "age": "20d",
+      "state_md": "<p>SAP answered nine of twelve security questions. The three open items are data-residency, subprocessor list currency, and breach-notification SLA. InfoSec has the thread but has not weighed in.</p>",
+      "rec_md": "<p>Pending an InfoSec read; no confident move yet.</p>"
+    },
+    {
+      "id": "workday/flexcredits-renewal",
+      "title": "Workday FlexCredits renewal",
+      "party": "Workday",
+      "priority": "med",
+      "state": "waiting",
+      "topic": "Renewal",
+      "channel": "Email",
+      "confidence": "med",
+      "opened": "Jun 30",
+      "age": "22d",
+      "renewal": { "expiry": "2026-08-20", "notice_by": "2026-08-05", "auto_renew": true },
+      "state_md": "<p>Renewal quote requested. Workday acknowledged and said pricing would arrive by end of month. Nothing is owed by you until it lands.</p>",
+      "rec_md": "<p><strong>Recommendation: Renegotiate.</strong> Usage is flat but the list uplift is 7 percent. Hold for a multiyear flat rate or a credit true-down before committing.</p>"
+    },
+    {
+      "id": "servicenow/itsm-true-up",
+      "title": "ServiceNow ITSM true-up",
+      "party": "ServiceNow",
+      "priority": "med",
+      "state": "action",
+      "topic": "Commercial",
+      "channel": "Ariba",
+      "confidence": "high",
+      "due": "Jul 29",
+      "dueSoon": true,
+      "opened": "Jul 14",
+      "age": "8d",
+      "unblocks": "Q3 provisioning",
+      "state_md": "<p>Ariba requisition PR-48812 is waiting on your approval for the fulfiller true-up. Finance pre-approved the amount and the requisition is clean.</p>",
+      "rec_md": "<p><strong>Approve PR-48812.</strong> The count matches the audited fulfiller list and finance signed off. Approving unblocks the Q3 provisioning batch.</p>"
+    },
+    {
+      "id": "coupa/ap-automation-sow",
+      "title": "Coupa AP automation - scope of work",
+      "party": "Coupa",
+      "priority": "med",
+      "state": "waiting",
+      "topic": "Sourcing",
+      "channel": "Email",
+      "confidence": "med",
+      "opened": "Jul 10",
+      "age": "12d",
+      "state_md": "<p>Draft SOW is with Coupa for their delivery estimate. They committed to a staffing plan by Friday.</p>",
+      "rec_md": "<p><strong>Hold.</strong> No action until the staffing plan arrives. If Friday passes with no reply, send a one-line nudge.</p>"
+    },
+    {
+      "id": "docusign/ela-renewal",
+      "title": "DocuSign ELA renewal - notice window",
+      "party": "DocuSign",
+      "priority": "high",
+      "state": "action",
+      "topic": "Renewal",
+      "channel": "Email",
+      "confidence": "med",
+      "due": "Aug 2",
+      "dueSoon": true,
+      "opened": "Jun 18",
+      "age": "34d",
+      "renewal": { "expiry": "2026-08-02", "notice_by": "2026-07-15", "auto_renew": true },
+      "state_md": "<p>The enterprise agreement auto-renews on August 2 and the non-renewal notice date has already passed. Procurement did not receive the 45-day reminder.</p>",
+      "rec_md": "<p><strong>Recommendation: Recompete or renegotiate now.</strong> The notice window lapsed, so leverage is limited this cycle. Open the renegotiation immediately and set a calendar guard 60 days before the next term.</p>"
+    }
+  ],
+  "meetings": [
+    {
+      "id": "mtg-veeva-steering",
+      "day": "Thu Jul 24",
+      "time": "10:00 AM",
+      "who": "Veeva + steering committee",
+      "soon": true,
+      "link": "veeva/vault-crm-transition",
+      "prep_md": "<p><strong>Goal:</strong> get sign-off to send the commercial counter.</p><p>Walk the committee through the two open terms (volume tier, termination window) and the migration credit ask. Bring the TPRM clearance note so security is not relitigated.</p>"
+    },
+    {
+      "id": "mtg-sap-infosec",
+      "day": "Fri Jul 25",
+      "time": "1:30 PM",
+      "who": "InfoSec review",
+      "soon": true,
+      "link": "sap/rise-security-exhibit",
+      "prep_md": "<p><strong>Goal:</strong> close the three open SAP security items.</p><p>Get InfoSec's read on data-residency first; it gates the other two. Come with the exact SAP wording so the answer is unambiguous.</p>"
+    },
+    {
+      "id": "mtg-category-review",
+      "day": "Mon Jul 28",
+      "time": "9:00 AM",
+      "who": "IT category team",
+      "soon": false,
+      "prep_md": "<p><strong>Goal:</strong> weekly category sync.</p><p>Bring the renewals radar; DocuSign and Workday both need a decision this cycle.</p>"
+    }
+  ],
+  "hidden_note": "3 holds and 2 personal blocks are hidden. Only Issue-linked and counterparty meetings show here.",
+  "comms": {
+    "topics": [
+      { "id": "renewal", "label": "Renewal terms" },
+      { "id": "security", "label": "Security exhibit" },
+      { "id": "commercial", "label": "Commercial pricing" }
+    ],
+    "nodes": [
+      { "topic": "renewal", "date": "2026-07-08", "status": "Open", "label": "Workday renewal quote requested", "cite": "Email: RE Workday FlexCredits, Jul 8" },
+      { "topic": "renewal", "date": "2026-07-15", "status": "Flagged", "label": "DocuSign notice window lapsed", "cite": "Email thread: DocuSign ELA, Jul 15" },
+      { "topic": "renewal", "date": "2026-07-21", "status": "Disputed", "label": "Veeva volume tier redline returned", "cite": "Email: Veeva commercial redline, Jul 21" },
+      { "topic": "security", "date": "2026-07-05", "status": "Open", "label": "SAP returns 9 of 12 answers", "cite": "Teams: SAP RISE security, Jul 5" },
+      { "topic": "security", "date": "2026-07-12", "status": "Agreed", "label": "Veeva security exhibit cleared TPRM", "cite": "Aravo TPRM clearance, Jul 12" },
+      { "topic": "security", "date": "2026-07-19", "status": "Disputed", "label": "SAP data-residency answer contested", "cite": "Teams: InfoSec review, Jul 19" },
+      { "topic": "commercial", "date": "2026-07-14", "status": "Open", "label": "ServiceNow true-up requisition raised", "cite": "Ariba PR-48812, Jul 14" },
+      { "topic": "commercial", "date": "2026-07-22", "status": "Agreed", "label": "Finance pre-approves true-up amount", "cite": "Email: Finance sign-off, Jul 22" }
+    ],
+    "flow": [
+      { "topic": "renewal", "days": [0,1,0,0,2,1,0,0,1,0,0,3,0,1,2,0,0,1,0,0,2,3,0,1,0,0,2,1] },
+      { "topic": "security", "days": [0,2,1,0,0,3,1,0,0,2,0,0,1,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0] },
+      { "topic": "commercial", "days": [0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,1,3,2,0,1,0,0,2] }
+    ]
+  },
+  "savings": {
+    "committed": 4200000,
+    "achieved": 2650000,
+    "ci": 1750000,
+    "ca": 900000,
+    "target": 4000000,
+    "pipeline": [
+      { "name": "Veeva Vault CRM transition", "amount": 620000, "status": "committed" },
+      { "name": "Workday FlexCredits renewal", "amount": 180000, "status": "pending" },
+      { "name": "ServiceNow ITSM true-up", "amount": 240000, "status": "achieved" },
+      { "name": "DocuSign ELA renewal", "amount": 150000, "status": "pending" },
+      { "name": "Coupa AP automation", "amount": 310000, "status": "committed" }
+    ]
+  },
+  "reportCard": {
+    "gpa": "3.4",
+    "categories": [
+      { "name": "Renewals actioned on time", "value": 8, "target": 10, "grade": "B" },
+      { "name": "Cycle time to award", "value": 7, "target": 10, "grade": "C" },
+      { "name": "Savings vs target", "value": 2650000, "target": 4000000, "grade": "B" },
+      { "name": "TPRM clearance rate", "value": 9, "target": 10, "grade": "A" },
+      { "name": "Aged issues cleared", "value": 4, "target": 10, "grade": "D" }
+    ],
+    "bandwidth": { "load": 115, "sustainable": 100 }
+  }
+}
+  </script>
+
+  <script>
+/* Personal Command Center, Field Guide board
+   Self-locates by id (no document.currentScript dependency). */
+(function () {
+  "use strict";
+
+  // ── Element bindings ──
+  // These identifiers were referenced throughout the script but never bound,
+  // so the first top-level use (modeIssuesBtn.addEventListener) threw an
+  // uncaught ReferenceError on load and the board never rendered. Bind each
+  // to its real element before any use.
+  var modeIssuesBtn   = document.getElementById("modeIssues");
+  var modeMeetingsBtn = document.getElementById("modeMeetings");
+  var sortRow         = document.getElementById("sortRow");
+  var listEl          = document.getElementById("list");
+  var panelEl         = document.getElementById("panel");
+  var dockEl          = document.getElementById("dock");
+  var btnSubmit       = document.getElementById("btnSubmit");
+  var btnResetAll     = document.getElementById("btnResetAll");
+  var scrim           = document.getElementById("scrim");
+  var promptBox       = document.getElementById("promptBox");
+  // New PCC elements (bound before any use, same C5 discipline)
+  var modeCommsBtn    = document.getElementById("modeComms");
+  var fgFilterEl      = document.getElementById("fgFilter");
+  var filterSearch    = document.getElementById("filterSearch");
+  var filterChips     = document.getElementById("filterChips");
+  var filterCount     = document.getElementById("filterCount");
+  var fgKpiEl         = document.getElementById("fgKpi");
+  var fgBannerEl      = document.getElementById("fgBanner");
+  var fgViewsEl       = document.getElementById("fgViews");
+
+  // ── View state ── defaults mirror the markup (Issues lane on, Priority sort)
+  var mode      = "issues";                      // "issues" | "meetings" | "comms"
+  var sortMode  = "priority";                    // "priority" | "aged" | "new"
+  var staged    = {};                            // itemId -> staged direction text
+  var sel       = { issues: null, meetings: null, comms: null }; // selected row per lane
+  var panelView = null;                          // null | "renewals" | "savings" | "reportcard"
+  var filterQuery = "";                          // Issues lane search text
+  var activeChips = {};                          // "facet:value" -> true (lens filters)
+
+  // ── Lookups used by SORTS / renderPanel / renderFooter ──
+  // ISSUES / META / MEETINGS are the live projection of FG_GRAPH (see fgProject);
+  // these are only invoked after boot, once that projection is populated.
+  function ageNum(id) {
+    var m = META[id] || {};
+    var n = parseInt(String(m.age), 10);         // "6d" -> 6; missing -> 0
+    return isNaN(n) ? 0 : n;
+  }
+  function issueById(id) {
+    for (var i = 0; i < ISSUES.length; i++) { if (ISSUES[i].id === id) return ISSUES[i]; }
+    return null;
+  }
+  function mtgById(id) {
+    for (var i = 0; i < MEETINGS.length; i++) { if (MEETINGS[i].id === id) return MEETINGS[i]; }
+    return null;
+  }
+  function stagedCount() { return Object.keys(staged).length; }
+
+  var SORTS = {
+    priority: function (a, b) {
+      var r = (a.priority === "high" ? 0 : 1) - (b.priority === "high" ? 0 : 1); if (r) return r;
+      var d = ((META[a.id] || {}).dueSoon ? 0 : 1) - ((META[b.id] || {}).dueSoon ? 0 : 1); if (d) return d;
+      return ageNum(b.id) - ageNum(a.id);
+    },
+    aged: function (a, b) { return ageNum(b.id) - ageNum(a.id); },
+    "new": function (a, b) { return ageNum(a.id) - ageNum(b.id); }
+  };
+
+  // ── Mode toggle ──
+  function setMode(m) {
+    mode = m;
+    panelView = null;   // switching lanes clears any on-demand view
+    modeIssuesBtn.classList.toggle("is-on", m === "issues");
+    modeMeetingsBtn.classList.toggle("is-on", m === "meetings");
+    modeCommsBtn.classList.toggle("is-on", m === "comms");
+    modeIssuesBtn.setAttribute("aria-selected", m === "issues" ? "true" : "false");
+    modeMeetingsBtn.setAttribute("aria-selected", m === "meetings" ? "true" : "false");
+    modeCommsBtn.setAttribute("aria-selected", m === "comms" ? "true" : "false");
+    sortRow.style.display = (m === "issues") ? "flex" : "none";
+    fgFilterEl.style.display = (m === "issues") ? "block" : "none";
+    syncViewButtons();
+    renderList();
+    renderPanel();
+  }
+  modeIssuesBtn.addEventListener("click", function () { setMode("issues"); });
+  modeMeetingsBtn.addEventListener("click", function () { setMode("meetings"); });
+  modeCommsBtn.addEventListener("click", function () { setMode("comms"); });
+
+  filterSearch.addEventListener("input", function () {
+    filterQuery = filterSearch.value;
+    renderList();
+  });
+
+  function setSort(s) {
+    sortMode = s;
+    var btns = sortRow.querySelectorAll(".sort-btn");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle("is-on", btns[i].getAttribute("data-sort") === s);
+    }
+    renderList();
+  }
+  (function () {
+    var sBtns = sortRow.querySelectorAll(".sort-btn");
+    for (var i = 0; i < sBtns.length; i++) {
+      (function (btn) {
+        btn.addEventListener("click", function () { setSort(btn.getAttribute("data-sort")); });
+      })(sBtns[i]);
+    }
+  })();
+
+  // ── Render left rail ──
+  function renderList() {
+    listEl.innerHTML = "";
+    if (mode === "issues") {
+      var matches = ISSUES.filter(issueMatchesFilter).sort(SORTS[sortMode] || SORTS.priority);
+      matches.slice(0, 40).forEach(function (iss) { listEl.appendChild(issueRow(iss)); });
+      updateFilterCount(matches.length, ISSUES.length);
+    } else if (mode === "comms") {
+      var topics = (COMMS && COMMS.topics) || [];
+      if (!topics.length) {
+        var e = document.createElement("div");
+        e.className = "list-foot";
+        e.textContent = "No comms mapped this run.";
+        listEl.appendChild(e);
+      } else {
+        topics.forEach(function (t) { listEl.appendChild(commsRow(t)); });
+      }
+    } else {
+      MEETINGS.forEach(function (mt) { listEl.appendChild(meetingRow(mt)); });
+      var foot = document.createElement("div");
+      foot.className = "list-foot";
+      foot.innerHTML = HIDDEN_NOTE;
+      listEl.appendChild(foot);
+    }
+  }
+
+  function rowShell(id, isActive) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "row" + (isActive ? " is-active" : "") + (staged[id] != null ? " is-staged" : "");
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+    btn.dataset.id = id;
+    btn.addEventListener("click", function () {
+      sel[mode] = id;
+      renderList();
+      renderPanel();
+    });
+    return btn;
+  }
+
+  function issueRow(iss) {
+    var btn = rowShell(iss.id, iss.id === sel.issues);
+    var m = META[iss.id] || {};
+    var dueCls = m.due ? (m.dueSoon ? "soon" : "set") : "none";
+    var dueLabel = m.due ? (m.due === "Past due" ? "Past due" : "Due " + m.due) : "No due date";
+    btn.innerHTML =
+      '<span class="dot ' + iss.priority + '" aria-hidden="true"></span>' +
+      '<span class="row-main">' +
+        '<span class="row-id">' + iss.id + "</span>" +
+        '<div class="row-title">' + iss.title + "</div>" +
+        '<div class="row-meta">' +
+          '<span class="m-due ' + dueCls + '">' + dueLabel + "</span>" +
+          '<span class="rsep">·</span>' +
+          '<span class="m-age">Age ' + (m.age || "n/a") + "</span>" +
+        "</div>" +
+      "</span>" +
+      '<span class="stagemark" aria-label="staged">✓</span>';
+    return btn;
+  }
+
+  function meetingRow(mt) {
+    var btn = rowShell(mt.id, mt.id === sel.meetings);
+    btn.innerHTML =
+      '<span class="dot ' + (mt.soon ? "high" : "med") + '" aria-hidden="true"></span>' +
+      '<span class="row-main">' +
+        '<span class="row-id">' + mt.day + "</span>" +
+        '<div class="row-title">' + mt.title + "</div>" +
+        '<div class="row-meta">' +
+          '<span class="m-due ' + (mt.soon ? "soon" : "set") + '">' + mt.time + "</span>" +
+          '<span class="rsep">·</span>' +
+          '<span class="m-age">' + mt.who + "</span>" +
+        "</div>" +
+      "</span>" +
+      '<span class="stagemark" aria-label="staged">✓</span>';
+    return btn;
+  }
+
+  // ── Render right panel ──
+  function renderPanel() {
+    if (panelView === "renewals")  { renderRenewals();  return; }
+    if (panelView === "savings")   { renderSavings();   return; }
+    if (panelView === "reportcard"){ renderReportCard();return; }
+    if (mode === "comms") { renderComms(); return; }
+    var id = sel[mode];
+    if (!id) {
+      if (mode === "issues" && ISSUES.length) renderHome();
+      else renderWelcome();
+      return;
+    }
+    if (mode === "issues") renderIssue(issueById(id));
+    else renderMeeting(mtgById(id));
+  }
+
+  function renderWelcome() {
+    var lane = mode === "issues" ? "an issue" : "a meeting";
+    dockEl.innerHTML = "";
+    panelEl.innerHTML =
+      '<div class="welcome">' +
+        "<h1>Welcome to your Command Center.</h1>" +
+        "<p>It's rebuilt fresh each time you open it: a scan of your mail, calendar and chats, sorted into what actually needs you. Nothing here has been sent or changed yet. You decide what happens to each item, then fire it all off in a single batch.</p>" +
+        '<div class="welcome-steps">' +
+          '<div class="wstep"><span>1</span><div><b>Pick a lane.</b> <b>Issues</b> is your open work; <b>Meeting&nbsp;Prep</b> is your next important meetings with notes I\'ve already pulled together. Switch between them at the top left.</div></div>' +
+          '<div class="wstep"><span>2</span><div><b>Open an item.</b> Click any row and the right side shows where it stands and the next move I\'d recommend, so you\'re not digging back through threads to remember what it is.</div></div>' +
+          '<div class="wstep"><span>3</span><div><b>Tell me what to do, then stage it.</b> In <b>Your direction</b>, write the instruction you want me to carry out for that item. For example: \u201cdraft the reply and cc Liza,\u201d \u201cdefer this for 5 days,\u201d or \u201cthis isn\u2019t an issue, remove it.\u201d Hit <b>Stage</b> and it joins the queue. Do this for as many items as you like; staging an item again just replaces what you wrote.</div></div>' +
+          '<div class="wstep"><span>4</span><div><b>Submit once, at the end.</b> Don\u2019t hit <b>Submit Actions</b> until you\u2019ve staged every item you want handled; it sends all your directions in one turn. I run them, update your work graph, re-scan for anything new, and hand back a refreshed board.</div></div>' +
+        "</div>" +
+        '<p class="welcome-hint">← Select ' + lane + " from the left to begin.</p>" +
+      "</div>";
+  }
+
+  function renderIssue(iss) {
+    if (!iss) { renderWelcome(); return; }
+    var m = META[iss.id] || {};
+    var parts = [];
+    parts.push('<span class="pm-lbl">Priority</span><span class="pm-prio ' + iss.priority + '">' +
+      (iss.priority === "high" ? "High" : "Medium") + "</span>");
+    parts.push('<span class="pm-lbl">Status</span>' + (iss.state === "action" ? "Action" : "Waiting"));
+    parts.push('<span class="pm-lbl">Supplier</span>' + iss.party);
+    if (m.due) {
+      parts.push('<span class="pm-lbl">Due</span><span class="pm-due' + (m.dueSoon ? " soon" : "") + '">' +
+        (m.due === "Past due" ? "Overdue" : m.due) + "</span>");
+    }
+    if (m.opened) parts.push('<span class="pm-lbl">Opened</span>' + m.opened + (m.age ? " (" + m.age + ")" : ""));
+    if (iss.renewal && iss.renewal.expiry) {
+      var dte = daysTo(iss.renewal.expiry);
+      var dteTxt = isNaN(dte) ? "n/a" : (dte < 0 ? "Expired" : dte + "d to expiry");
+      parts.push('<span class="pm-lbl">Renewal</span><span class="pm-renew">' + dteTxt + "</span>");
+    }
+    var metaLine = parts.join('<span class="psep">·</span>');
+
+    panelEl.innerHTML =
+      '<div class="p-head">' +
+        '<span class="p-idchip">' + iss.id + "</span>" +
+        '<div class="p-titlewrap">' +
+          '<h1 class="p-title">' + iss.title + "</h1>" +
+          '<div class="p-meta">' + metaLine + "</div>" +
+        "</div>" +
+      "</div>" +
+      '<div class="zone">' +
+        '<p class="zone-lbl">Current state</p>' +
+        '<div class="zone-body">' + (iss.state_md || "<p>No state recorded.</p>") + "</div>" +
+      "</div>" +
+      recZoneHtml(iss);
+
+    dockEl.innerHTML = directionZone(iss.id);
+    wireDirection(iss.id, "Correct, refine, or direct me on this issue. For example: \u201cdraft the reply and cc Liza\u201d or \u201cmove to waiting.\u201d Leave blank to skip.");
+  }
+
+  function renderMeeting(mt) {
+    if (!mt) { renderWelcome(); return; }
+    dockEl.innerHTML = "";   // Meeting Prep is read-only
+    var parts = [];
+    parts.push('<span class="pm-lbl">When</span>' + mt.day + ", " + mt.time);
+    parts.push('<span class="pm-lbl">With</span>' + mt.who);
+    if (mt.link) parts.push('<span class="pm-lbl">Issue</span>' + mt.link);
+    var metaLine = parts.join('<span class="psep">·</span>');
+
+    panelEl.innerHTML =
+      '<div class="p-head">' +
+        '<span class="p-idchip date">' + mt.day.replace(/^\w+\s/, "") + "</span>" +
+        '<div class="p-titlewrap">' +
+          '<h1 class="p-title">' + mt.title + "</h1>" +
+          '<div class="p-meta">' + metaLine + "</div>" +
+        "</div>" +
+      "</div>" +
+      '<div class="zone">' +
+        '<p class="zone-lbl">Prep notes</p>' +
+        '<div class="zone-body prep">' + mt.prep_md + "</div>" +
+      "</div>";
+  }
+
+  /* ==============  Personal Command Center render surfaces  ==============
+     All of these guard missing data and degrade to a graceful empty state
+     rather than throwing. Deterministic layout only; no fabrication. */
+
+  // -- Small helpers --
+  function num(v) { var n = (typeof v === "number") ? v : parseFloat(v); return isNaN(n) ? 0 : n; }
+  function money(n) {
+    n = num(n); var a = Math.abs(n);
+    if (a >= 1e6) return "$" + (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + "M";
+    if (a >= 1e3) return "$" + Math.round(n / 1e3) + "K";
+    return "$" + Math.round(n);
+  }
+  function parseISO(s) {
+    if (!s) return null;
+    var t = Date.parse((/T/.test(String(s)) ? s : s + "T00:00:00"));
+    return isNaN(t) ? null : t;
+  }
+  function todayMidnight() { var d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); }
+  function daysTo(iso) {
+    var t = parseISO(iso); if (t == null) return NaN;
+    return Math.round((t - RUN_TODAY) / 86400000);
+  }
+  function clip(s, n) { s = String(s == null ? "" : s); return s.length > n ? s.slice(0, n - 1) + "." : s; }
+  function cap(s) { s = String(s == null ? "" : s); return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function isAbstaining(iss) { return iss && (iss.abstain === true || iss.confidence === "low"); }
+
+  function showBanner(msg) {
+    if (!fgBannerEl) return;
+    fgBannerEl.textContent = msg;
+    fgBannerEl.hidden = false;
+  }
+
+  // -- KPI strip (deterministic counts over the projected graph) --
+  function renderKpis() {
+    if (!fgKpiEl) return;
+    var action = 0, waiting = 0, aged = 0;
+    ISSUES.forEach(function (i) {
+      if (i.state === "action") action++;
+      else if (i.state === "waiting") waiting++;
+      if (ageNum(i.id) > 7) aged++;
+    });
+    var tiles = [
+      ["Open issues", ISSUES.length, ""],
+      ["Action now", action, "action"],
+      ["Waiting", waiting, "waiting"],
+      ["Meetings ahead", MEETINGS.length, ""],
+      ["Aged 7d+", aged, aged > 0 ? "warn" : ""]
+    ];
+    var h = "";
+    tiles.forEach(function (t) {
+      h += '<div class="kpi-tile ' + (t[2] ? "kpi--" + t[2] : "") + '">' +
+        '<span class="kpi-num">' + t[1] + "</span>" +
+        '<span class="kpi-lbl">' + t[0] + "</span>" +
+      "</div>";
+    });
+    fgKpiEl.innerHTML = h;
+  }
+
+  // -- On-demand view buttons (offered only when their data key exists) --
+  function hasRenewals() { return ISSUES.some(function (i) { return i.renewal && i.renewal.expiry; }); }
+  function syncViewButtons() {
+    if (!fgViewsEl) return;
+    fgViewsEl.innerHTML = "";
+    var defs = [];
+    if (hasRenewals()) defs.push(["renewals", "Renewals"]);
+    if (SAVINGS)       defs.push(["savings", "Savings"]);
+    if (REPORTCARD)    defs.push(["reportcard", "Report Card"]);
+    defs.forEach(function (d) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "view-btn" + (panelView === d[0] ? " is-on" : "");
+      b.textContent = d[1];
+      b.addEventListener("click", function () {
+        panelView = (panelView === d[0]) ? null : d[0];
+        syncViewButtons();
+        renderPanel();
+      });
+      fgViewsEl.appendChild(b);
+    });
+  }
+
+  // -- Filter + lens bar (Issues lane) --
+  function issueMatchesFilter(iss) {
+    var q = filterQuery.trim().toLowerCase();
+    if (q) {
+      var hay = ((iss.title || "") + " " + (iss.party || "") + " " + (iss.id || "")).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    var facets = {};
+    Object.keys(activeChips).forEach(function (k) {
+      if (!activeChips[k]) return;
+      var i = k.indexOf(":"); var f = k.slice(0, i), v = k.slice(i + 1);
+      (facets[f] = facets[f] || []).push(v);
+    });
+    var ok = true;
+    Object.keys(facets).forEach(function (f) {
+      var val = f === "status" ? (iss.state || "") :
+                f === "party"  ? (iss.party || "") :
+                f === "topic"  ? (iss.topic || "") :
+                f === "channel"? (iss.channel || "") : "";
+      if (facets[f].indexOf(val) === -1) ok = false;
+    });
+    return ok;
+  }
+  function renderFilterBar() {
+    if (!filterChips) return;
+    filterChips.innerHTML = "";
+    var order = ["status", "party", "topic", "channel"];
+    var seen = { status: {}, party: {}, topic: {}, channel: {} };
+    var lists = { status: [], party: [], topic: [], channel: [] };
+    ISSUES.forEach(function (iss) {
+      if (iss.state && !seen.status[iss.state]) { seen.status[iss.state] = 1; lists.status.push(iss.state); }
+      if (iss.party && !seen.party[iss.party]) { seen.party[iss.party] = 1; lists.party.push(iss.party); }
+      if (iss.topic && !seen.topic[iss.topic]) { seen.topic[iss.topic] = 1; lists.topic.push(iss.topic); }
+      if (iss.channel && !seen.channel[iss.channel]) { seen.channel[iss.channel] = 1; lists.channel.push(iss.channel); }
+    });
+    // drop stale active chips whose value no longer exists
+    Object.keys(activeChips).forEach(function (k) {
+      var i = k.indexOf(":"); var f = k.slice(0, i), v = k.slice(i + 1);
+      if (!lists[f] || lists[f].indexOf(v) === -1) delete activeChips[k];
+    });
+    order.forEach(function (f) {
+      lists[f].forEach(function (v) {
+        var key = f + ":" + v;
+        var label = (f === "status") ? (v === "action" ? "Action" : v === "waiting" ? "Waiting" : cap(v)) : v;
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip chip--" + f + (activeChips[key] ? " is-on" : "");
+        b.textContent = label;
+        b.addEventListener("click", function () {
+          if (activeChips[key]) delete activeChips[key]; else activeChips[key] = true;
+          b.classList.toggle("is-on");
+          renderList();
+        });
+        filterChips.appendChild(b);
+      });
+    });
+  }
+  function updateFilterCount(n, m) {
+    if (!filterCount) return;
+    var filtering = (filterQuery.trim() !== "") ||
+      Object.keys(activeChips).some(function (k) { return activeChips[k]; });
+    filterCount.textContent = filtering ? (n + " of " + m + " shown") : (m + (m === 1 ? " issue" : " issues"));
+  }
+
+  // -- Confidence + abstaining next-best-action zone --
+  function recZoneHtml(iss) {
+    var pill = "";
+    if (iss.confidence === "high") pill = '<span class="conf-pill high">High confidence</span>';
+    else if (iss.confidence === "med") pill = '<span class="conf-pill med">Medium confidence</span>';
+    else if (iss.confidence === "low") pill = '<span class="conf-pill low">Low confidence</span>';
+
+    if (isAbstaining(iss)) {
+      var reason = iss.abstain_reason ? '<p class="abstain-reason">' + escapeHtml(iss.abstain_reason) + "</p>" : "";
+      var resolve = iss.abstain_resolve ? '<p class="abstain-resolve"><strong>What would resolve it:</strong> ' + escapeHtml(iss.abstain_resolve) + "</p>" : "";
+      return '<div class="zone">' +
+        '<p class="zone-lbl">Recommended next action ' + pill + "</p>" +
+        '<div class="abstain">' +
+          '<p class="abstain-head">Not enough signal to recommend a next move.</p>' +
+          reason + resolve +
+        "</div>" +
+      "</div>";
+    }
+    return '<div class="zone">' +
+      '<p class="zone-lbl">Recommended next action ' + pill + "</p>" +
+      '<div class="rec"><div class="zone-body">' + (iss.rec_md || "<p>No recommendation recorded.</p>") + "</div></div>" +
+    "</div>";
+  }
+
+  // -- Command home: Next best actions + needs-signal + waiting-on --
+  function dueSoonOf(iss) { return !!(META[iss.id] && META[iss.id].dueSoon); }
+  function nbaRank(a, b) {
+    var r = (a.priority === "high" ? 0 : 1) - (b.priority === "high" ? 0 : 1); if (r) return r;
+    var d = (dueSoonOf(a) ? 0 : 1) - (dueSoonOf(b) ? 0 : 1); if (d) return d;
+    return ageNum(b.id) - ageNum(a.id);
+  }
+  function whyChips(iss) {
+    var chips = [], m = META[iss.id] || {};
+    if (m.due === "Past due") chips.push('<span class="why-chip red">Overdue</span>');
+    else if (m.dueSoon && m.due) chips.push('<span class="why-chip amber">Due ' + escapeHtml(m.due) + "</span>");
+    if (iss.priority === "high") chips.push('<span class="why-chip">High priority</span>');
+    if (ageNum(iss.id) > 7) chips.push('<span class="why-chip">Aged ' + escapeHtml(m.age || (ageNum(iss.id) + "d")) + "</span>");
+    if (iss.unblocks) chips.push('<span class="why-chip">Unblocks ' + escapeHtml(iss.unblocks) + "</span>");
+    return chips.slice(0, 3).join("");
+  }
+  function renderHome() {
+    dockEl.innerHTML = "";
+    var action = ISSUES.filter(function (i) { return i.state === "action"; });
+    var nba = action.filter(function (i) { return !isAbstaining(i); }).sort(nbaRank).slice(0, 5);
+    var needs = action.filter(isAbstaining);
+    var waiting = ISSUES.filter(function (i) { return i.state === "waiting"; });
+
+    var html = '<div class="home">' +
+      '<h1 class="home-h">Welcome to your Command Center.</h1>' +
+      '<p class="home-sub">A fresh read of your work graph: what needs you now, what is waiting on others, and where the signal is thin. Nothing here has been sent or changed.</p>';
+
+    html += '<div class="zone"><p class="zone-lbl">Next best actions</p>';
+    if (!nba.length) {
+      html += '<p class="home-empty">No clear next action right now.</p>';
+    } else {
+      html += '<div class="nba-list">';
+      nba.forEach(function (iss) {
+        html += '<button type="button" class="nba-item" data-goto="' + escapeHtml(iss.id) + '">' +
+          '<span class="nba-dot ' + iss.priority + '"></span>' +
+          '<span class="nba-main">' +
+            '<span class="nba-title">' + escapeHtml(iss.title) + "</span>" +
+            '<span class="nba-why">' + whyChips(iss) + "</span>" +
+          "</span>" +
+          '<span class="nba-party">' + escapeHtml(iss.party || "") + "</span>" +
+        "</button>";
+      });
+      html += "</div>";
+    }
+    html += "</div>";
+
+    if (needs.length) {
+      html += '<button type="button" class="needs-signal" data-goto="' + escapeHtml(needs[0].id) + '">' +
+        needs.length + (needs.length === 1 ? " item needs more signal" : " items need more signal") +
+      "</button>";
+    }
+
+    html += '<div class="zone"><p class="zone-lbl">Waiting on others</p>';
+    if (!waiting.length) {
+      html += '<p class="home-empty">Nothing is waiting on someone else.</p>';
+    } else {
+      html += '<div class="waiting-mini">';
+      waiting.slice(0, 6).forEach(function (iss) {
+        html += '<button type="button" class="wm-item" data-goto="' + escapeHtml(iss.id) + '">' +
+          '<span class="wm-title">' + escapeHtml(iss.title) + "</span>" +
+          '<span class="wm-party">' + escapeHtml(iss.party || "") + "</span>" +
+        "</button>";
+      });
+      html += "</div>";
+    }
+    html += "</div></div>";
+    panelEl.innerHTML = html;
+    wirePanelLinks(panelEl);
+  }
+
+  // -- Comms lane: River of convergence + Topic flow --
+  function commsFlowFor(topicId) {
+    var flows = (COMMS && COMMS.flow) || [];
+    for (var i = 0; i < flows.length; i++) { if (flows[i].topic === topicId) return flows[i]; }
+    return null;
+  }
+  function commsTempo(topicId) {
+    var flow = commsFlowFor(topicId);
+    if (!flow || !flow.days || !flow.days.length) return { text: "quiet", stalled: true };
+    var days = flow.days, last = -1;
+    for (var i = 0; i < days.length; i++) { if (days[i] > 0) last = i; }
+    if (last === -1) return { text: "quiet", stalled: true };
+    var stall = (days.length - 1) - last;
+    if (stall <= 1) return { text: "active", stalled: false };
+    return { text: "stalled " + stall + "d", stalled: true };
+  }
+  function commsRow(t) {
+    var btn = rowShell(t.id, sel.comms === t.id);
+    var tempo = commsTempo(t.id);
+    btn.innerHTML =
+      '<span class="dot ' + (tempo.stalled ? "med" : "high") + '" aria-hidden="true"></span>' +
+      '<span class="row-main">' +
+        '<span class="row-id">TOPIC</span>' +
+        '<div class="row-title">' + escapeHtml(t.label) + "</div>" +
+        '<div class="row-meta"><span class="m-age">' + escapeHtml(tempo.text) + "</span></div>" +
+      "</span>" +
+      '<span class="stagemark" aria-label="staged">-</span>';
+    return btn;
+  }
+  function statusColor(st) {
+    switch (String(st || "").toLowerCase()) {
+      case "agreed":   return "#1b6cba";  // blue-060 (settled)
+      case "disputed": return "#a55500";  // orange-060 (amber, contested)
+      case "flagged":  return "#d31710";  // red-060 (needs attention)
+      default:         return "#8a8a8a";  // neutral-050 (Open / unknown)
+    }
+  }
+  function commsLayout(c) {
+    var topics = (c.topics || []).slice();
+    var nodes = (c.nodes || []).slice();
+    var W = 640, padL = 100, padR = 22, padT = 26, padB = 24;
+    var H = Math.max(130, topics.length * 46 + 46);
+    var laneY = {};
+    topics.forEach(function (t, i) {
+      laneY[t.id] = (topics.length <= 1)
+        ? (padT + (H - padT - padB) / 2)
+        : (padT + i * (H - padT - padB) / (topics.length - 1));
+    });
+    var times = [];
+    nodes.forEach(function (n) { var t = parseISO(n.date); n._t = t; if (t != null) times.push(t); });
+    var minT = times.length ? Math.min.apply(null, times) : 0;
+    var maxT = times.length ? Math.max.apply(null, times) : 1;
+    if (minT === maxT) maxT = minT + 1;
+    function xOf(n, idx, count) {
+      if (n._t != null) return padL + (n._t - minT) / (maxT - minT) * (W - padL - padR);
+      return padL + (count <= 1 ? 0.5 : idx / (count - 1)) * (W - padL - padR);
+    }
+    var byTopic = {};
+    nodes.forEach(function (n) { (byTopic[n.topic] = byTopic[n.topic] || []).push(n); });
+    var placed = [];
+    topics.forEach(function (t) {
+      var arr = (byTopic[t.id] || []).slice().sort(function (a, b) { return (a._t || 0) - (b._t || 0); });
+      arr.forEach(function (n, i) {
+        n._x = xOf(n, i, arr.length);
+        n._y = laneY[t.id];
+        n._idx = placed.length;
+        placed.push(n);
+      });
+      byTopic[t.id] = arr;
+    });
+    return { topics: topics, laneY: laneY, byTopic: byTopic, nodes: placed, W: W, H: H, padL: padL, padR: padR };
+  }
+  function smoothPath(arr) {
+    var pts = arr.map(function (n) { return [n._x, n._y]; });
+    if (pts.length < 2) return "";
+    var d = "M " + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+    for (var i = 1; i < pts.length; i++) {
+      var mx = (pts[i - 1][0] + pts[i][0]) / 2, my = (pts[i - 1][1] + pts[i][1]) / 2;
+      d += " Q " + pts[i - 1][0].toFixed(1) + " " + pts[i - 1][1].toFixed(1) + " " + mx.toFixed(1) + " " + my.toFixed(1);
+    }
+    var last = pts[pts.length - 1];
+    d += " T " + last[0].toFixed(1) + " " + last[1].toFixed(1);
+    return d;
+  }
+  function commsSvg(lay) {
+    var s = '<div class="comms-svg-wrap"><svg viewBox="0 0 ' + lay.W + " " + lay.H +
+      '" class="comms-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="River of convergence">';
+    lay.topics.forEach(function (t) {
+      var y = lay.laneY[t.id];
+      s += '<line x1="' + lay.padL + '" y1="' + y.toFixed(1) + '" x2="' + (lay.W - lay.padR) + '" y2="' + y.toFixed(1) + '" class="comms-lane" />';
+      s += '<text x="8" y="' + (y + 4).toFixed(1) + '" class="comms-lane-lbl">' + escapeHtml(clip(t.label, 15)) + "</text>";
+    });
+    lay.topics.forEach(function (t) {
+      var arr = lay.byTopic[t.id] || [];
+      if (arr.length >= 2) s += '<path d="' + smoothPath(arr) + '" class="comms-path" />';
+    });
+    lay.nodes.forEach(function (n) {
+      var col = statusColor(n.status);
+      var on = (commsNode === n._idx);
+      s += '<circle data-node="' + n._idx + '" cx="' + n._x.toFixed(1) + '" cy="' + n._y.toFixed(1) +
+        '" r="' + (on ? 8 : 6) + '" fill="#fff" stroke="' + col + '" stroke-width="' + (on ? 3.5 : 3) + '" class="comms-node" />';
+    });
+    return s + "</svg></div>";
+  }
+  function commsLegend() {
+    var items = [["Agreed", "#1b6cba"], ["Open", "#8a8a8a"], ["Disputed", "#a55500"], ["Flagged", "#d31710"]];
+    var h = '<div class="comms-legend">';
+    items.forEach(function (it) {
+      h += '<span class="cl-item"><span class="cl-dot" style="border-color:' + it[1] + '"></span>' + it[0] + "</span>";
+    });
+    return h + "</div>";
+  }
+  function commsFlowHtml(c) {
+    var topics = c.topics || [];
+    var h = '<div class="flow-wrap">';
+    topics.forEach(function (t) {
+      var flow = commsFlowFor(t.id);
+      var days = (flow && flow.days) || [];
+      var tempo = commsTempo(t.id);
+      h += '<div class="flow-row"><div class="flow-name">' + escapeHtml(t.label) + '</div><div class="flow-cells">';
+      if (!days.length) {
+        h += '<span class="flow-empty">no activity</span>';
+      } else {
+        days.forEach(function (d) {
+          var op = Math.max(0, Math.min(3, num(d))) / 3;
+          h += '<span class="flow-cell" style="opacity:' + (0.12 + op * 0.88).toFixed(2) + '"></span>';
+        });
+      }
+      h += '</div><div class="flow-tempo ' + (tempo.stalled ? "stall" : "live") + '">' + escapeHtml(tempo.text) + "</div></div>";
+    });
+    return h + "</div>";
+  }
+  function commsNodeDetailHtml() {
+    if (commsNode == null || !commsPlaced || !commsPlaced[commsNode]) return "";
+    var n = commsPlaced[commsNode];
+    var col = statusColor(n.status);
+    return '<div class="node-detail"><div class="nd-top">' +
+      '<span class="nd-status" style="border-color:' + col + ";color:" + col + '">' + escapeHtml(cap(n.status)) + "</span>" +
+      '<span class="nd-date">' + escapeHtml(n.date || "") + "</span>" +
+      '<button type="button" class="nd-clear" id="commsClear">Clear</button>' +
+      "</div>" +
+      '<p class="nd-label">' + escapeHtml(n.label || "") + "</p>" +
+      (n.cite ? '<p class="nd-cite">' + escapeHtml(n.cite) + "</p>" : "") +
+    "</div>";
+  }
+  function renderComms() {
+    dockEl.innerHTML = "";
+    if (!COMMS || !(COMMS.topics && COMMS.topics.length)) {
+      panelEl.innerHTML = '<div class="welcome"><h1 class="home-h">No comms mapped this run.</h1>' +
+        '<p class="home-sub">When the scan finds cross-thread negotiation activity, this lane charts each topic as a river of convergence points and a tempo heat row.</p></div>';
+      return;
+    }
+    var lay = commsLayout(COMMS);
+    commsPlaced = lay.nodes;
+    var detailHtml = commsNodeDetailHtml();
+    var svg = commsSvg(lay);
+    var flowHtml = commsFlowHtml(COMMS);
+
+    panelEl.innerHTML =
+      '<div class="p-head"><div class="p-titlewrap">' +
+        '<h1 class="p-title">Comms convergence</h1>' +
+        '<div class="p-meta">Where each negotiation topic is converging. Click a point for its source.</div>' +
+      "</div></div>" +
+      detailHtml +
+      '<div class="zone"><p class="zone-lbl">River of convergence</p>' + svg + commsLegend() + "</div>" +
+      '<div class="zone"><p class="zone-lbl">Topic flow</p>' + flowHtml + "</div>";
+
+    var dots = panelEl.querySelectorAll("[data-node]");
+    for (var i = 0; i < dots.length; i++) {
+      (function (el) {
+        el.addEventListener("click", function () {
+          commsNode = parseInt(el.getAttribute("data-node"), 10);
+          renderPanel();
+        });
+      })(dots[i]);
+    }
+    var clr = panelEl.querySelector("#commsClear");
+    if (clr) clr.addEventListener("click", function () { commsNode = null; renderPanel(); });
+  }
+
+  // -- On-demand view header + link wiring --
+  function viewHeader(title, sub) {
+    return '<div class="view-head">' +
+      '<button type="button" class="view-back" data-back="1">Back to board</button>' +
+      '<h1 class="p-title">' + escapeHtml(title) + "</h1>" +
+      '<p class="p-meta">' + escapeHtml(sub) + "</p>" +
+    "</div>";
+  }
+  function wirePanelLinks(root) {
+    var backs = root.querySelectorAll("[data-back]");
+    for (var i = 0; i < backs.length; i++) {
+      backs[i].addEventListener("click", function () { panelView = null; syncViewButtons(); renderPanel(); });
+    }
+    var goers = root.querySelectorAll("[data-goto]");
+    for (var j = 0; j < goers.length; j++) {
+      (function (el) {
+        el.addEventListener("click", function () {
+          var id = el.getAttribute("data-goto");
+          setMode("issues");     // clears panelView, restores Issues lane
+          sel.issues = id;
+          renderList();
+          renderPanel();
+        });
+      })(goers[j]);
+    }
+  }
+
+  // -- Renewals radar (HIGH; offered when any issue carries renewal{}) --
+  function renderRenewals() {
+    dockEl.innerHTML = "";
+    var rows = ISSUES.filter(function (i) { return i.renewal && i.renewal.expiry; })
+      .map(function (i) { return { iss: i, dte: daysTo(i.renewal.expiry) }; })
+      .sort(function (a, b) {
+        var an = isNaN(a.dte) ? 1e9 : a.dte, bn = isNaN(b.dte) ? 1e9 : b.dte;
+        return an - bn;
+      });
+    var html = viewHeader("Renewals radar", "Contracts with a renewal or notice window, soonest first. Days to expiry are measured from this run's date.");
+    if (!rows.length) {
+      html += '<p class="home-empty">No renewals carried on the board this run.</p>';
+    } else {
+      html += '<div class="rnw-list">';
+      rows.forEach(function (r) {
+        var iss = r.iss, rn = iss.renewal;
+        var nb = parseISO(rn.notice_by);
+        var overdue = (nb != null && nb < RUN_TODAY);
+        var dteLabel = isNaN(r.dte) ? "n/a" : (r.dte < 0 ? "Expired" : r.dte + " days");
+        var dteCls = (r.dte < 0) ? " past" : ((r.dte >= 0 && r.dte <= 30) ? " soon" : "");
+        html += '<div class="rnw-item' + (overdue ? " overdue" : "") + '" data-goto="' + escapeHtml(iss.id) + '" role="button" tabindex="0">' +
+          '<div class="rnw-head">' +
+            '<span class="rnw-title">' + escapeHtml(iss.title) + "</span>" +
+            '<span class="rnw-dte' + dteCls + '">' + dteLabel + "</span>" +
+          "</div>" +
+          '<div class="rnw-meta">' +
+            "<span>" + escapeHtml(iss.party || "") + "</span>" +
+            '<span class="rnw-sep">/</span>' +
+            "<span>Expiry " + escapeHtml(rn.expiry) + "</span>" +
+            '<span class="rnw-sep">/</span>' +
+            '<span class="' + (overdue ? "rnw-notice-bad" : "") + '">Notice by ' + escapeHtml(rn.notice_by || "n/a") + (overdue ? " (passed)" : "") + "</span>" +
+            '<span class="auto-pill ' + (rn.auto_renew ? "on" : "off") + '">Auto-renew ' + (rn.auto_renew ? "ON" : "OFF") + "</span>" +
+          "</div>" +
+          '<div class="rnw-rec">' + (iss.rec_md || "<p>No recommendation recorded.</p>") + "</div>" +
+        "</div>";
+      });
+      html += "</div>";
+    }
+    panelEl.innerHTML = html;
+    wirePanelLinks(panelEl);
+  }
+
+  // -- My savings (HIGH; offered when savings{} present) --
+  function renderSavings() {
+    dockEl.innerHTML = "";
+    var s = SAVINGS;
+    var html = viewHeader("My savings", "Committed vs achieved this year, with the active pipeline. Figures are illustrative and sum deterministically.");
+    if (!s) {
+      html += '<p class="home-empty">No savings summary carried this run.</p>';
+      panelEl.innerHTML = html; wirePanelLinks(panelEl); return;
+    }
+    var achieved = num(s.achieved), target = num(s.target), committed = num(s.committed);
+    var ci = num(s.ci), ca = num(s.ca);
+    var cica = (ci + ca) || achieved || 1;
+    var toGo = Math.max(0, target - achieved);
+    var pct = target > 0 ? Math.round(achieved / target * 100) : 0;
+    var ciPct = Math.round(ci / cica * 100), caPct = 100 - ciPct;
+
+    html += '<div class="sav-hero"><span class="sav-num">' + money(achieved) + '</span>' +
+      '<span class="sav-cap">achieved of ' + money(target) + " target</span></div>";
+    html += '<div class="sav-progress"><div class="sav-bar"><span style="width:' + Math.min(100, pct) + '%"></span></div>' +
+      '<div class="sav-progress-lbl">' + pct + "% of target / " + money(toGo) + " to go</div></div>";
+
+    html += '<div class="zone"><p class="zone-lbl">Cost improvement vs cost avoidance</p>' +
+      '<div class="split-bar"><span class="split-ci" style="width:' + ciPct + '%"></span>' +
+      '<span class="split-ca" style="width:' + caPct + '%"></span></div>' +
+      '<div class="split-legend"><span><span class="sl-dot ci"></span>Cost improvement ' + money(ci) + "</span>" +
+      '<span><span class="sl-dot ca"></span>Cost avoidance ' + money(ca) + "</span></div></div>";
+
+    var pipe = s.pipeline || [];
+    html += '<div class="zone"><p class="zone-lbl">Pipeline</p>';
+    if (!pipe.length) {
+      html += '<p class="home-empty">No pipeline items.</p>';
+    } else {
+      html += '<div class="pipeline">';
+      pipe.forEach(function (p) {
+        var st = String(p.status || "").toLowerCase();
+        html += '<div class="pipe-item">' +
+          '<span class="pip ' + st + '"></span>' +
+          '<span class="pipe-name">' + escapeHtml(p.name || "") + "</span>" +
+          '<span class="pipe-amt">' + money(num(p.amount)) + "</span>" +
+          '<span class="pipe-status">' + escapeHtml(cap(p.status || "")) + "</span>" +
+        "</div>";
+      });
+      html += "</div>";
+    }
+    html += "</div>";
+    html += '<p class="sav-foot">Committed target for the year: ' + money(committed) + ".</p>";
+    panelEl.innerHTML = html;
+    wirePanelLinks(panelEl);
+  }
+
+  // -- Report card + bandwidth (optional; offered when reportCard{} present) --
+  function renderReportCard() {
+    dockEl.innerHTML = "";
+    var rc = REPORTCARD;
+    var html = viewHeader("Report card", "A self-scored read on category health and your bandwidth. Grades and labels are illustrative.");
+    if (!rc) {
+      html += '<p class="home-empty">No report card carried this run.</p>';
+      panelEl.innerHTML = html; wirePanelLinks(panelEl); return;
+    }
+    html += '<div class="rc-gpa"><span class="rc-gpa-num">' + escapeHtml(String(rc.gpa != null ? rc.gpa : "n/a")) +
+      '</span><span class="rc-gpa-cap">overall GPA</span></div>';
+    var cats = rc.categories || [];
+    html += '<div class="zone"><p class="zone-lbl">By category</p>';
+    if (!cats.length) {
+      html += '<p class="home-empty">No categories scored.</p>';
+    } else {
+      html += '<div class="rc-list">';
+      cats.forEach(function (c) {
+        var g = String(c.grade || "").toUpperCase().charAt(0);
+        var gc = (g === "D" || g === "F") ? "bad" : (g === "C" ? "warn" : "good");
+        var v = num(c.value), tg = num(c.target);
+        var pct = tg > 0 ? Math.min(100, Math.round(v / tg * 100)) : 0;
+        html += '<div class="rc-item">' +
+          '<span class="rc-grade ' + gc + '">' + escapeHtml(c.grade || "-") + "</span>" +
+          '<span class="rc-main"><span class="rc-name">' + escapeHtml(c.name || "") + "</span>" +
+          '<span class="rc-bar"><span style="width:' + pct + '%"></span></span></span>' +
+          '<span class="rc-val">' + escapeHtml(String(c.value)) + " / " + escapeHtml(String(c.target)) + "</span>" +
+        "</div>";
+      });
+      html += "</div>";
+    }
+    html += "</div>";
+    var bw = rc.bandwidth;
+    if (bw) {
+      var load = num(bw.load), sust = num(bw.sustainable) || 100;
+      var denom = Math.max(load, sust) || 1;
+      var loadPct = Math.round(load / denom * 100);
+      var markPct = Math.round(sust / denom * 100);
+      var over = load > sust;
+      html += '<div class="zone"><p class="zone-lbl">Bandwidth</p>' +
+        '<div class="bw-gauge"><span class="bw-fill ' + (over ? "over" : "ok") + '" style="width:' + Math.min(100, loadPct) + '%"></span>' +
+        '<span class="bw-mark" style="left:' + Math.min(100, markPct) + '%"></span></div>' +
+        '<div class="bw-lbl">Load ' + load + " vs sustainable " + sust + (over ? " (over capacity)" : " (within capacity)") + "</div></div>";
+    }
+    panelEl.innerHTML = html;
+    wirePanelLinks(panelEl);
+  }
+
+  // ── Shared direction zone (issues only, pinned in the dock) ──
+  function directionZone(itemId) {
+    var isStaged = staged[itemId] != null;
+    return '<div class="zone">' +
+      '<p class="zone-lbl dir-lbl"><span>Your direction</span></p>' +
+      '<textarea class="dir" id="dir"></textarea>' +
+      '<div class="dir-actions">' +
+        '<button class="btn btn--stage" id="btnStage" type="button" disabled>Stage direction</button>' +
+        '<button class="btn btn--clear" id="btnClear" type="button"' + (isStaged ? "" : " disabled") + ">Remove from queue</button>" +
+      "</div>" +
+    "</div>";
+  }
+
+  function wireDirection(itemId, placeholder) {
+    var dir = document.getElementById("dir");
+    var btnStage = document.getElementById("btnStage");
+    var btnClear = document.getElementById("btnClear");
+    dir.setAttribute("placeholder", placeholder);
+    if (staged[itemId] != null) dir.value = staged[itemId];
+
+    function syncStageBtn() {
+      var v = dir.value.trim();
+      btnStage.disabled = v.length === 0;
+      btnStage.textContent = (staged[itemId] != null) ? "Update direction" : "Stage direction";
+    }
+    dir.addEventListener("input", syncStageBtn);
+    syncStageBtn();
+
+    btnStage.addEventListener("click", function () {
+      var v = dir.value.trim();
+      if (!v) return;
+      staged[itemId] = v;
+      flashChip();
+      renderList();
+      renderFooter();
+      syncStageBtn();
+      btnClear.disabled = false;
+    });
+
+    btnClear.addEventListener("click", function () {
+      delete staged[itemId];
+      dir.value = "";
+      var chip = document.getElementById("stagedChip");
+      if (chip) chip.classList.remove("show");
+      renderList();
+      renderFooter();
+      syncStageBtn();
+      btnClear.disabled = true;
+    });
+  }
+
+  function flashChip() {
+    var chip = document.getElementById("stagedChip");
+    if (!chip) return;
+    chip.classList.add("show");
+    chip.textContent = "✓ Staged";
+    chip.style.transform = "scale(1.08)";
+    setTimeout(function () { chip.style.transform = "scale(1)"; }, 160);
+  }
+
+  // ── Footer / counts ──
+  function renderFooter() {
+    var n = stagedCount();
+    btnSubmit.disabled = n === 0;
+    btnResetAll.disabled = n === 0;
+    btnSubmit.textContent = n > 0 ? "Submit Actions · " + n : "Submit Actions";
+  }
+
+  // ── Build the consolidated prompt ──
+  function buildPrompt() {
+    var lines = [];
+    ISSUES.forEach(function (iss) {
+      if (staged[iss.id] != null) lines.push("[" + iss.id + " " + iss.party + "] " + staged[iss.id]);
+    });
+    return lines.join("\n");
+  }
+
+  function buildPromptHtml() {
+    return ISSUES.filter(function (i) { return staged[i.id] != null; })
+      .map(function (iss) {
+        return '<span class="pid">[' + iss.id + " " + iss.party + "]</span> " + escapeHtml(staged[iss.id]);
+      }).join("\n");
+  }
+
+  // ── Submit ──
+  btnSubmit.addEventListener("click", function () {
+    if (stagedCount() === 0) return;
+    var text = buildPrompt();
+    if (typeof window.sendPrompt === "function") {
+      window.sendPrompt(text);   // live Field Guide path
+    } else {
+      promptBox.innerHTML = buildPromptHtml();
+      scrim.classList.add("show");
+    }
+  });
+
+  btnResetAll.addEventListener("click", function () {
+    if (stagedCount() === 0) return;
+    staged = {};
+    renderList();
+    renderPanel();
+    renderFooter();
+  });
+
+  // ── Overlay controls ──
+  document.getElementById("btnCloseSheet").addEventListener("click", function () {
+    scrim.classList.remove("show");
+  });
+  scrim.addEventListener("click", function (e) {
+    if (e.target === scrim) scrim.classList.remove("show");
+  });
+  document.getElementById("btnCopy").addEventListener("click", function () {
+    var text = buildPrompt();
+    var btn = this;
+    function ok() { btn.textContent = "Copied ✓"; setTimeout(function () { btn.textContent = "Copy prompt"; }, 1400); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () { fallbackCopy(text); ok(); });
+    } else { fallbackCopy(text); ok(); }
+  });
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  // ── util ──
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // ── Ambient: Theo wanders the footer with a little walk cycle and the odd roar ──
+  (function () {
+    var zone = document.getElementById("fgPacer");
+    var dino = document.getElementById("fgPacerDino");
+    var roar = document.getElementById("fgRoar");
+    if (!zone || !dino) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    var x = 0, dir = 1, speed = 26, target = 0, phase = 0, depth = 1, targetDepth = 1;
+    var state = "walk", until = 0, last = null;
+
+    function maxX() { return Math.max(0, zone.clientWidth - dino.offsetWidth); }
+    function place() { dino.style.left = x + "px"; if (roar) roar.style.left = x + "px"; }
+    function stand() { dino.style.transform = "scaleX(" + (dir > 0 ? -1 : 1) + ") scale(" + depth.toFixed(3) + ")"; }
+    function pickTarget() {
+      var lim = maxX(), t, tries = 0;
+      do { t = Math.random() * lim; tries++; }
+      while (tries < 6 && Math.abs(t - x) < Math.min(70, lim * 0.35));
+      target = t; dir = (target >= x) ? 1 : -1; speed = 10 + Math.random() * 16;
+      targetDepth = 0.82 + Math.random() * 0.36;   // 0.82 (far) to 1.18 (near)
+    }
+    pickTarget(); place(); stand();
+
+    function step(ts) {
+      if (last == null) last = ts;
+      var dt = Math.min(0.05, (ts - last) / 1000); last = ts;
+      var f = (dir > 0 ? -1 : 1);
+
+      if (state === "walk") {
+        x += dir * speed * dt;
+        var lim = maxX(), arrived = (dir > 0 && x >= target) || (dir < 0 && x <= target);
+        if (x < 0) { x = 0; arrived = true; }
+        if (x > lim) { x = lim; arrived = true; }
+        place();
+        // walk cycle: gentle bob + slight wobble, cadence scales with speed
+        phase += dt * (4 + speed * 0.12);
+        depth += (targetDepth - depth) * Math.min(1, dt * 0.8);   // ease toward this trip's distance
+        var bob = -Math.abs(Math.sin(phase)) * 1.5;
+        var tilt = Math.sin(phase) * 4;
+        dino.style.transform = "scaleX(" + f + ") translateY(" + bob + "px) rotate(" + tilt + "deg) scale(" + depth.toFixed(3) + ")";
+        if (arrived) {
+          stand();
+          if (Math.random() < 0.55) {
+            state = "roar";
+            dino.style.transition = "transform .15s";
+            dino.style.transform = "scaleX(" + f + ") scale(" + (depth * 1.18).toFixed(3) + ")";
+            if (roar) {
+              roar.textContent = "Ra" + "w".repeat(1 + Math.floor(Math.random() * 4)) + "r".repeat(1 + Math.floor(Math.random() * 3)) + "!";
+              if (dir > 0) { roar.style.left = (x + dino.offsetWidth - 6) + "px"; roar.style.transform = "translate(2px,-3px) rotate(-5deg)"; }
+              else { roar.style.left = (x + 6) + "px"; roar.style.transform = "translateX(-100%) translate(-2px,-3px) rotate(-5deg)"; }
+              roar.classList.add("show");
+            }
+            until = ts + 1200;
+          } else {
+            state = "pause";
+            until = ts + (900 + Math.random() * 1800);
+          }
+        }
+      } else if (state === "roar") {
+        if (ts >= until) {
+          if (roar) roar.classList.remove("show");      // start the fade
+          dino.style.transform = "scaleX(" + f + ") scale(" + depth.toFixed(3) + ")";    // shrink back, keep facing
+          state = "settle"; until = ts + 300;            // hold facing until Rawr! has faded (no turn yet)
+        }
+      } else if (ts >= until) {                          // pause or settle complete
+        state = "walk";
+        dino.style.transition = "";
+        pickTarget();
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+
+
+  /* ───────────────  Persistence layer (window.storage)  ───────────────
+     The work graph lives in the artifact's own per-user storage and
+     accumulates across sessions. Each run the host writes FG_DELTA (the
+     current view); we upsert it into the stored graph by issue id, so
+     issues persist and update instead of being re-derived every run.
+     window.storage is async; if it is absent (board shown outside an
+     artifact host) we fall back to the delta alone so it still renders. */
+  var ISSUES = [], META = {}, MEETINGS = [], HIDDEN_NOTE = "";
+  var COMMS = null, SAVINGS = null, REPORTCARD = null, RUN_TODAY = 0;
+  var commsPlaced = null, commsNode = null;
+  var STORE_KEY = "theo.fieldguide.workgraph.v1";
+  var FG_GRAPH = null;
+
+  /* FG_DELTA = the current view for this run, read from the inert
+     application/json island (#fgData) rather than an inline JS literal.
+     Emitting DATA (JSON) is far safer than emitting CODE (a JS object):
+     a syntax error inside a type="application/json" block is NOT executed,
+     so a malformed payload can never break this script or blank the board.
+     readDelta parses defensively; on failure FG_DELTA is null, FG_DATA_ERROR
+     is set, and fgBoot degrades to the saved/stored board with a banner. */
+  var FG_DATA_ERROR = null;
+  function readDelta() {
+    var el = document.getElementById("fgData");
+    var raw = el ? el.textContent : "";
+    if (!raw || !raw.trim()) return null;
+    try { return JSON.parse(raw); }
+    catch (e) { FG_DATA_ERROR = e; return null; }   // isolated; never throws to load
+  }
+  function normalizeDelta(d) {
+    if (!d || typeof d !== "object") return { issues: [], meetings: null, hidden_note: null };
+    if (!Array.isArray(d.issues)) d.issues = [];
+    return d;   // meetings / comms / savings / reportCard pass through (null keeps stored)
+  }
+  var FG_DELTA = readDelta();
+
+  function fgEmptyGraph() { return { v:1, synced:"", today:"", issues:{}, meetings:[], hidden_note:"", comms:null, savings:null, reportCard:null }; }
+
+  function fgMerge(g, d) {
+    if (!g.issues) g.issues = {};
+    if (d.synced) g.synced = d.synced;
+    if (d.today) g.today = d.today;
+    (d.issues || []).forEach(function (di) {
+      if (!di || !di.id) return;
+      if (di.close) { if (g.issues[di.id]) delete g.issues[di.id]; return; }
+      var ex = g.issues[di.id] || { id: di.id, closed: false };
+      ["title","party","priority","state","state_md","rec_md","due","dueSoon","opened","age",
+       "confidence","abstain","abstain_reason","abstain_resolve","topic","channel","renewal","unblocks"]
+        .forEach(function (k) { if (di[k] !== undefined && di[k] !== null) ex[k] = di[k]; });
+      ex.closed = false;
+      ex.lastTouched = d.synced || ex.lastTouched || "";
+      g.issues[di.id] = ex;
+    });
+    if (d.meetings != null) g.meetings = d.meetings;
+    if (d.hidden_note != null) g.hidden_note = d.hidden_note;
+    if (d.comms != null) g.comms = d.comms;
+    if (d.savings != null) g.savings = d.savings;
+    if (d.reportCard != null) g.reportCard = d.reportCard;
+    return g;
+  }
+
+  function fgProject(g) {
+    var live = [];
+    Object.keys(g.issues || {}).forEach(function (id) {
+      var it = g.issues[id]; if (it && !it.closed) live.push(it);
+    });
+    ISSUES = live.map(function (it) {
+      return { id:it.id, title:it.title, party:it.party, priority:it.priority,
+               state:it.state, state_md:it.state_md, rec_md:it.rec_md,
+               confidence:it.confidence, abstain:it.abstain, abstain_reason:it.abstain_reason,
+               abstain_resolve:it.abstain_resolve, topic:it.topic, channel:it.channel,
+               renewal:it.renewal, unblocks:it.unblocks };
+    });
+    META = {};
+    live.forEach(function (it) { META[it.id] = { due:it.due, dueSoon:it.dueSoon, opened:it.opened, age:it.age }; });
+    MEETINGS = g.meetings || [];
+    HIDDEN_NOTE = g.hidden_note || "";
+    COMMS = g.comms || null;
+    SAVINGS = g.savings || null;
+    REPORTCARD = g.reportCard || null;
+    RUN_TODAY = parseISO(g.today) || todayMidnight();
+  }
+
+  function fgLoad(cb) {
+    try {
+      if (window.storage && window.storage.get) {
+        window.storage.get(STORE_KEY).then(function (r) {
+          var g = fgEmptyGraph();
+          if (r && r.value) { try { g = JSON.parse(r.value); } catch (e) {} }
+          cb(g, true);
+        }, function () { cb(fgEmptyGraph(), false); });
+        return;
+      }
+    } catch (e) {}
+    cb(fgEmptyGraph(), false);
+  }
+
+  function fgSave(g) {
+    try { if (window.storage && window.storage.set) window.storage.set(STORE_KEY, JSON.stringify(g)); }
+    catch (e) {}
+  }
+
+  function fgSetSynced(s) {
+    var el = document.getElementById("fgClock");
+    if (el && s) el.innerHTML = '<span class="synced-dot" aria-hidden="true"></span>Synced ' + s;
+  }
+
+  function fgMountIO() {
+    var host = document.querySelector(".fg-top-right");
+    if (!host || document.getElementById("fgIO")) return;
+    var wrap = document.createElement("span"); wrap.id = "fgIO"; wrap.className = "fg-io";
+    var exp = document.createElement("button"); exp.type = "button"; exp.className = "fg-io-btn"; exp.textContent = "Export";
+    exp.addEventListener("click", fgExport);
+    var imp = document.createElement("button"); imp.type = "button"; imp.className = "fg-io-btn"; imp.textContent = "Import";
+    var file = document.createElement("input"); file.type = "file"; file.accept = "application/json,.json"; file.style.display = "none";
+    file.addEventListener("change", fgImport);
+    imp.addEventListener("click", function () { file.click(); });
+    wrap.appendChild(exp); wrap.appendChild(imp); wrap.appendChild(file);
+    host.appendChild(wrap);
+  }
+
+  function fgExport() {
+    var data = JSON.stringify(FG_GRAPH || fgEmptyGraph(), null, 2);
+    var blob = new Blob([data], { type: "application/json" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "theo-workgraph.json";
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 0);
+  }
+
+  function fgImport(e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try { var g = JSON.parse(rd.result); FG_GRAPH = g; fgSave(g); fgProject(g);
+            fgSetSynced(g.synced); sel = { issues:null, meetings:null, comms:null };
+            commsNode = null; panelView = null; fgRenderAll(); }
+      catch (err) { alert("Import failed: not valid work-graph JSON."); }
+    };
+    rd.readAsText(f);
+  }
+
+  function fgRenderAll() {
+    renderKpis();
+    syncViewButtons();
+    renderFilterBar();
+    renderList();
+    renderPanel();
+    renderFooter();
+  }
+
+  function fgBoot() {
+    fgLoad(function (g) {
+      if (FG_DELTA) {
+        FG_GRAPH = fgMerge(g, normalizeDelta(FG_DELTA));
+        fgSave(FG_GRAPH);
+      } else {
+        FG_GRAPH = g;   // no usable delta this run; fall back to the stored board
+      }
+      fgProject(FG_GRAPH);
+      fgSetSynced((FG_DELTA && FG_DELTA.synced) || FG_GRAPH.synced);
+      fgMountIO();
+      if (FG_DATA_ERROR) showBanner("Couldn't read this run's update. Showing your saved board.");
+      fgRenderAll();
+    });
+  }
+
+  // ── Boot ──
+  fgBoot();
+})();
+
+</script>
+</body>
+</html>

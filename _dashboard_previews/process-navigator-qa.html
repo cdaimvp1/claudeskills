@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Process Navigator - Sample Q&amp;A Exchange</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --blue:#0F3A85;
+    --blue-bg:#D4E5F7;
+    --blue-border:#0F3A8540;
+    --amber:#B45309;
+    --amber-bg:#FFF0D8;
+    --amber-border:#B4530955;
+    --red:#E1251B;
+    --red-bg:#FDE8E5;
+    --red-border:#E1251B40;
+    --stone:#8A969E;
+    --stone-bg:#E4EBF1;
+    --ink:#212121;
+    --page:#EEF1F4;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--page);
+    color:var(--ink);
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:14px;
+    line-height:1.55;
+    padding:32px 16px 60px;
+  }
+  .page{
+    max-width:840px;
+    margin:0 auto;
+  }
+
+  /* ---------- brand bar ---------- */
+  .brandbar{
+    background:var(--blue);
+    color:#fff;
+    border-radius:10px 10px 0 0;
+    padding:16px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .brandbar .name{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:19px;
+    font-weight:700;
+    letter-spacing:.01em;
+  }
+  .brandbar .sub{
+    font-size:11px;
+    color:#CBDAF0;
+    margin-top:2px;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+  .brandbar .tag{
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:20px;
+    padding:5px 11px;
+    white-space:nowrap;
+  }
+
+  .shell{
+    background:var(--card);
+    border:1px solid #DCE3EA;
+    border-top:none;
+    border-radius:0 0 10px 10px;
+    padding:26px 26px 8px;
+  }
+
+  .metaRow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .metaChip{
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:5px 11px;
+    border-radius:20px;
+    border:1px solid var(--stone-bg);
+    color:var(--stone);
+    background:#F7F9FA;
+  }
+  .metaChip.live{
+    color:var(--blue);
+    background:var(--blue-bg);
+    border-color:var(--blue-border);
+  }
+  .metaChip.bucket{
+    color:var(--ink);
+    background:var(--stone-bg);
+    border-color:#c9d3da;
+  }
+
+  /* ---------- chat messages ---------- */
+  .msg{
+    display:flex;
+    gap:12px;
+    margin-bottom:26px;
+    align-items:flex-start;
+  }
+  .avatar{
+    flex:0 0 auto;
+    width:38px;height:38px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:Georgia,serif;
+    font-weight:700;
+    font-size:13px;
+    color:#fff;
+  }
+  .avatar.person{background:#5B6B77;}
+  .avatar.skill{background:var(--blue);}
+
+  .msgBody{flex:1 1 auto; min-width:0;}
+  .msgHead{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-bottom:6px;
+    flex-wrap:wrap;
+  }
+  .msgHead .who{
+    font-weight:700;
+    font-size:13px;
+  }
+  .msgHead .role{
+    font-size:11.5px;
+    color:var(--stone);
+  }
+  .msgHead .time{
+    font-size:11px;
+    color:var(--stone);
+    margin-left:auto;
+  }
+
+  .bubble{
+    background:#F1F4F7;
+    border:1px solid #E1E7EC;
+    border-radius:12px;
+    border-top-left-radius:3px;
+    padding:14px 16px;
+    font-size:14px;
+  }
+  .bubble .qtext{
+    margin:0;
+  }
+  .bubble .inputsUsed{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed #D4DBE1;
+    font-size:11.5px;
+    color:var(--stone);
+  }
+  .bubble .inputsUsed b{color:var(--ink);}
+  .inputPill{
+    display:inline-block;
+    background:#fff;
+    border:1px solid #D4DBE1;
+    border-radius:6px;
+    padding:2px 8px;
+    font-size:11px;
+    margin:3px 4px 0 0;
+    color:var(--ink);
+  }
+
+  /* ---------- answer card ---------- */
+  .answerCard{
+    background:#fff;
+    border:1px solid #DCE3EA;
+    border-radius:12px;
+    border-top-left-radius:3px;
+    overflow:hidden;
+  }
+  .aSection{
+    padding:15px 18px;
+    border-bottom:1px solid #ECEFF2;
+  }
+  .aSection:last-child{border-bottom:none;}
+  .aLabel{
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--blue);
+    margin:0 0 7px;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+  .aLabel .bar{
+    display:inline-block;
+    width:3px;height:11px;
+    background:var(--blue);
+    margin-right:7px;
+    border-radius:2px;
+    vertical-align:middle;
+  }
+
+  .qReframed{
+    font-family:Georgia,serif;
+    font-style:italic;
+    color:#3A4650;
+    font-size:14.5px;
+    margin:0;
+  }
+
+  .answerHeadline{
+    font-family:Georgia,serif;
+    font-size:16.5px;
+    font-weight:700;
+    color:var(--ink);
+    margin:0;
+    line-height:1.45;
+  }
+
+  .detailsList{
+    margin:0;
+    padding-left:19px;
+  }
+  .detailsList li{
+    margin-bottom:9px;
+    font-size:13.5px;
+  }
+  .detailsList li:last-child{margin-bottom:0;}
+
+  .citeList{
+    margin:0;
+    padding:0;
+    list-style:none;
+  }
+  .citeItem{
+    display:flex;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px solid #F0F2F4;
+    font-size:12.5px;
+  }
+  .citeItem:last-child{border-bottom:none;padding-bottom:0;}
+  .citeItem:first-child{padding-top:0;}
+  .citeMark{
+    flex:0 0 auto;
+    width:8px;height:8px;
+    border-radius:50%;
+    margin-top:5px;
+    background:var(--blue);
+  }
+  .citeMark.unread{
+    background:transparent;
+    border:1.5px dashed var(--stone);
+  }
+  .citeMain b{display:block;font-size:13px;color:var(--ink);}
+  .citeMain .section{color:#3A4650;}
+  .citeMain .url{
+    display:block;
+    color:var(--stone);
+    font-size:11px;
+    word-break:break-all;
+    margin-top:2px;
+  }
+  .citeMain .asof{
+    display:inline-block;
+    margin-top:3px;
+    font-size:10.5px;
+    font-weight:700;
+    color:var(--blue);
+    background:var(--blue-bg);
+    border-radius:10px;
+    padding:1px 8px;
+  }
+  .citeMain .unreadNote{
+    font-size:11.5px;
+    color:var(--stone);
+    font-style:italic;
+  }
+
+  .confRow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .confChip{
+    font-family:Georgia,serif;
+    font-weight:700;
+    font-size:13px;
+    padding:5px 14px;
+    border-radius:20px;
+  }
+  .confChip.high{color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-border);}
+  .confRationale{font-size:12px;color:#3A4650;flex:1 1 260px;}
+
+  .nextGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  @media (max-width:620px){
+    .nextGrid{grid-template-columns:1fr;}
+  }
+  .nextTile{
+    background:#F7F9FA;
+    border:1px solid #E7ECF0;
+    border-left:3px solid var(--blue);
+    border-radius:8px;
+    padding:11px 12px;
+  }
+  .nextTile .nLabel{
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    color:var(--stone);
+    margin:0 0 5px;
+  }
+  .nextTile .nVal{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    margin:0 0 3px;
+  }
+  .nextTile .nSub{
+    font-size:11.5px;
+    color:#3A4650;
+    margin:0;
+  }
+
+  .caveat{
+    background:var(--amber-bg);
+    border:1px solid var(--amber-border);
+    border-left:4px solid var(--amber);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:11.5px;
+    line-height:1.5;
+    margin-top:2px;
+  }
+  .caveat b{color:var(--amber);}
+
+  .crossSkill{
+    margin-top:18px;
+    padding:14px 16px;
+    background:#F7F9FA;
+    border:1px dashed #D4DBE1;
+    border-radius:10px;
+  }
+  .crossSkill .csQ{
+    font-size:13px;
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .csBtn{
+    display:inline-block;
+    font-size:12px;
+    font-weight:700;
+    padding:6px 14px;
+    border-radius:18px;
+    margin-right:8px;
+    border:1px solid #C7D0D8;
+    background:#fff;
+    color:#5B6B77;
+  }
+  .csBtn.default{
+    border-color:var(--blue-border);
+    background:var(--blue-bg);
+    color:var(--blue);
+  }
+
+  .foot{
+    margin-top:18px;
+    padding:14px 4px 4px;
+    border-top:1px solid #E4EBF1;
+    font-size:11px;
+    color:var(--stone);
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="brandbar">
+    <div>
+      <div class="name">Process Navigator</div>
+      <div class="sub">Procurement Process Q&amp;A - Lilly Skills Suite v10.6.6</div>
+    </div>
+    <div class="tag">chat-only skill v1.2</div>
+  </div>
+
+  <div class="shell">
+
+    <div class="metaRow">
+      <span class="metaChip live">Live policy read - M365 connector</span>
+      <span class="metaChip bucket">Question type: Contract instrument</span>
+      <span class="metaChip">Read as of Jul 22, 2026</span>
+    </div>
+
+    <!-- Stakeholder question -->
+    <div class="msg">
+      <div class="avatar person">JR</div>
+      <div class="msgBody">
+        <div class="msgHead">
+          <span class="who">Jordan Reyes</span>
+          <span class="role">Sourcing Manager, IT Category</span>
+          <span class="time">10:42 AM</span>
+        </div>
+        <div class="bubble">
+          <p class="qtext">Do I need an MSA for this, or can I just use PO T&amp;Cs? It's a consulting engagement, roughly $80,000 a year, no system access for the vendor.</p>
+          <div class="inputsUsed">
+            <b>Inputs captured (Step 1b, asked once, batched):</b><br>
+            <span class="inputPill">Contract value: $80,000 / year</span>
+            <span class="inputPill">Use-case: Professional / consulting services, no system access</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill answer -->
+    <div class="msg">
+      <div class="avatar skill">PN</div>
+      <div class="msgBody">
+        <div class="msgHead">
+          <span class="who">Process Navigator</span>
+          <span class="role">answering from Global Procurement Playbook + FRAP Policy</span>
+          <span class="time">10:42 AM</span>
+        </div>
+
+        <div class="answerCard">
+
+          <div class="aSection">
+            <p class="aLabel"><span class="bar"></span>Question (reframed)</p>
+            <p class="qReframed">For an $80,000/year professional-services engagement with no vendor access to Lilly data or systems, is a full MSA required, or is standard PO Terms &amp; Conditions sufficient?</p>
+          </div>
+
+          <div class="aSection">
+            <p class="aLabel"><span class="bar"></span>Answer</p>
+            <p class="answerHeadline">Standard PO Terms &amp; Conditions are sufficient. A full MSA is not required for this engagement as described.</p>
+          </div>
+
+          <div class="aSection">
+            <p class="aLabel"><span class="bar"></span>Details</p>
+            <ul class="detailsList">
+              <li>Total contract value ($80,000/year) falls under the Playbook's PO-T&amp;Cs ceiling for standalone services engagements (Section 4.2 sets that ceiling at $100,000 total value, including renewals).</li>
+              <li>No vendor access to Lilly data or systems was indicated for this use-case, so TPRM and Privacy Review are not triggered here.</li>
+              <li>This is a single-year engagement as described. If it becomes multi-year and cumulative value crosses $100,000, re-run this check: the threshold is evaluated on total value including renewals, not the annual figure alone.</li>
+              <li>FRAP does not apply: the Global Following FRAP Policy governs foreign-currency / cross-border payment-following arrangements, not standard domestic services procurement of this kind.</li>
+            </ul>
+          </div>
+
+          <div class="aSection">
+            <p class="aLabel"><span class="bar"></span>Citations</p>
+            <ul class="citeList">
+              <li class="citeItem">
+                <span class="citeMark"></span>
+                <span class="citeMain">
+                  <b>Global Procurement Playbook</b>
+                  <span class="section">Section 4.2, "Contract Instrument Selection"</span>
+                  <span class="url">collab.lilly.com/sites/Global_Procurement/Playbook2.0/SitePages/Global-Procurement-Playbook-Main-Page.aspx</span>
+                  <span class="asof">read as of Jul 22, 2026</span>
+                </span>
+              </li>
+              <li class="citeItem">
+                <span class="citeMark"></span>
+                <span class="citeMain">
+                  <b>Global Following FRAP Policy (PDF)</b>
+                  <span class="section">Section 2, "Applicability"</span>
+                  <span class="url">collab.lilly.com/.../Global Following FRAP Policy.pdf</span>
+                  <span class="asof">read as of Jul 22, 2026</span>
+                </span>
+              </li>
+              <li class="citeItem">
+                <span class="citeMark unread"></span>
+                <span class="citeMain">
+                  <b>Global ProtectLilly</b>
+                  <span class="unreadNote">Not read for this question - no data/system access was indicated, so third-party risk review was out of scope here. (This source lives on the now.lilly.com intranet, which the M365 connector does not index; see Confidence note.)</span>
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="aSection">
+            <p class="aLabel"><span class="bar"></span>Confidence</p>
+            <div class="confRow">
+              <span class="confChip high">HIGH</span>
+              <span class="confRationale">Pulled directly from a clearly-stated threshold in Section 4.2 of the Playbook, which loaded on this connector read, and confirmed against the FRAP Policy's applicability section. Both sources loaded; no conflict between them.</span>
+            </div>
+          </div>
+
+          <div class="aSection">
+            <p class="aLabel"><span class="bar"></span>Next Steps - where to go / which system / who to contact</p>
+            <div class="nextGrid">
+              <div class="nextTile">
+                <p class="nLabel">Where to go</p>
+                <p class="nVal">BuyLilly &gt; "Start a Purchase"</p>
+                <p class="nSub">Routes straight to standard PO T&amp;Cs paperwork; no MSA drafting step will appear for this profile.</p>
+              </div>
+              <div class="nextTile">
+                <p class="nLabel">Which system</p>
+                <p class="nVal">Ariba</p>
+                <p class="nSub">Issue the requisition / PO directly in Ariba once the sourcing rep confirms the supplier record.</p>
+              </div>
+              <div class="nextTile">
+                <p class="nLabel">Who to contact</p>
+                <p class="nVal">Sourcing Rep of Record</p>
+                <p class="nSub">Only if scope changes to include Lilly data access or system integration - that would retrigger TPRM and this determination.</p>
+              </div>
+            </div>
+            <div class="caveat" style="margin-top:12px;">
+              <b>Not a substitute for the policy itself.</b> This is a live read of the Playbook and FRAP Policy with citations, not a legal determination. If the engagement scope changes from what's described above, re-ask before proceeding to contract.
+            </div>
+          </div>
+
+          <div class="aSection">
+            <div class="crossSkill">
+              <p class="csQ">You mentioned this is a real engagement, not a hypothetical - want me to draft the RFP package for this consulting buy?</p>
+              <span class="csBtn default">No thanks, just needed the answer</span>
+              <span class="csBtn">Yes, draft the RFP package</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="foot">
+          Deliverable = this answer block (chat-side), per Step 4's deterministic skeleton: Question / Answer / Details / Citations / Confidence / Next Steps. Process Navigator is chat-only - it answers and cites, it does not draft, approve, or file anything on your behalf. Sample exchange shown for illustration.
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

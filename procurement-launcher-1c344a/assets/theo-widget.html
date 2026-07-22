@@ -1,0 +1,268 @@
+
+<!-- Theo launcher widget (v2.4 split-panel layout, footer stamp v2.9) - pass this verbatim to
+     visualize:show_widget as widget_code. Split-panel master-detail. Left: collapsible sections
+     with skill rows (32px row indent). Right: sticky info panel showing the open section's
+     description by default, switching to per-row 4-block detail (What it does / How to use /
+     What you get / Trigger) on row hover, reverting to section description on mouseleave. Only one
+     section open at a time. All sections start collapsed. Search filters row title + what +
+     trigger; matching sections auto-expand; non-matching sections hidden; empty-state when no
+     matches. Header: Sacramento Theo wordmark + vertical divider + subtitle + ? button + 165px
+     search. Footer: black with white t-rex emoji (left) + "Theo v2.9" (right). All row data-t
+     trigger phrases are parameter-free so a click fires a complete phrase. Row click fires
+     sendPrompt(data-t); if sendPrompt is absent it copies the phrase to the clipboard; ? button
+     fires the teach mode trigger. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/sacramento@5.0.16/400.css">
+<style>
+  .th-app{background:#EBD389;border-radius:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A;overflow:hidden}
+  .th-head{background:#0E0E0E;padding:8px 14px;display:flex;align-items:center;gap:8px;min-height:44px}
+  .th-theo{font-family:'Sacramento',cursive;color:#fff;-webkit-text-fill-color:#fff;font-size:32px;line-height:1;display:inline-block}
+  .th-divider{width:1px;height:20px;background:rgba(255,255,255,.4);margin:0 2px 0 6px;flex-shrink:0}
+  .th-sub{color:#fff;-webkit-text-fill-color:#fff;font-size:11px;opacity:.85;line-height:1.2;margin-right:auto}
+  .th-qbtn{background:transparent;border:1.5px solid #fff;color:#fff;-webkit-text-fill-color:#fff;width:24px;height:24px;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;padding:0;cursor:pointer;font-family:inherit;transition:background .12s,color .12s,-webkit-text-fill-color .12s}
+  .th-qbtn:hover{background:#fff;color:#0E0E0E;-webkit-text-fill-color:#0E0E0E}
+  .th-sw{position:relative;width:165px;flex-shrink:0;display:flex;align-items:center}
+  .th-s{width:100%;box-sizing:border-box;padding:0 8px 0 24px;font-size:11px;font-family:inherit;border:1px solid #555;border-radius:5px;background:rgba(255,255,255,.1);color:#fff;-webkit-text-fill-color:#fff;outline:none;transition:padding-left .12s,border-color .12s,background .12s;height:24px;line-height:22px}
+  .th-s:focus{border-color:#fff;background:rgba(255,255,255,.2)}
+  .th-s.th-s-typing{padding-left:8px}
+  .th-si{position:absolute;left:6px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:#fff;opacity:.55;transition:opacity .12s,visibility .12s;pointer-events:none}
+  .th-si.th-si-hidden{opacity:0;visibility:hidden}
+  .th-body{display:flex;align-items:stretch;min-height:340px}
+  .th-left{flex:0 0 50%;border-right:1px solid #B89A4E;padding:6px 0 8px}
+  .th-right{flex:1;padding:12px 12px 14px;font-size:12px;background:rgba(255,255,255,.08);min-width:0}
+  .th-sec{padding:0;margin-bottom:1px}
+  .th-sec.th-hidden{display:none}
+  .th-sec>summary{margin:5px 0 1px;padding:3px 14px;font-size:12.5px;font-weight:600;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A;cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;transition:background .12s;user-select:none}
+  .th-sec>summary::-webkit-details-marker{display:none}
+  .th-sec>summary::before{content:"\25B8";font-size:9px;opacity:.6;width:9px;transition:transform .15s}
+  .th-sec[open]>summary::before{transform:rotate(90deg)}
+  .th-sec>summary:hover{background:rgba(0,0,0,.06)}
+  .th-cnt{font-weight:400;opacity:.5;margin-left:2px;font-size:10.5px}
+  .th-list{margin:0;padding:0;list-style:none}
+  .th-row{display:flex;align-items:center;gap:6px;padding:3px 14px 3px 32px;font-size:11.5px;cursor:pointer;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A;transition:background .12s,color .12s,-webkit-text-fill-color .12s;user-select:none}
+  .th-row.th-hidden{display:none}
+  .th-row:hover{background:#1A1A1A;color:#fff;-webkit-text-fill-color:#fff}
+  .th-row:hover .th-go{color:#FFC709;-webkit-text-fill-color:#FFC709;opacity:1}
+  .th-row:active{transform:scale(.997)}
+  .th-title{font-weight:600;color:inherit;-webkit-text-fill-color:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+  .th-go{font-size:14px;font-weight:700;color:inherit;-webkit-text-fill-color:inherit;flex-shrink:0;opacity:.45;line-height:1;transition:color .12s,opacity .12s,-webkit-text-fill-color .12s}
+  .th-empty{padding:14px;text-align:center;font-size:11px;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A;opacity:.55;font-style:italic;display:none}
+  .th-empty.th-show{display:block}
+  .th-pcrumb{font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;opacity:.55;margin-bottom:5px;font-weight:600;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-ptitle{font-size:13px;font-weight:700;margin:0 0 9px;line-height:1.25;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-psectiondesc{font-size:11.5px;line-height:1.5;margin:0 0 10px;opacity:.88;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-phint{font-size:10.5px;opacity:.55;font-style:italic;margin:8px 0 0;line-height:1.45;padding-top:8px;border-top:1px solid rgba(0,0,0,.1);color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-pblock{margin-bottom:7px}
+  .th-plabel{font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;opacity:.55;margin-bottom:2px;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-pcontent{font-size:11.5px;line-height:1.45;margin:0;opacity:.88;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-ptrigwrap{margin-top:9px;padding-top:7px;border-top:1px solid rgba(0,0,0,.12)}
+  .th-ptriglabel{font-size:10px;opacity:.6;margin-bottom:3px;font-style:italic;line-height:1.35;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-ptrig{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:10.5px;background:rgba(0,0,0,.07);padding:2px 5px;border-radius:3px;word-break:break-word;display:inline-block;color:#1A1A1A;-webkit-text-fill-color:#1A1A1A}
+  .th-ft{padding:5px 14px;display:flex;justify-content:space-between;align-items:center;font-size:10px;background:#0E0E0E;color:#fff;-webkit-text-fill-color:#fff;min-height:30px}
+  .th-ft-rex{font-size:20px;line-height:1;filter:grayscale(1) brightness(1.7) contrast(.85);display:inline-block}
+  .th-ft-ver{opacity:.85}
+</style>
+<div class="th-app">
+<header class="th-head">
+  <span class="th-theo">Theo</span>
+  <span class="th-divider"></span>
+  <span class="th-sub">Lilly's Claude Skills for Procurement</span>
+  <button class="th-qbtn" id="th-qbtn" title="Teach me about these skills">?</button>
+  <div class="th-sw"><svg class="th-si" id="th-si" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14.2" y2="14.2"/></svg><input type="text" class="th-s" id="th-search"/></div>
+</header>
+<div class="th-body">
+<div class="th-left" id="th-left">
+<details class="th-sec" data-sec="1. Contracts &amp; Negotiations" data-desc="Reviewing, redlining, benchmarking pricing, negotiating, and cleaning up supplier paper. Use these when you have or are about to receive a contract, MSA, SOW, work order, or change order.">
+<summary>1. Contracts &amp; Negotiations <span class="th-cnt">(12)</span></summary>
+<ul class="th-list">
+<li class="th-row" data-t="redline this contract" data-what="Reviews a supplier contract against the Lilly playbook and marks up issues, positions, and proposed changes." data-howto="Upload the contract DOCX (MSA, SOW, work order, change order, or order form). Claude asks for any supplier context it needs, then runs the four-pass review." data-output="A marked-up DOCX with tracked changes and inline comments, ready to send back to the supplier."><span class="th-title">Redline a Contract</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="build the contract review dashboard" data-what="Builds an interactive 3-panel dashboard from a contract: risk scoring, legal positions and Hard Stops, and commercial terms analysis." data-howto="Upload the contract DOCX. Claude reads it and assembles the dashboard." data-output="An interactive HTML dashboard you can use to brief leadership or plan the negotiation."><span class="th-title">Contract Review &amp; Negotiation Dashboard</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="build the contract review briefing" data-what="Builds a written briefing for an upcoming negotiation covering legal positions, predicted supplier pushback, fallback options, and commercial benchmarks." data-howto="Upload the contract DOCX. Claude reads it and synthesizes the briefing." data-output="A DOCX briefing for walking-into-the-room prep."><span class="th-title">Legal &amp; Commercial Negotiation Briefing</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="get me ready to negotiate" data-what="Builds a pre-negotiation legal briefing when there is no contract yet: playbook positions ordered by priority, predicted supplier pushback, fallback sequencing, and red lines." data-howto="Describe the upcoming deal and the supplier. No document needed. Claude asks for any strategic context it needs." data-output="A prep briefing with prioritized legal positions, predicted pushback, fallbacks, and red lines to walk in with."><span class="th-title">Pre-Negotiation Legal Prep</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="benchmark this pricing" data-what="Researches market rates for pricing in a contract or rate card and produces a counter-offer with justification." data-howto="Provide the contract pricing or rate card. Claude researches market rates via the web." data-output="A counter-offer DOCX with anchors, TCO breakdown, and justification."><span class="th-title">Benchmark Contract Pricing</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="review this SOW" data-what="Diagnoses, builds, or repairs a Statement of Work: scores scope quality (0-100), then fixes the in/out-of-scope boundary, deliverables, acceptance criteria, RACI, milestones, SLAs, and the rate-card structure." data-howto="Upload a draft SOW, a prior SOW, a proposal, or just describe the work. Claude runs the scope-quality diagnostic and rewrites the SOW." data-output="A Scope Definition Score, a findings list, and an issuance-ready rewritten SOW. Hands off to lilly-contract-review for the legal-protection pass."><span class="th-title">Scope / SOW Architect</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="practice this negotiation" data-what="Interactive practice mode for an upcoming negotiation. You play Lilly, Claude plays the supplier." data-howto="Describe the negotiation and the supplier. Claude builds the supplier persona and starts the roleplay." data-output="A live in-chat roleplay session with a coaching debrief at the end."><span class="th-title">Negotiation Roleplay</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="show me how this negotiation should go" data-what="Watch-and-learn mode. Claude plays both sides of a negotiation and annotates each tactical move." data-howto="Describe the negotiation issue or scenario. Claude plays it out." data-output="An in-chat simulation with tactical analysis. Useful prep before a hard call."><span class="th-title">Negotiation Simulation</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="drill a negotiation issue" data-what="Adversarial single-issue practice with simultaneous live coaching. Hardens one specific argument." data-howto="Pick one issue you want to drill. Claude as supplier refuses to budge until you land an argument that sticks." data-output="A live in-chat drill with the coach voice explaining your tactics in real time."><span class="th-title">Negotiation Drill</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="open the deal room" data-what="A live negotiation manager for one deal. Tracks a persistent concession ledger round by round: movement, tentative agreements, value of movement, open issues, and the recommended next counter." data-howto="Run in one Claude Project per negotiation. Seed it with your opening strategy, then paste in what happened after each meeting or email. Claude updates the ledger and drafts your next counter." data-output="A round-by-round concession ledger, a next-counter recommendation, a next-round brief, and at close a structured handoff to negotiation-playbook-learning."><span class="th-title">Deal Room (live negotiation)</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="record the negotiation outcome" data-what="Records how a completed negotiation landed so future reviews and prep with this supplier get smarter." data-howto="Describe what the supplier accepted, rejected, or countered. Optionally upload the original redline and the executed version." data-output="An outcome record added to the playbook that later contract reviews and negotiation prep draw on."><span class="th-title">Record a Negotiation Outcome</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="clean up the comments" data-what="Removes redundant, internal, or strategy-leaking comments from a redlined contract before you send it back." data-howto="Upload the commented DOCX. Claude flags comments to remove and asks for your approval." data-output="A cleaned DOCX ready to send to the supplier."><span class="th-title">Clean Up a Contract Redline</span><span class="th-go">&rsaquo;</span></li>
+</ul>
+</details>
+<details class="th-sec" data-sec="2. Sourcing / RFx" data-desc="Running RFx events from kickoff to award. Supplier search and deep-dives, RFx package creation, in-flight case management, response analysis, scoring, and award letters.">
+<summary>2. Sourcing / RFx <span class="th-cnt">(8)</span></summary>
+<ul class="th-list">
+<li class="th-row" data-t="options analysis" data-what="Decides WHICH PATH to take for one request: buy externally, build internally, expand incumbent, reuse existing, consolidate, defer, run RFI, run RFP, direct-negotiate-with-validation, or pilot-first. Scores each applicable path on cost, time, feasibility, switching burden, risk, and optionality." data-howto="Describe the request; no file needed. Claude screens all ten paths, scores the applicable ones, and reconciles the top score against evidence gaps before recommending." data-output="An options matrix, a recommended-path narrative, a decision workbook, and a dashboard. Hands the chosen path to supplier-landscape, rfp-engine, pro-forma-builder, or decision-deck."><span class="th-title">Procurement Options Analysis</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="find vendors" data-what="Researches and shortlists supplier options for a new sourcing need." data-howto="Describe what you need to source. Claude searches Lilly's existing supplier base plus the broader market." data-output="A Top-10 shortlist DOCX with capability profiles and fit assessments."><span class="th-title">Supplier Search</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="profile this supplier" data-what="Builds a defensible profile of one supplier across identity, capability, market, risk, and Lilly fit." data-howto="Name the supplier you want analyzed. Claude does the research." data-output="A profile DOCX. Useful for sole-source justification or pre-RFx homework."><span class="th-title">Single-Supplier Deep Dive</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="challenge this sole source" data-what="Challenges a proposed single-supplier pick before it is defended: unique capability, was competition run, real vs self-created urgency, alternatives, the lock-in constraint, and how price is validated without competition. Weighs it into a Defensibility verdict." data-howto="Name the proposed sole-source supplier and the need. Claude challenges the rationale and, if it is weak, ranks the alternatives." data-output="A defensibility verdict with a justification packet (if defensible) or ranked alternatives and a next action (if weak). Feeds executive-summary-package, or supplier-landscape/rfp-engine on a weak verdict."><span class="th-title">Sole-Source Challenge</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="create an RFP" data-what="Generates the full set of artifacts needed to issue an RFx." data-howto="Describe the sourcing need. Claude asks which artifacts you want (multi-select, All by default)." data-output="Invitations, instructions, requirements matrix, pricing template, demo guide, schedule, post-award timeline, and stakeholder roster."><span class="th-title">Build an RFx Package</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="set up a case for this RFx" data-what="Workflow operations for an in-flight RFx case: status, scheduling, comms log ingestion, timeline refresh." data-howto="Describe what you need (initialize, status, schedule, ingest, refresh). Microsoft Team binding optional." data-output="Updates to the case file plus either a status report, scheduled meetings, or a refreshed timeline."><span class="th-title">Manage an Active RFx</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="analyze the supplier responses" data-what="Builds a comprehensive evaluation of all vendor RFx responses." data-howto="Upload the vendor submissions. Claude analyzes against requirements." data-output="A 30-page evaluation DOCX with per-vendor profiles, cross-supplier comparison, gap analysis, and preliminary scoring."><span class="th-title">Analyze Supplier Responses</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="score the proposals" data-what="Final evaluation, scoring rollup, and award communications for an RFx." data-howto="Provide analyzed responses plus stakeholder scorecards. Claude asks which outputs you want." data-output="Stakeholder rollup, AI scoring with sensitivity, evaluation report, award and non-award letters, BAFO request, debrief prep, and business case deck."><span class="th-title">Score Proposals and Award</span><span class="th-go">&rsaquo;</span></li>
+</ul>
+</details>
+<details class="th-sec" data-sec="3. Category Strategy" data-desc="Building and maintaining strategic sourcing plans for a category, plus market rate benchmarks and portfolio rationalization.">
+<summary>3. Category Strategy <span class="th-cnt">(4)</span></summary>
+<ul class="th-list">
+<li class="th-row" data-t="develop a category strategy" data-what="Develops a strategic sourcing plan for a procurement category from scratch." data-howto="Upload spend data for the category. Claude analyzes and structures the strategy." data-output="An 11-tab interactive dashboard with spend, Pareto, supplier portfolio, Kraljic positioning, risk, and a 12-month action plan."><span class="th-title">Build a New Category Strategy</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="update the category strategy" data-what="Refreshes a prior category strategy with new data and shows what changed." data-howto="Upload the prior strategy plus new spend or market data. Claude reconciles." data-output="An updated 11-tab dashboard with a what-changed view. Used for the quarterly or annual category review."><span class="th-title">Update a Category Strategy</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="benchmark rates" data-what="Researches market rates for a category or rate type and positions your rate against the curve." data-howto="Name the category or rate type. Claude researches via the web." data-output="A rate range card with percentile bands and your rate plotted."><span class="th-title">Market Rate Benchmark</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="find rationalization opportunities" data-what="Identifies redundant suppliers and overlapping commodity codes for portfolio cleanup." data-howto="Upload a spend file. Claude clusters and analyzes." data-output="A rationalization register with consolidation opportunities and estimated savings."><span class="th-title">Supplier Rationalization</span><span class="th-go">&rsaquo;</span></li>
+</ul>
+</details>
+<details class="th-sec" data-sec="4. Cost &amp; Commercial" data-desc="Financial models that anchor negotiations and business cases: pro forma cost projections and bottoms-up should-cost models.">
+<summary>4. Cost &amp; Commercial <span class="th-cnt">(3)</span></summary>
+<ul class="th-list">
+<li class="th-row" data-t="build a pro forma" data-what="Builds a multi-year cost model for a deal with NPV, ROI, and payback analysis." data-howto="Provide the pricing or scope details. Claude structures the model." data-output="A formula-driven XLSX with multi-year projection, escalators, volume tiers, NPV, ROI, payback, scenarios, and sensitivity."><span class="th-title">Build a Pro Forma</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="build a should-cost model" data-what="Builds a bottoms-up cost estimate for a product or service to anchor a negotiation." data-howto="Describe the product or service. Claude breaks down the cost stack." data-output="An XLSX cost stack (materials, labor, overhead, logistics, margin) with the gap versus the supplier's price."><span class="th-title">Build a Should-Cost Model</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="audit this invoice" data-what="Audits a set of invoices against the executed contract/SOW, rate card, PO, and timesheets: rate and role/level mismatches, escalation-cap breaches, hours/quantity discrepancies, duplicates, unsupported charges, and the total questioned amount." data-howto="Upload the invoices plus the executed contract/SOW, rate card, PO, and timesheets. Rate and escalation math run through the vendored numeric kernel, never guesswork." data-output="A line-level exception audit with a kernel-verified questioned amount and a draft supplier dispute notice."><span class="th-title">Invoice &amp; Rate-Card Auditor</span><span class="th-go">&rsaquo;</span></li>
+</ul>
+</details>
+<details class="th-sec" data-sec="5. Decision Deck" data-desc="Building executive PPTX decks that frame any procurement decision for leadership approval.">
+<summary>5. Decision Deck <span class="th-cnt">(1)</span></summary>
+<ul class="th-list">
+<li class="th-row" data-t="build a deck" data-what="Builds an executive PPTX deck to frame a procurement decision for leadership approval." data-howto="Give Claude any inputs (evaluation results, dashboards, financial models, prior analysis). Claude drafts a storyboard for your review before building." data-output="A branded PPTX deck. Decision-oriented, not pitch-deck."><span class="th-title">Build a Decision Deck</span><span class="th-go">&rsaquo;</span></li>
+</ul>
+</details>
+<details class="th-sec" data-sec="6. Executive Summary" data-desc="ATC and ATS executive summaries from a contract or work order for the Lilly approval workflow.">
+<summary>6. Executive Summary <span class="th-cnt">(1)</span></summary>
+<ul class="th-list">
+<li class="th-row" data-t="ATC summary" data-what="Generates the executive summary required for the Lilly approval workflow on a contract or work order." data-howto="Upload the contract or work order. Claude extracts the key terms and risks." data-output="A 2-page DOCX summary with the FRAP approval chain, key terms, financial impact, and risk highlights."><span class="th-title">Build an ATC Summary</span><span class="th-go">&rsaquo;</span></li>
+</ul>
+</details>
+<details class="th-sec" data-sec="7. Personal Command Center" data-desc="Skills that wrap around your day-to-day procurement work: writing voice profile, open my field guide, process navigation, timeline and workflow estimates, and meeting prep.">
+<summary>7. Personal Command Center <span class="th-cnt">(6)</span></summary>
+<ul class="th-list">
+<li class="th-row" data-t="build my voice profile" data-what="Captures your writing voice from sent mail and uses it to draft replies, emails, and messages." data-howto="First run extracts your voice from Outlook sent mail. Later runs draft or audit content." data-output="A voice profile artifact plus drafted responses in your style on demand."><span class="th-title">Voice Profile</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="open my field guide" data-what="The work-graph personal command center. Organizes your work as Issues (not as a flat inbox digest). Tracks state, owners, evidence, and the next move per Issue." data-howto="Run on demand. Reads your inbox, calendar, and Teams via M365 connector. Optional hashtag protocol for explicit state signaling. Stale-review walkthrough cleans up quiet items in a few taps." data-output="An inline widget dashboard with 5 fixed sections (Action Needed, Waiting On, Today/Tomorrow, Stale, Snoozed) and real clickable action buttons per Issue."><span class="th-title">🦖 Theo's Field Guide</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="how do I buy this" data-what="Answers any procurement process, threshold, or system-requirement question by reading Lilly policy live." data-howto="Ask the question." data-output="An answer with citations to the relevant policy or guidance."><span class="th-title">Process Navigator</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="estimate the timeline for this request" data-what="Estimates the timeline for an upcoming sourcing or contracting effort." data-howto="Describe the request. First run asks 3 calibration questions to learn your tempo." data-output="A timeline estimate with key drivers, milestones, and confidence ranges."><span class="th-title">Timeline Builder</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="build a workflow map for this request" data-what="Maps out a procurement process or request as a diagram and checklist." data-howto="Describe the request. Choose output mode: in-chat, branded artifact, or email draft." data-output="A diagram plus checklist in your chosen format."><span class="th-title">Workflow Map</span><span class="th-go">&rsaquo;</span></li>
+<li class="th-row" data-t="prep me for this meeting" data-what="Assembles a one-page brief for an upcoming meeting by reading the invite, recent email, contracts, and spend." data-howto="Reference the meeting on your calendar. M365 connector required." data-output="A one-page brief covering who is in the room, what was last discussed, what is open, and what to say."><span class="th-title">Meeting Prep Brief</span><span class="th-go">&rsaquo;</span></li>
+</ul>
+</details>
+<div class="th-empty" id="th-empty">No matches. Try a different keyword.</div>
+</div>
+<aside class="th-right">
+<div class="th-pcrumb" id="th-pcrumb"></div>
+<h4 class="th-ptitle" id="th-ptitle"></h4>
+<div id="th-pmode-section">
+<p class="th-psectiondesc" id="th-psectiondesc"></p>
+<p class="th-phint">Hover any skill on the left for what it does, how to use it, and what you get. Click a skill to launch it.</p>
+</div>
+<div id="th-pmode-row" style="display:none">
+<div class="th-pblock"><div class="th-plabel">What it does</div><p class="th-pcontent" id="th-pwhat"></p></div>
+<div class="th-pblock"><div class="th-plabel">How to use</div><p class="th-pcontent" id="th-phowto"></p></div>
+<div class="th-pblock"><div class="th-plabel">What you get</div><p class="th-pcontent" id="th-poutput"></p></div>
+<div class="th-ptrigwrap"><div class="th-ptriglabel">Click the skill on the left to launch it, or type:</div><code class="th-ptrig" id="th-ptrig"></code></div>
+</div>
+</aside>
+</div>
+<footer class="th-ft"><span class="th-ft-rex">🦖</span><span class="th-ft-ver">Theo v2.9</span></footer>
+</div>
+<script>
+(function(){
+  var elCrumb=document.getElementById('th-pcrumb');
+  var elTitle=document.getElementById('th-ptitle');
+  var elSecDesc=document.getElementById('th-psectiondesc');
+  var modeSec=document.getElementById('th-pmode-section');
+  var modeRow=document.getElementById('th-pmode-row');
+  var elWhat=document.getElementById('th-pwhat');
+  var elHowto=document.getElementById('th-phowto');
+  var elOutput=document.getElementById('th-poutput');
+  var elTrig=document.getElementById('th-ptrig');
+  var searchEl=document.getElementById('th-search');
+  var iconEl=document.getElementById('th-si');
+  var emptyEl=document.getElementById('th-empty');
+  var sections=document.querySelectorAll('.th-sec');
+  var allRows=document.querySelectorAll('.th-row');
+
+  function fire(t){
+    if(typeof sendPrompt==='function'){sendPrompt(t);return;}
+    if(navigator&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);}
+  }
+  function showSection(d){
+    elCrumb.textContent='SECTION';
+    elTitle.textContent=d.getAttribute('data-sec');
+    elSecDesc.textContent=d.getAttribute('data-desc');
+    modeSec.style.display='';modeRow.style.display='none';
+  }
+  function showRow(r){
+    var d=r.closest('details');
+    elCrumb.textContent=d.getAttribute('data-sec');
+    elTitle.textContent=r.querySelector('.th-title').textContent;
+    elWhat.textContent=r.getAttribute('data-what');
+    elHowto.textContent=r.getAttribute('data-howto');
+    elOutput.textContent=r.getAttribute('data-output');
+    elTrig.textContent=r.getAttribute('data-t');
+    modeSec.style.display='none';modeRow.style.display='';
+  }
+  function showEmpty(){
+    elCrumb.textContent='';
+    elTitle.textContent='Tap a section to begin';
+    elSecDesc.textContent='Open any section on the left to see the skills it contains, or hover any header to preview.';
+    modeSec.style.display='';modeRow.style.display='none';
+  }
+  function getOpen(){return document.querySelector('details.th-sec[open]:not(.th-hidden)');}
+  function refreshDefault(){var o=getOpen();if(o)showSection(o);else showEmpty();}
+
+  function resetMenu(){
+    sections.forEach(function(sec){sec.classList.remove('th-hidden');sec.open=false;});
+    allRows.forEach(function(r){r.classList.remove('th-hidden');});
+    emptyEl.classList.remove('th-show');
+  }
+  function filterMenu(q){
+    q=q.toLowerCase().trim();
+    if(!q){resetMenu();refreshDefault();return;}
+    var totalMatches=0;
+    sections.forEach(function(sec){
+      var rows=sec.querySelectorAll('.th-row');
+      var secTitle=(sec.getAttribute('data-sec')||'').toLowerCase();
+      var secDesc=(sec.getAttribute('data-desc')||'').toLowerCase();
+      var secMatch=secTitle.indexOf(q)>=0||secDesc.indexOf(q)>=0;
+      var rowHits=0;
+      rows.forEach(function(r){
+        var title=r.querySelector('.th-title').textContent.toLowerCase();
+        var what=(r.getAttribute('data-what')||'').toLowerCase();
+        var trig=(r.getAttribute('data-t')||'').toLowerCase();
+        var hit=title.indexOf(q)>=0||what.indexOf(q)>=0||trig.indexOf(q)>=0;
+        if(hit||secMatch){r.classList.remove('th-hidden');rowHits++;}
+        else{r.classList.add('th-hidden');}
+      });
+      if(rowHits>0||secMatch){sec.classList.remove('th-hidden');sec.open=true;totalMatches+=rowHits;}
+      else{sec.classList.add('th-hidden');sec.open=false;}
+    });
+    emptyEl.classList.toggle('th-show',totalMatches===0);
+    refreshDefault();
+  }
+
+  document.querySelectorAll('.th-sec > summary').forEach(function(s){
+    s.addEventListener('click',function(){
+      if(searchEl.value.trim())return;
+      var thisD=s.closest('details');
+      var willOpen=!thisD.open;
+      if(willOpen){sections.forEach(function(d){if(d!==thisD)d.open=false;});}
+      setTimeout(refreshDefault,0);
+    });
+    s.addEventListener('mouseenter',function(){showSection(s.closest('details'));});
+  });
+  allRows.forEach(function(r){
+    r.addEventListener('mouseenter',function(){showRow(r);});
+    r.addEventListener('click',function(){var t=r.getAttribute('data-t');if(t)fire(t);});
+  });
+  document.getElementById('th-left').addEventListener('mouseleave',refreshDefault);
+  document.getElementById('th-qbtn').addEventListener('click',function(){fire('Teach me about my procurement skills.');});
+
+  searchEl.addEventListener('input',function(){
+    if(this.value.length>0){iconEl.classList.add('th-si-hidden');this.classList.add('th-s-typing');}
+    else{iconEl.classList.remove('th-si-hidden');this.classList.remove('th-s-typing');}
+    filterMenu(this.value);
+  });
+  searchEl.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){this.value='';iconEl.classList.remove('th-si-hidden');this.classList.remove('th-s-typing');filterMenu('');this.blur();}
+  });
+
+  refreshDefault();
+})();
+</script>
+
