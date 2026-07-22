@@ -426,8 +426,27 @@
 /* ============================================================================
    DESIGN TOKENS  (adapted from the platform's theo-color.css / dash-kit.css /
    pv.css - off-white canvas, neutral shade ladder, navy primary + teal
-   secondary + one constant burnt-orange standout. Full dark mode via
-   *{box-sizing:border-box}
+   secondary + one constant burnt-orange standout. No green anywhere in status/positive.)
+   ========================================================================== */
+:root{
+  --bg:#E2E6E1; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3; --well:#E4E0D8;
+  --line:#E3DED6; --line2:#D3CDC3;
+  --ink:#1A1A1A; --ink2:#3A362F; --mut:#505A64; --mut2:#564F48;
+  --red:#E1251B; --red-d:#B41E16;
+  --warn-bg:#FBF1DA; --warn-fg:#8A5A00; --warn-bar:#B45309;
+  --info-bg:#E8EEF6; --info-fg:#0F3A85; --info-bar:#0F3A85;
+  --danger-bg:#FBE7E3; --danger-fg:#B41E16; --danger-bar:#E1251B;
+  --pri:#0F3A85; --pri-soft:#2E5E9E; --sec:#0E6E87; --emph:#C15E19; --emph-soft:#E9D3BE;
+  --ent-nimbus:#123C82; --ent-cirrus:#2F6E6B; --ent-helio:#7A2436;
+  --topbar-bg:#EEF0EC; --topbar-fg:#1A1A1A; --topbar-line:#C9C3B8;
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-pill:30px;
+  --shadow-card:0 1px 2px rgba(38,30,20,.06), 0 2px 6px rgba(38,30,20,.07);
+  --shadow-pop:0 6px 18px rgba(38,30,20,.16), 0 2px 6px rgba(38,30,20,.10);
+  --font-sans:"Libre Franklin", system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:"Roboto Mono", ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+  --font-script:"Sacramento", "Segoe Script", "Bradley Hand", cursive;
+}
+*{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--ink); font-family:var(--font-sans);
