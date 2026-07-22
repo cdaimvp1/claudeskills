@@ -72,6 +72,15 @@ Adapt its selectors per dashboard; verify with `node --check` on the extracted `
 5. Verify: `node --check` on the main script = 0; grep 0 for `undefined`/`NaN`/`[object Object]`,
    `data-theme="dark"`, green-in-status, em dashes; confirm Title Case, plain Lilly logo, bare dino,
    black tabs/divider. Open in browser.
+6. **CSS INTEGRITY (mandatory - a JS-only check will miss this):** in `<style>`, confirm `/*` count ==
+   `*/` count (balanced comments) AND that `:root{` survives after stripping comments (i.e. the token
+   block is NOT inside a dangling comment). A single unclosed comment silently swallows the entire
+   token block and the dashboard renders unstyled - and neither `node --check` nor a jsdom harness
+   catches it (only a real browser does, and Playwright will not launch here).
+   CAVEAT that caused this: a dark-mode-removal regex like `html\[data-theme="dark"\][^{]*\{[^}]*\}`
+   will FALSELY match the literal text `html[data-theme="dark"]` inside a design-tokens COMMENT and eat
+   the comment's `*/` plus the `:root{}` block. Strip/rewrite dark rules with a regex that cannot match
+   inside comments, or remove comment text mentioning dark mode first.
 
 ## Rollout status
 - DONE: supplier-landscape (canonical reference exemplar).
