@@ -1,0 +1,4 @@
+# Build-time only (2.8MB); re-fetch with:
+# curl -o lib/babel.min.js https://unpkg.com/@babel/standalone@7.24.7/babel.min.js
+lib/babel.min.js
+lib/react.test.js
