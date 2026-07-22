@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Supplier Landscape - Theo</title>
 <!--
-  Supplier Landscape (redesigned reference dashboard) - self-contained, offline, reflect-only.
+  Supplier Landscape (redesigned reference dashboard) - self-contained, offline.
   Demonstrates the four standard properties of the redesigned skill-dashboard system:
    1. Consolidated IA  : 4 subtabs (Executive Summary / Supplier Deep Dive / Requirements Heatmap / Risk Assessment).
    2. Narrative pairing : every visualization is paired with a substantive "what it means / what to do" insight.
@@ -716,7 +716,7 @@ a{color:inherit}
   <section id="pane-deep" hidden></section>
   <section id="pane-heat" hidden></section>
   <section id="pane-risk" hidden></section>
-  <div class="foot">Theo &middot; supplier-landscape (redesign reference) &middot; reflect-only, procurement guidance, not legal advice</div>
+  <div class="foot">Theo &middot; supplier-landscape (redesign reference) &middot; procurement guidance, not legal advice</div>
 </main>
 
 <!-- ============================ RFx DRAWER ============================= -->
@@ -738,7 +738,7 @@ a{color:inherit}
 <script>
 "use strict";
 /* ===========================================================================
-   DATA MODEL  (illustrative, reflect-only). 3 cloud data-warehouse vendors,
+   DATA MODEL  (illustrative). 3 cloud data-warehouse vendors,
    6 weighted categories (weights sum to 100) each with 4-7 scored sub-reqs, and
    5 risk dimensions each with 2-4 scored sub-factors. All headline numbers are
    COMPUTED from these sub-scores (see rollup helpers) so they cannot drift.
@@ -1270,7 +1270,7 @@ function renderExec(){
     + ', the value option: strongest on commercial and TCO terms but weakest on governance, portability and residency, with the field\'s highest lock-in risk.</p></div>';
 
   // Recommendation (left) + Ranking (right)
-  var rec = '<div class="card accent"><div class="card-hd"><span class="ct">Recommendation</span><span class="cs">reflect-only</span></div>'
+  var rec = '<div class="card accent"><div class="card-hd"><span class="ct">Recommendation</span></div>'
     + '<div class="panel" style="border-left:4px solid var(--emph)"><div style="font-weight:800;font-size:15px">'+esc(lead.name)
     + ' <span class="tag-emph">Recommended lead</span></div>'
     + '<p class="small" style="margin:6px 0 0;color:var(--ink2)">Top of the field on functional depth, security and performance, at the lowest risk, and contractually flexible. Anchor an RFx around it.</p></div>'
@@ -1489,7 +1489,7 @@ function focusRationale(which){
   var expanded = which==="heat" ? state.heatExpanded : state.riskExpanded;
   var colFn = which==="heat" ? fitColors : riskColors;
   var head = '<div class="rationale"><div class="card-hd" style="margin-top:6px"><span class="ct" style="color:'+acc+'">Why '+esc(v.name)+' scored the way it did</span>'
-    + '<span class="cs">'+(which==="heat"?"per category":"per dimension")+' &middot; reflect-only</span></div>';
+    + '<span class="cs">'+(which==="heat"?"per category":"per dimension")+'</span></div>';
   var body = groups.map(function(g){
     var sc=scoreFn(g.id, v.id), col=colFn(sc,isDark());
     var subs="";
@@ -1562,7 +1562,7 @@ function renderDrawer(){
     + '<div class="addrow"><input type="text" id="addSupplierInput" placeholder="Add a supplier not in this landscape"><button class="btn" data-action="rfx-add">Add</button></div>'
     + '<div class="inc-suggest"><div class="eyebrow" style="margin-bottom:6px">Suggested qualified incumbents</div>'
     + '<div class="chips">'+(incHtml||'<span class="small muted">All suggestions added.</span>')+'</div></div>'
-    + '<div class="sent-note'+(state.rfxSent?" on":"")+'" id="sentNote">Draft slate of '+count+' routed to the sourcing rep for approval. Reflect-only: nothing is created or sent until the rep approves. On approval it would seed the RFx tab bidder set.</div>';
+    + '<div class="sent-note'+(state.rfxSent?" on":"")+'" id="sentNote">Draft slate of '+count+' routed to the sourcing rep for approval. Nothing is created or sent until the rep approves. On approval it would seed the RFx tab bidder set.</div>';
 }
 
 /* ===========================================================================
