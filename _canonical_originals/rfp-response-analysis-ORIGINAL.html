@@ -1,0 +1,424 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RFP Response Analysis - ORIGINAL canonical</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+  <script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>body{margin:0;font-family:Arial,Helvetica,sans-serif}#loaderr{padding:24px;color:#b00;font-family:monospace;white-space:pre-wrap}</style></head><body><div id="root"><div id="loaderr">Loading the original canonical dashboard (needs internet for React/Recharts CDN). If this message stays, the CDN was blocked.</div></div>
+<script type="text/babel" data-presets="react">
+const {useState, useMemo} = React;
+const {BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, LabelList} = Recharts;
+
+// ---------------------------------------------------------------------------
+// RFP Response Analysis - CANONICAL DASHBOARD (reference implementation)
+// LOCKED structure. See references/dashboard-canonical.md.
+// 6 tabs, identical in Mode A (Per-Supplier), Mode B (Cross-Vendor), and
+// Mode C (Full Analysis), and for every category or commodity. Only the data
+// and research change per run. Brief vs Full changes depth, not the tab set.
+// Data below is NEUTRAL and ILLUSTRATIVE (Supplier Alpha/Beta/Gamma, generic
+// requirement categories). Clone the structure, swap the data.
+// House style: SUITE STANDARD (Arial body, Georgia titles, dark #212121 header
+// with red rule, R/DK/GRN/BRN palette). Same family as every other dashboard.
+// ---------------------------------------------------------------------------
+
+const R = "#E1251B", DK = "#212121", GRN = "#0F3A85", BRN = "#521207",
+  CARD = "#E4EBF1", WARM = "#FFF0D8", RISK = "#FDE8E5", OK = "#D4E5F7", BD = "#E4EBF1",
+  MUT = "#8A969E", LT = "#8A969E", BLU = "#0F3A85", AMB = "#B45309";
+
+function pcC(p) { return p >= 90 ? GRN : p >= 70 ? AMB : R; }
+function pcBg(p) { return p >= 90 ? OK : p >= 70 ? WARM : RISK; }
+function scC(v) { return v >= 8.5 ? GRN : v >= 7 ? AMB : R; }
+function scBg(v) { return v >= 8.5 ? OK : v >= 7 ? WARM : RISK; }
+const SEV = { Critical: R, High: R, Medium: AMB, Low: GRN };
+const SEVBG = { Critical: RISK, High: RISK, Medium: WARM, Low: OK };
+const PRIO = { GATING: R, HIGH: AMB, MEDIUM: BLU };
+const PRIOBG = { GATING: RISK, HIGH: WARM, MEDIUM: "#EEF2FF" };
+const AWARD = [["Primary award", GRN], ["Secondary", BLU], ["Conditional", AMB], ["Not recommended", R]];
+
+const CN = ["Core Functional", "Integration & Data", "Scalability", "Implementation", "Support & SLAs", "Security & Compliance", "Commercial", "Roadmap", "General Requirements"];
+const CR = [90, 55, 40, 45, 35, 50, 25, 20, 25];
+const TOTAL = CR.reduce(function (a, c) { return a + c; }, 0);
+
+// Weighted scoring dimensions (weights sum to 100)
+const DIMS = [
+  { k: "fit", n: "Requirements Fit", w: 30 },
+  { k: "fin", n: "Financial Stability", w: 10 },
+  { k: "risk", n: "Risk Posture", w: 15 },
+  { k: "price", n: "Pricing", w: 15 },
+  { k: "impl", n: "Implementation Readiness", w: 10 },
+  { k: "tech", n: "Technology Differentiation", w: 10 },
+  { k: "legal", n: "Legal / Contract", w: 10 },
+];
+
+const S = [
+  {
+    name: "Supplier Alpha", basis: "Actual Submitted Response", hq: "City A, Country A", emp: "1,800", rev: "$540M (FY2025)", fin: "Public",
+    fm: 365, pct: 95.1, adeq: 9.0,
+    catPct: [96, 94, 92, 90, 91, 95, 88, 93, 92],
+    ws: { fit: 9.5, fin: 8.0, risk: 7.5, price: 0, impl: 7.0, tech: 8.5, legal: 0 },
+    price: { model: "Per-user SaaS subscription", annual: "Not submitted", disc: "Not submitted", term: "Not submitted", esc: "Not submitted", binding: "No" },
+    solution: "Cloud-based platform with a unified data model and modular capabilities. Replace with the supplier's actual proposed solution and architecture from their submission.",
+    overview: "Supplier Alpha submitted the most complete functional response in this illustrative set, meeting the large majority of requirements as standard capability with module-level specificity. Replace with the actual researched and submission-grounded overview.",
+    submissionNarr: "Submitted a completed requirements matrix and financial data. In this illustrative run, pricing, MSA/legal response, and a formal implementation plan are not yet submitted; these gate commercial and legal evaluation. Replace with the real submission inventory.",
+    commercialNarr: "Per-user subscription with module entitlements. No pricing submitted in this illustrative run; see the labeled state. Replace with verified commercial analysis.",
+    legalNarr: "No legal response submitted in this illustrative run. Contract risk cannot be assessed until legal documents are provided. Replace with verified legal analysis.",
+    implNarr: "No formal plan submitted; delivery typically runs several months with named integrator partners. Replace with verified implementation analysis.",
+    integNarr: "Documented APIs and certified connectors to common enterprise systems. Replace with verified integration analysis.",
+    recommendation: "Recommended as primary, subject to pricing, legal response, implementation plan, and references.",
+    str: ["Highest functional coverage with module-level specificity", "Deepest reference base in the domain", "Mature integration toolkit", "Financially disciplined and profitable"],
+    rsk: [
+      { sev: "Critical", desc: "No pricing, legal response, or implementation plan submitted. Gating prerequisite for commercial and legal evaluation." },
+      { sev: "High", desc: "Weakest category trails the field; confirm whether configuration closes the gap." },
+      { sev: "Medium", desc: "One capability handled via an OEM partner; confirm licensing and support." },
+      { sev: "Low", desc: "Leadership transition noted; confirm permanent appointment." },
+    ],
+    clars: [
+      { p: "GATING", q: "Submit complete pricing proposal per the sourcing template with a multi-year total cost of ownership." },
+      { p: "GATING", q: "Submit legal response: redline of the standard MSA or propose vendor paper." },
+      { p: "GATING", q: "Submit a formal implementation plan with phases, timeline, and named integrator." },
+      { p: "HIGH", q: "Provide 3-5 named reference clients with contact information." },
+      { p: "MEDIUM", q: "Clarify the requirements scored as needing significant customization." },
+    ],
+    issues: [
+      { sev: "Medium", desc: "Requirement matrix marks a capability as standard, but the narrative describes it as roadmap. Confirm release status." },
+    ],
+    scoreBreakdown: { five: 365, four: 18, three: 12, two: 8, one: 2 },
+  },
+  {
+    name: "Supplier Beta", basis: "Inferred from Landscape Research", hq: "City B, Country B", emp: "1,300+", rev: "Not disclosed", fin: "Private",
+    fm: 330, pct: 86.0, adeq: 5.0,
+    catPct: [88, 82, 85, 87, 84, 85, 82, 83, 90],
+    ws: { fit: 8.6, fin: 5.0, risk: 6.5, price: 0, impl: 8.0, tech: 7.5, legal: 0 },
+    price: { model: "Usage-based", annual: "Not submitted", disc: "Not submitted", term: "Not submitted", esc: "Not submitted", binding: "No" },
+    solution: "Purpose-built platform for the domain. Replace with the supplier's actual proposed solution.",
+    overview: "Supplier Beta did not submit a formal matrix in this illustrative run; coverage is estimated from landscape research and carries medium confidence. Replace with the actual basis and overview.",
+    submissionNarr: "No formal response documents submitted in this illustrative run. All scores are inferred and carry medium confidence until materials arrive. Replace with the real submission inventory.",
+    commercialNarr: "Usage-based model; historically flexible. No pricing submitted. Replace with verified analysis.",
+    legalNarr: "No legal response submitted. Contracting posture described as enterprise-negotiable. Replace with verified analysis.",
+    implNarr: "No plan submitted; delivered via in-house consultants and an alliance partner. Replace with verified analysis.",
+    integNarr: "Standard connectors; narrower certification ecosystem than the leader. Replace with verified analysis.",
+    recommendation: "Secondary; submit a matrix, pricing, and legal response to finalize.",
+    str: ["Deep domain specialization", "Strong delivery references", "Flexible commercial posture"],
+    rsk: [
+      { sev: "Critical", desc: "No formal response submitted; all scores are inferred estimates." },
+      { sev: "Medium", desc: "Private company; financial health cannot be independently verified." },
+      { sev: "Medium", desc: "Smaller scale may constrain capacity on large programs." },
+      { sev: "Low", desc: "SOC 2 certified; no known breaches." },
+    ],
+    clars: [
+      { p: "GATING", q: "Submit a completed requirements matrix for all requirements." },
+      { p: "GATING", q: "Submit pricing and a legal response." },
+      { p: "HIGH", q: "Demonstrate core capability in a live, buyer-specific scenario." },
+    ],
+    issues: [
+      { sev: "High", desc: "No submitted matrix to reconcile against; inferred scores cannot be cross-checked until a response arrives." },
+    ],
+    scoreBreakdown: { five: 330, four: 22, three: 15, two: 10, one: 8 },
+  },
+  {
+    name: "Supplier Gamma", basis: "Inferred from Landscape Research", hq: "City C, Country C", emp: "2,400", rev: "$700M (est.)", fin: "PE-backed",
+    fm: 300, pct: 79.0, adeq: 4.0,
+    catPct: [78, 84, 85, 72, 74, 82, 86, 92, 80],
+    ws: { fit: 7.9, fin: 6.0, risk: 6.0, price: 0, impl: 6.5, tech: 9.0, legal: 0 },
+    price: { model: "Subscription", annual: "Not submitted", disc: "Not submitted", term: "Not submitted", esc: "Not submitted", binding: "No" },
+    solution: "Modern, AI-forward platform. Replace with the supplier's actual proposed solution.",
+    overview: "Supplier Gamma did not submit a formal response in this illustrative run; estimates are inferred. The platform is the most modern in this set. Replace with the actual basis and overview.",
+    submissionNarr: "No formal response submitted in this illustrative run. Replace with the real submission inventory.",
+    commercialNarr: "Likely aggressive pricing to win references. No pricing submitted. Replace with verified analysis.",
+    legalNarr: "No legal response submitted. Replace with verified analysis.",
+    implNarr: "Delivery capacity is a watch item given rapid growth. Replace with verified analysis.",
+    integNarr: "Cloud-native with an extensible model. Replace with verified analysis.",
+    recommendation: "Conditional; useful to benchmark pricing and pressure-test claims in a demo.",
+    str: ["Most modern platform architecture", "Strongest roadmap", "Likely competitive pricing"],
+    rsk: [
+      { sev: "Critical", desc: "No formal response submitted; all scores are inferred estimates." },
+      { sev: "High", desc: "Less proven depth in the core category than the top two." },
+      { sev: "Medium", desc: "Pre-profitability with exit pressure may affect pricing stability." },
+    ],
+    clars: [
+      { p: "GATING", q: "Submit a completed requirements matrix and standalone pricing." },
+      { p: "HIGH", q: "Demonstrate core capability depth in a live scenario." },
+    ],
+    issues: [
+      { sev: "Medium", desc: "Public capability claims exceed documented customer adoption; validate in a reference call." },
+    ],
+    scoreBreakdown: { five: 300, four: 30, three: 25, two: 18, one: 12 },
+  },
+];
+
+const mainTabs = ["Executive Summary", "Supplier Deep Dive", "Coverage Heatmap", "Scoring & Pricing", "Risks & Clarifications", "Award Recommendation"];
+const ddSections = ["Profile & Assessment", "Response Analysis", "Strengths, Risks & Gaps", "Commercial & Operational", "Clarifications"];
+
+function wtd(s) { return DIMS.reduce(function (a, d) { return a + (s.ws[d.k] || 0) * d.w; }, 0) / 100; }
+
+function Badge({ label, color, bg }) { return <span style={{ display: "inline-block", padding: "2px 9px", borderRadius: 3, fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", color: color || "#fff", background: bg || DK, textTransform: "uppercase", whiteSpace: "nowrap" }}>{label}</span>; }
+function SevPill({ s }) { return <span style={{ color: SEV[s], background: SEVBG[s], border: "1px solid " + SEV[s] + "40", fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{s}</span>; }
+function PrioPill({ p }) { return <span style={{ color: PRIO[p], background: PRIOBG[p], border: "1px solid " + PRIO[p] + "40", fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{p}</span>; }
+function Metric({ label, value, sub, accent, warn, good }) {
+  var bar = accent ? R : warn ? R : good ? GRN : BD;
+  return <div style={{ background: accent ? WARM : warn ? RISK : good ? OK : "#fff", borderRadius: 8, padding: "14px 16px", borderLeft: "4px solid " + bar, minWidth: 0 }}>
+    <div style={{ fontSize: 10, fontWeight: 700, color: accent ? R : LT, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
+    <div style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, color: warn ? R : good ? GRN : DK, marginTop: 4 }}>{value}</div>
+    {sub && <div style={{ fontSize: 11, color: MUT, marginTop: 2 }}>{sub}</div>}
+  </div>;
+}
+function Card({ title, note, children }) {
+  return <div style={{ background: "#fff", borderRadius: 8, padding: 18, border: "1px solid " + BD, marginBottom: 14 }}>
+    {title && <div style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 700, color: DK, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ width: 3, height: 14, background: R, borderRadius: 2 }} />{title}
+      {note && <span style={{ fontFamily: "Arial", fontSize: 10, fontWeight: 600, color: MUT, marginLeft: "auto" }}>{note}</span>}
+    </div>}{children}
+  </div>;
+}
+function Tip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
+  return <div style={{ background: DK, borderRadius: 6, padding: "10px 14px", color: "#fff", fontSize: 12 }}>
+    {label && <div style={{ fontWeight: 600, color: LT }}>{label}</div>}
+    {payload.map(function (p, i) { return <div key={i}><strong>{typeof p.value === "number" ? p.value.toLocaleString("en-US") : p.value}</strong></div>; })}
+  </div>;
+}
+function StateBanner({ kind, msg }) {
+  var map = { NEEDS_INPUT: [AMB, WARM, "Needs input"], NOT_APPLICABLE: [MUT, CARD, "Not applicable"], RESEARCH_PENDING: [MUT, CARD, "Research pending"] };
+  var c = map[kind] || map.NOT_APPLICABLE;
+  return <div style={{ background: c[1], border: "1px solid " + c[0] + "55", borderLeft: "4px solid " + c[0], borderRadius: 8, padding: "12px 16px", marginBottom: 14 }}>
+    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", color: c[0], textTransform: "uppercase" }}>{c[2]}</span>
+    <div style={{ fontSize: 12, color: DK, marginTop: 4, lineHeight: 1.5 }}>{msg}</div>
+  </div>;
+}
+function STable({ columns, rows }) {
+  var _s = useState({ col: 0, dir: "asc" }); var sort = _s[0]; var setSort = _s[1];
+  var _q = useState(""); var q = _q[0]; var setQ = _q[1];
+  var filtered = useMemo(function () {
+    var r = rows;
+    if (q) { var lq = q.toLowerCase(); r = rows.filter(function (row) { return row.some(function (c) { return String(c.d).toLowerCase().indexOf(lq) >= 0; }); }); }
+    return r.slice().sort(function (a, b) {
+      var av = a[sort.col].v != null ? a[sort.col].v : a[sort.col].d;
+      var bv = b[sort.col].v != null ? b[sort.col].v : b[sort.col].d;
+      if (av < bv) return sort.dir === "asc" ? -1 : 1;
+      if (av > bv) return sort.dir === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [rows, q, sort]);
+  return <div>
+    <input value={q} onChange={function (e) { setQ(e.target.value); }} placeholder="Search..."
+      style={{ width: "100%", boxSizing: "border-box", padding: "7px 10px", border: "1px solid " + BD, borderRadius: 6, fontSize: 12, marginBottom: 8, fontFamily: "Arial" }} />
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+        <thead><tr>{columns.map(function (c, i) {
+          return <th key={i} onClick={function () { setSort({ col: i, dir: sort.col === i && sort.dir === "asc" ? "desc" : "asc" }); }}
+            style={{ textAlign: c.a || "left", padding: "8px 10px", background: DK, color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap" }}>
+            {c.h}{sort.col === i ? (sort.dir === "asc" ? " ^" : " v") : ""}
+          </th>;
+        })}</tr></thead>
+        <tbody>{filtered.map(function (row, ri) {
+          return <tr key={ri} style={{ background: ri % 2 ? "#fff" : "#FAFBFC" }}>{row.map(function (c, ci) {
+            return <td key={ci} style={{ padding: "8px 10px", textAlign: c.a || "left", color: c.c || DK, fontWeight: c.b ? 700 : 400, borderBottom: "1px solid " + BD, verticalAlign: "top" }}>{c.d}</td>;
+          })}</tr>;
+        })}</tbody>
+      </table>
+    </div>
+  </div>;
+}
+function PctCell({ p }) { return <span style={{ background: pcBg(p), color: pcC(p), fontWeight: 700, padding: "2px 9px", borderRadius: 12, fontSize: 12 }}>{p}%</span>; }
+function ScoreCell({ v }) { return v > 0 ? <span style={{ background: scBg(v), color: scC(v), fontWeight: 700, padding: "2px 9px", borderRadius: 12, fontSize: 12 }}>{v.toFixed(1)}</span> : <span style={{ color: MUT, fontSize: 11 }}>pending</span>; }
+
+function App() {
+  var _t = useState(0); var tab = _t[0]; var setTab = _t[1];
+  var _s = useState(0); var si = _s[0]; var setSi = _s[1];
+  var _sec = useState(0); var sec = _sec[0]; var setSec = _sec[1];
+
+  return <div style={{ fontFamily: "Arial,Helvetica,sans-serif", background: "#FFFFFF", minHeight: "100vh", color: DK, fontSize: 13 }}>
+    <div style={{ background: DK, borderLeft: "4px solid " + R, padding: "18px 24px" }}>
+      <div style={{ color: R, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Eli Lilly and Company - Procurement</div>
+      <div style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, color: "#fff", marginTop: 2 }}>Supplier Response Analysis - [Sourcing Event]</div>
+      <div style={{ color: LT, fontSize: 12, marginTop: 4 }}>[Month Year] | {TOTAL} requirements | {S.length} vendors | [Mode] analysis</div>
+    </div>
+    <div style={{ background: "#fff", borderBottom: "1px solid " + BD, padding: "0 14px", display: "flex", overflowX: "auto" }}>
+      {mainTabs.map(function (t, i) {
+        var active = tab === i;
+        return <button key={i} onClick={function () { setTab(i); }} style={{ border: "none", background: "none", padding: "13px 15px", fontSize: 12.5, fontWeight: active ? 700 : 500, color: active ? R : MUT, borderBottom: active ? "3px solid " + R : "3px solid transparent", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "Arial" }}>{t}</button>;
+      })}
+    </div>
+    <div style={{ maxWidth: 1180, margin: "0 auto", padding: "20px 24px 50px" }}>
+      {tab === 0 && <ExecTab />}
+      {tab === 1 && <DeepDiveTab si={si} setSi={function (v) { setSi(v); setSec(0); }} sec={sec} setSec={setSec} />}
+      {tab === 2 && <HeatTab />}
+      {tab === 3 && <ScorePriceTab />}
+      {tab === 4 && <RisksTab />}
+      {tab === 5 && <AwardTab />}
+    </div>
+    <div style={{ background: DK, color: LT, padding: "14px 24px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8, fontSize: 11 }}>
+      <span>Scoring: 5 standard, 4 via integration, 3 customization, 2 roadmap, 1 not available. Replace placeholders and illustrative data with submission-grounded values.</span>
+      <span>Company Confidential | rfp-response-analysis | procurement guidance, not legal advice</span>
+    </div>
+  </div>;
+}
+
+function ExecTab() {
+  var top = S[0];
+  return <div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 14 }}>
+      <Metric label="Suppliers evaluated" value={S.length} sub="responses analyzed" />
+      <Metric label="Total requirements" value={TOTAL} sub={CN.length + " categories"} />
+      <Metric label="Highest coverage" value={top.pct + "%"} good />
+      <Metric label="Recommended" value={top.name} sub="subject to conditions" good />
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Card title="Evaluation summary">
+        <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>This illustrative evaluation analyzes {S.length} vendor responses across {TOTAL} requirements in {CN.length} categories. Replace with the run summary noting which vendors submitted complete matrices and which coverage figures are estimated. Ranking: {S.map(function (s) { return s.name + " (" + s.pct + "%)"; }).join(", ")}.</div>
+      </Card>
+      <Card title={"Score distribution: " + top.name}>
+        <ResponsiveContainer width="100%" height={150}>
+          <BarChart data={[{ n: "5 Standard", v: top.scoreBreakdown.five }, { n: "4 Integration", v: top.scoreBreakdown.four }, { n: "3 Customize", v: top.scoreBreakdown.three }, { n: "2 Roadmap", v: top.scoreBreakdown.two }, { n: "1 Not avail", v: top.scoreBreakdown.one }]} layout="vertical" margin={{ left: 20, right: 30 }}>
+            <CartesianGrid horizontal={false} stroke={BD} />
+            <XAxis type="number" tick={{ fontSize: 11 }} /><YAxis type="category" dataKey="n" tick={{ fontSize: 11 }} width={90} />
+            <Tooltip content={<Tip />} cursor={{ fill: "#00000008" }} />
+            <Bar dataKey="v" fill={GRN} radius={[0, 4, 4, 0]}><LabelList dataKey="v" position="right" style={{ fontSize: 11, fontWeight: 700 }} /></Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+    </div>
+    <Card title="Vendor ranking" note="coverage %">
+      {S.map(function (s, i) {
+        return <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0", borderBottom: i < S.length - 1 ? "1px solid " + BD : "none" }}>
+          <div style={{ width: 26, height: 26, borderRadius: "50%", background: AWARD[Math.min(i, 3)][1], color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, flexShrink: 0 }}>{i + 1}</div>
+          <div style={{ width: 130, fontWeight: 700, fontSize: 13 }}>{s.name}</div>
+          <div style={{ flex: 1, background: CARD, borderRadius: 4, height: 16, overflow: "hidden" }}><div style={{ width: s.pct + "%", height: "100%", background: pcC(s.pct), borderRadius: 4 }} /></div>
+          <div style={{ width: 48, fontWeight: 700, fontSize: 13, color: pcC(s.pct), textAlign: "right", fontFamily: "Georgia,serif" }}>{s.pct}%</div>
+          <Badge label={s.basis.indexOf("Actual") >= 0 ? "Submitted" : "Inferred"} bg={s.basis.indexOf("Actual") >= 0 ? GRN : AMB} />
+        </div>;
+      })}
+    </Card>
+  </div>;
+}
+
+function DeepDiveTab({ si, setSi, sec, setSec }) {
+  var s = S[si];
+  return <div>
+    <div style={{ marginBottom: 12 }}>
+      <select value={si} onChange={function (e) { setSi(+e.target.value); }} style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid " + BD, fontSize: 13, fontWeight: 600, minWidth: 260, fontFamily: "Arial" }}>
+        {S.map(function (x, i) { return <option key={i} value={i}>{x.name} - {x.pct}% coverage</option>; })}
+      </select>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 14 }}>
+      <Metric label="Coverage" value={s.pct + "%"} good={s.pct >= 90} accent={s.pct >= 70 && s.pct < 90} warn={s.pct < 70} />
+      <Metric label="Requirements met" value={s.fm} sub={"of " + TOTAL} />
+      <Metric label="Adequacy" value={s.adeq.toFixed(1)} sub="of 10" />
+      <Metric label="Basis" value={s.basis.indexOf("Actual") >= 0 ? "Submitted" : "Inferred"} good={s.basis.indexOf("Actual") >= 0} accent={s.basis.indexOf("Actual") < 0} />
+      <Metric label="Financials" value={s.fin} />
+    </div>
+    <div style={{ display: "flex", marginBottom: 14, borderBottom: "1px solid " + BD, flexWrap: "wrap" }}>
+      {ddSections.map(function (ps, i) { return <button key={i} onClick={function () { setSec(i); }} style={{ padding: "8px 14px", fontSize: 12, fontWeight: sec === i ? 700 : 500, color: sec === i ? R : MUT, background: "none", border: "none", borderBottom: sec === i ? "2px solid " + R : "2px solid transparent", cursor: "pointer", fontFamily: "Arial" }}>{ps}</button>; })}
+    </div>
+
+    {sec === 0 && <div>
+      {s.basis.indexOf("Actual") < 0 && <StateBanner kind="RESEARCH_PENDING" msg="This supplier did not submit a formal response in this run. Coverage is estimated from landscape research and carries medium confidence until materials are submitted." />}
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14 }}>
+        <Card title="Company & submission overview"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.overview}</div><div style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 8 }}>{s.submissionNarr}</div></Card>
+        <Card title="Proposed solution"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.solution}</div></Card>
+      </div>
+    </div>}
+    {sec === 1 && <Card title="Response analysis by category" note="depth proportional to submission volume">
+      <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>Replace with category-level analysis grounded in what the supplier actually wrote.</div>
+      <STable columns={[{ h: "Category (requirements)" }, { h: "Coverage", a: "center" }]}
+        rows={CN.map(function (n, ci) { var v = s.catPct[ci]; return [{ d: n + " (" + CR[ci] + ")", b: true }, { d: <PctCell p={v} />, v: v, a: "center" }]; })} />
+    </Card>}
+    {sec === 2 && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Card title="Strengths">{s.str.map(function (x, i) { return <div key={i} style={{ fontSize: 12, lineHeight: 1.6, padding: "5px 0", borderBottom: i < s.str.length - 1 ? "1px solid " + BD : "none" }}><span style={{ color: GRN, fontWeight: 700 }}>+ </span>{x}</div>; })}</Card>
+      <Card title="Risks & gaps">{s.rsk.map(function (r, i) { return <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "6px 0", borderBottom: i < s.rsk.length - 1 ? "1px solid " + BD : "none" }}><SevPill s={r.sev} /><div style={{ fontSize: 12, lineHeight: 1.6 }}>{r.desc}</div></div>; })}</Card>
+    </div>}
+    {sec === 3 && <div>
+      <StateBanner kind="NEEDS_INPUT" msg="Pricing, MSA/legal, and implementation plan are gating items not yet submitted in this illustrative run. Provide them to populate the commercial, legal, and operational analysis below and the cross-vendor Scoring & Pricing tab." />
+      <Card title="Commercial & pricing"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.commercialNarr}</div></Card>
+      <Card title="Legal / MSA"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.legalNarr}</div></Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <Card title="Implementation"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.implNarr}</div></Card>
+        <Card title="Integration fit"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.integNarr}</div></Card>
+      </div>
+    </div>}
+    {sec === 4 && <Card title="Outstanding clarification questions">
+      {s.clars.map(function (c, j) { return <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "7px 0", borderBottom: j < s.clars.length - 1 ? "1px solid " + BD : "none" }}><PrioPill p={c.p} /><div style={{ fontSize: 12, lineHeight: 1.6 }}>{c.q}</div></div>; })}
+    </Card>}
+  </div>;
+}
+
+function HeatTab() {
+  return <Card title="Cross-vendor coverage heatmap" note="coverage %, inferred columns are medium confidence">
+    <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>Green (90%+) strong, amber (70-89%) addressable by configuration, red (below 70%) significant gap. Replace illustrative values with submission-grounded coverage.</div>
+    <STable columns={[{ h: "Category (requirements)" }].concat(S.map(function (s) { return { h: s.name, a: "center" }; }))}
+      rows={CN.map(function (n, ci) {
+        return [{ d: n + " (" + CR[ci] + ")", b: true }].concat(S.map(function (s) { var v = s.catPct[ci]; return { d: <PctCell p={v} />, v: v, a: "center" }; }));
+      }).concat([
+        [{ d: "OVERALL", b: true }].concat(S.map(function (s) { return { d: <PctCell p={s.pct} />, v: s.pct, a: "center" }; }))
+      ])} />
+    <div style={{ fontSize: 12, color: MUT, marginTop: 10, lineHeight: 1.6 }}>Replace with the run's read of category leaders and what each gap means for the buyer's use case.</div>
+  </Card>;
+}
+
+function ScorePriceTab() {
+  return <div>
+    <Card title="Weighted scoring matrix" note="weighted total = sum(score x weight)">
+      <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>Formal evaluation scoring across weighted dimensions, distinct from raw requirement coverage. Dimensions awaiting a submission (pricing, legal) show as pending and do not inflate the total. Replace illustrative scores and weights with the run's evaluation rubric.</div>
+      <STable columns={[{ h: "Dimension (weight)" }].concat(S.map(function (s) { return { h: s.name, a: "center" }; }))}
+        rows={DIMS.map(function (d) {
+          return [{ d: d.n + " (" + d.w + "%)", b: true }].concat(S.map(function (s) { return { d: <ScoreCell v={s.ws[d.k]} />, v: s.ws[d.k], a: "center" }; }));
+        }).concat([
+          [{ d: "WEIGHTED TOTAL", b: true }].concat(S.map(function (s) { var w = wtd(s); return { d: <span style={{ fontFamily: "Georgia,serif", fontWeight: 700, color: scC(w) }}>{w.toFixed(2)}</span>, v: w, a: "center" }; }))
+        ])} />
+      <div style={{ fontSize: 11, color: MUT, marginTop: 8 }}>Pending dimensions (pricing, legal) are scored 0 here only because materials are unsubmitted in this illustrative run; they are not real zeros. Do not finalize a weighted total while gating items are pending.</div>
+    </Card>
+    <Card title="Cross-vendor pricing comparison" note="apples-to-apples once submitted">
+      <StateBanner kind="NEEDS_INPUT" msg="No vendor submitted pricing in this illustrative run. This is the cross-vendor pricing comparison the DOCX produces; it populates once pricing proposals arrive. Each cell stays labeled until then, never fabricated." />
+      <STable columns={[{ h: "Pricing dimension" }].concat(S.map(function (s) { return { h: s.name, a: "center" }; }))}
+        rows={[
+          ["Pricing model", "model"], ["Annual fee", "annual"], ["Volume discount", "disc"], ["Term", "term"], ["Escalator", "esc"], ["Binding", "binding"],
+        ].map(function (row) {
+          return [{ d: row[0], b: true }].concat(S.map(function (s) { var val = s.price[row[1]]; return { d: val, c: val === "Not submitted" ? MUT : DK, a: "center" }; }));
+        })} />
+    </Card>
+  </div>;
+}
+
+function RisksTab() {
+  return <div>
+    <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 12 }}>Risks, inconsistencies (issues), and outstanding clarifications across all vendors. Severity: Critical (blocks evaluation), High (could affect the award), Medium (monitor), Low (manageable). GATING clarifications must be resolved before commercial or legal evaluation proceeds.</div>
+    {S.map(function (s, i) {
+      return <Card key={i} title={"#" + (i + 1) + " " + s.name} note={s.hq + " | " + s.pct + "% | " + s.basis}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: R, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Risk register</div>
+            {s.rsk.map(function (r, j) { return <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "6px 0", borderBottom: "1px solid " + BD }}><SevPill s={r.sev} /><div style={{ fontSize: 11.5, lineHeight: 1.55 }}>{r.desc}</div></div>; })}
+            <div style={{ fontSize: 10, fontWeight: 700, color: AMB, textTransform: "uppercase", letterSpacing: "0.05em", margin: "10px 0 4px" }}>Inconsistencies / issues</div>
+            {s.issues.map(function (r, j) { return <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "6px 0", borderBottom: j < s.issues.length - 1 ? "1px solid " + BD : "none" }}><SevPill s={r.sev} /><div style={{ fontSize: 11.5, lineHeight: 1.55 }}>{r.desc}</div></div>; })}
+          </div>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: BLU, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Clarifications</div>
+            {s.clars.map(function (c, j) { return <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "6px 0", borderBottom: j < s.clars.length - 1 ? "1px solid " + BD : "none" }}><PrioPill p={c.p} /><div style={{ fontSize: 11.5, lineHeight: 1.55 }}>{c.q}</div></div>; })}
+          </div>
+        </div>
+      </Card>;
+    })}
+    <Card title="Cross-cutting observation"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>Replace with the run's synthesis of the gating items shared across the field and what must be resolved for the event to proceed.</div></Card>
+  </div>;
+}
+
+function AwardTab() {
+  return <div>
+    {S.map(function (s, i) {
+      var tier = AWARD[Math.min(i, 3)];
+      return <Card key={i} title={tier[0].toUpperCase() + ": " + s.name}>
+        <div style={{ borderLeft: "4px solid " + tier[1], paddingLeft: 12 }}>
+          <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.recommendation}</div>
+        </div>
+      </Card>;
+    })}
+    <Card title="Standard caveats">
+      <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>This recommendation is preliminary and subject to resolution of all gating clarifications, MSA approval by Legal, pricing validation, satisfactory reference calls, and a successful live demonstration using buyer-specific scenarios. Final selection requires stakeholder consensus through the formal evaluation scoring process. Replace with the run's specific caveats.</div>
+    </Card>
+  </div>;
+}
+
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+
+</script></body></html>

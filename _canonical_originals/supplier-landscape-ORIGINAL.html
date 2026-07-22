@@ -1,0 +1,377 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Supplier Landscape - ORIGINAL canonical</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+  <script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>body{margin:0;font-family:Arial,Helvetica,sans-serif}#loaderr{padding:24px;color:#b00;font-family:monospace;white-space:pre-wrap}</style></head><body><div id="root"><div id="loaderr">Loading the original canonical dashboard (needs internet for React/Recharts CDN). If this message stays, the CDN was blocked.</div></div>
+<script type="text/babel" data-presets="react">
+const {useState, useMemo} = React;
+const {BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, LabelList} = Recharts;
+
+// ---------------------------------------------------------------------------
+// Supplier Landscape - CANONICAL DASHBOARD (reference implementation)
+// LOCKED structure. See references/dashboard-canonical.md.
+// 5 tabs, identical in Full Report mode and Supplement mode and for every
+// category or commodity. Only the data and research change per run.
+// Data below is NEUTRAL and ILLUSTRATIVE (Supplier Alpha/Beta/Gamma/Delta,
+// generic capability categories). Clone the structure, swap the data.
+// House style: SUITE STANDARD (Arial body, Georgia titles, dark #212121 header
+// with red rule, R/DK/GRN/BRN palette). Same family as every other dashboard.
+// ---------------------------------------------------------------------------
+
+const R = "#E1251B", DK = "#212121", GRN = "#0F3A85", BRN = "#521207",
+  CARD = "#E4EBF1", WARM = "#FFF0D8", RISK = "#FDE8E5", OK = "#D4E5F7", BD = "#E4EBF1",
+  MUT = "#8A969E", LT = "#8A969E", BLU = "#0F3A85", AMB = "#B45309";
+
+function scC(v) { return v >= 8.5 ? GRN : v >= 7 ? AMB : R; }
+function scBg(v) { return v >= 8.5 ? OK : v >= 7 ? WARM : RISK; }
+const SEV = { High: R, Medium: AMB, Low: GRN };
+const SEVBG = { High: RISK, Medium: WARM, Low: OK };
+
+const cats = [
+  { k: "core", n: "Core Capability", c: 90 },
+  { k: "integ", n: "Integration & Data", c: 55 },
+  { k: "scale", n: "Scalability & Performance", c: 40 },
+  { k: "impl", n: "Implementation & Delivery", c: 45 },
+  { k: "support", n: "Support & SLAs", c: 35 },
+  { k: "security", n: "Security & Compliance", c: 50 },
+  { k: "commercial", n: "Commercial Model", c: 25 },
+  { k: "roadmap", n: "Roadmap & Innovation", c: 20 },
+];
+const TOTAL = cats.reduce(function (a, c) { return a + c.c; }, 0);
+
+const S = [
+  {
+    r: 1, nm: "Supplier Alpha", hq: "City A, Country A", emp: "1,800", rev: "$540M (FY2025)", fin: "Public",
+    pd: "Extensive", ig: "Excellent", cf: "High", os: 8.7, fs: 9.0,
+    sc: { core: 9.3, integ: 9.0, scale: 8.8, impl: 8.5, support: 8.6, security: 9.0, commercial: 8.0, roadmap: 8.9 },
+    overview: "Supplier Alpha is an established category leader recognized by major analyst firms for several consecutive years. The illustrative profile shows a public company with disciplined growth and the deepest reference base in this evaluation. Replace this narrative with the actual researched company overview for the run.",
+    whyLilly: "Strongest overall fit for the stated requirements, with the broadest native coverage and a proven enterprise integration story. Replace with the run-specific rationale tied to the buyer's priorities.",
+    solution: "Cloud-based platform with a unified data model and modular capability set. Replace with the supplier's actual architecture, deployment model, and release cadence.",
+    arch: "Multi-tenant SaaS with documented APIs and certified connectors to common enterprise systems. Replace with verified architecture detail.",
+    str: ["Broadest native coverage across the weighted categories", "Deep reference base in the relevant domain", "Mature, documented integration toolkit", "Financially disciplined and profitable"],
+    rsk: [
+      { c: "Operational", d: "One capability area depends on an OEM partner rather than native function. Confirm licensing and support implications.", s: "Medium" },
+      { c: "Operational", d: "Leadership transition noted; confirm permanent appointment.", s: "Low" },
+      { c: "Cybersecurity", d: "SOC 2 Type II certified; no known breaches.", s: "Low" },
+      { c: "Geopolitical", d: "Data centers in two regions; no jurisdictional concerns identified.", s: "Low" },
+    ],
+    reqNarr: "Leads or ties in most weighted categories. Replace with category-by-category fit analysis citing the requirement counts.",
+    commNarr: "Per-user subscription with module entitlements. Pricing not yet submitted in this illustrative run; see the labeled state. Replace with the verified commercial model.",
+    opsNarr: "Implementations delivered with named system-integrator partners; typical timelines run several months to full deployment. Replace with verified delivery model.",
+    clients: "Counts a majority of the top peers in the domain among its clients. Replace with named, verified references.",
+    ecosystem: "Broad partner and integrator ecosystem. Replace with the verified ecosystem map.",
+  },
+  {
+    r: 2, nm: "Supplier Beta", hq: "City B, Country B", emp: "1,300+", rev: "Not disclosed", fin: "Private",
+    pd: "Extensive", ig: "Good", cf: "Moderate", os: 8.4, fs: 8.6,
+    sc: { core: 8.6, integ: 8.2, scale: 8.5, impl: 8.7, support: 8.4, security: 8.5, commercial: 8.2, roadmap: 8.3 },
+    overview: "Supplier Beta is a privately held specialist with deep domain expertise and strong delivery references. Financials are not publicly disclosed, which is reflected as a labeled research gap rather than a fabricated figure. Replace with the actual researched overview.",
+    whyLilly: "Strong domain depth and delivery track record. Replace with run-specific rationale.",
+    solution: "Purpose-built platform for the domain with strong delivery tooling. Replace with verified solution detail.",
+    arch: "Cloud-enabled with standard connectors; certification ecosystem is narrower than the leader. Replace with verified detail.",
+    str: ["Deep domain specialization", "Strong delivery and implementation references", "Competitive, flexible commercial posture"],
+    rsk: [
+      { c: "Financial", d: "Private company; financial health cannot be independently verified from public sources.", s: "Medium" },
+      { c: "Operational", d: "Smaller scale may constrain capacity on very large programs.", s: "Medium" },
+      { c: "Cybersecurity", d: "SOC 2 certified; no known breaches.", s: "Low" },
+    ],
+    reqNarr: "Competitive across core categories; trails the leader on integration breadth. Replace with verified fit analysis.",
+    commNarr: "Usage-based model; historically flexible with large enterprise clients. Pricing not yet submitted. Replace with verified terms.",
+    opsNarr: "Delivered via in-house consultants and a global alliance partner. Replace with verified delivery model.",
+    clients: "Strong named references in the domain. Replace with verified client list.",
+    ecosystem: "Focused partner ecosystem. Replace with verified detail.",
+  },
+  {
+    r: 3, nm: "Supplier Gamma", hq: "City C, Country C", emp: "2,400", rev: "$700M (est.)", fin: "PE-backed",
+    pd: "Moderate", ig: "Good", cf: "Moderate", os: 7.9, fs: 8.0,
+    sc: { core: 8.0, integ: 8.3, scale: 8.4, impl: 7.4, support: 7.6, security: 8.1, commercial: 8.4, roadmap: 9.0 },
+    overview: "Supplier Gamma is a growth-stage, PE-backed challenger with the most modern platform architecture in this illustrative set and the strongest innovation roadmap. Replace with the actual researched overview.",
+    whyLilly: "Most architecturally advanced option; strongest roadmap. Replace with run-specific rationale.",
+    solution: "Modern, AI-forward platform. Replace with verified solution detail.",
+    arch: "Cloud-native with an extensible model. Replace with verified detail.",
+    str: ["Most modern platform architecture", "Strongest innovation roadmap", "Likely aggressive commercial posture to win references"],
+    rsk: [
+      { c: "Financial", d: "Pre-profitability with private-equity exit pressure may affect long-term pricing stability.", s: "Medium" },
+      { c: "Operational", d: "Less proven depth in the specific domain than the top two.", s: "Medium" },
+      { c: "Operational", d: "Rapid growth may strain implementation and support capacity.", s: "Medium" },
+    ],
+    reqNarr: "Leads on roadmap and commercial model; trails on implementation depth. Replace with verified fit analysis.",
+    commNarr: "Aggressive subscription pricing likely. Pricing not yet submitted. Replace with verified terms.",
+    opsNarr: "Delivery capacity is a watch item given growth. Replace with verified delivery model.",
+    clients: "Fewer named domain references. Replace with verified client list.",
+    ecosystem: "Growing ecosystem. Replace with verified detail.",
+  },
+  {
+    r: 4, nm: "Supplier Delta", hq: "City D, Country D", emp: "8,000+", rev: "$3B+ (segment)", fin: "Public (subsidiary)",
+    pd: "Moderate", ig: "Excellent", cf: "Low", os: 7.3, fs: 7.2,
+    sc: { core: 7.2, integ: 9.0, scale: 8.0, impl: 6.8, support: 7.0, security: 8.2, commercial: 6.5, roadmap: 7.0 },
+    overview: "Supplier Delta is a large incumbent whose chief advantage is native integration with the buyer's existing stack, offset by a functional gap versus the pure-play leaders. Replace with the actual researched overview.",
+    whyLilly: "Native integration with existing systems reduces friction. Replace with run-specific rationale.",
+    solution: "Broad enterprise suite; the relevant module is one of many. Replace with verified solution detail.",
+    arch: "Native integration is the differentiator; cloud migration may still be in progress. Replace with verified detail.",
+    str: ["Native integration with the existing enterprise stack", "Existing vendor relationship reduces procurement friction", "Enterprise-grade infrastructure"],
+    rsk: [
+      { c: "Operational", d: "Functional gap versus pure-play leaders in the core category.", s: "High" },
+      { c: "Operational", d: "Platform modernization may still be in progress; migration risk.", s: "Medium" },
+      { c: "Financial", d: "Segment-level transparency limited as a subsidiary.", s: "Medium" },
+    ],
+    reqNarr: "Strong on integration; materially behind on core capability. Replace with verified fit analysis.",
+    commNarr: "Bundling may obscure standalone pricing; request apples-to-apples terms. Replace with verified terms.",
+    opsNarr: "Implementations can be complex and lengthy. Replace with verified delivery model.",
+    clients: "Large installed base; fewer references specific to the core category. Replace with verified client list.",
+    ecosystem: "Very broad integrator ecosystem. Replace with verified detail.",
+  },
+];
+
+const tabNames = ["Executive Summary", "Supplier Deep Dive", "Requirements Heatmap", "Risk Assessment", "Head-to-Head"];
+const ddSections = ["Profile & Fit", "Solution & Architecture", "Strengths & Risks", "Requirements Analysis", "Commercial & Operational", "Clients & Ecosystem"];
+
+function fF(v) { return "$" + v.toLocaleString("en-US"); }
+
+function SevPill({ s }) { return <span style={{ color: SEV[s], background: SEVBG[s], border: "1px solid " + SEV[s] + "40", fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{s}</span>; }
+function Metric({ label, value, sub, accent, warn, good }) {
+  var bar = accent ? R : warn ? R : good ? GRN : BD;
+  return <div style={{ background: accent ? WARM : warn ? RISK : good ? OK : "#fff", borderRadius: 8, padding: "14px 16px", borderLeft: "4px solid " + bar, minWidth: 0 }}>
+    <div style={{ fontSize: 10, fontWeight: 700, color: accent ? R : LT, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
+    <div style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, color: warn ? R : good ? GRN : DK, marginTop: 4 }}>{value}</div>
+    {sub && <div style={{ fontSize: 11, color: MUT, marginTop: 2 }}>{sub}</div>}
+  </div>;
+}
+function Card({ title, note, children }) {
+  return <div style={{ background: "#fff", borderRadius: 8, padding: 18, border: "1px solid " + BD, marginBottom: 14 }}>
+    {title && <div style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 700, color: DK, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ width: 3, height: 14, background: R, borderRadius: 2 }} />{title}
+      {note && <span style={{ fontFamily: "Arial", fontSize: 10, fontWeight: 600, color: MUT, marginLeft: "auto" }}>{note}</span>}
+    </div>}{children}
+  </div>;
+}
+function Pillar({ c, k, t, d }) {
+  return <div style={{ background: "#fff", borderRadius: 8, padding: 16, border: "1px solid " + BD, borderTop: "3px solid " + c, flex: 1, minWidth: 0 }}>
+    <div style={{ fontFamily: "Georgia,serif", fontSize: 20, fontWeight: 700, color: c }}>{k}</div>
+    <div style={{ fontSize: 12, fontWeight: 700, color: DK, marginTop: 4 }}>{t}</div>
+    <div style={{ fontSize: 11, color: MUT, marginTop: 4, lineHeight: 1.5 }}>{d}</div>
+  </div>;
+}
+function Tip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
+  return <div style={{ background: DK, borderRadius: 6, padding: "10px 14px", color: "#fff", fontSize: 12 }}>
+    {label && <div style={{ fontWeight: 600, color: LT }}>{label}</div>}
+    {payload.map(function (p, i) { return <div key={i}><strong>{typeof p.value === "number" ? p.value.toLocaleString("en-US") : p.value}</strong></div>; })}
+  </div>;
+}
+function StateBanner({ kind, msg }) {
+  var map = { NEEDS_INPUT: [AMB, WARM, "Needs input"], NOT_APPLICABLE: [MUT, CARD, "Not applicable"], RESEARCH_PENDING: [MUT, CARD, "Research pending"] };
+  var c = map[kind] || map.NOT_APPLICABLE;
+  return <div style={{ background: c[1], border: "1px solid " + c[0] + "55", borderLeft: "4px solid " + c[0], borderRadius: 8, padding: "12px 16px", marginBottom: 14 }}>
+    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", color: c[0], textTransform: "uppercase" }}>{c[2]}</span>
+    <div style={{ fontSize: 12, color: DK, marginTop: 4, lineHeight: 1.5 }}>{msg}</div>
+  </div>;
+}
+function STable({ columns, rows }) {
+  var _s = useState({ col: 0, dir: "asc" }); var sort = _s[0]; var setSort = _s[1];
+  var _q = useState(""); var q = _q[0]; var setQ = _q[1];
+  var filtered = useMemo(function () {
+    var r = rows;
+    if (q) { var lq = q.toLowerCase(); r = rows.filter(function (row) { return row.some(function (c) { return String(c.d).toLowerCase().indexOf(lq) >= 0; }); }); }
+    return r.slice().sort(function (a, b) {
+      var av = a[sort.col].v != null ? a[sort.col].v : a[sort.col].d;
+      var bv = b[sort.col].v != null ? b[sort.col].v : b[sort.col].d;
+      if (av < bv) return sort.dir === "asc" ? -1 : 1;
+      if (av > bv) return sort.dir === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [rows, q, sort]);
+  return <div>
+    <input value={q} onChange={function (e) { setQ(e.target.value); }} placeholder="Search..."
+      style={{ width: "100%", boxSizing: "border-box", padding: "7px 10px", border: "1px solid " + BD, borderRadius: 6, fontSize: 12, marginBottom: 8, fontFamily: "Arial" }} />
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+        <thead><tr>{columns.map(function (c, i) {
+          return <th key={i} onClick={function () { setSort({ col: i, dir: sort.col === i && sort.dir === "asc" ? "desc" : "asc" }); }}
+            style={{ textAlign: c.a || "left", padding: "8px 10px", background: DK, color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap" }}>
+            {c.h}{sort.col === i ? (sort.dir === "asc" ? " ^" : " v") : ""}
+          </th>;
+        })}</tr></thead>
+        <tbody>{filtered.map(function (row, ri) {
+          return <tr key={ri} style={{ background: ri % 2 ? "#fff" : "#FAFBFC" }}>{row.map(function (c, ci) {
+            return <td key={ci} style={{ padding: "8px 10px", textAlign: c.a || "left", color: c.c || DK, fontWeight: c.b ? 700 : 400, borderBottom: "1px solid " + BD, verticalAlign: "top" }}>{c.d}</td>;
+          })}</tr>;
+        })}</tbody>
+      </table>
+    </div>
+  </div>;
+}
+function ScoreCell({ v }) { return <span style={{ background: scBg(v), color: scC(v), fontWeight: 700, padding: "2px 9px", borderRadius: 12, fontSize: 12 }}>{v.toFixed(2)}</span>; }
+
+function App() {
+  var _t = useState(0); var tab = _t[0]; var setTab = _t[1];
+  var _s = useState(0); var si = _s[0]; var setSi = _s[1];
+  var _sec = useState(0); var sec = _sec[0]; var setSec = _sec[1];
+  var _a = useState(0); var cA = _a[0]; var setCA = _a[1];
+  var _b = useState(1); var cB = _b[0]; var setCB = _b[1];
+
+  return <div style={{ fontFamily: "Arial,Helvetica,sans-serif", background: "#FFFFFF", minHeight: "100vh", color: DK, fontSize: 13 }}>
+    <div style={{ background: DK, borderLeft: "4px solid " + R, padding: "18px 24px" }}>
+      <div style={{ color: R, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Eli Lilly and Company - Procurement</div>
+      <div style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, color: "#fff", marginTop: 2 }}>[Category] - Supplier Landscape</div>
+      <div style={{ color: LT, fontSize: 12, marginTop: 4 }}>[Month Year] | {TOTAL} requirements | {S.length} vendors evaluated | [N] deep profiles</div>
+    </div>
+    <div style={{ background: "#fff", borderBottom: "1px solid " + BD, padding: "0 14px", display: "flex", overflowX: "auto" }}>
+      {tabNames.map(function (t, i) {
+        var active = tab === i;
+        return <button key={i} onClick={function () { setTab(i); }} style={{ border: "none", background: "none", padding: "13px 16px", fontSize: 12.5, fontWeight: active ? 700 : 500, color: active ? R : MUT, borderBottom: active ? "3px solid " + R : "3px solid transparent", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "Arial" }}>{t}</button>;
+      })}
+    </div>
+    <div style={{ maxWidth: 1180, margin: "0 auto", padding: "20px 24px 50px" }}>
+      {tab === 0 && <ExecTab />}
+      {tab === 1 && <DDTab si={si} setSi={function (v) { setSi(v); setSec(0); }} sec={sec} setSec={setSec} />}
+      {tab === 2 && <HeatTab />}
+      {tab === 3 && <RiskTab />}
+      {tab === 4 && <CmpTab a={cA} b={cB} setA={setCA} setB={setCB} />}
+    </div>
+    <div style={{ background: DK, color: LT, padding: "14px 24px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8, fontSize: 11 }}>
+      <span>Scores on a 10-point scale, weighted by requirement count. Replace placeholders and illustrative data with researched values.</span>
+      <span>Company Confidential | supplier-landscape | procurement guidance, not legal advice</span>
+    </div>
+  </div>;
+}
+
+function ExecTab() {
+  return <div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 14 }}>
+      <Metric label="Vendors evaluated" value={S.length} sub="profiled in depth" />
+      <Metric label="Total requirements" value={TOTAL} sub={cats.length + " categories"} />
+      <Metric label="Top weighted score" value={S[0].os.toFixed(2)} good />
+      <Metric label="Recommended" value={S[0].nm} sub="subject to validation" good />
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Card title="Evaluation summary">
+        <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>This illustrative landscape evaluates {S.length} suppliers against {TOTAL} weighted requirements across {cats.length} categories. Replace with the run-specific summary describing the sourcing need and how the field was narrowed. Ranking: {S.map(function (s) { return s.nm + " (" + s.os.toFixed(2) + ")"; }).join(", ")}.</div>
+      </Card>
+      <Card title="Recommendation">
+        <div style={{ fontSize: 12.5, lineHeight: 1.7 }}><strong>Primary: {S[0].nm} ({S[0].os.toFixed(2)})</strong>. {S[0].whyLilly}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 8 }}><strong>Secondary: {S[1].nm} ({S[1].os.toFixed(2)})</strong>. Strong alternative; see Head-to-Head for the tradeoff.</div>
+      </Card>
+    </div>
+    <Card title="Supplier ranking" note="weighted score, 10-point">
+      <ResponsiveContainer width="100%" height={170}>
+        <BarChart data={S.map(function (s) { return { name: s.nm, score: s.os }; })} layout="vertical" margin={{ left: 20, right: 40 }}>
+          <CartesianGrid horizontal={false} stroke={BD} />
+          <XAxis type="number" domain={[0, 10]} tick={{ fontSize: 11 }} /><YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={110} />
+          <Tooltip content={<Tip />} cursor={{ fill: "#00000008" }} />
+          <Bar dataKey="score" radius={[0, 4, 4, 0]}>{S.map(function (s, i) { return <Cell key={i} fill={scC(s.os)} />; })}<LabelList dataKey="score" position="right" formatter={function (v) { return v.toFixed(2); }} style={{ fontSize: 12, fontWeight: 700 }} /></Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </Card>
+  </div>;
+}
+
+function DDTab({ si, setSi, sec, setSec }) {
+  var s = S[si];
+  return <div>
+    <div style={{ marginBottom: 12 }}>
+      <select value={si} onChange={function (e) { setSi(+e.target.value); }} style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid " + BD, fontSize: 13, fontWeight: 600, minWidth: 260, fontFamily: "Arial" }}>
+        {S.map(function (x, i) { return <option key={i} value={i}>#{x.r} {x.nm} - Score {x.os.toFixed(2)}</option>; })}
+      </select>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 14 }}>
+      <Metric label="Weighted score" value={s.os.toFixed(2)} good={s.os >= 8.5} accent={s.os >= 7 && s.os < 8.5} warn={s.os < 7} />
+      <Metric label="Fit score" value={s.fs.toFixed(2)} />
+      <Metric label="Employees" value={s.emp} />
+      <Metric label="Revenue" value={s.rev.split("(")[0].trim()} />
+      <Metric label="Domain depth" value={s.pd} good={s.pd === "Extensive"} accent={s.pd !== "Extensive"} />
+    </div>
+    <div style={{ display: "flex", marginBottom: 14, borderBottom: "1px solid " + BD, flexWrap: "wrap" }}>
+      {ddSections.map(function (ps, i) { return <button key={i} onClick={function () { setSec(i); }} style={{ padding: "8px 14px", fontSize: 12, fontWeight: sec === i ? 700 : 500, color: sec === i ? R : MUT, background: "none", border: "none", borderBottom: sec === i ? "2px solid " + R : "2px solid transparent", cursor: "pointer", fontFamily: "Arial" }}>{ps}</button>; })}
+    </div>
+
+    {sec === 0 && <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14 }}>
+      <Card title="Company overview"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.overview}</div></Card>
+      <Card title="Why this vendor"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.whyLilly}</div></Card>
+    </div>}
+    {sec === 1 && <div>
+      <Card title="Solution"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.solution}</div></Card>
+      <Card title="Architecture & integration"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.arch}</div></Card>
+    </div>}
+    {sec === 2 && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Card title="Strengths">{s.str.map(function (x, i) { return <div key={i} style={{ fontSize: 12, lineHeight: 1.6, padding: "5px 0", borderBottom: i < s.str.length - 1 ? "1px solid " + BD : "none" }}><span style={{ color: GRN, fontWeight: 700 }}>+ </span>{x}</div>; })}</Card>
+      <Card title="Risks">{s.rsk.map(function (r, i) { return <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "6px 0", borderBottom: i < s.rsk.length - 1 ? "1px solid " + BD : "none" }}><SevPill s={r.s} /><div style={{ fontSize: 12, lineHeight: 1.6 }}><strong style={{ color: MUT }}>{r.c}: </strong>{r.d}</div></div>; })}</Card>
+    </div>}
+    {sec === 3 && <Card title="Requirements analysis" note="10-point, by category">
+      <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>{s.reqNarr}</div>
+      <STable columns={[{ h: "Category (requirements)" }, { h: "Score", a: "center" }]}
+        rows={cats.map(function (c) { var v = s.sc[c.k]; return [{ d: c.n + " (" + c.c + ")", b: true }, { d: <ScoreCell v={v} />, v: v, a: "center" }]; })} />
+    </Card>}
+    {sec === 4 && <div>
+      {s.fin === "Private" && <StateBanner kind="RESEARCH_PENDING" msg="Financial figures are not publicly disclosed for this private company. Shown as a labeled gap rather than a fabricated number. Provide filings or a submitted financial statement to populate." />}
+      <Card title="Commercial model"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.commNarr}</div></Card>
+      <Card title="Implementation & operations"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.opsNarr}</div></Card>
+    </div>}
+    {sec === 5 && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Card title="Reference clients"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.clients}</div></Card>
+      <Card title="Partner ecosystem"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>{s.ecosystem}</div></Card>
+    </div>}
+  </div>;
+}
+
+function HeatTab() {
+  return <Card title="Cross-vendor requirements fit heatmap" note="10-point, weighted by requirement count">
+    <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>Green (8.5+) strong, amber (7-8.49) adequate, red (below 7) significant gap. Replace illustrative values with researched scores.</div>
+    <STable columns={[{ h: "Category (requirements)" }].concat(S.map(function (s) { return { h: s.nm, a: "center" }; }))}
+      rows={cats.map(function (cat) {
+        return [{ d: cat.n + " (" + cat.c + ")", b: true }].concat(S.map(function (s) { var v = s.sc[cat.k]; return { d: <ScoreCell v={v} />, v: v, a: "center" }; }));
+      }).concat([
+        [{ d: "WEIGHTED AVERAGE", b: true }].concat(S.map(function (s) { var w = cats.reduce(function (a, c) { return a + s.sc[c.k] * c.c; }, 0) / TOTAL; return { d: <ScoreCell v={w} />, v: w, a: "center" }; }))
+      ])} />
+    <div style={{ fontSize: 12, color: MUT, marginTop: 10, lineHeight: 1.6 }}>Replace with the run's read of who leads each category and what the gaps mean for the buyer's priorities.</div>
+  </Card>;
+}
+
+function RiskTab() {
+  return <div>
+    <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 12 }}>Risk across all profiled vendors, classified by category (Operational, Financial, Legal, Cybersecurity, Geopolitical) and severity (Low / Medium / High). Replace illustrative risks with researched findings.</div>
+    {S.map(function (s, i) {
+      return <Card key={i} title={"#" + s.r + " " + s.nm} note={"Score " + s.os.toFixed(2) + " | " + s.hq}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(" + Math.min(s.rsk.length, 3) + ",1fr)", gap: 10 }}>
+          {s.rsk.map(function (r, j) { return <div key={j} style={{ background: SEVBG[r.s], borderRadius: 6, padding: "10px 12px", borderLeft: "3px solid " + SEV[r.s] }}><div style={{ fontSize: 9, fontWeight: 700, color: SEV[r.s], textTransform: "uppercase", marginBottom: 4, letterSpacing: "0.04em" }}>{r.c} | {r.s}</div><div style={{ fontSize: 11, lineHeight: 1.55 }}>{r.d}</div></div>; })}
+        </div>
+      </Card>;
+    })}
+    <Card title="Cross-cutting risk observations"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>Replace with the run's synthesis of where risk concentrates across the field and what it means for the award.</div></Card>
+  </div>;
+}
+
+function CmpTab({ a, b, setA, setB }) {
+  var sA = S[a], sB = S[b];
+  return <div>
+    <Card title="Head-to-head comparison">
+      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <select value={a} onChange={function (e) { setA(+e.target.value); }} style={{ padding: "7px 10px", borderRadius: 6, border: "1px solid " + BD, fontSize: 12.5, fontWeight: 600, fontFamily: "Arial" }}>{S.map(function (s, i) { return <option key={i} value={i}>{s.nm}</option>; })}</select>
+        <span style={{ fontWeight: 800, color: R, fontSize: 14 }}>vs</span>
+        <select value={b} onChange={function (e) { setB(+e.target.value); }} style={{ padding: "7px 10px", borderRadius: 6, border: "1px solid " + BD, fontSize: 12.5, fontWeight: 600, fontFamily: "Arial" }}>{S.map(function (s, i) { return <option key={i} value={i}>{s.nm}</option>; })}</select>
+      </div>
+    </Card>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+      {[sA, sB].map(function (s, idx) {
+        return <Pillar key={idx} c={idx === 0 ? R : BLU} k={s.os.toFixed(2)} t={s.nm} d={s.hq + " | " + s.fin + " | Fit " + s.fs.toFixed(2) + " | Integration " + s.ig + " | Contract " + s.cf} />;
+      })}
+    </div>
+    <Card title="Category-by-category comparison" note="delta = first minus second">
+      <STable columns={[{ h: "Category (requirements)" }, { h: sA.nm, a: "center" }, { h: sB.nm, a: "center" }, { h: "Delta", a: "center" }]}
+        rows={cats.map(function (c) { var va = sA.sc[c.k], vb = sB.sc[c.k], d = va - vb; return [
+          { d: c.n + " (" + c.c + ")", b: true },
+          { d: <ScoreCell v={va} />, v: va, a: "center" },
+          { d: <ScoreCell v={vb} />, v: vb, a: "center" },
+          { d: (d > 0 ? "+" : "") + d.toFixed(2), v: d, a: "center", b: true, c: d > 0 ? GRN : d < 0 ? R : MUT },
+        ]; })} />
+    </Card>
+    <Card title="Key tradeoff"><div style={{ fontSize: 12.5, lineHeight: 1.7 }}>Compare {sA.nm} ({sA.os.toFixed(2)}) against {sB.nm} ({sB.os.toFixed(2)}) across the breakdown above. Replace with the run's plain-language read of the tradeoff between these two.</div></Card>
+  </div>;
+}
+
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+
+</script></body></html>

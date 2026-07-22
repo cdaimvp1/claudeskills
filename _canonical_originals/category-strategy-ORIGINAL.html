@@ -1,0 +1,283 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category Strategy - ORIGINAL canonical</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+  <script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>body{margin:0;font-family:Arial,Helvetica,sans-serif}#loaderr{padding:24px;color:#b00;font-family:monospace;white-space:pre-wrap}</style></head><body><div id="root"><div id="loaderr">Loading the original canonical dashboard (needs internet for React/Recharts CDN). If this message stays, the CDN was blocked.</div></div>
+<script type="text/babel" data-presets="react">
+const {useState, useMemo} = React;
+const {BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ComposedChart, Line, ReferenceLine, Cell, ScatterChart, Scatter, ZAxis, CartesianGrid} = Recharts;
+
+// ---------------------------------------------------------------------------
+// Category Strategy - CANONICAL DASHBOARD (reference implementation)
+// LOCKED structure. See references/dashboard-canonical.md.
+// 11 tabs, identical in DEVELOP and MANAGE modes and for every category or
+// commodity. Only the data and category-specific research change per run.
+// Data below is NEUTRAL and ILLUSTRATIVE (Supplier Alpha/Beta/Gamma, generic
+// subcategories). Clone the structure, swap the data.
+// House style: SUITE STANDARD (Arial body, Georgia titles, dark #212121 header
+// with red rule, Lilly-approved palette). Same family as every other dashboard.
+// See references/dashboard-components.md for component implementations.
+// ---------------------------------------------------------------------------
+
+const R="#E1251B",DK="#212121",GRN="#0F3A85",BRN="#521207",CARD="#E4EBF1",WARM="#FFF0D8",RISK="#FDE8E5",OK="#D4E5F7",BD="#E4EBF1",MUT="#8A969E",LT="#8A969E",BLU="#0F3A85",AMB="#B45309";
+const PAL=[R,BLU,GRN,"#F58E7D","#FFC709","#99BFE5",BRN,AMB];
+const TABS=["Overview","Pareto & Tail","Suppliers","Subcategories","Market & Kraljic","Risk","Strategy","Savings & Scorecard","Supplier Development","Rationalization","Trend & Change"];
+const NEEDS_INPUT={"Strategy":1,"Savings & Scorecard":1};
+
+// --- NEUTRAL ILLUSTRATIVE DATA (replace entirely per run) -----------------
+const D = {
+  meta: { commodity: "999", name: "Example Category", totalSpend: 285000000, s23: 88000000, s24: 95000000, s25ytd: 72000000, s25ann: 102000000, yoy2324: 8.0, ytdYoY: 12.5, lastComplete: 2024, cutoff: "Sep 30, 2025", vendors: 142, vendorsCY24: 98, p80: 12, p95: 38, hhi: 890, topShare: 18.2, top5Share: 52.1, top10Share: 68.4, tail50: 48, tail50Spend: 820000, tail50Pct: 0.86, tail100: 62, tail100Spend: 2100000, tail100Pct: 2.2, sbe23: 7200000, sbe24: 8100000, sbeRate23: 8.2, sbeRate24: 8.5 },
+  annual: [{ yr: "CY2023", s: 88000000, complete: true }, { yr: "CY2024", s: 95000000, complete: true }, { yr: "CY2025 YTD", s: 72000000, complete: false }],
+  suppliers: [
+    { r:1, n:"Supplier Alpha Corp", tot:51870000, s3:15600000, s4:17300000, s5:13200000, yoy:10.9, sbe:false, share:18.2 },
+    { r:2, n:"Supplier Beta Inc", tot:34200000, s3:10500000, s4:11400000, s5:8700000, yoy:8.6, sbe:false, share:12.0 },
+    { r:3, n:"Supplier Gamma LLC", tot:24510000, s3:7800000, s4:8100000, s5:6300000, yoy:3.8, sbe:true, share:8.6 },
+    { r:4, n:"Supplier Delta SA", tot:20520000, s3:6200000, s4:6800000, s5:5400000, yoy:9.7, sbe:false, share:7.2 },
+    { r:5, n:"Supplier Epsilon Ltd", tot:17100000, s3:5100000, s4:5700000, s5:4500000, yoy:11.8, sbe:false, share:6.0 },
+    { r:6, n:"Supplier Zeta GmbH", tot:11400000, s3:3400000, s4:3800000, s5:3000000, yoy:11.8, sbe:true, share:4.0 },
+    { r:7, n:"Supplier Eta Partners", tot:9690000, s3:2900000, s4:3200000, s5:2600000, yoy:10.3, sbe:false, share:3.4 },
+    { r:8, n:"Supplier Theta Co", tot:7980000, s3:2400000, s4:2600000, s5:2100000, yoy:8.3, sbe:false, share:2.8 },
+    { r:9, n:"Supplier Iota Corp", tot:5700000, s3:1700000, s4:1900000, s5:1500000, yoy:11.8, sbe:true, share:2.0 },
+    { r:10, n:"Supplier Kappa Inc", tot:4560000, s3:1300000, s4:1600000, s5:1200000, yoy:23.1, sbe:false, share:1.6 }
+  ],
+  pareto: [
+    { n:"Supplier Alpha Corp", s:17300000, cumPct:18.2, idx:1 },{ n:"Supplier Beta Inc", s:11400000, cumPct:30.2, idx:2 },
+    { n:"Supplier Gamma LLC", s:8100000, cumPct:38.7, idx:3 },{ n:"Supplier Delta SA", s:6800000, cumPct:45.9, idx:4 },
+    { n:"Supplier Epsilon Ltd", s:5700000, cumPct:51.9, idx:5 },{ n:"Supplier Zeta GmbH", s:3800000, cumPct:55.9, idx:6 },
+    { n:"Supplier Eta Partners", s:3200000, cumPct:59.3, idx:7 },{ n:"Supplier Theta Co", s:2600000, cumPct:62.0, idx:8 },
+    { n:"Supplier Iota Corp", s:1900000, cumPct:64.0, idx:9 },{ n:"Supplier Kappa Inc", s:1600000, cumPct:65.7, idx:10 }
+  ],
+  subcats: [
+    { n:"Subcategory A", tot:112000000, s3:33600000, s4:38080000, s5:28800000 },
+    { n:"Subcategory B", tot:76000000, s3:22800000, s4:25840000, s5:19440000 },
+    { n:"Subcategory C", tot:52000000, s3:15600000, s4:16640000, s5:14040000 },
+    { n:"Subcategory D", tot:28500000, s3:8550000, s4:9120000, s5:7695000 },
+    { n:"Subcategory E", tot:16500000, s3:7450000, s4:5320000, s5:2025000 }
+  ],
+  geo: [{ country:"United States", pct:62, spend:58900000 },{ country:"Germany", pct:18, spend:17100000 },{ country:"India", pct:11, spend:10450000 },{ country:"United Kingdom", pct:6, spend:5700000 },{ country:"Other", pct:3, spend:2850000 }],
+  anomalies: [{ n:"Supplier Kappa Inc", cy23:1300000, cy24:1600000, yoy:23 },{ n:"Supplier Epsilon Ltd", cy23:5100000, cy24:5700000, yoy:12 }],
+  newVendors: [{ n:"Supplier Lambda Co", s:420000 },{ n:"Supplier Mu Inc", s:310000 }],
+  exitVendors: [{ n:"Supplier Nu Corp", s:280000 },{ n:"Supplier Xi LLC", s:190000 }],
+  consolidation: [
+    { group:"Staffing agencies (tail)", vendors:["Supplier Omicron","Supplier Pi","Supplier Rho","Supplier Sigma"], combinedSpend:180000, recommendation:"Consolidate into MSP agreement with Supplier Gamma", estSavings:45000, effort:"Low" },
+    { group:"Niche consultants", vendors:["Supplier Tau","Supplier Upsilon"], combinedSpend:95000, recommendation:"Redirect scope to Supplier Beta under existing SOW", estSavings:20000, effort:"Medium" }
+  ],
+  trendDecomp: { totalChange:7000000, newSuppliers:730000, exitingSuppliers:-470000, existingGrowth:6740000, topDrivers:[
+    { n:"Supplier Alpha Corp", delta:1700000, cause:"Volume increase (new project)" },
+    { n:"Supplier Beta Inc", delta:900000, cause:"Rate escalation (contractual)" },
+    { n:"Supplier Kappa Inc", delta:300000, cause:"Scope expansion" },
+    { n:"Supplier Nu Corp", delta:-280000, cause:"Contract ended" }
+  ]},
+  dataQuality: { completeness: 94, quarantined: 3, confidence: "High" }
+};
+const m = D.meta;
+
+function f$(v){if(!v&&v!==0)return"";var a=Math.abs(v);if(a>=1e9)return"$"+(v/1e9).toFixed(2)+"B";if(a>=1e6)return"$"+(v/1e6).toFixed(1)+"M";if(a>=1e3)return"$"+(v/1e3).toFixed(0)+"K";return"$"+v.toFixed(0);}
+function fP(v){return v==null?"":v.toFixed(1)+"%";}
+function Metric({label,value,sub,accent,warn,good}){var bar=accent?R:warn?R:good?GRN:BD;return <div style={{background:accent?WARM:warn?RISK:good?OK:"#fff",borderRadius:8,padding:"14px 16px",borderLeft:"4px solid "+bar,minWidth:0}}><div style={{fontSize:10,fontWeight:700,color:accent?R:LT,textTransform:"uppercase",letterSpacing:"0.05em"}}>{label}</div><div style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:700,color:warn?R:good?GRN:DK,marginTop:4}}>{value}</div>{sub&&<div style={{fontSize:11,color:MUT,marginTop:2}}>{sub}</div>}</div>;}
+function Card({title,note,children}){return <div style={{background:"#fff",borderRadius:8,padding:18,border:"1px solid "+BD,marginBottom:14}}>{title&&<div style={{fontFamily:"Georgia,serif",fontSize:13,fontWeight:700,color:DK,marginBottom:12,display:"flex",alignItems:"center",gap:8}}><div style={{width:3,height:14,background:R,borderRadius:2}}/>{title}{note&&<span style={{fontFamily:"Arial",fontSize:10,fontWeight:600,color:MUT,marginLeft:"auto"}}>{note}</span>}</div>}{children}</div>;}
+function Pillar({c,k,t,d}){return <div style={{background:"#fff",borderRadius:8,padding:16,border:"1px solid "+BD,borderTop:"3px solid "+c,flex:1,minWidth:0}}><div style={{fontFamily:"Georgia,serif",fontSize:20,fontWeight:700,color:c}}>{k}</div><div style={{fontSize:12,fontWeight:700,color:DK,marginTop:4}}>{t}</div><div style={{fontSize:11,color:MUT,marginTop:4,lineHeight:1.5}}>{d}</div></div>;}
+function Tip({active,payload,label}){if(!active||!payload||!payload.length)return null;return <div style={{background:DK,borderRadius:6,padding:"10px 14px",color:"#fff",fontSize:12}}>{label&&<div style={{fontWeight:600,color:LT}}>{label}</div>}{payload.map(function(p,i){return <div key={i}><strong>{typeof p.value==="number"?p.value.toLocaleString("en-US"):p.value}</strong></div>;})}</div>;}
+function StateBanner({kind,msg}){var map={NEEDS_INPUT:[AMB,WARM,"Needs input"],NOT_APPLICABLE:[MUT,CARD,"Not applicable"],RESEARCH_PENDING:[MUT,CARD,"Research pending"]};var c=map[kind]||map.NOT_APPLICABLE;return <div style={{background:c[1],border:"1px solid "+c[0]+"55",borderLeft:"4px solid "+c[0],borderRadius:8,padding:"12px 16px",marginBottom:14}}><span style={{fontSize:10,fontWeight:700,letterSpacing:"0.06em",color:c[0],textTransform:"uppercase"}}>{c[2]}</span><div style={{fontSize:12,color:DK,marginTop:4,lineHeight:1.5}}>{msg}</div></div>;}
+function STable({columns,rows}){var _s=useState({col:0,dir:"asc"});var sort=_s[0];var setSort=_s[1];var _q=useState("");var q=_q[0];var setQ=_q[1];var filtered=useMemo(function(){var r=rows;if(q){var lq=q.toLowerCase();r=rows.filter(function(row){return row.some(function(c){return String(c.d).toLowerCase().indexOf(lq)>=0;});});}return r.slice().sort(function(a,b){var av=a[sort.col].v!=null?a[sort.col].v:a[sort.col].d;var bv=b[sort.col].v!=null?b[sort.col].v:b[sort.col].d;if(av<bv)return sort.dir==="asc"?-1:1;if(av>bv)return sort.dir==="asc"?1:-1;return 0;});},[rows,sort,q]);return <div><div style={{marginBottom:8}}><input value={q} onChange={function(e){setQ(e.target.value);}} placeholder="Search..." style={{padding:"6px 12px",borderRadius:6,border:"1px solid "+BD,fontSize:12,width:220}}/><span style={{fontSize:11,color:LT,marginLeft:8}}>{filtered.length} of {rows.length}</span></div><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr>{columns.map(function(h,i){var active=sort.col===i;return <th key={i} onClick={function(){setSort({col:i,dir:active&&sort.dir==="desc"?"asc":"desc"});}} style={{padding:"7px 8px",fontWeight:600,color:active?R:MUT,fontSize:11,borderBottom:"2px solid "+BD,cursor:"pointer",textAlign:h.a||"left",whiteSpace:"nowrap"}}>{h.l}{active?(sort.dir==="asc"?" ^":" v"):""}</th>;})}</tr></thead><tbody>{filtered.map(function(row,ri){return <tr key={ri} style={{background:ri%2===0?"#fff":CARD}}>{row.map(function(cell,ci){return <td key={ci} style={{padding:"6px 8px",fontSize:12,borderBottom:"1px solid "+BD,textAlign:columns[ci].a||"left",fontWeight:cell.b?700:400,color:cell.c||DK}}>{cell.d}</td>;})}</tr>;})}</tbody></table></div></div>;}
+
+function Dashboard(){
+  var _t=useState("Overview");var tab=_t[0];var setTab=_t[1];
+  var _dd=useState(null);var drawer=_dd[0];var setDrawer=_dd[1];
+
+  return (
+    <div style={{fontFamily:"Arial,sans-serif",background:"#FFFFFF",minHeight:"100vh",color:DK,fontSize:13}}>
+      <div style={{background:DK,padding:"12px 24px 8px"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div style={{display:"flex",alignItems:"center",gap:12}}><div style={{width:4,height:40,background:R,borderRadius:2}}/><div><div style={{fontSize:11,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",color:R}}>Category Strategy | DEVELOP mode</div><div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700,color:"#fff",marginTop:1}}>{m.commodity} - {m.name}</div></div></div><div style={{fontSize:11,color:MUT,textAlign:"right"}}>May 2026 | Annual metrics<br/>CY2023-CY2024 complete | CY2025 YTD (thru {m.cutoff})</div></div></div>
+      <div style={{background:"#fff",borderBottom:"1px solid "+BD,padding:"0 24px",display:"flex",overflowX:"auto"}}>{TABS.map(function(t){var active=t===tab;return <button key={t} onClick={function(){setTab(t);}} style={{padding:"10px 14px",fontSize:11,fontWeight:active?700:500,color:active?R:MUT,background:"transparent",border:"none",borderBottom:active?"2.5px solid "+R:"2.5px solid transparent",cursor:"pointer",whiteSpace:"nowrap"}}>{t}{NEEDS_INPUT[t]?<span style={{color:AMB,marginLeft:4}}>*</span>:null}</button>;})}</div>
+      <div style={{padding:"18px 24px 40px",maxWidth:1280,margin:"0 auto"}}>
+
+      {/* TAB 1: OVERVIEW */}
+      {tab==="Overview"&&<div>
+        <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr 1.1fr 1fr 1fr",gap:10,marginBottom:14}}>
+          <Metric label="CY2024 Annual Spend" value={f$(m.s24)} sub={"Most recent complete year | +"+m.yoy2324+"% YoY"} accent/>
+          <Metric label="3-Year Total" value={f$(m.totalSpend)} sub="CY2023-CY2025 YTD"/>
+          <Metric label="CY2025 YTD" value={f$(m.s25ytd)} sub={"Annualized ~"+f$(m.s25ann)+" | +"+m.ytdYoY+"% YTD YoY"}/>
+          <Metric label="Active Vendors (CY24)" value={m.vendorsCY24} sub={m.p80+" vendors = 80% of spend"}/>
+          <Metric label="SBE Rate (CY24)" value={fP(m.sbeRate24)} sub={f$(m.sbe24)+(m.sbeRate24<10?" | below 10% target":"")} warn={m.sbeRate24<10}/>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+          <Card title="Annual Spend Trend" note="CY2025 partial">
+            <ResponsiveContainer width="100%" height={210}><ComposedChart data={D.annual.map(function(a){return{name:a.yr,spend:a.s};})}><CartesianGrid strokeDasharray="3 3" stroke={BD}/><XAxis dataKey="name" tick={{fontSize:11,fill:MUT}}/><YAxis tickFormatter={function(v){return f$(v);}} tick={{fontSize:10,fill:MUT}} width={55}/><Tooltip content={Tip}/><Bar dataKey="spend" name="Spend" radius={[4,4,0,0]}>{D.annual.map(function(e,i){return <Cell key={i} fill={i===2?BD:R} fillOpacity={i===2?0.55:0.85}/>;})}</Bar></ComposedChart></ResponsiveContainer>
+          </Card>
+          <Card title="Top 10 Suppliers (CY2024)">
+            <ResponsiveContainer width="100%" height={210}><BarChart data={D.suppliers.slice(0,10).map(function(s){return{name:s.n.length>16?s.n.slice(0,14)+"..":s.n,spend:s.s4};})} layout="vertical"><XAxis type="number" tickFormatter={function(v){return f$(v);}} tick={{fontSize:10,fill:MUT}}/><YAxis type="category" dataKey="name" width={120} tick={{fontSize:10,fill:DK}}/><Tooltip content={Tip}/><Bar dataKey="spend" name="CY2024" radius={[0,4,4,0]}>{D.suppliers.slice(0,10).map(function(s,i){return <Cell key={i} fill={PAL[i%PAL.length]}/>;})}</Bar></BarChart></ResponsiveContainer>
+          </Card>
+        </div>
+        <Card title="Key Data-Driven Findings">
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+            <Pillar c={R} k={fP(m.topShare)} t="Supplier Alpha Concentration" d="Largest vendor at 18.2% of spend. Growth trajectory (+10.9% YoY) indicates increasing dependency. Monitor for single-source risk in Subcategory A."/>
+            <Pillar c={AMB} k={m.tail100+" vendors"} t="Tail Effort Mismatch" d={m.tail100+" vendors billed under $100K for just "+m.tail100Pct+"% of category spend. Each consumes equal contracting effort. Consolidation opportunity identified."}/>
+            <Pillar c={GRN} k={"+"+m.yoy2324+"%"} t="Steady Growth Trajectory" d="Category growing at a manageable pace. No anomalous spikes detected. Growth concentrated in Subcategories A and B."/>
+          </div>
+        </Card>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+          <Card title="Geographic Distribution">
+            <ResponsiveContainer width="100%" height={140}><BarChart data={D.geo} layout="vertical"><XAxis type="number" tickFormatter={function(v){return fP(v);}} tick={{fontSize:10,fill:MUT}}/><YAxis type="category" dataKey="country" width={100} tick={{fontSize:10,fill:DK}}/><Tooltip content={Tip}/><Bar dataKey="pct" name="% of Spend" radius={[0,4,4,0]} fill={BLU}/></BarChart></ResponsiveContainer>
+            <div style={{fontSize:11,color:MUT,marginTop:4}}>62% of spend concentrated in United States. No single-country risk threshold exceeded (70%).</div>
+          </Card>
+          <Card title="Data Quality">
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+              <Metric label="Field Completeness" value={D.dataQuality.completeness+"%"} good={D.dataQuality.completeness>=90}/>
+              <Metric label="Quarantined Records" value={D.dataQuality.quarantined}/>
+              <Metric label="Confidence" value={D.dataQuality.confidence} good={D.dataQuality.confidence==="High"}/>
+            </div>
+          </Card>
+        </div>
+        <div style={{background:WARM,borderRadius:8,padding:"12px 16px",border:"1px solid "+AMB+"30",borderLeft:"4px solid "+AMB,fontSize:12,lineHeight:1.55,marginTop:14}}>
+          <strong style={{color:AMB}}>Concentration snapshot.</strong> Top 5 = <strong>{m.top5Share}%</strong>, top 10 = <strong>{m.top10Share}%</strong>; HHI ~ <strong>{m.hhi}</strong>. No single vendor exceeds 30%.
+        </div>
+      </div>}
+
+      {/* TAB 2: PARETO & TAIL (with consolidation) */}
+      {tab==="Pareto & Tail"&&<div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:14}}>
+          <Metric label="80% of Spend" value={m.p80+" vendors"} accent/><Metric label="95% of Spend" value={m.p95+" vendors"}/><Metric label="Tail (<$50K)" value={m.tail50+" vendors"} sub={f$(m.tail50Spend)+" | "+m.tail50Pct+"%"}/><Metric label="Tail (<$100K)" value={m.tail100+" vendors"} sub={f$(m.tail100Spend)+" | "+m.tail100Pct+"%"} warn/>
+        </div>
+        <Card title="Pareto Distribution (CY2024)">
+          <ResponsiveContainer width="100%" height={280}><ComposedChart data={D.pareto.map(function(p){return{name:p.n.length>14?p.n.slice(0,12)+"..":p.n,spend:p.s,cumPct:p.cumPct};})}><CartesianGrid strokeDasharray="3 3" stroke={BD}/><XAxis dataKey="name" tick={{fontSize:9,fill:MUT}} angle={-30} textAnchor="end" height={60}/><YAxis yAxisId="left" tickFormatter={function(v){return f$(v);}} tick={{fontSize:10,fill:MUT}}/><YAxis yAxisId="right" orientation="right" domain={[0,100]} tickFormatter={function(v){return v+"%";}} tick={{fontSize:10,fill:MUT}}/><Tooltip content={Tip}/><ReferenceLine yAxisId="right" y={80} stroke={AMB} strokeDasharray="5 5" label={{value:"80%",fill:AMB,fontSize:10}}/><Bar yAxisId="left" dataKey="spend" name="Spend" radius={[4,4,0,0]}>{D.pareto.map(function(p,i){return <Cell key={i} fill={p.cumPct<=80?R:p.cumPct<=95?AMB:MUT}/>;})}</Bar><Line yAxisId="right" dataKey="cumPct" name="Cumulative %" stroke={BLU} strokeWidth={2} dot={false}/></ComposedChart></ResponsiveContainer>
+        </Card>
+        <Card title="Tail Consolidation Opportunities">
+          {D.consolidation.map(function(g,i){return <div key={i} style={{background:i%2===0?"#fff":CARD,borderRadius:8,padding:14,marginBottom:8,border:"1px solid "+BD}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong style={{fontSize:13}}>{g.group}</strong><span style={{fontSize:11,color:g.effort==="Low"?GRN:g.effort==="Medium"?AMB:R,fontWeight:700}}>Effort: {g.effort}</span></div>
+            <div style={{fontSize:11,color:MUT,marginTop:4}}>Vendors: {g.vendors.join(", ")} | Combined: {f$(g.combinedSpend)}</div>
+            <div style={{fontSize:12,marginTop:6}}><strong>Recommendation:</strong> {g.recommendation} | <strong style={{color:GRN}}>Est. savings: {f$(g.estSavings)}</strong></div>
+          </div>;})}
+        </Card>
+      </div>}
+
+      {/* TAB 3: SUPPLIERS (with deep dive drawer) */}
+      {tab==="Suppliers"&&<div>
+        <Card title="All Suppliers (click name for deep dive)">
+          <STable columns={[{l:"Rank",a:"center"},{l:"Supplier"},{l:"3-Yr Total",a:"right"},{l:"Share",a:"right"},{l:"CY2023",a:"right"},{l:"CY2024",a:"right"},{l:"CY2025 YTD",a:"right"},{l:"YoY",a:"right"},{l:"SBE"}]}
+            rows={D.suppliers.map(function(s){return[
+              {d:s.r,v:s.r},{d:<span onClick={function(){setDrawer(drawer===s.r?null:s.r);}} style={{cursor:"pointer",color:BLU,textDecoration:"underline"}}>{s.n}</span>,v:s.n},{d:f$(s.tot),v:s.tot},{d:fP(s.share),v:s.share},{d:f$(s.s3),v:s.s3},{d:f$(s.s4),v:s.s4},{d:f$(s.s5),v:s.s5},{d:(s.yoy>0?"+":"")+fP(s.yoy),v:s.yoy,c:s.yoy>20?R:s.yoy<0?GRN:DK},{d:s.sbe?"Yes":"",c:s.sbe?GRN:MUT}
+            ];})}/>
+        </Card>
+        {/* Supplier Deep Dive Drawer */}
+        {drawer&&<Card title={"Deep Dive: "+D.suppliers.find(function(s){return s.r===drawer;}).n} note="Click name above to close">
+          {function(){var s=D.suppliers.find(function(x){return x.r===drawer;});return <div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:14}}>
+              <Metric label="3-Year Total" value={f$(s.tot)}/><Metric label="CY2024" value={f$(s.s4)}/><Metric label="Share" value={fP(s.share)}/><Metric label="YoY Growth" value={(s.yoy>0?"+":"")+fP(s.yoy)} warn={s.yoy>20} good={s.yoy<5&&s.yoy>=0}/>
+            </div>
+            <ResponsiveContainer width="100%" height={160}><BarChart data={[{yr:"CY2023",spend:s.s3},{yr:"CY2024",spend:s.s4},{yr:"CY2025 YTD",spend:s.s5}]}><CartesianGrid strokeDasharray="3 3" stroke={BD}/><XAxis dataKey="yr" tick={{fontSize:11,fill:MUT}}/><YAxis tickFormatter={function(v){return f$(v);}} tick={{fontSize:10,fill:MUT}} width={55}/><Tooltip content={Tip}/><Bar dataKey="spend" name="Spend" radius={[4,4,0,0]} fill={BLU}/></BarChart></ResponsiveContainer>
+            <div style={{fontSize:12,color:MUT,marginTop:8}}>Subcategory, BU, and contract coverage breakdowns populated from source data. Rate-vs-volume decomposition shows whether YoY change is driven by price increases or consumption changes.</div>
+          </div>;}()}
+        </Card>}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+          <Card title="New Large Vendors (CY2025)">{D.newVendors.map(function(v,i){return <div key={i} style={{fontSize:12,padding:"4px 0"}}><strong>{v.n}</strong> -- {f$(v.s)}</div>;})}</Card>
+          <Card title="Exiting Vendors (CY2025)">{D.exitVendors.map(function(v,i){return <div key={i} style={{fontSize:12,padding:"4px 0"}}><strong>{v.n}</strong> -- {f$(v.s)}</div>;})}</Card>
+        </div>
+      </div>}
+
+      {/* TAB 4: SUBCATEGORIES */}
+      {tab==="Subcategories"&&<div>
+        <Card title="Spend by Subcategory (Annual)">
+          <ResponsiveContainer width="100%" height={250}><BarChart data={D.subcats.map(function(sc){return{name:sc.n,CY2023:sc.s3,CY2024:sc.s4,"CY2025 YTD":sc.s5};})}><CartesianGrid strokeDasharray="3 3" stroke={BD}/><XAxis dataKey="name" tick={{fontSize:10,fill:MUT}}/><YAxis tickFormatter={function(v){return f$(v);}} tick={{fontSize:10,fill:MUT}} width={55}/><Tooltip content={Tip}/><Bar dataKey="CY2023" fill={PAL[0]} radius={[4,4,0,0]}/><Bar dataKey="CY2024" fill={PAL[1]} radius={[4,4,0,0]}/><Bar dataKey="CY2025 YTD" fill={BD} radius={[4,4,0,0]}/></BarChart></ResponsiveContainer>
+        </Card>
+      </div>}
+
+      {/* TAB 5: MARKET & KRALJIC */}
+      {tab==="Market & Kraljic"&&<div>
+        <StateBanner kind="RESEARCH_PENDING" msg="Market intelligence populated from web search at analysis time. Porter's Five Forces, pricing environment, and Kraljic positioning are researched fresh for each category. This illustrative view shows the layout structure."/>
+        <Card title="Porter's Five Forces">
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr",gap:10}}>
+            {[{f:"Buyer Power",s:"Medium",c:AMB},{f:"Supplier Power",s:"Medium",c:AMB},{f:"New Entrants",s:"Low",c:GRN},{f:"Substitutes",s:"Low",c:GRN},{f:"Rivalry",s:"High",c:R}].map(function(p,i){return <Pillar key={i} c={p.c} k={p.s} t={p.f} d="Assessment derived from current market research with cited sources and confidence flags."/>;})}
+          </div>
+        </Card>
+        <Card title="Kraljic Positioning">
+          <div style={{fontSize:12,lineHeight:1.6}}>Category positioned in the <strong>Leverage</strong> quadrant (high profit impact, low supply risk). Multiple qualified suppliers exist. Strategy implication: competitive pressure is the primary lever. Sourcing approach: competitive bidding with dual-source structure.</div>
+        </Card>
+      </div>}
+
+      {/* TAB 6: RISK */}
+      {tab==="Risk"&&<div>
+        <Card title="Risk Register">
+          <STable columns={[{l:"Risk"},{l:"Driver"},{l:"Likelihood",a:"center"},{l:"Impact",a:"center"},{l:"Mitigation"}]}
+            rows={[
+              [{d:"Supplier Alpha concentration",b:true},{d:"18.2% of spend, growing"},{d:"Medium",c:AMB},{d:"High",c:R},{d:"Develop secondary source in Subcategory A"}],
+              [{d:"Rate escalation pressure",b:true},{d:"Contractual CPI-linked increases"},{d:"High",c:R},{d:"Medium",c:AMB},{d:"Negotiate rate caps at renewal"}],
+              [{d:"Geographic concentration",b:true},{d:"62% US-based suppliers"},{d:"Low",c:GRN},{d:"Low",c:GRN},{d:"Monitor; no action required at current levels"}]
+            ]}/>
+        </Card>
+      </div>}
+
+      {/* TAB 7: STRATEGY (NEEDS_INPUT) */}
+      {tab==="Strategy"&&<div>
+        <StateBanner kind="NEEDS_INPUT" msg="Strategy recommendations are shaped by your input on business priorities, constraints, and team structure. Claude will present data-derived proposals and ask you to confirm or adjust. Provide your priorities to populate this tab."/>
+        <Card title="Strategy Options (Proposed, pending confirmation)">
+          <div style={{fontSize:12,color:MUT,lineHeight:1.6}}>Three strategy options will be developed from the spend data and market research, with a recommended option, execution pillars, and supplier tiering. Options are specific to this category's data profile, not generic templates.</div>
+        </Card>
+      </div>}
+
+      {/* TAB 8: SAVINGS & SCORECARD (NEEDS_INPUT) */}
+      {tab==="Savings & Scorecard"&&<div>
+        <StateBanner kind="NEEDS_INPUT" msg="Savings targets and scorecard KPIs require your input. Claude will present data-derived estimates (consolidation opportunities, rate benchmarks, renewal timing) and ask you to confirm realistic targets. Provide your savings context to populate this tab."/>
+        <Card title="Savings Pipeline (Estimated ranges, pending confirmation)">
+          <div style={{fontSize:12,color:MUT,lineHeight:1.6}}>Savings opportunities are identified from the data: tail consolidation, rate renegotiation windows, volume leverage. Each carries an estimated range and confidence level. Committed targets are set only after your confirmation.</div>
+        </Card>
+      </div>}
+
+      {/* TAB 9: SUPPLIER DEVELOPMENT */}
+      {tab==="Supplier Development"&&<div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:14}}>
+          <Metric label="SBE Spend (CY24)" value={f$(m.sbe24)} accent/><Metric label="SBE Rate (CY24)" value={fP(m.sbeRate24)} warn={m.sbeRate24<10}/><Metric label="SBE Rate (CY23)" value={fP(m.sbeRate23)}/><Metric label="Target" value="10.0%" sub="Corporate goal"/>
+        </div>
+        <Card title="Supplier Development Trend">
+          <ResponsiveContainer width="100%" height={180}><ComposedChart data={[{yr:"CY2023",rate:m.sbeRate23,spend:m.sbe23},{yr:"CY2024",rate:m.sbeRate24,spend:m.sbe24}]}><CartesianGrid strokeDasharray="3 3" stroke={BD}/><XAxis dataKey="yr" tick={{fontSize:11,fill:MUT}}/><YAxis tickFormatter={function(v){return fP(v);}} tick={{fontSize:10,fill:MUT}} domain={[0,15]}/><Tooltip content={Tip}/><ReferenceLine y={10} stroke={R} strokeDasharray="5 5" label={{value:"10% target",fill:R,fontSize:10}}/><Bar dataKey="rate" name="SBE Rate" fill={GRN} radius={[4,4,0,0]}/></ComposedChart></ResponsiveContainer>
+        </Card>
+      </div>}
+
+      {/* TAB 10: RATIONALIZATION */}
+      {tab==="Rationalization"&&<div>
+        <Card title="Most Fragmented Subcategories">
+          <STable columns={[{l:"Subcategory"},{l:"Vendors",a:"center"},{l:"Top 3 Share",a:"right"},{l:"Assessment"}]}
+            rows={[
+              [{d:"Subcategory D",b:true},{d:"28",v:28},{d:"42%",v:42},{d:"Highly fragmented. Consolidation candidate.",c:R}],
+              [{d:"Subcategory E",b:true},{d:"22",v:22},{d:"55%",v:55},{d:"Moderately fragmented. Review tail vendors.",c:AMB}],
+              [{d:"Subcategory A",b:true},{d:"15",v:15},{d:"78%",v:78},{d:"Concentrated. No action needed.",c:GRN}]
+            ]}/>
+        </Card>
+        <Card title="Multi-Subcategory Vendors (Consolidation Candidates)">
+          <div style={{fontSize:12,color:MUT,lineHeight:1.6}}>Vendors serving 3+ subcategories are potential consolidation anchors. Redirect fragmented subcategory spend to vendors who already serve adjacent areas, reducing vendor count without adding new relationships.</div>
+        </Card>
+      </div>}
+
+      {/* TAB 11: TREND & CHANGE */}
+      {tab==="Trend & Change"&&<div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:14}}>
+          <Metric label="Total Change (CY23 to CY24)" value={f$(D.trendDecomp.totalChange)} sub={"+"+fP(m.yoy2324)+" YoY"} accent/>
+          <Metric label="From New Suppliers" value={f$(D.trendDecomp.newSuppliers)} good/>
+          <Metric label="From Exiting Suppliers" value={f$(D.trendDecomp.exitingSuppliers)}/>
+          <Metric label="From Existing Growth" value={f$(D.trendDecomp.existingGrowth)} warn={D.trendDecomp.existingGrowth>5000000}/>
+        </div>
+        <Card title="Top Swing Drivers (CY2023 to CY2024)">
+          <STable columns={[{l:"Supplier"},{l:"Change",a:"right"},{l:"Cause"}]}
+            rows={D.trendDecomp.topDrivers.map(function(d){return[
+              {d:d.n,b:true},{d:(d.delta>0?"+":"")+f$(d.delta),v:d.delta,c:d.delta>0?R:GRN},{d:d.cause}
+            ];})}/>
+        </Card>
+        <Card title="Change Decomposition">
+          <div style={{fontSize:12,lineHeight:1.6}}>The {f$(D.trendDecomp.totalChange)} increase decomposes into: <strong>{f$(D.trendDecomp.newSuppliers)}</strong> from new suppliers entering the category, <strong>{f$(Math.abs(D.trendDecomp.exitingSuppliers))}</strong> offset from exiting suppliers, and <strong>{f$(D.trendDecomp.existingGrowth)}</strong> from growth in existing supplier relationships. Rate-vs-volume analysis shows whether growth is driven by price increases or consumption changes.</div>
+        </Card>
+      </div>}
+
+      </div>
+      <div style={{background:DK,padding:"10px 24px",display:"flex",justifyContent:"space-between",fontSize:10,color:MUT}}>
+        <div>Data: NEUTRAL ILLUSTRATIVE | Vendor identity: VENDOR_PARENT2 with Vendor Name fallback | Supplier Development from SBE/WBE/MBE classification columns</div>
+        <div>Company Confidential | category-strategy v4.0 | 2026</div>
+      </div>
+    </div>
+  );
+}
+
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(Dashboard));
+
+</script></body></html>
