@@ -48,7 +48,19 @@ build `build_dashboard.py`, checks `smoke.cjs` / `verify_deepdive.cjs`. Self-con
       Requirements Heatmap / Head-to-Head / Risk Assessment / Supplier Deep Dive (exec relabeled 'Overview').
       Verified render + tab order + smoke green. NOTE: Overview still has the OLD embedded H2H (pvDynamicsHtml) —
       remove it in P6 so this tab is the only H2H home.
-- [ ] **P6 Overview** — 3 changes (fix score/count consistency, tighten dup narrative, move H2H out + teaser). OPEN.
+- [~] **P6 Overview** — funnel counts DONE (Suppliers reviewed / Passed screen / Screened out / Recommended for
+      RFx, from supplierCount + eliminations + shortlist) + Head-to-Head MOVED OUT (embedded pvDynamicsHtml replaced
+      by a compact launcher button -> pvSetSub('h2h')); exec tab relabeled 'Overview'. Verified. REMAINING: score
+      standardization (fit shown 90 vs 4.5 vs composite 60.77/61 — pick one visible scale via pvSlateRationale/
+      fitOf/composite), the mislabeled 'Segment' column (pvRecStanding 334-339 -> disposition or true segment), and
+      tighten the Evaluation-Summary prose that restates the table. (Marc: keep Overview largely as-is.)
+- [ ] **P4 Requirements Heatmap** — IMPROVE (delicate, Marc's favorite / "best part"). Do with fresh context.
+      Modify pvHeatmapHtml (703-837) + pvHmRationaleHtml (840-872): 1-decimal+semantic (kill 2-decimal), a SECOND
+      visual channel per cell = evidence confidence (solid/hatch/outline/gray-?), rename mislabeled 'coverage'
+      (pvCoverPct = pass-rate), leadership STRIP replacing leadNarr prose, decision-leverage = importance x
+      differentiation x confidence (not spread), evidence PANEL replacing rationale walls, top filters (must-haves/
+      gaps/unknowns), move knockout matrix UP. Keep the good bones (cross-supplier matrix, category expansion,
+      knockout). Only call site now = standalone heatmap tab (deep-dive reqs branch is dead). Map in workflow output.
 - [ ] **P7** — cleanup dead code, re-integrity, final verify, refresh Desktop folder.
 
 ## Seed bug fixes (Marc-caught)

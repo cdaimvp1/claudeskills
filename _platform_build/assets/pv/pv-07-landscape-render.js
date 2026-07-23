@@ -1277,7 +1277,14 @@ function pvExecSummaryHtml(refl,input){
  // next step). Everything is grounded in the landscape data; the existing Eval|Rec + Segmentation stay.
  var db=L.dataBasis||{},ms=L.marketStructure||{},cd=L.competitiveDynamics||{};
  var mtile=function(v,l){return '<div style="flex:1;min-width:120px;background:var(--surface);border:1px solid var(--line2);border-top:3px solid var(--tib-blue);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow-2,0 2px 4px rgba(38,30,20,.06),0 4px 8px -2px rgba(38,30,20,.10))"><div style="font:800 21px var(--sans);color:var(--ink);letter-spacing:-.01em">'+v+'</div><div style="font-size:11px;color:var(--mut2);font-weight:600;margin-top:2px">'+l+'</div></div>';};
- var mstrip='<div style="display:flex;gap:12px;flex-wrap:wrap;margin:0 0 16px">'+mtile(L.supplierCount,'Suppliers scanned')+mtile(L.eligibleCount+' / '+L.supplierCount,'Eligible after screen')+mtile(sumSubs,'Requirements scored')+mtile((cd.leaderGap!=null?cd.leaderGap:'&mdash;'),'Leader gap (composite)')+'</div>';
+ // Overview (Marc, 2026-07-23): a clear supplier FUNNEL instead of the ambiguous "7 scanned / 7-of-7 eligible +
+ // 2 eliminated (reads like 9)" mix. Reviewed = assessed field + pre-shortlist eliminations, then passed /
+ // screened out / recommended for RFx. Grounded in supplierCount / eligibleCount / eliminations / shortlist.
+ var elimN=((L.recommendation&&L.recommendation.eliminations)||(typeof P!=='undefined'&&P&&P.excludedVendors)||[]).length;
+ var reviewedN=(L.supplierCount||0)+elimN;
+ var screenedN=Math.max(0,(L.supplierCount||0)-(L.eligibleCount||0))+elimN;
+ var rfxN=(typeof shortlistIds!=='undefined'&&shortlistIds&&shortlistIds.length)?shortlistIds.length:(L.eligibleCount||0);
+ var mstrip='<div style="display:flex;gap:12px;flex-wrap:wrap;margin:0 0 16px">'+mtile(reviewedN,'Suppliers reviewed')+mtile(L.eligibleCount,'Passed screen')+mtile(screenedN,'Screened out')+mtile(rfxN,'Recommended for RFx')+'</div>';
  // assembly: scope strip → Eval | Recommendation → segmentation & differentiators (merged) → market structure → dynamics/H2H
  // (Marc: "Across the Field" prose + "Data basis" card removed, redundant with the strip/chips/recommendation.)
  h+=mstrip;
@@ -1297,7 +1304,10 @@ function pvExecSummaryHtml(refl,input){
  // Market structure panel CUT (owner decision, 2026-07): the HHI/composite-share concentration read
  // overclaimed leverage/replaceability and duplicated the Leader-gap; "how close is the race" now lives
  // only in Competitive Dynamics. pvMarketStructureHtml is retained (unused) in case it is restored.
- h+=pvDynamicsHtml(refl);
+ // Head-to-Head MOVED to its own top-level tab (Marc, 2026-07-23). The full embedded compare (pvDynamicsHtml) is
+ // no longer rendered here; a compact launcher takes its place so the Overview stays focused. pvDynamicsHtml is
+ // retained (unused) in case a teaser preview is wanted later.
+ h+='<div class="sa-card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap"><div><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Compare candidates head-to-head</div><div style="font-size:12.5px;color:var(--mut);margin-top:3px">Any two eligible suppliers, side by side: requirements fit, risk, category deltas, evidence coverage and commercial model.</div></div><button onclick="if(typeof pvSetSub===\'function\')pvSetSub(\'h2h\')" style="background:var(--navy,#0F3A85);color:#fff;border:none;border-radius:8px;padding:9px 16px;font:600 12.5px var(--sans);cursor:pointer;white-space:nowrap">Open Head-to-Head &rarr;</button></div>';
  return h;
 }
 function pvRankBarHtml(refl,input){
