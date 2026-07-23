@@ -7,12 +7,19 @@
    Loaded after pv-07a and pv-07 in the bundle.
    ============================================================================= */
 
+// Platform card style (.sa-card > .card-hd > .scc-b), matching the rest of the dashboard (Marc: panels must match
+// the platform). Accent normalized to the platform PANEL palette: PLUM/TEAL primary + BURNT-ORANGE (--emph)
+// emphasis; the old per-panel navy/rainbow accents fold into this scheme. Per-supplier + functional-severity
+// colours are handled separately inside each viz.
 function pvDD2Card(title, inner, accent, sub) {
-  return '<div class="sa-card" style="border-left:3px solid ' + (accent || 'var(--ddacc,var(--navy))') + '">'
-    + '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px">'
-    + '<h3 style="font-size:13.5px;font-weight:700;margin:0;color:var(--ink)">' + title + '</h3>'
-    + (sub ? '<span style="font-size:11px;color:var(--mut2)">' + sub + '</span>' : '') + '</div>'
-    + '<div>' + inner + '</div></div>';
+  var a = String(accent || '');
+  var ac = /emph|amber|orange|risk|red|A23A30|8A5A00|C15E19|D2691E/i.test(a) ? 'var(--emph,#C15E19)'
+         : /teal|2F6E6B|1F7A5A/i.test(a) ? 'var(--teal-d,#2F6E6B)'
+         : 'var(--plum,#5C2B50)';
+  return '<div class="sa-card" style="border-top:3px solid ' + ac + '">'
+    + '<div class="card-hd"><span style="font-size:13px;font-weight:700;color:var(--ink)">' + title + '</span>'
+    + (sub ? '<span style="margin-left:auto;font-size:11px;font-weight:400;color:var(--mut2)">' + sub + '</span>' : '') + '</div>'
+    + '<div class="scc-b">' + inner + '</div></div>';
 }
 
 function pvDD2Foot(t) { return '<div class="footbound" style="margin-top:9px">' + t + '</div>'; }

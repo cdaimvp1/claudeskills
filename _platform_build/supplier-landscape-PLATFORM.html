@@ -4907,10 +4907,7 @@ function pvExecSummaryHtml(refl,input){
  // Market structure panel CUT (owner decision, 2026-07): the HHI/composite-share concentration read
  // overclaimed leverage/replaceability and duplicated the Leader-gap; "how close is the race" now lives
  // only in Competitive Dynamics. pvMarketStructureHtml is retained (unused) in case it is restored.
- // Head-to-Head MOVED to its own top-level tab (Marc, 2026-07-23). The full embedded compare (pvDynamicsHtml) is
- // no longer rendered here; a compact launcher takes its place so the Overview stays focused. pvDynamicsHtml is
- // retained (unused) in case a teaser preview is wanted later.
- h+='<div class="sa-card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap"><div><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Compare candidates head-to-head</div><div style="font-size:12.5px;color:var(--mut);margin-top:3px">Any two eligible suppliers, side by side: requirements fit, risk, category deltas, evidence coverage and commercial model.</div></div><button onclick="if(typeof pvSetSub===\'function\')pvSetSub(\'h2h\')" style="background:var(--navy,#0F3A85);color:#fff;border:none;border-radius:8px;padding:9px 16px;font:600 12.5px var(--sans);cursor:pointer;white-space:nowrap">Open Head-to-Head &rarr;</button></div>';
+ // Head-to-Head lives on its own top-level tab; NO launcher/teaser on Overview (Marc: not needed at the bottom).
  return h;
 }
 function pvRankBarHtml(refl,input){
@@ -5683,12 +5680,19 @@ function landscapeHTML(){
    Loaded after pv-07a and pv-07 in the bundle.
    ============================================================================= */
 
+// Platform card style (.sa-card > .card-hd > .scc-b), matching the rest of the dashboard (Marc: panels must match
+// the platform). Accent normalized to the platform PANEL palette: PLUM/TEAL primary + BURNT-ORANGE (--emph)
+// emphasis; the old per-panel navy/rainbow accents fold into this scheme. Per-supplier + functional-severity
+// colours are handled separately inside each viz.
 function pvDD2Card(title, inner, accent, sub) {
-  return '<div class="sa-card" style="border-left:3px solid ' + (accent || 'var(--ddacc,var(--navy))') + '">'
-    + '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px">'
-    + '<h3 style="font-size:13.5px;font-weight:700;margin:0;color:var(--ink)">' + title + '</h3>'
-    + (sub ? '<span style="font-size:11px;color:var(--mut2)">' + sub + '</span>' : '') + '</div>'
-    + '<div>' + inner + '</div></div>';
+  var a = String(accent || '');
+  var ac = /emph|amber|orange|risk|red|A23A30|8A5A00|C15E19|D2691E/i.test(a) ? 'var(--emph,#C15E19)'
+         : /teal|2F6E6B|1F7A5A/i.test(a) ? 'var(--teal-d,#2F6E6B)'
+         : 'var(--plum,#5C2B50)';
+  return '<div class="sa-card" style="border-top:3px solid ' + ac + '">'
+    + '<div class="card-hd"><span style="font-size:13px;font-weight:700;color:var(--ink)">' + title + '</span>'
+    + (sub ? '<span style="margin-left:auto;font-size:11px;font-weight:400;color:var(--mut2)">' + sub + '</span>' : '') + '</div>'
+    + '<div class="scc-b">' + inner + '</div></div>';
 }
 
 function pvDD2Foot(t) { return '<div class="footbound" style="margin-top:9px">' + t + '</div>'; }

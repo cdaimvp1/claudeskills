@@ -1305,10 +1305,7 @@ function pvExecSummaryHtml(refl,input){
  // Market structure panel CUT (owner decision, 2026-07): the HHI/composite-share concentration read
  // overclaimed leverage/replaceability and duplicated the Leader-gap; "how close is the race" now lives
  // only in Competitive Dynamics. pvMarketStructureHtml is retained (unused) in case it is restored.
- // Head-to-Head MOVED to its own top-level tab (Marc, 2026-07-23). The full embedded compare (pvDynamicsHtml) is
- // no longer rendered here; a compact launcher takes its place so the Overview stays focused. pvDynamicsHtml is
- // retained (unused) in case a teaser preview is wanted later.
- h+='<div class="sa-card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap"><div><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Compare candidates head-to-head</div><div style="font-size:12.5px;color:var(--mut);margin-top:3px">Any two eligible suppliers, side by side: requirements fit, risk, category deltas, evidence coverage and commercial model.</div></div><button onclick="if(typeof pvSetSub===\'function\')pvSetSub(\'h2h\')" style="background:var(--navy,#0F3A85);color:#fff;border:none;border-radius:8px;padding:9px 16px;font:600 12.5px var(--sans);cursor:pointer;white-space:nowrap">Open Head-to-Head &rarr;</button></div>';
+ // Head-to-Head lives on its own top-level tab; NO launcher/teaser on Overview (Marc: not needed at the bottom).
  return h;
 }
 function pvRankBarHtml(refl,input){
