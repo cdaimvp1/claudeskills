@@ -352,6 +352,90 @@ var PVDD2_TABS = [
   ['lilly',   'Lilly Fit & Diligence']
 ];
 
+/* =============================================================================
+   TOP-LEVEL RISK ASSESSMENT (v3) — pvRiskHtml2, replaces pvRiskHtml on the spine.
+   Portfolio summary -> semantic cross-supplier heatmap (level + confidence, gates
+   override the average) -> coverage callout for unassessed dims -> selected-supplier
+   material risks + disposition + event timeline (directness) + mitigation board.
+   ============================================================================= */
+var PVR2_RISK_DIMS = [
+  ['financial', 'Financial viability'], ['resilience', 'Operational resilience'],
+  ['cyber', 'Cyber & privacy'], ['integrity', 'Integrity & compliance'],
+  ['quality', 'Quality & regulatory'], ['responsible', 'Responsible sourcing']
+];
+function pvR2ConcernToRisk(c){ return c === 'Insufficient evidence' ? 'Unknown' : c === 'Strong' ? 'Low' : c; }
+function pvR2Cell(level, confidence) {
+  var m = THEO_RISKBAND[level] || THEO_RISKBAND['Unknown'];
+  var ab = level === 'Unknown' ? '?' : level.charAt(0);
+  return '<div title="' + pvAEsc(level + ' · confidence ' + (confidence || 'n/a')) + '" style="display:flex;align-items:center;justify-content:center;gap:5px;background:' + m.bg + ';border-radius:7px;padding:6px 4px"><span style="font:800 12px var(--mono,monospace);color:' + m.c + '">' + ab + '</span>' + (confidence ? '<span style="display:inline-flex;gap:1.5px">' + (function(){ var n = confidence === 'High' ? 3 : confidence === 'Medium' ? 2 : 1, s = ''; for (var i = 0; i < 3; i++) s += '<i style="width:3px;height:3px;border-radius:50%;background:' + (i < n ? m.c : 'var(--line2,#CECCC7)') + '"></i>'; return s; })() + '</span>' : '') + '</div>';
+}
+function pvR2Disposition(x) {
+  if (x.gates.some(function(g){ return g.kind === 'hard'; })) return {l:'Hard stop', c:'#A23A30'};
+  if (x.gates.length) return {l:'Escalate', c:'#8A5A00'};
+  if (x.risk.level === 'High' || x.risk.level === 'Critical') return {l:'Mitigate', c:'#8A5A00'};
+  if (x.risk.level === 'Unknown') return {l:'Evidence required', c:'var(--mut2,#6a655f)'};
+  return {l:'Accept / monitor', c:'#1F7A5A'};
+}
+function pvRiskHtml2(refl) {
+  var input = (typeof PVSL_INPUT !== 'undefined' && PVSL_INPUT) || {};
+  var L = (refl && refl.landscape) || {};
+  var asmts = (L.assessments || []).slice().sort(function(p, q){ if (p.eligible !== q.eligible) return p.eligible ? -1 : 1; return (p.riskScore || 0) - (q.riskScore || 0); });
+  if (!asmts.length || typeof pvCandById !== 'function') return '<div class="sa-card"><div class="scc-b">No suppliers to assess.</div></div>';
+  var rows = asmts.map(function(av){ return {av: av, x: pvAssess(av, pvCandById(av.id), input)}; });
+  if (typeof PVSL_RK_VEND === 'undefined') { try { PVSL_RK_VEND = null; } catch (e) {} }
+  var selId = (typeof PVSL_RK_VEND !== 'undefined' && PVSL_RK_VEND && rows.some(function(r){ return r.av.id === PVSL_RK_VEND; })) ? PVSL_RK_VEND : rows[0].av.id;
+  try { PVSL_RK_VEND = selId; } catch (e) {}
+  var sel = rows.find(function(r){ return r.av.id === selId; });
+
+  // ---- portfolio summary ----
+  var critHigh = rows.filter(function(r){ return ['High','Critical'].indexOf(r.x.risk.level) >= 0; }).length;
+  var withGates = rows.filter(function(r){ return r.x.gates.length > 0; }).length;
+  var dimBad = {}, dimUnk = {}, dimConf = {};
+  rows.forEach(function(r){ r.x.dimensions.forEach(function(d){ if (PVR2_RISK_DIMS.every(function(rd){ return rd[0] !== d.id; })) return; var lv = pvR2ConcernToRisk(d.concern); if (['High','Critical','Moderate'].indexOf(lv) >= 0) dimBad[d.label] = (dimBad[d.label] || 0) + 1; if (lv === 'Unknown') dimUnk[d.label] = (dimUnk[d.label] || 0) + 1; if (d.confidence === 'High') dimConf[d.label] = (dimConf[d.label] || 0) + 1; }); });
+  var topKey = function(o){ var k = null, m = -1; for (var x in o) if (o[x] > m) { m = o[x]; k = x; } return k; };
+  var pcell = function(lab, val){ return '<div style="min-width:0"><div style="font:600 9.5px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:4px">' + lab + '</div><div style="font-size:14px;font-weight:800;color:var(--ink)">' + val + '</div></div>'; };
+  var portfolio = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 20px">'
+    + pcell('High / critical risk', critHigh + ' <span style="font-size:11px;color:var(--mut2);font-weight:600">of ' + rows.length + '</span>')
+    + pcell('Unresolved gates', String(withGates))
+    + pcell('Most common exposure', '<span style="font-size:12.5px">' + pvAEsc(topKey(dimBad) || 'None') + '</span>')
+    + pcell('Least-assessed', '<span style="font-size:12.5px">' + pvAEsc(topKey(dimUnk) || 'None') + '</span>')
+    + pcell('Highest-confidence', '<span style="font-size:12.5px">' + pvAEsc(topKey(dimConf) || 'None') + '</span>')
+    + '</div>';
+
+  // ---- heatmap: risk dims (rows) x suppliers (cols) ----
+  var heads = '<th style="text-align:left;padding:4px 8px 8px 0"></th>' + rows.map(function(r){
+      var sc = r.av.id === selId;
+      return '<th onclick="if(typeof pvRkVend===\'function\')pvRkVend(\'' + pvAEsc(r.av.id) + '\')" style="padding:4px 4px 8px;cursor:pointer;text-align:center;border-bottom:2px solid ' + (sc ? '#A23A30' : 'transparent') + '"><div style="font-size:10.5px;font-weight:700;color:' + (sc ? '#A23A30' : 'var(--ink)') + ';white-space:nowrap">' + pvAEsc((r.av.name || '').split(/[ ,]/)[0]) + '</div>' + (r.av.rank ? '<div style="font:600 9px var(--mono,monospace);color:var(--mut2)">#' + r.av.rank + (r.av.eligible ? '' : ' · out') + '</div>' : '') + '</div></th>';
+    }).join('');
+  var body = PVR2_RISK_DIMS.map(function(rd){
+      var cells = rows.map(function(r){ var d = r.x.dimensions.find(function(v){ return v.id === rd[0]; }) || {}; return '<td style="padding:3px">' + pvR2Cell(pvR2ConcernToRisk(d.concern), d.confidence) + '</td>'; }).join('');
+      return '<tr><td style="font-size:12px;font-weight:600;color:var(--ink);padding:5px 8px 5px 0;white-space:nowrap">' + pvAEsc(rd[1]) + '</td>' + cells + '</tr>';
+    }).join('');
+  var overall = '<tr><td style="font-size:11px;font-weight:700;color:var(--mut2);padding:8px 8px 3px 0;text-transform:uppercase;letter-spacing:.03em">Overall</td>' + rows.map(function(r){ var m = THEO_RISKBAND[r.x.risk.level] || THEO_RISKBAND['Unknown']; return '<td style="padding:3px;text-align:center"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;color:' + m.c + '">' + pvAEsc(r.x.risk.level) + '</span></td>'; }).join('') + '</tr>';
+  var heatmap = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>' + heads + '</tr></thead><tbody>' + body + overall + '</tbody></table></div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11px;color:var(--mut)">' + ['Low','Moderate','High','Critical','Unknown'].map(function(l){ var m = THEO_RISKBAND[l]; return '<span style="display:flex;align-items:center;gap:6px"><i style="width:11px;height:9px;border-radius:2px;background:' + m.bg + ';border:1px solid ' + m.c + '"></i>' + l + '</span>'; }).join('') + '<span style="color:var(--mut2)">· dots = confidence · gates override the average, no risk is averaged away</span></div>';
+
+  // ---- coverage callout for unassessed dims ----
+  var unassessedNote = '';
+  var respUnk = rows.filter(function(r){ var d = r.x.dimensions.find(function(v){ return v.id === 'responsible'; }) || {}; return pvR2ConcernToRisk(d.concern) === 'Unknown'; }).length;
+  if (respUnk) unassessedNote = pvDD2Foot('Responsible sourcing is <b>not assessed</b> for ' + respUnk + ' of ' + rows.length + ' suppliers &mdash; shown as Unknown, never a scored "no issue". "Not assessed" is not "low risk".');
+
+  // ---- selected supplier detail ----
+  var sx = sel.x, disp = pvR2Disposition(sx);
+  var matRisks = (sx.risks && sx.risks.length) ? sx.risks : sx.dimensions.filter(function(d){ return PVR2_RISK_DIMS.some(function(rd){ return rd[0] === d.id; }) && ['High','Critical','Moderate'].indexOf(pvR2ConcernToRisk(d.concern)) >= 0; }).map(function(d){ return {label: d.label, impact: pvR2ConcernToRisk(d.concern), type: 'Dimension', mitigation: d.evidence, gate: false}; });
+  var mitig = matRisks.map(function(rk){ return '<tr><td class="dt" style="vertical-align:top;white-space:nowrap">' + pvAEsc(rk.label) + '</td><td class="dd" style="vertical-align:top;color:var(--mut2);white-space:nowrap">' + pvAEsc(rk.type || '') + '</td><td class="dd" style="vertical-align:top">' + pvAEsc(rk.mitigation || '') + '</td><td class="dd" style="vertical-align:top;white-space:nowrap">' + (rk.gate ? '<b style="color:#8A5A00">Gate</b>' : 'Monitor') + '</td></tr>'; }).join('');
+  var selName = pvAEsc(sel.av.name);
+  var selHead = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:13px;font-weight:700;color:var(--ink)">' + selName + '</span>' + pvSemanticRiskCell(sx.risk.level, sx.risk.confidence) + '<span style="font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + disp.c + '">Disposition: ' + disp.l + '</span></div>';
+  var timeline = (typeof pvDD2EventTimeline === 'function' && sx.events && sx.events.length) ? pvDD2EventTimeline(sx.events) : '';
+
+  return pvDD2Card('Risk Assessment', '<div style="font-size:12.5px;color:var(--mut);line-height:1.55">Cross-supplier risk on the shared assessment model &mdash; one consistent taxonomy, semantic levels with a separate confidence read, and gates that override the blended average.</div>', 'var(--riskred,#A23A30)')
+    + pvDD2Card('Portfolio summary', portfolio, 'var(--ai,#5C2B50)')
+    + pvDD2Card('Risk by dimension', heatmap + unassessedNote, '#A23A30')
+    + pvDD2Card('Selected supplier &middot; ' + selName, selHead
+        + (mitig ? '<div style="overflow-x:auto"><table class="pvdl"><thead><tr><th style="text-align:left;font-size:10px;color:var(--mut2)">Risk</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Type</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Response</th><th style="font-size:10px;color:var(--mut2)">Gate</th></tr></thead><tbody>' + mitig + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No material risks above threshold for this supplier.</div>')
+        + (timeline ? '<div style="margin-top:14px"><div style="font:700 10px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:8px">Material events</div>' + timeline + '</div>' : ''), 'var(--navy,#0F3A85)');
+}
+
 function pvDD2Section(ddt, a, cand, refl, input) {
   var x = pvAssess(a, cand, input);
   if (ddt === 'company') return pvDD2Company(x, a, cand, input);

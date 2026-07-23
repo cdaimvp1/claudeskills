@@ -2053,7 +2053,7 @@ function landscapeHTML(){
  var panel;
  if(PVSL_SUB==='deep')panel=pvDeepDiveTabHtml(refl,input);
  else if(PVSL_SUB==='heatmap')panel=pvHeatmapHtml(refl);         // Pass B: collapsible categories -> sub-reqs, band legend, leaders narrative, filter, click-vendor rationale
- else if(PVSL_SUB==='risk')panel=pvRiskHtml(refl);               // Pass B: expandable sub-factors, contained/elevated legend, flag icons, click-vendor rationale
+ else if(PVSL_SUB==='risk')panel=pvRiskHtml2(refl);              // v3 (pv-07b): pvAssess spine — portfolio summary + semantic heatmap (level+confidence) + coverage callout + selected-supplier material risks/disposition/event-timeline/mitigation. Old pvRiskHtml now dead.
  else panel=pvExecSummaryHtml(refl,input);
  var body=pvSubtabsHtml()+panel;
  // Pass 2B: no Draft/Mark-Final lifebar on the Landscape tab, it is an analytical view, not a finalizable material.

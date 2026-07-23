@@ -26,8 +26,19 @@ build `build_dashboard.py`, checks `smoke.cjs` / `verify_deepdive.cjs`. Self-con
       Author the grounded per-tab data (ASSESS_AUTHORED.nimbus: ownership, locations, capabilities cells, references,
       dependencies, events, mitigations, diligence, actions) as each viz is built. THEN rebuild + verify + OPEN.
       Old pvDDSection / pvVerdictHeaderHtml / pvCompPositionHtml now dead (remove in P7).
-- [ ] **P3 Risk Assessment** — rebuild (8-row taxonomy, semantic+confidence, gates override, event directness +
-      timeline, mitigation board, coverage-not-scored for unassessed). OPEN.
+- [~] **P3-P6 TOP-LEVEL TABS** — IN PROGRESS (Marc: "roll into the top level tabs"). Building myself on the
+      pvAssess spine (modify existing renderers + 1 new tab). Mapping workflow wf_ee3f9580-dab ran 3 parallel
+      Sonnet readers over pvExecSummaryHtml / pvHeatmapHtml / pvRiskHtml first. Order: Risk Assessment rebuild ->
+      Requirements Heatmap improve -> Head-to-Head (new) -> Overview tweaks. OPEN each.
+      SEQUENCING (Marc, 2026-07-23): (1) finish Landscape top-level tabs, THEN (2) Marc gives Deal dashboard review,
+      (3) Marc will send documented CHANGES to the Landscape (incl. deep dive) once written up — fold those in when
+      they arrive. Deal notes + deep-dive-change-list both QUEUED behind top-level tabs.
+- [x] **P3 Risk Assessment** — DONE 2026-07-23. New `pvRiskHtml2` (pv-07b) on pvAssess; rerouted landscapeHTML
+      dispatch (line 2056). Portfolio summary + semantic cross-supplier heatmap (level + confidence dots, gates
+      override) + responsible-sourcing coverage callout + selected-supplier material risks / disposition (accept /
+      mitigate / evidence-required / escalate / hard-stop) / event timeline (pvDD2EventTimeline directness) /
+      mitigation board. Old pvRiskHtml + helpers now DEAD (remove in P7). Verified smoke (risk marker updated) +
+      rendered evidence. Content check: non-authored suppliers derive events via pvDeriveEvents (Redshift AWS outage).
 - [ ] **P4 Requirements Heatmap** — improve (1-decimal+semantic, evidence-confidence 2nd channel, leadership strip,
       decision-leverage, evidence panel, filters, rename "coverage"). OPEN.
 - [ ] **P5 Head-to-Head** — new tab (selectors, compare strip, delta bars, req-diff heatmap, risk-diff, evidence

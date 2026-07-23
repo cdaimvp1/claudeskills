@@ -48,7 +48,7 @@ const SUBS = ['exec', 'deep', 'heatmap', 'risk'];
 const MARKERS = {
   exec: /Executive Summary/,
   heatmap: /hcell|hmt/,
-  risk: /CONTAINED|ELEVATED|rkt/,
+  risk: /Portfolio summary|Risk by dimension/,
   deep: /\bdd\b|Deep Dive|ddtab/
 };
 
