@@ -5666,7 +5666,7 @@ function landscapeHTML(){
  var panel;
  if(PVSL_SUB==='deep')panel=pvDeepDiveTabHtml(refl,input);
  else if(PVSL_SUB==='heatmap')panel=pvHeatmapHtml(refl);         // Pass B: collapsible categories -> sub-reqs, band legend, leaders narrative, filter, click-vendor rationale
- else if(PVSL_SUB==='h2h')panel=pvH2HHtml(refl);                 // v3 (pv-07b): compare any two eligible suppliers on the pvAssess spine
+ else if(PVSL_SUB==='h2h')panel=pvDynamicsHtml(refl)+pvH2HExtras(refl);  // HH1 (Marc): old pvDynamicsHtml design + merged new data (risk-diff / evidence / commercial). pvH2HHtml now unused.
  else if(PVSL_SUB==='risk')panel=pvRiskHtml2(refl);              // v3 (pv-07b): pvAssess spine — portfolio summary + semantic heatmap (level+confidence) + coverage callout + selected-supplier material risks/disposition/event-timeline/mitigation. Old pvRiskHtml now dead.
  else panel=pvExecSummaryHtml(refl,input);
  var body=pvSubtabsHtml()+panel;
@@ -6066,10 +6066,17 @@ var PVR2_RISK_DIMS = [
   ['quality', 'Quality & regulatory'], ['responsible', 'Responsible sourcing']
 ];
 function pvR2ConcernToRisk(c){ return c === 'Insufficient evidence' ? 'Unknown' : c === 'Strong' ? 'Low' : c; }
+// RA1 (Marc): old-heatmap look — a fully-COLOURED cell (like the legacy .rcell) showing the semantic level +
+// confidence dots (no raw score). Severity ramp teal(low) -> red(critical).
 function pvR2Cell(level, confidence) {
-  var m = THEO_RISKBAND[level] || THEO_RISKBAND['Unknown'];
-  var ab = level === 'Unknown' ? '?' : level.charAt(0);
-  return '<div title="' + pvAEsc(level + ' · confidence ' + (confidence || 'n/a')) + '" style="display:flex;align-items:center;justify-content:center;gap:5px;background:' + m.bg + ';border-radius:7px;padding:6px 4px"><span style="font:800 12px var(--mono,monospace);color:' + m.c + '">' + ab + '</span>' + (confidence ? '<span style="display:inline-flex;gap:1.5px">' + (function(){ var n = confidence === 'High' ? 3 : confidence === 'Medium' ? 2 : 1, s = ''; for (var i = 0; i < 3; i++) s += '<i style="width:3px;height:3px;border-radius:50%;background:' + (i < n ? m.c : 'var(--line2,#CECCC7)') + '"></i>'; return s; })() + '</span>' : '') + '</div>';
+  var s = level === 'Unknown' ? ['var(--nested,#f1efec)', 'var(--mut2,#6a655f)']
+    : level === 'Low' ? ['var(--teal-t,#DCEBE9)', 'var(--teal-d,#2F6E6B)']
+    : level === 'Moderate' ? ['#FBF1DA', '#8A5A00']
+    : level === 'High' ? ['#F6D5B0', '#8A3D0A']
+    : ['#E7A79F', '#6A1A12'];
+  var n = confidence === 'High' ? 3 : confidence === 'Medium' ? 2 : 1, dots = '';
+  for (var i = 0; i < 3; i++) dots += '<i style="width:3px;height:3px;border-radius:50%;background:' + (i < n ? s[1] : 'rgba(0,0,0,.18)') + '"></i>';
+  return '<div title="' + pvAEsc(level + ' · confidence ' + (confidence || 'n/a')) + '" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:' + s[0] + ';border:1px solid rgba(0,0,0,.06);border-radius:5px;padding:6px 5px"><span style="font:700 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.02em;color:' + s[1] + '">' + pvAEsc(level) + '</span>' + (confidence ? '<span style="display:inline-flex;gap:2px">' + dots + '</span>' : '') + '</div>';
 }
 function pvR2Disposition(x) {
   if (x.gates.some(function(g){ return g.kind === 'hard'; })) return {l:'Hard stop', c:'#A23A30'};
@@ -6144,7 +6151,31 @@ function pvRiskHtml2(refl) {
    difference, evidence-confidence compare, commercial-model compare, conclusion.
    ============================================================================= */
 var PVH2H_A = null, PVH2H_B = null;
-function pvH2HPick(which, id) { if (which === 'a') PVH2H_A = id; else PVH2H_B = id; if (typeof pvRerender === 'function') pvRerender(); }
+// HH1 (Marc): Head-to-Head reverts to the OLD design (pvDynamicsHtml in pv-07, which keeps its own index-based
+// pvH2HPick / PVSL_H2H_A/B). My pv-07b pvH2HPick override is removed so the old picker works. pvH2HExtras merges
+// the NEW data (risk difference, evidence-confidence compare, commercial-model compare) onto the old design for
+// the same selected pair. pvH2HHtml below is now unused (kept for reference; remove in cleanup).
+function pvH2HExtras(refl) {
+  var input = (typeof PVSL_INPUT !== 'undefined' && PVSL_INPUT) || {};
+  var L = (refl && refl.landscape) || {};
+  if (typeof pvCandById !== 'function' || !L.assessments || L.assessments.length < 2) return '';
+  var order = L.assessments.slice().sort(function(x, y){ if (x.eligible !== y.eligible) return x.eligible ? -1 : 1; if (x.eligible) return (x.rank || 99) - (y.rank || 99); return String(x.name).localeCompare(y.name); });
+  var ai = (typeof PVSL_H2H_A !== 'undefined') ? PVSL_H2H_A : 0, bi = (typeof PVSL_H2H_B !== 'undefined') ? PVSL_H2H_B : 1;
+  if (ai >= order.length || ai < 0) ai = 0; if (bi >= order.length || bi < 0) bi = Math.min(1, order.length - 1); if (bi === ai) bi = (ai + 1) % order.length;
+  var A = {av: order[ai], x: pvAssess(order[ai], pvCandById(order[ai].id), input)};
+  var B = {av: order[bi], x: pvAssess(order[bi], pvCandById(order[bi].id), input)};
+  var nm = function(av){ return (av.name || '').split(/[ ,]/)[0]; };
+  var riskDiff = PVR2_RISK_DIMS.map(function(rd){
+    var da = A.x.dimensions.find(function(d){ return d.id === rd[0]; }) || {}, db = B.x.dimensions.find(function(d){ return d.id === rd[0]; }) || {};
+    return '<tr><td style="font-size:12px;font-weight:600;color:var(--ink);padding:6px 8px 6px 0">' + pvAEsc(rd[1]) + '</td><td style="padding:4px;text-align:center">' + pvSemanticRiskCell(pvR2ConcernToRisk(da.concern), da.confidence) + '</td><td style="padding:4px;text-align:center">' + pvSemanticRiskCell(pvR2ConcernToRisk(db.concern), db.confidence) + '</td></tr>';
+  }).join('');
+  var riskCard = pvDD2Card('Risk Difference', '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="font-size:11px;color:var(--teal-d);padding-bottom:6px">' + pvAEsc(nm(A.av)) + '</th><th style="font-size:11px;color:var(--emph);padding-bottom:6px">' + pvAEsc(nm(B.av)) + '</th></tr></thead><tbody>' + riskDiff + '</tbody></table></div>', 'var(--emph)');
+  var cov = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div><div style="font-size:12px;font-weight:700;color:var(--teal-d);margin-bottom:8px">' + pvAEsc(A.av.name) + '</div>' + pvEvidCoverageBar(A.x.evidenceCoverage) + '</div><div><div style="font-size:12px;font-weight:700;color:var(--emph);margin-bottom:8px">' + pvAEsc(B.av.name) + '</div>' + pvEvidCoverageBar(B.x.evidenceCoverage) + '</div></div>';
+  var covCard = pvDD2Card('Evidence Confidence', cov, 'var(--teal-d)');
+  var ca = A.x.commercialDrivers, cb = B.x.commercialDrivers;
+  var commCard = (ca || cb) ? pvDD2Card('Commercial Model', '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div><div style="font-size:12px;font-weight:700;color:var(--teal-d);margin-bottom:8px">' + pvAEsc(A.av.name) + '</div>' + (ca ? pvDD2CommercialDrivers(ca) : '<div style="font-size:12px;color:var(--mut2)">Not on file.</div>') + '</div><div><div style="font-size:12px;font-weight:700;color:var(--emph);margin-bottom:8px">' + pvAEsc(B.av.name) + '</div>' + (cb ? pvDD2CommercialDrivers(cb) : '<div style="font-size:12px;color:var(--mut2)">Not on file.</div>') + '</div></div>', 'var(--plum)') : '';
+  return riskCard + covCard + commCard;
+}
 function pvH2HCounts(x) {
   var g = x.reqGroups || [];
   return {

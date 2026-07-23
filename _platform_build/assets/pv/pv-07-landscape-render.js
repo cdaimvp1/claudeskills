@@ -2062,7 +2062,7 @@ function landscapeHTML(){
  var panel;
  if(PVSL_SUB==='deep')panel=pvDeepDiveTabHtml(refl,input);
  else if(PVSL_SUB==='heatmap')panel=pvHeatmapHtml(refl);         // Pass B: collapsible categories -> sub-reqs, band legend, leaders narrative, filter, click-vendor rationale
- else if(PVSL_SUB==='h2h')panel=pvH2HHtml(refl);                 // v3 (pv-07b): compare any two eligible suppliers on the pvAssess spine
+ else if(PVSL_SUB==='h2h')panel=pvDynamicsHtml(refl)+pvH2HExtras(refl);  // HH1 (Marc): old pvDynamicsHtml design + merged new data (risk-diff / evidence / commercial). pvH2HHtml now unused.
  else if(PVSL_SUB==='risk')panel=pvRiskHtml2(refl);              // v3 (pv-07b): pvAssess spine — portfolio summary + semantic heatmap (level+confidence) + coverage callout + selected-supplier material risks/disposition/event-timeline/mitigation. Old pvRiskHtml now dead.
  else panel=pvExecSummaryHtml(refl,input);
  var body=pvSubtabsHtml()+panel;
