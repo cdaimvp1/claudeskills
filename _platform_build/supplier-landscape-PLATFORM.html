@@ -6568,18 +6568,28 @@ function pvRiskHtml2(refl) {
 
   // ---- selected supplier detail ----
   var sx = sel.x, disp = pvR2Disposition(sx);
-  var matRisks = (sx.risks && sx.risks.length) ? sx.risks : sx.dimensions.filter(function(d){ return PVR2_RISK_DIMS.some(function(rd){ return rd[0] === d.id; }) && ['High','Critical','Moderate'].indexOf(pvR2ConcernToRisk(d.concern)) >= 0; }).map(function(d){ return {label: d.label, impact: pvR2ConcernToRisk(d.concern), type: 'Dimension', mitigation: d.evidence, gate: false}; });
-  var mitig = matRisks.map(function(rk){ return '<tr><td class="dt" style="vertical-align:top;white-space:nowrap">' + pvAEsc(rk.label) + '</td><td class="dd" style="vertical-align:top;color:var(--mut2);white-space:nowrap">' + pvAEsc(rk.type || '') + '</td><td class="dd" style="vertical-align:top">' + pvAEsc(rk.mitigation || '') + '</td><td class="dd" style="vertical-align:top;white-space:nowrap">' + (rk.gate ? '<b style="color:#8A5A00">Gate</b>' : 'Monitor') + '</td></tr>'; }).join('');
+  var matRisks = (sx.risks && sx.risks.length) ? sx.risks : sx.dimensions.filter(function(d){ return PVR2_RISK_DIMS.some(function(rd){ return rd[0] === d.id; }) && ['High','Critical','Moderate'].indexOf(pvR2ConcernToRisk(d.concern)) >= 0; }).map(function(d){ return {label: d.label, impact: pvR2ConcernToRisk(d.concern), likelihood: 'Medium', confidence: d.confidence, type: 'Dimension', mitigation: d.evidence, gate: false}; });
+  var msev = { High:3, Medium:2, Low:1, Critical:3 };
+  var mReg = matRisks.slice().sort(function(a, b){ return ((msev[b.impact] || 1) + (msev[b.likelihood] || 1)) - ((msev[a.impact] || 1) + (msev[a.likelihood] || 1)); }).map(function(rk){
+      var sv = (typeof pvDD2RiskSeverity === 'function') ? pvDD2RiskSeverity(rk) : { t: rk.impact || 'Low', c: 'var(--mut2)', bg: 'var(--nested)' };
+      return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + '</td>'
+        + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top;white-space:nowrap">' + pvAEsc(rk.type || '') + '</td>'
+        + '<td style="padding:8px 10px 8px 0;vertical-align:top"><span style="font:700 9.5px var(--mono,monospace);color:' + sv.c + ';background:' + sv.bg + ';border-radius:20px;padding:2px 9px">' + sv.t.toUpperCase() + '</span></td>'
+        + '<td style="padding:8px 10px 8px 0;vertical-align:top;text-align:center">' + ((typeof pvDD2FinDots === 'function') ? pvDD2FinDots(rk.confidence) : '') + '</td>'
+        + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top;line-height:1.45">' + pvAEsc(rk.mitigation || '') + '</td>'
+        + '<td style="padding:8px 0;vertical-align:top;white-space:nowrap">' + (rk.gate ? '<b style="color:var(--emph,#C15E19)">Gate</b>' : 'Monitor') + '</td></tr>';
+    }).join('');
   var selName = pvAEsc(sel.av.name);
-  var selHead = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:13px;font-weight:700;color:var(--ink)">' + selName + '</span>' + pvSemanticRiskCell(sx.risk.level, sx.risk.confidence) + '<span style="font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + disp.c + '">Disposition: ' + disp.l + '</span></div>';
-  var timeline = (typeof pvDD2EventTimeline === 'function' && sx.events && sx.events.length) ? pvDD2EventTimeline(sx.events) : '';
+  var selHead = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px"><span style="font-size:13px;font-weight:700;color:var(--ink)">' + selName + '</span>' + pvSemanticRiskCell(sx.risk.level, sx.risk.confidence) + '<span style="font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + disp.c + '">Disposition: ' + disp.l + '</span></div>';
+  var events = (typeof pvDD2TypedEvents === 'function' && sx.events && sx.events.length) ? pvDD2TypedEvents(sx.events) : ((typeof pvDD2EventTimeline === 'function' && sx.events && sx.events.length) ? pvDD2EventTimeline(sx.events) : '');
+  var rth = function(h, al){ return '<th style="text-align:' + (al || 'left') + ';padding:0 10px 6px 0;font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + h + '</th>'; };
 
-  return pvDD2Card('Risk Assessment', '<div style="font-size:12.5px;color:var(--mut);line-height:1.55">Cross-supplier risk on the shared assessment model &mdash; one consistent taxonomy, semantic levels with a separate confidence read, and gates that override the blended average.</div>', 'var(--riskred,#A23A30)')
-    + pvDD2Card('Portfolio summary', portfolio, 'var(--ai,#5C2B50)')
-    + pvDD2Card('Risk by dimension', heatmap + unassessedNote, '#A23A30')
+  return pvDD2Card('Risk Assessment', '<div style="font-size:12.5px;color:var(--mut);line-height:1.55">Cross-supplier risk on the shared assessment model &mdash; one taxonomy, semantic levels with a separate confidence read, and gates that override the blended average.</div>', 'var(--emph)')
+    + pvDD2Card('Portfolio summary', portfolio, 'var(--plum)')
+    + pvDD2Card('Risk by dimension', heatmap + unassessedNote, 'var(--emph)')
     + pvDD2Card('Selected supplier &middot; ' + selName, selHead
-        + (mitig ? '<div style="overflow-x:auto"><table class="pvdl"><thead><tr><th style="text-align:left;font-size:10px;color:var(--mut2)">Risk</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Type</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Response</th><th style="font-size:10px;color:var(--mut2)">Gate</th></tr></thead><tbody>' + mitig + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No material risks above threshold for this supplier.</div>')
-        + (timeline ? '<div style="margin-top:14px"><div style="font:700 10px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:8px">Material events</div>' + timeline + '</div>' : ''), 'var(--navy,#0F3A85)');
+        + (mReg ? '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + rth('Risk') + rth('Type') + rth('Severity') + rth('Conf.', 'center') + rth('Response') + rth('Gate') + '</tr></thead><tbody>' + mReg + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No material risks above threshold for this supplier.</div>')
+        + (events ? '<div style="margin-top:16px;border-top:1px solid var(--line);padding-top:13px"><div style="font:700 9px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:10px">Material events</div>' + events + '</div>' : ''), 'var(--teal-d)');
 }
 
 /* =============================================================================
