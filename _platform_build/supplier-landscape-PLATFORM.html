@@ -5713,6 +5713,17 @@ function pvDD2DimLead(x, id) {
     + '<div style="font-size:12.5px;color:var(--mut);line-height:1.5">' + pvAEsc(d.evidence) + '</div>';
 }
 
+/* compact DE-CARDED assessment strip (Marc G3: the dimension lead should not be its own card): a slim plum-barred
+   strip with the dimension label + concern pill + a one-line read, sitting on the page, not in a panel. */
+function pvDD2AssessStrip(x, id) {
+  var d = x.dimensions.find(function(v){ return v.id === id; });
+  if (!d) return '';
+  return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 14px;padding:9px 13px;background:var(--nested,#f1efec);border-left:3px solid var(--plum,#5C2B50);border-radius:8px">'
+    + '<span style="font:800 11px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink)">' + pvAEsc(d.label) + '</span>'
+    + pvConcernPill(d.concern, d.confidence)
+    + '<span style="font-size:11.5px;color:var(--mut);line-height:1.4;flex:1;min-width:220px">' + pvAEsc(d.evidence) + '</span></div>';
+}
+
 function pvDD2KV(rows) {
   return rows.filter(function(r){ return r[1]; }).map(function(r){
     return '<div style="display:grid;grid-template-columns:158px 1fr;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.55">'
@@ -5806,7 +5817,7 @@ function pvDD2Company(x, a, cand, input) {
     ['Leadership', comp.leadership],
     ['Headcount', comp.headcount]
   ]);
-  return pvDD2Card('Company &amp; ownership', pvDD2DimLead(x, 'identity'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='identity';})||{}).concern] || {}).c)
+  return pvDD2AssessStrip(x, 'identity')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
     +   pvDD2Card('Ownership &amp; control', pvDD2OwnershipTree(x.ownership, a, cand) + pvDD2Foot('Lilly contracts an <b>entity</b>, evaluates an <b>offering</b>, and depends on specific <b>services</b> &mdash; three different things.'), 'var(--navy,#0F3A85)')
     +   pvDD2Card('Identity verification', pvDD2StatusMatrix(markerRows), 'var(--teal-d,#2F6E6B)')
@@ -5857,7 +5868,7 @@ function pvDD2Caps(x, a, cand, input) {
   var offTable = offs ? '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + offs + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No offerings on file.</div>';
   var refCard = x.references ? pvDD2Card('Reference relevance', pvDD2RefMatrix(x.references), 'var(--ai,#5C2B50)')
     : (dd.clients ? pvDD2Card('Reference customers', '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(dd.clients) + '</div>', 'var(--mut2,#6a655f)') : '');
-  return pvDD2Card('Capabilities &amp; operations', pvDD2DimLead(x, 'capability'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='capability';})||{}).concern] || {}).c)
+  return pvDD2AssessStrip(x, 'capability')
     + pvDD2Card('Capability to requirement', pvDD2CapHeatmap(x.capabilities), 'var(--navy,#0F3A85)')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
     +   pvDD2Card('Offering &amp; delivery', (idn.delivery ? '<div style="font-size:12.5px;margin-bottom:10px"><b style="color:var(--mut2)">Delivery model &middot;</b> ' + pvAEsc(idn.delivery) + '</div>' : '') + offTable, 'var(--teal-d,#2F6E6B)')
@@ -5917,7 +5928,7 @@ function pvDD2FinMkt(x, a, cand, input, refl) {
   var revSvg = (typeof pvRevHistSvg === 'function' && fin.revenueHistory) ? pvRevHistSvg(fin.revenueHistory) : '';
   var mkt = at.gartner ? '<div style="font-size:12.5px;line-height:1.55"><b style="color:var(--mut2)">Analyst position &middot;</b> ' + pvAEsc(at.gartner) + '</div>' : '<div style="font-size:12px;color:var(--mut2)">No analyst position on file.</div>';
   var scatter = pvDD2PeerScatter(refl, input, a && a.id);
-  return pvDD2Card('Financial &amp; market', pvDD2DimLead(x, 'financial'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='financial';})||{}).concern] || {}).c)
+  return pvDD2AssessStrip(x, 'financial')
     + (scatter ? pvDD2Card('Peer position', scatter, 'var(--navy,#0F3A85)') : '')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
     +   pvDD2Card('Financial viability', summary + (fin.sources && fin.sources.length ? pvDD2Foot('<b>Sources.</b> ' + fin.sources.map(function(s){return pvAEsc(s);}).join(' &middot; ')) : ''), 'var(--teal-d,#2F6E6B)')
@@ -6022,7 +6033,7 @@ function pvDD2Lilly(x, a, cand, input) {
       ? '<ol style="margin:0;padding-left:20px;font-size:12.5px;line-height:1.6">' + oq.map(function(q){ return '<li>' + (q.plain ? pvAEsc((typeof pvStripTags === 'function' ? pvStripTags(q.plain) : q.plain)) : pvAEsc(q.tag || '')) + '</li>'; }).join('') + '</ol>'
       : '<div style="font-size:12px;color:var(--mut2)">No open items derived; standard pre-award confirmations still apply.</div>';
   }
-  return pvDD2Card('Lilly fit &amp; diligence', pvDD2DimLead(x, 'capability'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='capability';})||{}).concern] || {}).c)
+  return pvDD2AssessStrip(x, 'capability')
     + pvDD2Card('Lilly-specific fit', fitRows || '<div style="font-size:12px;color:var(--mut2)">No Lilly-fit read on file.</div>', 'var(--ai,#5C2B50)')
     + (funnel ? pvDD2Card('Diligence funnel', funnel, 'var(--navy,#0F3A85)') : pvDD2Card('Required diligence before advancement', oqFallback + pvDD2Foot('The companion outreach skill turns these into supplier requests; responses (M365) flow back to re-enrich.'), 'var(--navy,#0F3A85)'))
     + (board ? pvDD2Card('Action board', board + pvDD2Foot('Diligence turned into a workplan; gated actions must clear before advancement.'), 'var(--amber-d,#8A5A00)') : '');
