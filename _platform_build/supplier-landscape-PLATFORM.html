@@ -3203,31 +3203,33 @@ const RENEWAL = _PVDOM.renewal || { levers: [], matrix: { performance: { dims: [
    ============================================================================= */
 
 var THEO_DISPO = {
-  'Advance':                {c:'#1F7A5A', bg:'#DCEBE9'},
-  'Advance with conditions':{c:'#2E5E8C', bg:'var(--ti-blue,#E4EBF1)'},
+  'Advance':                {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)'},
+  'Advance with conditions':{c:'var(--plum,#5C2B50)', bg:'var(--plum-t,#EDDFE9)'},
   'Hold as alternate':      {c:'#8A5A00', bg:'var(--ti-amber,#FBF1DA)'},
   'Do not advance':         {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)'},
   'Screened out':           {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)'}
 };
+// Palette (Marc, LOCKED): teal-primary for good/low, amber moderate, BURNT-ORANGE (--emph) high, red critical,
+// gray unknown/insufficient. No navy-as-primary.
 var THEO_CONCERN = {
-  'Low':                    {c:'#0F3A85', bg:'var(--ti-blue,#E4EBF1)', fav:0.90},
-  'Strong':                 {c:'#1F7A5A', bg:'#DCEBE9',                fav:0.92},
+  'Low':                    {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',   fav:0.90},
+  'Strong':                 {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',   fav:0.92},
   'Moderate':               {c:'#8A5A00', bg:'var(--ti-amber,#FBF1DA)',fav:0.58},
-  'High':                   {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)',  fav:0.32},
-  'Critical':               {c:'#7A1F1A', bg:'#F3DEDE',               fav:0.15},
+  'High':                   {c:'var(--emph,#C15E19)', bg:'#FBEAD9',    fav:0.32},
+  'Critical':               {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)', fav:0.15},
   'Insufficient evidence':  {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)', fav:0}
 };
 var THEO_RISKBAND = {
-  'Low':     {c:'#0F3A85', bg:'var(--ti-blue,#E4EBF1)'},
+  'Low':     {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)'},
   'Moderate':{c:'#8A5A00', bg:'var(--ti-amber,#FBF1DA)'},
-  'High':    {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)'},
-  'Critical':{c:'#7A1F1A', bg:'#F3DEDE'},
+  'High':    {c:'var(--emph,#C15E19)', bg:'#FBEAD9'},
+  'Critical':{c:'#A23A30', bg:'var(--ti-red,#FBE7E3)'},
   'Unknown': {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)'}
 };
 var THEO_EVID = {
-  'Verified':         {c:'#0F3A85', fill:'solid',  key:'verified'},
+  'Verified':         {c:'var(--teal-d,#2F6E6B)', fill:'solid',  key:'verified'},
   'Partial':          {c:'#8A5A00', fill:'hatch',  key:'partial'},
-  'Supplier asserted':{c:'#2E5E8C', fill:'outline',key:'supplier'},
+  'Supplier asserted':{c:'var(--plum,#5C2B50)', fill:'outline',key:'supplier'},
   'Proxy':            {c:'var(--mut2,#6a655f)', fill:'outline', key:'proxy'},
   'Missing':          {c:'var(--mut2,#6a655f)', fill:'none',    key:'missing'}
 };
@@ -3545,9 +3547,9 @@ function pvAssessBars(dims) {
 function pvEvidCoverageBar(cov) {
   cov = cov || {};
   var segs = [
-    ['Verified', cov.verified || 0, '#0F3A85'],
+    ['Verified', cov.verified || 0, 'var(--teal-d,#2F6E6B)'],
     ['Partial', cov.partial || 0, '#8A5A00'],
-    ['Supplier input', cov.supplier || 0, '#8FA3BE'],
+    ['Supplier input', cov.supplier || 0, 'var(--plum,#5C2B50)'],
     ['Missing', cov.missing || 0, 'var(--line2,#CECCC7)']
   ];
   var bar = '<div style="display:flex;height:12px;border-radius:30px;overflow:hidden;border:1px solid var(--line,#E1E0DC)">'
