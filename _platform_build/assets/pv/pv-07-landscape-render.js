@@ -365,7 +365,7 @@ var PVSL_INPUT=null,PVSL_DD=null,PVSL_SHORT={};
    deep-dive vendor + nested sub-tab, and whether the Start-an-RFx picker is open. */
 var PVSL_SUB='exec';          // exec | deep | heatmap | risk
 var PVSL_DDV=null;            // selected vendor id in the Supplier Deep Dive subtab
-var PVSL_DDT='profile';      // profile | solfin | strisk | lilly | reqs (Marc's intentional order, restored 2026-07-23)
+var PVSL_DDT='summary';      // v3 deep dive (pv-07b): summary | company | caps | finmkt | risk | lilly
 var PVSL_RFX_OPEN=false;     // Start-an-RFx picker open?
 var PVSL_RFX_PICK={};        // vendor id -> included in the draft slate
 var PVSL_RFX_SENT=false;     // Pass B: draft routed to sourcing rep (pending approval)?
@@ -2025,14 +2025,14 @@ function pvDeepDiveTabHtml(refl,input){
  // (owner: "shade of the supplier's colour") used for band/row fills. Burnt orange stays the emphasis colour.
  var ddc=pvSupColor(a);var ddacc='style="--ddacc:'+ddc+';--ddacc-t:'+ddc+'14"';
  if(!a||!cand||!cand.deepDive){return '<div class="dd" '+ddacc+'>'+bar+'<div class="sa-card"><div class="scc-b">Deep dive is not available for this candidate.</div></div></div>';}
- // Tab order RESTORED to Marc's intentional sequence (2026-07-23): Profile is the entry point, then the
- // evidence (Market & Financials), then Strengths & Risks, Lilly Fit, and the Requirements Fit heatmap last.
- // The earlier "decision-first" reorder + rename ("Risk to Engaging" / "Why Them") was not requested; reverted.
- var tabs=[['profile','Profile'],['solfin','Market & Financials'],['strisk','Strengths & Risks'],['lilly','Lilly Fit'],['reqs','Requirements Fit']];
- var ddt=PVSL_DDT;if(!tabs.some(function(t){return t[0]===ddt;}))ddt='profile';
+ // Deep Dive v3 (pv-07b): 6 visual subtabs on the pvAssess spine. The two big header bands + the visible
+ // composite score are replaced by ONE compact decision-header strip (Marc's analysis: decision -> evidence ->
+ // materiality -> action, no false-precision composite). Default = Supplier Summary.
+ var tabs=PVDD2_TABS;
+ var ddt=PVSL_DDT;if(!tabs.some(function(t){return t[0]===ddt;}))ddt='summary';
  var tabbar='<div class="ddtabs">'+tabs.map(function(t){return '<button class="ddtab'+(ddt===t[0]?' on':'')+'" onclick="pvSetDDT(\''+t[0]+'\')">'+escD(t[1])+'</button>';}).join('')+'</div>';
- // Verdict header (the ONE answer: INVITE / HOLD / PASS) sits above the competitive-position band and the tabs.
- return '<div class="dd" '+ddacc+'>'+bar+pvVerdictHeaderHtml(a,cand,refl,input)+pvCompPositionHtml(a,cand,refl,input)+tabbar+pvDDSection(ddt,a,cand,refl,input)+'</div>';
+ var _assess=pvAssess(a,cand,input);
+ return '<div class="dd" '+ddacc+'>'+bar+pvDecisionHeaderStrip(_assess)+tabbar+pvDD2Section(ddt,a,cand,refl,input)+'</div>';
 }
 /* ---- Landscape tab entry point: deep native surface (nimbus) or thin cards (acme/helios/datapipe) ---- */
 function landscapeThinHTML(){

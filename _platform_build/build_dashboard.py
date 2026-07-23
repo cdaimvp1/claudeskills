@@ -85,6 +85,9 @@ JS_FILES_IN_ORDER = [
     # constants + functions at load (no escD/pvRound calls until render time).
     os.path.join(ASSETS, 'pv', 'pv-07a-assess-model.js'),
     os.path.join(ASSETS, 'pv', 'pv-07-landscape-render.js'),
+    # pv-07b: Supplier Deep Dive v3 (6 visual subtabs on pvAssess). After pv-07 so
+    # pvDeepDiveTabHtml can route to pvDD2Section / PVDD2_TABS.
+    os.path.join(ASSETS, 'pv', 'pv-07b-deepdive.js'),
     # escD/escapeHtmlPV are called by pv-07 but defined in pv-14-docs-comms.js (not shipped
     # here). Extracted verbatim rather than stubbed -- see pv-extracted-helpers.js header.
     os.path.join(ASSETS, 'pv-extracted-helpers.js'),

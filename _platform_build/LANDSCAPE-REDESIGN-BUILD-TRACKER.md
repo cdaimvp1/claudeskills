@@ -12,9 +12,20 @@ build `build_dashboard.py`, checks `smoke.cjs` / `verify_deepdive.cjs`. Self-con
       Summary-level `ASSESS_AUTHORED.nimbus` grounded; others derive+gap. Wired into build_dashboard.py + smoke.cjs.
       Verified: verify_assess.cjs 15/15 + smoke no-regression. NOTE: richer per-tab authored data (ownership tree,
       locations, events, capability map, references, dependencies, diligence, actions) is authored per tab in P2.
-- [ ] **P2 Deep Dive** — 6 subtabs (Summary / Company&Ownership / Capabilities&Operations / Financial&Market /
-      Risk&Resilience / Lilly Fit&Diligence), each dominant-viz-first. Replace 2 header bands w/ compact decision
-      header. OPEN for review.
+- [~] **P2 Deep Dive** — IN PROGRESS. `assets/pv/pv-07b-deepdive.js`: 6-subtab dispatch (PVDD2_TABS + pvDD2Section),
+      wired into pvDeepDiveTabHtml (compact pvDecisionHeaderStrip replaces the 2 bands + visible composite; default
+      = summary). Verified smoke (6 tabs) + verify_dd2.cjs 28/28. **Summary tab DONE** (assessment bars, req
+      mini-heatmap, opp/concern, evidence coverage, gates). Other 5 tabs = FIRST PASS (real grounded content, but
+      dominant viz still "to follow"). **DO NOT OPEN until dominant viz built.** REMAINING per tab:
+      - Company&Ownership: ownership TREE diagram (currently text tree) + footprint (map/table).
+      - Capabilities&Operations: capability-to-requirement HEATMAP (evidence cells) + reference-relevance matrix +
+        delivery-readiness bar + dependency diagram.
+      - Financial&Market: peer-position SCATTER + commercial-driver matrix + financial-health bridge (trend guard).
+      - Risk&Resilience: impact x likelihood MATRIX + event TIMELINE (directness) + mitigation board.
+      - Lilly Fit&Diligence: lilly-fit matrix + diligence FUNNEL + owner-grouped action board + relationship timeline.
+      Author the grounded per-tab data (ASSESS_AUTHORED.nimbus: ownership, locations, capabilities cells, references,
+      dependencies, events, mitigations, diligence, actions) as each viz is built. THEN rebuild + verify + OPEN.
+      Old pvDDSection / pvVerdictHeaderHtml / pvCompPositionHtml now dead (remove in P7).
 - [ ] **P3 Risk Assessment** — rebuild (8-row taxonomy, semantic+confidence, gates override, event directness +
       timeline, mitigation board, coverage-not-scored for unassessed). OPEN.
 - [ ] **P4 Requirements Heatmap** — improve (1-decimal+semantic, evidence-confidence 2nd channel, leadership strip,
@@ -36,3 +47,5 @@ build `build_dashboard.py`, checks `smoke.cjs` / `verify_deepdive.cjs`. Self-con
   mislabel fixed. NEXT: P2 Deep Dive 6 subtabs on pvAssess -> replace pvDDSection branches + tab list + compact
   decision header (drop the 2 big bands + composite from the visible surface). Author per-tab grounded data as built.
 - Also (side task): bundled platform My Work page -> Desktop\Lilly Procurement Dashboards\My-Work.html (build_my_work.py).
+- 2026-07-23: P2 STRUCTURE + Summary done (pv-07b, 6-tab dispatch, compact decision header, 28/28 verify_dd2).
+  Other 5 tabs first-pass. NEXT: build the dominant visualization + authored data for each of the 5, then OPEN.

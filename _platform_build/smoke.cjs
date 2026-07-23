@@ -14,12 +14,13 @@ const pv01 = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-01-boot-helpers.js'), '
 const pv04 = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-04-domain-data.js'), 'utf8');
 const pv07a = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-07a-assess-model.js'), 'utf8');
 const pv07 = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-07-landscape-render.js'), 'utf8');
+const pv07b = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-07b-deepdive.js'), 'utf8');
 // escD/escapeHtmlPV are called by pv-07 but defined in pv-14-docs-comms.js (not shipped
 // here). Extracted verbatim rather than stubbed -- see pv-extracted-helpers.js header.
 const extra = fs.readFileSync(path.join(ASSETS, 'pv-extracted-helpers.js'), 'utf8');
 const data = fs.readFileSync(path.join(ASSETS, 'landscape-data.js'), 'utf8');
 
-const concatenatedJS = pv01 + '\n' + pv04 + '\n' + pv07a + '\n' + pv07 + '\n' + extra + '\n' + data;
+const concatenatedJS = pv01 + '\n' + pv04 + '\n' + pv07a + '\n' + pv07 + '\n' + pv07b + '\n' + extra + '\n' + data;
 
 const ctx = {};
 ctx.window = ctx;
@@ -82,7 +83,7 @@ for (const sub of SUBS) {
 // pvDDSection()'s per-tab branch (profile/solfin/strisk/lilly/reqs), including the
 // infoHover() calls in the lilly/reqs branches that previously threw. Same direct
 // landscapeHTML() call, no pvRerender/live DOM.
-const DDTS = ['profile', 'solfin', 'strisk', 'lilly', 'reqs'];
+const DDTS = ['summary', 'company', 'caps', 'finmkt', 'risk', 'lilly'];
 const ddHtml = {};
 
 for (const ddt of DDTS) {
@@ -139,7 +140,7 @@ for (const ddt of DDTS) {
   const ddVend = ctx.PVSL_DDV;
   const ddVendData = ddVend && findVendor(ddVend);
   const rev = ddVendData && ddVendData.financials && (ddVendData.financials.latestRevenue || ddVendData.financials.revenue);
-  const solfinHtml = ddHtml.solfin || '';
+  const solfinHtml = ddHtml.finmkt || '';
   if (!ddVend || !rev) {
     console.log('content/market-financials', 'FAIL', 'no auto-selected deep-dive vendor or no financials.latestRevenue on record (vend=' + ddVend + ')');
     anyFail = true;
