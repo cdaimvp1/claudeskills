@@ -6349,21 +6349,49 @@ function pvDD2EventTimeline(events) {
       }).join('') + '</div>';
 }
 
+function pvDD2RiskSeverity(rk){
+  var m = { High:3, Medium:2, Low:1 }, s = (m[rk.impact] || 1) + (m[rk.likelihood] || 1);
+  return s >= 6 ? { t:'Critical', c:'#A23A30', bg:'var(--ti-red,#FBE7E3)' } : s >= 5 ? { t:'High', c:'var(--emph,#C15E19)', bg:'var(--emph-t,#F6DDC9)' } : s >= 4 ? { t:'Moderate', c:'#8A5A00', bg:'var(--ti-amber,#FBF1DA)' } : { t:'Low', c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)' };
+}
+/* ranked material-risks register (replaces the thin narrative beside the matrix) */
+function pvDD2RiskRegister(risks){
+  if (!risks || !risks.length) return '<div style="font-size:12px;color:var(--mut2)">No plotted risks on file.</div>';
+  var m = { High:3, Medium:2, Low:1 };
+  var sorted = risks.slice().sort(function(a, b){ return ((m[b.impact] || 1) + (m[b.likelihood] || 1)) - ((m[a.impact] || 1) + (m[a.likelihood] || 1)); });
+  var th = function(h, al){ return '<th style="text-align:' + (al || 'left') + ';padding:0 10px 6px 0;font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + h + '</th>'; };
+  return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + th('Risk') + th('Type') + th('Severity') + th('Conf.', 'right') + '</tr></thead><tbody>'
+    + sorted.map(function(rk){
+        var sv = pvDD2RiskSeverity(rk);
+        return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + (rk.gate ? ' <span style="font:700 8px var(--mono,monospace);color:var(--emph,#C15E19);background:var(--emph-t,#F6DDC9);border-radius:20px;padding:1px 6px;vertical-align:middle">GATE</span>' : '') + '</td>'
+          + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top">' + pvAEsc(rk.type) + '</td>'
+          + '<td style="padding:8px 10px 8px 0;vertical-align:top"><span style="font:700 9.5px var(--mono,monospace);color:' + sv.c + ';background:' + sv.bg + ';border-radius:20px;padding:2px 9px">' + sv.t.toUpperCase() + '</span></td>'
+          + '<td style="padding:8px 0;vertical-align:top;text-align:right">' + pvDD2FinDots(rk.confidence) + '</td></tr>';
+      }).join('') + '</tbody></table></div>'
+    + pvDD2Foot('Ranked by impact &times; likelihood. GATE = a sourcing gate to clear before award. A critical single risk overrides the average.');
+}
+/* risk-side mitigation register (owner-grouped actions live on the Lilly Action Board) */
+function pvDD2MitigationBoard(risks){
+  if (!risks || !risks.length) return '';
+  var th = function(h, al){ return '<th style="text-align:' + (al || 'left') + ';padding:0 10px 6px 0;font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + h + '</th>'; };
+  return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + th('Risk') + th('Treatment') + th('Gate?', 'center') + th('Status') + '</tr></thead><tbody>'
+    + risks.map(function(rk){
+        var status = rk.gate ? 'Open' : 'Monitor', sc = rk.gate ? '#8A5A00' : 'var(--teal-d,#2F6E6B)';
+        return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + '</td>'
+          + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top;line-height:1.45">' + pvAEsc(rk.mitigation) + '</td>'
+          + '<td style="padding:8px 10px 8px 0;vertical-align:top;text-align:center">' + (rk.gate ? '<b style="color:var(--emph,#C15E19)">Yes</b>' : '&mdash;') + '</td>'
+          + '<td style="padding:8px 0;vertical-align:top;white-space:nowrap;color:' + sc + ';font-weight:700">' + status + '</td></tr>';
+      }).join('') + '</tbody></table></div>'
+    + pvDD2Foot('The risk-side workplan; owner-grouped actions live on the Lilly Action Board and share these underlying items.');
+}
 function pvDD2Risk(x, a, cand, input) {
   var riskDims = x.dimensions.filter(function(d){ return ['financial','resilience','integrity','quality','cyber','responsible'].indexOf(d.id) >= 0; });
-  // RR2 (Marc): narrative beside the impact x likelihood matrix.
-  var nBad = riskDims.filter(function(d){ return ['High','Critical','Moderate'].indexOf(pvR2ConcernToRisk(d.concern)) >= 0; }).length;
-  var riskNarr = '<div style="font-size:12.5px;line-height:1.55;color:var(--ink)"><b>' + pvAEsc(a.name) + '</b> carries <b>' + nBad + '</b> material risk dimension' + (nBad !== 1 ? 's' : '')
-    + (x.gates.length ? '; the sourcing gates are <b>' + pvAEsc(x.gates.map(function(g){ return g.label; }).join(', ')) + '</b>' : '')
-    + '. A hard flag disqualifies; a critical single risk overrides the average &mdash; no risk is averaged away.</div>';
-  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:stretch">'
-    +   pvDD2Card('Impact &times; Likelihood', pvDD2RiskMatrix(x.risks) + pvDD2Foot('Each risk placed by impact (rows) and likelihood (columns); a ring marks a sourcing gate.'), 'var(--emph)')
-    +   pvDD2Card('Risk Read', riskNarr, 'var(--plum)')
+  return '<div style="display:grid;grid-template-columns:minmax(300px,1fr) minmax(340px,1.15fr);gap:14px;align-items:start">'
+    +   pvDD2Card('Impact &times; Likelihood', pvDD2RiskMatrix(x.risks) + pvDD2Foot('Each risk placed by impact (rows) and likelihood (columns); a ring marks a sourcing gate.'), 'var(--emph)', 'Where each risk sits', '<path d="M4 20h16M4 20V4"/><rect x="7" y="8" width="4" height="4" rx="1"/><rect x="14" y="12" width="4" height="4" rx="1"/>')
+    +   pvDD2Card('Top Material Risks', pvDD2RiskRegister(x.risks), 'var(--plum)', 'Ranked · typed · confidence', '<path d="M4 6h16M4 12h16M4 18h10"/>')
     + '</div>'
-    // RR3 (Marc): accordion, one dimension open at a time.
-    + pvDD2Card('Risk Posture by Dimension', (typeof pvDD2RiskAccordion === 'function' ? pvDD2RiskAccordion(riskDims) : ''), 'var(--teal-d)')
-    // RR4 (Marc): typed / filterable material events. RR5: mitigation board dropped (the Lilly Action Board is the single action home).
-    + (x.events && x.events.length ? pvDD2Card('Material Events', (typeof pvDD2TypedEvents === 'function' ? pvDD2TypedEvents(x.events) : pvDD2EventTimeline(x.events)), 'var(--teal-d)') : '');
+    + pvDD2Card('Risk Posture by Dimension', (typeof pvDD2RiskAccordion === 'function' ? pvDD2RiskAccordion(riskDims) : ''), 'var(--teal-d)', 'Expand one at a time', '<path d="M6 9l6 6 6-6"/>')
+    + (x.events && x.events.length ? pvDD2Card('Material Events', (typeof pvDD2TypedEvents === 'function' ? pvDD2TypedEvents(x.events) : pvDD2EventTimeline(x.events)), 'var(--teal-d)', 'Typed · filterable', '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>') : '')
+    + pvDD2Card('Risk Mitigation', pvDD2MitigationBoard(x.risks), 'var(--emph)', 'Treatment · gate · status', '<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/>');
 }
 
 /* ------------------------------------------------ 5. LILLY FIT & DILIGENCE */
