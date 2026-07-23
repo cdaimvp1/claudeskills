@@ -248,7 +248,7 @@ function pvDD2PeerScatter(refl, input, selId) {
     + dots + '</svg></div>'
     + pvDD2Foot('Each supplier plotted by financial viability (x) and capability fit (y); the selected supplier is highlighted. Surfaces strong-capability / weak-financial vs. balanced candidates.');
 }
-function pvDD2VarColor(v){ return /high|significant|exposure/i.test(v) ? '#A23A30' : /moderate/i.test(v) ? '#8A5A00' : '#0F3A85'; }
+function pvDD2VarColor(v){ return /high|significant|exposure/i.test(v) ? 'var(--emph,#C15E19)' : /moderate/i.test(v) ? '#8A5A00' : 'var(--teal-d,#2F6E6B)'; }
 function pvDD2CommercialDrivers(drivers) {
   if (!drivers || !drivers.length) return '';
   var w = function(v){ return /high|significant/i.test(v) ? 92 : /exposure/i.test(v) ? 68 : /moderate/i.test(v) ? 52 : 28; };
@@ -257,36 +257,220 @@ function pvDD2CommercialDrivers(drivers) {
       return '<div style="display:grid;grid-template-columns:150px 1fr 160px;gap:12px;align-items:center" title="' + pvAEsc(d.note || '') + '"><span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(d.driver) + '</span><div style="height:8px;border-radius:30px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:' + w(d.variability) + '%;background:' + c + '"></i></div><span style="font-size:11px;color:' + c + ';font-weight:600">' + pvAEsc(d.variability) + '</span></div>';
     }).join('') + '</div>' + pvDD2Foot('Cost-driver variability, not a fabricated annual $ &mdash; precise TCO comes from RFx bids and internal usage assumptions.');
 }
-function pvDD2FinMkt(x, a, cand, input, refl) {
+/* ---- Financial & Market: D&B/Bloomberg-grade rebuild (Marc 2026-07-23) ----
+   Dominant Financial Health = full-size revenue trend + Bloomberg-style NUMERIC metric table (discrete
+   numbers from x.financial, not prose) + calculated ratios. Supporting: health bridge, enlarged peer
+   scatter + peer-comps table, commercial model. Collapsible comparative detail names what is NOT in the
+   snapshot. Licensed-feed items render as marked enrichment slots, gated by PVDD2_FIN_ENRICH so we can
+   show the page with and without them. Nothing fabricated: figures grounded, ratios labelled Calculated. */
+var PVDD2_FIN_ENRICH = true; // toggle (flip window.PVDD2_FIN_ENRICH then re-render) to compare with / without slots
+var PVIC_FINHEALTH = '<path d="M4 5v14h16"/><path d="M5 15l4-5 4 3 6-8"/>';
+var PVIC_BRIDGE    = '<rect x="4" y="10" width="3.4" height="9" rx="1"/><rect x="10.3" y="6" width="3.4" height="13" rx="1"/><rect x="16.6" y="13" width="3.4" height="6" rx="1"/>';
+var PVIC_SCATTER   = '<path d="M4 20h16M4 20V4"/><circle cx="8" cy="15" r="1.5"/><circle cx="13" cy="9" r="1.5"/><circle cx="18" cy="6" r="1.5"/>';
+var PVIC_COMM      = '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.6 9.8h4.2M9.6 14.2h4.2"/>';
+var PVIC_ENRICH    = '<path d="M12 3l2.3 4.7 5.2.8-3.8 3.7.9 5.2L12 15.9 7.2 17.4l.9-5.2L4.3 8.5l5.2-.8z"/>';
+function pvDD2FinDots(conf){
+  var n = /high/i.test(conf) ? 3 : /med|calc/i.test(conf) ? 2 : /low|unknown|insuff|not/i.test(conf) ? 1 : 0;
+  var s = '';
+  for (var i = 0; i < 3; i++) s += '<span style="width:5px;height:5px;border-radius:50%;display:inline-block;margin-left:2px;background:' + (i < n ? 'var(--teal-d,#2F6E6B)' : 'var(--line2,#d8d4ce)') + '"></span>';
+  return '<span style="white-space:nowrap" title="Evidence confidence: ' + pvAEsc(conf || 'Unknown') + '">' + s + '</span>';
+}
+/* full-size revenue trend: y-axis + gridlines + value labels + trend line; fills its column */
+function pvDD2RevTrend(series){
+  series = (series || []).filter(function(p){ return p && p.value != null && isFinite(p.value); });
+  if (series.length < 3) return '';
+  var W = 560, H = 236, padL = 50, padR = 16, padT = 22, padB = 32, plotW = W - padL - padR, plotH = H - padT - padB;
+  var max = Math.max.apply(null, series.map(function(p){ return p.value; }));
+  var niceMax = Math.max(max, Math.ceil(max / 1000) * 1000) || 1;
+  var sy = function(v){ return padT + plotH - (v / niceMax) * plotH; };
+  var n = series.length, band = plotW / n, bw = Math.min(52, band * 0.5);
+  var bfmt = function(v){ return '$' + (v / 1000).toFixed(v >= 1000 ? 1 : 2) + 'B'; };
+  var grid = '';
+  for (var g = 0; g <= 4; g++){
+    var yv = niceMax * g / 4, y = sy(yv);
+    grid += '<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (padL + plotW) + '" y2="' + y.toFixed(1) + '" stroke="var(--line)" stroke-width="1"' + (g ? ' stroke-dasharray="2 3"' : '') + '/>'
+      + '<text x="' + (padL - 8) + '" y="' + (y + 3).toFixed(1) + '" text-anchor="end" font-size="9.5" font-family="var(--mono,monospace)" fill="var(--mut2)">' + (g ? '$' + (yv / 1000).toFixed(1) + 'B' : '0') + '</text>';
+  }
+  var cols = '', pts = [];
+  series.forEach(function(p, i){
+    var x = padL + i * band + (band - bw) / 2, h = Math.max(2, (p.value / niceMax) * plotH), y = padT + plotH - h, isLast = i === n - 1;
+    pts.push((x + bw / 2).toFixed(1) + ',' + y.toFixed(1));
+    cols += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (isLast ? 'var(--teal-d,#2F6E6B)' : 'var(--teal-t,#DCEBE9)') + '"' + (isLast ? '' : ' stroke="var(--teal-d,#2F6E6B)" stroke-width="1.1"') + '><title>' + pvAEsc(p.period + ': ' + bfmt(p.value)) + '</title></rect>'
+      + '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 6).toFixed(1) + '" text-anchor="middle" font-size="10" font-family="var(--mono,monospace)" font-weight="700" fill="var(--ink)">' + bfmt(p.value) + '</text>'
+      + '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 11) + '" text-anchor="middle" font-size="10" font-family="var(--mono,monospace)" fill="var(--mut2)">' + pvAEsc(p.period) + '</text>';
+  });
+  var line = '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--teal-d,#2F6E6B)" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.5"/>';
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:600px;height:auto;display:block" role="img" aria-label="Revenue by fiscal year">' + grid + line + cols + '</svg>';
+}
+/* Bloomberg-style numeric metric table: discrete value + period + confidence */
+function pvDD2FinMetricTable(metrics){
+  if (!metrics || !metrics.length) return '';
+  var th = function(t, a){ return '<th style="text-align:' + a + ';padding:0 0 6px ' + (a === 'left' ? '0' : '10px') + ';font:700 8.5px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)">' + t + '</th>'; };
+  return '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + th('Metric', 'left') + th('Value', 'right') + th('Period', 'right') + '<th style="width:0"></th></tr></thead><tbody>'
+    + metrics.map(function(m){
+        var neg = /^\(|^-|loss|^\$\(/.test(String(m.value));
+        return '<tr style="border-top:1px solid var(--line)"><td style="padding:6px 0;color:var(--ink)">' + pvAEsc(m.label) + '</td>'
+          + '<td style="padding:6px 0 6px 10px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:' + (neg ? '#8A5A00' : 'var(--ink)') + '">' + pvAEsc(m.value) + '</td>'
+          + '<td style="padding:6px 0 6px 10px;text-align:right;color:var(--mut2);white-space:nowrap;font-size:11px">' + pvAEsc(m.period || '') + '</td>'
+          + '<td style="padding:6px 0 6px 8px;text-align:right">' + pvDD2FinDots(m.conf || 'High') + '</td></tr>';
+      }).join('') + '</tbody></table>';
+}
+/* calculated ratio chips (labelled Calculated, never a reported figure) */
+function pvDD2FinRatios(ratios){
+  if (!ratios || !ratios.length) return '';
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-top:16px">'
+    + ratios.map(function(r){
+        var neg = /^-|\(/.test(String(r.value));
+        return '<div style="background:var(--nested,#f1efec);border-radius:9px;padding:8px 11px">'
+          + '<div style="font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(r.label) + '</div>'
+          + '<div style="font-size:17px;font-weight:800;color:' + (neg ? '#8A5A00' : 'var(--teal-d,#2F6E6B)') + ';font-variant-numeric:tabular-nums;margin:2px 0 1px">' + pvAEsc(r.value) + '</div>'
+          + '<div style="font-size:10px;color:var(--mut);line-height:1.35">' + pvAEsc(r.basis || '') + '</div></div>';
+      }).join('') + '</div>'
+    + '<div style="font-size:10px;color:var(--mut2);margin-top:7px">Calculated from the figures above, not reported values.</div>';
+}
+function pvDD2FinBridge(fin){
+  fin = fin || {};
+  function sign(v){ v = String(v || ''); if (/declin|contract|net loss|down\b|negativ|deficit|not\s+(yet\s+)?profit/i.test(v)) return -1; if (/grow|increas|positive|profitab|strong|\+\s*\d/i.test(v)) return 1; return 0; }
+  var growth = fin.growth || '', profit = fin.profitability || '';
+  var cashM = /free cash flow[^;]*/i.exec(profit) || /free cash flow[^;]*/i.exec(fin.margin || '');
+  var dims = [
+    { k:'Growth', band: growth ? (sign(growth) > 0 ? 'good' : 'warn') : 'gap', assess: growth ? (sign(growth) > 0 ? 'Strong' : 'Watch') : 'Not reported', ev: growth || 'No growth figure on file.', conf: growth ? 'High' : 'Unknown' },
+    { k:'Profitability', band: profit ? (sign(profit) > 0 ? 'good' : 'warn') : 'gap', assess: profit ? (sign(profit) > 0 ? 'Positive' : 'Mixed') : 'Not reported', ev: profit || 'No profitability figure on file.', conf: profit ? 'High' : 'Unknown' },
+    { k:'Cash generation', band: cashM ? 'good' : 'gap', assess: cashM ? 'Strong' : 'Not in snapshot', ev: cashM ? cashM[0].replace(/^./, function(c){ return c.toUpperCase(); }) : 'Free-cash-flow figure not isolated in the public snapshot.', conf: cashM ? 'High' : 'Low' },
+    { k:'Leverage & obligations', band:'gap', assess:'Not in snapshot', ev:'Debt, leverage and balance-sheet detail are not in this public snapshot; precise figures come from filings or an RFx financial pack.', conf:'Low' }
+  ];
+  var col = { good:'var(--teal-d,#2F6E6B)', warn:'#8A5A00', gap:'var(--mut2,#6a655f)' };
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px">' + dims.map(function(d){
+      return '<div style="border-left:3px solid ' + col[d.band] + ';padding:1px 0 1px 11px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font:700 9.5px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(d.k) + '</span>' + pvDD2FinDots(d.conf) + '</div>'
+        + '<div style="font-size:13px;font-weight:800;color:' + col[d.band] + ';margin:3px 0 4px">' + pvAEsc(d.assess) + '</div>'
+        + '<div style="font-size:11px;color:var(--mut);line-height:1.45">' + pvAEsc(d.ev) + '</div></div>';
+    }).join('') + '</div>';
+}
+/* enlarged peer scatter: axes zoomed to the data range so the field spreads out; bigger palette dots;
+   selected supplier in emphasis colour; labels de-collided vertically */
+function pvDD2PeerScatterBig(refl, input, selId){
+  var asmts = (refl && refl.landscape && refl.landscape.assessments) || [];
+  if (asmts.length < 2 || typeof pvCandById !== 'function' || typeof pvAssess !== 'function') return '';
+  var pts = asmts.map(function(av){
+    var pv = pvAssess(av, pvCandById(av.id), input);
+    var finDim = pv.dimensions.find(function(d){ return d.id === 'financial'; }) || {};
+    var fav = (THEO_CONCERN[finDim.concern] || { fav: 0.5 }).fav;
+    return { name: (av.name || '').split(/[ ,]/)[0], x: fav, y: (pv.fit.score5 || 0) / 5, elig: !!av.eligible, sel: av.id === selId };
+  });
+  var xs = pts.map(function(p){ return p.x; }), ys = pts.map(function(p){ return p.y; });
+  var xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs), ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys);
+  var xpad = Math.max(0.1, (xmax - xmin) * 0.4), ypad = Math.max(0.1, (ymax - ymin) * 0.4);
+  var dxmin = Math.max(0, xmin - xpad), dxmax = Math.min(1, xmax + xpad), dymin = Math.max(0, ymin - ypad), dymax = Math.min(1, ymax + ypad);
+  if (dxmax - dxmin < 0.001) { dxmin = Math.max(0, dxmin - 0.1); dxmax = Math.min(1, dxmax + 0.1); }
+  if (dymax - dymin < 0.001) { dymin = Math.max(0, dymin - 0.1); dymax = Math.min(1, dymax + 0.1); }
+  var W = 560, H = 372, padL = 46, padR = 20, padT = 16, padB = 38, plotW = W - padL - padR, plotH = H - padT - padB;
+  var sx = function(v){ return padL + ((v - dxmin) / (dxmax - dxmin)) * plotW; };
+  var sy = function(v){ return padT + plotH - ((v - dymin) / (dymax - dymin)) * plotH; };
+  var grid = '';
+  for (var g = 1; g < 4; g++) grid += '<line x1="' + (padL + plotW * g / 4) + '" y1="' + padT + '" x2="' + (padL + plotW * g / 4) + '" y2="' + (padT + plotH) + '" stroke="var(--line)" stroke-dasharray="2 3"/><line x1="' + padL + '" y1="' + (padT + plotH * g / 4) + '" x2="' + (padL + plotW) + '" y2="' + (padT + plotH * g / 4) + '" stroke="var(--line)" stroke-dasharray="2 3"/>';
+  var placed = [];
+  var dots = pts.map(function(p){
+    var cx = sx(p.x), cy = sy(p.y), col = p.sel ? 'var(--emph,#C15E19)' : (p.elig ? 'var(--teal-d,#2F6E6B)' : 'var(--mut2,#6a655f)'), r = p.sel ? 8 : 6;
+    var ly = cy + 3;
+    placed.slice().sort(function(a, b){ return a - b; }).forEach(function(py){ if (Math.abs(ly - py) < 13) ly = py + 13; });
+    placed.push(ly);
+    return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r + '" fill="' + col + '" opacity="' + (p.elig ? 0.95 : 0.4) + '"/>'
+      + '<text x="' + (cx + r + 4).toFixed(1) + '" y="' + ly.toFixed(1) + '" font-size="11.5" font-family="var(--sans)" font-weight="' + (p.sel ? '700' : '400') + '" fill="' + (p.sel ? 'var(--emph,#C15E19)' : 'var(--mut,#4A443C)') + '">' + pvAEsc(p.name) + '</text>';
+  }).join('');
+  return '<div style="overflow-x:auto"><svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:600px;height:auto">' + grid
+    + '<line x1="' + padL + '" y1="' + (padT + plotH) + '" x2="' + (padL + plotW) + '" y2="' + (padT + plotH) + '" stroke="var(--line2)"/><line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + plotH) + '" stroke="var(--line2)"/>'
+    + '<text x="' + (padL + plotW / 2) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="10.5" font-family="var(--sans)" fill="var(--mut2)">Financial viability &rarr;</text>'
+    + '<text x="14" y="' + (padT + plotH / 2) + '" text-anchor="middle" font-size="10.5" font-family="var(--sans)" fill="var(--mut2)" transform="rotate(-90 14 ' + (padT + plotH / 2) + ')">Capability fit &rarr;</text>'
+    + dots + '</svg></div>' + pvDD2Foot('Axes zoomed to the candidate range so the field spreads; the selected supplier is highlighted. Upper-right = strong capability + low financial risk.');
+}
+/* peer comps table (fills the right column of Peer Position with real comparison) */
+function pvDD2PeerComps(refl, input, selId){
+  var asmts = (refl && refl.landscape && refl.landscape.assessments) || [];
+  if (!asmts.length || typeof pvCandById !== 'function' || typeof pvAssess !== 'function') return '';
+  var rows = asmts.map(function(av){
+    var pv = pvAssess(av, pvCandById(av.id), input);
+    var finDim = pv.dimensions.find(function(d){ return d.id === 'financial'; }) || {};
+    var mc = '';
+    ((pv.financial && pv.financial.metrics) || []).forEach(function(m){ if (/market cap/i.test(m.label)) mc = m.value; });
+    return { name: (av.name || '').split(/[ ,]/)[0], fit: pv.fit.label, fit5: pv.fit.score5 || 0, risk: finDim.concern || 'Unknown', mc: mc || '—', sel: av.id === selId };
+  }).sort(function(a, b){ return b.fit5 - a.fit5; });
+  var th = function(t, i){ return '<th style="text-align:' + (i ? 'right' : 'left') + ';padding:0 0 6px ' + (i ? '10px' : '0') + ';font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + t + '</th>'; };
+  return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr>' + ['Supplier', 'Capability fit', 'Financial risk', 'Market cap'].map(th).join('') + '</tr></thead><tbody>'
+    + rows.map(function(r){
+        return '<tr style="border-top:1px solid var(--line)' + (r.sel ? ';background:var(--emph-t,#F6DDC9)' : '') + '">'
+          + '<td style="padding:6px 0 6px ' + (r.sel ? '6px' : '0') + ';font-weight:' + (r.sel ? '800' : '600') + ';color:var(--ink)">' + pvAEsc(r.name) + '</td>'
+          + '<td style="padding:6px 0 6px 10px;text-align:right;color:var(--ink)">' + pvAEsc(r.fit) + '</td>'
+          + '<td style="padding:6px 0 6px 10px;text-align:right;color:var(--mut)">' + pvAEsc(r.risk) + '</td>'
+          + '<td style="padding:6px 0 6px 10px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)">' + pvAEsc(r.mc) + '</td></tr>';
+      }).join('') + '</tbody></table></div>'
+    + '<div style="font-size:10px;color:var(--mut2);margin-top:7px">Market cap shown where a public figure is on file; a dash means private / not listed.</div>';
+}
+function pvDD2PeerRead(refl, input, a, at, x){
+  var me = (a && a.name) || 'This supplier';
+  var finLabel = ((x && (x.dimensions.find(function(d){ return d.id === 'financial'; }) || {}).concern) || '').toLowerCase();
+  var bullets = [];
+  bullets.push('<b>' + pvAEsc(me) + '</b> sits in the strong-capability, ' + pvAEsc(finLabel || 'stable') + '-financial-risk group, upper-right of the field.');
+  if (at && at.gartner) bullets.push('<b>Analyst position &middot;</b> ' + pvAEsc(at.gartner));
+  return '<ul style="margin:0 0 2px;padding-left:16px;display:flex;flex-direction:column;gap:8px;font-size:12.5px;line-height:1.5;color:var(--ink)">'
+    + bullets.map(function(b){ return '<li>' + b + '</li>'; }).join('') + '</ul>';
+}
+function pvDD2FinStatement(fin, st){
+  fin = fin || {};
+  var hist = (st && st.revByYear && st.revByYear.length) ? st.revByYear.map(function(p){ return { period: p.period, value: '$' + (p.value / 1000).toFixed(2) + 'B' }; }) : (fin.revenueHistory || []);
+  var histTbl = hist.length ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:12px;margin-bottom:9px">'
+      + '<thead><tr><th style="text-align:left;padding:4px 14px 4px 0;font:700 10px var(--mono,monospace);color:var(--mut2)">Total revenue</th>' + hist.map(function(h){ return '<th style="text-align:right;padding:4px 0 4px 16px;font:700 10px var(--mono,monospace);color:var(--mut2)">' + pvAEsc(h.period) + '</th>'; }).join('') + '</tr></thead>'
+      + '<tbody><tr><td style="padding:4px 14px 4px 0;color:var(--mut2);font-size:11px">$M, by fiscal year</td>' + hist.map(function(h){ return '<td style="text-align:right;padding:4px 0 4px 16px;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600">' + pvAEsc(h.value) + '</td>'; }).join('') + '</tr></tbody></table></div>' : '';
+  var missing = '<b>Not in this public snapshot:</b> full balance sheet (assets, liabilities, equity), liquidity &amp; leverage ratios, trade-payment behaviour (PAYDEX / days-beyond-terms) and a model default probability. These come from filings, a commercial-credit provider, or an RFx financial pack.';
+  return '<details style="margin-top:12px;border-top:1px solid var(--line);padding-top:9px"><summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--teal-d,#2F6E6B)">Comparative financials &amp; data not in the snapshot</summary>'
+    + '<div style="padding:11px 0 2px">' + histTbl + '<div style="font-size:11px;color:var(--mut);line-height:1.5">' + missing + '</div></div></details>';
+}
+/* marked enrichment slots for licensed D&B/Bloomberg fields we do NOT hold (schema-ready, not faked) */
+function pvDD2FinEnrich(list){
+  if (!list || !list.length) return '';
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px">'
+    + list.map(function(e){
+        return '<div style="border:1px dashed var(--line2,#c9c4bc);border-radius:9px;padding:10px 12px;background:repeating-linear-gradient(135deg,transparent,transparent 7px,rgba(0,0,0,.02) 7px,rgba(0,0,0,.02) 14px)">'
+          + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px"><span style="font-size:12px;font-weight:700;color:var(--ink);line-height:1.3">' + pvAEsc(e.label) + '</span><span style="font:700 8px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--plum,#5C2B50);background:var(--plum-t,#EDDFE9);border-radius:20px;padding:2px 7px;white-space:nowrap;flex:none">' + pvAEsc(e.src) + '</span></div>'
+          + '<div style="font-size:11px;color:var(--mut);line-height:1.4">' + pvAEsc(e.note) + '</div>'
+          + '<div style="font-size:10px;color:var(--mut2);margin-top:6px;font-style:italic">Awaiting licensed feed</div></div>';
+      }).join('') + '</div>'
+    + pvDD2Foot('Standard D&amp;B / Bloomberg fields we do not license in this snapshot, shown as schema-ready slots so the profile is explicit about what is evidenced vs. what needs a paid source.');
+}
+function pvDD2FinMkt(x, a, cand, input, refl){
   var dd = cand.deepDive || {}, fin = cand.financials || dd.financials || {}, at = dd.attrs || {};
-  var finRow = function(k, v){ v = v == null ? '' : String(v); return v ? '<tr><td class="dt" style="white-space:nowrap;vertical-align:top">' + pvAEsc(k) + '</td><td class="dd">' + pvAEsc(v) + '</td></tr>' : ''; };
-  var summary = '<div style="overflow-x:auto"><table class="pvdl"><tbody>'
-    + finRow('Latest revenue', fin.latestRevenue || fin.revenue)
-    + finRow('Revenue growth', fin.growth)
-    + finRow('Product revenue / ARR', fin.arr)
-    + finRow('Net income / cash flow', fin.margin)
-    + finRow('Profitability', fin.profitability)
-    + finRow('Market capitalization', fin.valuationOrMarketCap || fin.cash)
-    + finRow('Forward guidance', fin.guidance)
-    + '</tbody></table></div>';
-  var revSvg = (typeof pvRevHistSvg === 'function' && fin.revenueHistory) ? pvRevHistSvg(fin.revenueHistory) : '';
-  var mkt = at.gartner ? '<div style="font-size:12.5px;line-height:1.55"><b style="color:var(--mut2)">Analyst position &middot;</b> ' + pvAEsc(at.gartner) + '</div>' : '<div style="font-size:12px;color:var(--mut2)">No analyst position on file.</div>';
-  var scatter = pvDD2PeerScatter(refl, input, a && a.id);
-  var quadrant = (typeof pvDD2Quadrant === 'function') ? pvDD2Quadrant(refl, input, a && a.id) : '';
-  var finConcern = (x.dimensions.find(function(d){ return d.id === 'financial'; }) || {}).concern || '';
-  // FM1 (Marc): narrative beside the peer plot; FM4: market position folded in here.
-  var finNarr = '<div style="font-size:12.5px;line-height:1.55;color:var(--ink)"><b>' + pvAEsc(a.name) + '</b> reads <b>' + pvAEsc(finConcern) + '</b> on financial viability with <b>' + pvAEsc(x.fit.label) + '</b> capability fit; the quadrant below places it against the field.</div>'
-    + (at.gartner ? '<div style="font-size:12px;color:var(--mut);margin-top:10px;line-height:1.5"><b style="color:var(--mut2)">Analyst position &middot;</b> ' + pvAEsc(at.gartner) + '</div>' : '');
-  // FM2 (Marc): financials as visuals (merges the revenue history); fallback to the table.
-  var finVizHtml = (typeof pvDD2FinViz === 'function') ? pvDD2FinViz(fin) : (summary + (revSvg ? '<div style="margin-top:10px">' + revSvg + '</div>' : ''));
+  var st = (x && x.financial) || null;
+  var enrich = (typeof PVDD2_FIN_ENRICH === 'undefined') ? true : PVDD2_FIN_ENRICH;
+  // revenue series: structured numbers preferred, else parse the prose revenueHistory
+  var series = (st && st.revByYear && st.revByYear.length) ? st.revByYear
+    : (fin.revenueHistory || []).map(function(h){ var m = /\$?\s*([\d.,]+)\s*([bBmM])/.exec(String(h.value)); var num = m ? parseFloat(m[1].replace(/,/g, '')) : null; if (num != null && /b/i.test(m[2])) num *= 1000; return { period: h.period, value: num }; }).filter(function(p){ return p.value != null; });
+  var trend = (series.length >= 3 && typeof pvDD2RevTrend === 'function') ? pvDD2RevTrend(series) : '';
+  var metricTbl = (st && st.metrics && st.metrics.length) ? pvDD2FinMetricTable(st.metrics) : pvDD2FinMetrics(fin);
+  var ratios = (st && st.ratios && st.ratios.length) ? pvDD2FinRatios(st.ratios) : '';
+  var leftCol = trend
+    ? '<div style="min-width:0">' + trend + pvDD2Foot('Total revenue by fiscal year; latest period solid. Trend drawn only where >=3 comparable periods exist.') + ratios + '</div>'
+    : (ratios || '');
+  var healthInner = (trend || ratios)
+    ? '<div style="display:grid;grid-template-columns:minmax(300px,1.15fr) minmax(250px,.85fr);gap:26px;align-items:start"><div style="min-width:0">' + leftCol + '</div><div style="min-width:0">' + metricTbl + '</div></div>'
+    : metricTbl;
+  var evLabel = (x && (x.dimensions.find(function(d){ return d.id === 'financial'; }) || {}).concern) || 'Unknown';
+  // peer position: enlarged scatter + comps table
+  var scatter = (typeof pvDD2PeerScatterBig === 'function') ? pvDD2PeerScatterBig(refl, input, a && a.id) : '';
+  var comps = (typeof pvDD2PeerComps === 'function') ? pvDD2PeerComps(refl, input, a && a.id) : '';
+  var peerRight = '<div style="min-width:0">' + pvDD2PeerRead(refl, input, a, at, x) + (comps ? '<div style="margin-top:16px">' + comps + '</div>' : '') + '</div>';
+  var peerBlock = scatter
+    ? '<div style="display:grid;grid-template-columns:minmax(320px,1fr) minmax(280px,1fr);gap:24px;align-items:start"><div style="min-width:0">' + scatter + '</div>' + peerRight + '</div>'
+    : peerRight;
+  var showEnrich = enrich && st && st.enrichment && st.enrichment.length;
   return pvDD2AssessStrip(x, 'financial')
-    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:stretch">'
-    +   (scatter ? pvDD2Card('Peer Position', scatter, 'var(--plum)') : '')
-    +   pvDD2Card('Market Read', finNarr, 'var(--teal-d)')
-    + '</div>'
-    + (quadrant ? pvDD2Card('Financial vs. Capability Quadrant', quadrant, 'var(--plum)') : '')
-    + pvDD2Card('Financials', finVizHtml + (fin.sources && fin.sources.length ? pvDD2Foot('<b>Sources.</b> ' + fin.sources.map(function(s){return pvAEsc(s);}).join(' &middot; ')) : ''), 'var(--teal-d)')
-    + (x.commercialDrivers ? pvDD2Card('Commercial Model', pvDD2CommercialDrivers(x.commercialDrivers), 'var(--emph)') : '');
+    + pvDD2Card('Financial Health',
+        healthInner + pvDD2FinStatement(fin, st)
+          + (fin.sources && fin.sources.length ? pvDD2Foot('<b>Sources.</b> ' + fin.sources.map(function(s){ return pvAEsc(s); }).join(' &middot; ')) : ''),
+        'var(--teal-d)', 'Viability reads ' + pvAEsc(evLabel), PVIC_FINHEALTH)
+    + pvDD2Card('Financial Health Bridge', pvDD2FinBridge(fin), 'var(--plum)', 'Growth · profitability · cash · leverage', PVIC_BRIDGE)
+    + (scatter ? pvDD2Card('Peer Position', peerBlock, 'var(--plum)', 'Financial viability &times; capability fit', PVIC_SCATTER) : '')
+    + (x.commercialDrivers ? pvDD2Card('Commercial Model', pvDD2CommercialDrivers(x.commercialDrivers), 'var(--emph)', 'Cost-driver exposure, not a TCO estimate', PVIC_COMM) : '')
+    + (showEnrich ? pvDD2Card('Credit &amp; Market Enrichment', pvDD2FinEnrich(st.enrichment), 'var(--plum)', 'D&amp;B / Bloomberg feed &middot; not licensed here', PVIC_ENRICH) : '');
 }
 
 /* ------------------------------------------------ 4. RISK & RESILIENCE */

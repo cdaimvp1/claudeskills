@@ -58,6 +58,41 @@ var ASSESS_AUTHORED = {
     evidenceConfidence: 'Medium',
     riskConfidence: 'Medium',
     openIssues: 5,
+    // Structured financial fields (discrete numbers, not prose) so the profile reads like a D&B/Bloomberg
+    // metric table. Every figure is grounded; ratios are CALCULATED from the figures and labelled as such.
+    financial: {
+      metrics: [
+        {label:'Total revenue',        value:'$4,684M',    period:'FY2026',        conf:'High'},
+        {label:'Revenue (latest qtr)', value:'$1,390M',    period:'Q1 FY2027',     conf:'High'},
+        {label:'Revenue growth',       value:'+29%',       period:'FY2026 YoY',    conf:'High'},
+        {label:'Revenue growth',       value:'+33%',       period:'Q1 FY27 YoY',   conf:'High'},
+        {label:'Product revenue',      value:'$4,470M',    period:'FY2026',        conf:'High'},
+        {label:'Net revenue retention',value:'125%',       period:'FY2026',        conf:'High'},
+        {label:'Non-GAAP net income',  value:'$466M',      period:'FY2026',        conf:'High'},
+        {label:'GAAP net income',      value:'$(1,329)M',  period:'FY2026',        conf:'High'},
+        {label:'Free cash flow',       value:'$1,120M',    period:'FY2026',        conf:'High'},
+        {label:'Market capitalization',value:'$93,200M',   period:'Jul 17 2026',   conf:'High'}
+      ],
+      revByYear: [
+        {period:'FY2022', value:1219}, {period:'FY2023', value:2066}, {period:'FY2024', value:2806},
+        {period:'FY2025', value:3626}, {period:'FY2026', value:4684}
+      ],
+      ratios: [
+        {label:'FCF margin',         value:'24%',   basis:'FCF / revenue, FY2026'},
+        {label:'Non-GAAP net margin',value:'10%',   basis:'Non-GAAP NI / revenue'},
+        {label:'GAAP net margin',    value:'-28%',  basis:'GAAP NI / revenue (mostly SBC)'},
+        {label:'Revenue CAGR',       value:'+40%',  basis:'FY2022 to FY2026'}
+      ],
+      enrichment: [
+        {label:'Viability / Failure score', src:'D&B',       note:'Predictive failure & business-continuity score for the entity.'},
+        {label:'PAYDEX (trade payment)',    src:'D&B',       note:'Payment performance vs. terms; days-beyond-terms.'},
+        {label:'1-yr probability of default',src:'Bloomberg', note:'Default risk from market signals + financial statements.'},
+        {label:'5-yr CDS / implied spread', src:'Bloomberg', note:'Market-implied credit risk; model vs. market.'},
+        {label:'Liquidity ratios',          src:'Filings',   note:'Current & quick ratios (need balance sheet).'},
+        {label:'Leverage ratios',           src:'Filings',   note:'Debt/equity, interest coverage (need balance sheet).'},
+        {label:'Sector percentile',         src:'Bloomberg', note:'Position vs. industry median / quartiles.'}
+      ]
+    },
     gates: [
       {kind:'escalate', label:'Consumption-cost exposure', why:'Consumption billing means peak concurrency and cost volatility must be modeled before any commitment.'},
       {kind:'escalate', label:'Data residency unconfirmed', why:'US / EU residency and support-location scope for regulated data are not yet confirmed.'},
@@ -221,6 +256,7 @@ function pvAssess(a, cand, input) {
     commercialDrivers: auth.commercialDrivers || null,
     diligence: auth.diligence || null,
     actions: auth.actions || null,
+    financial: auth.financial || null,
     _authored: !!auth.dimensions
   };
 }
