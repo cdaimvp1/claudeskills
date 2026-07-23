@@ -672,6 +672,22 @@ function pvDD2ActionBoard(actions) {
     }).join('');
   return '<div style="overflow-x:auto"><table class="pvdl"><thead><tr><th style="text-align:left;font-size:10px;color:var(--mut2)">Action</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Owner</th><th style="font-size:10px;color:var(--mut2)">Gate?</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Status</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
 }
+/* internal relationship: existing contracts / spend / owners / prior sourcing -> timeline,
+   gap-stated honestly when there is no Lilly history on file. */
+function pvDD2InternalRel(rel){
+  var slots = (rel && rel.slots) || [
+    { label:'Existing contracts', value:'None on file' }, { label:'Current annual spend', value:'None on file' },
+    { label:'Business owner(s)', value:'To assign' }, { label:'Prior sourcing events', value:'None on file' }, { label:'Supplier performance', value:'No history' }
+  ];
+  var summary = (rel && rel.summary) || 'No prior Lilly contractual or performance history found. Treat as a net-new supplier.';
+  var chips = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:13px">' + slots.map(function(s){
+      var none = /none|no history|to assign/i.test(s.value);
+      return '<div style="background:var(--nested,#f1efec);border-radius:9px;padding:9px 11px"><div style="font:700 9px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(s.label) + '</div><div style="font-size:12.5px;font-weight:600;color:' + (none ? 'var(--mut2)' : 'var(--ink)') + ';margin-top:3px">' + pvAEsc(s.value) + '</div></div>';
+    }).join('') + '</div>';
+  var tl = (rel && rel.timeline && rel.timeline.length) ? '<div style="margin-top:15px;border-top:1px solid var(--line);padding-top:12px"><div style="font:700 9px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);margin-bottom:8px">Relationship timeline</div>' + rel.timeline.map(function(t){ return '<div style="display:flex;gap:12px;font-size:12px;padding:3px 0"><span style="font-family:var(--mono,monospace);color:var(--mut2);white-space:nowrap;min-width:74px">' + pvAEsc(t.date) + '</span><span style="color:var(--ink)">' + pvAEsc(t.event) + '</span></div>'; }).join('') + '</div>' : '';
+  return '<div style="font-size:12.5px;line-height:1.55;color:var(--ink)">' + pvAEsc(summary) + '</div>' + chips + tl
+    + pvDD2Foot('Populated from internal contract, spend and performance systems when a relationship exists; gap-stated here because none is on file.');
+}
 function pvDD2Lilly(x, a, cand, input) {
   var dd = cand.deepDive || {}, lf = dd.lillyFit || {};
   var fitRows = pvDD2KV([
@@ -691,10 +707,11 @@ function pvDD2Lilly(x, a, cand, input) {
   }
   return pvDD2AssessStrip(x, 'capability')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
-    +   pvDD2Card('Lilly-Specific Fit', fitRows || '<div style="font-size:12px;color:var(--mut2)">No Lilly-fit read on file.</div>', 'var(--plum)')
-    +   (funnel ? pvDD2Card('Diligence Funnel', funnel, 'var(--teal-d)') : pvDD2Card('Required Diligence', oqFallback + pvDD2Foot('The companion outreach skill turns these into supplier requests; responses (M365) flow back to re-enrich.'), 'var(--teal-d)'))
+    +   pvDD2Card('Lilly-Specific Fit', fitRows || '<div style="font-size:12px;color:var(--mut2)">No Lilly-fit read on file.</div>', 'var(--plum)', 'Fit · confidence', '<path d="M12 21s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 11c0 5.5-7 10-7 10z"/>')
+    +   (funnel ? pvDD2Card('Diligence Funnel', funnel, 'var(--teal-d)', 'Progress to advancement', '<path d="M3 5h18l-7 8v6l-4-2v-4z"/>') : pvDD2Card('Required Diligence', oqFallback + pvDD2Foot('The companion outreach skill turns these into supplier requests; responses (M365) flow back to re-enrich.'), 'var(--teal-d)'))
     + '</div>'
-    + (board ? pvDD2Card('Action Board', board + pvDD2Foot('Diligence turned into a workplan; gated actions must clear before advancement.'), 'var(--emph)') : '');
+    + pvDD2Card('Internal Relationship', pvDD2InternalRel(x.internalRelationship), 'var(--teal-d)', 'Contracts · spend · history', '<path d="M8 7V3M16 7V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/>')
+    + (board ? pvDD2Card('Action Board', board + pvDD2Foot('Diligence turned into a workplan; gated actions must clear before advancement.'), 'var(--emph)', 'Owner · gate · status', '<path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>') : '');
 }
 
 /* ------------------------------------------------ dispatch */

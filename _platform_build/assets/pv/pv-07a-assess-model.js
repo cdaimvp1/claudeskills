@@ -178,6 +178,20 @@ var ASSESS_AUTHORED = {
         ]
       }
     },
+    internalRelationship: {
+      status:'none',
+      summary:'No prior Lilly contractual or performance history found for Snowflake. Treat as a net-new supplier; there is no incumbency to weigh or existing spend to consolidate.',
+      slots:[
+        {label:'Existing contracts',   value:'None on file'},
+        {label:'Current annual spend',  value:'None on file'},
+        {label:'Business owner(s)',     value:'To assign'},
+        {label:'Prior sourcing events', value:'None on file'},
+        {label:'Supplier performance',  value:'No history'}
+      ],
+      timeline:[
+        {date:'Jul 2026', event:'Entered this analytics-workload-platform sourcing evaluation'}
+      ]
+    },
     capabilities: {
       cols: ['Core', 'Integration', 'Security', 'Scale', 'Governance'],
       rows: [
@@ -283,6 +297,7 @@ function pvAssess(a, cand, input) {
     actions: auth.actions || null,
     deliveryReadiness: auth.deliveryReadiness || null,
     dependencies: auth.dependencies || null,
+    internalRelationship: auth.internalRelationship || null,
     financial: auth.financial || null,
     _authored: !!auth.dimensions
   };
