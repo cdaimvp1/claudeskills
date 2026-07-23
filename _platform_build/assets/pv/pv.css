@@ -1756,7 +1756,7 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 #pvhm-table tfoot tr.avgrow td{background:var(--tint-e4e4df,#E4E4DF);border-top:2px solid #CECCC7;box-shadow:0 3px 8px rgba(90,66,20,.17);position:relative;z-index:1}
 #pvhm-table tfoot tr.avgrow td.cat b{font-family:var(--sans);font-size:13px;color:#1A1A1A;font-weight:700}
 .pvsl .hmramp{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:var(--sans);font-size:12.5px;font-weight:600;color:#3E3933}
-.pvsl .hmramp .ramp{width:120px;height:12px;border-radius:3px;background:linear-gradient(90deg,#E8EEF4,#1C4A75)}
+.pvsl .hmramp .ramp{width:120px;height:12px;border-radius:3px;background:linear-gradient(90deg,#EDDFE9,#5C2B50)}
 .pvsl .hmramp .rsc{margin-left:8px;color:var(--mut2);font-weight:500}
 .pvsl .insightrow{border:1px solid var(--line2);border-left:3px solid var(--line2);border-radius:9px;padding:11px 13px;background:var(--bg)}
 .pvsl .insightrow.leader{border-left-color:var(--navy)}

@@ -695,7 +695,7 @@ function pvDynamicsHtml(refl){
    // to the very BOTTOM of the tab. The "Key tradeoff" advisory and the "Validation before the decision" chips
    // are removed.
    var sect=function(label,inner){return '<div style="margin-top:20px;border-top:1px solid var(--line);padding-top:15px"><div style="font:700 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut2);margin-bottom:12px">'+label+'</div>'+inner+'</div>';};
-   var spineHd='<div class="cdyn-cmphd"><span class="t">Category on the spine, each vendor extends outward</span><span class="lg"><span style="color:'+accentA+';font-weight:700">&#9668; '+escD(fn(A.name))+'</span> &nbsp; <span style="color:'+accentB+';font-weight:700">'+escD(fn(B.name))+' &#9658;</span></span></div>';
+   var spineHd='<div class="cdyn-cmphd" style="justify-content:flex-end"><span class="lg"><span style="color:'+accentA+';font-weight:700">&#9668; '+escD(fn(A.name))+'</span> &nbsp; <span style="color:'+accentB+';font-weight:700">'+escD(fn(B.name))+' &#9658;</span></span></div>';
    var spineRow=function(o){
      var bar=function(w,c,on){return on&&w>0?'<div style="height:11px;border-radius:3px;width:'+w+'%;background:'+c+'"></div>':'';};
      return '<div style="display:grid;grid-template-columns:104px 1fr 168px 1fr 104px;align-items:center;border-bottom:1px solid var(--line);background:linear-gradient(90deg,'+accentA+'10,transparent 32%,transparent 68%,'+accentB+'10)">'
@@ -721,7 +721,13 @@ function pvDynamicsHtml(refl){
    (xB.commercialDrivers||[]).forEach(function(d){cdB[d.driver]=d;if(cOrder.indexOf(d.driver)<0)cOrder.push(d.driver);});
    var commRows=cOrder.map(function(name){var a=cdA[name],b=cdB[name];var va=a?a.variability:'',vb=b?b.variability:'';var ca=a?pvDD2VarColor(va):'var(--mut2)',cb=b?pvDD2VarColor(vb):'var(--mut2)';return spineRow({lLab:a?escD(va):'Not on file',lc:ca,lw:a?cwidth(va):0,lbar:ca,lon:!!a,mid:escD(name),sub:'',rw:b?cwidth(vb):0,rbar:cb,ron:!!b,rLab:b?escD(vb):'Not on file',rc:cb});}).join('');
    var commSect=cOrder.length?sect('Commercial model',spineHd+'<div class="cdyn-dvg">'+commRows+'</div>'):'';
-   var evSect=sect('Evidence confidence','<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px"><div><div style="font-size:12px;font-weight:700;color:'+accentA+';margin-bottom:8px">'+escD(A.name)+'</div>'+pvEvidCoverageBar(xA.evidenceCoverage)+'</div><div><div style="font-size:12px;font-weight:700;color:'+accentB+';margin-bottom:8px">'+escD(B.name)+'</div>'+pvEvidCoverageBar(xB.evidenceCoverage)+'</div></div>');
+   // Evidence confidence, same center-spine so the eye follows the pattern: each evidence category on the
+   // middle axis, each vendor's share extends outward, coloured by category (Verified teal / Partial burnt-
+   // orange / Supplier input plum / Missing grey).
+   var evCats=[['Verified','verified','var(--teal-d,#2F6E6B)'],['Partial','partial','#B4560F'],['Supplier input','supplier','var(--plum,#5C2B50)'],['Missing','missing','var(--line2,#CECCC7)']];
+   var eca=xA.evidenceCoverage||{},ecb=xB.evidenceCoverage||{};
+   var evRows=evCats.map(function(c){var va=Math.round(eca[c[1]]||0),vb=Math.round(ecb[c[1]]||0);return spineRow({lLab:va+'%',lc:c[2],lw:va,lbar:c[2],lon:va>0,mid:c[0],sub:'',rw:vb,rbar:c[2],ron:vb>0,rLab:vb+'%',rc:c[2]});}).join('');
+   var evSect=sect('Evidence confidence',spineHd+'<div class="cdyn-dvg">'+evRows+'</div>');
    body=raceLine+picker+h2hBand+h2hSub+cards+cmpHd+dvg+riskSect+commSect+evSect;
  }
  return '<div class="sa-card">'+

@@ -2343,7 +2343,7 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 #pvhm-table tfoot tr.avgrow td{background:var(--tint-e4e4df,#E4E4DF);border-top:2px solid #CECCC7;box-shadow:0 3px 8px rgba(90,66,20,.17);position:relative;z-index:1}
 #pvhm-table tfoot tr.avgrow td.cat b{font-family:var(--sans);font-size:13px;color:#1A1A1A;font-weight:700}
 .pvsl .hmramp{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:var(--sans);font-size:12.5px;font-weight:600;color:#3E3933}
-.pvsl .hmramp .ramp{width:120px;height:12px;border-radius:3px;background:linear-gradient(90deg,#E8EEF4,#1C4A75)}
+.pvsl .hmramp .ramp{width:120px;height:12px;border-radius:3px;background:linear-gradient(90deg,#EDDFE9,#5C2B50)}
 .pvsl .hmramp .rsc{margin-left:8px;color:var(--mut2);font-weight:500}
 .pvsl .insightrow{border:1px solid var(--line2);border-left:3px solid var(--line2);border-radius:9px;padding:11px 13px;background:var(--bg)}
 .pvsl .insightrow.leader{border-left-color:var(--navy)}
@@ -4380,7 +4380,7 @@ function pvDynamicsHtml(refl){
    // to the very BOTTOM of the tab. The "Key tradeoff" advisory and the "Validation before the decision" chips
    // are removed.
    var sect=function(label,inner){return '<div style="margin-top:20px;border-top:1px solid var(--line);padding-top:15px"><div style="font:700 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut2);margin-bottom:12px">'+label+'</div>'+inner+'</div>';};
-   var spineHd='<div class="cdyn-cmphd"><span class="t">Category on the spine, each vendor extends outward</span><span class="lg"><span style="color:'+accentA+';font-weight:700">&#9668; '+escD(fn(A.name))+'</span> &nbsp; <span style="color:'+accentB+';font-weight:700">'+escD(fn(B.name))+' &#9658;</span></span></div>';
+   var spineHd='<div class="cdyn-cmphd" style="justify-content:flex-end"><span class="lg"><span style="color:'+accentA+';font-weight:700">&#9668; '+escD(fn(A.name))+'</span> &nbsp; <span style="color:'+accentB+';font-weight:700">'+escD(fn(B.name))+' &#9658;</span></span></div>';
    var spineRow=function(o){
      var bar=function(w,c,on){return on&&w>0?'<div style="height:11px;border-radius:3px;width:'+w+'%;background:'+c+'"></div>':'';};
      return '<div style="display:grid;grid-template-columns:104px 1fr 168px 1fr 104px;align-items:center;border-bottom:1px solid var(--line);background:linear-gradient(90deg,'+accentA+'10,transparent 32%,transparent 68%,'+accentB+'10)">'
@@ -4406,7 +4406,13 @@ function pvDynamicsHtml(refl){
    (xB.commercialDrivers||[]).forEach(function(d){cdB[d.driver]=d;if(cOrder.indexOf(d.driver)<0)cOrder.push(d.driver);});
    var commRows=cOrder.map(function(name){var a=cdA[name],b=cdB[name];var va=a?a.variability:'',vb=b?b.variability:'';var ca=a?pvDD2VarColor(va):'var(--mut2)',cb=b?pvDD2VarColor(vb):'var(--mut2)';return spineRow({lLab:a?escD(va):'Not on file',lc:ca,lw:a?cwidth(va):0,lbar:ca,lon:!!a,mid:escD(name),sub:'',rw:b?cwidth(vb):0,rbar:cb,ron:!!b,rLab:b?escD(vb):'Not on file',rc:cb});}).join('');
    var commSect=cOrder.length?sect('Commercial model',spineHd+'<div class="cdyn-dvg">'+commRows+'</div>'):'';
-   var evSect=sect('Evidence confidence','<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px"><div><div style="font-size:12px;font-weight:700;color:'+accentA+';margin-bottom:8px">'+escD(A.name)+'</div>'+pvEvidCoverageBar(xA.evidenceCoverage)+'</div><div><div style="font-size:12px;font-weight:700;color:'+accentB+';margin-bottom:8px">'+escD(B.name)+'</div>'+pvEvidCoverageBar(xB.evidenceCoverage)+'</div></div>');
+   // Evidence confidence, same center-spine so the eye follows the pattern: each evidence category on the
+   // middle axis, each vendor's share extends outward, coloured by category (Verified teal / Partial burnt-
+   // orange / Supplier input plum / Missing grey).
+   var evCats=[['Verified','verified','var(--teal-d,#2F6E6B)'],['Partial','partial','#B4560F'],['Supplier input','supplier','var(--plum,#5C2B50)'],['Missing','missing','var(--line2,#CECCC7)']];
+   var eca=xA.evidenceCoverage||{},ecb=xB.evidenceCoverage||{};
+   var evRows=evCats.map(function(c){var va=Math.round(eca[c[1]]||0),vb=Math.round(ecb[c[1]]||0);return spineRow({lLab:va+'%',lc:c[2],lw:va,lbar:c[2],lon:va>0,mid:c[0],sub:'',rw:vb,rbar:c[2],ron:vb>0,rLab:vb+'%',rc:c[2]});}).join('');
+   var evSect=sect('Evidence confidence',spineHd+'<div class="cdyn-dvg">'+evRows+'</div>');
    body=raceLine+picker+h2hBand+h2hSub+cards+cmpHd+dvg+riskSect+commSect+evSect;
  }
  return '<div class="sa-card">'+
@@ -6574,14 +6580,18 @@ var PVR2_RISK_DIMS = [
   ['quality', 'Quality & regulatory'], ['responsible', 'Responsible sourcing']
 ];
 function pvR2ConcernToRisk(c){ return c === 'Insufficient evidence' ? 'Unknown' : c === 'Strong' ? 'Low' : c; }
-// RA1 (Marc): old-heatmap look, a fully-COLOURED cell (like the legacy .rcell) showing the semantic level +
-// confidence dots (no raw score). Severity ramp teal(low) -> red(critical).
+// RA1 (Marc): fully-COLOURED cell showing the semantic level + confidence dots (no raw score). Severity ramp
+// teal(low) -> burnt-orange(moderate/high) -> red(critical). Marc: richer fills so Low/Moderate/Unknown read
+// clearly; the same map drives the legend swatches. [bg, text]
+var PVR2_LVLCOL = {
+  'Low':      ['#93C4BD', '#17403C'],
+  'Moderate': ['#E7AE79', '#6E3708'],
+  'High':     ['#D98A55', '#532706'],
+  'Critical': ['#CB6E62', '#431009'],
+  'Unknown':  ['#CBC6BD', '#514C45']
+};
 function pvR2Cell(level, confidence) {
-  var s = level === 'Unknown' ? ['var(--nested,#f1efec)', 'var(--mut2,#6a655f)']
-    : level === 'Low' ? ['var(--teal-t,#DCEBE9)', 'var(--teal-d,#2F6E6B)']
-    : level === 'Moderate' ? ['#F7E3D3', '#B4560F']
-    : level === 'High' ? ['#EFC6A4', '#8A3D0A']
-    : ['#E7A79F', '#6A1A12'];
+  var s = PVR2_LVLCOL[level] || PVR2_LVLCOL['Critical'];
   var n = confidence === 'High' ? 3 : confidence === 'Medium' ? 2 : 1, dots = '';
   for (var i = 0; i < 3; i++) dots += '<i style="width:3px;height:3px;border-radius:50%;background:' + (i < n ? s[1] : 'rgba(0,0,0,.18)') + '"></i>';
   return '<div title="' + pvAEsc(level + ' · confidence ' + (confidence || 'n/a')) + '" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:' + s[0] + ';border:1px solid rgba(0,0,0,.06);border-radius:5px;padding:6px 5px"><span style="font:700 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.02em;color:' + s[1] + '">' + pvAEsc(level) + '</span>' + (confidence ? '<span style="display:inline-flex;gap:2px">' + dots + '</span>' : '') + '</div>';
@@ -6630,7 +6640,7 @@ function pvRiskHtml2(refl) {
     }).join('');
   var overall = '<tr><td style="font-size:11px;font-weight:700;color:var(--mut2);padding:8px 8px 3px 0;text-transform:uppercase;letter-spacing:.03em">Overall</td>' + rows.map(function(r){ var m = THEO_RISKBAND[r.x.risk.level] || THEO_RISKBAND['Unknown']; return '<td style="padding:3px;text-align:center"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;color:' + m.c + '">' + pvAEsc(r.x.risk.level) + '</span></td>'; }).join('') + '</tr>';
   var heatmap = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>' + heads + '</tr></thead><tbody>' + body + overall + '</tbody></table></div>'
-    + '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11px;color:var(--mut)">' + ['Low','Moderate','High','Critical','Unknown'].map(function(l){ var m = THEO_RISKBAND[l]; return '<span style="display:flex;align-items:center;gap:6px"><i style="width:11px;height:9px;border-radius:2px;background:' + m.bg + ';border:1px solid ' + m.c + '"></i>' + l + '</span>'; }).join('') + '<span style="color:var(--mut2)">· dots = confidence · gates override the average, no risk is averaged away</span></div>';
+    + '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11px;color:var(--mut)">' + ['Low','Moderate','High','Critical','Unknown'].map(function(l){ var m = PVR2_LVLCOL[l]; return '<span style="display:flex;align-items:center;gap:6px"><i style="width:11px;height:9px;border-radius:2px;background:' + m[0] + ';border:1px solid ' + m[1] + '"></i>' + l + '</span>'; }).join('') + '<span style="color:var(--mut2)">· dots = confidence · gates override the average, no risk is averaged away</span></div>';
 
   // ---- coverage callout for unassessed dims ----
   var unassessedNote = '';

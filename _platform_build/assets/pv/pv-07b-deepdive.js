@@ -783,14 +783,18 @@ var PVR2_RISK_DIMS = [
   ['quality', 'Quality & regulatory'], ['responsible', 'Responsible sourcing']
 ];
 function pvR2ConcernToRisk(c){ return c === 'Insufficient evidence' ? 'Unknown' : c === 'Strong' ? 'Low' : c; }
-// RA1 (Marc): old-heatmap look, a fully-COLOURED cell (like the legacy .rcell) showing the semantic level +
-// confidence dots (no raw score). Severity ramp teal(low) -> red(critical).
+// RA1 (Marc): fully-COLOURED cell showing the semantic level + confidence dots (no raw score). Severity ramp
+// teal(low) -> burnt-orange(moderate/high) -> red(critical). Marc: richer fills so Low/Moderate/Unknown read
+// clearly; the same map drives the legend swatches. [bg, text]
+var PVR2_LVLCOL = {
+  'Low':      ['#93C4BD', '#17403C'],
+  'Moderate': ['#E7AE79', '#6E3708'],
+  'High':     ['#D98A55', '#532706'],
+  'Critical': ['#CB6E62', '#431009'],
+  'Unknown':  ['#CBC6BD', '#514C45']
+};
 function pvR2Cell(level, confidence) {
-  var s = level === 'Unknown' ? ['var(--nested,#f1efec)', 'var(--mut2,#6a655f)']
-    : level === 'Low' ? ['var(--teal-t,#DCEBE9)', 'var(--teal-d,#2F6E6B)']
-    : level === 'Moderate' ? ['#F7E3D3', '#B4560F']
-    : level === 'High' ? ['#EFC6A4', '#8A3D0A']
-    : ['#E7A79F', '#6A1A12'];
+  var s = PVR2_LVLCOL[level] || PVR2_LVLCOL['Critical'];
   var n = confidence === 'High' ? 3 : confidence === 'Medium' ? 2 : 1, dots = '';
   for (var i = 0; i < 3; i++) dots += '<i style="width:3px;height:3px;border-radius:50%;background:' + (i < n ? s[1] : 'rgba(0,0,0,.18)') + '"></i>';
   return '<div title="' + pvAEsc(level + ' · confidence ' + (confidence || 'n/a')) + '" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:' + s[0] + ';border:1px solid rgba(0,0,0,.06);border-radius:5px;padding:6px 5px"><span style="font:700 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.02em;color:' + s[1] + '">' + pvAEsc(level) + '</span>' + (confidence ? '<span style="display:inline-flex;gap:2px">' + dots + '</span>' : '') + '</div>';
@@ -839,7 +843,7 @@ function pvRiskHtml2(refl) {
     }).join('');
   var overall = '<tr><td style="font-size:11px;font-weight:700;color:var(--mut2);padding:8px 8px 3px 0;text-transform:uppercase;letter-spacing:.03em">Overall</td>' + rows.map(function(r){ var m = THEO_RISKBAND[r.x.risk.level] || THEO_RISKBAND['Unknown']; return '<td style="padding:3px;text-align:center"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;color:' + m.c + '">' + pvAEsc(r.x.risk.level) + '</span></td>'; }).join('') + '</tr>';
   var heatmap = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>' + heads + '</tr></thead><tbody>' + body + overall + '</tbody></table></div>'
-    + '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11px;color:var(--mut)">' + ['Low','Moderate','High','Critical','Unknown'].map(function(l){ var m = THEO_RISKBAND[l]; return '<span style="display:flex;align-items:center;gap:6px"><i style="width:11px;height:9px;border-radius:2px;background:' + m.bg + ';border:1px solid ' + m.c + '"></i>' + l + '</span>'; }).join('') + '<span style="color:var(--mut2)">· dots = confidence · gates override the average, no risk is averaged away</span></div>';
+    + '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11px;color:var(--mut)">' + ['Low','Moderate','High','Critical','Unknown'].map(function(l){ var m = PVR2_LVLCOL[l]; return '<span style="display:flex;align-items:center;gap:6px"><i style="width:11px;height:9px;border-radius:2px;background:' + m[0] + ';border:1px solid ' + m[1] + '"></i>' + l + '</span>'; }).join('') + '<span style="color:var(--mut2)">· dots = confidence · gates override the average, no risk is averaged away</span></div>';
 
   // ---- coverage callout for unassessed dims ----
   var unassessedNote = '';
