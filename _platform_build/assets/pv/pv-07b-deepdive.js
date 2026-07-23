@@ -146,11 +146,13 @@ function pvDD2Company(x, a, cand, input) {
   ]);
   return pvDD2AssessStrip(x, 'identity')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
-    +   pvDD2Card('Ownership &amp; control', pvDD2OwnershipTree(x.ownership, a, cand) + pvDD2Foot('Lilly contracts an <b>entity</b>, evaluates an <b>offering</b>, and depends on specific <b>services</b> &mdash; three different things.'), 'var(--navy,#0F3A85)')
-    +   pvDD2Card('Identity verification', pvDD2StatusMatrix(markerRows), 'var(--teal-d,#2F6E6B)')
+    +   pvDD2Card('Identity Verification', pvDD2StatusMatrix(markerRows), 'var(--teal-d)')
+    +   pvDD2Card('Ownership &amp; Control', pvDD2OwnershipTree(x.ownership, a, cand) + pvDD2Foot('Lilly contracts an <b>entity</b>, evaluates an <b>offering</b>, and depends on specific <b>services</b> &mdash; three different things.'), 'var(--plum)')
     + '</div>'
-    + pvDD2Card('Operating footprint', pvDD2Footprint(x.locations), 'var(--ai,#5C2B50)')
-    + pvDD2Card('Firmographics', scale, 'var(--mut2,#6a655f)');
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
+    +   pvDD2Card('Firmographics', scale, 'var(--plum)')
+    +   pvDD2Card('Operating Footprint', pvDD2Footprint(x.locations), 'var(--teal-d)')
+    + '</div>';
 }
 
 /* --------------------------------------------- 2. CAPABILITIES & OPERATIONS */
@@ -320,8 +322,7 @@ function pvDD2Risk(x, a, cand, input) {
         + '<td class="dd" style="vertical-align:top">' + pvAEsc(rk.mitigation) + '</td>'
         + '<td class="dd" style="vertical-align:top;white-space:nowrap">' + (rk.gate ? '<b style="color:#8A5A00">Gate</b>' : 'Monitor') + '</td></tr>';
     }).join('');
-  return pvDD2Card('Risk &amp; resilience', '<div style="font-size:12.5px;color:var(--mut);line-height:1.55">What could prevent successful performance, and how Lilly should respond. A hard flag disqualifies; a critical single risk overrides the average &mdash; no risk is averaged away.</div>', 'var(--riskred,#A23A30)')
-    + pvDD2Card('Impact &times; likelihood', pvDD2RiskMatrix(x.risks) + pvDD2Foot('Each risk placed by impact (rows) and likelihood (columns); a ring marks a sourcing gate. Hover a chip for its type and mitigation.'), '#A23A30')
+  return pvDD2Card('Impact &times; Likelihood', pvDD2RiskMatrix(x.risks) + pvDD2Foot('Each risk placed by impact (rows) and likelihood (columns); a ring marks a sourcing gate. Hover a chip for its type and mitigation.'), '#A23A30')
     + pvDD2Card('Risk posture by dimension', cells, 'var(--navy,#0F3A85)')
     + (x.events && x.events.length ? pvDD2Card('Material events', pvDD2EventTimeline(x.events), 'var(--teal-d,#2F6E6B)') : '')
     + (mitig ? pvDD2Card('Mitigation board', '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + mitig + '</tbody></table></div>', 'var(--amber-d,#8A5A00)') : '');
@@ -361,9 +362,11 @@ function pvDD2Lilly(x, a, cand, input) {
       : '<div style="font-size:12px;color:var(--mut2)">No open items derived; standard pre-award confirmations still apply.</div>';
   }
   return pvDD2AssessStrip(x, 'capability')
-    + pvDD2Card('Lilly-specific fit', fitRows || '<div style="font-size:12px;color:var(--mut2)">No Lilly-fit read on file.</div>', 'var(--ai,#5C2B50)')
-    + (funnel ? pvDD2Card('Diligence funnel', funnel, 'var(--navy,#0F3A85)') : pvDD2Card('Required diligence before advancement', oqFallback + pvDD2Foot('The companion outreach skill turns these into supplier requests; responses (M365) flow back to re-enrich.'), 'var(--navy,#0F3A85)'))
-    + (board ? pvDD2Card('Action board', board + pvDD2Foot('Diligence turned into a workplan; gated actions must clear before advancement.'), 'var(--amber-d,#8A5A00)') : '');
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
+    +   pvDD2Card('Lilly-Specific Fit', fitRows || '<div style="font-size:12px;color:var(--mut2)">No Lilly-fit read on file.</div>', 'var(--plum)')
+    +   (funnel ? pvDD2Card('Diligence Funnel', funnel, 'var(--teal-d)') : pvDD2Card('Required Diligence', oqFallback + pvDD2Foot('The companion outreach skill turns these into supplier requests; responses (M365) flow back to re-enrich.'), 'var(--teal-d)'))
+    + '</div>'
+    + (board ? pvDD2Card('Action Board', board + pvDD2Foot('Diligence turned into a workplan; gated actions must clear before advancement.'), 'var(--emph)') : '');
 }
 
 /* ------------------------------------------------ dispatch */
