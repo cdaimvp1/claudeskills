@@ -41,8 +41,13 @@ build `build_dashboard.py`, checks `smoke.cjs` / `verify_deepdive.cjs`. Self-con
       rendered evidence. Content check: non-authored suppliers derive events via pvDeriveEvents (Redshift AWS outage).
 - [ ] **P4 Requirements Heatmap** — improve (1-decimal+semantic, evidence-confidence 2nd channel, leadership strip,
       decision-leverage, evidence panel, filters, rename "coverage"). OPEN.
-- [ ] **P5 Head-to-Head** — new tab (selectors, compare strip, delta bars, req-diff heatmap, risk-diff, evidence
-      compare, cost-driver compare, conclusion+chips). OPEN.
+- [x] **P5 Head-to-Head** — DONE 2026-07-23. New pvH2HHtml (pv-07b) + PVH2H_A/B state + pvH2HPick. Two selectors,
+      comparison summary strip (fit/risk/met/partial/must-gaps/evidence + tie-vs-meaningful), category delta bars
+      (both scores + advantage), risk-difference (semantic cells), evidence-confidence compare (coverage bars),
+      commercial-model compare, conclusion + chips. Wired: new 'h2h' subtab + dispatch + subtab order = Overview /
+      Requirements Heatmap / Head-to-Head / Risk Assessment / Supplier Deep Dive (exec relabeled 'Overview').
+      Verified render + tab order + smoke green. NOTE: Overview still has the OLD embedded H2H (pvDynamicsHtml) —
+      remove it in P6 so this tab is the only H2H home.
 - [ ] **P6 Overview** — 3 changes (fix score/count consistency, tighten dup narrative, move H2H out + teaser). OPEN.
 - [ ] **P7** — cleanup dead code, re-integrity, final verify, refresh Desktop folder.
 

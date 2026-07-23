@@ -4723,8 +4723,9 @@ function pvDeepDiveHtml(id,refl,input){
 
 /* ======================= Pass A: 4-subtab Landscape shell ======================= */
 function pvSubtabsHtml(){
- var tabs=[['exec','Executive Summary'],['deep','Supplier Deep Dive'],['heatmap','Requirements Heatmap'],['risk','Risk Assessment']];
- if(['exec','deep','heatmap','risk'].indexOf(PVSL_SUB)<0)PVSL_SUB='exec';
+ // v3 order (Marc): Overview -> Requirements Heatmap -> Head-to-Head -> Risk Assessment -> Supplier Deep Dive.
+ var tabs=[['exec','Overview'],['heatmap','Requirements Heatmap'],['h2h','Head-to-Head'],['risk','Risk Assessment'],['deep','Supplier Deep Dive']];
+ if(['exec','deep','heatmap','risk','h2h'].indexOf(PVSL_SUB)<0)PVSL_SUB='exec';
  return '<div class="pvsubtabs">'+tabs.map(function(t){return '<button class="pvsubtab'+(PVSL_SUB===t[0]?' on':'')+'" onclick="pvSetSub(\''+t[0]+'\')">'+escD(t[1])+'</button>';}).join('')+'</div>';
 }
 /* one-line rationale for a slate member (Exec Summary recommendation) */
@@ -5655,6 +5656,7 @@ function landscapeHTML(){
  var panel;
  if(PVSL_SUB==='deep')panel=pvDeepDiveTabHtml(refl,input);
  else if(PVSL_SUB==='heatmap')panel=pvHeatmapHtml(refl);         // Pass B: collapsible categories -> sub-reqs, band legend, leaders narrative, filter, click-vendor rationale
+ else if(PVSL_SUB==='h2h')panel=pvH2HHtml(refl);                 // v3 (pv-07b): compare any two eligible suppliers on the pvAssess spine
  else if(PVSL_SUB==='risk')panel=pvRiskHtml2(refl);              // v3 (pv-07b): pvAssess spine — portfolio summary + semantic heatmap (level+confidence) + coverage callout + selected-supplier material risks/disposition/event-timeline/mitigation. Old pvRiskHtml now dead.
  else panel=pvExecSummaryHtml(refl,input);
  var body=pvSubtabsHtml()+panel;
@@ -6097,6 +6099,84 @@ function pvRiskHtml2(refl) {
     + pvDD2Card('Selected supplier &middot; ' + selName, selHead
         + (mitig ? '<div style="overflow-x:auto"><table class="pvdl"><thead><tr><th style="text-align:left;font-size:10px;color:var(--mut2)">Risk</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Type</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Response</th><th style="font-size:10px;color:var(--mut2)">Gate</th></tr></thead><tbody>' + mitig + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No material risks above threshold for this supplier.</div>')
         + (timeline ? '<div style="margin-top:14px"><div style="font:700 10px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:8px">Material events</div>' + timeline + '</div>' : ''), 'var(--navy,#0F3A85)');
+}
+
+/* =============================================================================
+   TOP-LEVEL HEAD-TO-HEAD (v3) — pvH2HHtml. Compare any two eligible suppliers on the
+   shared spine: summary strip (with tie-vs-meaningful), category delta bars, risk
+   difference, evidence-confidence compare, commercial-model compare, conclusion.
+   ============================================================================= */
+var PVH2H_A = null, PVH2H_B = null;
+function pvH2HPick(which, id) { if (which === 'a') PVH2H_A = id; else PVH2H_B = id; if (typeof pvRerender === 'function') pvRerender(); }
+function pvH2HCounts(x) {
+  var g = x.reqGroups || [];
+  return {
+    met: g.filter(function(r){ return r.fitLabel === 'Strong' || r.fitLabel === 'Meets'; }).length,
+    partial: g.filter(function(r){ return r.fitLabel === 'Partial'; }).length,
+    gap: g.filter(function(r){ return r.fitLabel === 'Gap'; }).length,
+    mustGap: g.filter(function(r){ return r.must && r.fitLabel === 'Gap'; }).length
+  };
+}
+function pvH2HBarCell(v, color) {
+  if (v == null) return '<div style="font-size:11px;color:var(--mut2)">Unknown</div>';
+  return '<div style="display:flex;align-items:center;gap:7px"><div style="flex:1;height:7px;border-radius:30px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:' + (v / 5 * 100) + '%;background:' + color + '"></i></div><span style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:' + color + '">' + v.toFixed(1) + '</span></div>';
+}
+function pvH2HHtml(refl) {
+  var input = (typeof PVSL_INPUT !== 'undefined' && PVSL_INPUT) || {};
+  var L = (refl && refl.landscape) || {};
+  var elig = (L.assessments || []).filter(function(a){ return a.eligible; }).sort(function(p, q){ return (p.rank || 99) - (q.rank || 99); });
+  if (elig.length < 2 || typeof pvCandById !== 'function') return '<div class="sa-card"><div class="scc-b">Need at least two eligible suppliers to compare.</div></div>';
+  var ids = elig.map(function(a){ return a.id; });
+  var aId = (PVH2H_A && ids.indexOf(PVH2H_A) >= 0) ? PVH2H_A : ids[0];
+  var bId = (PVH2H_B && ids.indexOf(PVH2H_B) >= 0 && PVH2H_B !== aId) ? PVH2H_B : (ids[1] === aId ? ids[0] : ids[1]);
+  PVH2H_A = aId; PVH2H_B = bId;
+  var mk = function(id){ var av = elig.find(function(a){ return a.id === id; }); return {av: av, x: pvAssess(av, pvCandById(id), input)}; };
+  var A = mk(aId), B = mk(bId);
+  var nm = function(av){ return (av.name || '').split(/[ ,]/)[0]; };
+
+  var sel = function(which, cur){ return '<select onchange="pvH2HPick(\'' + which + '\',this.value)" style="font:600 13px var(--sans);padding:6px 10px;border:1px solid var(--line2,#CECCC7);border-radius:8px;background:var(--surface,#fff);color:var(--ink)">' + elig.map(function(a){ return '<option value="' + pvAEsc(a.id) + '"' + (a.id === cur ? ' selected' : '') + '>' + pvAEsc(a.name) + (a.rank ? ' · #' + a.rank : '') + '</option>'; }).join('') + '</select>'; };
+  var pickers = '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="font-size:12px;color:var(--mut2)">Compare</span>' + sel('a', aId) + '<span style="font-weight:700;color:var(--mut2)">vs</span>' + sel('b', bId) + '</div>';
+
+  var ca = pvH2HCounts(A.x), cb = pvH2HCounts(B.x);
+  var fa = A.x.fit.score5, fb = B.x.fit.score5;
+  var adv = (fa == null || fb == null) ? 'Insufficient data' : Math.abs(fa - fb) < 0.15 ? 'Effectively a tie on fit' : (fa > fb ? nm(A.av) : nm(B.av)) + ' leads fit by ' + Math.abs(fa - fb).toFixed(1);
+  var strip = '<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;align-items:center">'
+    + '<div></div><div style="font-size:13px;font-weight:800;color:#0F3A85;text-align:center">' + pvAEsc(A.av.name) + '</div><div style="font-size:13px;font-weight:800;color:#2F6E6B;text-align:center">' + pvAEsc(B.av.name) + '</div>'
+    + [['Requirements fit', (fa != null ? fa + '/5 · ' + A.x.fit.label : '—'), (fb != null ? fb + '/5 · ' + B.x.fit.label : '—')],
+       ['Risk posture', A.x.risk.level, B.x.risk.level],
+       ['Requirements met', ca.met, cb.met],
+       ['Partial', ca.partial, cb.partial],
+       ['Must-have gaps', ca.mustGap, cb.mustGap],
+       ['Evidence confidence', A.x.evidenceConfidence, B.x.evidenceConfidence]
+      ].map(function(r){ return '<div style="font-size:12px;color:var(--mut2);padding:6px 0;border-top:1px solid var(--line)">' + r[0] + '</div><div style="font-size:12.5px;font-weight:600;color:var(--ink);text-align:center;padding:6px 0;border-top:1px solid var(--line)">' + pvAEsc(String(r[1])) + '</div><div style="font-size:12.5px;font-weight:600;color:var(--ink);text-align:center;padding:6px 0;border-top:1px solid var(--line)">' + pvAEsc(String(r[2])) + '</div>'; }).join('')
+    + '</div><div style="margin-top:10px;padding:8px 12px;background:var(--nested,#f1efec);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--ink);text-align:center">' + pvAEsc(adv) + '</div>';
+
+  var deltas = (A.x.reqGroups || []).map(function(ga, i){
+    var gb = (B.x.reqGroups || [])[i] || {}, va = ga.fit, vb = gb.fit;
+    var a2 = (va == null || vb == null) ? '—' : Math.abs(va - vb) < 0.15 ? 'Tie' : (va > vb ? nm(A.av) : nm(B.av)) + ' +' + Math.abs(va - vb).toFixed(1);
+    return '<div style="display:grid;grid-template-columns:150px 1fr 1fr 120px;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(ga.label) + (ga.must ? ' <span style="font:700 8px var(--mono,monospace);color:#A23A30">MUST</span>' : '') + '</span>' + pvH2HBarCell(va, '#0F3A85') + pvH2HBarCell(vb, '#2F6E6B') + '<span style="font-size:11px;font-weight:600;color:var(--mut)">' + pvAEsc(a2) + '</span></div>';
+  }).join('');
+
+  var riskDiff = PVR2_RISK_DIMS.map(function(rd){
+    var da = A.x.dimensions.find(function(d){ return d.id === rd[0]; }) || {}, db = B.x.dimensions.find(function(d){ return d.id === rd[0]; }) || {};
+    return '<tr><td style="font-size:12px;font-weight:600;color:var(--ink);padding:6px 8px 6px 0">' + pvAEsc(rd[1]) + '</td><td style="padding:4px;text-align:center">' + pvSemanticRiskCell(pvR2ConcernToRisk(da.concern), da.confidence) + '</td><td style="padding:4px;text-align:center">' + pvSemanticRiskCell(pvR2ConcernToRisk(db.concern), db.confidence) + '</td></tr>';
+  }).join('');
+
+  var cov = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div><div style="font-size:12px;font-weight:700;color:#0F3A85;margin-bottom:8px">' + pvAEsc(A.av.name) + '</div>' + pvEvidCoverageBar(A.x.evidenceCoverage) + '</div><div><div style="font-size:12px;font-weight:700;color:#2F6E6B;margin-bottom:8px">' + pvAEsc(B.av.name) + '</div>' + pvEvidCoverageBar(B.x.evidenceCoverage) + '</div></div>';
+
+  var commA = A.x.commercialDrivers, commB = B.x.commercialDrivers;
+  var commCard = (commA || commB) ? pvDD2Card('Commercial model', '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div><div style="font-size:12px;font-weight:700;color:#0F3A85;margin-bottom:8px">' + pvAEsc(A.av.name) + '</div>' + (commA ? pvDD2CommercialDrivers(commA) : '<div style="font-size:12px;color:var(--mut2)">Not on file.</div>') + '</div><div><div style="font-size:12px;font-weight:700;color:#2F6E6B;margin-bottom:8px">' + pvAEsc(B.av.name) + '</div>' + (commB ? pvDD2CommercialDrivers(commB) : '<div style="font-size:12px;color:var(--mut2)">Not on file.</div>') + '</div></div>', 'var(--ai,#5C2B50)') : '';
+
+  var chips = (A.x.concerns || []).slice(0, 2).concat((B.x.concerns || []).slice(0, 1)).map(function(c){ return '<span style="display:inline-block;font-size:11.5px;color:var(--mut);background:var(--nested,#f1efec);border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:0 6px 6px 0">' + pvAEsc(c) + '</span>'; }).join('');
+  var conclusion = '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(nm(A.av)) + ' and ' + pvAEsc(nm(B.av)) + ' are separated mostly by the categories above; ' + pvAEsc(adv.toLowerCase()) + '. The decision most likely turns on the open validation items below.</div><div style="margin-top:12px">' + chips + '</div>';
+
+  return pvDD2Card('Head-to-Head', pickers, 'var(--navy,#0F3A85)')
+    + pvDD2Card('Comparison summary', strip, 'var(--ai,#5C2B50)')
+    + pvDD2Card('Category delta', deltas || '<div style="font-size:12px;color:var(--mut2)">No requirement groups to compare.</div>', 'var(--teal-d,#2F6E6B)')
+    + pvDD2Card('Risk difference', '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="font-size:11px;color:#0F3A85;padding-bottom:6px">' + pvAEsc(nm(A.av)) + '</th><th style="font-size:11px;color:#2F6E6B;padding-bottom:6px">' + pvAEsc(nm(B.av)) + '</th></tr></thead><tbody>' + riskDiff + '</tbody></table></div>', 'var(--amber-d,#8A5A00)')
+    + pvDD2Card('Evidence confidence', cov, 'var(--mut2,#6a655f)')
+    + commCard
+    + pvDD2Card('Conclusion', conclusion, 'var(--navy,#0F3A85)');
 }
 
 function pvDD2Section(ddt, a, cand, refl, input) {

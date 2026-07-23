@@ -1121,8 +1121,9 @@ function pvDeepDiveHtml(id,refl,input){
 
 /* ======================= Pass A: 4-subtab Landscape shell ======================= */
 function pvSubtabsHtml(){
- var tabs=[['exec','Executive Summary'],['deep','Supplier Deep Dive'],['heatmap','Requirements Heatmap'],['risk','Risk Assessment']];
- if(['exec','deep','heatmap','risk'].indexOf(PVSL_SUB)<0)PVSL_SUB='exec';
+ // v3 order (Marc): Overview -> Requirements Heatmap -> Head-to-Head -> Risk Assessment -> Supplier Deep Dive.
+ var tabs=[['exec','Overview'],['heatmap','Requirements Heatmap'],['h2h','Head-to-Head'],['risk','Risk Assessment'],['deep','Supplier Deep Dive']];
+ if(['exec','deep','heatmap','risk','h2h'].indexOf(PVSL_SUB)<0)PVSL_SUB='exec';
  return '<div class="pvsubtabs">'+tabs.map(function(t){return '<button class="pvsubtab'+(PVSL_SUB===t[0]?' on':'')+'" onclick="pvSetSub(\''+t[0]+'\')">'+escD(t[1])+'</button>';}).join('')+'</div>';
 }
 /* one-line rationale for a slate member (Exec Summary recommendation) */
@@ -2053,6 +2054,7 @@ function landscapeHTML(){
  var panel;
  if(PVSL_SUB==='deep')panel=pvDeepDiveTabHtml(refl,input);
  else if(PVSL_SUB==='heatmap')panel=pvHeatmapHtml(refl);         // Pass B: collapsible categories -> sub-reqs, band legend, leaders narrative, filter, click-vendor rationale
+ else if(PVSL_SUB==='h2h')panel=pvH2HHtml(refl);                 // v3 (pv-07b): compare any two eligible suppliers on the pvAssess spine
  else if(PVSL_SUB==='risk')panel=pvRiskHtml2(refl);              // v3 (pv-07b): pvAssess spine — portfolio summary + semantic heatmap (level+confidence) + coverage callout + selected-supplier material risks/disposition/event-timeline/mitigation. Old pvRiskHtml now dead.
  else panel=pvExecSummaryHtml(refl,input);
  var body=pvSubtabsHtml()+panel;
