@@ -80,6 +80,10 @@ JS_FILES_IN_ORDER = [
     # whole (small, 3.5KB) real file is inlined rather than hand-stubbing RFX's shape.
     # Loaded here, before pv-07, matching the real project-view.html script order.
     os.path.join(ASSETS, 'pv', 'pv-04-domain-data.js'),
+    # pv-07a: shared assessment spine (pvAssess + evidence/disposition/scoring
+    # primitives). Loaded before pv-07 so the renderers can call it; defines only
+    # constants + functions at load (no escD/pvRound calls until render time).
+    os.path.join(ASSETS, 'pv', 'pv-07a-assess-model.js'),
     os.path.join(ASSETS, 'pv', 'pv-07-landscape-render.js'),
     # escD/escapeHtmlPV are called by pv-07 but defined in pv-14-docs-comms.js (not shipped
     # here). Extracted verbatim rather than stubbed -- see pv-extracted-helpers.js header.

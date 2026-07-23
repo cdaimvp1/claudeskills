@@ -12,13 +12,14 @@ const pv01 = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-01-boot-helpers.js'), '
 // pv-07 reads the RFX global, declared in pv-04-domain-data.js (gracefully degrades to
 // empty defaults without Theo -- our exact sandbox case). Inlined whole, verbatim.
 const pv04 = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-04-domain-data.js'), 'utf8');
+const pv07a = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-07a-assess-model.js'), 'utf8');
 const pv07 = fs.readFileSync(path.join(ASSETS, 'pv', 'pv-07-landscape-render.js'), 'utf8');
 // escD/escapeHtmlPV are called by pv-07 but defined in pv-14-docs-comms.js (not shipped
 // here). Extracted verbatim rather than stubbed -- see pv-extracted-helpers.js header.
 const extra = fs.readFileSync(path.join(ASSETS, 'pv-extracted-helpers.js'), 'utf8');
 const data = fs.readFileSync(path.join(ASSETS, 'landscape-data.js'), 'utf8');
 
-const concatenatedJS = pv01 + '\n' + pv04 + '\n' + pv07 + '\n' + extra + '\n' + data;
+const concatenatedJS = pv01 + '\n' + pv04 + '\n' + pv07a + '\n' + pv07 + '\n' + extra + '\n' + data;
 
 const ctx = {};
 ctx.window = ctx;
