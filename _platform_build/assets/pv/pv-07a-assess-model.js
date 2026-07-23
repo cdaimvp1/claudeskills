@@ -133,11 +133,19 @@ var ASSESS_AUTHORED = {
       {date:'~May 2026',     title:'~$6B multi-year AWS partnership announced', directness:'Affects the service', resolution:'Positive signal.', detail:'Deepens multi-cloud footing and marketplace reach.'}
     ],
     ownership: {
-      tree: [
-        {label:'Global ultimate', value:'Snowflake Inc.', note:'Independent — no parent company', tag:'public'},
-        {label:'Contracting entity', value:'Snowflake Inc. (NYSE: SNOW)', note:'The entity Lilly would contract with', tag:'entity'},
-        {label:'Product / service entities', value:'Data Cloud · Snowpark · Cortex AI · Marketplace', note:'Delivered on AWS, Azure and GCP', tag:'offering'}
-      ],
+      treeRoot: {
+        label:'Global ultimate', value:'Snowflake Inc.', note:'Independent — no parent company', tag:'public',
+        children:[{
+          label:'Contracting entity', value:'Snowflake Inc. (NYSE: SNOW)', note:'The entity Lilly would contract with', tag:'entity',
+          children:[
+            {label:'Product entity',           value:'Data Cloud',            tag:'offering'},
+            {label:'Product entity',           value:'Snowpark',              tag:'offering'},
+            {label:'Product entity',           value:'Cortex AI',             tag:'offering'},
+            {label:'Marketplace',              value:'Snowflake Marketplace', tag:'offering'},
+            {label:'Infrastructure dependency',value:'AWS · Azure · GCP', note:'Delivered on hyperscalers', tag:'infra'}
+          ]
+        }]
+      },
       markers: [
         ['Public / private', 'Verified', 'Public (NYSE: SNOW)'],
         ['Ultimate parent', 'Verified', 'None — independent'],
@@ -148,9 +156,9 @@ var ASSESS_AUTHORED = {
       ]
     },
     locations: [
-      {name:'Bozeman, Montana, US', type:'Registered HQ', region:'US', conf:'Verified'},
-      {name:'Bay Area, California, US', type:'Largest operational hub', region:'US', conf:'Verified'},
-      {name:'AWS / Azure / GCP regions', type:'Service delivery', region:'US · EU · APAC', conf:'Verified'},
+      {name:'Bozeman, Montana, US', type:'Registered HQ', region:'US', conf:'Verified', coords:[-111.0, 45.7]},
+      {name:'Bay Area, California, US', type:'Largest operational hub', region:'US', conf:'Verified', coords:[-122.3, 37.6]},
+      {name:'AWS / Azure / GCP regions', type:'Service delivery', region:'US · EU · APAC', conf:'Verified', pts:[{label:'US', lon:-98, lat:39}, {label:'EU', lon:10, lat:50}, {label:'APAC', lon:110, lat:15}]},
       {name:'Support locations', type:'Support', region:'To confirm for regulated data', conf:'Missing'}
     ],
     capabilities: {
