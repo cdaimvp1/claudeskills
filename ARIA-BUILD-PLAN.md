@@ -462,3 +462,9 @@ NARROWED Phase-0 spike (only these two remain unproven, not the general question
 2. Native artifact / show_widget / chart rendering by name (dashboards today are produced by aria_compose_dashboard, an aria_* tool; rendering our self-contained HTML via a native artifact is unproven).
 
 Net: the plan's foundational native+ARIA-orchestration dependence is largely validated by shipped example; the residual spike is small and targeted.
+
+
+---
+
+## Risk #1 UPDATE 2 (Marc, 2026-07-22): essentially RESOLVED
+The user is STILL working in Claude Desktop when ARIA is activated - ARIA does not remove or sandbox Claude's native tools. So native web_fetch (the external-research funnel) and native artifact/widget rendering are INHERENTLY AVAILABLE in the session, whether or not a shipped recipe has yet exercised them. The two residual items were 'not yet demonstrated in the recipe corpus', NOT 'not possible'. Net: risk #1 is resolved; the Phase-0 spike becomes a quick pattern/ergonomics confirmation, not a feasibility gate.
