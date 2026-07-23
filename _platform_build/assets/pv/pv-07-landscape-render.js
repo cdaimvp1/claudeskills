@@ -1121,10 +1121,9 @@ function pvDeepDiveHtml(id,refl,input){
 
 /* ======================= Pass A: 4-subtab Landscape shell ======================= */
 function pvSubtabsHtml(){
- // ORIGINAL tab order RESTORED (Marc, 2026-07-23): I reordered these without being told to; reverted to the
- // original sequence + labels. Head-to-Head is ADDED as its own tab (Marc: "was originally a separate tab and
- // could be again"), appended for now — its final position is Marc's call.
- var tabs=[['exec','Executive Summary'],['deep','Supplier Deep Dive'],['heatmap','Requirements Heatmap'],['risk','Risk Assessment'],['h2h','Head-to-Head']];
+ // Tab order (Marc, 2026-07-23): Head-to-Head placed right after Supplier Deep Dive per Marc's explicit
+ // direction; 'Overview' label applied from the analysis (treat-analyses-as-directives). Marc adjusts as needed.
+ var tabs=[['exec','Overview'],['deep','Supplier Deep Dive'],['h2h','Head-to-Head'],['heatmap','Requirements Heatmap'],['risk','Risk Assessment']];
  if(['exec','deep','heatmap','risk','h2h'].indexOf(PVSL_SUB)<0)PVSL_SUB='exec';
  return '<div class="pvsubtabs">'+tabs.map(function(t){return '<button class="pvsubtab'+(PVSL_SUB===t[0]?' on':'')+'" onclick="pvSetSub(\''+t[0]+'\')">'+escD(t[1])+'</button>';}).join('')+'</div>';
 }
