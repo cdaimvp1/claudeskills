@@ -445,3 +445,20 @@ The one load-bearing unknown is whether a recipe's narrative body can drive Clau
 - **Q5 MVP seed skills:** clarified = the 1-2 skills we build FIRST to prove the plugin->recipe->deterministic-exec + native-tools + real-deliverable path end to end before scaling to all ~24. Recommendation: invoice-rate-card-auditor + should-cost-builder (most self-contained math), or pro-forma-builder for a tangible XLSX demo. [pick deferred to build start]
 - **Q6 Recipe-dispatch Phase-0 spike:** APPROVED.
 - **Q7 Trust tier / readOnly:** readOnly is INHERENT - there is NO write path to any procurement system of record; the only write ARIA performs is to its own Fabric/data layer. No PO/RFx/SoR write risk exists. Ship procurement as optional+beta for rollout hygiene; readOnly by construction.
+
+
+---
+
+## Risk #1 UPDATE - recipe-corpus read (2026-07-22): REDUCED (was STILL-OPEN)
+
+Read all 33 recipes + AUTHORING-GUIDE.md + ARIA SKILL.md. The core assumption (a recipe can drive Claude's NATIVE tools alongside ARIA's) is ALREADY DEMONSTRATED and MANDATED, not merely assumed:
+- Native CODE-EXECUTION + FILE-WRITE are used in the guide's own canonical reference recipes: trial_balance_report.md and us_income_statement.md build Excel via openpyxl and write to /mnt/user-data/outputs (Claude's native sandbox path, NOT ARIA/OneLake), with assert-based validation scripts.
+- ARIA SKILL.md MANDATES native tools every session: create_file + present_files (session logs), web search (domain terminology), view()/execute (code templates) - run alongside aria_* tools unconditionally.
+- NO SANDBOXING: a recipe is plain markdown read by the same un-sandboxed Claude Desktop session. The only isolation is the deterministic plan: executor's closed kind-vocabulary (fabric_dax/fabric_measure/hana_sql/sac_query), which fences off ITS OWN deterministic slice - not Claude's native tools. Everything else = normal Claude with its full toolset (the LLM-orchestrated path).
+- CONSEQUENCE: the XLSX (openpyxl) and file-write deliverable paths are PROVEN native. Pro-forma .xlsx and the self-contained HTML dashboards ride a validated path.
+
+NARROWED Phase-0 spike (only these two remain unproven, not the general question):
+1. Native web_fetch for a multi-pass EXTERNAL-research funnel inside a recipe (SEC currently routes via ARIA's aria_sec_* plugin; native web_search IS used for terminology, but the research-funnel pattern is unproven for e.g. supplier-landscape).
+2. Native artifact / show_widget / chart rendering by name (dashboards today are produced by aria_compose_dashboard, an aria_* tool; rendering our self-contained HTML via a native artifact is unproven).
+
+Net: the plan's foundational native+ARIA-orchestration dependence is largely validated by shipped example; the residual spike is small and targeted.
