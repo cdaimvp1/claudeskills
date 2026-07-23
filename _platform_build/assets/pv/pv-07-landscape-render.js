@@ -865,7 +865,7 @@ function pvHmRationaleHtml(ordered,reqs,covOf,candOf,hm){
  var rows=reqs.map(function(r){
    var c=covOf[id][r.id];var sc=c?c.score:0;var lead=hm.leaders[r.id]===id&&a.eligible;
    var cov=pvCoverPct(cand,r);
-   var covchip=cov?'<span class="vratchip" title="Coverage, share of this category\'s sub-requirements met at/above 3.5/5 (distinct from the weighted fit score)">coverage <b>'+escD(cov.pct)+'%</b> ('+escD(cov.met)+'/'+escD(cov.total)+' &ge;3.5)</span>':'';
+   var covchip=cov?'<span class="vratchip" title="Share of this category\'s sub-requirements scored at/above the 3.5/5 bar. This is a pass-rate, distinct from evidence coverage and from the weighted fit score.">meets bar <b>'+escD(cov.pct)+'%</b> ('+escD(cov.met)+'/'+escD(cov.total)+' &ge;3.5)</span>':'';
    var catOpen=(PVSL_HM_RAT_CAT===r.id);
    var body='';
    if(catOpen){
