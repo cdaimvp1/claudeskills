@@ -1,7 +1,7 @@
 # Platform-Fidelity Dashboard Consolidation — Master Tracker
 
 **Started:** 2026-07-22 · **Owner:** Marc · **Repo:** github.com/cdaimvp1/claudeskills (branch `main`, commit + push after each unit)
-**Status:** Landscape exemplar built + real-vendor enriched (round 2 done); Phase-2 Landscape redesign pending; everything else queued behind Marc's visual sign-off on Landscape.
+**Status (2026-07-23):** Landscape dashboard DONE + Marc-approved + LOCKED INTO the skill (`supplier-landscape-1c344a/dashboard/` ships the deterministic engine; SKILL.md v3.0; commit 935427e). Next build = **Deal tab (P2), Marc's call to start there.** Audit of the non-dashboard skills complete (see PART G). Framing reaffirmed with Marc: skills STAY separate (analysis-core + renderers per A3.3); dashboards are hubs/renderers OVER them, never skill mergers.
 
 This tracker is the source of truth for the dashboard-redesign / platform-consolidation effort. Read it top to bottom before resuming. The condensed cross-session version lives in memory (`project_lilly_skills_dashboard_redesign`); THIS file is the detailed one.
 
@@ -161,6 +161,16 @@ Formalize a **hybrid** pipeline (the researched best design; more accurate + aud
 - **GOTCHAS:** (1) Playwright/browser won't launch here → verify structurally (node --check + node-vm render harness) + open in Marc's browser via `Start-Process`. (2) unpkg reachable from build env but BLOCKED in Marc's browser → preview harnesses must be self-contained (inline UMD + pre-transpile JSX), never CDN. (3) Prompt-injection seen → harden every build agent w/ an anti-injection clause; platform dir READ-ONLY (copy-from only). (4) CSS integrity: verify `<style>` `/*`==`*/` balance AND `:root{` survives comment-stripping. (5) Ultracode ON → Workflow for big builds; edit the single pv-07 file in SEQUENTIAL stages (parallel edits collide) + adversarial-verify; Sonnet for stages. (6) Workflow scripts: no backticks inside prompt strings; Date.now/Math.random blocked.
 
 ---
+
+## PART G — NON-DASHBOARD SKILL AUDIT (2026-07-23) + P3 GENERATOR STATE
+
+The MATH is already deterministic almost everywhere (`numeric_kernel.py` vendored into ~10 skills as a HARD RULE + siblings `tier_kernel`/`timeline_engine`/`audience_kernel`/`frap_chain_kernel`/`roster_kernel`). The missing half is deterministic FILE GENERATION.
+
+- **Only pro-forma is end-to-end optimized:** `pro_forma_generator.py` (~1150 lines, openpyxl, real formulas + invariant checks) computes via the kernel AND emits the `.xlsx`. This is the P3 template. (Task #81 "convert pro-forma to xlsx" is effectively DONE.)
+- **File-generator gap (kernel math, no code-generated file):** should-cost (xlsx), market-rate (xlsx), executive-summary (docx, #82), sole-source (pptx/docx, #83), evaluation-engine (docx, worst: 30-40pg truncation risk), rfp-response-analysis (docx, same), scope-sow (docx), commercial-neg (docx/xlsx). Each is a real ~pro-forma-sized build, not a batch one-shot. Libs confirmed available here (openpyxl 3.1.5, python-docx, python-pptx).
+- **CORRECTNESS FLAG — contract-review Protection Score:** the audit said "wire it to `weighted_score()`" but that is MIS-DIAGNOSED — the Protection Score is a DEDUCTION model (start 100, subtract severity x coverage-column deductions, hard-stops not reduced), NOT a weighted average, so `weighted_score()` is the wrong shape. Rule 12 already MANDATES a deterministic, auditable, reproducible calculation table via `references/risk-scoring.md`. Real enhancement = a deterministic `deduction_score()` kernel fn; but contract-review is the sensitive skill we agreed NOT to casually modify (B4). HOLD for explicit Marc go.
+- **playbook-learning:** the one data skill with no kernel (acceptance rate / win-loss / difficulty in prose). Add aggregate-stats fns to the CANONICAL `lilly-procurement-kernels/numeric_kernel.py` then re-vendor (shared-infra change, do carefully). numeric_kernel's own gap list also: ROI/payback/waterfall, sensitivity/perturbation, correlated-drivers.
+- **Front door:** `procurement-launcher` = competent single-hop router (trigger table + widget + chains). Marc's INTENT = a conversational INTAKE that diagnoses need + kicks off the skill on confirm. Gaps: routing lives in 4-5 hand-synced files (→ JSON manifest source-of-truth); help-desk inert v0.1; no cross-session journey state. Do after hubs land.
 
 ## PART F — OPEN / PENDING MARC DECISIONS
 - Marc's **visual sign-off** on the Landscape exemplar (gates the rollout).
