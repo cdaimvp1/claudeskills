@@ -4326,6 +4326,10 @@ function pvExecSummaryHtml(refl,input){
  // bottom of the Evaluation summary (above the Rec | ranking row). Same text/markup + blue-teal styling.
  // Recommendation surfaces the Must-Have miss as a GATE/RISK TO CLEAR (not a "next action" —
  // the next team step lives on Overview/Workflow). Only shown if the field has a must-have gap.
+ // #92 (owner ask, 2026-07): koRec/recNext are now DEAD — the "Gate to clear" band they built is no longer
+ // wired into the page (the Evaluation Summary's "Recommended next step" carries the lead's open Must-Have
+ // gap instead, grounded off the requirements model rather than the RFX.suppliers mock). Left defined,
+ // harmless and unused, in case the RFX-scoped gate band is restored.
  var koRec=isCompRFx()?RFX.suppliers.filter(function(s){return s.mustFail&&s.mustFail.length;}):[];
  var recNext=(lead&&koRec.length)?'<p class="rna" style="border-left:3px solid #A23A30;background:var(--pink-t,#FBE7E3)"><span class="nal" style="color:var(--riskred)">Gate to clear</span>'+koRec.map(function(s){return '<b>'+escD(s.n)+' does not meet '+escD(s.mustFail.join(', '))+' (a Must-Have).</b>';}).join(' ')+' If the team advances that supplier, this hard gate must be cleared before award: a Cyber review of whether Lilly can proceed, and confirmation from the supplier of whether they hold the certification (and if not, if/when they will). The gate-passing suppliers clear it today.</p>':'';
  // #4 (Marc): the per-card advisory note is dropped, the page-level REFLECT-ONLY badge + the prose's closing
@@ -4352,7 +4356,46 @@ function pvExecSummaryHtml(refl,input){
  // #6 (Marc): enrich the Evaluation Summary with a structured per-candidate read that scales with the
  // supplier count (mirrors the Recommendation panel height), narrative lede + "Where each candidate stands".
  var evalFindings=(false)?('<div class="esfind"><div class="esfind-h">Where each candidate stands</div>'+ranked.map(function(a,i){var ar=(recAuth[a.id]&&recAuth[a.id].risk!=null)?recAuth[a.id].risk:pvAuthRisk(a.id,a.riskScore);var ac=(recAuth[a.id]&&recAuth[a.id].comp!=null)?recAuth[a.id].comp:Math.round(a.compositeScore);var read=a.segment==='disqualified'?'Carries a hard flag; off the shortlist.':(i===0?'Front-runner on the strongest requirements fit.':(a.segment==='challenger'?'Strong fit, but elevated risk to weigh.':(a.segment==='niche'?'Narrower fit; a fit-for-purpose option.':(a.segment==='caution'?'Narrower fit and elevated risk.':'A genuine contender in the field.'))));return '<div class="esrow"><span class="esr-dot" style="background:'+pvSupColor(a)+'"></span><div class="esr-b"><div class="esr-top"><span class="esr-nm">'+escD(a.name)+'</span><span class="esr-seg">'+escD(PVSEG_LBL[a.segment])+'</span></div><div class="esr-meta">fit '+escD(fitOf(a))+'/100 &middot; risk '+escD(ar)+'/5 &middot; composite '+escD(ac)+'</div><div class="esr-read">'+escD(read)+'</div></div></div>';}).join('')+'</div>'):'';
- var evalHtml='<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">Evaluation Summary</span></div><div class="scc-b"><div class="pvlede" style="margin:0">'+escD(prose)+'</div>'+evalFindings+'</div></div>';
+ // #92 (owner ask, 2026-07): the provenance/methodology bchip strip that used to sit under the Rec panel was
+ // cut (no value, owner ask). In its place the Evaluation Summary now carries the actual call: a grounded
+ // Recommendation (primary + secondary, each drawn from this project's own deepDive.whyLilly, never
+ // fabricated) and a Recommended next step (advance the shortlist band, plus the lead's own open Must-Have
+ // gap off the SAME 3.5/5 knockout rule the heatmap's must-have matrix uses, or its lowest open requirement
+ // if nothing gates it).
+ var leadCand=lead?pvCandById(lead.id):null;
+ var riskOf=function(a){var ra=recAuth[a.id];return (ra&&ra.risk!=null)?ra.risk:pvAuthRisk(a.id,a.riskScore);};
+ var leadWhy=(leadCand&&leadCand.deepDive&&leadCand.deepDive.whyLilly)?String(leadCand.deepDive.whyLilly).trim():'';
+ var secA=ranked[1],secCand=secA?pvCandById(secA.id):null;
+ var recTxt='<p class="pvlede" style="margin:0">No candidate is eligible for this field; every vendor carries a hard flag.</p>';
+ if(lead){
+   recTxt='<p class="pvlede" style="margin:0 0 6px"><b>Primary: '+escD(lead.name)+'</b> ('+escD(fitOf(lead))+'/100 fit). '+
+     escD(leadWhy||('Leads the field on weighted fit ('+fitOf(lead)+'/100) with risk held at '+riskOf(lead)+'/5.'))+'</p>';
+   if(secA)recTxt+='<p class="pvlede" style="margin:0"><b>Secondary: '+escD(secA.name)+'</b>. '+escD(pvSlateRationale(secA,secCand))+'</p>';
+ }
+ var recNarrHtml='<div class="subt" style="margin-top:14px">Recommendation</div>'+recTxt;
+ // lead's own open Must-Have gap: same knockout rule as the heatmap's must-have matrix (a sub.must
+ // requirement scored below the 3.5/5 adequacy threshold). Falls back to the lead's single lowest-scoring
+ // requirement (must or not) if no Must-Have gap is open, never fabricated.
+ var leadMustGap=null,leadLowest=null;
+ if(leadCand&&leadCand.subFit){
+   (input.requirements||[]).forEach(function(r){
+     (r.subs||[]).forEach(function(sub){
+       var v=(leadCand.subFit[r.id]||{})[sub.id];
+       if(v==null)return;
+       if(leadLowest==null||v<leadLowest.score)leadLowest={label:sub.label,score:pvRound(v,1)};
+       if(sub.must&&v<3.5&&!leadMustGap)leadMustGap={label:sub.label,score:pvRound(v,1)};
+     });
+   });
+ }
+ var nextTxt='Re-scope the requirements or widen the field before advancing to an RFx; no candidate clears the bar today.';
+ if(lead){
+   var slNames=shortlist.map(function(x){return x.a.name;});
+   nextTxt='Advance the shortlist ('+slNames.join(', ')+') to an RFx with '+lead.name+' as pace-setter.';
+   if(leadMustGap)nextTxt+=' Before award, screen '+lead.name+' on '+leadMustGap.label+' ('+leadMustGap.score+'/5).';
+   else if(leadLowest)nextTxt+=' Validate '+leadLowest.label+' ('+leadLowest.score+'/5) in the RFx.';
+ }
+ var nextStepHtml='<div class="subt" style="margin-top:14px">Recommended next step</div><p class="pvlede" style="margin:0">'+escD(nextTxt)+'</p>';
+ var evalHtml='<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">Evaluation Summary</span></div><div class="scc-b"><div class="pvlede" style="margin:0">'+escD(prose)+'</div>'+recNarrHtml+nextStepHtml+evalFindings+'</div></div>';
  // #80 (Marc): make this a real EXECUTIVE SUMMARY of the search, add a scope/coverage strip, a key
  // differentiators & trade-offs read, and an across-the-field read (market structure + gating watch-items +
  // next step). Everything is grounded in the landscape data; the existing Eval|Rec + Segmentation stay.
@@ -4362,17 +4405,15 @@ function pvExecSummaryHtml(refl,input){
  // assembly: scope strip → Eval | Recommendation → segmentation & differentiators (merged) → market structure → dynamics/H2H
  // (Marc: "Across the Field" prose + "Data basis" card removed, redundant with the strip/chips/recommendation.)
  h+=mstrip;
- // #2 (owner ask, 2026-07): recNext (the must-have "Gate to clear" band) is wired in under the Recommendation
- // table. The compact top-candidate rationale sentence (recrat, "X ranks first on the weighted 6-category
- // model...") was removed (owner ask, 2026-07: valueless filler prose).
- h+='<div class="execside">'+evalHtml+'<div class="recR">'+recHtml+recNext+recAdvNote+'</div></div>';
- // Methodology / provenance strip (owner ask, 2026-07): grounded-only pills under the Rec area -- requirements
- // basis + field size straight off the model's own counts. No invented internal/external search-count claims.
- h+='<div class="basis" style="margin:14px 0 0">'+
-   '<span class="bchip">Requirements basis <b>'+escD((input.requirements||[]).length)+'</b> categor'+(((input.requirements||[]).length===1)?'y':'ies')+'</span>'+
-   '<span class="bchip">Field <b>'+escD(L.supplierCount)+'</b> scanned &middot; <b>'+escD(L.eligibleCount)+'</b> eligible</span>'+
-   '<span class="bchip">Research as of <b>July 2026</b></span>'+
- '</div>';
+ // #92 (owner ask, 2026-07): recNext (the must-have "Gate to clear" band) no longer renders here — the lead's
+ // open Must-Have gap now lives in the Evaluation Summary's "Recommended next step" (grounded off the
+ // requirements model). The compact top-candidate rationale sentence (recrat, "X ranks first on the weighted
+ // 6-category model...") stays removed (owner ask, 2026-07: valueless filler prose).
+ h+='<div class="execside">'+evalHtml+'<div class="recR">'+recHtml+recAdvNote+'</div></div>';
+ // #92 (owner ask, 2026-07): the methodology/provenance bchip strip ("Requirements basis N categories" /
+ // "Field N scanned · N eligible" / "Research as of July 2026") is CUT — owner said it adds no value. The
+ // mstrip 4-metric tiles above (Suppliers scanned / Eligible after screen / Requirements scored / Leader gap)
+ // already carry the scope read; the Evaluation Summary now carries the substantive call.
  // "Eliminated before the shortlist" card removed (owner ask, 2026-07): merged into the Recommendation table
  // above as a divider + name/reason rows (elimReal/elimIllus/elimRowsSrc are computed earlier, alongside P,
  // before recHtml is assembled).
