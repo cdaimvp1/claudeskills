@@ -202,15 +202,23 @@ function pvDD2Caps(x, a, cand, input) {
     return '<tr><td class="dt" style="white-space:nowrap;vertical-align:top">' + pvAEsc(o.name) + '</td><td class="dd">' + pvAEsc(o.note || '') + '</td></tr>';
   }).join('');
   var offTable = offs ? '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + offs + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No offerings on file.</div>';
-  var refCard = x.references ? pvDD2Card('Reference relevance', pvDD2RefMatrix(x.references), 'var(--ai,#5C2B50)')
-    : (dd.clients ? pvDD2Card('Reference customers', '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(dd.clients) + '</div>', 'var(--mut2,#6a655f)') : '');
+  var refInner = x.references ? pvDD2RefMatrix(x.references)
+    : (dd.clients ? '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(dd.clients) + '</div>' : '<div style="font-size:12px;color:var(--mut2)">No reference data on file.</div>');
+  // CAP5 narrative: fit summary from the requirement groups (grounded, condensed).
+  var rg = x.reqGroups || [];
+  var strong = rg.filter(function(g){ return g.fitLabel === 'Strong' || g.fitLabel === 'Meets'; }).length;
+  var soft = rg.filter(function(g){ return g.fitLabel === 'Partial' || g.fitLabel === 'Gap'; });
+  var capNarr = '<div style="font-size:12.5px;line-height:1.55;color:var(--ink)"><b>' + pvAEsc(a.name) + '</b> meets <b>' + strong + ' of ' + rg.length + '</b> requirement groups strongly'
+    + (soft.length ? '; the soft spots are <b>' + pvAEsc(soft.map(function(g){ return g.label; }).join(', ')) + '</b> &mdash; confirm these in the RFP.' : ' with no material gaps.') + '</div>';
+  var deliveryLine = idn.delivery ? '<div style="font-size:12.5px;margin-bottom:10px"><b style="color:var(--mut2)">Delivery model &middot;</b> ' + pvAEsc(idn.delivery) + '</div>' : '';
   return pvDD2AssessStrip(x, 'capability')
-    + pvDD2Card('Capability to requirement', pvDD2CapHeatmap(x.capabilities), 'var(--navy,#0F3A85)')
-    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
-    +   pvDD2Card('Offering &amp; delivery', (idn.delivery ? '<div style="font-size:12.5px;margin-bottom:10px"><b style="color:var(--mut2)">Delivery model &middot;</b> ' + pvAEsc(idn.delivery) + '</div>' : '') + offTable, 'var(--teal-d,#2F6E6B)')
-    +   pvDD2Card('Fit to requirements', pvReqGroupMini(x.reqGroups), 'var(--amber-d,#8A5A00)')
+    + pvDD2Card('Capability Read', capNarr, 'var(--plum)', null, '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>')
+    + pvDD2Card('Capability to Requirement', pvDD2CapHeatmap(x.capabilities), 'var(--teal-d)')
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:stretch">'
+    +   pvDD2Card('Reference Relevance', refInner, 'var(--emph)')
+    +   pvDD2Card('Fit to Requirements', pvReqGroupMini(x.reqGroups), 'var(--plum)')
     + '</div>'
-    + refCard;
+    + pvDD2Card('Offering &amp; Delivery', deliveryLine + offTable, 'var(--teal-d)');
 }
 
 /* ------------------------------------------------ 3. FINANCIAL & MARKET */
