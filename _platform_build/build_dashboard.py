@@ -187,10 +187,10 @@ def extract_chrome():
     # ---- Footer -------------------------------------------------------------
     # theo-brand.js's injectFooter(): `f.innerHTML = '...' + ... ;` (the
     # "Help Center / Procurement Playbook / Give feedback / What's new" bar).
-    i = theo_brand.index('f.innerHTML =')
-    j = theo_brand.index('document.body.appendChild(f); return true;', i)
-    footer_inner_html = concat_quoted_segments(theo_brand[i:j])
-    footer_html = '<footer class="theo-foot" role="contentinfo">' + footer_inner_html + '</footer>'
+    # Marc: remove ALL footer text (staging label + Help Center / Playbook / Give feedback /
+    # What's new link bar). Keep an empty footer element only for the bottom gutter it provides.
+    footer_inner_html = ''
+    footer_html = '<footer class="theo-foot" role="contentinfo" aria-hidden="true"></footer>'
 
     # ---- theomark / Sacramento-wordmark CSS (+ the --dino-filter token) ----
     # theo-brand.js's inject(): the :root chrome tokens (incl. --dino-filter,

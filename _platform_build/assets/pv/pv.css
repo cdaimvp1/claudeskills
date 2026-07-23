@@ -1,4 +1,4 @@
-:root{--red:#E1251B;--red-d:#B41E16;--ink:#1A1A1A;--mut:#3E3933;--mut2:#4A443C;--line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--surface:#FFFFFF;--panel:#E4E3E0;--nested:#E4E4DF;--well:#DDDCD8;--pink-t:#FBE7E3;--pink-2:#F0C7BF;--ti-blue:#D2E1F2;--ti-gray:#E1E1DD;--ti-red:#F6D5CE;--ti-purple:#E3D8F0;--ti-amber:#F4E6BC;--tib-blue:#A9C4E6;--tib-gray:#CBC8C1;--tib-red:#E7B6A9;--tib-purple:#D0BEEA;--tib-amber:#E0CB8C;--teal-t:#EFF7F3;--teal-d:#1F7A5A;--amber-t:#FBF1DA;--amber:#FFC709;--amber-d:var(--amber-d);--blue-t:#E4EBF1;--blue:#99BFE5;--blue-d:#2E5E8C;--cci-orange:#D2691E;--cci-red:#C0392B;--ai:#7A0E8C;--ai-t:#F6ECF8;--shadow:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);--shadow-lg:0 12px 34px rgba(38,30,20,.14);--glow:0 8px 24px rgba(225,37,27,.28);--sans:'Libre Franklin',system-ui,Arial,sans-serif;--mono:'Libre Franklin',system-ui,Arial,sans-serif;--fz-h:17px;--fz-title:15.5px;--fz-body:14px;--fz-sm:13px;--fz-meta:12px;--fz-mono:12px;--header:#E1251B;--teal:#1F7A5A;--navy:#0F3A85;--riskred:#A23A30;}
+:root{--red:#E1251B;--red-d:#B41E16;--ink:#1A1A1A;--mut:#3E3933;--mut2:#4A443C;--line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--surface:#FFFFFF;--panel:#E4E3E0;--nested:#E4E4DF;--well:#DDDCD8;--pink-t:#FBE7E3;--pink-2:#F0C7BF;--ti-blue:#D2E1F2;--ti-gray:#E1E1DD;--ti-red:#F6D5CE;--ti-purple:#E3D8F0;--ti-amber:#F4E6BC;--tib-blue:#A9C4E6;--tib-gray:#CBC8C1;--tib-red:#E7B6A9;--tib-purple:#D0BEEA;--tib-amber:#E0CB8C;--teal-t:#EFF7F3;--teal-d:#2F6E6B;--amber-t:#FBF1DA;--amber:#FFC709;--amber-d:var(--amber-d);--blue-t:#E4EFEC;--blue:#A7CBC6;--blue-d:#2F6E6B;--cci-orange:#D2691E;--cci-red:#C0392B;--ai:#7A0E8C;--ai-t:#F6ECF8;--shadow:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);--shadow-lg:0 12px 34px rgba(38,30,20,.14);--glow:0 8px 24px rgba(225,37,27,.28);--sans:'Libre Franklin',system-ui,Arial,sans-serif;--mono:'Libre Franklin',system-ui,Arial,sans-serif;--fz-h:17px;--fz-title:15.5px;--fz-body:14px;--fz-sm:13px;--fz-meta:12px;--fz-mono:12px;--header:#E1251B;--teal:#2F6E6B;--navy:#5C2B50;--riskred:#A23A30;}
 /* ===== Dark theme, PURELY ADDITIVE token override (color layer only; no rule/markup changed, so light stays byte-identical). Toggle sets data-theme="dark" on <html>. ===== */
 html[data-theme="dark"]{--tint-a4c2e6:#172637;--tint-c6d8ee:#172536;--tint-c6dfe7:#162d34;--tint-cbddef:#172736;--tint-cde8de:#173228;--tint-e0daec:#201830;--tint-e1e3e7:#292929;--tint-e3dac7:#302818;--tint-e4e0d7:#29251c;--tint-e4e4df:#292929;--tint-e7a33e:#3b2d19;--tint-eaf0f9:#172437;--tint-ece8f2:#211a2d;--tint-edece8:#26241d;--tint-eef0f3:#1c2128;--tint-efece8:#28231c;--tint-efedea:#26231d;--tint-efeeec:#292929;--tint-f1e3bc:#383018;--tint-f2eeee:#261d1d;--tint-f4d1cc:#381c18;--tint-f4f1ea:#2f2819;--tint-f4f1ec:#2d261a;--tint-f4f2ee:#2a251b;--tint-f4f6fb:#171f35;--tint-f4f7fb:#172435;--tint-f6e9e8:#341916;--tint-f7dbaf:#3b2e19;--tint-f7f5f1:#2d271a;--tint-f7f5f2:#2b251b;--tint-fafaf9:#292929;--tint-fbe7c7:#3c2f1a;--tint-fbeae8:#391c19;--tint-fbefc9:#3c341a;--tint-fbf4e6:#3a2f19;--tint-fce4e0:#3b1e19;--tint-fff0d8:#3e311b;color-scheme:dark;
  --ink:#ECECEC;--mut:#B0B0B0;--mut2:#8A8A8A;--line:#3A3A3A;--line2:#484848;
@@ -8,7 +8,7 @@ html[data-theme="dark"]{--tint-a4c2e6:#172637;--tint-c6d8ee:#172536;--tint-c6dfe
  --ti-blue:#22324A;--ti-gray:#2A2E34;--ti-red:#40241F;--ti-purple:#322842;--ti-amber:#33290F;
  --tib-blue:#3C5476;--tib-gray:#474C55;--tib-red:#603830;--tib-purple:#4C3F66;--tib-amber:#57481F;
  --teal-t:#15271F;--teal-d:#49B591;--teal:#49B591;--amber-t:#2E2713;--amber:#FFC709;--amber-d:#DBAA50;
- --blue-t:#2E2E2E;--blue:#6E9AD8;--blue-d:#7CA6E2;--navy:#6E9AD8;
+ --blue-t:#2A2230;--blue:#C79AB8;--blue-d:#C79AB8;--navy:#C79AB8;
  --cci-orange:#E08A45;--cci-red:#E06456;--ai:#B267C6;--ai-t:#2A1830;
  --shadow:0 1px 2px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 12px 34px rgba(0,0,0,.6);--glow:0 8px 24px rgba(240,87,76,.35);
 }
@@ -1460,6 +1460,9 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 /* meaningful pairing: financial position + revenue history side by side, chart never full-bleed */
 .pvsl .ddfinpair{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;margin-bottom:16px}
 .pvsl .ddfinpair>.sa-card{margin-bottom:0}
+/* Marc: deep-dive equal-height pairs = one 16px-separated block; inner cards zero their own margin so
+   spacing between stacked pairs (and pair-then-card) is consistent, never zero. */
+.pvsl .dd2pair>.sa-card{margin-bottom:0}
 @media(max-width:900px){.pvsl .ddfinpair{grid-template-columns:1fr}}
 /* ===== Pass A: 4-subtab shell + Executive Summary + nested Supplier Deep Dive ===== */
 .pvsl .pvsubtabs{display:flex;gap:2px;flex-wrap:wrap;margin:0 0 18px;border-bottom:1px solid var(--line)}
