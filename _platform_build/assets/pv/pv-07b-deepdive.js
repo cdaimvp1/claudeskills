@@ -71,6 +71,16 @@ function pvDD2StatusMatrix(rows) {
 }
 
 /* ---------------------------------------------------------------- 0. SUMMARY */
+/* compact confidence-encoded scorecard (replaces the wide 8-dimension bars) */
+function pvDD2ScoreCard(dims){
+  return '<table style="width:100%;border-collapse:collapse;font-size:12.5px">' + (dims || []).map(function(d){
+      var ev = String(d.evidence || '');
+      var read = ev.length > 104 ? ev.slice(0, 102).replace(/\s+\S*$/, '') + '…' : ev;
+      return '<tr style="border-top:1px solid var(--line)"><td style="padding:9px 14px 9px 0;font-weight:700;color:var(--ink);vertical-align:top;width:172px">' + pvAEsc(d.label) + '</td>'
+        + '<td style="padding:9px 14px 9px 0;vertical-align:top;white-space:nowrap">' + pvConcernPill(d.concern, d.confidence) + '</td>'
+        + '<td style="padding:9px 0;vertical-align:top;color:var(--mut);line-height:1.45;font-size:12px" title="' + pvAEsc(ev) + '">' + pvAEsc(read) + '</td></tr>';
+    }).join('') + '</table>';
+}
 function pvDD2Summary(x, a, cand, input) {
   var gates = x.gates.length ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">' + x.gates.map(function(g){
       var hard = g.kind === 'hard';
@@ -78,18 +88,25 @@ function pvDD2Summary(x, a, cand, input) {
       return '<span title="' + pvAEsc(g.why) + '" style="display:inline-flex;align-items:center;gap:6px;font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:4px 10px;border-radius:20px;color:' + c + ';background:' + bg + '">' + (hard ? 'HARD STOP' : 'ESCALATE') + ' &middot; ' + pvAEsc(g.label) + '</span>';
     }).join('') + '</div>' : '';
   // SS1 (Marc): the Summary must read like a summary — lead with a grounded recommendation narrative.
-  var narr = '<div style="font-size:13px;line-height:1.6;color:var(--ink)"><b>' + pvAEsc(a.name) + '</b> is a <b style="color:var(--plum,#5C2B50)">' + pvAEsc(x.disposition) + '</b> candidate'
-    + (x.rank ? ' (ranked #' + x.rank + ' of ' + (x.ofN || '&mdash;') + ' on requirements fit)' : '') + '. '
+  var topConcern = (x.concerns && x.concerns[0]) || '';
+  var hardGate = x.gates.some(function(g){ return g.kind === 'hard'; });
+  var art = /^[aeiou]/i.test(String(x.disposition || '')) ? 'an' : 'a';
+  var narr = '<div style="font-size:13px;line-height:1.6;color:var(--ink)"><b>' + pvAEsc(a.name) + '</b> is ' + art + ' <b style="color:var(--plum,#5C2B50)">' + pvAEsc(x.disposition) + '</b> candidate'
+    + (x.rank ? ' (ranked #' + x.rank + ' of ' + (x.ofN || '&mdash;') + ' on requirements fit; ' + pvAEsc(String(x.fit.label).toLowerCase()) + ' capability fit at ' + pvAEsc(String(x.risk.level).toLowerCase()) + ' risk)' : '') + '. '
     + pvAEsc((x.opportunities && x.opportunities[0]) || '') + ' '
-    + (x.gates.length ? 'Before advancing, clear ' + x.gates.length + ' open item' + (x.gates.length > 1 ? 's' : '') + ': <b>' + pvAEsc(x.gates.map(function(g){ return g.label; }).join('; ')) + '</b>.' : 'No open gates.')
+    + (topConcern ? 'The main watch-item is ' + pvAEsc(topConcern.charAt(0).toLowerCase() + topConcern.slice(1)) : '')
+    + '</div>'
+    + '<div style="font-size:12.5px;line-height:1.55;color:var(--ink);margin-top:10px">'
+    + (x.gates.length ? '<b>Before advancing</b>, clear ' + x.gates.length + ' open item' + (x.gates.length > 1 ? 's' : '') + ': <b>' + pvAEsc(x.gates.map(function(g){ return g.label; }).join('; ')) + '</b>. ' : 'No open gates on file. ')
+    + '<b>The call would change</b> if ' + (hardGate ? 'the hard gate is not cleared' : 'a gated item resolves unfavourably in diligence (e.g. residency cannot be met for regulated data) or a critical risk surfaces') + ', dropping the disposition to hold-as-alternate.'
     + '</div>';
   return pvDD2Card('Recommendation', narr, 'var(--plum)', 'Evidence confidence: ' + pvAEsc(x.evidenceConfidence), '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>')
     + pvDD2Card('Assessment across eight dimensions',
-        pvAssessBars(x.dimensions)
-        + pvDD2Foot('Bar length reads favorability, colour reads concern, dots read evidence confidence. No blended score &mdash; a strong dimension never offsets a gate below.')
-        + gates, 'var(--teal-d)')
+        pvDD2ScoreCard(x.dimensions)
+        + pvDD2Foot('Each dimension carries its own rating and evidence confidence (dots). No blended score &mdash; a strong dimension never offsets a gate below.')
+        + gates, 'var(--teal-d)', 'Rating &middot; evidence read &middot; confidence')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
-    +   pvDD2Card('Requirements fit', pvReqGroupMini(x.reqGroups), 'var(--navy,#0F3A85)')
+    +   pvDD2Card('Requirements fit', pvReqGroupMini(x.reqGroups), 'var(--plum)')
     +   pvDD2Card('Opportunities &amp; concerns', pvOppConcern(x.opportunities, x.concerns), 'var(--teal-d,#2F6E6B)')
     + '</div>'
     + pvDD2Card('Evidence coverage', pvEvidCoverageBar(x.evidenceCoverage)
