@@ -1559,11 +1559,16 @@ function pvDDSection(ddt,a,cand,refl,input){
  if(ddt==='profile'){
    // STAGE DeepDive #2 (Marc): "Company snapshot" + "Corporate identity" + "Key Attributes" were three
    // separate cards repeating the same HQ / founded / ownership / financial facts under three different
-   // labels. Merged into ONE consolidated Identity & Company panel: stat tiles for scale (headcount,
-   // customers, valuation, funding, preferring the richer top-level financials.* / deepDive.company.* value
-   // where both exist), then a single deduped key/value grid. Pricing / contract-flex / integration / Gartner
-   // move out entirely, they already render on the Financials and Roadmap cards below and repeating the exact
-   // same string on the same tab was pure duplication, not enrichment.
+   // labels. Merged into ONE consolidated Identity & Company panel: a single deduped key/value grid,
+   // every identity/company fact (incl. headcount, customers, funding) a row, preferring the richer
+   // top-level financials.* / deepDive.company.* value where both exist. Pricing / contract-flex /
+   // integration / Gartner move out entirely, they already render on the Financials and Roadmap cards
+   // below and repeating the exact same string on the same tab was pure duplication, not enrichment.
+   // De-bubble (Marc, LOCKED): this used to lead with a row of boxed "cosnap" stat-tile mini-cards that
+   // largely duplicated the very key/value table rendered right below them; the tiles are gone and their
+   // facts (headcount, customers, funding) are now plain table rows, no boxes anywhere on this card.
+   // Valuation / market cap is dropped from this card entirely (it has one home only, the Financial
+   // position card on Market & Financials), so it no longer appears in two places at once.
    var idn=dd.identity||{},comp=dd.company||{},pAttrs=dd.attrs||{},finTop=cand.financials||{};
    var idKnown=idn.legal||idn.parent||idn.ownership||idn.ticker||idn.jurisdiction;
    var compKnown=comp.headcount||comp.customers||comp.valuation||comp.funding||comp.founded||comp.footprint||comp.leadership||comp.partners;
@@ -1571,20 +1576,20 @@ function pvDDSection(ddt,a,cand,refl,input){
    if(idKnown||compKnown||pAttrs.hq||pAttrs.founded||pAttrs.financial||pAttrs.esg){
      confMeta=idn.confidence==='Confirmed'?{c:'#0F3A85',bg:'var(--ti-blue)'}:(idn.confidence?{c:'#8A5A00',bg:'var(--ti-amber)'}:null);
      confChip=(idn.confidence&&confMeta)?' <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:20px;color:'+confMeta.c+';background:'+confMeta.bg+';vertical-align:1px">Identity: '+escD(idn.confidence)+'</span>':'';
-     var icT=function(v,l){return v?'<div class="cosnap-t"><div class="cosnap-v">'+escD(v)+'</div><div class="cosnap-l">'+escD(l)+'</div></div>':'';};
-     var valTile=finTop.valuationOrMarketCap||comp.valuation,fundTile=finTop.funding||comp.funding;
-     var icTiles=icT(comp.headcount,'Headcount')+icT(comp.customers,'Customers')+icT(valTile,'Valuation / market cap')+icT(fundTile,'Funding raised');
+     var fundTile=finTop.funding||comp.funding;
      var icPairs=[
+       [['Headcount',comp.headcount],['Customers',comp.customers]],
        [['Legal entity',idn.legal],['Parent / owner',idn.parent]],
        [['Ownership',idn.ownership||finTop.ownership],['Ticker',idn.ticker||(idKnown?'n/a · private':'')]],
        [['HQ & footprint',comp.footprint||pAttrs.hq],['Jurisdiction',idn.jurisdiction]],
        [['Founded',comp.founded||pAttrs.founded],['Leadership',comp.leadership]],
-       [['Financial position',pAttrs.financial],['ESG',pAttrs.esg]]
-     ].filter(function(pair){return pair[0][1]||pair[1][1];});
-     var icCell=function(d){var val=(d[1]!=null&&d[1]!=='')?d[1]:'Data not available';return '<span class="kk">'+escD(d[0])+'</span><span class="kvv">'+escD(val)+'</span>';};
-     var icRows=icPairs.map(function(pair,r){return '<div class="kar'+(r%2===0?' z':'')+'">'+icCell(pair[0])+icCell(pair[1])+'</div>';}).join('');
+       [['Financial position',pAttrs.financial],['ESG',pAttrs.esg]],
+       [['Funding raised',fundTile],null]
+     ].filter(function(pair){return pair[0][1]||(pair[1]&&pair[1][1]);});
+     var icCell=function(d){if(!d)return '';var val=(d[1]!=null&&d[1]!=='')?d[1]:'Data not available';return '<span class="kk">'+escD(d[0])+'</span><span class="kvv">'+escD(val)+'</span>';};
+     var icRows=icPairs.map(function(pair,r){var single=!pair[1];return '<div class="kar'+(single?' single':'')+(r%2===0?' z':'')+'">'+icCell(pair[0])+(single?'':icCell(pair[1]))+'</div>';}).join('');
      var partnersLine=comp.partners?'<div class="cosnap-line" style="margin-top:'+(icRows?'9px':'0')+'"><span class="cosnap-k">Partners &amp; ecosystem</span> '+escD(comp.partners)+'</div>':'';
-     icBlk=(icTiles?'<div class="cosnap">'+icTiles+'</div>':'')+(icRows?'<div class="pvka">'+icRows+'</div>':'')+partnersLine+
+     icBlk=(icRows?'<div class="pvka">'+icRows+'</div>':'')+partnersLine+
        '<p class="pvka-note">Identity, ownership and company-scale facts are <b>illustrative</b> reflect-only enrichment (credible public sources &middot; not validated); a live deep dive resolves identity against the Lilly vendor master before asserting a parent, a wrong-company profile is worse than none.</p>';
    }
    // G9 roadmap & vision, a forward-look from the analyst position + the roadmap/extensibility sub-fit
@@ -1625,17 +1630,17 @@ function pvDDSection(ddt,a,cand,refl,input){
        (dd.clients?dlR('Reference clients &amp; partners '+pvSrcTag('ext'),escD(dd.clients)):'')+
        (dd.relationship?dlR('Relationship history '+pvSrcTag('int'),escD(dd.relationship)):'');
    }
-   // STAGE DeepDive #2/#4: each logical sub-section is its own accent-bordered card. Offering Profile and
-   // Roadmap & Vision now sit SIDE BY SIDE via .ddpair (an equal-column sibling of the .recwrap 2-col grid
-   // used sitewide) instead of stacking, condensing the tab's vertical flow.
+   // STAGE DeepDive #2/#4: each logical sub-section is its own accent-bordered card.
+   // De-bubble revert (Marc, LOCKED): Offering Profile and Roadmap & Vision were paired side by side via
+   // .ddpair purely to save vertical space; that arbitrary 2-up layout is reverted, every card on this tab
+   // is single-column full-width again like the rest of the deep dive.
    var pvCards=[];
    pvCards.push(pvCard('<path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v6l8 4 8-4V7"/>',escD(a.name)+' &middot; profile','<div class="pvlede">'+escD(dd.overview||'')+'</div><div class="pvlede"><b style="color:var(--emph)">Why this vendor for Lilly.</b> '+escD(dd.whyLilly||'')+'</div>'));
    if(icBlk)pvCards.push(pvCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/>','Identity &amp; Company '+pvSrcTag('ext')+confChip,icBlk,confMeta&&confMeta.c));
    var offCard=offBlk?pvCard('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>','Offering profile <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; illustrative</span>',offBlk):'';
    var roadCard=roadBlk?pvCard('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','Roadmap &amp; vision '+pvSrcTag('ext'),roadBlk):'';
-   if(offCard&&roadCard)pvCards.push('<div class="ddpair">'+offCard+roadCard+'</div>');
-   else if(offCard)pvCards.push(offCard);
-   else if(roadCard)pvCards.push(roadCard);
+   if(offCard)pvCards.push(offCard);
+   if(roadCard)pvCards.push(roadCard);
    if(extIntBlk)pvCards.push(pvCard('<path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/>','Market Presence &amp; History',extIntBlk));
    return pvCards.join('');
  }
@@ -1684,20 +1689,21 @@ function pvDDSection(ddt,a,cand,refl,input){
    var newsRows=news.map(function(nw){return '<tr><td class="dt">'+escD(nw.date||'')+'</td><td class="dd">'+escD(nw.headline||'')+(nw.note?'<div style="font-size:11.5px;color:var(--mut);font-weight:400;margin-top:3px;line-height:1.45">'+escD(nw.note)+'</div>':'')+'</td></tr>';}).join('');
    // STAGE DeepDive #2/#3: Market & Financials used to be one .sa-card with .subt-labelled sections; each
    // becomes its own accent card. Financial Position leads with the real headline scale (was thin/absent),
-   // Revenue History is a new bar sparkline over financials.revenueHistory[], then Market position pairs with
-   // Commercial estimate and Additional detail pairs with Recent news via .ddpair so the tab reads across
-   // instead of one long stack of six full-width cards.
+   // Revenue History is a new bar sparkline over financials.revenueHistory[].
+   // De-bubble revert (Marc, LOCKED): Market position/Commercial estimate and Additional detail/Recent news
+   // were paired side by side via .ddpair purely to save vertical space; that arbitrary 2-up layout is
+   // reverted, every card on this tab is single-column full-width again like the rest of the deep dive.
    var sfCards=[];
    sfCards.push(pvCard('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>','Financial position '+pvSrcTag('ext')+viabBadge,periodCap+(finTiles?'<div class="cosnap">'+finTiles+'</div>':'')+'<div class="pvlede mut">'+escD(dd.finHealth||'')+'</div>'+finLines+(viab?'<div class="footbound" style="margin-top:4px">Viability grade read from the financial-stability signal (runway, margin, scale, standard distress signals): <b style="color:var(--navy)">Safe</b> below 1.75 &middot; <b style="color:var(--amber-d)">Watch</b> 1.75&ndash;3 &middot; <b style="color:var(--riskred)">Distress risk</b> at 3+/5. Reflect-only, illustrative.</div>':''),viab&&viab.c));
    if(revSvg)sfCards.push(pvCard('<path d="M4 19h16"/><path d="M7 19V10M12 19V5M17 19v-7"/>','Revenue history '+pvSrcTag('ext'),'<div style="max-width:460px">'+revSvg+'</div>'+(revRows?'<div style="overflow-x:auto;margin-top:9px"><table class="pvdl"><tbody>'+revRows+'</tbody></table></div>':'')+'<div class="footbound">Bars are scaled to the reported figures above (normalized to $M for height only); the exact reported text is preserved in each bar\'s tooltip and the table.</div>'));
    var mktCard=pvCard('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>','Market position',mpBlk+solPtr);
    var comCard=pvCard('<path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/>','Commercial estimate <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; illustrative</span>','<div style="overflow-x:auto"><table class="pvdl"><tbody>'+ceRows+'</tbody></table></div><div class="footbound"><b>Illustrative mock, tagged external.</b> Reported figures are owner-sanctioned mock enrichment from credible public sources (not validated). The commercial estimate is a light read to spot <b>price-led vs premium</b> and <b>lock-in / switching exposure</b>, the firm 3-year TCO comes from the RFx bids (normalized pricing) and the Deal pro-forma, and exit terms are settled in negotiation. A genuinely undisclosed figure would read Data not available, never silently invented.</div>',pricePosCol);
-   sfCards.push('<div class="ddpair">'+mktCard+comCard+'</div>');
+   sfCards.push(mktCard);
+   sfCards.push(comCard);
    var moreCard=(moreRows||sourcesBlk)?pvCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/>','Additional financial detail '+pvSrcTag('ext'),(moreRows?'<div style="overflow-x:auto"><table class="pvdl"><tbody>'+moreRows+'</tbody></table></div>':'')+sourcesBlk):'';
    var newsCard=newsRows?pvCard('<path d="M4 5h16M4 10h16M4 15h10"/>','Recent news <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; illustrative, last ~18 months</span>','<div style="overflow-x:auto"><table class="pvdl"><tbody>'+newsRows+'</tbody></table></div>'):'';
-   if(moreCard&&newsCard)sfCards.push('<div class="ddpair">'+moreCard+newsCard+'</div>');
-   else if(moreCard)sfCards.push(moreCard);
-   else if(newsCard)sfCards.push(newsCard);
+   if(moreCard)sfCards.push(moreCard);
+   if(newsCard)sfCards.push(newsCard);
    return sfCards.join('');
  }
  if(ddt==='strisk'){

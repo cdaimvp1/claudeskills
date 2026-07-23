@@ -1256,10 +1256,9 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .band.contained{color:var(--blue);background:var(--blue-t)}
 .pvsl .band.elevated{color:var(--red);background:var(--pink-t)}
 .pvsl .recwrap{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
-/* STAGE DeepDive #2: equal-column sibling of .recwrap, pairs two full DeepDive cards (each keeps its own
-   card-hd/accent) side by side instead of stacking; collapses to one column with .recwrap at 1100px. */
-.pvsl .ddpair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.pvsl .ddpair>.sa-card{margin-bottom:0}
+/* De-bubble revert (Marc, LOCKED): .ddpair (an equal-column sibling of .recwrap that paired two DeepDive
+   cards side by side to save vertical space) is retired -- every DeepDive card is single-column full-width
+   again. Rule intentionally removed, not just unused, so it can't be reintroduced by accident. */
 .pvsl .leadcard{border:1px solid var(--blue-d);border-radius:12px;overflow:hidden}
 .pvsl .leadcard .lh{display:flex;align-items:center;gap:9px;padding:11px 14px;background:var(--blue-t);border-bottom:1px solid var(--line)}
 .pvsl .leadcard .lh .lt{font-size:14px;font-weight:800}
@@ -1335,7 +1334,7 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .pvcond{display:flex;flex-direction:column;gap:7px}
 .pvsl .pvcond .cr{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.5}
 .pvsl .pvcond .cr .cd{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:700;margin-top:2px}
-@media(max-width:1100px){.pvsl .metrics{grid-template-columns:repeat(3,1fr)}.pvsl .metric{border-bottom:1px solid var(--line)}.pvsl .recwrap{grid-template-columns:1fr}.pvsl .ddpair{grid-template-columns:1fr}.pvsl .pvattrs{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1100px){.pvsl .metrics{grid-template-columns:repeat(3,1fr)}.pvsl .metric{border-bottom:1px solid var(--line)}.pvsl .recwrap{grid-template-columns:1fr}.pvsl .pvattrs{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.pvsl .metrics{grid-template-columns:repeat(2,1fr)}.pvsl .segs{grid-template-columns:repeat(2,1fr)}.pvsl .pvattrs{grid-template-columns:1fr}}
 /* ===== Competitive Dynamics, head-to-head (race-line, H2H band, vendor cards, diverging bars) ===== */
 .pvsl .cdyn-race{display:flex;align-items:center;gap:11px;font-size:12.5px;color:var(--mut);border-radius:8px;padding:9px 13px;margin-bottom:14px;line-height:1.45}
@@ -1502,10 +1501,15 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .segsev.low{color:var(--mut);background:var(--well)}
 .pvsl .seglchip{display:inline-block;font:600 11px var(--sans);background:var(--well);color:var(--ink);border:1px solid var(--line2);border-radius:14px;padding:1px 8px;margin:1px 3px 1px 0;white-space:nowrap}
 .pvsl .segmut{color:var(--mut2)}
-/* #.2 (Marc): Deep Dive "Company snapshot", real-vendor dimensions; stat tiles take the supplier primary/tint */
-.pvsl .cosnap{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 12px}
-.pvsl .cosnap-t{flex:1;min-width:118px;background:var(--ddacc-t,var(--well));border:1px solid var(--line2);border-left:3px solid var(--ddacc,var(--navy));border-radius:9px;padding:9px 12px}
-.pvsl .cosnap-v{font:800 16px var(--sans);color:var(--ink);letter-spacing:-.01em;line-height:1.15}
+/* De-bubble (Marc, LOCKED): Deep Dive metric band, real-vendor dimensions. Was a row of boxed
+   mini-cards (border+background+radius per tile, "cards inside a card"); now a single unboxed
+   band that sits directly on the parent .sa-card surface -- thin top/bottom hairlines mark the
+   band as a group, thin vertical dividers (not boxes) separate each metric, no per-tile border,
+   fill, shadow or radius. Values/captions unchanged. */
+.pvsl .cosnap{display:flex;flex-wrap:wrap;margin:6px 0 14px;padding:11px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.pvsl .cosnap-t{flex:1;min-width:118px;padding:0 18px;border-left:1px solid var(--line)}
+.pvsl .cosnap-t:first-child{border-left:none;padding-left:0}
+.pvsl .cosnap-v{font:800 17px var(--sans);color:var(--ink);letter-spacing:-.01em;line-height:1.15}
 .pvsl .cosnap-l{font:600 9.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);margin-top:3px}
 .pvsl .cosnap-line{font-size:12.5px;color:var(--ink);line-height:1.5;margin:4px 0}
 .pvsl .cosnap-k{font-weight:700;color:var(--ddacc,var(--navy))}
@@ -1636,6 +1640,7 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 /* Panel 2, Key Attributes zebra key/value list */
 .pvsl .pvka{border:1px solid #DAD3C5;border-radius:8px;background:var(--surface);padding:5px 10px;font-variant-numeric:tabular-nums}
 .pvsl .pvka .kar{display:grid;grid-template-columns:98px minmax(0,1fr) 98px minmax(0,1fr);column-gap:28px;align-items:baseline;padding:13px 20px}
+.pvsl .pvka .kar.single{grid-template-columns:98px minmax(0,1fr)}
 .pvsl .pvka .kar.z{background:var(--ddacc-t,var(--tint-e4e4df,#E4E4DF));border-radius:6px}
 .pvsl .pvka .kk{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ddacc,#2E5E8C);padding-top:2px}
 .pvsl .pvka .kvv{font-family:var(--sans);font-size:13px;color:#1A1A1A;line-height:1.35;min-width:0}
