@@ -632,6 +632,8 @@ function pvDynamicsHtml(refl){
    if(PVSL_H2H_B>=order.length||PVSL_H2H_B<0)PVSL_H2H_B=Math.min(1,order.length-1);
    if(PVSL_H2H_B===PVSL_H2H_A)PVSL_H2H_B=(PVSL_H2H_A+1)%order.length;
    var A=order[PVSL_H2H_A],B=order[PVSL_H2H_B];
+   var xA=pvAssess(A,pvCandById(A.id),PVSL_INPUT||{}),xB=pvAssess(B,pvCandById(B.id),PVSL_INPUT||{});
+   var h2cA=(typeof pvH2HCounts==='function')?pvH2HCounts(xA):{mustGap:0},h2cB=(typeof pvH2HCounts==='function')?pvH2HCounts(xB):{mustGap:0};
    var rankLbl=function(a){return (a.eligible&&a.rank!=null)?('#'+a.rank):'—';};
    var optsFor=function(sel){return order.map(function(x,i){return '<option value="'+i+'"'+(i===sel?' selected':'')+'>'+escD(rankLbl(x)+' '+x.name)+'</option>';}).join('');};
    var selStyle='font:600 12.5px var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:7px 10px;min-width:200px';
@@ -662,7 +664,7 @@ function pvDynamicsHtml(refl){
    var h2hBand='<div class="cdyn-h2h"><div class="cdyn-side"><div class="nm"><span class="dot" style="background:'+accentA+'"></span>'+escD(A.name)+'</div><div class="comp" style="color:'+(aLead?accentA:'var(--mut)')+'">'+escD(A.compositeScore)+'</div><div class="cl">Composite</div></div><div class="cdyn-mid">'+mid+'</div><div class="cdyn-side"><div class="nm"><span class="dot" style="background:'+accentB+'"></span>'+escD(B.name)+'</div><div class="comp" style="color:'+(bLead?accentB:'var(--mut)')+'">'+escD(B.compositeScore)+'</div><div class="cl">Composite</div></div></div>';
    var fitSub=fitDelta>0?'<span style="color:'+accentA+';font-weight:700">'+escD(fn(A.name))+' +'+escD(fitDelta)+'</span>':fitDelta<0?'<span style="color:'+accentB+';font-weight:700">'+escD(fn(B.name))+' +'+escD(-fitDelta)+'</span>':'<span style="color:var(--mut2)">level</span>';
    var riskSub=Math.abs(riskDelta)<0.05?'<span style="color:var(--mut2);font-weight:700">&#8776; even ('+(riskDelta>0?'+':'')+escD(riskDelta)+')</span>':riskDelta<0?'<b>'+escD(fn(A.name))+' lower ('+escD(riskDelta)+')</b>':'<b>'+escD(fn(B.name))+' lower (+'+escD(riskDelta)+')</b>';
-   var h2hSub='<div class="cdyn-sub"><span>Fit '+fitSub+'</span><span>Risk '+riskSub+'</span><span>Requirements won <b>'+escD(fn(A.name))+' '+winsA+'</b> &middot; <b>'+escD(fn(B.name))+' '+winsB+'</b></span><span>Leads composite <b>'+escD(leadId?nameOf(leadId):'tie')+'</b></span></div>';
+   var h2hSub='<div class="cdyn-sub"><span>Fit '+fitSub+'</span><span>Risk '+riskSub+'</span><span>Requirements won <b>'+escD(fn(A.name))+' '+winsA+'</b> &middot; <b>'+escD(fn(B.name))+' '+winsB+'</b></span><span>Must-have gaps <b>'+escD(fn(A.name))+' '+h2cA.mustGap+'</b> &middot; <b>'+escD(fn(B.name))+' '+h2cB.mustGap+'</b></span><span>Evidence <b>'+escD(xA.evidenceConfidence)+'</b> &middot; <b>'+escD(xB.evidenceConfidence)+'</b></span><span>Leads composite <b>'+escD(leadId?nameOf(leadId):'tie')+'</b></span></div>';
    // vendor cards, leader gets an outline + "Leads composite" ribbon
    var pillar=function(a,accent,isLead){
      var cand=pvCandById(a.id)||{};var at=(cand.deepDive&&cand.deepDive.attrs)||cand.attrs||{};
@@ -689,7 +691,16 @@ function pvDynamicsHtml(refl){
    var cmpHd='<div class="cdyn-cmphd"><span class="t">Per-requirement, where each one wins</span><span class="lg"><span style="color:'+accentA+';font-weight:700">&#9668; '+escD(fn(A.name))+'</span> &nbsp; <span style="color:'+accentB+';font-weight:700">'+escD(fn(B.name))+' &#9658;</span></span></div>';
    var dvg='<div class="cdyn-dvg">'+dvgRows+'</div>';
    var tradeoff='<div class="caveat" style="margin-top:14px"><b>Key tradeoff.</b> '+escD(pvH2HTradeoff(A,B,per,leadId,fitDelta,riskDelta))+'</div>';
-   body=raceLine+picker+h2hBand+h2hSub+cards+cmpHd+dvg+tradeoff;
+   // HH1 (Marc): fold Risk difference / Evidence confidence / Commercial model INTO this panel as sections,
+   // in the panel's own style, instead of three separate cards below.
+   var sect=function(label,inner){return '<div style="margin-top:20px;border-top:1px solid var(--line);padding-top:15px"><div style="font:700 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut2);margin-bottom:12px">'+label+'</div>'+inner+'</div>';};
+   var rdRows=(typeof PVR2_RISK_DIMS!=='undefined'?PVR2_RISK_DIMS:[]).map(function(rd){var da=xA.dimensions.find(function(d){return d.id===rd[0];})||{},db=xB.dimensions.find(function(d){return d.id===rd[0];})||{};return '<tr><td style="font-size:12px;font-weight:600;color:var(--ink);padding:6px 8px 6px 0">'+escD(rd[1])+'</td><td style="padding:4px;text-align:center">'+pvSemanticRiskCell(pvR2ConcernToRisk(da.concern),da.confidence)+'</td><td style="padding:4px;text-align:center">'+pvSemanticRiskCell(pvR2ConcernToRisk(db.concern),db.confidence)+'</td></tr>';}).join('');
+   var riskSect=sect('Risk difference','<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="font-size:11px;color:'+accentA+';padding-bottom:6px">'+escD(fn(A.name))+'</th><th style="font-size:11px;color:'+accentB+';padding-bottom:6px">'+escD(fn(B.name))+'</th></tr></thead><tbody>'+rdRows+'</tbody></table></div>');
+   var evSect=sect('Evidence confidence','<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px"><div><div style="font-size:12px;font-weight:700;color:'+accentA+';margin-bottom:8px">'+escD(A.name)+'</div>'+pvEvidCoverageBar(xA.evidenceCoverage)+'</div><div><div style="font-size:12px;font-weight:700;color:'+accentB+';margin-bottom:8px">'+escD(B.name)+'</div>'+pvEvidCoverageBar(xB.evidenceCoverage)+'</div></div>');
+   var commSect=(xA.commercialDrivers||xB.commercialDrivers)?sect('Commercial model','<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px"><div><div style="font-size:12px;font-weight:700;color:'+accentA+';margin-bottom:8px">'+escD(A.name)+'</div>'+(xA.commercialDrivers?pvDD2CommercialDrivers(xA.commercialDrivers):'<div style="font-size:12px;color:var(--mut2)">Not on file.</div>')+'</div><div><div style="font-size:12px;font-weight:700;color:'+accentB+';margin-bottom:8px">'+escD(B.name)+'</div>'+(xB.commercialDrivers?pvDD2CommercialDrivers(xB.commercialDrivers):'<div style="font-size:12px;color:var(--mut2)">Not on file.</div>')+'</div></div>'):'';
+   var vg=(xA.gates||[]).concat(xB.gates||[]).map(function(g){return g.label;}),vseen={};vg=vg.filter(function(l){if(vseen[l])return false;vseen[l]=true;return true;}).slice(0,6);
+   var chipsSect=vg.length?sect('Validation before the decision',vg.map(function(l){return '<span style="display:inline-block;font:600 11px var(--mono);color:var(--emph);background:var(--emph-t);border-radius:20px;padding:3px 10px;margin:0 6px 6px 0">'+escD(l)+'</span>';}).join('')):'';
+   body=raceLine+picker+h2hBand+h2hSub+cards+cmpHd+dvg+tradeoff+riskSect+evSect+commSect+chipsSect;
  }
  return '<div class="sa-card">'+
    '<div class="card-hd"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="ct">Competitive Dynamics &amp; Head-to-Head</span></div>'+
@@ -2062,7 +2073,7 @@ function landscapeHTML(){
  var panel;
  if(PVSL_SUB==='deep')panel=pvDeepDiveTabHtml(refl,input);
  else if(PVSL_SUB==='heatmap')panel=pvHeatmapHtml(refl);         // Pass B: collapsible categories -> sub-reqs, band legend, leaders narrative, filter, click-vendor rationale
- else if(PVSL_SUB==='h2h')panel=pvDynamicsHtml(refl)+pvH2HExtras(refl);  // HH1 (Marc): old pvDynamicsHtml design + merged new data (risk-diff / evidence / commercial). pvH2HHtml now unused.
+ else if(PVSL_SUB==='h2h')panel=pvDynamicsHtml(refl);  // HH1 (Marc): risk-diff / evidence / commercial now folded INTO the Competitive Dynamics panel. pvH2HExtras + pvH2HHtml unused.
  else if(PVSL_SUB==='risk')panel=pvRiskHtml2(refl);              // v3 (pv-07b): pvAssess spine — portfolio summary + semantic heatmap (level+confidence) + coverage callout + selected-supplier material risks/disposition/event-timeline/mitigation. Old pvRiskHtml now dead.
  else panel=pvExecSummaryHtml(refl,input);
  var body=pvSubtabsHtml()+panel;
