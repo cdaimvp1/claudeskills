@@ -1187,7 +1187,10 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .needs b{font-weight:700;letter-spacing:.04em}
 .pvsl .needs span{color:var(--amber-d)}
 .pvsl .plane{position:relative;height:300px;border:1px solid var(--line2);border-radius:12px;background:var(--surface);margin:6px 0 14px;overflow:hidden}
-/* 4 EQUAL quadrant cells (Marc), each a distinct faint tone so the zones read + never blend.
+/* Quadrant cells, each a distinct faint tone so the zones read + never blend. 50/50 (Marc) is the DEFAULT
+   split; the Segmentation & Differentiators panel overrides width/height inline per the slider thresholds so
+   the 4 regions resize as the reviewer drags Fit/Risk (owner ask, 2026-07: sliders must move the axes, not
+   just re-bucket dots on a fixed split).
    Brightened (owner ask, 2026-07): ~8-13% alpha read as near-invisible; bumped to ~22-28% so the
    four zones clearly read at a glance, same hues, same relative ordering. */
 .pvsl .plane .pq{position:absolute;width:50%;height:50%}
@@ -1253,6 +1256,10 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .band.contained{color:var(--blue);background:var(--blue-t)}
 .pvsl .band.elevated{color:var(--red);background:var(--pink-t)}
 .pvsl .recwrap{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+/* STAGE DeepDive #2: equal-column sibling of .recwrap, pairs two full DeepDive cards (each keeps its own
+   card-hd/accent) side by side instead of stacking; collapses to one column with .recwrap at 1100px. */
+.pvsl .ddpair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pvsl .ddpair>.sa-card{margin-bottom:0}
 .pvsl .leadcard{border:1px solid var(--blue-d);border-radius:12px;overflow:hidden}
 .pvsl .leadcard .lh{display:flex;align-items:center;gap:9px;padding:11px 14px;background:var(--blue-t);border-bottom:1px solid var(--line)}
 .pvsl .leadcard .lh .lt{font-size:14px;font-weight:800}
@@ -1328,7 +1335,7 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .pvcond{display:flex;flex-direction:column;gap:7px}
 .pvsl .pvcond .cr{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.5}
 .pvsl .pvcond .cr .cd{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:700;margin-top:2px}
-@media(max-width:1100px){.pvsl .metrics{grid-template-columns:repeat(3,1fr)}.pvsl .metric{border-bottom:1px solid var(--line)}.pvsl .recwrap{grid-template-columns:1fr}.pvsl .pvattrs{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1100px){.pvsl .metrics{grid-template-columns:repeat(3,1fr)}.pvsl .metric{border-bottom:1px solid var(--line)}.pvsl .recwrap{grid-template-columns:1fr}.pvsl .ddpair{grid-template-columns:1fr}.pvsl .pvattrs{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.pvsl .metrics{grid-template-columns:repeat(2,1fr)}.pvsl .segs{grid-template-columns:repeat(2,1fr)}.pvsl .pvattrs{grid-template-columns:1fr}}
 /* ===== Competitive Dynamics, head-to-head (race-line, H2H band, vendor cards, diverging bars) ===== */
 .pvsl .cdyn-race{display:flex;align-items:center;gap:11px;font-size:12.5px;color:var(--mut);border-radius:8px;padding:9px 13px;margin-bottom:14px;line-height:1.45}
@@ -1447,6 +1454,10 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .segR{display:flex;flex-direction:column;min-height:0;min-width:0}
 .pvsl .pdot{cursor:pointer}
 .pvsl .pdot.pdot-sel{box-shadow:0 0 0 3px rgba(38,30,20,.16),var(--shadow);z-index:3}
+/* Shortlist tint + de-emphasis on the Segmentation plane dots (owner ask, 2026-07): mirrors the Recommendation
+   table's row tint instead of the removed "Shortlist to advance" sentence; rank-1's dot is left as designed. */
+.pvsl .pdot.pdot-short{box-shadow:0 0 0 3px var(--tib-blue),var(--shadow);z-index:2}
+.pvsl .pdot.pdot-dim{opacity:.62}
 .pvsl .segassess{margin-top:12px;flex:none;border:1px solid var(--line2);border-radius:11px;background:var(--well);padding:11px 13px}
 .pvsl .segassess-h{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 7px;font:700 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--navy)}
 .pvsl .segassess-tag{font:700 8px var(--mono);letter-spacing:.03em;text-transform:uppercase;background:var(--line2);color:var(--mut2);border-radius:20px;padding:2px 7px}
@@ -1508,6 +1519,25 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .riskpost-item{display:flex;flex-direction:column;gap:2px}
 .pvsl .riskpost-k{font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--rpacc,var(--navy))}
 .pvsl .riskpost-v{font-size:12.5px;color:var(--ink);line-height:1.4}
+/* STAGE Risk+Issues: "Recent public issues" (breach/lawsuit/financial/regulatory), surfaces deepDive.riskPosture.recentIssues */
+.pvsl .riskpost-issues{margin-top:13px;padding-top:12px;border-top:1px solid var(--line2)}
+.pvsl .riskpost-issues-hd{font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:9px}
+.pvsl .rpissue{padding:9px 0;border-bottom:1px solid var(--line)}
+.pvsl .rpissue:first-child{padding-top:0}
+.pvsl .rpissue:last-child{border-bottom:none;padding-bottom:0}
+.pvsl .rpissue-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.pvsl .rpissue-cat{font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--mut);background:var(--nested);border-radius:20px;padding:2px 8px}
+.pvsl .rpissue-sev{font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;border-radius:20px;padding:2px 8px}
+.pvsl .rpissue-sev.high{color:var(--riskred);background:var(--pink-t)}
+.pvsl .rpissue-sev.medium{color:var(--amber-d);background:var(--amber-t)}
+.pvsl .rpissue-sev.low{color:var(--mut2);background:var(--well)}
+.pvsl .rpissue-date{font:600 10.5px var(--mono);color:var(--mut2);margin-left:auto;white-space:nowrap}
+.pvsl .rpissue-title{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:3px}
+.pvsl .rpissue-detail{font-size:12px;color:var(--mut);line-height:1.5;margin-bottom:5px}
+.pvsl .rpissue-meta{font-size:10.5px;color:var(--mut2);line-height:1.5}
+.pvsl .rpissue-meta b{color:var(--mut);font-weight:600}
+.pvsl .rpissue-conf{font:700 8px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);background:var(--bg);border:1px solid var(--line2);border-radius:20px;padding:1px 7px;margin-left:7px}
+.pvsl .rpissue-none{font-size:12px;color:var(--mut2);line-height:1.5}
 /* #7 (Marc): interactive cross-supplier ZOPA, supplier labels AT their dots (staggered), price ticks along the line, hover emphasis */
 .csz-line{margin:0 0 30px}
 .csz-line:last-child{margin-bottom:8px}
@@ -1636,6 +1666,20 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .pvrec .rcomp{font-family:var(--sans);text-align:right;font-weight:600;color:#1A1A1A}
 .pvsl .pvrec .lead .rcomp{font-weight:800;color:var(--emph)}
 .pvsl .pvrec .lead .n{font-weight:600;color:var(--ink)}
+/* Shortlist row tint (owner ask, 2026-07): replaces the removed "Shortlist to advance" sentence; rank-1
+   keeps its own .lead styling untouched, non-shortlisted rows stay plain (de-emphasized by contrast). */
+.pvsl .pvrec .rgrid.shortlisted{background:var(--ti-blue);border-radius:6px}
+.pvsl .pvrec .rgrid.shortlisted .rrk{color:var(--navy)}
+/* Eliminated-vendor divider + rows, merged into the Recommendation table (owner ask, 2026-07: no separate
+   "Eliminated before the shortlist" card). Reason spans grid-column 3/-1 (segment+composite+fit+risk). */
+.pvsl .pvrec .rgrid.rdiv{padding:7px 10px 5px;margin-top:6px;border-top:1px solid #E4E4DF;background:var(--panel)}
+.pvsl .pvrec .rdiv-lbl{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)}
+.pvsl .pvrec .rdiv-note{font-family:var(--sans);font-size:10px;color:var(--mut2);text-align:left}
+.pvsl .pvrec .rgrid.elimr{padding:7px 10px;border-bottom:1px solid #E4E4DF;background:var(--pink-t)}
+.pvsl .pvrec .rgrid.elimr:last-child{border-bottom:none}
+.pvsl .pvrec .elimr .rnm{color:var(--mut);font-weight:600;text-decoration:line-through}
+.pvsl .pvrec .elimr .elimreason{font-family:var(--sans);font-size:11.5px;color:var(--mut2);text-decoration:none}
+.pvsl .pvrec .elimr .ex{width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:700}
 .pvsl .rna{margin:14px 0 0;padding:10px 13px;background:var(--tint-c6dfe7,#C6DFE7);border:1px solid #8CBAC7;border-radius:7px;box-shadow:0 2px 8px rgba(10,82,102,.20);font-family:var(--sans);font-size:13px;color:#33454C;line-height:1.5}
 .pvsl .rna .nal{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0A5266;margin-right:7px;white-space:nowrap}
 .pvsl .rna b{font-weight:800;color:#1A1A1A}
@@ -1798,6 +1842,15 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .frrole.d{color:var(--navy)}
 .pvsl .frrole.p{color:var(--mut2)}
 .pvsl .frrole.m{color:var(--mut)}
+/* STAGE Risk+Issues: "Knockout matrix" (replaces the old stacked must-have warning list), must-have
+   requirements (rows) x at-risk vendors only (cols), reuses .hmt table chrome + .hcell sub sizing. */
+.pvsl .mustmx{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.pvsl .mustmx-hd{font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:8px}
+.pvsl .mustmx-sub{font-weight:400;text-transform:none;letter-spacing:0;color:var(--mut2)}
+.pvsl .mustmx-clear{font-size:12px;color:var(--mut);line-height:1.5}
+.pvsl .mmt th.cat{width:46%}
+.pvsl .mmt td.cat{font-size:12px}
+.pvsl .mmcatlbl{display:block;font-size:10px;color:var(--mut2);font-weight:500;margin-top:1px}
 @media(max-width:720px){.pvsl .hmrat-sub{width:auto} .pvsl .hmrat-tbl,.pvsl .hmrat-tbl tbody,.pvsl .hmrat-tbl tr,.pvsl .hmrat-tbl td{display:block;width:auto} .pvsl .hmrat-tbl td{border-top:none;padding:2px 0}}
 /* --- risk (Pass 2B): dimensions (rows) x vendors (cols), reuses the heatmap table chrome (.hmt);
    .rkt only tunes the score cells + the summary (weighted / band / flags) footer rows --- */
