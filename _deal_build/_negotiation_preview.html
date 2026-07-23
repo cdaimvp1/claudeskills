@@ -1,0 +1,1799 @@
+<!doctype html><html><head><meta charset='utf-8'><title>Negotiation tab preview</title>
+<style>/* =============================================================================
+ * style.css — Deal-artifact design system.
+ * Platform-matching .sa-card / .card-hd, plum/teal/burnt-orange tokens, evidence
+ * chips, severity, and viz base styles (table / heatmap / matrix / timeline /
+ * waterfall). Self-contained: no external fonts, no remote assets.
+ *
+ * Colour discipline (LOCKED, see brief):
+ *   Structural  = PLUM (--pri) primary + TEAL (--sec) secondary + BURNT ORANGE
+ *                 (--emph) emphasis/attention. <=3 structural hues (shades OK).
+ *   Functional severity (used ONLY where meaning requires, never as decoration):
+ *     danger red  --danger-*  signature condition / material exposure
+ *     amber       --warn-*    issue / uncertain / decision
+ *     teal/green  --ok-*      aligned / cleared
+ *   Colour is never the only signal — always paired with a label, icon, or shape.
+ * Dark mode: token VALUES redefined under @media(prefers-color-scheme:dark) AND
+ *   html[data-theme=dark] / [data-theme=light]; components read tokens only.
+ * ========================================================================== */
+
+/* ---- 1. TOKENS ----------------------------------------------------------- */
+:root{
+  /* neutral shade ladder (hierarchy backbone) — warm-biased toward plum */
+  --bg:#E7E4E9;          /* page — off-white with a faint plum bias so white cards separate */
+  --surface:#FFFFFF;     /* elevated card */
+  --panel:#F4F1F0;       /* sub-panel inside a card */
+  --nested:#ECE8EA;      /* nested block */
+  --well:#E3DEE2;        /* inset / deepest well */
+  --line:#E1DBDF;        /* hairline */
+  --line2:#CFC7CD;       /* stronger divider */
+  --ink:#1C1A1D;         /* primary text (near-black, slight plum) */
+  --ink2:#403A40;        /* secondary text */
+  --mut:#585059;         /* muted text (AA-safe) */
+  --mut2:#6C636B;        /* secondary muted */
+
+  /* structural hues (the 3-colour system) */
+  --pri:#5C2B50;   --pri-t:#EEDEEA;  --pri-fg:#F4ECF1;  --pri-tx:#5C2B50;   /* PLUM primary */
+  --sec:#2F6E6B;   --sec-t:#DCEBE9;  --sec-fg:#EAF4F2;  --sec-tx:#2F6E6B;   /* TEAL secondary */
+  --emph:#C15E19;  --emph-t:#F6E0CF; --emph-fg:#FBEFE4; --emph-tx:#A2500F;  /* BURNT ORANGE emphasis */
+
+  /* functional severity tones: -bg tint, -fg text/icon, -bar accent */
+  --danger-bg:#F6E5E1; --danger-fg:#A23A30; --danger-bar:#A23A30;  /* signature condition / exposure */
+  --warn-bg:#F8EFD9;   --warn-fg:#8A5A00;   --warn-bar:#B45309;    /* issue / uncertain / decision */
+  --ok-bg:#DFEEEA;     --ok-fg:#2F6E6B;     --ok-bar:#2F6E6B;      /* aligned / cleared (teal-green) */
+  --info-bg:var(--sec-t); --info-fg:var(--sec-tx); --info-bar:var(--sec);
+
+  /* heatmap ramp (neutral -> plum), used for intensity encoding */
+  --heat-0:#F1EEF0; --heat-1:#E4D3DE; --heat-2:#CBA7BE; --heat-3:#A66E93; --heat-4:#7C4069; --heat-5:#5C2B50;
+
+  --shadow-1:0 1px 2px rgba(40,28,36,.05),0 1px 3px rgba(40,28,36,.08);
+  --shadow-2:0 2px 4px rgba(40,28,36,.06),0 6px 16px -4px rgba(40,28,36,.12);
+
+  --sans:'Libre Franklin','Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  --mono:'Roboto Mono',ui-monospace,'SFMono-Regular',Consolas,monospace;
+  --fz-h:15px; --fz:13.5px; --fz-sm:12.5px; --fz-meta:11.5px; --fz-floor:11px; --fz-title:13px;
+  --r:11px; --r-sm:8px;
+  --tab-h:44px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme]){ color-scheme:dark;
+    --bg:#1A181A; --surface:#252325; --panel:#2C2A2C; --nested:#322F32; --well:#3A363A;
+    --line:#38343800; --line:#38343A; --line2:#4A454B; --ink:#ECE9EC; --ink2:#C9C4C9; --mut:#AEA6AD; --mut2:#8B838A;
+    --pri:#3E2038; --pri-t:#33253B; --pri-fg:#EFDFEC; --pri-tx:#CE9FC6;
+    --sec:#245552; --sec-t:#1E302E; --sec-fg:#DDF0ED; --sec-tx:#5FBAAE;
+    --emph:#EF9A5A; --emph-t:#33241A; --emph-fg:#FBEFE4; --emph-tx:#E89A5D;
+    --danger-bg:#3A1E1A; --danger-fg:#EB9C93; --danger-bar:#D2554A;
+    --warn-bg:#332905;  --warn-fg:#E2BE55;  --warn-bar:#DBAA50;
+    --ok-bg:#182A26;    --ok-fg:#63BBA9;    --ok-bar:#3C8B80;
+    --info-bg:var(--sec-t); --info-fg:var(--sec-tx); --info-bar:var(--sec);
+    --heat-0:#2A2730; --heat-1:#3A2A3A; --heat-2:#5A2F52; --heat-3:#7C4069; --heat-4:#9E5C88; --heat-5:#C99BC0;
+    --shadow-1:0 1px 2px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+    --shadow-2:0 2px 4px rgba(0,0,0,.55),0 6px 16px -4px rgba(0,0,0,.5);
+  }
+}
+html[data-theme="dark"]{ color-scheme:dark;
+  --bg:#1A181A; --surface:#252325; --panel:#2C2A2C; --nested:#322F32; --well:#3A363A;
+  --line:#38343A; --line2:#4A454B; --ink:#ECE9EC; --ink2:#C9C4C9; --mut:#AEA6AD; --mut2:#8B838A;
+  --pri:#3E2038; --pri-t:#33253B; --pri-fg:#EFDFEC; --pri-tx:#CE9FC6;
+  --sec:#245552; --sec-t:#1E302E; --sec-fg:#DDF0ED; --sec-tx:#5FBAAE;
+  --emph:#EF9A5A; --emph-t:#33241A; --emph-fg:#FBEFE4; --emph-tx:#E89A5D;
+  --danger-bg:#3A1E1A; --danger-fg:#EB9C93; --danger-bar:#D2554A;
+  --warn-bg:#332905;  --warn-fg:#E2BE55;  --warn-bar:#DBAA50;
+  --ok-bg:#182A26;    --ok-fg:#63BBA9;    --ok-bar:#3C8B80;
+  --info-bg:var(--sec-t); --info-fg:var(--sec-tx); --info-bar:var(--sec);
+  --heat-0:#2A2730; --heat-1:#3A2A3A; --heat-2:#5A2F52; --heat-3:#7C4069; --heat-4:#9E5C88; --heat-5:#C99BC0;
+  --shadow-1:0 1px 2px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+  --shadow-2:0 2px 4px rgba(0,0,0,.55),0 6px 16px -4px rgba(0,0,0,.5);
+}
+html[data-theme="light"]{ color-scheme:light;
+  --bg:#E7E4E9; --surface:#FFFFFF; --panel:#F4F1F0; --nested:#ECE8EA; --well:#E3DEE2;
+  --line:#E1DBDF; --line2:#CFC7CD; --ink:#1C1A1D; --ink2:#403A40; --mut:#585059; --mut2:#6C636B;
+  --pri:#5C2B50; --pri-t:#EEDEEA; --pri-fg:#F4ECF1; --pri-tx:#5C2B50;
+  --sec:#2F6E6B; --sec-t:#DCEBE9; --sec-fg:#EAF4F2; --sec-tx:#2F6E6B;
+  --emph:#C15E19; --emph-t:#F6E0CF; --emph-fg:#FBEFE4; --emph-tx:#A2500F;
+  --danger-bg:#F6E5E1; --danger-fg:#A23A30; --danger-bar:#A23A30;
+  --warn-bg:#F8EFD9; --warn-fg:#8A5A00; --warn-bar:#B45309;
+  --ok-bg:#DFEEEA; --ok-fg:#2F6E6B; --ok-bar:#2F6E6B;
+  --heat-0:#F1EEF0; --heat-1:#E4D3DE; --heat-2:#CBA7BE; --heat-3:#A66E93; --heat-4:#7C4069; --heat-5:#5C2B50;
+}
+
+/* ---- 2. RESET / BASE ----------------------------------------------------- */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:var(--sans); font-size:var(--fz); line-height:1.5;
+  color:var(--ink); background:var(--bg);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+h1,h2,h3,h4{margin:0; text-wrap:balance; line-height:1.25}
+p{margin:0 0 .5em}
+a{color:var(--sec-tx); text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--emph); outline-offset:2px; border-radius:3px}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--mut)}
+.tiny{font-size:var(--fz-meta)}
+.eyebrow{font-size:var(--fz-floor); letter-spacing:.09em; text-transform:uppercase; color:var(--mut); font-weight:700}
+.wrap{max-width:1320px; margin:0 auto; padding:0 20px}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+
+/* ---- 3. APP HEADER + SNAPSHOT BANNER ------------------------------------- */
+.deal-head{background:var(--pri); color:var(--pri-fg); border-bottom:2px solid var(--emph)}
+.deal-head .wrap{display:flex; align-items:center; gap:16px; min-height:58px; padding-top:9px; padding-bottom:9px}
+.deal-head .dh-title{font-size:16px; font-weight:800; letter-spacing:-.01em; line-height:1.2}
+.deal-head .dh-sub{font-size:var(--fz-meta); opacity:.85; margin-top:1px}
+.deal-head .dh-spacer{margin-left:auto}
+.deal-head .dh-btn{display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); color:var(--pri-fg);
+  border:1px solid rgba(255,255,255,.28); border-radius:30px; padding:6px 13px; font:600 var(--fz-meta)/1 var(--sans); cursor:pointer}
+.deal-head .dh-btn:hover{background:rgba(255,255,255,.22)}
+.deal-head .dh-btn svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2}
+.snapshot-note{background:var(--warn-bg); color:var(--warn-fg); border-bottom:1px solid var(--line2); font-size:var(--fz-meta); font-weight:600}
+.snapshot-note .wrap{display:flex; align-items:center; gap:8px; padding-top:6px; padding-bottom:6px}
+.snapshot-note svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; flex:none}
+
+/* Sticky-head wrapper: the shell wraps <summary-strip> + <tabbar> in ONE
+   .sticky-head so they stick together without overlap (children become static). */
+.sticky-head{position:sticky; top:0; z-index:30; box-shadow:var(--shadow-1)}
+.sticky-head .summary-strip,.sticky-head .tabbar{position:static; box-shadow:none}
+
+/* ---- 4. SUMMARY STRIP (persistent, <=5 clickable values) ----------------- */
+.summary-strip{position:sticky; top:0; z-index:30; background:var(--surface); border-bottom:1px solid var(--line2); box-shadow:var(--shadow-1)}
+.summary-strip .wrap{display:flex; gap:10px; padding-top:9px; padding-bottom:9px; overflow-x:auto}
+.ss-item{flex:1 1 0; min-width:132px; display:flex; flex-direction:column; gap:2px; padding:7px 12px;
+  border:1px solid var(--line); border-left:3px solid var(--mut2); border-radius:var(--r-sm); background:var(--panel);
+  cursor:pointer; text-align:left; font-family:inherit}
+.ss-item:hover{background:var(--nested); border-color:var(--line2)}
+.ss-item .ss-val{font-size:20px; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.ss-item .ss-lbl{font-size:var(--fz-floor); color:var(--mut); text-transform:uppercase; letter-spacing:.05em; font-weight:700}
+.ss-item.tone-danger{border-left-color:var(--danger-bar)} .ss-item.tone-danger .ss-val{color:var(--danger-fg)}
+.ss-item.tone-warn{border-left-color:var(--warn-bar)}     .ss-item.tone-warn .ss-val{color:var(--warn-fg)}
+.ss-item.tone-info{border-left-color:var(--sec)}          .ss-item.tone-info .ss-val{color:var(--sec-tx)}
+.ss-item.tone-ok{border-left-color:var(--ok-bar)}         .ss-item.tone-ok .ss-val{color:var(--ok-fg)}
+
+/* ---- 5. TAB BAR + SUBTAB BAR --------------------------------------------- */
+.tabbar{position:sticky; top:0; z-index:25; background:var(--surface); border-bottom:1px solid var(--line2)}
+.summary-strip + .tabbar{top:0}
+.tabbar .wrap{display:flex; gap:2px; overflow-x:auto}
+.tab-btn{appearance:none; background:transparent; border:0; border-bottom:2.5px solid transparent; color:var(--mut);
+  font:700 var(--fz)/1 var(--sans); letter-spacing:.01em; padding:14px 16px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:7px}
+.tab-btn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn[aria-selected="true"]{color:var(--pri-tx); border-bottom-color:var(--emph)}
+.subtabbar{background:var(--panel); border-bottom:1px solid var(--line)}
+.subtabbar .wrap{display:flex; gap:6px; padding-top:9px; padding-bottom:9px; overflow-x:auto}
+.subtab-btn{appearance:none; background:var(--surface); border:1px solid var(--line2); border-radius:30px; color:var(--mut);
+  font:700 var(--fz-sm)/1 var(--sans); padding:7px 14px; cursor:pointer; white-space:nowrap}
+.subtab-btn:hover{color:var(--ink); border-color:var(--mut2)}
+.subtab-btn[aria-selected="true"]{background:var(--pri); color:var(--pri-fg); border-color:var(--pri)}
+
+/* tab/subtab panels */
+[data-tabpanel]{display:none}
+[data-tabpanel].is-active{display:block; animation:fade .18s ease}
+[data-subpanel]{display:none}
+[data-subpanel].is-active{display:block; animation:fade .18s ease}
+@keyframes fade{from{opacity:0; transform:translateY(3px)}to{opacity:1; transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important}}
+
+.tab-body{padding:20px 0 60px}
+.tab-intro{margin-bottom:16px}
+.tab-intro h2{font-size:20px; font-weight:800; letter-spacing:-.02em}
+.tab-intro .q{color:var(--mut); font-size:var(--fz); margin-top:3px; max-width:70ch}
+
+/* ---- 6. GRID ------------------------------------------------------------- */
+.grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px}
+.col-12{grid-column:span 12} .col-8{grid-column:span 8} .col-7{grid-column:span 7}
+.col-6{grid-column:span 6} .col-5{grid-column:span 5} .col-4{grid-column:span 4} .col-3{grid-column:span 3}
+@media (max-width:900px){ .grid{grid-template-columns:repeat(6,1fr)}
+  .col-8,.col-7,.col-6,.col-5,.col-4,.col-3{grid-column:span 6} }
+
+/* ---- 7. SA-CARD (platform card w/ left accent bar + icon + uppercase title) */
+.sa-card{position:relative; background:var(--surface); border:1px solid var(--line2); border-radius:var(--r);
+  box-shadow:var(--shadow-1); overflow:hidden; display:flex; flex-direction:column; min-width:0}
+.sa-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--pri)}
+.sa-card.accent-teal::before{background:var(--sec)}
+.sa-card.accent-emph::before{background:var(--emph)}
+.sa-card.accent-danger::before{background:var(--danger-bar)}
+.sa-card.accent-warn::before{background:var(--warn-bar)}
+.card-hd{display:flex; align-items:center; gap:9px; padding:12px 15px 12px 16px; border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,var(--panel),var(--surface))}
+.card-hd .ch-ic{width:17px; height:17px; flex:none; color:var(--pri-tx)}
+.sa-card.accent-teal .card-hd .ch-ic{color:var(--sec-tx)}
+.sa-card.accent-emph .card-hd .ch-ic{color:var(--emph-tx)}
+.card-hd .ch-ic svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:2}
+.card-hd .ct{font-size:var(--fz-title); font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink)}
+.card-hd .cs{margin-left:auto; font-family:var(--mono); font-size:var(--fz-meta); color:var(--mut); font-weight:600; text-align:right}
+.card-bd{padding:14px 15px; flex:1; min-width:0}
+.card-bd.tight{padding:11px 13px}
+.card-bd > :last-child{margin-bottom:0}
+.card-note{font-size:var(--fz-sm); color:var(--mut); margin-top:8px; line-height:1.45}
+
+/* insight line — short narrative that SUPPORTS a visual (never a wall) */
+.insight{display:flex; gap:8px; align-items:flex-start; font-size:var(--fz-sm); color:var(--ink2); line-height:1.45; padding:6px 0}
+.insight + .insight{border-top:1px solid var(--line)}
+.insight .ib{width:5px; align-self:stretch; border-radius:3px; background:var(--sec); flex:none}
+.insight.warn .ib{background:var(--warn-bar)} .insight.danger .ib{background:var(--danger-bar)}
+
+/* ---- 8. EVIDENCE CHIPS + COVERAGE --------------------------------------- */
+.ev{display:inline-flex; align-items:center; gap:4px; font:700 var(--fz-floor)/1 var(--sans); letter-spacing:.03em;
+  padding:3px 7px 3px 6px; border-radius:20px; border:1px solid transparent; white-space:nowrap; vertical-align:middle}
+.ev::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor; flex:none}
+.ev-contract{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 30%,transparent)}
+.ev-internal{background:var(--pri-t); color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 25%,transparent)}
+.ev-public{background:var(--info-bg); color:var(--info-fg); border-color:color-mix(in srgb,var(--sec) 22%,transparent)}
+.ev-calculated{background:var(--emph-t); color:var(--emph-tx); border-color:color-mix(in srgb,var(--emph) 30%,transparent)}
+.ev-inference{background:var(--warn-bg); color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 30%,transparent)}
+.ev-assumption{background:var(--pri-t); color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 40%,transparent); border-style:dashed}
+.ev-unavailable{background:var(--well); color:var(--mut); border-color:var(--line2)}
+.ev-unavailable::before{background:var(--mut)}
+
+.cov{display:inline-flex; align-items:center; gap:5px; font:700 var(--fz-meta)/1 var(--sans); padding:4px 9px; border-radius:20px; border:1px solid var(--line2)}
+.cov .dots{display:inline-flex; gap:2px}
+.cov .dots i{width:6px; height:6px; border-radius:50%; background:var(--line2)}
+.cov-strong{color:var(--ok-fg); background:var(--ok-bg)} .cov-strong .dots i{background:var(--ok-fg)}
+.cov-moderate{color:var(--warn-fg); background:var(--warn-bg)} .cov-moderate .dots i:nth-child(-n+2){background:var(--warn-fg)}
+.cov-limited{color:var(--danger-fg); background:var(--danger-bg)} .cov-limited .dots i:nth-child(1){background:var(--danger-fg)}
+
+/* ---- 9. STATUS / SEVERITY PILLS ----------------------------------------- */
+.pill{display:inline-flex; align-items:center; gap:5px; font:700 var(--fz-meta)/1 var(--sans); padding:4px 9px; border-radius:6px; border:1px solid transparent; white-space:nowrap}
+.pill::before{content:""; width:7px; height:7px; border-radius:2px; background:currentColor; flex:none}
+.sev-hard-stop,.pill.danger{background:var(--danger-bg); color:var(--danger-fg); border-color:color-mix(in srgb,var(--danger-bar) 35%,transparent)}
+.sev-high,.pill.warn{background:var(--warn-bg); color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 32%,transparent)}
+.sev-medium,.pill.info{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 28%,transparent)}
+.sev-low,.pill.muted{background:var(--nested); color:var(--mut2); border-color:var(--line2)}
+.pill.ok{background:var(--ok-bg); color:var(--ok-fg); border-color:color-mix(in srgb,var(--ok-bar) 30%,transparent)}
+/* status shading for scope/SLA rows */
+.st-aligned{color:var(--ok-fg)} .st-partial{color:var(--warn-fg)} .st-deviation{color:var(--danger-fg)} .st-missing{color:var(--mut)}
+
+/* ---- 10. TABLES ---------------------------------------------------------- */
+.tbl-wrap{overflow-x:auto; border-radius:var(--r-sm)}
+table.dt{width:100%; border-collapse:collapse; font-size:var(--fz-sm)}
+table.dt th,table.dt td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top}
+table.dt thead th{position:sticky; top:0; background:var(--panel); color:var(--mut); font-weight:700; font-size:var(--fz-meta);
+  text-transform:uppercase; letter-spacing:.05em; border-bottom:1.5px solid var(--line2); white-space:nowrap; z-index:1}
+table.dt th[data-sort]{cursor:pointer; user-select:none}
+table.dt th[data-sort]:hover{color:var(--ink)}
+table.dt th[data-sort]::after{content:"\2195"; opacity:.35; margin-left:5px; font-size:10px}
+table.dt th[data-sort][aria-sort="ascending"]::after{content:"\2191"; opacity:1}
+table.dt th[data-sort][aria-sort="descending"]::after{content:"\2193"; opacity:1}
+table.dt.zebra tbody tr:nth-child(even){background:color-mix(in srgb,var(--panel) 55%,transparent)}
+table.dt tbody tr:hover{background:var(--nested)}
+table.dt td.num,table.dt th.num{text-align:right; font-variant-numeric:tabular-nums; font-family:var(--mono)}
+table.dt.dense th,table.dt.dense td{padding:6px 9px}
+tr.rowtint-danger>td{background:var(--danger-bg)}
+tr.rowtint-warn>td{background:var(--warn-bg)}
+tr.is-hidden{display:none}
+.expander-row>td{padding:0; background:var(--nested)}
+.expander-row .exp-inner{padding:13px 15px; border-left:3px solid var(--pri)}
+tr.expandable{cursor:pointer}
+tr.expandable>td:first-child{position:relative; padding-left:24px}
+tr.expandable>td:first-child::before{content:"\25B8"; position:absolute; left:9px; color:var(--mut); transition:transform .15s}
+tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
+
+/* ---- 11. COLLAPSIBLE / DRAWER ------------------------------------------- */
+.collapsible{border:1px solid var(--line); border-radius:var(--r-sm); background:var(--panel); overflow:hidden; margin:8px 0}
+.collapsible>summary{list-style:none; cursor:pointer; padding:9px 12px; font-weight:700; font-size:var(--fz-sm); color:var(--ink2);
+  display:flex; align-items:center; gap:8px}
+.collapsible>summary::-webkit-details-marker{display:none}
+.collapsible>summary::before{content:"\25B8"; color:var(--mut); transition:transform .15s}
+.collapsible[open]>summary::before{transform:rotate(90deg)}
+.collapsible>summary:hover{background:var(--nested)}
+.collapsible .cl-body{padding:11px 13px; border-top:1px solid var(--line); font-size:var(--fz-sm); line-height:1.55; color:var(--ink2)}
+.excerpt{font-family:var(--mono); font-size:var(--fz-meta); background:var(--well); border-left:3px solid var(--sec);
+  padding:9px 11px; border-radius:0 var(--r-sm) var(--r-sm) 0; color:var(--ink2); line-height:1.5}
+
+/* ---- 12. VIZ: mini-bar / comparison bars -------------------------------- */
+.minibar{position:relative; height:16px; background:var(--well); border-radius:4px; overflow:hidden; min-width:60px}
+.minibar>span{position:absolute; left:0; top:0; bottom:0; background:var(--sec); border-radius:4px}
+.minibar.pri>span{background:var(--pri)} .minibar.emph>span{background:var(--emph)}
+.minibar.danger>span{background:var(--danger-bar)} .minibar.warn>span{background:var(--warn-bar)}
+.bar-row{display:grid; grid-template-columns:130px 1fr 62px; align-items:center; gap:10px; padding:5px 0; font-size:var(--fz-sm)}
+.bar-row + .bar-row{border-top:1px solid var(--line)}
+.bar-row .bl{color:var(--ink2); font-weight:600}
+.bar-row .bv{text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--ink)}
+
+/* ---- 13. VIZ: heatmap / matrix cells ------------------------------------ */
+.heatcell{display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:26px; padding:0 7px;
+  border-radius:5px; font:700 var(--fz-meta)/1 var(--mono); color:var(--ink); border:1px solid var(--line)}
+.heat-0{background:var(--heat-0)} .heat-1{background:var(--heat-1)} .heat-2{background:var(--heat-2); color:#fff}
+.heat-3{background:var(--heat-3); color:#fff} .heat-4{background:var(--heat-4); color:#fff} .heat-5{background:var(--heat-5); color:#fff}
+.heat-grid{display:grid; gap:4px}
+.heat-grid .hg-lbl{font-size:var(--fz-meta); color:var(--mut); display:flex; align-items:center; padding-right:6px}
+.heat-grid .hg-col{font-size:var(--fz-floor); color:var(--mut); text-align:center; text-transform:uppercase; letter-spacing:.03em; padding-bottom:3px}
+
+/* 2-D decision matrix (priority-impact / give-get / decision-impact-vs-ease) */
+.matrix{position:relative; width:100%; aspect-ratio:4/3; background:
+  linear-gradient(0deg,transparent 49.6%,var(--line) 49.6%,var(--line) 50.4%,transparent 50.4%),
+  linear-gradient(90deg,transparent 49.6%,var(--line) 49.6%,var(--line) 50.4%,transparent 50.4%),
+  var(--panel);
+  border:1px solid var(--line2); border-radius:var(--r-sm)}
+.matrix .mx-pt{position:absolute; transform:translate(-50%,50%); width:26px; height:26px; border-radius:50%;
+  background:var(--pri); color:var(--pri-fg); display:flex; align-items:center; justify-content:center;
+  font:800 var(--fz-floor)/1 var(--sans); border:2px solid var(--surface); box-shadow:var(--shadow-1); cursor:pointer}
+.matrix .mx-pt.teal{background:var(--sec); color:var(--sec-fg)}
+.matrix .mx-pt.emph{background:var(--emph); color:var(--emph-fg)}
+.matrix .mx-pt.danger{background:var(--danger-bar); color:#fff}
+.matrix .mx-pt:hover{outline:2px solid var(--emph); outline-offset:1px; z-index:2}
+.matrix .mx-axis-x,.matrix .mx-axis-y{position:absolute; font-size:var(--fz-floor); color:var(--mut); text-transform:uppercase; letter-spacing:.05em; font-weight:700}
+.matrix .mx-axis-x{bottom:-18px; width:100%; text-align:center}
+.matrix .mx-axis-y{left:-8px; top:50%; transform:rotate(-90deg) translateX(50%); transform-origin:left}
+.mx-quad{position:absolute; font-size:var(--fz-floor); color:var(--mut2); opacity:.7; padding:6px 8px}
+
+/* ---- 14. VIZ: waterfall (ask -> normalized -> negotiated) --------------- */
+.waterfall{display:flex; align-items:flex-end; gap:10px; height:190px; padding:10px 4px 0}
+.wf-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; min-width:0}
+.wf-bar{width:100%; max-width:74px; border-radius:5px 5px 0 0; position:relative; transition:height .3s}
+.wf-bar.total{background:var(--pri)} .wf-bar.up{background:var(--danger-bar)} .wf-bar.down{background:var(--sec)} .wf-bar.final{background:var(--emph)}
+.wf-val{font:700 var(--fz-meta)/1 var(--mono); color:var(--ink); margin-bottom:5px; white-space:nowrap}
+.wf-lbl{font-size:var(--fz-floor); color:var(--mut); text-align:center; margin-top:7px; line-height:1.2}
+
+/* ---- 15. VIZ: timeline (milestones / sequence) -------------------------- */
+.timeline{position:relative; padding-left:8px}
+.tl-track{position:absolute; left:15px; top:6px; bottom:6px; width:2px; background:var(--line2)}
+.tl-item{position:relative; padding:0 0 16px 34px}
+.tl-item::before{content:""; position:absolute; left:9px; top:3px; width:14px; height:14px; border-radius:50%;
+  background:var(--surface); border:3px solid var(--sec); z-index:1}
+.tl-item.pri::before{border-color:var(--pri)} .tl-item.emph::before{border-color:var(--emph)}
+.tl-item .tl-date{font:700 var(--fz-meta)/1 var(--mono); color:var(--sec-tx)}
+.tl-item .tl-name{font-weight:700; font-size:var(--fz-sm); margin:2px 0}
+.tl-item .tl-meta{font-size:var(--fz-meta); color:var(--mut)}
+/* horizontal gantt-ish bar timeline */
+.gantt{display:grid; gap:6px}
+.gantt-row{display:grid; grid-template-columns:150px 1fr; gap:10px; align-items:center; font-size:var(--fz-sm)}
+.gantt-track{position:relative; height:22px; background:var(--panel); border-radius:5px; border:1px solid var(--line)}
+.gantt-fill{position:absolute; top:2px; bottom:2px; background:var(--sec); border-radius:4px; display:flex; align-items:center; padding:0 6px; color:var(--sec-fg); font:700 var(--fz-floor)/1 var(--sans); overflow:hidden}
+.gantt-fill.pri{background:var(--pri); color:var(--pri-fg)}
+
+/* ---- 16. ASSUMPTION CONTROLS (LOCAL, editable) -------------------------- */
+.asm-ctrl{display:flex; flex-direction:column; gap:5px; padding:10px 0; border-bottom:1px solid var(--line)}
+.asm-ctrl:last-child{border-bottom:0}
+.asm-ctrl .asm-top{display:flex; align-items:baseline; gap:8px}
+.asm-ctrl label{font-weight:700; font-size:var(--fz-sm); color:var(--ink2)}
+.asm-ctrl .asm-val{margin-left:auto; font-family:var(--mono); font-weight:700; color:var(--emph-tx); font-variant-numeric:tabular-nums}
+.asm-ctrl input[type=range]{width:100%; accent-color:var(--pri); height:4px}
+.asm-ctrl .asm-badge{font-size:var(--fz-floor); color:var(--mut)}
+.local-flag{display:inline-flex; align-items:center; gap:4px; font:700 var(--fz-floor)/1 var(--sans); color:var(--emph-tx);
+  background:var(--emph-t); border-radius:5px; padding:3px 6px; text-transform:uppercase; letter-spacing:.05em}
+.btn{appearance:none; font:700 var(--fz-sm)/1 var(--sans); padding:8px 13px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--line2); background:var(--surface); color:var(--ink); display:inline-flex; align-items:center; gap:6px}
+.btn svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2}
+.btn:hover{background:var(--nested); border-color:var(--mut2)}
+.btn.primary{background:var(--pri); color:var(--pri-fg); border-color:var(--pri)}
+.btn.primary:hover{background:color-mix(in srgb,var(--pri) 85%,black)}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+
+/* ---- 17. FILTER / TOOLBAR ----------------------------------------------- */
+.toolbar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+.toolbar input[type=search],.toolbar select{font:600 var(--fz-sm)/1 var(--sans); padding:8px 11px; border-radius:8px;
+  border:1px solid var(--line2); background:var(--surface); color:var(--ink)}
+.toolbar input[type=search]{min-width:200px}
+.chip-filter{appearance:none; font:700 var(--fz-meta)/1 var(--sans); padding:6px 11px; border-radius:20px; cursor:pointer;
+  border:1px solid var(--line2); background:var(--surface); color:var(--mut)}
+.chip-filter[aria-pressed="true"]{background:var(--pri); color:var(--pri-fg); border-color:var(--pri)}
+.toolbar .spacer{margin-left:auto}
+.filter-count{font-size:var(--fz-meta); color:var(--mut)}
+
+/* ---- 18. KV / DEFINITION ROWS (compact fact rows, not cards) ------------ */
+.kv{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:var(--fz-sm)}
+.kv dt{color:var(--mut); font-weight:600; white-space:nowrap}
+.kv dd{margin:0; color:var(--ink); display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.divider{height:1px; background:var(--line); margin:12px 0; border:0}
+
+/* jump / copy affordances */
+.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,100%{box-shadow:0 0 0 0 transparent}20%{box-shadow:0 0 0 3px var(--emph)}}
+.jump{cursor:pointer; color:var(--sec-tx); font-weight:700; font-size:var(--fz-meta); text-decoration:underline; text-decoration-style:dotted}
+.copyable{position:relative}
+.copied-toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--surface);
+  padding:9px 16px; border-radius:8px; font:700 var(--fz-sm)/1 var(--sans); box-shadow:var(--shadow-2); z-index:100; opacity:0; pointer-events:none; transition:opacity .2s}
+.copied-toast.show{opacity:1}
+
+/* ---- 19. GAP / UNAVAILABLE card (never an empty fabricated panel) -------- */
+.gap-card{border:1px dashed var(--line2); background:var(--panel); border-radius:var(--r-sm); padding:13px 15px}
+.gap-card .gc-hd{display:flex; align-items:center; gap:8px; font-weight:700; color:var(--mut2); font-size:var(--fz-sm)}
+.gap-card .gc-hd svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2}
+.legend{display:flex; flex-wrap:wrap; gap:10px; font-size:var(--fz-meta); color:var(--mut); margin-top:10px}
+.legend span{display:inline-flex; align-items:center; gap:5px}
+.legend i{width:11px; height:11px; border-radius:3px; display:inline-block}
+
+/* print */
+@media print{
+  .summary-strip,.tabbar,.subtabbar,.deal-head .dh-btn,.toolbar{position:static}
+  [data-tabpanel],[data-subpanel]{display:block !important}
+  .sa-card{break-inside:avoid; box-shadow:none}
+  body{background:#fff}
+}
+
+body{background:var(--bg)}
+.tabbar{position:static}
+</style>
+</head><body>
+<div class='deal-head'><div class='wrap'><div><div class='dh-title'>Visier People Analytics — MSA + SOW</div><div class='dh-sub'>Session snapshot preview</div></div></div></div>
+<div class='sticky-head'>
+<div class='summary-strip'><div class='wrap' id='ss'></div></div>
+<div class='tabbar'><div class='wrap'>
+<button class='tab-btn' data-tab='negotiation' aria-selected='true'>Negotiation</button>
+</div></div>
+</div>
+<div data-tabpanel='negotiation' class='is-active'></div>
+<script>/* =============================================================================
+ * data.js — the SINGLE canonical model that drives every tab of the Deal artifact.
+ *
+ * Exposes one global:  const dashboardData = {...}
+ *
+ * HARD RULES (see DEAL-REDESIGN-BRIEF.md):
+ *  - One object drives ALL tabs. No fact is hard-coded twice in the UI.
+ *  - The SAME issue object drives Brief top-issues + Contract register +
+ *    Negotiation positions + Meeting Brief + Sources cross-ref. Look them up by id.
+ *  - Every material value carries an evidenceType from this fixed set:
+ *      'contract'   Contract fact  (text in an uploaded/related contract)
+ *      'internal'   Internal fact  (playbook / template / finance / risk / M365)
+ *      'public'     Public fact    (credible external source)
+ *      'calculated' Calculated     (client-side arithmetic over the above)
+ *      'inference'  Claude inference (reasoned, not directly stated)
+ *      'assumption' User assumption (editable LOCAL input)
+ *      'unavailable'Unavailable    (not in session — drives a gap, never a fake panel)
+ *  - Plain-language coverage only: 'Strong' | 'Moderate' | 'Limited'. Never a % .
+ *  - Sample data = an ILLUSTRATIVE Visier (people-analytics SaaS) MSA + SOW deal.
+ *    Internally consistent, fully evidence-classified, NOT a live record.
+ * ========================================================================== */
+const dashboardData = {
+
+  /* ---- session envelope: this is a snapshot, say so in the UI --------------- */
+  meta: {
+    artifactKind: 'session-snapshot',
+    generatedAt: '2026-07-23T14:10:00',
+    disclaimer: 'Session snapshot — a single Claude analysis of the information available at generation time. Not a live system, not a version of record. Figures are illustrative and internally consistent for a sample Visier deal.',
+    contractSet: 'new-msa-plus-sow'   // drives adaptive tabs: MSA + initial SOW both present
+  },
+
+  /* ---- 1. deal ------------------------------------------------------------- */
+  deal: {
+    title: 'Visier People Analytics — Master Services Agreement + Initial SOW',
+    supplier: 'Visier Inc.',
+    supplierCategory: 'HR / People-Analytics SaaS',
+    projectId: 'PRJ-2026-0417',
+    analysisDate: '2026-07-23',
+    negotiationType: 'New MSA + initial Statement of Work (SaaS subscription + implementation)',
+    stage: 'Pre-negotiation redline review',
+    counterparties: { buyer: 'Eli Lilly and Company', supplier: 'Visier Inc.' },
+    evidenceCoverage: 'Moderate',   // Strong | Moderate | Limited
+    recommendation: {
+      stance: 'Negotiate — do not sign as drafted',
+      headline: 'Sound platform fit, but three signature-blocking terms and a soft commercial anchor.',
+      rationale: 'The MSA is broadly workable and the SOW scope matches the stated objective, but the liability cap, auto-renewal, and data-protection terms sit outside playbook tolerance and must move before signature. Commercials are anchored high versus internal precedent, leaving a credible path to a low-seven-figure reduction across the initial term.',
+      conditions: [
+        { text: 'Liability cap raised from 12 months to at least 24 months of fees, with data-breach and confidentiality carve-outs uncapped or super-capped.', issueId: 'ISS-01' },
+        { text: 'Auto-renewal converted to opt-in, or notice window cut from 90 to 30 days with a price-increase cap at renewal.', issueId: 'ISS-04' },
+        { text: 'Signed DPA with EU SCCs and a defined sub-processor change-notice mechanism attached before execution.', issueId: 'ISS-03' }
+      ],
+      limitations: [
+        'DPA and Security Exhibit were referenced in the MSA but not provided in this session — protection assessment on data terms is Limited.',
+        'No prior-year Visier pricing or a competing quote is in-session; the benchmark rests on one internal analytics precedent.',
+        'Internal budget ceiling for FY27 was not supplied; max-acceptable is a working assumption, not an approved figure.'
+      ]
+    },
+    // compact top-strip values (each clickable -> jump-to). Counts, not a score.
+    summaryStrip: [
+      { key: 'hardStops',    label: 'Hard stops',            value: 3,  tone: 'danger', jump: 'tab:contract/sub:terms', evidenceType: 'calculated' },
+      { key: 'high',         label: 'High-priority issues',  value: 4,  tone: 'warn',   jump: 'tab:contract/sub:terms', evidenceType: 'calculated' },
+      { key: 'unresolved',   label: 'Open / unresolved',     value: 9,  tone: 'warn',   jump: 'tab:contract/sub:terms', evidenceType: 'calculated' },
+      { key: 'signConds',    label: 'Signature conditions',  value: 3,  tone: 'danger', jump: 'tab:brief',              evidenceType: 'inference' },
+      { key: 'tcvGap',       label: 'Target vs ask (3-yr)',  value: '−$0.62M', tone: 'info', jump: 'tab:commercials/sub:scenarios', evidenceType: 'calculated' }
+    ]
+  },
+
+  /* ---- 2. documents -------------------------------------------------------- */
+  // role: governing | ordering | scope | data | security | correspondence | reference
+  documents: [
+    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft — supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, evidenceType: 'contract', limitations: [] },
+    { id: 'DOC-02', name: 'SOW-01 — Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft — under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, evidenceType: 'contract', limitations: [] },
+    { id: 'DOC-03', name: 'Order Form — Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, evidenceType: 'contract', limitations: [] },
+    { id: 'DOC-04', name: 'Data Processing Addendum (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session — data-protection assessment is Limited and partly inferred from the MSA body.'] },
+    { id: 'DOC-05', name: 'Security & Availability Exhibit (Exhibit B)', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session — SLA credit schedule and security controls could not be verified.'] },
+    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, evidenceType: 'internal', limitations: [] }
+  ],
+
+  /* ---- 3. issues (THE spine — referenced by id everywhere) ------------------ */
+  // category: Liability | Data & Privacy | Commercial | Term & Renewal | Service Levels |
+  //           IP | Audit & Compliance | Scope & Acceptance | Continuity
+  // priority: 'hard-stop' | 'high' | 'medium' | 'low'
+  // internalDecision: 'pending' | 'accept' | 'reject' | 'trade'
+  issues: [
+    {
+      id: 'ISS-01', title: 'Liability cap set at 12 months of fees, all damages capped',
+      category: 'Liability', priority: 'hard-stop', documentId: 'DOC-01', clause: 'MSA §11.2 (Limitation of Liability)',
+      supplierPosition: 'Aggregate liability capped at fees paid in the 12 months preceding the claim; all categories capped, no carve-outs.',
+      sourceExcerpt: '“…the total aggregate liability of either party … shall not exceed the fees paid by Customer in the twelve (12) months preceding the event giving rise to the claim.”',
+      playbookPosition: 'Minimum 24 months fees for SaaS handling workforce data; data-breach, confidentiality and IP-infringement liability must be uncapped or super-capped at 3× fees.',
+      deviation: 'Cap is half the floor and contains no carve-outs for the highest-exposure events.',
+      impact: 'A workforce-data breach could generate exposure far exceeding a single year of fees; a 12-month all-inclusive cap leaves the buyer materially under-protected.',
+      recommendedPosition: '24-month cap; data-breach and confidentiality breaches carved out to a 3× super-cap; IP indemnity uncapped.',
+      fallback: '24-month cap with a 2× super-cap on data-breach only.',
+      hardStop: '12-month all-inclusive cap with no data-breach carve-out.',
+      supplierPushback: '“Our standard cap is 12 months; super-caps are non-standard and require executive approval.”',
+      recommendedResponse: 'Anchor on the workforce-data sensitivity and regulatory exposure; offer to accept a 24-month cap (not 3×) if the data-breach super-cap holds.',
+      tradeOpportunity: 'Buyer can concede the mutual 24-month cap symmetry in exchange for the data-breach carve-out.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-02', title: 'Mutual indemnity narrow; no IP-infringement defense of the platform',
+      category: 'Liability', priority: 'high', documentId: 'DOC-01', clause: 'MSA §10.1–10.3 (Indemnification)',
+      supplierPosition: 'Supplier indemnifies only for third-party bodily injury and tangible property damage; no IP-infringement indemnity for the platform.',
+      sourceExcerpt: '“Supplier shall indemnify Customer against third-party claims for bodily injury or damage to tangible property arising from Supplier’s gross negligence…”',
+      playbookPosition: 'SaaS supplier must indemnify and defend against third-party claims that the service infringes IP, with a repair/replace/refund remedy.',
+      deviation: 'IP-infringement indemnity absent entirely; injury/property indemnity gated on “gross” negligence.',
+      impact: 'If a third party alleges the platform infringes their IP, the buyer bears its own defense and any settlement.',
+      recommendedPosition: 'Add standard IP-infringement indemnity with defense obligation and repair/replace/refund; remove the “gross” qualifier.',
+      fallback: 'IP indemnity capped at the super-cap; retain “gross” qualifier on injury only.',
+      hardStop: 'No IP-infringement indemnity of any kind.',
+      supplierPushback: '“IP indemnity is covered by the general warranty.”',
+      recommendedResponse: 'Distinguish warranty (a promise) from indemnity (a defense obligation); the platform aggregates third-party data connectors, raising real IP exposure.',
+      tradeOpportunity: 'Pair with ISS-01 super-cap — a single liability package.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-03', title: 'Data-protection terms reference an unsigned DPA; no SCCs attached',
+      category: 'Data & Privacy', priority: 'hard-stop', documentId: 'DOC-01', clause: 'MSA §9.4 (Data Protection)',
+      supplierPosition: 'MSA states a DPA “will be entered into” but none is attached; no EU Standard Contractual Clauses referenced.',
+      sourceExcerpt: '“The parties will enter into a Data Processing Addendum in Supplier’s standard form, which is incorporated herein by reference.”',
+      playbookPosition: 'A signed DPA with EU SCCs and a sub-processor change-notice mechanism must be attached and executed at signature for any processor of employee personal data.',
+      deviation: 'DPA incorporated “by reference” but not provided; no SCCs; sub-processor notice mechanism unstated.',
+      impact: 'Processing of global workforce personal data without an executed, reviewed DPA is a compliance exposure and likely a policy blocker.',
+      recommendedPosition: 'Attach and execute a reviewed DPA with EU SCCs, a 30-day sub-processor objection right, and breach-notice within 72 hours, before MSA signature.',
+      fallback: 'Execute DPA within 15 days of MSA signature with the platform paused for production data until executed.',
+      hardStop: 'Signature with no DPA and no SCCs.',
+      supplierPushback: '“Our standard DPA is sufficient and rarely modified.”',
+      recommendedResponse: 'Require the actual DPA text in-session for review; “standard and rarely modified” is not a substitute for reviewing the sub-processor and SCC terms.',
+      tradeOpportunity: 'Low trade value — this is a compliance gate, not a lever.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','DOC-04','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-04', title: 'Auto-renewal with 90-day notice and uncapped renewal uplift',
+      category: 'Term & Renewal', priority: 'high', documentId: 'DOC-01', clause: 'MSA §3.2 / Order Form §4 (Term & Renewal)',
+      supplierPosition: 'Auto-renews for successive 12-month terms unless cancelled 90 days before expiry; renewal price “at then-current list.”',
+      sourceExcerpt: '“…renew automatically for successive one-year periods unless either party provides written notice at least ninety (90) days prior … at Supplier’s then-current list price.”',
+      playbookPosition: 'Auto-renewal acceptable only with a ≤30-day notice window and a contractual cap on renewal price increases (CPI or 3–5%).',
+      deviation: '90-day window (3× tolerance) and no renewal-price cap expose the buyer to an unbounded uplift.',
+      impact: 'A missed 90-day window locks in another year at an uncapped increase; renewal leverage is lost.',
+      recommendedPosition: 'Opt-in renewal, or 30-day notice with renewal uplift capped at CPI or 4%, whichever is lower.',
+      fallback: '45-day notice with a 5% renewal cap.',
+      hardStop: '90-day window with no price cap.',
+      supplierPushback: '“90 days is needed for capacity planning; list price protects our roadmap investment.”',
+      recommendedResponse: 'Offer a 45-day window in exchange for the uplift cap; capacity planning does not require a pricing free hand.',
+      tradeOpportunity: 'Concede notice window (45 vs 30) to win the renewal-price cap.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','DOC-03','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-05', title: 'No termination for convenience for the customer',
+      category: 'Term & Renewal', priority: 'medium', documentId: 'DOC-01', clause: 'MSA §12.1 (Termination)',
+      supplierPosition: 'Termination only for uncured material breach; no convenience right for the customer; fees non-refundable.',
+      sourceExcerpt: '“Either party may terminate for material breach uncured within thirty (30) days. Fees are non-cancellable and non-refundable.”',
+      playbookPosition: 'Prefer a convenience-termination right after year 1 with pro-rata refund of prepaid, unused fees.',
+      deviation: 'No convenience exit; prepaid fees fully sunk on any exit.',
+      impact: 'If the platform underdelivers, the buyer is locked in for the full term with no refund path.',
+      recommendedPosition: 'Convenience termination after month 12 with 60-day notice and pro-rata refund of unused prepaid fees.',
+      fallback: 'Convenience right only at each anniversary.',
+      hardStop: 'None — this is a trade item, not a gate.',
+      supplierPushback: '“Subscriptions are committed; convenience termination undermines the discount.”',
+      recommendedResponse: 'Tie the convenience right to a sustained SLA miss rather than a free walk-away, if a clean convenience right is refused.',
+      tradeOpportunity: 'High trade value — can be conceded to protect ISS-01/03.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-06', title: 'Uptime SLA 99.5% with weak, capped service credits',
+      category: 'Service Levels', priority: 'high', documentId: 'DOC-01', clause: 'MSA §7.2 / Exhibit B (referenced)',
+      supplierPosition: '99.5% monthly uptime; credit of 5% of monthly fee per 1% below target, capped at 15%; credits are sole remedy.',
+      sourceExcerpt: '“Supplier will use commercially reasonable efforts to achieve 99.5% availability … service credits are Customer’s sole and exclusive remedy.”',
+      playbookPosition: '99.9% for a system-of-engagement analytics platform; credits meaningful (up to 100% of monthly fee); chronic-failure termination right.',
+      deviation: '99.5% target (≈3.6h/mo permitted downtime), credit cap low, and “sole remedy” blocks other recourse.',
+      impact: 'A quarter of degraded service yields a token credit and no exit; downtime during quarterly reporting is costly.',
+      recommendedPosition: '99.9% target; credits scaled to 50% of monthly fee; three consecutive misses trigger a termination right.',
+      fallback: '99.7% with a chronic-failure termination right retained.',
+      hardStop: 'None — but chronic-failure exit is a firm ask.',
+      supplierPushback: '“99.5% is our contractual standard; 99.9% is an enterprise-tier upgrade.”',
+      recommendedResponse: 'Ask whether 99.9% is genuinely a paid tier or a negotiation posture; require the actual achieved-uptime history to justify 99.5%.',
+      tradeOpportunity: 'Data gap (Exhibit B) — resolve before trading.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','DOC-05','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-07', title: 'Customer configurations and dashboards deemed supplier IP',
+      category: 'IP', priority: 'high', documentId: 'DOC-01', clause: 'MSA §8.3 (Intellectual Property)',
+      supplierPosition: 'All configurations, dashboards and derived analytics models are supplier IP; customer gets a license during the term only.',
+      sourceExcerpt: '“All configurations, templates and analytic models created within the Service shall be the exclusive property of Supplier.”',
+      playbookPosition: 'Customer-specific configurations and dashboards built with customer data should be customer-owned or perpetually licensed; customer data is unambiguously customer-owned.',
+      deviation: 'Supplier claims ownership of buyer-built configurations and dashboards, retrievable only during the term.',
+      impact: 'On exit, the buyer loses the dashboards and models it built and paid to configure; raises switching cost and lock-in.',
+      recommendedPosition: 'Customer owns customer-specific configurations and dashboards; supplier retains platform IP; customer data always customer-owned with export rights.',
+      fallback: 'Perpetual, royalty-free licence to configurations plus a defined export format on exit.',
+      hardStop: 'Supplier ownership of customer data (not just configs).',
+      supplierPushback: '“Configurations rely on our proprietary modelling engine.”',
+      recommendedResponse: 'Separate the engine (theirs) from the buyer’s specific configuration and dashboard layer (buyer’s); require machine-readable export on exit either way.',
+      tradeOpportunity: 'Bundle with ISS-05 continuity/exit terms.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-08', title: 'Sub-processors listed by reference; no change-notice or objection right',
+      category: 'Data & Privacy', priority: 'medium', documentId: 'DOC-01', clause: 'MSA §9.6 (Sub-processors)',
+      supplierPosition: 'Supplier may add or replace sub-processors at any time; list maintained on a webpage; no notice to customer.',
+      sourceExcerpt: '“Supplier may engage sub-processors and will maintain a current list at its website; continued use constitutes consent.”',
+      playbookPosition: 'Advance notice of new sub-processors (≥30 days) with a right to object; onward-transfer safeguards required.',
+      deviation: 'No notice, no objection right; “continued use = consent” is not affirmative consent.',
+      impact: 'A new sub-processor in a high-risk jurisdiction could be added silently, undermining the data-transfer posture.',
+      recommendedPosition: '30-day advance email notice of new sub-processors with a good-faith objection-and-remediation right.',
+      fallback: 'Notice via a subscribed change-feed with 15-day objection window.',
+      hardStop: 'None.',
+      supplierPushback: '“Web-list notice is standard SaaS practice.”',
+      recommendedResponse: 'Web-list without push notice is not sufficient for employee data; require an emailed change-feed at minimum.',
+      tradeOpportunity: 'Fold into the DPA negotiation (ISS-03).',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','DOC-04','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-09', title: 'Audit rights limited to a SOC 2 report once per year',
+      category: 'Audit & Compliance', priority: 'low', documentId: 'DOC-01', clause: 'MSA §7.5 (Audit)',
+      supplierPosition: 'Customer audit satisfied by an annual SOC 2 Type II report; no on-site or for-cause audit right.',
+      sourceExcerpt: '“Supplier will provide its SOC 2 Type II report annually in lieu of any audit right.”',
+      playbookPosition: 'SOC 2 acceptable for routine assurance, plus a for-cause audit right following a security incident.',
+      deviation: 'No for-cause audit right after an incident.',
+      impact: 'After a breach, the buyer cannot independently verify remediation.',
+      recommendedPosition: 'Keep SOC 2 for routine assurance; add a for-cause audit (or independent assessor) right triggered by a reportable incident.',
+      fallback: 'For-cause right satisfied by an agreed third-party assessor’s report.',
+      hardStop: 'None.',
+      supplierPushback: '“SOC 2 is comprehensive and independently assured.”',
+      recommendedResponse: 'SOC 2 is periodic and general; a for-cause right is incident-specific — the two are complementary, not redundant.',
+      tradeOpportunity: 'Low-cost concession item for the supplier — easy give to bank goodwill.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-01','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-10', title: 'SOW acceptance is deemed after 10 days of silence',
+      category: 'Scope & Acceptance', priority: 'high', documentId: 'DOC-02', clause: 'SOW-01 §5 (Acceptance)',
+      supplierPosition: 'Each deliverable is deemed accepted if the customer does not reject in writing within 10 business days.',
+      sourceExcerpt: '“Deliverables shall be deemed accepted unless Customer provides written notice of non-conformance within ten (10) business days.”',
+      playbookPosition: 'Acceptance requires positive sign-off against written acceptance criteria; deemed-acceptance windows ≥20 business days with defined criteria.',
+      deviation: 'Silence = acceptance in a short window, and the SOW lists no objective acceptance criteria.',
+      impact: 'A busy stakeholder could “accept” a non-conforming milestone by inaction, weakening remedies and triggering payment.',
+      recommendedPosition: 'Positive sign-off against acceptance criteria defined per milestone; 20-business-day review; a cure period on rejection.',
+      fallback: 'Deemed acceptance at 20 business days but only against written criteria.',
+      hardStop: 'Deemed acceptance with no acceptance criteria at all.',
+      supplierPushback: '“Deemed acceptance keeps the project timeline moving.”',
+      recommendedResponse: 'Timelines are protected by criteria + a cure period, not by a silence trap; offer a named reviewer with an SLA on turnaround.',
+      tradeOpportunity: 'Links to SOW milestone schedule — negotiate together.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-02','PLAYBOOK-01','TEMPLATE-01']
+    },
+    {
+      id: 'ISS-11', title: 'Annual price uplift uncapped after the initial 3-year term',
+      category: 'Commercial', priority: 'high', documentId: 'DOC-03', clause: 'Order Form §4.2 (Fees)',
+      supplierPosition: 'Fees fixed for the 3-year initial term; thereafter “at then-current list price” with no cap.',
+      sourceExcerpt: '“Subscription fees are fixed during the Initial Term and thereafter adjust to Supplier’s then-current list price.”',
+      playbookPosition: 'Post-term uplift capped at CPI or a fixed 3–5%; a price-protection window beyond the initial term.',
+      deviation: 'No cap on the first post-term renewal — pairs with ISS-04 auto-renewal to create real exposure.',
+      impact: 'Year-4 fees could jump materially with the buyer already locked into the platform.',
+      recommendedPosition: 'Cap post-term uplift at CPI or 4% for renewals 4 and 5; extend price protection two years past initial term.',
+      fallback: '5% cap for the first renewal only.',
+      hardStop: 'None on its own — but jointly with ISS-04 it is high-priority.',
+      supplierPushback: '“List pricing rises with roadmap investment.”',
+      recommendedResponse: 'Fixed-term protection is meaningless if year 4 is unbounded; a CPI cap still lets list price rise with the market.',
+      tradeOpportunity: 'Package with ISS-04 renewal terms.',
+      internalDecision: 'pending',
+      evidenceType: 'contract', sourceIds: ['DOC-03','PLAYBOOK-01']
+    },
+    {
+      id: 'ISS-12', title: 'Total contract value anchored ~15% above internal precedent',
+      category: 'Commercial', priority: 'high', documentId: 'DOC-03', clause: 'Order Form §2 (Fees) + SOW-01 §7',
+      supplierPosition: 'Year-1 all-in of $1.168M (platform $780K + implementation $220K + support $95K + connectors $45K + training $28K).',
+      sourceExcerpt: 'Order Form §2 subscription and SOW-01 §7 fee schedule (see Commercials tab for the line-item breakdown).',
+      playbookPosition: 'Target discount to internal precedent benchmark; implementation and support are the most negotiable lines.',
+      deviation: 'Ask sits ≈15% above the comparable internal analytics deal on a per-user basis (see Benchmarks).',
+      impact: 'Accepting the ask overpays by an estimated $0.6M across the 3-year term versus a defensible target.',
+      recommendedPosition: 'Anchor to the target scenario ($908K Y1); implementation and premium support carry the largest concessions.',
+      fallback: 'Fallback scenario ($1.008M Y1) if platform discount is resisted.',
+      hardStop: 'Above the max-acceptable Y1 of $1.07M.',
+      supplierPushback: '“Pricing reflects the platform’s premium analytics capability.”',
+      recommendedResponse: 'Separate platform value (defensible) from implementation and support loading (negotiable); benchmark the services lines against day-rate norms.',
+      tradeOpportunity: 'Multi-year prepay or a case-study reference can fund a platform discount.',
+      internalDecision: 'pending',
+      evidenceType: 'calculated', sourceIds: ['DOC-03','DOC-02','FIN-01','BENCH-int']
+    }
+  ],
+
+  /* ---- 4. scope (SOW-01 — prominent because a SOW exists) ------------------- */
+  scope: {
+    objective: 'Stand up Visier People Analytics for ~18,000 employees: onboard core HR data sources, configure the standard workforce-analytics model, deliver an executive dashboard set, and train the people-analytics team.',
+    objectiveEvidence: 'contract',
+    inScope: [
+      { text: 'Onboarding of 4 core data sources (HRIS, payroll, recruiting, learning).', evidenceType: 'contract' },
+      { text: 'Configuration of Visier’s standard workforce-analytics content model.', evidenceType: 'contract' },
+      { text: 'Executive and manager dashboard set (up to 12 dashboards).', evidenceType: 'contract' },
+      { text: 'Admin and analyst training (2 sessions, up to 25 users).', evidenceType: 'contract' },
+      { text: 'Single-sign-on and role-based access configuration.', evidenceType: 'contract' }
+    ],
+    outOfScope: [
+      { text: 'Custom data-source connectors beyond the 4 named sources.', evidenceType: 'contract' },
+      { text: 'Bespoke predictive models beyond the standard content pack.', evidenceType: 'contract' },
+      { text: 'Historical data migration older than 3 years.', evidenceType: 'contract' },
+      { text: 'Integration with non-HR systems (finance, CRM).', evidenceType: 'inference' }
+    ],
+    deliverables: [
+      { id: 'D1', name: 'Data-source integration (4 sources)', milestone: 'M2', owner: 'Supplier', acceptanceRef: 'AC-1', evidenceType: 'contract' },
+      { id: 'D2', name: 'Configured content model + validation', milestone: 'M3', owner: 'Supplier', acceptanceRef: 'AC-2', evidenceType: 'contract' },
+      { id: 'D3', name: 'Dashboard set (up to 12)', milestone: 'M4', owner: 'Supplier', acceptanceRef: 'AC-3', evidenceType: 'contract' },
+      { id: 'D4', name: 'SSO / RBAC configuration', milestone: 'M4', owner: 'Joint', acceptanceRef: 'AC-3', evidenceType: 'contract' },
+      { id: 'D5', name: 'Admin + analyst training (2 sessions)', milestone: 'M5', owner: 'Supplier', acceptanceRef: 'AC-4', evidenceType: 'contract' }
+    ],
+    milestones: [
+      { id: 'M1', name: 'Kickoff & discovery', date: '2026-09-01', end: '2026-09-15', dependsOn: [],          evidenceType: 'contract' },
+      { id: 'M2', name: 'Data onboarding',    date: '2026-09-15', end: '2026-10-20', dependsOn: ['M1'],       evidenceType: 'contract' },
+      { id: 'M3', name: 'Model configuration', date: '2026-10-20', end: '2026-11-17', dependsOn: ['M2'],       evidenceType: 'contract' },
+      { id: 'M4', name: 'Dashboards + access',  date: '2026-11-17', end: '2026-12-15', dependsOn: ['M3'],       evidenceType: 'contract' },
+      { id: 'M5', name: 'Training & go-live',   date: '2026-12-15', end: '2027-01-12', dependsOn: ['M4'],       evidenceType: 'contract' }
+    ],
+    acceptance: [
+      { id: 'AC-1', deliverable: 'D1', criteria: 'All 4 sources ingest with <2% record-reject rate over 2 cycles.', defined: true,  evidenceType: 'contract' },
+      { id: 'AC-2', deliverable: 'D2', criteria: 'Validation pack reconciles headcount to HRIS within ±0.5%.',       defined: true,  evidenceType: 'contract' },
+      { id: 'AC-3', deliverable: 'D3', criteria: 'Dashboards render agreed metrics; no objective criteria stated for “agreed”.', defined: false, evidenceType: 'inference' },
+      { id: 'AC-4', deliverable: 'D5', criteria: 'Training delivered; no competency or attendance threshold stated.', defined: false, evidenceType: 'inference' }
+    ],
+    dependencies: [
+      { id: 'DEP-1', text: 'Buyer provides HRIS/payroll extract access by M1+5 days.', owner: 'Buyer', risk: 'high', evidenceType: 'contract' },
+      { id: 'DEP-2', text: 'Buyer confirms data-classification for employee PII.',      owner: 'Buyer', risk: 'medium', evidenceType: 'inference' },
+      { id: 'DEP-3', text: 'Supplier provisions production tenant before M2.',           owner: 'Supplier', risk: 'low', evidenceType: 'contract' }
+    ],
+    // RACI matrix — activities x roles; value: R|A|C|I|'' ; flag ambiguity where >1 A or none
+    raci: {
+      roles: ['Buyer PMO', 'Buyer HRIS', 'Supplier PM', 'Supplier Eng'],
+      rows: [
+        { activity: 'Data extract & access', vals: ['A','R','C','I'], ambiguous: false, evidenceType: 'contract' },
+        { activity: 'Content-model config',  vals: ['C','I','A','R'], ambiguous: false, evidenceType: 'contract' },
+        { activity: 'Dashboard design',      vals: ['A','C','A','R'], ambiguous: true,  evidenceType: 'inference', note: 'Two Accountable owners — unclear who signs off dashboards.' },
+        { activity: 'Acceptance sign-off',   vals: ['','','','' ],    ambiguous: true,  evidenceType: 'unavailable', note: 'No accountable owner named for acceptance (links to ISS-10).' },
+        { activity: 'Training delivery',     vals: ['I','I','A','R'], ambiguous: false, evidenceType: 'contract' }
+      ]
+    },
+    serviceLevels: [
+      { id: 'SL-1', metric: 'Platform uptime', target: '99.5% / month', remedy: '5% credit per 1% miss, capped 15%', playbook: '99.9%', status: 'deviation', issueId: 'ISS-06', evidenceType: 'contract' },
+      { id: 'SL-2', metric: 'Support response (P1)', target: '4 business hours', remedy: 'None stated', playbook: '1 hour, 24×7', status: 'partial', issueId: null, evidenceType: 'contract' },
+      { id: 'SL-3', metric: 'Data refresh latency', target: 'Next-day (T+1)', remedy: 'None stated', playbook: 'T+1 acceptable', status: 'aligned', issueId: null, evidenceType: 'contract' }
+    ],
+    changeControl: [
+      { text: 'Changes require a signed Change Order; supplier estimates effort at standard day-rate.', evidenceType: 'contract' },
+      { text: 'No cap on change-order day-rate; ties to ISS-11 uncapped pricing.', evidenceType: 'inference' }
+    ]
+  },
+
+  /* ---- 5. commercialLines -------------------------------------------------- */
+  // All money is annual unless frequency='one-time'. termValue = value across the 3-yr term
+  // computed with the base assumptions below (see assumptions ASM-*).
+  commercialLines: [
+    { id: 'CL-1', item: 'Platform subscription (18,000 employees)', supplierAmount: 780000, unit: 'per year', frequency: 'annual',   quantity: 18000, target: 640000, fallback: 690000, maximumAcceptable: 720000, negotiability: 'medium', evidenceType: 'contract', sourceIds: ['DOC-03'] },
+    { id: 'CL-2', item: 'Implementation services (SOW-01)',          supplierAmount: 220000, unit: 'fixed fee',  frequency: 'one-time', quantity: 1,     target: 160000, fallback: 185000, maximumAcceptable: 200000, negotiability: 'high',   evidenceType: 'contract', sourceIds: ['DOC-02'] },
+    { id: 'CL-3', item: 'Premium support tier',                      supplierAmount: 95000,  unit: 'per year',   frequency: 'annual',   quantity: 1,     target: 60000,  fallback: 75000,  maximumAcceptable: 85000,  negotiability: 'high',   evidenceType: 'contract', sourceIds: ['DOC-03'] },
+    { id: 'CL-4', item: 'Additional data connectors (2)',            supplierAmount: 45000,  unit: 'fixed fee',  frequency: 'one-time', quantity: 2,     target: 30000,  fallback: 36000,  maximumAcceptable: 40000,  negotiability: 'medium', evidenceType: 'contract', sourceIds: ['DOC-02'] },
+    { id: 'CL-5', item: 'Training (2 sessions, 25 users)',           supplierAmount: 28000,  unit: 'fixed fee',  frequency: 'one-time', quantity: 2,     target: 18000,  fallback: 22000,  maximumAcceptable: 25000,  negotiability: 'high',   evidenceType: 'contract', sourceIds: ['DOC-02'] }
+  ],
+
+  /* ---- 6. scenarios -------------------------------------------------------- */
+  // values keyed by commercialLine id (Year-1 figure per line). total = 3-yr TCV
+  // calculated with baseUplift + term from assumptions; interpretation is narrative.
+  scenarios: [
+    { id: 'SC-ask',  name: 'Supplier ask',      basis: 'As drafted', values: { 'CL-1':780000, 'CL-2':220000, 'CL-3':95000, 'CL-4':45000, 'CL-5':28000 }, y1Total: 1168000, total: 3051000, interpretation: 'Opening anchor. Platform + support loaded high; services priced at a premium day-rate.', evidenceType: 'contract' },
+    { id: 'SC-target', name: 'Target',          basis: 'Playbook + internal precedent', values: { 'CL-1':640000, 'CL-2':160000, 'CL-3':60000, 'CL-4':30000, 'CL-5':18000 }, y1Total: 908000, total: 2372000, interpretation: 'Defensible goal: ~15% platform discount to precedent, services to day-rate norms. Aim here.', evidenceType: 'calculated' },
+    { id: 'SC-fallback', name: 'Fallback',      basis: 'If platform discount resisted', values: { 'CL-1':690000, 'CL-2':185000, 'CL-3':75000, 'CL-4':36000, 'CL-5':22000 }, y1Total: 1008000, total: 2634000, interpretation: 'Acceptable if the platform line holds firm but services and support concede.', evidenceType: 'calculated' },
+    { id: 'SC-max',  name: 'Max acceptable',    basis: 'Working ceiling (unapproved)', values: { 'CL-1':720000, 'CL-2':200000, 'CL-3':85000, 'CL-4':40000, 'CL-5':25000 }, y1Total: 1070000, total: 2797000, interpretation: 'Walk-away line. Above this, escalate rather than sign. Budget ceiling not yet confirmed (see gaps).', evidenceType: 'assumption' }
+  ],
+
+  /* ---- 7. benchmarks (ONLY internal precedent + one public norm are real) --- */
+  benchmarks: [
+    { id: 'BENCH-int', item: 'Platform $/employee/yr', comparisonValue: '$37 (this ask) vs $32 (precedent)', sourceId: 'FIN-01', comparability: 'Moderate', explanation: 'Internal precedent: a 2024 workforce-analytics platform at ~14,000 employees. Scale and scope differ; directional, not exact.', evidenceType: 'internal' },
+    { id: 'BENCH-svc', item: 'Implementation day-rate', comparisonValue: '≈$2,000/day (this SOW) vs $1,500–1,750 norm', sourceId: 'FIN-01', comparability: 'Moderate', explanation: 'Derived from SOW effort estimate against internal services-rate range. Effort split is inferred, not itemised in the SOW.', evidenceType: 'calculated' },
+    { id: 'BENCH-pub', item: 'SaaS auto-renewal notice', comparisonValue: '30–45 days typical', sourceId: 'WEB-01', comparability: 'Weak', explanation: 'General market practice for enterprise SaaS; not a Visier-specific or verified figure. Context only.', evidenceType: 'public' }
+  ],
+
+  /* ---- 8. negotiation (positions reference issue ids — never re-state them) - */
+  negotiation: {
+    objectives: [
+      { id: 'OBJ-1', text: 'Close the three signature-blocking terms (liability, DPA, renewal).', priority: 1, issueIds: ['ISS-01','ISS-03','ISS-04'], evidenceType: 'inference' },
+      { id: 'OBJ-2', text: 'Bring 3-year TCV to the target scenario (~$2.37M).', priority: 2, issueIds: ['ISS-12','ISS-11'], evidenceType: 'calculated' },
+      { id: 'OBJ-3', text: 'Secure meaningful SLA credits and a chronic-failure exit.', priority: 3, issueIds: ['ISS-06'], evidenceType: 'inference' },
+      { id: 'OBJ-4', text: 'Protect buyer ownership of configurations and data on exit.', priority: 4, issueIds: ['ISS-07','ISS-05'], evidenceType: 'inference' }
+    ],
+    // leverage: what we can push with; strength label + basis
+    leverage: [
+      { id: 'LV-1', text: 'Multi-year prepay available if platform line discounts.', strength: 'Strong', basis: 'Internal finance confirms prepay appetite.', evidenceType: 'internal' },
+      { id: 'LV-2', text: 'Reference-customer / case-study consent as trade currency.', strength: 'Moderate', basis: 'Marketing value to Visier in pharma vertical.', evidenceType: 'inference' },
+      { id: 'LV-3', text: 'Competitive alternative exists (incumbent BI + one rival).', strength: 'Moderate', basis: 'Landscape analysis; no competing quote in-session.', evidenceType: 'inference' },
+      { id: 'LV-4', text: 'End-of-quarter timing aligns with supplier bookings pressure.', strength: 'Weak', basis: 'General SaaS sales-cycle inference, not confirmed.', evidenceType: 'inference' }
+    ],
+    // give-get matrix: what we give vs what we get; value low/med/high to each side
+    giveGets: [
+      { id: 'GG-1', give: '3-year prepay', giveCost: 'low', get: 'Platform discount to target', getValue: 'high', issueIds: ['ISS-12'], evidenceType: 'internal' },
+      { id: 'GG-2', give: 'Case-study reference', giveCost: 'low', get: 'Support-tier discount', getValue: 'medium', issueIds: ['ISS-12'], evidenceType: 'inference' },
+      { id: 'GG-3', give: '45-day renewal notice (vs 30)', giveCost: 'low', get: 'Renewal price cap', getValue: 'high', issueIds: ['ISS-04','ISS-11'], evidenceType: 'inference' },
+      { id: 'GG-4', give: 'Mutual 24-month cap symmetry', giveCost: 'medium', get: 'Data-breach super-cap', getValue: 'high', issueIds: ['ISS-01'], evidenceType: 'inference' },
+      { id: 'GG-5', give: 'Drop clean convenience-termination', giveCost: 'medium', get: 'Config ownership + export', getValue: 'high', issueIds: ['ISS-05','ISS-07'], evidenceType: 'inference' }
+    ],
+    concessionLadders: [
+      { id: 'CLAD-1', issueId: 'ISS-01', steps: ['24mo cap + 3× breach super-cap + uncapped IP', '24mo cap + 2× breach super-cap', '24mo cap + breach carve-out only'], evidenceType: 'inference' },
+      { id: 'CLAD-2', issueId: 'ISS-04', steps: ['Opt-in renewal', '30-day notice + CPI cap', '45-day notice + 5% cap'], evidenceType: 'inference' },
+      { id: 'CLAD-3', issueId: 'ISS-12', steps: ['Target TCV $2.37M', 'Split the difference ~$2.5M', 'Fallback TCV $2.63M'], evidenceType: 'calculated' }
+    ],
+    // packages: bundled asks that trade together
+    packages: [
+      { id: 'PKG-A', name: 'Protection package', issueIds: ['ISS-01','ISS-02','ISS-03'], give: 'Mutual cap symmetry + 3-yr commitment', get: 'Breach super-cap, IP indemnity, executed DPA', priority: 1, evidenceType: 'inference' },
+      { id: 'PKG-B', name: 'Commercial package', issueIds: ['ISS-12','ISS-04','ISS-11','ISS-03b'], give: '3-year prepay + case-study', get: 'Platform discount + renewal/uplift caps', priority: 2, evidenceType: 'calculated' },
+      { id: 'PKG-C', name: 'Service & exit package', issueIds: ['ISS-06','ISS-07','ISS-05','ISS-10'], give: 'Concede clean convenience-termination', get: '99.9% SLA + chronic-exit + config ownership + real acceptance', priority: 3, evidenceType: 'inference' }
+    ],
+    sequence: [
+      { step: 1, text: 'Open with the Protection package — these are gates, frame them as non-negotiable compliance.', packageId: 'PKG-A', evidenceType: 'inference' },
+      { step: 2, text: 'Move to the Commercial package once protection is verbally agreed; lead with prepay-for-discount.', packageId: 'PKG-B', evidenceType: 'inference' },
+      { step: 3, text: 'Close on the Service & exit package; trade the convenience-termination give for SLA + ownership.', packageId: 'PKG-C', evidenceType: 'inference' }
+    ],
+    meetingBrief: {
+      objective: 'Secure agreement in principle on the three signature conditions and land the 3-year TCV within the target–fallback band.',
+      objectiveEvidence: 'inference',
+      agenda: [
+        { block: '0–10 min', item: 'Confirm scope and shared understanding of SOW-01 objective.', evidenceType: 'contract' },
+        { block: '10–25 min', item: 'Protection package — liability cap, IP indemnity, DPA/SCCs.', evidenceType: 'inference' },
+        { block: '25–45 min', item: 'Commercial package — platform discount, renewal + uplift caps.', evidenceType: 'calculated' },
+        { block: '45–55 min', item: 'Service & exit — SLA, config ownership, acceptance.', evidenceType: 'inference' },
+        { block: '55–60 min', item: 'Recap agreed points, owners, and next-draft date.', evidenceType: 'inference' }
+      ],
+      opening: 'We see strong platform fit and want to move quickly. Three terms are compliance gates for us — liability, data protection, and renewal — and we have a straightforward path to close them. On commercials we are ready to commit multi-year if the platform pricing reflects that commitment.',
+      asks: [
+        { text: 'Raise the liability cap to 24 months with a data-breach super-cap.', issueId: 'ISS-01', evidenceType: 'contract' },
+        { text: 'Attach and execute a reviewed DPA with EU SCCs before signature.', issueId: 'ISS-03', evidenceType: 'contract' },
+        { text: 'Convert auto-renewal to 45-day notice with a renewal price cap.', issueId: 'ISS-04', evidenceType: 'contract' },
+        { text: 'Discount the platform line toward $640K in exchange for 3-year prepay.', issueId: 'ISS-12', evidenceType: 'calculated' },
+        { text: 'Move uptime to 99.9% with meaningful credits and a chronic-failure exit.', issueId: 'ISS-06', evidenceType: 'contract' }
+      ],
+      questions: [
+        { text: 'Can you share the actual DPA text and Security Exhibit today?', issueId: 'ISS-03', evidenceType: 'inference' },
+        { text: 'What achieved-uptime history supports the 99.5% target?', issueId: 'ISS-06', evidenceType: 'inference' },
+        { text: 'Is 99.9% a genuine paid tier or a negotiation position?', issueId: 'ISS-06', evidenceType: 'inference' },
+        { text: 'What is the real floor on the platform line for a 3-year prepay?', issueId: 'ISS-12', evidenceType: 'inference' }
+      ],
+      expectedPushback: [
+        { pushback: '“12-month cap is standard.”', response: 'Workforce-data sensitivity justifies 24 months; we will accept mutual symmetry.', issueId: 'ISS-01', evidenceType: 'inference' },
+        { pushback: '“Our standard DPA is fine.”', response: 'We must review the actual text; standard is not a substitute for review.', issueId: 'ISS-03', evidenceType: 'inference' },
+        { pushback: '“99.5% is our contractual standard.”', response: 'Show the achieved-uptime history; a system-of-record needs 99.9%.', issueId: 'ISS-06', evidenceType: 'inference' },
+        { pushback: '“Pricing reflects premium capability.”', response: 'Platform value is defensible; services and support loading are not.', issueId: 'ISS-12', evidenceType: 'calculated' }
+      ],
+      closing: 'To recap: we are aligned on platform fit and ready to commit for three years. Closing depends on the liability, data-protection and renewal terms, and platform pricing that reflects a multi-year commitment. Let us confirm owners and a date for the next draft.'
+    }
+  },
+
+  /* ---- 9. assumptions (editable LOCAL inputs; drive recalc) ------------------ */
+  // classification uses the evidence set; materiality: high|medium|low
+  assumptions: [
+    { id: 'ASM-1', label: 'Employee count (subscription basis)', value: 18000, unit: 'employees', min: 12000, max: 24000, step: 500, classification: 'internal',  usedIn: ['CL-1','BENCH-int'], materiality: 'high',  evidenceType: 'internal' },
+    { id: 'ASM-2', label: 'Initial term',                        value: 3,     unit: 'years',     min: 1,     max: 5,     step: 1,   classification: 'contract',  usedIn: ['scenarios'],       materiality: 'high',  evidenceType: 'contract' },
+    { id: 'ASM-3', label: 'Annual uplift (post-term modelling)',  value: 4,     unit: '%',         min: 0,     max: 10,    step: 0.5, classification: 'assumption',usedIn: ['scenarios','ISS-11'], materiality: 'medium', evidenceType: 'assumption' },
+    { id: 'ASM-4', label: 'Target platform discount',            value: 18,    unit: '%',         min: 0,     max: 30,    step: 1,   classification: 'assumption',usedIn: ['SC-target','CL-1'], materiality: 'high',  evidenceType: 'assumption' },
+    { id: 'ASM-5', label: 'Discount rate (NPV of prepay)',       value: 6,     unit: '%',         min: 0,     max: 12,    step: 0.5, classification: 'internal',  usedIn: ['scenarios'],       materiality: 'medium', evidenceType: 'internal' }
+  ],
+
+  /* ---- 10. gaps (ranked; render as list/matrix, NEVER an empty chart) ------- */
+  // priority: 'critical' | 'important' | 'helpful'
+  gaps: [
+    { id: 'GAP-1', priority: 'critical',  input: 'Executed DPA text + EU SCCs (DOC-04)', whyItMatters: 'Data-protection assessment is Limited and partly inferred; this is a signature gate.', possibleSource: 'Supplier legal / MSA §9.4 reference', decisionImpact: 5, ease: 4, affectedAnalysis: ['ISS-03','ISS-08','Contract/Terms & Risk','Sources'], evidenceType: 'unavailable' },
+    { id: 'GAP-2', priority: 'critical',  input: 'Security & Availability Exhibit B (DOC-05)', whyItMatters: 'SLA credit schedule and security controls cannot be verified without it.', possibleSource: 'Supplier / MSA §7.2 reference', decisionImpact: 4, ease: 4, affectedAnalysis: ['ISS-06','Scope/SLAs'], evidenceType: 'unavailable' },
+    { id: 'GAP-3', priority: 'important', input: 'Approved FY27 budget ceiling', whyItMatters: 'Max-acceptable is a working assumption, not an approved walk-away figure.', possibleSource: 'Internal finance / category budget', decisionImpact: 5, ease: 3, affectedAnalysis: ['SC-max','ISS-12','Commercials/Scenarios'], evidenceType: 'unavailable' },
+    { id: 'GAP-4', priority: 'important', input: 'Prior-year Visier quote or a competing bid', whyItMatters: 'Benchmark rests on a single internal precedent; a second reference would firm the target.', possibleSource: 'Sourcing history / RFx', decisionImpact: 4, ease: 2, affectedAnalysis: ['BENCH-int','ISS-12','Commercials/Benchmarks'], evidenceType: 'unavailable' },
+    { id: 'GAP-5', priority: 'helpful',   input: 'Visier achieved-uptime history', whyItMatters: 'Would test whether 99.5% reflects real performance or a conservative posture.', possibleSource: 'Supplier status page / references', decisionImpact: 2, ease: 3, affectedAnalysis: ['ISS-06'], evidenceType: 'unavailable' },
+    { id: 'GAP-6', priority: 'helpful',   input: 'SOW effort breakdown by workstream', whyItMatters: 'Day-rate benchmark is inferred from a lump-sum; itemised effort would sharpen it.', possibleSource: 'Supplier delivery team', decisionImpact: 2, ease: 3, affectedAnalysis: ['BENCH-svc','ISS-10'], evidenceType: 'unavailable' }
+  ],
+
+  /* ---- 11. sources (IDs referenced by sourceIds[] everywhere) --------------- */
+  // kind: contract | playbook | template | internal | finance | risk | m365 | web
+  // coverage[]: analysis areas this source materially supports (for the coverage matrix)
+  sources: [
+    { id: 'DOC-01',     kind: 'contract', label: 'Visier MSA v3 (redline)',        detail: 'Uploaded 2026-07-15 · 34 pp · supplier paper', coverage: ['Liability','Data & Privacy','Term & Renewal','Service Levels','IP','Audit & Compliance'], evidenceType: 'contract' },
+    { id: 'DOC-02',     kind: 'contract', label: 'SOW-01 (Implementation)',        detail: 'Uploaded 2026-07-15 · 11 pp',                 coverage: ['Scope & Acceptance','Commercial','Service Levels'], evidenceType: 'contract' },
+    { id: 'DOC-03',     kind: 'contract', label: 'Order Form (Fees)',              detail: 'Uploaded 2026-07-15 · 3 pp',                  coverage: ['Commercial','Term & Renewal'], evidenceType: 'contract' },
+    { id: 'DOC-04',     kind: 'contract', label: 'DPA (referenced, missing)',      detail: 'Not provided — MSA §9.4',                     coverage: ['Data & Privacy'], evidenceType: 'unavailable' },
+    { id: 'DOC-05',     kind: 'contract', label: 'Security Exhibit B (missing)',   detail: 'Not provided — MSA §7.2',                     coverage: ['Service Levels','Audit & Compliance'], evidenceType: 'unavailable' },
+    { id: 'PLAYBOOK-01',kind: 'playbook', label: 'Procurement Contract Playbook',  detail: 'Internal · SaaS + data-processing positions',  coverage: ['Liability','Data & Privacy','Term & Renewal','Service Levels','IP','Audit & Compliance','Scope & Acceptance','Commercial'], evidenceType: 'internal' },
+    { id: 'TEMPLATE-01',kind: 'template', label: 'Standard SOW template',          detail: 'Internal · acceptance + milestone norms',      coverage: ['Scope & Acceptance'], evidenceType: 'internal' },
+    { id: 'EMAIL-01',   kind: 'm365',     label: 'Supplier redline cover email',   detail: 'Outlook · 2026-07-15 (DOC-06)',                coverage: ['Term & Renewal','Commercial'], evidenceType: 'internal' },
+    { id: 'FIN-01',     kind: 'finance',  label: 'Internal analytics precedent',   detail: 'Finance · 2024 platform, ~14k employees',      coverage: ['Commercial'], evidenceType: 'internal' },
+    { id: 'WEB-01',     kind: 'web',      label: 'Enterprise-SaaS renewal norms',  detail: 'Public · general market practice',             coverage: ['Term & Renewal'], evidenceType: 'public' }
+  ],
+
+  /* ---- coverage matrix axis (source coverage x analysis area) --------------- */
+  analysisAreas: ['Liability','Data & Privacy','Term & Renewal','Commercial','Service Levels','IP','Scope & Acceptance','Audit & Compliance']
+};
+
+/* one alias referenced in PKG-B (renewal-price cap issue folded into ISS-11/ISS-04) */
+dashboardData.negotiation.packages.find(p => p.id === 'PKG-B').issueIds =
+  dashboardData.negotiation.packages.find(p => p.id === 'PKG-B').issueIds.filter(id => id !== 'ISS-03b');
+
+if (typeof window !== 'undefined') { window.dashboardData = dashboardData; }
+</script>
+<script>/* =============================================================================
+ * helpers.js — shared render + interaction helpers for the Deal artifact.
+ * The 5 tab builders (Brief / Contract / Commercials / Negotiation / Sources)
+ * MUST use these verbatim so the artifact reads as one system.
+ *
+ * ─────────────────────────  BUILDER CONVENTION  ─────────────────────────────
+ * 1. Every helper that renders returns an HTML STRING. Compose with template
+ *    literals; never build detached DOM in a builder.
+ * 2. Each tab builder is a function on window.DealTabs, e.g.
+ *        window.DealTabs.brief = (d) => `...html...`;   // d === dashboardData
+ *    The shell calls it once and injects the string into the tab panel.
+ * 3. STRUCTURE the shell (built by the shell author, not the tab builders):
+ *        <div class="tabbar"><div class="wrap">
+ *           <button class="tab-btn" data-tab="brief" ...>…</button> … </div></div>
+ *        <div data-tabpanel="brief">…</div>  (one per tab)
+ *    Subtabs INSIDE a panel:
+ *        <div class="subtabbar" data-subtab-group="contract"><div class="wrap">
+ *           <button class="subtab-btn" data-subtab="map">…</button> …</div></div>
+ *        <div data-subpanel="contract/map">…</div>  (id = "group/key")
+ * 4. Interaction is DELEGATED and wired on load by DealUI.init() — builders only
+ *    emit the right data-attributes (documented per helper below). No inline
+ *    onclick. Allowed controls ONLY: show-evidence, expand/collapse, filter,
+ *    sort, change-assumption+recalc+reset, copy, print, jump. Nothing else.
+ * 5. Assumptions: emit assumptionSlider(a); register a recompute callback with
+ *    DealUI.onRecalc(fn). Editing any slider updates dashboardData.assumptions
+ *    live value and runs every registered fn. resetAssumptions() restores.
+ * 6. EVERY material value must be followed by evidenceChip(type). No exceptions.
+ * ─────────────────────────────────────────────────────────────────────────── */
+(function (global) {
+'use strict';
+
+/* ---------- 0. tiny utils ------------------------------------------------- */
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+  ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const money = (n, opts) => {
+  if (n == null || isNaN(n)) return '—';
+  const o = opts || {};
+  if (o.compact && Math.abs(n) >= 1000) {
+    const m = n / 1e6;
+    return '$' + (Math.abs(m) >= 1 ? m.toFixed(2).replace(/\.00$/, '') + 'M'
+                                   : (n / 1e3).toFixed(0) + 'K');
+  }
+  return '$' + Math.round(n).toLocaleString('en-US');
+};
+const pct = (n, d) => (n == null ? '—' : (d ? n.toFixed(d) : Math.round(n)) + '%');
+const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+const uid = (() => { let i = 0; return (p) => (p || 'u') + '-' + (++i); })();
+
+/* ---------- 1. ICON LIBRARY (inline SVG, no external assets) -------------- */
+// Usage: icon('scale')  ->  '<svg …>…</svg>'. Add new icons HERE only.
+const ICONS = {
+  brief:     '<path d="M4 4h16v16H4z" opacity=".0"/><path d="M6 4h9l4 4v12H6z"/><path d="M15 4v4h4"/><path d="M9 13h6M9 16h4"/>',
+  doc:       '<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h6M10 15h6M10 18h3"/>',
+  scale:     '<path d="M12 3v18"/><path d="M6 7h12"/><path d="M6 7l-3 6h6z"/><path d="M18 7l-3 6h6z"/><path d="M8 21h8"/>',
+  shield:    '<path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/>',
+  money:     '<path d="M12 2v20M17 6.5c0-1.9-2.2-3-5-3s-5 1.3-5 3.2c0 4.3 10 2.2 10 6.6 0 1.9-2.2 3.2-5 3.2s-5-1.1-5-3"/>',
+  scenarios: '<path d="M4 19V5M4 19h16"/><path d="M8 15l3-4 3 2 4-6"/>',
+  bench:     '<path d="M4 20V4M4 20h16"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/>',
+  handshake: '<path d="M8 12l3 3 2-2 3 3"/><path d="M3 8l4-2 5 3 5-3 4 2v6l-4 3-5-4-5 4-4-3z"/>',
+  target:    '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>',
+  trade:     '<path d="M4 8h13l-3-3M20 16H7l3 3"/>',
+  meeting:   '<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8M12 18v3"/>',
+  sources:   '<path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="2"/>',
+  assume:    '<path d="M12 3a9 9 0 100 18 9 9 0 000-18z"/><path d="M9.5 9a2.5 2.5 0 013.9-2c1.3.8 1 2.4-.4 3.2-.9.5-1 .9-1 1.8"/><path d="M12 17h.01"/>',
+  gap:       '<path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.4 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  raci:      '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>',
+  clock:     '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  flag:      '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  eye:       '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  copy:      '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h8"/>',
+  print:     '<path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M8 17h8v4H8z"/>',
+  reset:     '<path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.3M3 3v4h4"/>',
+  chevron:   '<path d="M9 6l6 6-6 6"/>',
+  info:      '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'
+};
+function icon(name) {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || ICONS.info) + '</svg>';
+}
+
+/* ---------- 2. EVIDENCE + COVERAGE ---------------------------------------- */
+// evidenceType set (matches data.js): contract|internal|public|calculated|inference|assumption|unavailable
+const EV_META = {
+  contract:    { label: 'Contract fact',   cls: 'ev-contract' },
+  internal:    { label: 'Internal fact',   cls: 'ev-internal' },
+  public:      { label: 'Public fact',     cls: 'ev-public' },
+  calculated:  { label: 'Calculated',      cls: 'ev-calculated' },
+  inference:   { label: 'Claude inference',cls: 'ev-inference' },
+  assumption:  { label: 'User assumption', cls: 'ev-assumption' },
+  unavailable: { label: 'Unavailable',     cls: 'ev-unavailable' }
+};
+// evidenceChip(type, {short, sources}) -> chip; if sources given, becomes a jump-to-source affordance.
+function evidenceChip(type, opts) {
+  const o = opts || {}; const m = EV_META[type] || EV_META.inference;
+  const txt = o.short ? m.label.split(' ')[0] : m.label;
+  const src = (o.sources && o.sources.length)
+    ? ' data-jump="tab:sources/sub:sources" title="' + esc(m.label) + ' · ' + esc(o.sources.join(', ')) + '"'
+    : ' title="' + esc(m.label) + '"';
+  return '<span class="ev ' + m.cls + '"' + src + '>' + esc(txt) + '</span>';
+}
+// coverageBadge('Strong'|'Moderate'|'Limited')
+function coverageBadge(level) {
+  const key = String(level || '').toLowerCase();
+  const cls = key === 'strong' ? 'cov-strong' : key === 'limited' ? 'cov-limited' : 'cov-moderate';
+  return '<span class="cov ' + cls + '"><span class="dots"><i></i><i></i><i></i></span>' +
+         esc(level || 'Moderate') + ' evidence</span>';
+}
+
+/* ---------- 3. SEVERITY / STATUS PILLS ------------------------------------ */
+const SEV_LABEL = { 'hard-stop':'Hard stop', high:'High', medium:'Medium', low:'Low' };
+function severityPill(priority) {
+  const p = priority || 'medium';
+  return '<span class="pill sev-' + esc(p) + '">' + esc(SEV_LABEL[p] || p) + '</span>';
+}
+function statusPill(status, label) {
+  const map = { aligned:'ok', partial:'warn', deviation:'danger', missing:'muted',
+                accept:'ok', reject:'danger', trade:'info', pending:'warn' };
+  return '<span class="pill ' + (map[status] || 'muted') + '">' + esc(label || status) + '</span>';
+}
+
+/* ---------- 4. SA-CARD ---------------------------------------------------- */
+// saCard(title, innerHTML, {accent:'plum'|'teal'|'emph'|'danger'|'warn', icon:'scale',
+//                           sub:'right-aligned meta html', id, bodyClass})
+function saCard(title, inner, opts) {
+  const o = opts || {};
+  const acc = o.accent && o.accent !== 'plum' ? ' accent-' + o.accent : '';
+  const ic = o.icon ? '<span class="ch-ic">' + icon(o.icon) + '</span>' : '';
+  const sub = o.sub ? '<span class="cs">' + o.sub + '</span>' : '';
+  const id = o.id ? ' id="' + esc(o.id) + '"' : '';
+  const bc = o.bodyClass ? ' ' + o.bodyClass : '';
+  return '<section class="sa-card' + acc + '"' + id + '>' +
+    '<header class="card-hd">' + ic + '<span class="ct">' + esc(title) + '</span>' + sub + '</header>' +
+    '<div class="card-bd' + bc + '">' + (inner || '') + '</div></section>';
+}
+// insight(text, tone) — a SHORT supporting narrative line (never a wall). tone: ''|'warn'|'danger'
+function insight(text, tone) {
+  return '<div class="insight ' + (tone || '') + '"><span class="ib"></span><span>' + text + '</span></div>';
+}
+
+/* ---------- 5. TABLE ------------------------------------------------------ */
+// dataTable(cols, rows, opts)
+//   cols: [{ key, label, align:'left'|'num', width, sort:true, render:(row)=>html }]
+//   rows: array of plain objects
+//   opts: { zebra, dense, id, sortable:true, filterId, rowClass:(row)=>'', expand:(row)=>html|null }
+// Emits sortable headers (th[data-sort]) and, when expand() returns html, expandable rows.
+function dataTable(cols, rows, opts) {
+  const o = opts || {}; const tid = o.id || uid('tbl');
+  const head = '<tr>' + cols.map(c => {
+    const cls = (c.align === 'num' ? 'num' : '');
+    const st = (o.sortable !== false && c.sort !== false) ? ' data-sort="' + esc(c.key) + '"' : '';
+    const w = c.width ? ' style="width:' + esc(c.width) + '"' : '';
+    return '<th class="' + cls + '"' + st + w + '>' + esc(c.label) + '</th>';
+  }).join('') + '</tr>';
+  const body = rows.map((r, i) => {
+    const rc = o.rowClass ? o.rowClass(r) : '';
+    const exp = o.expand ? o.expand(r) : null;
+    const key = (r.id != null ? r.id : i);
+    let tr = '<tr class="' + rc + (exp ? ' expandable' : '') + '"' +
+      (exp ? ' data-exprow="' + esc(tid + '-' + key) + '"' : '') +
+      ' data-rowkey="' + esc(key) + '">' +
+      cols.map(c => {
+        const cls = (c.align === 'num' ? 'num' : '');
+        const val = c.render ? c.render(r) : esc(r[c.key]);
+        const sv = c.sortVal ? ' data-sv="' + esc(c.sortVal(r)) + '"' : '';
+        return '<td class="' + cls + '"' + sv + '>' + val + '</td>';
+      }).join('') + '</tr>';
+    if (exp) tr += '<tr class="expander-row is-hidden" data-expfor="' + esc(tid + '-' + key) +
+      '"><td colspan="' + cols.length + '"><div class="exp-inner">' + exp + '</div></td></tr>';
+    return tr;
+  }).join('');
+  const cls = 'dt' + (o.zebra ? ' zebra' : '') + (o.dense ? ' dense' : '');
+  const filterAttr = o.filterId ? ' data-filter-target="' + esc(o.filterId) + '"' : '';
+  return '<div class="tbl-wrap"><table class="' + cls + '" id="' + esc(tid) + '"' + filterAttr +
+    '><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
+}
+
+/* ---------- 6. COLLAPSIBLE / EXCERPT -------------------------------------- */
+// collapsible(summaryHTML, innerHTML, {open, tone}) -> <details>
+function collapsible(summary, inner, opts) {
+  const o = opts || {};
+  return '<details class="collapsible"' + (o.open ? ' open' : '') + '>' +
+    '<summary>' + summary + '</summary><div class="cl-body">' + inner + '</div></details>';
+}
+function excerpt(text) { return '<div class="excerpt">' + esc(text) + '</div>'; }
+
+/* ---------- 7. VIZ PRIMITIVES --------------------------------------------- */
+// miniBar(value, max, {color:'teal'|'pri'|'emph'|'danger'|'warn', title}) -> inline bar
+function miniBar(value, max, opts) {
+  const o = opts || {}; const w = clamp(max ? (value / max) * 100 : 0, 0, 100);
+  const c = o.color && o.color !== 'teal' ? ' ' + o.color : '';
+  const t = o.title ? ' title="' + esc(o.title) + '"' : '';
+  return '<span class="minibar' + c + '"' + t + '><span style="width:' + w.toFixed(1) + '%"></span></span>';
+}
+// barRow(label, value, max, formatted, opts) -> a labelled comparison bar row
+function barRow(label, value, max, formatted, opts) {
+  return '<div class="bar-row"><span class="bl">' + esc(label) + '</span>' +
+    miniBar(value, max, opts) + '<span class="bv">' + (formatted != null ? formatted : value) + '</span></div>';
+}
+// heatCell(value, {scale:5, label, title}) -> intensity cell (0..scale -> heat-0..heat-5)
+function heatCell(value, opts) {
+  const o = opts || {}; const scale = o.scale || 5;
+  const lvl = clamp(Math.round((value / scale) * 5), 0, 5);
+  const t = o.title ? ' title="' + esc(o.title) + '"' : '';
+  return '<span class="heatcell heat-' + lvl + '"' + t + '>' + esc(o.label != null ? o.label : value) + '</span>';
+}
+// matrixPlot(points, {xLabel, yLabel, xMax, yMax, quadrants:[tl,tr,bl,br]})
+//   points: [{ x, y, label, color:'pri'|'teal'|'emph'|'danger', title, jump }]
+function matrixPlot(points, opts) {
+  const o = opts || {}; const xMax = o.xMax || 5, yMax = o.yMax || 5;
+  const pts = points.map(p => {
+    const left = clamp((p.x / xMax) * 100, 2, 98);
+    const bottom = clamp((p.y / yMax) * 100, 2, 98);
+    const c = p.color ? ' ' + p.color : '';
+    const j = p.jump ? ' data-jump="' + esc(p.jump) + '"' : '';
+    return '<button class="mx-pt' + c + '" style="left:' + left.toFixed(1) + '%;bottom:' + bottom.toFixed(1) +
+      '%"' + j + ' title="' + esc(p.title || p.label) + '">' + esc(p.label) + '</button>';
+  }).join('');
+  const q = o.quadrants || [];
+  const quad = (q.length === 4) ?
+    '<span class="mx-quad" style="left:2%;top:4%">' + esc(q[0]) + '</span>' +
+    '<span class="mx-quad" style="right:2%;top:4%">' + esc(q[1]) + '</span>' +
+    '<span class="mx-quad" style="left:2%;bottom:4%">' + esc(q[2]) + '</span>' +
+    '<span class="mx-quad" style="right:2%;bottom:4%">' + esc(q[3]) + '</span>' : '';
+  return '<div style="padding:0 10px 26px 20px"><div class="matrix">' + quad + pts +
+    '<span class="mx-axis-x">' + esc(o.xLabel || '') + '</span>' +
+    '<span class="mx-axis-y">' + esc(o.yLabel || '') + '</span></div></div>';
+}
+// waterfall(steps, {height}) steps:[{label, value, kind:'total'|'up'|'down'|'final', display}]
+//   Bars are sized to each step's absolute value against the max; kind sets colour + meaning.
+function waterfall(steps, opts) {
+  const o = opts || {}; const max = Math.max.apply(null, steps.map(s => Math.abs(s.value))) || 1;
+  const cols = steps.map(s => {
+    const h = clamp((Math.abs(s.value) / max) * 100, 3, 100);
+    return '<div class="wf-col"><span class="wf-val">' + (s.display != null ? s.display : s.value) + '</span>' +
+      '<div class="wf-bar ' + (s.kind || 'total') + '" style="height:' + h.toFixed(1) + '%"></div>' +
+      '<span class="wf-lbl">' + esc(s.label) + '</span></div>';
+  }).join('');
+  return '<div class="waterfall">' + cols + '</div>';
+}
+// timeline(items) items:[{date, name, meta, tone:'pri'|'emph'|''}]
+function timeline(items) {
+  return '<div class="timeline"><span class="tl-track"></span>' + items.map(it =>
+    '<div class="tl-item ' + (it.tone || '') + '"><div class="tl-date">' + esc(it.date) + '</div>' +
+    '<div class="tl-name">' + esc(it.name) + '</div>' +
+    (it.meta ? '<div class="tl-meta">' + it.meta + '</div>' : '') + '</div>').join('') + '</div>';
+}
+// gantt(rows, {start, end}) rows:[{label, start, end, tone}] dates as YYYY-MM-DD; positions by day.
+function gantt(rows, opts) {
+  const o = opts || {}; const t0 = +new Date(o.start), t1 = +new Date(o.end); const span = (t1 - t0) || 1;
+  const body = rows.map(r => {
+    const a = clamp(((+new Date(r.start) - t0) / span) * 100, 0, 100);
+    const b = clamp(((+new Date(r.end) - t0) / span) * 100, 0, 100);
+    return '<div class="gantt-row"><span class="bl" style="font-weight:600">' + esc(r.label) + '</span>' +
+      '<div class="gantt-track"><div class="gantt-fill ' + (r.tone || '') + '" style="left:' + a.toFixed(1) +
+      '%;width:' + Math.max(b - a, 4).toFixed(1) + '%">' + esc(r.badge || '') + '</div></div></div>';
+  }).join('');
+  return '<div class="gantt">' + body + '</div>';
+}
+
+/* ---------- 8. ASSUMPTION SLIDER (LOCAL) ---------------------------------- */
+// assumptionSlider(a) — a is a dashboardData.assumptions[] entry.
+// Emits a range input wired to DealUI; editing updates a.value and runs recalc callbacks.
+function assumptionSlider(a) {
+  const disp = a.unit === '%' ? a.value + '%' : (a.value.toLocaleString('en-US') + (a.unit ? ' ' + a.unit : ''));
+  return '<div class="asm-ctrl">' +
+    '<div class="asm-top"><label for="asm-' + esc(a.id) + '">' + esc(a.label) + '</label>' +
+    '<span class="asm-val" data-asm-out="' + esc(a.id) + '">' + esc(disp) + '</span></div>' +
+    '<input type="range" id="asm-' + esc(a.id) + '" data-assumption="' + esc(a.id) + '" data-unit="' + esc(a.unit || '') +
+    '" min="' + a.min + '" max="' + a.max + '" step="' + a.step + '" value="' + a.value + '">' +
+    '<div class="asm-badge">' + evidenceChip(a.evidenceType || a.classification, { short: true }) +
+    ' <span class="local-flag">Local</span> · materiality: ' + esc(a.materiality) + '</div></div>';
+}
+
+/* ---------- 9. GAP CARD (renders instead of a fabricated empty panel) ----- */
+function gapCard(title, note) {
+  return '<div class="gap-card"><div class="gc-hd">' + icon('gap') + esc(title) + '</div>' +
+    '<div class="card-note" style="margin-top:6px">' + note + '</div></div>';
+}
+
+/* ---------- 10. jump helper (for building data-jump strings) -------------- */
+// jumpLink(text, target) target: "tab:commercials/sub:scenarios" or "el:SOME-ID"
+function jumpLink(text, target) {
+  return '<span class="jump" data-jump="' + esc(target) + '">' + esc(text) + '</span>';
+}
+function copyBtn(label, targetSel, rawText) {
+  const data = rawText != null ? ' data-copy-text="' + esc(rawText) + '"' : ' data-copy="' + esc(targetSel) + '"';
+  return '<button class="btn"' + data + '>' + icon('copy') + esc(label || 'Copy') + '</button>';
+}
+
+/* =========================================================================
+ *  INTERACTION LAYER — DealUI  (wired once on load via DealUI.init())
+ * ========================================================================= */
+const recalcFns = [];
+const assumptionOriginals = {};
+
+const DealUI = {
+  onRecalc(fn) { if (typeof fn === 'function') recalcFns.push(fn); },
+  recalc() { recalcFns.forEach(fn => { try { fn(global.dashboardData); } catch (e) { console.error(e); } }); },
+
+  // ---- tab + subtab routing ----
+  showTab(key) {
+    document.querySelectorAll('[data-tab]').forEach(b =>
+      b.setAttribute('aria-selected', b.getAttribute('data-tab') === key ? 'true' : 'false'));
+    document.querySelectorAll('[data-tabpanel]').forEach(p =>
+      p.classList.toggle('is-active', p.getAttribute('data-tabpanel') === key));
+    if (history.replaceState) history.replaceState(null, '', '#' + key);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  },
+  showSubtab(group, key) {
+    document.querySelectorAll('[data-subtab-group="' + group + '"] [data-subtab]').forEach(b =>
+      b.setAttribute('aria-selected', b.getAttribute('data-subtab') === key ? 'true' : 'false'));
+    document.querySelectorAll('[data-subpanel]').forEach(p => {
+      const id = p.getAttribute('data-subpanel');
+      if (id.indexOf(group + '/') === 0) p.classList.toggle('is-active', id === group + '/' + key);
+    });
+  },
+  jump(target) {
+    // "tab:contract/sub:terms"  |  "tab:brief"  |  "el:ISS-01"
+    if (target.indexOf('el:') === 0) {
+      const el = document.getElementById(target.slice(3));
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200); }
+      return;
+    }
+    const tabM = target.match(/tab:([^/]+)/); const subM = target.match(/sub:([^/]+)/);
+    if (tabM) this.showTab(tabM[1]);
+    if (subM && tabM) this.showSubtab(tabM[1], subM[1]);
+  },
+
+  toast(msg) {
+    let t = document.querySelector('.copied-toast');
+    if (!t) { t = document.createElement('div'); t.className = 'copied-toast'; document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add('show'); clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('show'), 1500);
+  },
+
+  init() {
+    // snapshot originals for reset
+    (global.dashboardData.assumptions || []).forEach(a => { assumptionOriginals[a.id] = a.value; });
+
+    // one delegated click handler for the whole document
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle]');
+      if (!t) return;
+
+      if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
+      if (t.hasAttribute('data-subtab')) {
+        const grp = t.closest('[data-subtab-group]');
+        if (grp) this.showSubtab(grp.getAttribute('data-subtab-group'), t.getAttribute('data-subtab'));
+        return;
+      }
+      if (t.hasAttribute('data-jump')) { this.jump(t.getAttribute('data-jump')); return; }
+      if (t.hasAttribute('data-print')) { window.print(); return; }
+      if (t.hasAttribute('data-theme-toggle')) {
+        const cur = document.documentElement.getAttribute('data-theme');
+        const next = cur === 'dark' ? 'light' : (cur === 'light' ? 'dark'
+          : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'));
+        document.documentElement.setAttribute('data-theme', next); return;
+      }
+      if (t.hasAttribute('data-reset-assumptions')) { this.resetAssumptions(); return; }
+      if (t.hasAttribute('data-copy') || t.hasAttribute('data-copy-text')) {
+        let text = t.getAttribute('data-copy-text');
+        if (text == null) { const el = document.querySelector(t.getAttribute('data-copy')); text = el ? el.innerText : ''; }
+        this.copy(text); return;
+      }
+      // expandable table rows
+      const rowKey = t.getAttribute('data-exprow') || (t.matches('tr.expandable') ? t.getAttribute('data-exprow') : null);
+      if (rowKey) {
+        t.classList.toggle('is-open');
+        const exp = document.querySelector('[data-expfor="' + rowKey + '"]');
+        if (exp) exp.classList.toggle('is-hidden');
+        return;
+      }
+    });
+
+    // assumptions: live update + recalc
+    document.addEventListener('input', (e) => {
+      const inp = e.target.closest('[data-assumption]');
+      if (!inp) return;
+      const id = inp.getAttribute('data-assumption');
+      const a = (global.dashboardData.assumptions || []).find(x => x.id === id);
+      if (!a) return;
+      a.value = parseFloat(inp.value);
+      const out = document.querySelector('[data-asm-out="' + id + '"]');
+      if (out) out.textContent = a.unit === '%' ? a.value + '%'
+        : (a.value.toLocaleString('en-US') + (a.unit ? ' ' + a.unit : ''));
+      this.recalc();
+    });
+
+    // filter inputs (search box) + sortable headers
+    document.addEventListener('input', (e) => {
+      const box = e.target.closest('[data-filter-input]');
+      if (box) this.applyFilter(box);
+    });
+    document.addEventListener('change', (e) => {
+      const sel = e.target.closest('[data-filter-select]');
+      if (sel) this.applyFilter(sel);
+    });
+    document.querySelectorAll('table.dt th[data-sort]').forEach(th =>
+      th.addEventListener('click', () => this.sortTable(th)));
+    // chip filters (aria-pressed toggles)
+    document.addEventListener('click', (e) => {
+      const chip = e.target.closest('[data-filterchip]');
+      if (!chip) return;
+      const on = chip.getAttribute('aria-pressed') === 'true';
+      chip.setAttribute('aria-pressed', on ? 'false' : 'true');
+      this.applyChipFilters(chip.closest('[data-filter-scope]') || document);
+    });
+
+    // deep-link to a tab via hash
+    const h = (location.hash || '').replace('#', '');
+    if (h && document.querySelector('[data-tabpanel="' + h + '"]')) this.showTab(h);
+    else { const first = document.querySelector('[data-tab]'); if (first) this.showTab(first.getAttribute('data-tab')); }
+
+    this.recalc();
+  },
+
+  copy(text) {
+    const done = () => this.toast('Copied to clipboard');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, () => this.fallbackCopy(text, done));
+    } else this.fallbackCopy(text, done);
+  },
+  fallbackCopy(text, cb) {
+    const ta = document.createElement('textarea'); ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch (e) {} document.body.removeChild(ta);
+  },
+
+  resetAssumptions() {
+    (global.dashboardData.assumptions || []).forEach(a => {
+      a.value = assumptionOriginals[a.id];
+      const inp = document.querySelector('[data-assumption="' + a.id + '"]');
+      if (inp) inp.value = a.value;
+      const out = document.querySelector('[data-asm-out="' + a.id + '"]');
+      if (out) out.textContent = a.unit === '%' ? a.value + '%'
+        : (a.value.toLocaleString('en-US') + (a.unit ? ' ' + a.unit : ''));
+    });
+    this.recalc(); this.toast('Assumptions reset');
+  },
+
+  // free-text filter over a target table (data-filter-input has data-filter-for="tableId")
+  applyFilter(control) {
+    const scope = control.closest('[data-filter-scope]') || document;
+    const tableId = control.getAttribute('data-filter-for');
+    const table = tableId ? document.getElementById(tableId) : scope.querySelector('table.dt');
+    if (!table) return;
+    const q = (scope.querySelector('[data-filter-input]') || {}).value || '';
+    this._filterTable(table, q.toLowerCase(), scope);
+  },
+  applyChipFilters(scope) {
+    const table = scope.querySelector('table.dt'); if (!table) return;
+    const box = scope.querySelector('[data-filter-input]');
+    this._filterTable(table, ((box && box.value) || '').toLowerCase(), scope);
+  },
+  _filterTable(table, q, scope) {
+    const chips = Array.from(scope.querySelectorAll('[data-filterchip][aria-pressed="true"]'))
+      .map(c => c.getAttribute('data-filterchip').toLowerCase());
+    let shown = 0, total = 0;
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      if (tr.classList.contains('expander-row')) { return; }
+      total++;
+      const txt = tr.textContent.toLowerCase();
+      const facet = (tr.getAttribute('data-facet') || '').toLowerCase();
+      const okText = !q || txt.indexOf(q) !== -1;
+      const okChip = !chips.length || chips.some(c => facet.split(' ').indexOf(c) !== -1 || facet.indexOf(c) !== -1);
+      const show = okText && okChip;
+      tr.classList.toggle('is-hidden', !show);
+      const exp = tr.getAttribute('data-exprow');
+      if (exp) { const e2 = table.querySelector('[data-expfor="' + exp + '"]');
+        if (e2 && !tr.classList.contains('is-open')) e2.classList.add('is-hidden');
+        if (e2 && !show) e2.classList.add('is-hidden'); }
+      if (show) shown++;
+    });
+    const cnt = scope.querySelector('.filter-count');
+    if (cnt) cnt.textContent = shown + ' of ' + total + ' shown';
+  },
+
+  sortTable(th) {
+    const table = th.closest('table'); const tbody = table.querySelector('tbody');
+    const idx = Array.from(th.parentNode.children).indexOf(th);
+    const cur = th.getAttribute('aria-sort');
+    const dir = cur === 'ascending' ? 'descending' : 'ascending';
+    table.querySelectorAll('th[data-sort]').forEach(h => h.removeAttribute('aria-sort'));
+    th.setAttribute('aria-sort', dir);
+    // group main rows with their (optional) expander rows
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => !r.classList.contains('expander-row'));
+    const getVal = (tr) => {
+      const td = tr.children[idx]; if (!td) return '';
+      const sv = td.getAttribute('data-sv'); if (sv != null) { const n = parseFloat(sv); return isNaN(n) ? sv : n; }
+      const n = parseFloat(td.textContent.replace(/[^0-9.\-]/g, ''));
+      return isNaN(n) ? td.textContent.trim().toLowerCase() : n;
+    };
+    rows.sort((a, b) => {
+      const va = getVal(a), vb = getVal(b);
+      if (va < vb) return dir === 'ascending' ? -1 : 1;
+      if (va > vb) return dir === 'ascending' ? 1 : -1;
+      return 0;
+    });
+    rows.forEach(r => {
+      tbody.appendChild(r);
+      const exp = r.getAttribute('data-exprow');
+      if (exp) { const e2 = tbody.querySelector('[data-expfor="' + exp + '"]'); if (e2) tbody.appendChild(e2); }
+    });
+  }
+};
+
+/* ---------- EXPORTS ------------------------------------------------------- */
+const api = {
+  // formatting
+  esc, money, pct, uid, icon,
+  // evidence + status
+  evidenceChip, coverageBadge, severityPill, statusPill,
+  // layout
+  saCard, insight, dataTable, collapsible, excerpt, gapCard, jumpLink, copyBtn,
+  // viz
+  miniBar, barRow, heatCell, matrixPlot, waterfall, timeline, gantt, assumptionSlider,
+  // interaction
+  DealUI
+};
+Object.assign(global, api);            // expose helpers as globals for terse builders
+global.DealUI = DealUI;
+global.DealTabs = global.DealTabs || {};   // builders attach: DealTabs.brief = d => '...'
+global.dealRecalc = () => DealUI.recalc();  // brief-named recalc hook
+
+if (document.readyState === 'loading')
+  document.addEventListener('DOMContentLoaded', () => DealUI.init());
+else DealUI.init();
+
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>/* =============================================================================
+ * tab-negotiation.js — "Negotiation" primary tab builder for the Deal artifact.
+ * Attaches window.renderTab_negotiation(d) and window.DealTabs.negotiation(d).
+ * Reads ONLY from dashboardData (param d). No fact is restated/hard-coded —
+ * every value is looked up from d.issues / d.negotiation / d.assumptions etc.
+ *
+ * Subtabs (group="negotiation"): positions | tradeplan | meeting
+ * ========================================================================== */
+(function (global) {
+'use strict';
+
+const PR_RANK = { 'hard-stop': 0, high: 1, medium: 2, low: 3 };
+const STRENGTH_RANK = { Strong: 0, Moderate: 1, Weak: 2 };
+const MAG_LEVEL = { low: 1.4, medium: 3, high: 4.6 };
+
+function magPill(level) {
+  const cls = level === 'high' ? 'warn' : level === 'medium' ? 'info' : 'muted';
+  return '<span class="pill ' + cls + '">' + esc(level) + '</span>';
+}
+
+function wordingPair(text) {
+  return '<span class="word-collab clamp2">We would like to move toward: ' + esc(text) + '</span>' +
+         '<span class="word-direct clamp2">We require: ' + esc(text) + '</span>';
+}
+
+function hardStopCell(row) {
+  if (/^none/i.test(row.hardStop || '')) {
+    return '<span class="muted tiny">No walk-away line drawn</span>';
+  }
+  return '<span class="hs-line">' + icon('flag') + '<span>' + esc(row.hardStop) + '</span></span>';
+}
+
+function renderTab_negotiation(d) {
+  const issueById = (id) => d.issues.find((i) => i.id === id);
+  const docById = (id) => d.documents.find((x) => x.id === id);
+  const pkgById = (id) => d.negotiation.packages.find((p) => p.id === id);
+
+  // small cross-reference chip — every negotiation view points back at the SAME
+  // issue objects that drive Contract; never restates the issue, just links to it.
+  function issueTag(id) {
+    const iss = issueById(id);
+    const t = iss ? iss.title : id;
+    return '<span class="pill info neg-tag" data-jump="tab:contract/sub:terms" title="' +
+      esc(id + ' — ' + t + ' (jump to Terms &amp; Risk register)') + '">' + esc(id) + '</span>';
+  }
+
+  /* ================================ POSITIONS =============================== */
+  function buildPositions() {
+    const rows = d.issues.slice().sort((a, b) =>
+      (PR_RANK[a.priority] - PR_RANK[b.priority]) || a.id.localeCompare(b.id));
+
+    const cols = [
+      { key: 'title', label: 'Issue', width: '19%', render: (r) =>
+          '<div style="font-weight:700">' + esc(r.title) + '</div>' +
+          '<div class="tiny muted">' + esc(r.category) + ' · ' + esc(r.id) + '</div>',
+        sortVal: (r) => r.title.toLowerCase() },
+      { key: 'priority', label: 'Priority', width: '9%', render: (r) => severityPill(r.priority),
+        sortVal: (r) => PR_RANK[r.priority] },
+      { key: 'basis', label: 'Basis', width: '15%', render: (r) =>
+          '<div class="tiny">' + esc(r.clause) + '</div><div style="margin-top:3px">' +
+          evidenceChip(r.evidenceType, { short: true, sources: r.sourceIds }) + '</div>',
+        sort: false },
+      { key: 'supplierPosition', label: 'Supplier position', width: '19%', render: (r) =>
+          '<span class="clamp2">' + esc(r.supplierPosition) + '</span>', sort: false },
+      { key: 'recommendedPosition', label: 'Recommended (target)', width: '17%',
+        render: (r) => wordingPair(r.recommendedPosition), sort: false },
+      { key: 'fallback', label: 'Fallback', width: '13%',
+        render: (r) => wordingPair(r.fallback), sort: false },
+      { key: 'hardStop', label: 'Hard stop', width: '8%', render: hardStopCell, sort: false }
+    ];
+
+    const expand = (r) => {
+      const doc = docById(r.documentId);
+      return '<div class="grid">' +
+        '<div class="col-7">' +
+        '<div class="eyebrow" style="margin-bottom:5px">Source excerpt · ' + esc(doc ? doc.name : r.documentId) + '</div>' +
+        excerpt(r.sourceExcerpt) +
+        '<div class="insight" style="margin-top:8px"><span class="ib"></span><span><b>Playbook position:</b> ' + esc(r.playbookPosition) + '</span></div>' +
+        '<div class="insight warn"><span class="ib"></span><span><b>Deviation:</b> ' + esc(r.deviation) + '</span></div>' +
+        '<div class="insight danger"><span class="ib"></span><span><b>Impact:</b> ' + esc(r.impact) + '</span></div>' +
+        '</div>' +
+        '<div class="col-5">' +
+        '<div class="eyebrow" style="margin-bottom:5px">Negotiation notes</div>' +
+        '<div class="tiny" style="margin-bottom:6px"><b>Supplier pushback:</b> ' + esc(r.supplierPushback) + '</div>' +
+        '<div class="tiny" style="margin-bottom:6px"><b>Recommended response:</b> ' + esc(r.recommendedResponse) + '</div>' +
+        '<div class="tiny" style="margin-bottom:8px"><b>Trade opportunity:</b> ' + esc(r.tradeOpportunity) + '</div>' +
+        '<div>' + statusPill(r.internalDecision, r.internalDecision === 'pending' ? 'Decision pending' : r.internalDecision) +
+        ' ' + evidenceChip(r.evidenceType, { sources: r.sourceIds }) + '</div>' +
+        '</div></div>';
+    };
+
+    const table = dataTable(cols, rows, {
+      id: 'negPositionsTable', zebra: true, sortable: true, expand,
+      rowClass: (r) => 'pos-row" data-facet="' + esc(r.priority)
+    });
+
+    const chips = ['hard-stop', 'high', 'medium', 'low'].map((p) =>
+      '<button class="chip-filter" data-filterchip="' + p + '" aria-pressed="false">' +
+      esc(SEV_LABEL_LOCAL[p]) + '</button>').join('');
+
+    const toolbar =
+      '<div class="toolbar" data-filter-scope>' +
+      '<input type="search" placeholder="Filter by keyword, clause, category…" data-filter-input data-filter-for="negPositionsTable">' +
+      chips +
+      '<span class="spacer"></span><span class="filter-count">' + rows.length + ' of ' + rows.length + ' shown</span>' +
+      '</div>' +
+      '<input type="radio" id="wm-collab-pos" name="wm-pos" value="collab" class="sr-only" checked>' +
+      '<input type="radio" id="wm-direct-pos" name="wm-pos" value="direct" class="sr-only">' +
+      '<div class="word-toggle-row">' +
+      '<span class="eyebrow">Wording</span>' +
+      '<label for="wm-collab-pos" class="chip-filter word-lbl">Collaborative</label>' +
+      '<label for="wm-direct-pos" class="chip-filter word-lbl">Direct</label>' +
+      '</div>' +
+      '<div class="word-scope">' + table + '</div>';
+
+    const body =
+      insight('Same ' + rows.length + ' issues that drive Contract → Terms &amp; Risk — positions, not a duplicate register. Expand a row for the source excerpt, playbook gap, and supplier pushback.') +
+      toolbar;
+
+    return saCard('Negotiation positions', body, { accent: 'plum', icon: 'target', id: 'negPositionsCard',
+      sub: coverageBadge(d.deal.evidenceCoverage) });
+  }
+  const SEV_LABEL_LOCAL = { 'hard-stop': 'Hard stop', high: 'High', medium: 'Medium', low: 'Low' };
+
+  /* ================================ TRADE PLAN ============================== */
+  function buildTradePlan() {
+    const objectives = d.negotiation.objectives.slice().sort((a, b) => a.priority - b.priority);
+    const objHtml = objectives.map((o) =>
+      '<div class="obj-row"><span class="obj-num">' + o.priority + '</span>' +
+      '<div class="obj-body"><div>' + esc(o.text) + ' ' + evidenceChip(o.evidenceType, { short: true }) + '</div>' +
+      '<div class="obj-issues">' + o.issueIds.map(issueTag).join(' ') + '</div></div></div>').join('');
+    const objectivesCard = saCard('Objectives (priority order)', objHtml, { accent: 'plum', icon: 'flag' });
+
+    const leverage = d.negotiation.leverage.slice().sort((a, b) => STRENGTH_RANK[a.strength] - STRENGTH_RANK[b.strength]);
+    const levCols = [
+      { key: 'text', label: 'Leverage', width: '46%', render: (r) => esc(r.text), sort: false },
+      { key: 'strength', label: 'Strength', width: '16%', render: (r) => {
+          const cls = r.strength === 'Strong' ? 'ok' : r.strength === 'Weak' ? 'muted' : 'warn';
+          return '<span class="pill ' + cls + '">' + esc(r.strength) + '</span>';
+        }, sortVal: (r) => STRENGTH_RANK[r.strength] },
+      { key: 'basis', label: 'Basis', width: '38%', render: (r) =>
+          '<span class="tiny">' + esc(r.basis) + '</span> ' + evidenceChip(r.evidenceType, { short: true }), sort: false }
+    ];
+    const leverageCard = saCard('Leverage — evidence-based', dataTable(levCols, leverage, { id: 'negLeverageTable', dense: true }),
+      { accent: 'teal', icon: 'scale' });
+
+    // give-get matrix: x = give cost (low->high), y = get value (low->high)
+    const points = d.negotiation.giveGets.map((g) => {
+      const linked = g.issueIds.map(issueById).filter(Boolean);
+      const color = linked.some((i) => i.priority === 'hard-stop') ? 'danger'
+        : linked.some((i) => i.priority === 'high') ? 'emph' : 'teal';
+      return {
+        x: MAG_LEVEL[g.giveCost], y: MAG_LEVEL[g.getValue], label: g.id,
+        color, title: g.id + ': give ' + g.give + ' → get ' + g.get, jump: 'tab:contract/sub:terms'
+      };
+    });
+    const matrix = matrixPlot(points, {
+      xLabel: 'Give cost (low → high)', yLabel: 'Get value (low → high)', xMax: 6, yMax: 6,
+      quadrants: ['Easy wins — do first', 'Key trades', 'Low priority', 'High cost, low return — avoid']
+    });
+    const ggCols = [
+      { key: 'give', label: 'Give', width: '26%', render: (r) => esc(r.give), sort: false },
+      { key: 'giveCost', label: 'Cost', width: '10%', render: (r) => magPill(r.giveCost), sortVal: (r) => MAG_LEVEL[r.giveCost] },
+      { key: 'get', label: 'Get', width: '26%', render: (r) => esc(r.get), sort: false },
+      { key: 'getValue', label: 'Value', width: '10%', render: (r) => magPill(r.getValue), sortVal: (r) => MAG_LEVEL[r.getValue] },
+      { key: 'issues', label: 'Linked issues', width: '18%', render: (r) => r.issueIds.map(issueTag).join(' '), sort: false }
+    ];
+    const ggTable = dataTable(ggCols, d.negotiation.giveGets, { id: 'negGiveGetTable', dense: true, zebra: true });
+    const ggMatrixCard = saCard('Give-get matrix', matrix, { accent: 'emph', icon: 'trade',
+      sub: evidenceChip('inference', { short: true }) });
+    const ggTableCard = saCard('Give / get detail', ggTable, { accent: 'plum', icon: 'handshake' });
+
+    // concession ladders — one timeline per issue, laid out side by side
+    const laddersInner = '<div class="grid">' + d.negotiation.concessionLadders.map((cl) => {
+      const iss = issueById(cl.issueId);
+      const items = cl.steps.map((s, i) => ({
+        date: 'Step ' + (i + 1), name: s,
+        tone: i === 0 ? 'pri' : (i === cl.steps.length - 1 ? 'emph' : '')
+      }));
+      return '<div class="col-4"><div class="ladder-hd">' + (iss ? issueTag(iss.id) : cl.issueId) +
+        '<span style="margin-left:6px">' + esc(iss ? iss.title : cl.issueId) + '</span></div>' +
+        timeline(items) + '</div>';
+    }).join('') + '</div>';
+    const laddersCard = saCard('Concession ladders', laddersInner, { accent: 'teal', icon: 'clock' });
+
+    // packages — 2-3 bundled asks that trade together
+    const pkgCards = d.negotiation.packages.map((p, i) => {
+      const accent = i === 0 ? 'plum' : i === 1 ? 'teal' : 'emph';
+      const inner =
+        '<div class="tiny muted" style="margin-bottom:6px">Priority ' + p.priority + '</div>' +
+        '<div style="margin-bottom:6px"><b>Give:</b> ' + esc(p.give) + '</div>' +
+        '<div style="margin-bottom:8px"><b>Get:</b> ' + esc(p.get) + '</div>' +
+        '<div style="margin-bottom:6px">' + p.issueIds.map(issueTag).join(' ') + '</div>' +
+        evidenceChip(p.evidenceType, { short: true });
+      return '<div class="col-4">' + saCard(p.name, inner, { accent, icon: 'target' }) + '</div>';
+    }).join('');
+    const packagesRow = '<div class="grid">' + pkgCards + '</div>';
+
+    // sequence — the order packages are opened in a session
+    const seqItems = d.negotiation.sequence.map((s) => {
+      const p = pkgById(s.packageId);
+      return { date: 'Step ' + s.step, name: s.text, meta: p ? esc(p.name) : s.packageId, tone: s.step === 1 ? 'pri' : '' };
+    });
+    const sequenceCard = saCard('Sequence', timeline(seqItems) +
+      insight('Open with protection, move to commercials once terms are verbally agreed, close on service and exit.'),
+      { accent: 'plum', icon: 'clock' });
+
+    return '<div class="grid">' +
+      '<div class="col-5">' + objectivesCard + '</div>' +
+      '<div class="col-7">' + leverageCard + '</div>' +
+      '<div class="col-7">' + ggMatrixCard + '</div>' +
+      '<div class="col-5">' + ggTableCard + '</div>' +
+      '<div class="col-12">' + laddersCard + '</div>' +
+      '<div class="col-12">' + packagesRow + '</div>' +
+      '<div class="col-12">' + sequenceCard + '</div>' +
+      '</div>';
+  }
+
+  /* ================================ MEETING BRIEF ============================ */
+  function buildMeetingBrief() {
+    const mb = d.negotiation.meetingBrief;
+
+    const fullBriefText = [
+      'MEETING BRIEF — ' + d.deal.title,
+      '',
+      'Objective: ' + mb.objective,
+      '',
+      'Agenda:',
+      ...mb.agenda.map((a) => '  ' + a.block + ' — ' + a.item),
+      '',
+      'Opening statement:',
+      mb.opening,
+      '',
+      'Asks:',
+      ...mb.asks.map((a) => '  - ' + a.text + ' (' + a.issueId + ')'),
+      '',
+      'Questions:',
+      ...mb.questions.map((q) => '  - ' + q.text),
+      '',
+      'Expected pushback:',
+      ...mb.expectedPushback.map((p) => '  Q: ' + p.pushback + '\n  A: ' + p.response),
+      '',
+      'Closing:',
+      mb.closing
+    ].join('\n');
+
+    const agendaCard = saCard('Objective &amp; agenda',
+      '<div style="margin-bottom:10px">' + esc(mb.objective) + ' ' + evidenceChip(mb.objectiveEvidence, { short: true }) + '</div>' +
+      timeline(mb.agenda.map((a) => ({ date: a.block, name: a.item, tone: '' }))),
+      { accent: 'plum', icon: 'meeting', sub: copyBtn('Copy full brief', null, fullBriefText) });
+
+    const openingCard = saCard('Opening statement',
+      '<div class="excerpt" style="border-left-color:var(--pri)">' + esc(mb.opening) + '</div>' +
+      '<div class="btn-row">' + copyBtn('Copy opening', null, mb.opening) + '</div>',
+      { accent: 'plum', icon: 'handshake' });
+
+    const closingCard = saCard('Closing recap',
+      '<div class="excerpt" style="border-left-color:var(--emph)">' + esc(mb.closing) + '</div>' +
+      '<div class="btn-row">' + copyBtn('Copy closing', null, mb.closing) + '</div>',
+      { accent: 'emph', icon: 'meeting' });
+
+    const asksText = mb.asks.map((a) => '- ' + a.text).join('\n');
+    const asksCard = saCard('Exact asks',
+      '<ul class="plain-list">' + mb.asks.map((a) =>
+        '<li>' + esc(a.text) + ' ' + issueTag(a.issueId) + ' ' + evidenceChip(a.evidenceType, { short: true }) + '</li>').join('') + '</ul>' +
+      '<div class="btn-row">' + copyBtn('Copy asks', null, asksText) + '</div>',
+      { accent: 'teal', icon: 'flag' });
+
+    const questionsText = mb.questions.map((q) => '- ' + q.text).join('\n');
+    const questionsCard = saCard('Questions to ask',
+      '<ul class="plain-list">' + mb.questions.map((q) =>
+        '<li>' + esc(q.text) + ' ' + issueTag(q.issueId) + ' ' + evidenceChip(q.evidenceType, { short: true }) + '</li>').join('') + '</ul>' +
+      '<div class="btn-row">' + copyBtn('Copy questions', null, questionsText) + '</div>',
+      { accent: 'teal', icon: 'info' });
+
+    const pbCols = [
+      { key: 'pushback', label: 'Expected pushback', width: '38%', render: (r) => '<span class="tiny">' + esc(r.pushback) + '</span>', sort: false },
+      { key: 'response', label: 'Recommended response', width: '38%', render: (r) => esc(r.response), sort: false },
+      { key: 'issue', label: 'Issue', width: '24%', render: (r) => issueTag(r.issueId) + ' ' + evidenceChip(r.evidenceType, { short: true }), sort: false }
+    ];
+    const pbText = mb.expectedPushback.map((p) => 'Q: ' + p.pushback + '\nA: ' + p.response).join('\n\n');
+    const pushbackCard = saCard('Expected pushback',
+      dataTable(pbCols, mb.expectedPushback, { id: 'negPushbackTable', zebra: true, dense: true }) +
+      '<div class="btn-row">' + copyBtn('Copy pushback table', null, pbText) + '</div>',
+      { accent: 'plum', icon: 'scale' });
+
+    return '<div class="grid">' +
+      '<div class="col-12">' + agendaCard + '</div>' +
+      '<div class="col-6">' + openingCard + '</div>' +
+      '<div class="col-6">' + closingCard + '</div>' +
+      '<div class="col-6">' + asksCard + '</div>' +
+      '<div class="col-6">' + questionsCard + '</div>' +
+      '<div class="col-12">' + pushbackCard + '</div>' +
+      '</div>';
+  }
+
+  /* ================================ SHELL ==================================== */
+  const scopedStyle = '<style>' +
+    '.neg-tab .obj-row{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line)}' +
+    '.neg-tab .obj-row:first-child{border-top:0}' +
+    '.neg-tab .obj-num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--pri);color:var(--pri-fg);' +
+    'font:800 var(--fz-sm)/24px var(--sans);text-align:center}' +
+    '.neg-tab .obj-body{font-size:var(--fz-sm)}' +
+    '.neg-tab .obj-issues{margin-top:5px;display:flex;gap:5px;flex-wrap:wrap}' +
+    '.neg-tab .neg-tag{cursor:pointer;font-family:var(--mono)}' +
+    '.neg-tab .ladder-hd{font-weight:700;font-size:var(--fz-sm);margin-bottom:8px;display:flex;align-items:center}' +
+    '.neg-tab .hs-line{display:flex;gap:5px;align-items:flex-start;color:var(--danger-fg);font-weight:600;font-size:var(--fz-sm)}' +
+    '.neg-tab .hs-line svg{width:13px;height:13px;flex:none;margin-top:2px;stroke:currentColor;fill:none;stroke-width:2}' +
+    '.neg-tab .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}' +
+    '.neg-tab .word-direct{display:none}' +
+    '.neg-tab .word-toggle-row{display:flex;align-items:center;gap:6px;margin:10px 0}' +
+    '.neg-tab #wm-collab-pos:checked + label,.neg-tab #wm-direct-pos:checked + label{background:var(--pri);color:var(--pri-fg);border-color:var(--pri)}' +
+    '.neg-tab #wm-direct-pos:checked ~ .word-scope .word-collab{display:none}' +
+    '.neg-tab #wm-direct-pos:checked ~ .word-scope .word-direct{display:-webkit-box}' +
+    '.neg-tab .plain-list{margin:0;padding-left:18px;font-size:var(--fz-sm);line-height:1.6}' +
+    '.neg-tab .plain-list li{margin-bottom:6px}' +
+    '</style>';
+
+  return scopedStyle + '<div class="neg-tab">' +
+    '<div class="wrap"><div class="tab-intro"><h2>Negotiation</h2>' +
+    '<p class="q">Positions to open with, the trades available, and a copy-ready meeting brief — keyed to the same evidence-based issue register used in Contract. ' +
+    coverageBadge(d.deal.evidenceCoverage) + '</p></div></div>' +
+    '<div class="subtabbar" data-subtab-group="negotiation"><div class="wrap">' +
+    '<button class="subtab-btn" data-subtab="positions" aria-selected="true">' + icon('target') + ' Positions</button>' +
+    '<button class="subtab-btn" data-subtab="tradeplan">' + icon('trade') + ' Trade Plan</button>' +
+    '<button class="subtab-btn" data-subtab="meeting">' + icon('meeting') + ' Meeting Brief</button>' +
+    '</div></div>' +
+    '<div class="tab-body"><div class="wrap">' +
+    '<div data-subpanel="negotiation/positions" class="is-active">' + buildPositions() + '</div>' +
+    '<div data-subpanel="negotiation/tradeplan">' + buildTradePlan() + '</div>' +
+    '<div data-subpanel="negotiation/meeting">' + buildMeetingBrief() + '</div>' +
+    '</div></div>' +
+    '</div>';
+}
+
+if (typeof global !== 'undefined') {
+  global.renderTab_negotiation = renderTab_negotiation;
+  global.DealTabs = global.DealTabs || {};
+  global.DealTabs.negotiation = renderTab_negotiation;
+}
+
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>
+document.querySelector('[data-tabpanel="negotiation"]').innerHTML = renderTab_negotiation(dashboardData);
+document.getElementById('ss').innerHTML = dashboardData.deal.summaryStrip.map(s=>'<button class="ss-item tone-'+s.tone+'" data-jump="'+s.jump+'"><span class="ss-val">'+s.value+'</span><span class="ss-lbl">'+s.label+'</span></button>').join('');
+</script>
+</body></html>

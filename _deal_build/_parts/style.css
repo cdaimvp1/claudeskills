@@ -1,0 +1,432 @@
+/* =============================================================================
+ * style.css — Deal-artifact design system.
+ * Platform-matching .sa-card / .card-hd, plum/teal/burnt-orange tokens, evidence
+ * chips, severity, and viz base styles (table / heatmap / matrix / timeline /
+ * waterfall). Self-contained: no external fonts, no remote assets.
+ *
+ * Colour discipline (LOCKED, see brief):
+ *   Structural  = PLUM (--pri) primary + TEAL (--sec) secondary + BURNT ORANGE
+ *                 (--emph) emphasis/attention. <=3 structural hues (shades OK).
+ *   Functional severity (used ONLY where meaning requires, never as decoration):
+ *     danger red  --danger-*  signature condition / material exposure
+ *     amber       --warn-*    issue / uncertain / decision
+ *     teal/green  --ok-*      aligned / cleared
+ *   Colour is never the only signal — always paired with a label, icon, or shape.
+ * Dark mode: token VALUES redefined under @media(prefers-color-scheme:dark) AND
+ *   html[data-theme=dark] / [data-theme=light]; components read tokens only.
+ * ========================================================================== */
+
+/* ---- 1. TOKENS ------------------------------------------------------------
+ * Platform-exact tokens (matches the Landscape dashboard / theo-color.css
+ * authoritative layer). Legacy internal names (--pri/--sec/--danger-bg/…) are
+ * kept as ALIASES so every existing rule + inlined scoped <style> block in
+ * this file keeps working unchanged — only the underlying values moved.
+ * ---------------------------------------------------------------------- */
+:root{
+  /* 1. neutral shade ladder (hierarchy backbone) */
+  --bg:#E2E6E1;          /* page — off-white so white cards separate */
+  --surface:#FFFFFF;     /* elevated card */
+  --surface2:#F7F5F1;    /* sub-panel inside a card */
+  --nested:#EDEAE3;      /* nested block */
+  --well:#E4E0D8;        /* inset / deepest well */
+  --line:#E3DED6;        /* hairline */
+  --line2:#D3CDC3;       /* stronger divider */
+  --ink:#1A1A1A;         /* primary text */
+  --ink2:#3A362F;        /* secondary text */
+  --mut:#505A64;         /* muted text (AA-safe) */
+  --mut2:#564F48;        /* secondary muted */
+  --panel:var(--surface2); /* legacy alias */
+
+  /* structural hues (the 3-colour system) */
+  --plum:#5C2B50;  --plum-t:#EDDFE9;                     /* PLUM primary */
+  --teal-d:#2F6E6B; --teal-t:#DCEBE9;                     /* TEAL secondary */
+  --emph:#C15E19;  --emph-t:#F6DDC9;                      /* BURNT ORANGE emphasis */
+  --pri:var(--plum);   --pri-t:var(--plum-t);   --pri-fg:#F3ECF1;  --pri-tx:var(--plum);   /* legacy alias */
+  --sec:var(--teal-d); --sec-t:var(--teal-t);   --sec-fg:#EAF4F2;  --sec-tx:var(--teal-d); /* legacy alias */
+  --emph-fg:#FBEFE4; --emph-tx:#A2500F;
+
+  /* functional severity tones: -bg tint, -fg text/icon, -bar accent */
+  --danger:#A23A30;    --danger-t:#FBE7E3;    /* signature condition / material exposure */
+  --warn:#8A5A00;      --warn-t:#FBF1DA;      /* issue / uncertain / decision */
+  --ok:#1F7A5A;        --ok-t:#DFEEE6;        /* aligned / cleared */
+  --ai:#2E5E8C;        --ai-t:#E4EBF1;        /* AI-sourced / inference accent */
+  --danger-bg:var(--danger-t); --danger-fg:var(--danger); --danger-bar:var(--danger);      /* legacy alias */
+  --warn-bg:var(--warn-t);     --warn-fg:var(--warn);     --warn-bar:#B45309;              /* legacy alias */
+  --ok-bg:var(--ok-t);         --ok-fg:var(--ok);         --ok-bar:var(--ok);              /* legacy alias */
+  --info-bg:var(--sec-t); --info-fg:var(--sec-tx); --info-bar:var(--sec);
+
+  /* heatmap ramp (neutral -> plum), used for intensity encoding */
+  --heat-0:#F2F1EC; --heat-1:#E3D2DE; --heat-2:#C9A6BE; --heat-3:#A36D92; --heat-4:#7A3F68; --heat-5:#5C2B50;
+
+  --shadow-1:0 1px 2px rgba(28,28,34,.04),0 5px 14px -4px rgba(28,28,34,.10);
+  --shadow-2:0 2px 4px rgba(28,28,34,.06),0 10px 26px -6px rgba(28,28,34,.16);
+
+  --card-hd-a:#F1F3F6; --card-hd-b:#E7EBF1; /* card-header gradient stops */
+
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono','Segoe UI Mono','SFMono-Regular',Consolas,'Roboto Mono',monospace;
+  --fz-h:15px; --fz:13.5px; --fz-sm:12.5px; --fz-meta:11.5px; --fz-floor:11px; --fz-title:13px;
+  --r:11px; --r-sm:8px;
+  --tab-h:44px;
+  color-scheme:light;
+}
+/* Dark is SECONDARY — applied only via explicit data-theme="dark" (toggle),
+   or as an OS-preference fallback when no explicit theme has been chosen.
+   The app boots with data-theme="light" stamped on <html>, so by default the
+   page is always light regardless of OS preference; the Theme toggle is what
+   moves it into this block. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme]){ color-scheme:dark;
+    --bg:#1C1C1C; --surface:#262626; --surface2:#2E2E2E; --nested:#343434; --well:#3B3B3B;
+    --line:#333333; --line2:#454545; --ink:#ECECEC; --ink2:#C9C6C0; --mut:#B0B0B0; --mut2:#8A8A8A;
+    --plum:#3A1E34; --plum-t:#33253B; --teal-t:#1E302D;
+    --emph:#EF9A5A; --emph-t:#33241A;
+    --pri-fg:#EADEF5; --pri-tx:#C99BD1; --sec-fg:#DDF0ED; --sec-tx:#5FBAAE; --emph-fg:#3A2410; --emph-tx:#E89A5D;
+    --danger:#EB9C93;    --danger-t:#3A1E1A;    --danger-bar:#D2554A;
+    --warn:#E8C24A;      --warn-t:#332905;      --warn-bar:#DBAA50;
+    --ok:#63BBA9;        --ok-t:#182A26;        --ok-bar:#3C8B80;
+    --ai:#7BA5DE;        --ai-t:#1A2740;
+    --card-hd-a:#2E2E2E; --card-hd-b:#262626;
+    --heat-0:#2A2A2A; --heat-1:#3A2A38; --heat-2:#5A2F52; --heat-3:#7C4069; --heat-4:#9E5C88; --heat-5:#C99BC0;
+    --shadow-1:0 1px 2px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+    --shadow-2:0 2px 4px rgba(0,0,0,.55),0 6px 16px -4px rgba(0,0,0,.5);
+  }
+}
+html[data-theme="dark"]{ color-scheme:dark;
+  --bg:#1C1C1C; --surface:#262626; --surface2:#2E2E2E; --nested:#343434; --well:#3B3B3B;
+  --line:#333333; --line2:#454545; --ink:#ECECEC; --ink2:#C9C6C0; --mut:#B0B0B0; --mut2:#8A8A8A;
+  --plum:#3A1E34; --plum-t:#33253B; --teal-t:#1E302D;
+  --emph:#EF9A5A; --emph-t:#33241A;
+  --pri-fg:#EADEF5; --pri-tx:#C99BD1; --sec-fg:#DDF0ED; --sec-tx:#5FBAAE; --emph-fg:#3A2410; --emph-tx:#E89A5D;
+  --danger:#EB9C93;    --danger-t:#3A1E1A;    --danger-bar:#D2554A;
+  --warn:#E8C24A;      --warn-t:#332905;      --warn-bar:#DBAA50;
+  --ok:#63BBA9;        --ok-t:#182A26;        --ok-bar:#3C8B80;
+  --ai:#7BA5DE;        --ai-t:#1A2740;
+  --card-hd-a:#2E2E2E; --card-hd-b:#262626;
+  --heat-0:#2A2A2A; --heat-1:#3A2A38; --heat-2:#5A2F52; --heat-3:#7C4069; --heat-4:#9E5C88; --heat-5:#C99BC0;
+  --shadow-1:0 1px 2px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+  --shadow-2:0 2px 4px rgba(0,0,0,.55),0 6px 16px -4px rgba(0,0,0,.5);
+}
+html[data-theme="light"]{ color-scheme:light;
+  --bg:#E2E6E1; --surface:#FFFFFF; --surface2:#F7F5F1; --nested:#EDEAE3; --well:#E4E0D8;
+  --line:#E3DED6; --line2:#D3CDC3; --ink:#1A1A1A; --ink2:#3A362F; --mut:#505A64; --mut2:#564F48;
+  --plum:#5C2B50; --plum-t:#EDDFE9; --teal-d:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --pri-fg:#F3ECF1; --pri-tx:#5C2B50; --sec-fg:#EAF4F2; --sec-tx:#2F6E6B; --emph-fg:#FBEFE4; --emph-tx:#A2500F;
+  --danger:#A23A30;    --danger-t:#FBE7E3;    --danger-bar:#A23A30;
+  --warn:#8A5A00;      --warn-t:#FBF1DA;      --warn-bar:#B45309;
+  --ok:#1F7A5A;        --ok-t:#DFEEE6;        --ok-bar:#1F7A5A;
+  --ai:#2E5E8C;        --ai-t:#E4EBF1;
+  --card-hd-a:#F1F3F6; --card-hd-b:#E7EBF1;
+  --heat-0:#F2F1EC; --heat-1:#E3D2DE; --heat-2:#C9A6BE; --heat-3:#A36D92; --heat-4:#7A3F68; --heat-5:#5C2B50;
+}
+
+/* ---- 2. RESET / BASE ----------------------------------------------------- */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:var(--sans); font-size:var(--fz); line-height:1.5;
+  color:var(--ink); background:var(--bg);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+h1,h2,h3,h4{margin:0; text-wrap:balance; line-height:1.25}
+p{margin:0 0 .5em}
+a{color:var(--sec-tx); text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--emph); outline-offset:2px; border-radius:3px}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--mut)}
+.tiny{font-size:var(--fz-meta)}
+.eyebrow{font-size:var(--fz-floor); letter-spacing:.09em; text-transform:uppercase; color:var(--mut); font-weight:700}
+.wrap{max-width:1280px; margin:0 auto; padding:0 20px}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+
+/* ---- 3. APP HEADER + SNAPSHOT BANNER -------------------------------------
+ * Platform-style light header: off-white page, plum eyebrow, dark bold title,
+ * muted snapshot line, subtle bordered Print/Theme pills. No filled bar. */
+.deal-head{background:var(--bg); color:var(--ink); border-bottom:1px solid var(--line2)}
+.deal-head .wrap{display:flex; align-items:center; gap:16px; min-height:76px; padding-top:16px; padding-bottom:16px}
+.deal-head .dh-eyebrow{font-size:var(--fz-floor); letter-spacing:.09em; text-transform:uppercase; color:var(--pri-tx); font-weight:800; margin-bottom:4px}
+.deal-head .dh-title{font-size:22px; font-weight:800; letter-spacing:-.01em; line-height:1.2; color:var(--ink)}
+.deal-head .dh-sub{font-size:var(--fz-meta); color:var(--mut); margin-top:3px}
+.deal-head .dh-spacer{margin-left:auto}
+.deal-head .dh-btn{display:inline-flex; align-items:center; gap:6px; background:var(--surface); color:var(--ink);
+  border:1px solid var(--line2); border-radius:30px; padding:6px 13px; font:600 var(--fz-meta)/1 var(--sans); cursor:pointer; box-shadow:var(--shadow-1)}
+.deal-head .dh-btn:hover{background:var(--nested); border-color:var(--mut2)}
+.deal-head .dh-btn svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2}
+.snapshot-note{background:var(--warn-bg); color:var(--warn-fg); border-bottom:1px solid var(--line2); font-size:var(--fz-meta); font-weight:600}
+.snapshot-note .wrap{display:flex; align-items:center; gap:8px; padding-top:6px; padding-bottom:6px}
+.snapshot-note svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; flex:none}
+
+/* Sticky-head wrapper: the shell wraps <summary-strip> + <tabbar> in ONE
+   .sticky-head so they stick together without overlap (children become static). */
+.sticky-head{position:sticky; top:0; z-index:30; box-shadow:var(--shadow-1)}
+.sticky-head .summary-strip,.sticky-head .tabbar{position:static; box-shadow:none}
+
+/* ---- 4. SUMMARY STRIP (persistent, <=5 clickable values) ----------------- */
+.summary-strip{position:sticky; top:0; z-index:30; background:var(--surface); border-bottom:1px solid var(--line2); box-shadow:var(--shadow-1)}
+.summary-strip .wrap{display:flex; gap:10px; padding-top:9px; padding-bottom:9px; overflow-x:auto}
+.ss-item{flex:1 1 0; min-width:132px; display:flex; flex-direction:column; gap:2px; padding:7px 12px;
+  border:1px solid var(--line); border-left:3px solid var(--mut2); border-radius:var(--r-sm); background:var(--panel);
+  cursor:pointer; text-align:left; font-family:inherit}
+.ss-item:hover{background:var(--nested); border-color:var(--line2)}
+.ss-item .ss-val{font-size:20px; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.ss-item .ss-lbl{font-size:var(--fz-floor); color:var(--mut); text-transform:uppercase; letter-spacing:.05em; font-weight:700}
+.ss-item.tone-danger{border-left-color:var(--danger-bar)} .ss-item.tone-danger .ss-val{color:var(--danger-fg)}
+.ss-item.tone-warn{border-left-color:var(--warn-bar)}     .ss-item.tone-warn .ss-val{color:var(--warn-fg)}
+.ss-item.tone-info{border-left-color:var(--sec)}          .ss-item.tone-info .ss-val{color:var(--sec-tx)}
+.ss-item.tone-ok{border-left-color:var(--ok-bar)}         .ss-item.tone-ok .ss-val{color:var(--ok-fg)}
+
+/* ---- 5. TAB BAR + SUBTAB BAR --------------------------------------------- */
+.tabbar{position:sticky; top:0; z-index:25; background:var(--surface); border-bottom:1px solid var(--line2)}
+.summary-strip + .tabbar{top:0}
+.tabbar .wrap{display:flex; gap:2px; overflow-x:auto}
+.tab-btn{appearance:none; background:transparent; border:0; border-bottom:2.5px solid transparent; color:var(--mut);
+  font:700 var(--fz)/1 var(--sans); letter-spacing:.01em; padding:14px 16px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:7px}
+.tab-btn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn[aria-selected="true"]{color:var(--pri-tx); border-bottom-color:var(--emph)}
+.subtabbar{background:var(--panel); border-bottom:1px solid var(--line)}
+.subtabbar .wrap{display:flex; gap:6px; padding-top:9px; padding-bottom:9px; overflow-x:auto}
+.subtab-btn{appearance:none; background:var(--surface); border:1px solid var(--line2); border-radius:30px; color:var(--mut);
+  font:700 var(--fz-sm)/1 var(--sans); padding:7px 14px; cursor:pointer; white-space:nowrap}
+.subtab-btn:hover{color:var(--ink); border-color:var(--mut2)}
+.subtab-btn[aria-selected="true"]{background:var(--pri); color:var(--pri-fg); border-color:var(--pri)}
+
+/* tab/subtab panels */
+[data-tabpanel]{display:none}
+[data-tabpanel].is-active{display:block; animation:fade .18s ease}
+[data-subpanel]{display:none}
+[data-subpanel].is-active{display:block; animation:fade .18s ease}
+@keyframes fade{from{opacity:0; transform:translateY(3px)}to{opacity:1; transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important}}
+
+.tab-body{padding:20px 0 60px}
+.tab-intro{margin-bottom:16px}
+.tab-intro h2{font-size:20px; font-weight:800; letter-spacing:-.02em}
+.tab-intro .q{color:var(--mut); font-size:var(--fz); margin-top:3px; max-width:70ch}
+
+/* ---- 6. GRID ------------------------------------------------------------- */
+.grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px}
+.col-12{grid-column:span 12} .col-8{grid-column:span 8} .col-7{grid-column:span 7}
+.col-6{grid-column:span 6} .col-5{grid-column:span 5} .col-4{grid-column:span 4} .col-3{grid-column:span 3}
+@media (max-width:900px){ .grid{grid-template-columns:repeat(6,1fr)}
+  .col-8,.col-7,.col-6,.col-5,.col-4,.col-3{grid-column:span 6} }
+
+/* ---- 7. SA-CARD (platform card w/ left accent bar + icon + uppercase title) */
+.sa-card{position:relative; background:var(--surface); border:1px solid var(--line2); border-radius:var(--r);
+  box-shadow:var(--shadow-1); overflow:hidden; display:flex; flex-direction:column; min-width:0}
+.sa-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--pri)}
+.sa-card.accent-teal::before{background:var(--sec)}
+.sa-card.accent-emph::before{background:var(--emph)}
+.sa-card.accent-danger::before{background:var(--danger-bar)}
+.sa-card.accent-warn::before{background:var(--warn-bar)}
+.card-hd{display:flex; align-items:center; gap:9px; padding:13px 15px; border-bottom:1px solid var(--line2);
+  background:linear-gradient(180deg,var(--card-hd-a),var(--card-hd-b))}
+.card-hd .ch-ic{width:17px; height:17px; flex:none; color:var(--pri-tx)}
+.sa-card.accent-teal .card-hd .ch-ic{color:var(--sec-tx)}
+.sa-card.accent-emph .card-hd .ch-ic{color:var(--emph-tx)}
+.card-hd .ch-ic svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:2}
+.card-hd .ct{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink)}
+.card-hd .cs{margin-left:auto; font-family:var(--mono); font-size:var(--fz-meta); color:var(--mut); font-weight:600; text-align:right}
+.card-bd{padding:15px 16px; flex:1; min-width:0}
+.card-bd.tight{padding:11px 13px}
+.card-bd > :last-child{margin-bottom:0}
+.card-note{font-size:var(--fz-sm); color:var(--mut); margin-top:8px; line-height:1.45}
+
+/* insight line — short narrative that SUPPORTS a visual (never a wall) */
+.insight{display:flex; gap:8px; align-items:flex-start; font-size:var(--fz-sm); color:var(--ink2); line-height:1.45; padding:6px 0}
+.insight + .insight{border-top:1px solid var(--line)}
+.insight .ib{width:5px; align-self:stretch; border-radius:3px; background:var(--sec); flex:none}
+.insight.warn .ib{background:var(--warn-bar)} .insight.danger .ib{background:var(--danger-bar)}
+
+/* ---- 8. EVIDENCE CHIPS + COVERAGE --------------------------------------- */
+.ev{display:inline-flex; align-items:center; gap:4px; font:700 var(--fz-floor)/1 var(--sans); letter-spacing:.03em;
+  padding:3px 7px 3px 6px; border-radius:20px; border:1px solid transparent; white-space:nowrap; vertical-align:middle}
+.ev::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor; flex:none}
+.ev-contract{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 30%,transparent)}
+.ev-internal{background:var(--pri-t); color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 25%,transparent)}
+.ev-public{background:var(--info-bg); color:var(--info-fg); border-color:color-mix(in srgb,var(--sec) 22%,transparent)}
+.ev-calculated{background:var(--emph-t); color:var(--emph-tx); border-color:color-mix(in srgb,var(--emph) 30%,transparent)}
+.ev-inference{background:var(--warn-bg); color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 30%,transparent)}
+.ev-assumption{background:var(--pri-t); color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 40%,transparent); border-style:dashed}
+.ev-unavailable{background:var(--well); color:var(--mut); border-color:var(--line2)}
+.ev-unavailable::before{background:var(--mut)}
+
+.cov{display:inline-flex; align-items:center; gap:5px; font:700 var(--fz-meta)/1 var(--sans); padding:4px 9px; border-radius:20px; border:1px solid var(--line2)}
+.cov .dots{display:inline-flex; gap:2px}
+.cov .dots i{width:6px; height:6px; border-radius:50%; background:var(--line2)}
+.cov-strong{color:var(--ok-fg); background:var(--ok-bg)} .cov-strong .dots i{background:var(--ok-fg)}
+.cov-moderate{color:var(--warn-fg); background:var(--warn-bg)} .cov-moderate .dots i:nth-child(-n+2){background:var(--warn-fg)}
+.cov-limited{color:var(--danger-fg); background:var(--danger-bg)} .cov-limited .dots i:nth-child(1){background:var(--danger-fg)}
+
+/* ---- 9. STATUS / SEVERITY PILLS ----------------------------------------- */
+.pill{display:inline-flex; align-items:center; gap:5px; font:700 var(--fz-meta)/1 var(--sans); padding:4px 9px; border-radius:6px; border:1px solid transparent; white-space:nowrap}
+.pill::before{content:""; width:7px; height:7px; border-radius:2px; background:currentColor; flex:none}
+.sev-hard-stop,.pill.danger{background:var(--danger-bg); color:var(--danger-fg); border-color:color-mix(in srgb,var(--danger-bar) 35%,transparent)}
+.sev-high,.pill.warn{background:var(--warn-bg); color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 32%,transparent)}
+.sev-medium,.pill.info{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 28%,transparent)}
+.sev-low,.pill.muted{background:var(--nested); color:var(--mut2); border-color:var(--line2)}
+.pill.ok{background:var(--ok-bg); color:var(--ok-fg); border-color:color-mix(in srgb,var(--ok-bar) 30%,transparent)}
+/* status shading for scope/SLA rows */
+.st-aligned{color:var(--ok-fg)} .st-partial{color:var(--warn-fg)} .st-deviation{color:var(--danger-fg)} .st-missing{color:var(--mut)}
+
+/* ---- 10. TABLES ---------------------------------------------------------- */
+.tbl-wrap{overflow-x:auto; border-radius:var(--r-sm)}
+table.dt{width:100%; border-collapse:collapse; font-size:var(--fz-sm)}
+table.dt th,table.dt td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top}
+table.dt thead th{position:sticky; top:0; background:var(--panel); color:var(--mut); font-weight:700; font-size:var(--fz-meta);
+  text-transform:uppercase; letter-spacing:.05em; border-bottom:1.5px solid var(--line2); white-space:nowrap; z-index:1}
+table.dt th[data-sort]{cursor:pointer; user-select:none}
+table.dt th[data-sort]:hover{color:var(--ink)}
+table.dt th[data-sort]::after{content:"\2195"; opacity:.35; margin-left:5px; font-size:10px}
+table.dt th[data-sort][aria-sort="ascending"]::after{content:"\2191"; opacity:1}
+table.dt th[data-sort][aria-sort="descending"]::after{content:"\2193"; opacity:1}
+table.dt.zebra tbody tr:nth-child(even){background:color-mix(in srgb,var(--panel) 55%,transparent)}
+table.dt tbody tr:hover{background:var(--nested)}
+table.dt td.num,table.dt th.num{text-align:right; font-variant-numeric:tabular-nums; font-family:var(--mono)}
+table.dt.dense th,table.dt.dense td{padding:6px 9px}
+tr.rowtint-danger>td{background:var(--danger-bg)}
+tr.rowtint-warn>td{background:var(--warn-bg)}
+tr.is-hidden{display:none}
+.expander-row>td{padding:0; background:var(--nested)}
+.expander-row .exp-inner{padding:13px 15px; border-left:3px solid var(--pri)}
+tr.expandable{cursor:pointer}
+tr.expandable>td:first-child{position:relative; padding-left:24px}
+tr.expandable>td:first-child::before{content:"\25B8"; position:absolute; left:9px; color:var(--mut); transition:transform .15s}
+tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
+
+/* ---- 11. COLLAPSIBLE / DRAWER ------------------------------------------- */
+.collapsible{border:1px solid var(--line); border-radius:var(--r-sm); background:var(--panel); overflow:hidden; margin:8px 0}
+.collapsible>summary{list-style:none; cursor:pointer; padding:9px 12px; font-weight:700; font-size:var(--fz-sm); color:var(--ink2);
+  display:flex; align-items:center; gap:8px}
+.collapsible>summary::-webkit-details-marker{display:none}
+.collapsible>summary::before{content:"\25B8"; color:var(--mut); transition:transform .15s}
+.collapsible[open]>summary::before{transform:rotate(90deg)}
+.collapsible>summary:hover{background:var(--nested)}
+.collapsible .cl-body{padding:11px 13px; border-top:1px solid var(--line); font-size:var(--fz-sm); line-height:1.55; color:var(--ink2)}
+.excerpt{font-family:var(--mono); font-size:var(--fz-meta); background:var(--well); border-left:3px solid var(--sec);
+  padding:9px 11px; border-radius:0 var(--r-sm) var(--r-sm) 0; color:var(--ink2); line-height:1.5}
+
+/* ---- 12. VIZ: mini-bar / comparison bars -------------------------------- */
+.minibar{position:relative; height:16px; background:var(--well); border-radius:4px; overflow:hidden; min-width:60px}
+.minibar>span{position:absolute; left:0; top:0; bottom:0; background:var(--sec); border-radius:4px}
+.minibar.pri>span{background:var(--pri)} .minibar.emph>span{background:var(--emph)}
+.minibar.danger>span{background:var(--danger-bar)} .minibar.warn>span{background:var(--warn-bar)}
+.bar-row{display:grid; grid-template-columns:130px 1fr 62px; align-items:center; gap:10px; padding:5px 0; font-size:var(--fz-sm)}
+.bar-row + .bar-row{border-top:1px solid var(--line)}
+.bar-row .bl{color:var(--ink2); font-weight:600}
+.bar-row .bv{text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--ink)}
+
+/* ---- 13. VIZ: heatmap / matrix cells ------------------------------------ */
+.heatcell{display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:26px; padding:0 7px;
+  border-radius:5px; font:700 var(--fz-meta)/1 var(--mono); color:var(--ink); border:1px solid var(--line)}
+.heat-0{background:var(--heat-0)} .heat-1{background:var(--heat-1)} .heat-2{background:var(--heat-2); color:#fff}
+.heat-3{background:var(--heat-3); color:#fff} .heat-4{background:var(--heat-4); color:#fff} .heat-5{background:var(--heat-5); color:#fff}
+.heat-grid{display:grid; gap:4px}
+.heat-grid .hg-lbl{font-size:var(--fz-meta); color:var(--mut); display:flex; align-items:center; padding-right:6px}
+.heat-grid .hg-col{font-size:var(--fz-floor); color:var(--mut); text-align:center; text-transform:uppercase; letter-spacing:.03em; padding-bottom:3px}
+
+/* 2-D decision matrix (priority-impact / give-get / decision-impact-vs-ease) */
+.matrix{position:relative; width:100%; aspect-ratio:4/3; background:
+  linear-gradient(0deg,transparent 49.6%,var(--line) 49.6%,var(--line) 50.4%,transparent 50.4%),
+  linear-gradient(90deg,transparent 49.6%,var(--line) 49.6%,var(--line) 50.4%,transparent 50.4%),
+  var(--panel);
+  border:1px solid var(--line2); border-radius:var(--r-sm)}
+.matrix .mx-pt{position:absolute; transform:translate(-50%,50%); width:26px; height:26px; border-radius:50%;
+  background:var(--pri); color:var(--pri-fg); display:flex; align-items:center; justify-content:center;
+  font:800 var(--fz-floor)/1 var(--sans); border:2px solid var(--surface); box-shadow:var(--shadow-1); cursor:pointer}
+.matrix .mx-pt.teal{background:var(--sec); color:var(--sec-fg)}
+.matrix .mx-pt.emph{background:var(--emph); color:var(--emph-fg)}
+.matrix .mx-pt.danger{background:var(--danger-bar); color:#fff}
+.matrix .mx-pt:hover{outline:2px solid var(--emph); outline-offset:1px; z-index:2}
+.matrix .mx-axis-x,.matrix .mx-axis-y{position:absolute; font-size:var(--fz-floor); color:var(--mut); text-transform:uppercase; letter-spacing:.05em; font-weight:700}
+.matrix .mx-axis-x{bottom:-18px; width:100%; text-align:center}
+.matrix .mx-axis-y{left:-8px; top:50%; transform:rotate(-90deg) translateX(50%); transform-origin:left}
+.mx-quad{position:absolute; font-size:var(--fz-floor); color:var(--mut2); opacity:.7; padding:6px 8px}
+
+/* ---- 14. VIZ: waterfall (ask -> normalized -> negotiated) --------------- */
+.waterfall{display:flex; align-items:flex-end; gap:10px; height:190px; padding:10px 4px 0}
+.wf-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; min-width:0}
+.wf-bar{width:100%; max-width:74px; border-radius:5px 5px 0 0; position:relative; transition:height .3s}
+.wf-bar.total{background:var(--pri)} .wf-bar.up{background:var(--danger-bar)} .wf-bar.down{background:var(--sec)} .wf-bar.final{background:var(--emph)}
+.wf-val{font:700 var(--fz-meta)/1 var(--mono); color:var(--ink); margin-bottom:5px; white-space:nowrap}
+.wf-lbl{font-size:var(--fz-floor); color:var(--mut); text-align:center; margin-top:7px; line-height:1.2}
+
+/* ---- 15. VIZ: timeline (milestones / sequence) -------------------------- */
+.timeline{position:relative; padding-left:8px}
+.tl-track{position:absolute; left:15px; top:6px; bottom:6px; width:2px; background:var(--line2)}
+.tl-item{position:relative; padding:0 0 16px 34px}
+.tl-item::before{content:""; position:absolute; left:9px; top:3px; width:14px; height:14px; border-radius:50%;
+  background:var(--surface); border:3px solid var(--sec); z-index:1}
+.tl-item.pri::before{border-color:var(--pri)} .tl-item.emph::before{border-color:var(--emph)}
+.tl-item .tl-date{font:700 var(--fz-meta)/1 var(--mono); color:var(--sec-tx)}
+.tl-item .tl-name{font-weight:700; font-size:var(--fz-sm); margin:2px 0}
+.tl-item .tl-meta{font-size:var(--fz-meta); color:var(--mut)}
+/* horizontal gantt-ish bar timeline */
+.gantt{display:grid; gap:6px}
+.gantt-row{display:grid; grid-template-columns:150px 1fr; gap:10px; align-items:center; font-size:var(--fz-sm)}
+.gantt-track{position:relative; height:22px; background:var(--panel); border-radius:5px; border:1px solid var(--line)}
+.gantt-fill{position:absolute; top:2px; bottom:2px; background:var(--sec); border-radius:4px; display:flex; align-items:center; padding:0 6px; color:var(--sec-fg); font:700 var(--fz-floor)/1 var(--sans); overflow:hidden}
+.gantt-fill.pri{background:var(--pri); color:var(--pri-fg)}
+
+/* ---- 16. ASSUMPTION CONTROLS (LOCAL, editable) -------------------------- */
+.asm-ctrl{display:flex; flex-direction:column; gap:5px; padding:10px 0; border-bottom:1px solid var(--line)}
+.asm-ctrl:last-child{border-bottom:0}
+.asm-ctrl .asm-top{display:flex; align-items:baseline; gap:8px}
+.asm-ctrl label{font-weight:700; font-size:var(--fz-sm); color:var(--ink2)}
+.asm-ctrl .asm-val{margin-left:auto; font-family:var(--mono); font-weight:700; color:var(--emph-tx); font-variant-numeric:tabular-nums}
+.asm-ctrl input[type=range]{width:100%; accent-color:var(--pri); height:4px}
+.asm-ctrl .asm-badge{font-size:var(--fz-floor); color:var(--mut)}
+.local-flag{display:inline-flex; align-items:center; gap:4px; font:700 var(--fz-floor)/1 var(--sans); color:var(--emph-tx);
+  background:var(--emph-t); border-radius:5px; padding:3px 6px; text-transform:uppercase; letter-spacing:.05em}
+.btn{appearance:none; font:700 var(--fz-sm)/1 var(--sans); padding:8px 13px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--line2); background:var(--surface); color:var(--ink); display:inline-flex; align-items:center; gap:6px}
+.btn svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2}
+.btn:hover{background:var(--nested); border-color:var(--mut2)}
+.btn.primary{background:var(--pri); color:var(--pri-fg); border-color:var(--pri)}
+.btn.primary:hover{background:color-mix(in srgb,var(--pri) 85%,black)}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+
+/* ---- 17. FILTER / TOOLBAR ----------------------------------------------- */
+.toolbar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+.toolbar input[type=search],.toolbar select{font:600 var(--fz-sm)/1 var(--sans); padding:8px 11px; border-radius:8px;
+  border:1px solid var(--line2); background:var(--surface); color:var(--ink)}
+.toolbar input[type=search]{min-width:200px}
+.chip-filter{appearance:none; font:700 var(--fz-meta)/1 var(--sans); padding:6px 11px; border-radius:20px; cursor:pointer;
+  border:1px solid var(--line2); background:var(--surface); color:var(--mut)}
+.chip-filter[aria-pressed="true"]{background:var(--pri); color:var(--pri-fg); border-color:var(--pri)}
+.toolbar .spacer{margin-left:auto}
+.filter-count{font-size:var(--fz-meta); color:var(--mut)}
+
+/* ---- 18. KV / DEFINITION ROWS (compact fact rows, not cards) ------------ */
+.kv{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:var(--fz-sm)}
+.kv dt{color:var(--mut); font-weight:600; white-space:nowrap}
+.kv dd{margin:0; color:var(--ink); display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.divider{height:1px; background:var(--line); margin:12px 0; border:0}
+
+/* jump / copy affordances */
+.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,100%{box-shadow:0 0 0 0 transparent}20%{box-shadow:0 0 0 3px var(--emph)}}
+.jump{cursor:pointer; color:var(--sec-tx); font-weight:700; font-size:var(--fz-meta); text-decoration:underline; text-decoration-style:dotted}
+.copyable{position:relative}
+.copied-toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--surface);
+  padding:9px 16px; border-radius:8px; font:700 var(--fz-sm)/1 var(--sans); box-shadow:var(--shadow-2); z-index:100; opacity:0; pointer-events:none; transition:opacity .2s}
+.copied-toast.show{opacity:1}
+
+/* ---- 19. GAP / UNAVAILABLE card (never an empty fabricated panel) -------- */
+.gap-card{border:1px dashed var(--line2); background:var(--panel); border-radius:var(--r-sm); padding:13px 15px}
+.gap-card .gc-hd{display:flex; align-items:center; gap:8px; font-weight:700; color:var(--mut2); font-size:var(--fz-sm)}
+.gap-card .gc-hd svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2}
+.legend{display:flex; flex-wrap:wrap; gap:10px; font-size:var(--fz-meta); color:var(--mut); margin-top:10px}
+.legend span{display:inline-flex; align-items:center; gap:5px}
+.legend i{width:11px; height:11px; border-radius:3px; display:inline-block}
+
+/* print */
+@media print{
+  .summary-strip,.tabbar,.subtabbar,.deal-head .dh-btn,.toolbar{position:static}
+  [data-tabpanel],[data-subpanel]{display:block !important}
+  .sa-card{break-inside:avoid; box-shadow:none}
+  body{background:#fff}
+}
