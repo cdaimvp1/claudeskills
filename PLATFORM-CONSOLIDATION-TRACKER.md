@@ -125,32 +125,33 @@ Formalize a **hybrid** pipeline (the researched best design; more accurate + aud
 
 ---
 
-## PART D — BUILD / DESIGN LIST (prioritized)
+## PART D — BUILD / DESIGN LIST (updated 2026-07-23; reconciled with the harness task list #103-#115)
 
-**P0 — finish Landscape (Marc validating visually first):**
-1. Landscape Phase-2 deep-dive redesign (C2): panel merges + condense side-by-side + deepen w/ real financial visuals + must-have knockout matrix + recentIssues in risk posture.
-2. Apply the remaining Exec Summary refinements (C2 last bullet).
-3. Marc visual sign-off → freeze the Landscape exemplar as the template.
+**DONE:**
+- Landscape dashboard: built, real-vendor enriched, Phase-2 redesign, Marc-approved, and **LOCKED INTO the skill** (`supplier-landscape-1c344a/dashboard/` ships the deterministic engine; SKILL.md v3.0; the exemplar/template for every hub). Commit 935427e.
+- Roster cuts (decision-deck, procurement-options-analysis). Converged Dashboard Operating Rules + gap-state component (task #79). Deal tab mapped (#77). pro-forma `.xlsx` generator (`pro_forma_generator.py`, #81).
 
-**P1 — roster cleanup (independent; Marc's go pending):**
-4. CUT decision-deck + procurement-options-analysis (delete dirs + strip ~14 refs each + fix count + repackage).
+**P1 — Deal dashboard (ACTIVE; first hub; reference `acme`/P-1042):** [task #103 design → #78 build]
+1. **Design the structure first (grounded, do NOT snap tab count)** from DEAL-TAB-MAP.md + the prior `_deal_build` + Marc's rethink → Marc sign-off (#103).
+2. Build: converge the 3 lenses (contract-review Legal Protection, scope-sow Scope Definition, pro-forma Deal Economics) over ONE persisted data object (orchestrator-over-slices). Per rethink: slim term-evolution/conflict **document map** (MSA/amendments/SOW/COs; not emails), **ZOPA**, merge **Ask-vs-Target + Normalized-Line-Items**, real **pro-forma/P&L/cash-flow** (reuse pv-12), **Communications synthesis** replacing Meeting Brief (email/Teams, traceable, who-has-the-pen), **playbook-grounded positions** w/ term interdependencies; fewer tabs, less redundancy (#78).
+3. contract-review clause-analysis enhancement (A5) at Deal phase (#80).
 
-**P2 — Deal tab (the big consolidation; reference project `acme`/P-1042):**
-5. Map the platform Deal tab (pv-11/12/13) sub-tabs + components (like the Landscape map).
-6. Bundle the Deal tab self-contained via `build_dashboard.py` pointed at `acme`.
-7. Converge the 3 lenses (contract-review Legal Protection, scope-sow Scope Definition, pro-forma Deal Economics); enrich only what pv-12 lacks (WACC slider, cost-component build-up).
-8. Codify the **Converged Dashboard Operating Rules** reference (grounding + materialized artifacts + output-scoped execution) + build the reusable **gap-state component**.
-9. contract-review clause-analysis enhancement (A5): parser + clause-inventory schema (IDs + spans) + missing-clause checklist + extract/judge split. Park re-paper-to-Lilly-SOW.
+**P2 — remaining hubs:**
+4. Supplier Deep Dive hub: external + INTERNAL layer (contracts/spend/owners/approvers) (#111).
+5. RFx hub: workflow inferred from Outlook/Teams/docs + response-analysis + evaluation (#112).
+6. Personal Command Center hub: platform My Work redesign; absorbs meeting-prep (#115).
 
-**P3 — doc-generators (M365-native):**
-10. pro-forma → Excel `.xlsx`; executive-summary-package → Word `.docx`; sole-source-challenge → PPTX or Word.
+**P3 — file generators (the `<skill>_generator.py` layer; pro-forma is the template; libs confirmed available):**
+7. should-cost `.xlsx` (#104), market-rate `.xlsx` (#105), executive-summary `.docx` (#82), sole-source `.pptx`/`.docx` (#83), evaluation-engine `.docx` (#106), rfp-response-analysis `.docx` (#107).
 
-**P4 — remaining dashboards:**
-11. Roll the bundle-the-platform-tab process across the other dashboards per the B6 mapping.
-12. PCC redesign (→ platform My Work).
+**P4 — front door + cobbled orchestrator:**
+8. **"Theo"** = conversational-intake + skill-routing front-door skill (diagnose → recommend → confirm → hand off), triggered by `@Theo` / natural phrases; RETIRES the static "Theo, go!" menu/widget; `procurement-launcher` collapses into it; specific skills keep their own direct triggers (#108).
+9. Per-skill handoff redesign: top-3 context-ranked successors + 4th = back to intake carrying context (#109).
+10. Convert launcher routing to ONE JSON manifest source-of-truth (#110).
 
-**P5 — package:**
-13. Re-integrity sweep + re-package the installable `.skill` zip (preserve the `-1c344a` suffix).
+**P5 — correctness + package:**
+11. playbook-learning aggregate-stats kernel + port numeric_kernel's gap list (#113). contract-review Protection Score deduction-kernel = **HELD for Marc go** (sensitive skill; audit mis-diagnosed it as weighted_score) (#114).
+12. invoice-rate-card-auditor mapping (#86). Re-integrity sweep + re-package the `.skill` zip, `-1c344a` preserved (#87).
 
 ---
 
