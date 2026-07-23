@@ -49,3 +49,9 @@ build `build_dashboard.py`, checks `smoke.cjs` / `verify_deepdive.cjs`. Self-con
 - Also (side task): bundled platform My Work page -> Desktop\Lilly Procurement Dashboards\My-Work.html (build_my_work.py).
 - 2026-07-23: P2 STRUCTURE + Summary done (pv-07b, 6-tab dispatch, compact decision header, 28/28 verify_dd2).
   Other 5 tabs first-pass. NEXT: build the dominant visualization + authored data for each of the 5, then OPEN.
+- 2026-07-23: **Risk & Resilience dominant viz DONE** — impact x likelihood matrix (gate rings, zone tint) +
+  classified event timeline (directness: service/division/parent) + mitigation board. Authored nimbus.risks +
+  nimbus.events; pvAssess returns risks/events; pvDeriveEvents for non-authored. Verified (grounded: matrix GATEs,
+  UNC5537 + Patel timeline, mitigation board). REMAINING dominant viz: Company (ownership tree + footprint),
+  Capabilities (capability-to-requirement heatmap + reference matrix), Financial&Market (peer scatter + commercial
+  drivers), Lilly Fit (diligence funnel + action board). THEN rebuild + verify + OPEN.

@@ -81,7 +81,20 @@ var ASSESS_AUTHORED = {
       'US / EU data residency and support-location scope unconfirmed for regulated data.',
       'Single-platform lock-in and exit / portability terms to be negotiated up front.'
     ],
-    evidenceCoverage: {verified:48, partial:24, supplier:17, missing:11}
+    evidenceCoverage: {verified:48, partial:24, supplier:17, missing:11},
+    risks: [
+      {label:'Consumption-cost volatility', impact:'High',   likelihood:'Medium', confidence:'Medium', type:'Commercial',        gate:true,  mitigation:'Model peak concurrency; negotiate committed-use pricing with caps.'},
+      {label:'Data residency (US / EU)',    impact:'High',   likelihood:'Medium', confidence:'Low',    type:'Diligence unknown', gate:true,  mitigation:'Confirm service + support locations for regulated data before award.'},
+      {label:'Tenant credential control',   impact:'Medium', likelihood:'Medium', confidence:'Medium', type:'Lilly exposure',    gate:true,  mitigation:'Mandate MFA / key-pair auth / network policy on any Lilly tenant.'},
+      {label:'Single-platform lock-in',     impact:'Medium', likelihood:'Medium', confidence:'High',   type:'Solution / design',  gate:false, mitigation:'Negotiate portability + exit terms; validate open-table (Iceberg) path.'},
+      {label:'Not yet GAAP-profitable',     impact:'Low',    likelihood:'Low',    confidence:'High',   type:'Supplier-inherent',  gate:false, mitigation:'Monitor; strong free cash flow ($1.12B) and scale offset.'},
+      {label:'Securities class action',     impact:'Low',    likelihood:'Low',    confidence:'Medium', type:'Supplier-inherent',  gate:false, mitigation:'Monitor Patel v. Snowflake governance outcome.'}
+    ],
+    events: [
+      {date:'Apr-Jun 2024', title:'UNC5537 customer-credential breach campaign', directness:'Affects the service', resolution:'Several claims dismissed with prejudice Dec 2025; litigation ongoing (MDL 3126).', detail:'Infostealer-harvested credentials accessed 165+ customer tenants lacking MFA; Snowflake infrastructure itself not breached.'},
+      {date:'Feb 2026',      title:'Patel v. Snowflake securities class action filed', directness:'Affects the operating division', resolution:'Ongoing.', detail:'Over a withdrawn 2029 revenue target; a governance matter to track, not a viability threat.'},
+      {date:'~May 2026',     title:'~$6B multi-year AWS partnership announced', directness:'Affects the service', resolution:'Positive signal.', detail:'Deepens multi-cloud footing and marketplace reach.'}
+    ]
   }
 };
 
@@ -135,8 +148,22 @@ function pvAssess(a, cand, input) {
     opportunities: auth.opportunities || pvDeriveOpps(cand),
     concerns: auth.concerns || pvDeriveConcerns(cand),
     evidenceCoverage: cov,
+    risks: auth.risks || [],
+    events: auth.events || pvDeriveEvents(cand),
     _authored: !!auth.dimensions
   };
+}
+
+function pvDeriveEvents(cand) {
+  var dd = (cand && cand.deepDive) || {};
+  var ri = (dd.riskPosture && dd.riskPosture.recentIssues) || [];
+  return ri.map(function(ev){
+    var cat = String(ev.category || '').toLowerCase();
+    var direct = /outage|breach|cyber|security|incident|recall|enforcement/.test(cat) ? 'Affects the service'
+               : /financ|governance|litig|earnings/.test(cat) ? 'Affects the operating division'
+               : 'Parent-company context';
+    return {date: ev.date || '', title: ev.title || '', directness: direct, detail: ev.detail || '', resolution: ''};
+  });
 }
 
 function pvDeriveDimensions(a, cand) {

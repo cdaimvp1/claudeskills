@@ -142,28 +142,65 @@ function pvDD2FinMkt(x, a, cand, input) {
 }
 
 /* ------------------------------------------------ 4. RISK & RESILIENCE */
+var PVDD2_LVL = {Low:1, Medium:2, High:3};
+function pvDD2ImpColor(imp){ return imp === 'High' ? '#A23A30' : imp === 'Medium' ? '#8A5A00' : '#0F3A85'; }
+
+/* impact x likelihood matrix: 3x3 grid, risks placed in their cell as chips; gate
+   risks get a ring, colour = impact, zone tint = combined severity. */
+function pvDD2RiskMatrix(risks) {
+  if (!risks || !risks.length) return '<div style="font-size:12px;color:var(--mut2)">No plotted risks on file.</div>';
+  var byCell = {};
+  risks.forEach(function(rk){ var k = rk.impact + '|' + rk.likelihood; (byCell[k] = byCell[k] || []).push(rk); });
+  var impacts = ['High','Medium','Low'], likes = ['Low','Medium','High'];
+  var zoneBg = function(imp, lk){ var s = (PVDD2_LVL[imp] || 1) + (PVDD2_LVL[lk] || 1); return s >= 5 ? 'var(--ti-red,#FBE7E3)' : s >= 4 ? 'var(--ti-amber,#FBF1DA)' : 'var(--ti-blue,#E4EBF1)'; };
+  var rows = impacts.map(function(imp){
+    var cells = likes.map(function(lk){
+      var items = (byCell[imp + '|' + lk] || []).map(function(rk){
+        return '<div title="' + pvAEsc(rk.type + ' · ' + rk.mitigation) + '" style="display:flex;align-items:center;gap:5px;font-size:10px;line-height:1.2;padding:3px 6px;border-radius:6px;background:var(--surface,#fff);border:1px solid ' + pvDD2ImpColor(imp) + (rk.gate ? ';box-shadow:0 0 0 2px ' + pvDD2ImpColor(imp) + '33' : '') + '"><span style="width:7px;height:7px;border-radius:50%;background:' + pvDD2ImpColor(imp) + ';flex:none"></span><span>' + pvAEsc(rk.label) + (rk.gate ? ' <b style="font:700 7px var(--mono,monospace);color:' + pvDD2ImpColor(imp) + '">GATE</b>' : '') + '</span></div>';
+      }).join('');
+      return '<div style="min-height:56px;background:' + zoneBg(imp, lk) + ';border:1px solid var(--line);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:4px">' + items + '</div>';
+    }).join('');
+    return '<div style="font:700 10px var(--mono,monospace);color:' + pvDD2ImpColor(imp) + ';text-transform:uppercase;display:flex;align-items:center;justify-content:flex-end;padding-right:8px">' + imp + '</div>' + cells;
+  }).join('');
+  var xlabels = '<div></div>' + likes.map(function(lk){ return '<div style="font:700 10px var(--mono,monospace);color:var(--mut2);text-align:center;padding-top:6px;text-transform:uppercase">' + lk + '</div>'; }).join('');
+  return '<div style="max-width:560px"><div style="display:grid;grid-template-columns:58px 1fr 1fr 1fr;gap:6px">' + rows + xlabels + '</div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mut2);margin-top:5px"><span>Impact &darr; (rows)</span><span>Likelihood &rarr; (columns)</span></div></div>';
+}
+
+/* material-events timeline with directness classification */
+function pvDD2EventTimeline(events) {
+  if (!events || !events.length) return '';
+  var dcol = function(d){ return /service/i.test(d) ? '#A23A30' : /division/i.test(d) ? '#8A5A00' : '#8FA3BE'; };
+  return '<div style="position:relative;padding-left:6px">'
+    + '<div style="position:absolute;left:4px;top:5px;bottom:5px;width:2px;background:var(--line)"></div>'
+    + events.map(function(ev){
+        return '<div style="position:relative;padding:0 0 15px 18px">'
+          + '<span style="position:absolute;left:-1px;top:3px;width:10px;height:10px;border-radius:50%;background:' + dcol(ev.directness) + ';border:2px solid var(--surface,#fff)"></span>'
+          + '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline"><span style="font-family:var(--mono,monospace);font-size:10px;color:var(--mut2)">' + pvAEsc(ev.date || '') + '</span><b style="font-size:12.5px;color:var(--ink)">' + pvAEsc(ev.title || '') + '</b><span style="font:700 8px var(--mono,monospace);text-transform:uppercase;color:' + dcol(ev.directness) + ';border:1px solid ' + dcol(ev.directness) + ';border-radius:20px;padding:1px 7px">' + pvAEsc(ev.directness || '') + '</span></div>'
+          + (ev.detail ? '<div style="font-size:11.5px;color:var(--mut);line-height:1.5;margin-top:3px">' + pvAEsc(ev.detail) + '</div>' : '')
+          + (ev.resolution ? '<div style="font-size:11px;color:var(--mut2);margin-top:2px"><b>Resolution &middot;</b> ' + pvAEsc(ev.resolution) + '</div>' : '')
+          + '</div>';
+      }).join('') + '</div>';
+}
+
 function pvDD2Risk(x, a, cand, input) {
-  var dd = cand.deepDive || {};
   var riskDims = x.dimensions.filter(function(d){ return ['financial','resilience','integrity','quality','cyber','responsible'].indexOf(d.id) >= 0; });
   var cells = '<div style="display:flex;flex-direction:column;gap:9px">' + riskDims.map(function(d){
       return '<div style="display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:start;padding:7px 0;border-bottom:1px solid var(--line)">'
         + '<span style="font-size:12.5px;font-weight:600;color:var(--ink)">' + pvAEsc(d.label) + '</span>'
         + '<div><div style="margin-bottom:4px">' + pvConcernPill(d.concern, d.confidence) + '</div><div style="font-size:11.5px;color:var(--mut);line-height:1.45">' + pvAEsc(d.evidence) + '</div></div></div>';
     }).join('') + '</div>';
-  var risks = (dd.risksNarr || []).map(function(r){
-      var sev = r.sev === 'high' ? 'High' : r.sev === 'med' ? 'Moderate' : 'Low';
-      var c = r.sev === 'high' ? '#A23A30' : r.sev === 'med' ? '#8A5A00' : '#0F3A85';
-      return '<div style="padding:9px 0;border-bottom:1px solid var(--line)"><div style="display:flex;gap:8px;align-items:baseline"><b style="font-size:12.5px;color:var(--ink)">' + pvAEsc(r.cat) + '</b><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;color:' + c + '">' + sev + '</span></div><div style="font-size:12px;color:var(--mut);line-height:1.5;margin-top:3px">' + pvAEsc(r.detail) + '</div></div>';
+  var mitig = (x.risks || []).map(function(rk){
+      return '<tr><td class="dt" style="vertical-align:top;white-space:nowrap">' + pvAEsc(rk.label) + '</td>'
+        + '<td class="dd" style="vertical-align:top;color:var(--mut2);white-space:nowrap">' + pvAEsc(rk.type) + '</td>'
+        + '<td class="dd" style="vertical-align:top">' + pvAEsc(rk.mitigation) + '</td>'
+        + '<td class="dd" style="vertical-align:top;white-space:nowrap">' + (rk.gate ? '<b style="color:#8A5A00">Gate</b>' : 'Monitor') + '</td></tr>';
     }).join('');
-  var events = ((dd.riskPosture && dd.riskPosture.recentIssues) || []).map(function(ev){
-      return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="font-family:var(--mono,monospace);font-size:10.5px;color:var(--mut2)">' + pvAEsc(ev.date || '') + '</span><div><div style="font-size:12.5px;font-weight:600;color:var(--ink)">' + pvAEsc(ev.title || '') + '</div>' + (ev.detail ? '<div style="font-size:11.5px;color:var(--mut);line-height:1.5;margin-top:3px">' + pvAEsc(ev.detail) + '</div>' : '') + '</div></div>';
-    }).join('');
-  var gates = x.gates.map(function(g){ return '<tr><td class="dt">' + pvAEsc(g.label) + '</td><td class="dd">' + pvAEsc(g.why) + '</td><td class="dd" style="white-space:nowrap"><b style="color:#8A5A00">' + (g.kind === 'hard' ? 'Hard stop' : 'Escalate') + '</b></td></tr>'; }).join('');
-  return pvDD2Card('Risk &amp; resilience', '<div style="font-size:12.5px;color:var(--mut);line-height:1.55">What could prevent successful performance, and how Lilly should respond. A hard flag disqualifies; a critical single risk overrides the average.</div>', 'var(--riskred,#A23A30)')
-    + pvDD2Card('Risk posture by dimension', cells + pvDD2Foot('Impact &times; likelihood matrix to follow; each score already carries its plain-English read and confidence.'), 'var(--navy,#0F3A85)')
-    + (risks ? pvDD2Card('Material risks', risks, 'var(--amber-d,#8A5A00)') : '')
-    + (events ? pvDD2Card('Material events', events + pvDD2Foot('Timeline with directness classification (direct / division / parent-context) to follow.'), 'var(--teal-d,#2F6E6B)') : '')
-    + (gates ? pvDD2Card('Mitigation &amp; gates', '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + gates + '</tbody></table></div>', 'var(--riskred,#A23A30)') : '');
+  return pvDD2Card('Risk &amp; resilience', '<div style="font-size:12.5px;color:var(--mut);line-height:1.55">What could prevent successful performance, and how Lilly should respond. A hard flag disqualifies; a critical single risk overrides the average &mdash; no risk is averaged away.</div>', 'var(--riskred,#A23A30)')
+    + pvDD2Card('Impact &times; likelihood', pvDD2RiskMatrix(x.risks) + pvDD2Foot('Each risk placed by impact (rows) and likelihood (columns); a ring marks a sourcing gate. Hover a chip for its type and mitigation.'), '#A23A30')
+    + pvDD2Card('Risk posture by dimension', cells, 'var(--navy,#0F3A85)')
+    + (x.events && x.events.length ? pvDD2Card('Material events', pvDD2EventTimeline(x.events), 'var(--teal-d,#2F6E6B)') : '')
+    + (mitig ? pvDD2Card('Mitigation board', '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + mitig + '</tbody></table></div>', 'var(--amber-d,#8A5A00)') : '');
 }
 
 /* ------------------------------------------------ 5. LILLY FIT & DILIGENCE */
