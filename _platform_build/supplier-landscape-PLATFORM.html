@@ -5752,10 +5752,17 @@ function pvDD2Summary(x, a, cand, input) {
       var c = hard ? '#A23A30' : '#8A5A00', bg = hard ? 'var(--ti-red,#FBE7E3)' : 'var(--ti-amber,#FBF1DA)';
       return '<span title="' + pvAEsc(g.why) + '" style="display:inline-flex;align-items:center;gap:6px;font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:4px 10px;border-radius:20px;color:' + c + ';background:' + bg + '">' + (hard ? 'HARD STOP' : 'ESCALATE') + ' &middot; ' + pvAEsc(g.label) + '</span>';
     }).join('') + '</div>' : '';
-  return pvDD2Card('Assessment across eight dimensions',
+  // SS1 (Marc): the Summary must read like a summary — lead with a grounded recommendation narrative.
+  var narr = '<div style="font-size:13px;line-height:1.6;color:var(--ink)"><b>' + pvAEsc(a.name) + '</b> is a <b style="color:var(--plum,#5C2B50)">' + pvAEsc(x.disposition) + '</b> candidate'
+    + (x.rank ? ' (ranked #' + x.rank + ' of ' + (x.ofN || '&mdash;') + ' on requirements fit)' : '') + '. '
+    + pvAEsc((x.opportunities && x.opportunities[0]) || '') + ' '
+    + (x.gates.length ? 'Before advancing, clear ' + x.gates.length + ' open item' + (x.gates.length > 1 ? 's' : '') + ': <b>' + pvAEsc(x.gates.map(function(g){ return g.label; }).join('; ')) + '</b>.' : 'No open gates.')
+    + '</div>';
+  return pvDD2Card('Recommendation', narr, 'var(--plum)', 'Evidence confidence: ' + pvAEsc(x.evidenceConfidence), '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>')
+    + pvDD2Card('Assessment across eight dimensions',
         pvAssessBars(x.dimensions)
         + pvDD2Foot('Bar length reads favorability, colour reads concern, dots read evidence confidence. No blended score &mdash; a strong dimension never offsets a gate below.')
-        + gates, 'var(--ai,#5C2B50)')
+        + gates, 'var(--teal-d)')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
     +   pvDD2Card('Requirements fit', pvReqGroupMini(x.reqGroups), 'var(--navy,#0F3A85)')
     +   pvDD2Card('Opportunities &amp; concerns', pvOppConcern(x.opportunities, x.concerns), 'var(--teal-d,#2F6E6B)')
