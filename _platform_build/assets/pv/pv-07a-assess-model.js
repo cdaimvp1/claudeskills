@@ -94,6 +94,27 @@ var ASSESS_AUTHORED = {
       {date:'Apr-Jun 2024', title:'UNC5537 customer-credential breach campaign', directness:'Affects the service', resolution:'Several claims dismissed with prejudice Dec 2025; litigation ongoing (MDL 3126).', detail:'Infostealer-harvested credentials accessed 165+ customer tenants lacking MFA; Snowflake infrastructure itself not breached.'},
       {date:'Feb 2026',      title:'Patel v. Snowflake securities class action filed', directness:'Affects the operating division', resolution:'Ongoing.', detail:'Over a withdrawn 2029 revenue target; a governance matter to track, not a viability threat.'},
       {date:'~May 2026',     title:'~$6B multi-year AWS partnership announced', directness:'Affects the service', resolution:'Positive signal.', detail:'Deepens multi-cloud footing and marketplace reach.'}
+    ],
+    ownership: {
+      tree: [
+        {label:'Global ultimate', value:'Snowflake Inc.', note:'Independent — no parent company', tag:'public'},
+        {label:'Contracting entity', value:'Snowflake Inc. (NYSE: SNOW)', note:'The entity Lilly would contract with', tag:'entity'},
+        {label:'Product / service entities', value:'Data Cloud · Snowpark · Cortex AI · Marketplace', note:'Delivered on AWS, Azure and GCP', tag:'offering'}
+      ],
+      markers: [
+        ['Public / private', 'Verified', 'Public (NYSE: SNOW)'],
+        ['Ultimate parent', 'Verified', 'None — independent'],
+        ['Beneficial ownership', 'Verified', 'Widely held; no single UBO (n/a)'],
+        ['Sanctions / watchlist', 'Missing', 'Formal screen not run'],
+        ['Lilly vendor-master match', 'Missing', 'Not checked'],
+        ['Contracting entity confirmed', 'Supplier asserted', 'Confirm in RFx']
+      ]
+    },
+    locations: [
+      {name:'Bozeman, Montana, US', type:'Registered HQ', region:'US', conf:'Verified'},
+      {name:'Bay Area, California, US', type:'Largest operational hub', region:'US', conf:'Verified'},
+      {name:'AWS / Azure / GCP regions', type:'Service delivery', region:'US · EU · APAC', conf:'Verified'},
+      {name:'Support locations', type:'Support', region:'To confirm for regulated data', conf:'Missing'}
     ]
   }
 };
@@ -150,6 +171,8 @@ function pvAssess(a, cand, input) {
     evidenceCoverage: cov,
     risks: auth.risks || [],
     events: auth.events || pvDeriveEvents(cand),
+    ownership: auth.ownership || null,
+    locations: auth.locations || null,
     _authored: !!auth.dimensions
   };
 }

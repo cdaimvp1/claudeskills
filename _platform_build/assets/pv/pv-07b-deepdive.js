@@ -66,26 +66,50 @@ function pvDD2Summary(x, a, cand, input) {
 }
 
 /* ------------------------------------------------ 1. COMPANY & OWNERSHIP */
+function pvDD2OwnTag(t){ return t === 'public' ? '#1F7A5A' : t === 'entity' ? '#0F3A85' : t === 'offering' ? '#2F6E6B' : 'var(--mut2,#6a655f)'; }
+
+/* ownership tree: indented node cards with elbow connectors + a marker matrix */
+function pvDD2OwnershipTree(ownership, a, cand) {
+  var dd = (cand && cand.deepDive) || {}, idn = dd.identity || {};
+  var nodes = (ownership && ownership.tree) || [
+    {label:'Ultimate parent', value:/independent|no parent/i.test(idn.parent || '') ? 'None — independent' : (idn.parent || 'Not verified'), tag:'public'},
+    {label:'Contracting entity', value:(idn.legal || (a && a.name) || ''), note:idn.ownership || '', tag:'entity'}
+  ];
+  return '<div>' + nodes.map(function(n, i){
+      return '<div style="position:relative;margin-left:' + (i * 26) + 'px;margin-bottom:12px">'
+        + (i > 0 ? '<span style="position:absolute;left:-16px;top:-12px;height:28px;width:0;border-left:2px solid var(--line)"></span><span style="position:absolute;left:-16px;top:16px;width:13px;height:0;border-top:2px solid var(--line)"></span>' : '')
+        + '<div style="display:inline-block;background:var(--surface,#fff);border:1px solid var(--line);border-left:3px solid ' + pvDD2OwnTag(n.tag) + ';border-radius:9px;padding:8px 12px">'
+        + '<div style="font:600 9.5px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(n.label) + '</div>'
+        + '<div style="font-size:13px;font-weight:700;color:var(--ink)">' + pvAEsc(n.value) + '</div>'
+        + (n.note ? '<div style="font-size:11px;color:var(--mut)">' + pvAEsc(n.note) + '</div>' : '')
+        + '</div></div>';
+    }).join('') + '</div>';
+}
+
+function pvDD2Footprint(locations) {
+  if (!locations || !locations.length) return '<div style="font-size:12px;color:var(--mut2)">No delivery-relevant locations on file.</div>';
+  return '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + locations.map(function(l){
+      return '<tr><td class="dt" style="white-space:nowrap;vertical-align:top">' + pvAEsc(l.name) + '</td>'
+        + '<td class="dd" style="vertical-align:top"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:var(--teal-d,#2F6E6B);background:var(--teal-t,#DCEBE9);border-radius:20px;padding:2px 8px">' + pvAEsc(l.type) + '</span></td>'
+        + '<td class="dd" style="vertical-align:top;color:var(--mut)">' + pvAEsc(l.region) + '</td>'
+        + '<td class="dd" style="vertical-align:top">' + pvEvidChip(l.conf) + '</td></tr>';
+    }).join('') + '</tbody></table></div>'
+    + pvDD2Foot('Only delivery-relevant locations, not every registered office. A geographic map can follow where precise coordinates are sourced.');
+}
+
 function pvDD2Company(x, a, cand, input) {
   var dd = cand.deepDive || {}, idn = dd.identity || {}, comp = dd.company || {}, at = dd.attrs || {};
   var clean = function(v){ return v == null ? '' : String(v); };
   var beforeSemi = function(v){ v = clean(v); return v ? v.split(';')[0].trim() : ''; };
   var beforeParen = function(v){ v = clean(v); return v ? v.split('(')[0].trim() : ''; };
   var stripHQ = function(v){ v = clean(v); return v ? v.replace(/^Legal HQ[^;]*;\s*/i, '').trim() : ''; };
-  // ownership as a simple text tree (dominant relationship view; full diagram later)
-  var parent = idn.parent || 'Independent (no parent)';
-  var tree = '<div style="font-family:var(--mono,monospace);font-size:12px;line-height:1.9;color:var(--ink)">'
-    + '<div><b>Ultimate parent</b> &middot; ' + pvAEsc(/independent|no parent/i.test(parent) ? 'None — independent' : beforeSemi(parent)) + '</div>'
-    + '<div style="padding-left:14px">&#9492;&#9472; <b>Contracting entity</b> &middot; ' + pvAEsc(idn.legal || a.name) + ' <span style="color:var(--mut2)">' + pvAEsc(beforeParen(idn.ownership) || '') + '</span></div>'
-    + (comp.footprint ? '<div style="padding-left:32px">&#9492;&#9472; Operating footprint &middot; multi-region</div>' : '')
-    + '</div>';
-  var matrix = pvDD2StatusMatrix([
-    ['Legal entity', idn.legal ? 'Verified' : 'Missing', 'Public filings / company site'],
-    ['Ultimate parent', /independent|public/i.test(parent) ? 'Verified' : 'Partial', 'Public filings'],
-    ['Beneficial ownership', /public/i.test(idn.ownership || '') ? 'Verified' : 'Missing', /public/i.test(idn.ownership || '') ? 'Widely held public co (UBO n/a)' : 'UBO verification required'],
-    ['Lilly vendor-master match', 'Missing', 'Internal vendor master — not checked'],
+  var markerRows = (x.ownership && x.ownership.markers) || [
+    ['Legal entity', idn.legal ? 'Verified' : 'Missing', 'Public filings'],
+    ['Ultimate parent', /independent|public/i.test(idn.parent || '') ? 'Verified' : 'Partial', 'Public filings'],
+    ['Beneficial ownership', /public/i.test(idn.ownership || '') ? 'Verified' : 'Missing', /public/i.test(idn.ownership || '') ? 'Widely held (UBO n/a)' : 'UBO verification required'],
+    ['Lilly vendor-master match', 'Missing', 'Not checked'],
     ['Contracting entity confirmed', 'Supplier asserted', 'Confirm in RFx']
-  ]);
+  ];
   var scale = pvDD2KV([
     ['Legal entity', idn.legal],
     ['Ownership / structure', idn.parent || idn.ownership],
@@ -98,9 +122,10 @@ function pvDD2Company(x, a, cand, input) {
   ]);
   return pvDD2Card('Company &amp; ownership', pvDD2DimLead(x, 'identity'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='identity';})||{}).concern] || {}).c)
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
-    +   pvDD2Card('Ownership &amp; control', tree + pvDD2Foot('Lilly contracts an <b>entity</b>, evaluates an <b>offering</b>, and depends on specific <b>services</b> &mdash; three different things. Full ownership diagram to follow.'), 'var(--navy,#0F3A85)')
-    +   pvDD2Card('Identity verification', matrix, 'var(--teal-d,#2F6E6B)')
+    +   pvDD2Card('Ownership &amp; control', pvDD2OwnershipTree(x.ownership, a, cand) + pvDD2Foot('Lilly contracts an <b>entity</b>, evaluates an <b>offering</b>, and depends on specific <b>services</b> &mdash; three different things.'), 'var(--navy,#0F3A85)')
+    +   pvDD2Card('Identity verification', pvDD2StatusMatrix(markerRows), 'var(--teal-d,#2F6E6B)')
     + '</div>'
+    + pvDD2Card('Operating footprint', pvDD2Footprint(x.locations), 'var(--ai,#5C2B50)')
     + pvDD2Card('Firmographics', scale, 'var(--mut2,#6a655f)');
 }
 
