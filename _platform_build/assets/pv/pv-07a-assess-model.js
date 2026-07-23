@@ -161,6 +161,23 @@ var ASSESS_AUTHORED = {
       {name:'AWS / Azure / GCP regions', type:'Service delivery', region:'US · EU · APAC', conf:'Verified', pts:[{label:'US', lon:-98, lat:39}, {label:'EU', lon:10, lat:50}, {label:'APAC', lon:110, lat:15}]},
       {name:'Support locations', type:'Support', region:'To confirm for regulated data', conf:'Missing'}
     ],
+    deliveryReadiness: [
+      {label:'Product maturity',      state:'Complete'},
+      {label:'Implementation model',  state:'Demonstrated'},
+      {label:'Lilly architecture fit',state:'Partial'},
+      {label:'Capacity at scale',     state:'Proxy'},
+      {label:'Support model',         state:'Needed'}
+    ],
+    dependencies: {
+      root: {
+        label:'Lilly analytics workload', value:'Delivered by Snowflake', tag:'entity',
+        children:[
+          {label:'Cloud infrastructure',  value:'AWS · Azure · GCP', note:'Multi-cloud; reduces single-hyperscaler lock-in', tag:'infra'},
+          {label:'Implementation partner',value:'Not disclosed', note:'Identify the SI / delivery partner in the RFx', tag:'gap'},
+          {label:'Support subcontractor', value:'Not disclosed', note:'Support-location scope to confirm for regulated data', tag:'gap'}
+        ]
+      }
+    },
     capabilities: {
       cols: ['Core', 'Integration', 'Security', 'Scale', 'Governance'],
       rows: [
@@ -264,6 +281,8 @@ function pvAssess(a, cand, input) {
     commercialDrivers: auth.commercialDrivers || null,
     diligence: auth.diligence || null,
     actions: auth.actions || null,
+    deliveryReadiness: auth.deliveryReadiness || null,
+    dependencies: auth.dependencies || null,
     financial: auth.financial || null,
     _authored: !!auth.dimensions
   };

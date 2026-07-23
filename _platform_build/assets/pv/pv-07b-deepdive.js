@@ -275,29 +275,45 @@ function pvDD2RefMatrix(refs) {
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>'
     + pvDD2Foot('Stops "has major customers" counting as validated evidence &mdash; a reference matters only if it is pharma, similar scale, similar use case, and independently verified.');
 }
+/* delivery-readiness staged bars: needed -> proxy -> partial -> demonstrated -> complete */
+function pvDD2Readiness(items){
+  if (!items || !items.length) return '<div style="font-size:12px;color:var(--mut2)">No delivery-readiness assessment on file.</div>';
+  var order = { 'Needed':1, 'Confirmation needed':1, 'Proxy':2, 'Partial':3, 'Partially validated':3, 'Demonstrated':4, 'Complete':5 };
+  var col = function(n){ return n >= 4 ? 'var(--teal-d,#2F6E6B)' : n === 3 ? '#8A5A00' : 'var(--mut2,#6a655f)'; };
+  return '<div style="display:flex;flex-direction:column;gap:12px">' + items.map(function(it){
+      var n = order[it.state] || 1, c = col(n), segs = '';
+      for (var i = 1; i <= 5; i++) segs += '<span style="flex:1;height:7px;border-radius:3px;background:' + (i <= n ? c : 'var(--line,#e5e1db)') + '"></span>';
+      return '<div style="display:grid;grid-template-columns:minmax(120px,168px) 1fr minmax(96px,140px);gap:12px;align-items:center">'
+        + '<span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(it.label) + '</span>'
+        + '<div style="display:flex;gap:3px">' + segs + '</div>'
+        + '<span style="font-size:11.5px;font-weight:700;color:' + c + ';text-align:right">' + pvAEsc(it.state) + '</span></div>';
+    }).join('') + '</div>' + pvDD2Foot('Stage: needed &rarr; proxy &rarr; partial &rarr; demonstrated &rarr; complete. Grounded in the evidence on file.');
+}
+/* delivery-dependency chain (reuses the tree renderer); undisclosed sub-tiers are gap-stated */
+function pvDD2Dependency(dep){
+  if (!dep || !dep.root) return '<div style="font-size:12.5px;color:var(--ink);line-height:1.55"><b>Critical sub-tier dependencies not yet disclosed.</b> Identify the implementation partner, cloud regions and support subcontractors in the RFx.</div>';
+  return '<div style="overflow-x:auto"><div style="min-width:250px">' + pvDD2TreeNode(dep.root, 0) + '</div></div>'
+    + pvDD2Foot('Delivery chain for the Lilly workload; undisclosed sub-tiers are gap-stated and become RFx questions.');
+}
 function pvDD2Caps(x, a, cand, input) {
   var dd = cand.deepDive || {}, idn = dd.identity || {};
-  var offs = (dd.offerings || []).map(function(o){
-    return '<tr><td class="dt" style="white-space:nowrap;vertical-align:top">' + pvAEsc(o.name) + '</td><td class="dd">' + pvAEsc(o.note || '') + '</td></tr>';
-  }).join('');
-  var offTable = offs ? '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + offs + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No offerings on file.</div>';
   var refInner = x.references ? pvDD2RefMatrix(x.references)
     : (dd.clients ? '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(dd.clients) + '</div>' : '<div style="font-size:12px;color:var(--mut2)">No reference data on file.</div>');
-  // CAP5 narrative: fit summary from the requirement groups (grounded, condensed).
   var rg = x.reqGroups || [];
   var strong = rg.filter(function(g){ return g.fitLabel === 'Strong' || g.fitLabel === 'Meets'; }).length;
   var soft = rg.filter(function(g){ return g.fitLabel === 'Partial' || g.fitLabel === 'Gap'; });
-  var capNarr = '<div style="font-size:12.5px;line-height:1.55;color:var(--ink)"><b>' + pvAEsc(a.name) + '</b> meets <b>' + strong + ' of ' + rg.length + '</b> requirement groups strongly'
+  var capNarr = '<div style="font-size:12.5px;line-height:1.55;color:var(--ink);margin-bottom:13px"><b>' + pvAEsc(a.name) + '</b> meets <b>' + strong + ' of ' + rg.length + '</b> requirement groups strongly'
     + (soft.length ? '; the soft spots are <b>' + pvAEsc(soft.map(function(g){ return g.label; }).join(', ')) + '</b> &mdash; confirm these in the RFP.' : ' with no material gaps.') + '</div>';
-  var deliveryLine = idn.delivery ? '<div style="font-size:12.5px;margin-bottom:10px"><b style="color:var(--mut2)">Delivery model &middot;</b> ' + pvAEsc(idn.delivery) + '</div>' : '';
+  var deliveryLine = idn.delivery ? '<div style="font-size:12px;color:var(--mut);margin-bottom:12px"><b style="color:var(--mut2)">Delivery model &middot;</b> ' + pvAEsc(idn.delivery) + '</div>' : '';
   return pvDD2AssessStrip(x, 'capability')
-    + pvDD2Card('Capability Read', capNarr, 'var(--plum)', null, '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>')
-    + pvDD2Card('Capability to Requirement', pvDD2CapHeatmap(x.capabilities), 'var(--teal-d)')
-    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:stretch">'
-    +   pvDD2Card('Reference Relevance', refInner, 'var(--emph)')
-    +   pvDD2Card('Fit to Requirements', pvReqGroupMini(x.reqGroups), 'var(--plum)')
-    + '</div>'
-    + pvDD2Card('Offering &amp; Delivery', deliveryLine + offTable, 'var(--teal-d)');
+    + pvDD2Card('Capability to Requirement', capNarr + pvDD2CapHeatmap(x.capabilities)
+        + pvDD2Foot('Confirmed / partially confirmed / supplier-asserted / not-demonstrated / gap. Cells reflect evidence, not keyword matching.'),
+        'var(--teal-d)', 'Can they deliver at scale?', '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>')
+    + pvDD2Card('Reference Relevance', refInner, 'var(--emph)', 'Pharma · scale · use-case · independently verified', '<path d="M4 5h16M4 5v14M4 12h10M4 19h16"/>')
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
+    +   pvDD2Card('Delivery Readiness', deliveryLine + pvDD2Readiness(x.deliveryReadiness), 'var(--plum)', 'Maturity to support model', '<path d="M3 12h4l3 7 4-14 3 7h4"/>')
+    +   pvDD2Card('Delivery Dependencies', pvDD2Dependency(x.dependencies), 'var(--emph)', 'Sub-tier chain &middot; gap-stated', '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M6 8.5v3a2 2 0 002 2h8a2 2 0 002-2v-3M12 13.5v2"/>')
+    + '</div>';
 }
 
 /* ------------------------------------------------ 3. FINANCIAL & MARKET */
