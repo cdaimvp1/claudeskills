@@ -130,23 +130,93 @@ function pvDD2Company(x, a, cand, input) {
 }
 
 /* --------------------------------------------- 2. CAPABILITIES & OPERATIONS */
+function pvDD2CapCell(s) {
+  return s === 'Confirmed' ? {c:'#0F3A85', bg:'var(--ti-blue,#E4EBF1)', t:'Confirmed'}
+    : s === 'Partially confirmed' ? {c:'#2F6E6B', bg:'#DCEBE9', t:'Partial'}
+    : s === 'Supplier asserted' ? {c:'#8A5A00', bg:'var(--ti-amber,#FBF1DA)', t:'Asserted'}
+    : s === 'Not demonstrated' ? {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)', t:'Not dem.'}
+    : s === 'Gap' ? {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)', t:'Gap'}
+    : {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)', t:'N/A'};
+}
+/* capability-to-requirement heatmap (evidence-based cells, replaces keyword mapping) */
+function pvDD2CapHeatmap(capabilities) {
+  if (!capabilities || !capabilities.rows) return '<div style="font-size:12px;color:var(--mut2)">No validated capability map on file.</div>';
+  var head = '<tr><th></th>' + capabilities.cols.map(function(c){ return '<th style="font:700 9px var(--mono,monospace);text-transform:uppercase;color:var(--mut2);padding:4px 5px;text-align:center">' + pvAEsc(c) + '</th>'; }).join('') + '</tr>';
+  var rows = capabilities.rows.map(function(r){
+    return '<tr><td style="font-size:12px;font-weight:600;color:var(--ink);padding:5px 8px 5px 0;white-space:nowrap">' + pvAEsc(r.cap) + '</td>'
+      + r.cells.map(function(s){ var m = pvDD2CapCell(s); return '<td style="padding:3px"><div title="' + pvAEsc(s) + '" style="font:700 8.5px var(--mono,monospace);text-transform:uppercase;color:' + m.c + ';background:' + m.bg + ';border-radius:6px;padding:5px 3px;text-align:center;line-height:1.1">' + m.t + '</div></td>'; }).join('')
+      + '</tr>';
+  }).join('');
+  return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>'
+    + pvDD2Foot('Each cell is an evidence read, not a keyword match. Confirmed / Partial / Asserted / Not demonstrated / Gap / N-A &mdash; click-through evidence to follow.');
+}
+function pvDD2RefTick(v) {
+  return v === true ? '<span style="color:#1F7A5A;font-weight:800">&#10003;</span>'
+    : v === 'partial' ? '<span style="color:#8A5A00;font-weight:700">~</span>'
+    : '<span style="color:var(--mut2,#6a655f)">&mdash;</span>';
+}
+function pvDD2RefMatrix(refs) {
+  if (!refs || !refs.length) return '';
+  var cols = ['Pharma', 'Similar scale', 'Similar use case', 'Independently verified'];
+  var head = '<tr><th style="text-align:left;font-size:11px;color:var(--mut2);padding-bottom:4px">Reference</th>' + cols.map(function(c){ return '<th style="font-size:10px;color:var(--mut2);padding:0 8px 4px;text-align:center">' + c + '</th>'; }).join('') + '</tr>';
+  var rows = refs.map(function(r){ return '<tr style="border-top:1px solid var(--line)"><td style="font-size:12px;font-weight:600;color:var(--ink);padding:6px 8px 6px 0">' + pvAEsc(r.name) + '</td><td style="text-align:center">' + pvDD2RefTick(r.pharma) + '</td><td style="text-align:center">' + pvDD2RefTick(r.scale) + '</td><td style="text-align:center">' + pvDD2RefTick(r.useCase) + '</td><td style="text-align:center">' + pvDD2RefTick(r.verified) + '</td></tr>'; }).join('');
+  return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>'
+    + pvDD2Foot('Stops "has major customers" counting as validated evidence &mdash; a reference matters only if it is pharma, similar scale, similar use case, and independently verified.');
+}
 function pvDD2Caps(x, a, cand, input) {
   var dd = cand.deepDive || {}, idn = dd.identity || {};
   var offs = (dd.offerings || []).map(function(o){
     return '<tr><td class="dt" style="white-space:nowrap;vertical-align:top">' + pvAEsc(o.name) + '</td><td class="dd">' + pvAEsc(o.note || '') + '</td></tr>';
   }).join('');
   var offTable = offs ? '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + offs + '</tbody></table></div>' : '<div style="font-size:12px;color:var(--mut2)">No offerings on file.</div>';
-  var refsTxt = dd.clients || (dd.company && dd.company.refs) || '';
+  var refCard = x.references ? pvDD2Card('Reference relevance', pvDD2RefMatrix(x.references), 'var(--ai,#5C2B50)')
+    : (dd.clients ? pvDD2Card('Reference customers', '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(dd.clients) + '</div>', 'var(--mut2,#6a655f)') : '');
   return pvDD2Card('Capabilities &amp; operations', pvDD2DimLead(x, 'capability'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='capability';})||{}).concern] || {}).c)
+    + pvDD2Card('Capability to requirement', pvDD2CapHeatmap(x.capabilities), 'var(--navy,#0F3A85)')
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
-    +   pvDD2Card('Offering &amp; delivery', (idn.delivery ? '<div style="font-size:12.5px;margin-bottom:10px"><b style="color:var(--mut2)">Delivery model &middot;</b> ' + pvAEsc(idn.delivery) + '</div>' : '') + offTable, 'var(--navy,#0F3A85)')
-    +   pvDD2Card('Fit to requirements', pvReqGroupMini(x.reqGroups) + pvDD2Foot('Capability read against each requirement group. A validated capability map (evidence per cell) replaces keyword matching in the next pass.'), 'var(--teal-d,#2F6E6B)')
+    +   pvDD2Card('Offering &amp; delivery', (idn.delivery ? '<div style="font-size:12.5px;margin-bottom:10px"><b style="color:var(--mut2)">Delivery model &middot;</b> ' + pvAEsc(idn.delivery) + '</div>' : '') + offTable, 'var(--teal-d,#2F6E6B)')
+    +   pvDD2Card('Fit to requirements', pvReqGroupMini(x.reqGroups), 'var(--amber-d,#8A5A00)')
     + '</div>'
-    + (refsTxt ? pvDD2Card('Reference customers', '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(refsTxt) + '</div>' + pvDD2Foot('Reference-relevance (pharma? similar scale? similar use case? independently verified?) to follow.'), 'var(--mut2,#6a655f)') : '');
+    + refCard;
 }
 
 /* ------------------------------------------------ 3. FINANCIAL & MARKET */
-function pvDD2FinMkt(x, a, cand, input) {
+/* peer-position scatter: every eligible candidate by financial viability (x) and
+   capability fit (y); selected supplier highlighted. Both axes from the shared model. */
+function pvDD2PeerScatter(refl, input, selId) {
+  var asmts = (refl && refl.landscape && refl.landscape.assessments) || [];
+  if (asmts.length < 2 || typeof pvCandById !== 'function') return '';
+  var W = 520, H = 300, padL = 46, padB = 40, padT = 14, padR = 16;
+  var plotW = W - padL - padR, plotH = H - padT - padB;
+  var sx = function(v){ return padL + (v / 5) * plotW; };
+  var sy = function(v){ return padT + plotH - (v / 5) * plotH; };
+  var grid = '';
+  for (var g = 1; g < 5; g++) grid += '<line x1="' + sx(g) + '" y1="' + padT + '" x2="' + sx(g) + '" y2="' + (padT + plotH) + '" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3"/><line x1="' + padL + '" y1="' + sy(g) + '" x2="' + (padL + plotW) + '" y2="' + sy(g) + '" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3"/>';
+  var dots = asmts.map(function(av){
+    var pv = pvAssess(av, pvCandById(av.id), input);
+    var finDim = pv.dimensions.find(function(d){ return d.id === 'financial'; }) || {};
+    var fav = (THEO_CONCERN[finDim.concern] || {fav:0.5}).fav;
+    var x = sx(fav * 5), y = sy(pv.fit.score5 || 0), sel = av.id === selId;
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + (sel ? 7 : 5) + '" fill="' + (sel ? '#A23A30' : '#0F3A85') + '" opacity="' + (av.eligible ? 0.9 : 0.35) + '"/><text x="' + (x + 8) + '" y="' + (y + 3) + '" font-family="var(--mono,monospace)" font-size="9" fill="' + (sel ? '#A23A30' : 'var(--mut,#4A443C)') + '">' + pvAEsc((av.name || '').split(/[ ,]/)[0]) + '</text>';
+  }).join('');
+  return '<div style="overflow-x:auto"><svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:' + W + 'px;height:auto">'
+    + grid
+    + '<line x1="' + padL + '" y1="' + (padT + plotH) + '" x2="' + (padL + plotW) + '" y2="' + (padT + plotH) + '" stroke="var(--line2)" stroke-width="1"/><line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + plotH) + '" stroke="var(--line2)" stroke-width="1"/>'
+    + '<text x="' + (padL + plotW / 2) + '" y="' + (H - 6) + '" text-anchor="middle" font-family="var(--sans)" font-size="10" fill="var(--mut2)">Financial viability &rarr;</text>'
+    + '<text x="13" y="' + (padT + plotH / 2) + '" text-anchor="middle" font-family="var(--sans)" font-size="10" fill="var(--mut2)" transform="rotate(-90 13 ' + (padT + plotH / 2) + ')">Capability fit &rarr;</text>'
+    + dots + '</svg></div>'
+    + pvDD2Foot('Each supplier plotted by financial viability (x) and capability fit (y); the selected supplier is highlighted. Surfaces strong-capability / weak-financial vs. balanced candidates.');
+}
+function pvDD2VarColor(v){ return /high|significant|exposure/i.test(v) ? '#A23A30' : /moderate/i.test(v) ? '#8A5A00' : '#0F3A85'; }
+function pvDD2CommercialDrivers(drivers) {
+  if (!drivers || !drivers.length) return '';
+  var w = function(v){ return /high|significant/i.test(v) ? 92 : /exposure/i.test(v) ? 68 : /moderate/i.test(v) ? 52 : 28; };
+  return '<div style="display:flex;flex-direction:column;gap:8px">' + drivers.map(function(d){
+      var c = pvDD2VarColor(d.variability);
+      return '<div style="display:grid;grid-template-columns:150px 1fr 160px;gap:12px;align-items:center" title="' + pvAEsc(d.note || '') + '"><span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(d.driver) + '</span><div style="height:8px;border-radius:30px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:' + w(d.variability) + '%;background:' + c + '"></i></div><span style="font-size:11px;color:' + c + ';font-weight:600">' + pvAEsc(d.variability) + '</span></div>';
+    }).join('') + '</div>' + pvDD2Foot('Cost-driver variability, not a fabricated annual $ &mdash; precise TCO comes from RFx bids and internal usage assumptions.');
+}
+function pvDD2FinMkt(x, a, cand, input, refl) {
   var dd = cand.deepDive || {}, fin = cand.financials || dd.financials || {}, at = dd.attrs || {};
   var finRow = function(k, v){ v = v == null ? '' : String(v); return v ? '<tr><td class="dt" style="white-space:nowrap;vertical-align:top">' + pvAEsc(k) + '</td><td class="dd">' + pvAEsc(v) + '</td></tr>' : ''; };
   var summary = '<div style="overflow-x:auto"><table class="pvdl"><tbody>'
@@ -160,10 +230,15 @@ function pvDD2FinMkt(x, a, cand, input) {
     + '</tbody></table></div>';
   var revSvg = (typeof pvRevHistSvg === 'function' && fin.revenueHistory) ? pvRevHistSvg(fin.revenueHistory) : '';
   var mkt = at.gartner ? '<div style="font-size:12.5px;line-height:1.55"><b style="color:var(--mut2)">Analyst position &middot;</b> ' + pvAEsc(at.gartner) + '</div>' : '<div style="font-size:12px;color:var(--mut2)">No analyst position on file.</div>';
+  var scatter = pvDD2PeerScatter(refl, input, a && a.id);
   return pvDD2Card('Financial &amp; market', pvDD2DimLead(x, 'financial'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='financial';})||{}).concern] || {}).c)
-    + pvDD2Card('Financial viability', summary + (fin.sources && fin.sources.length ? pvDD2Foot('<b>Sources.</b> ' + fin.sources.map(function(s){return pvAEsc(s);}).join(' &middot; ')) : ''), 'var(--navy,#0F3A85)')
-    + (revSvg ? pvDD2Card('Revenue history', '<div style="max-width:520px">' + revSvg + '</div>' + pvDD2Foot('Trend shown only where multiple comparable periods exist.'), 'var(--teal-d,#2F6E6B)') : '')
-    + pvDD2Card('Market position', mkt + pvDD2Foot('Commercial model driver-matrix (compute / storage / transfer / support / exit variability) and peer-position scatter to follow &mdash; precise TCO comes from RFx bids, never a public-data proxy.'), 'var(--mut2,#6a655f)');
+    + (scatter ? pvDD2Card('Peer position', scatter, 'var(--navy,#0F3A85)') : '')
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">'
+    +   pvDD2Card('Financial viability', summary + (fin.sources && fin.sources.length ? pvDD2Foot('<b>Sources.</b> ' + fin.sources.map(function(s){return pvAEsc(s);}).join(' &middot; ')) : ''), 'var(--teal-d,#2F6E6B)')
+    +   (revSvg ? pvDD2Card('Revenue history', '<div>' + revSvg + '</div>' + pvDD2Foot('Trend shown only where multiple comparable periods exist.'), 'var(--amber-d,#8A5A00)') : '')
+    + '</div>'
+    + (x.commercialDrivers ? pvDD2Card('Commercial model', pvDD2CommercialDrivers(x.commercialDrivers), 'var(--ai,#5C2B50)') : '')
+    + pvDD2Card('Market position', mkt, 'var(--mut2,#6a655f)');
 }
 
 /* ------------------------------------------------ 4. RISK & RESILIENCE */
@@ -229,6 +304,21 @@ function pvDD2Risk(x, a, cand, input) {
 }
 
 /* ------------------------------------------------ 5. LILLY FIT & DILIGENCE */
+function pvDD2DiligenceFunnel(stages) {
+  if (!stages || !stages.length) return '';
+  return '<div style="display:flex;flex-direction:column;gap:7px">' + stages.map(function(s){
+      var c = s.pct >= 75 ? '#1F7A5A' : s.pct >= 40 ? '#2E5E8C' : s.pct > 0 ? '#8A5A00' : 'var(--mut2,#6a655f)';
+      return '<div style="display:grid;grid-template-columns:200px 1fr 40px;gap:12px;align-items:center"><span style="font-size:12px;color:var(--ink)">' + pvAEsc(s.stage) + '</span><div style="height:9px;border-radius:30px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:' + s.pct + '%;background:' + c + '"></i></div><span style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:' + c + ';text-align:right">' + s.pct + '%</span></div>';
+    }).join('') + '</div>' + pvDD2Foot('Progress toward advancement, not a wall of open questions.');
+}
+function pvDD2ActionBoard(actions) {
+  if (!actions || !actions.length) return '';
+  var rows = actions.map(function(act){
+      var sc = act.status === 'Open' ? '#8A5A00' : act.status === 'Not started' ? '#A23A30' : '#1F7A5A';
+      return '<tr><td class="dt" style="vertical-align:top">' + pvAEsc(act.action) + '</td><td class="dd" style="vertical-align:top;white-space:nowrap;color:var(--mut2)">' + pvAEsc(act.owner) + '</td><td class="dd" style="vertical-align:top;text-align:center">' + (act.gate ? '<b style="color:#8A5A00">Yes</b>' : '&mdash;') + '</td><td class="dd" style="vertical-align:top;white-space:nowrap;color:' + sc + ';font-weight:600">' + pvAEsc(act.status) + '</td></tr>';
+    }).join('');
+  return '<div style="overflow-x:auto"><table class="pvdl"><thead><tr><th style="text-align:left;font-size:10px;color:var(--mut2)">Action</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Owner</th><th style="font-size:10px;color:var(--mut2)">Gate?</th><th style="text-align:left;font-size:10px;color:var(--mut2)">Status</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+}
 function pvDD2Lilly(x, a, cand, input) {
   var dd = cand.deepDive || {}, lf = dd.lillyFit || {};
   var fitRows = pvDD2KV([
@@ -237,18 +327,19 @@ function pvDD2Lilly(x, a, cand, input) {
     ['Pharma / GxP', lf.pharma],
     ['Value / next move', lf.value]
   ]);
-  var oq = (typeof pvOpenQuestionsList === 'function') ? pvOpenQuestionsList(a, cand, input, (typeof pvReqFitRead === 'function' ? pvReqFitRead(a, cand, input) : null)) : [];
-  var diligence = '';
-  if (oq && oq.length) {
-    diligence = '<ol style="margin:0;padding-left:20px;font-size:12.5px;line-height:1.6">' + oq.map(function(q){ return '<li>' + (q.plain ? pvAEsc((typeof pvStripTags === 'function' ? pvStripTags(q.plain) : q.plain)) : pvAEsc(q.tag || '')) + '</li>'; }).join('') + '</ol>';
-  } else {
-    diligence = '<div style="font-size:12px;color:var(--mut2)">No open items derived; standard pre-award confirmations still apply.</div>';
+  var funnel = pvDD2DiligenceFunnel(x.diligence);
+  var board = pvDD2ActionBoard(x.actions);
+  var oqFallback = '';
+  if (!board) {
+    var oq = (typeof pvOpenQuestionsList === 'function') ? pvOpenQuestionsList(a, cand, input, (typeof pvReqFitRead === 'function' ? pvReqFitRead(a, cand, input) : null)) : [];
+    oqFallback = (oq && oq.length)
+      ? '<ol style="margin:0;padding-left:20px;font-size:12.5px;line-height:1.6">' + oq.map(function(q){ return '<li>' + (q.plain ? pvAEsc((typeof pvStripTags === 'function' ? pvStripTags(q.plain) : q.plain)) : pvAEsc(q.tag || '')) + '</li>'; }).join('') + '</ol>'
+      : '<div style="font-size:12px;color:var(--mut2)">No open items derived; standard pre-award confirmations still apply.</div>';
   }
-  var actions = x.gates.map(function(g){ return '<tr><td class="dt">' + pvAEsc(g.label) + '</td><td class="dd">' + pvAEsc(g.why) + '</td></tr>'; }).join('');
   return pvDD2Card('Lilly fit &amp; diligence', pvDD2DimLead(x, 'capability'), (THEO_CONCERN[(x.dimensions.find(function(d){return d.id==='capability';})||{}).concern] || {}).c)
     + pvDD2Card('Lilly-specific fit', fitRows || '<div style="font-size:12px;color:var(--mut2)">No Lilly-fit read on file.</div>', 'var(--ai,#5C2B50)')
-    + pvDD2Card('Required diligence before advancement', diligence + pvDD2Foot('The companion outreach skill turns these into supplier requests; responses (M365) flow back to re-enrich. A diligence funnel + owner-grouped action board to follow.'), 'var(--navy,#0F3A85)')
-    + (actions ? pvDD2Card('Action board', '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + actions + '</tbody></table></div>', 'var(--amber-d,#8A5A00)') : '');
+    + (funnel ? pvDD2Card('Diligence funnel', funnel, 'var(--navy,#0F3A85)') : pvDD2Card('Required diligence before advancement', oqFallback + pvDD2Foot('The companion outreach skill turns these into supplier requests; responses (M365) flow back to re-enrich.'), 'var(--navy,#0F3A85)'))
+    + (board ? pvDD2Card('Action board', board + pvDD2Foot('Diligence turned into a workplan; gated actions must clear before advancement.'), 'var(--amber-d,#8A5A00)') : '');
 }
 
 /* ------------------------------------------------ dispatch */
@@ -265,7 +356,7 @@ function pvDD2Section(ddt, a, cand, refl, input) {
   var x = pvAssess(a, cand, input);
   if (ddt === 'company') return pvDD2Company(x, a, cand, input);
   if (ddt === 'caps')    return pvDD2Caps(x, a, cand, input);
-  if (ddt === 'finmkt')  return pvDD2FinMkt(x, a, cand, input);
+  if (ddt === 'finmkt')  return pvDD2FinMkt(x, a, cand, input, refl);
   if (ddt === 'risk')    return pvDD2Risk(x, a, cand, input);
   if (ddt === 'lilly')   return pvDD2Lilly(x, a, cand, input);
   return pvDD2Summary(x, a, cand, input);

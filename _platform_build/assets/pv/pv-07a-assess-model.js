@@ -115,6 +115,47 @@ var ASSESS_AUTHORED = {
       {name:'Bay Area, California, US', type:'Largest operational hub', region:'US', conf:'Verified'},
       {name:'AWS / Azure / GCP regions', type:'Service delivery', region:'US · EU · APAC', conf:'Verified'},
       {name:'Support locations', type:'Support', region:'To confirm for regulated data', conf:'Missing'}
+    ],
+    capabilities: {
+      cols: ['Core', 'Integration', 'Security', 'Scale', 'Governance'],
+      rows: [
+        {cap:'Data platform / warehouse',   cells:['Confirmed','Confirmed','Confirmed','Confirmed','Partially confirmed']},
+        {cap:'AI / ML (Cortex, Snowpark)',   cells:['Confirmed','Supplier asserted','Not demonstrated','Confirmed','Partially confirmed']},
+        {cap:'SAP / legacy integration',     cells:['Partially confirmed','Partially confirmed','Confirmed','Confirmed','N/A']},
+        {cap:'Regulated / GxP workloads',    cells:['Confirmed','Confirmed','Confirmed','Confirmed','Partially confirmed']}
+      ]
+    },
+    references: [
+      {name:'Capital One', pharma:false, scale:true,      useCase:true,      verified:true},
+      {name:'Novartis',    pharma:true,  scale:true,      useCase:true,      verified:false},
+      {name:'Sanofi',      pharma:true,  scale:true,      useCase:'partial', verified:false},
+      {name:'IQVIA',       pharma:true,  scale:true,      useCase:true,      verified:false},
+      {name:'Adobe',       pharma:false, scale:true,      useCase:false,     verified:true}
+    ],
+    commercialDrivers: [
+      {driver:'Compute',               variability:'High',                    note:'Consumption-based; peak concurrency drives cost'},
+      {driver:'Storage',               variability:'Moderate',                note:'Separated, priced independently'},
+      {driver:'Data transfer / egress',variability:'Potential exposure',      note:'Cross-cloud / cross-region egress'},
+      {driver:'Support',               variability:'Fixed / tiered',          note:'Tiered support plans'},
+      {driver:'Implementation',        variability:'Moderate',                note:'One-time; partner-led'},
+      {driver:'Exit / migration',      variability:'Potentially significant', note:'Single-platform lock-in'}
+    ],
+    diligence: [
+      {stage:'Research complete',           pct:85},
+      {stage:'Supplier evidence received',  pct:20},
+      {stage:'Security review',             pct:15},
+      {stage:'Quality / regulatory review', pct:0},
+      {stage:'Financial / TPRM review',     pct:40},
+      {stage:'References validated',        pct:25},
+      {stage:'Contract readiness',          pct:0}
+    ],
+    actions: [
+      {action:'Model peak consumption and negotiate committed-use caps', owner:'Finance / Sourcing',   gate:true,  status:'Open'},
+      {action:'Confirm US / EU data residency and support locations',    owner:'Supplier',             gate:true,  status:'Open'},
+      {action:'Complete cyber / privacy review; mandate MFA + key-pair', owner:'Information Security',  gate:true,  status:'Not started'},
+      {action:'Validate SAP / legacy integration path',                  owner:'Architecture',         gate:false, status:'Open'},
+      {action:'Obtain independent pharma references',                    owner:'Sourcing',             gate:false, status:'Open'},
+      {action:'Negotiate exit / portability terms',                      owner:'Sourcing / Legal',     gate:false, status:'Not started'}
     ]
   }
 };
@@ -173,6 +214,11 @@ function pvAssess(a, cand, input) {
     events: auth.events || pvDeriveEvents(cand),
     ownership: auth.ownership || null,
     locations: auth.locations || null,
+    capabilities: auth.capabilities || null,
+    references: auth.references || null,
+    commercialDrivers: auth.commercialDrivers || null,
+    diligence: auth.diligence || null,
+    actions: auth.actions || null,
     _authored: !!auth.dimensions
   };
 }

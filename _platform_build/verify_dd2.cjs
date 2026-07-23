@@ -25,6 +25,6 @@ has('company',render('company'),'Ownership &amp; control');
 has('caps',render('caps'),'Offering &amp; delivery');
 has('finmkt',render('finmkt'),'Financial viability');
 has('risk',render('risk'),'Risk posture by dimension'); has('risk',render('risk'),'UNC5537');
-has('lilly',render('lilly'),'Required diligence');
+has('lilly',render('lilly'),'Diligence funnel'); has('lilly',render('lilly'),'Action board');
 console.log('\n'+(fails?fails+' FAILURE(S)':'ALL DD2 CHECKS PASSED'));
 process.exit(fails?1:0);
