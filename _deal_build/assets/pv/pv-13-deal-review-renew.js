@@ -101,7 +101,7 @@ function dealOverviewHTML(){
   'MEDIUM -2 to -3 (renewal cap); LOW -1 (venue). Scale: 75-100 Low/Strong, 50-74 Moderate, 25-49 High, 0-24 Critical.</div></div>';
  var msa=dealGoverningMSA();
  var traces='<div class="rvtrace">'+pvData('deal.defTraces',DEAL_DEFTRACES).map(function(t){return '<span>'+escD(t)+'</span>';}).join('')+'</div>';
- var gov='<div class="card"><div style="font-size:12.5px;color:var(--ink);line-height:1.6"><b>'+escD(msa||'Acme MSA (2024)')+'</b> read in full. '+
+ var gov='<div class="card"><div style="font-size:12.5px;color:var(--ink);line-height:1.6"><b>'+escD(msa||'Visier MSA (2024)')+'</b> read in full. '+
   'Amendment 1 (pricing), Amendment 2 (term + renewal) and Change Order 3 (Lilly DPA + EU SCCs) incorporated and '+
   'reconciled across the amendment chain. This is a <b>new supplier engagement on '+escD(SUPPLIER_CONTACT.company)+' paper</b>, '+
   'so terms are negotiated from the Lilly standard, not an established relationship. Every finding below cross-references the governing documents.</div>'+
@@ -180,7 +180,7 @@ function dealProtectionHTML(){
    '<div style="font-size:11px;color:var(--mut2)">'+covered+' of '+total+' categories covered by combined protection (MSA + amendments + Change Order 3).</div>';
  var rows=cats.map(function(c,i){return '<tr><td style="width:5%;color:var(--mut2)">'+(i+1)+'</td><td class="iss" style="width:20%">'+escD(c.cat)+'</td><td style="width:14%">'+dealStatPill(c.status)+'</td><td style="color:var(--mut)">'+escD(c.src)+'</td></tr>';}).join('');
  var table='<div class="card" style="padding:4px 6px"><table class="agenda"><thead><tr><th>#</th><th>Category</th><th>Status</th><th>Governing document source</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
- return '<div class="sect"><div class="secthd"><div class="t">Protection &amp; coverage</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">scored on combined protection</span></div>'+
+ return '<div class="sect"><div class="secthd"><div class="t">Protection &amp; coverage</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">14-category governing-protection scan · scored on combined protection</span></div>'+
   '<div class="rvsn">Scored on COMBINED protection (MSA + amendments + Change Order 3). A category is Covered when the governing document already carries the protection; Confirm = present but needs a clause confirmation; Gap = a real protection to add.</div>'+
   metrics+'<div class="card">'+bar+'</div>'+table+'</div>';
 }
@@ -196,7 +196,7 @@ function dealVendorTacticsHTML(){
   return '<tr><td class="iss">'+escD(t.cat)+'</td><td>'+pill+'</td><td style="color:'+txtCol+'">'+escD(t.txt)+acc+'</td></tr>';
  }).join('');
  return '<div class="sect"><div class="secthd"><div class="t">Vendor tactics</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">'+flagged+' of '+DEAL_TACTICS.length+' flagged · FLAG=amber, CLEAR=blue</span></div>'+
-  '<div class="rvsn">12-category tactic scan against this contract; CLEAR shows what was checked and passed. Acceptance rates are market benchmarks for the counter-position. Reflect-only; a human confirms.</div>'+
+  '<div class="rvsn">12-category tactic scan against this contract (illustrative seed pattern; the evidence-grounded per-clause detection lives in the contract-review skill). CLEAR shows what was checked and passed. Acceptance rates are market benchmarks for the counter-position. Reflect-only; a human confirms.</div>'+
   '<div class="card" style="padding:4px 6px"><table class="agenda"><thead><tr><th style="width:26%">Category</th><th style="width:12%">Status</th><th>Triggering text</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 function dealReviewExtras(){var C=pvData('deal.contract',CONTRACT);
@@ -207,9 +207,12 @@ function dealReviewExtras(){var C=pvData('deal.contract',CONTRACT);
  var h='<div id="dealReviewHost">'+dealOverviewHTML()+'</div>';
  h+=dealDocTypeReadHTML();
  h+=dealFindingsHTML();       // evidentiary findings (reconciled model), grouped by severity
- h+=dealRiskHeatmapHTML();    // 14-category governing-protection scan
- h+=dealProtectionHTML();     // Protection & Coverage: metrics + bar + per-category table
- h+=dealVendorTacticsHTML();  // 12-category tactic scan
+ // DEDUP (approved IA): the Risk Heatmap and Protection & Coverage rendered the SAME
+ // 14-category array twice. Keep the richer Protection & Coverage (its metric tiles
+ // ARE the heatmap's tile-summary, folded into its header); the duplicate heatmap
+ // table is dropped. dealRiskHeatmapHTML() is retained (defined, uncalled) for ref.
+ h+=dealProtectionHTML();     // Protection & Coverage: rollup tiles (folded-in heatmap summary) + bar + per-category table
+ h+=dealVendorTacticsHTML();  // 12-category tactic scan (kept per owner Q4; relabeled illustrative)
  h+=dealReviewActionsHTML();
  h+=cvSectionHTML();
  h+=(typeof pushToLeahSectionHTML==='function'?pushToLeahSectionHTML():'');   // #135 type-gated Push-to-LEAH (MSA / CDA / MSA-amendment only)
@@ -237,7 +240,7 @@ function dealDemoGoNoGoHTML(){
 var DEAL_REVIEW_LIVE=null;    // B: last live {review,dashboard}, or null when offline/demo
 var DEAL_CDR_ROWS=null;       // A: current CDR rows (demo or live-normalized)
 var DEAL_CDR_CID=null, DEAL_CDR_VID=null, DEAL_CDR_PROJ=null; // A: live ids for confirm writes
-var CDR_DOC_URL='https://lilly.sharepoint.com/sites/it-procurement/Shared%20Documents/MSA_Acme_2024_executed.pdf';
+var CDR_DOC_URL='#';   // neutralized placeholder (self-contained bundle; no external SharePoint ref). The executed contract lives in LEAH / CLM.
 function ensureCdrCss(){ if(document.getElementById('cdr-css'))return; var s=document.createElement('style'); s.id='cdr-css'; s.textContent=
  '.cdrbadge{font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:30px;white-space:nowrap;flex:none}'+
  '.cdrbadge.trust{background:var(--blue-t,#EAF0F9);color:var(--plum)}'+
@@ -395,7 +398,7 @@ function cdrFmt(v){
 function cdrAutoAccept(r){var m=r.meta||{};if(r.always)return false;if(m.discrepancy)return false;var det=(m.provenance==='deterministic-capture'||m.provenance==='human-entered');var conf=(typeof m.confidence==='number'?m.confidence:0)>=0.9;return det&&conf;}
 function cdrDemoRows(){
  return [
-  {id:'r-counterparty',path:'counterparty.legalEntity',label:'Counterparty legal entity',display:'Acme Analytics, Inc.',always:true,src:'MSA (2024) executed PDF',
+  {id:'r-counterparty',path:'counterparty.legalEntity',label:'Counterparty legal entity',display:'Visier, Inc.',always:true,src:'MSA (2024) executed PDF',
    meta:{provenance:'deterministic-capture',confidence:0.96,confirmed:false,verifyBeforeRelying:true}},
   {id:'r-expiry',path:'dates.expirationDate',label:'Expiration / term-end',display:'2027-08-01',always:true,src:'Amendment 2, Term',
    meta:{provenance:'deterministic-capture',confidence:0.93,confirmed:false,verifyBeforeRelying:true}},
@@ -413,7 +416,7 @@ function cdrDemoRows(){
    meta:{provenance:'deterministic-capture',confidence:0.74,confirmed:false,verifyBeforeRelying:true}},
   {id:'r-fee',path:'pricing.annualFee',label:'Annual fee',display:'$600,000 / yr',src:'Amendment 1, Pricing',
    meta:{provenance:'deterministic-capture',confidence:0.86,confirmed:false,verifyBeforeRelying:true,discrepancy:{capturedValue:'$600,000 / yr',extractedValue:'$620,000 / yr',severity:'warning'}}},
-  {id:'r-noticemethod',path:'renewal.noticeMethod',label:'Notice method',display:'Email (to the Acme contract contact)',src:'notices clause',
+  {id:'r-noticemethod',path:'renewal.noticeMethod',label:'Notice method',display:'Email (to the Visier contract contact)',src:'notices clause',
    meta:{provenance:'extracted',confidence:0.50,confirmed:false,verifyBeforeRelying:true}},
   {id:'r-effective',path:'dates.effectiveDate',label:'Effective date',display:'2024-08-01',
    meta:{provenance:'deterministic-capture',confidence:0.97,confirmed:false,verifyBeforeRelying:false}},
@@ -423,7 +426,7 @@ function cdrDemoRows(){
    meta:{provenance:'deterministic-capture',confidence:0.95,confirmed:false,verifyBeforeRelying:false}},
   {id:'r-renewterm',path:'renewal.renewalTerm',label:'Renewal term',display:'1 year',
    meta:{provenance:'deterministic-capture',confidence:0.92,confirmed:false,verifyBeforeRelying:false}},
-  {id:'r-governing',path:'family.governingAgreement',label:'Governing agreement',display:'Acme MSA (2024)',
+  {id:'r-governing',path:'family.governingAgreement',label:'Governing agreement',display:'Visier MSA (2024)',
    meta:{provenance:'deterministic-capture',confidence:0.96,confirmed:false,verifyBeforeRelying:false}}
  ];
 }
@@ -777,6 +780,42 @@ function dealRateCardHTML(){
  var rows=rc.lines.map(function(l){return '<tr><td class="iss">'+escD(l.item)+'</td><td>'+escD(l.rate)+'</td><td style="color:var(--mut2)">'+escD(l.unit||'')+'</td></tr>';}).join('');
  return '<div class="sect"><div class="secthd"><div class="t">Contracted rate card</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">'+escD(rc.contract)+(rc.expires?(' · to '+escD(rc.expires)):'')+' · reflect-only</span></div><div class="card" style="padding:4px 6px"><table class="agenda"><thead><tr><th>Line item</th><th>Contracted rate</th><th>Unit / basis</th></tr></thead><tbody>'+rows+'</tbody></table>'+(rc.note?'<div class="spnote">'+escD(rc.note)+'</div>':'')+'<div class="spnote">Negotiated rates reflected from the executed contract. The contract in LEAH / CLM is the source of record.</div></div></div>';
 }
+// Total-deal ZOPA/TCO one-line readout (the decision number) for the Overview landing.
+// Reads the SAME shared band (zopaTcoBand) the Pricing ZOPA total row uses; illustrative.
+function dealZopaReadoutHTML(){
+ if(typeof zopaTcoBand!=='function'||typeof ZOPA_LINES==='undefined'||!ZOPA_LINES||!ZOPA_LINES.length)return '';
+ var B=zopaTcoBand();var askOver=B.ask>B.walk;
+ var chip=function(lab,val,cls){return '<span class="ztchip '+(cls||'')+'">'+lab+' '+zTco(val)+'</span>';};
+ var seats=(typeof DEAL_TCO!=='undefined'&&DEAL_TCO.seats)||'';var years=(typeof DEAL_TCO!=='undefined'&&DEAL_TCO.years)||'';
+ return '<div class="sect"><div class="secthd"><div class="t">Total-deal ZOPA · TCO</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">the decision number · illustrative</span></div>'+
+  '<div class="card"><div class="ztband">'+chip('Theo opening',B.open,'open')+chip('Target',B.target,'tgt')+'<span class="ztarrow">to</span>'+chip('Walk-away',B.walk,'walk')+chip('Supplier ask',B.ask,askOver?'over':'ok')+'</div>'+
+  '<div class="spnote">Whole-deal band'+(seats?(' across '+seats+' seats'):'')+(years?(' · '+years+'-yr term'):'')+'. Full line-item ZOPA lives in Pricing &amp; Commercial. Illustrative demo figures; reflect-only.</div></div></div>';
+}
+// Deal sub-mode 0: OVERVIEW landing (approved IA) - the decision headline. Protection
+// Score gauge + Go/No-Go + Conditions, plus the Total-deal ZOPA/TCO one-line readout.
+// Methodology/findings/governing detail live in Review (one-line citation here). The
+// Key Issues index is rendered once as shared context above the sub-tabs (dealHTML).
+function dealOverviewModeHTML(){
+ ensureReviewCss();
+ var C=pvData('deal.contract',CONTRACT);
+ var band=C.score>=75?'Strong protection (Low risk)':C.score>=50?'Moderate protection':C.score>=25?'High risk':'Critical risk';
+ var scoreCol=C.score>=75?'var(--plum)':C.score>=50?'#8A5A00':C.score>=25?'#C0392B':'#C8202E';
+ var highs=dealFindings().filter(function(x){return x.sev==='high';}).length;
+ var kpi='<div class="rvkpi">'+
+  '<div class="rvk"><div class="kl">Annual value</div><div class="kv" style="color:var(--plum)">$600K/yr</div><div class="ks">$1.8M TCO (3-yr) · illustrative</div></div>'+
+  '<div class="rvk"><div class="kl">Protection score</div><div class="kv" style="color:'+scoreCol+'">'+C.score+'/100</div><div class="ks">'+band+' · higher = better</div></div>'+
+  '<div class="rvk"><div class="kl">Hard stops</div><div class="kv">0</div><div class="ks">'+highs+' high finding'+(highs===1?'':'s')+' to resolve</div></div>'+
+  '<div class="rvk"><div class="kl">Est. rounds</div><div class="kv">2-3</div><div class="ks">Moderate complexity · supplier paper</div></div>'+
+ '</div>';
+ var gauge='<div class="card"><div class="rvgauge">'+dealRiskGauge(C.score)+
+  '<div style="flex:1;min-width:190px"><div style="font-size:13px;font-weight:700;color:'+scoreCol+'">'+C.score+' / 100 · '+band+'</div>'+
+  '<div style="font-size:12px;color:var(--mut2);margin-top:6px;line-height:1.55">Higher = better protected. '+escD(C.summary)+'</div></div></div>'+dealDemoGoNoGoHTML()+'</div>';
+ var cite='<div class="spnote">Score starts at 100 and deducts by finding severity against combined protection (MSA + amendments + Change Order 3). Full methodology, findings and governing-agreement detail are in the Review tab.</div>';
+ return kpi+
+  '<div class="sect"><div class="secthd"><div class="t">Decision · protection score &amp; Go/No-Go</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">the recommendation</span></div>'+gauge+cite+'</div>'+
+  dealZopaReadoutHTML()+
+  dealConditionsHTML();
+}
 function dealMode(m){DEAL_MODE=m;if(curtab==='deal')$('#tabbody').innerHTML=dealHTML();}
 // cross-link from another tab into the Deal tab, choosing the right mode
 function dealTo(t){var map={contract:'review',negprep:'negotiate',pricing:'negotiate',renewal:'renew',savings:'renew'};DEAL_MODE=(map[t]||'negotiate');tab('deal');}
@@ -785,25 +824,38 @@ function dealHTML(){
  if(dealIsRfx()) return dealRfxHTML();
  if(typeof dealIsBuyMsa==='function'&&dealIsBuyMsa()) return dealBuyMsaHTML();
  var P=PROJECTS[CURPROJ];var isRenew=dealIsRenewal();
- var mode=DEAL_MODE; if(mode==='renew'&&!isRenew) mode='negotiate'; if(mode==='cdr') mode='negotiate';   // CDR is no longer a Deal sub-mode; it lives at the pre-execution gate
- var modes=[['negotiate','Negotiate'],['proforma','Pro-forma'],['review','Review']]; if(isRenew) modes.push(['renew','Renew']);
+ // Approved IA: Overview / Strategy & Positions / Pricing & Commercial / Pro-forma / Review.
+ // The overloaded Negotiate is split into two peers (Strategy = the argument content,
+ // Pricing = the numbers). Legacy aliases keep old entry points working: 'negotiate' ->
+ // 'strategy', 'cdr' -> 'overview'. Renew stays trait-gated (renewals only).
+ // NOTE: the SCOPE sub-tab (deferred external-merge of scope-sow content) will slot in
+ // HERE, right after Overview, once that follow-up pass ports it. Not built this pass.
+ var mode=DEAL_MODE;
+ if(mode==='negotiate') mode='strategy';
+ if(mode==='cdr') mode='overview';
+ if(mode==='renew'&&!isRenew) mode='strategy';
+ var modes=[['overview','Overview'],['strategy','Strategy &amp; Positions'],['pricing','Pricing &amp; Commercial'],['proforma','Pro-forma'],['review','Review']]; if(isRenew) modes.push(['renew','Renew']);
+ if(['overview','strategy','pricing','proforma','review','renew'].indexOf(mode)<0) mode='overview';
  var sw=modes.map(function(m){return '<button class="dmode'+(m[0]===mode?' on':'')+'" onclick="dealMode(\''+m[0]+'\')">'+m[1]+'</button>';}).join('');
- var h='<p class="dashintro"><b>Deal · '+P.supplier+'</b> - negotiate the terms, review the contract'+(isRenew?', and plan the renewal':'')+'. Pricing and ZOPA live in Negotiate; Review owns the contract and its versions. Reflect-only; targets and redlines are drafts for the team.</p>';
- h+=dealStatusStripHTML();   // persistent, read-only contract-process status strip (above the sub-nav)
+ var h='<p class="dashintro"><b>Deal · '+P.supplier+'</b> - the decision at a glance, then work the positions and pricing, model the economics, and review the contract'+(isRenew?', and plan the renewal':'')+'. Illustrative demo figures; reflect-only, targets and redlines are drafts for the team.</p>';
+ h+=dealStatusStripHTML();   // shared: persistent contract-process status strip (above the sub-nav)
+ h+=dealIssuesHTML();        // shared: the Key Issues index sits ABOVE the sub-tabs as cross-cutting context
  h+='<div class="dealbar"><div class="dmodes">'+sw+'</div><div class="deallinks">'
   +'<a onclick="tab(\'workflow\');return false;" title="Contract &amp; review workflow" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line2);border-radius:8px;color:var(--mut);cursor:pointer;text-decoration:none"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"><path d="M4 6h7M4 12h10M4 18h6"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/></svg></a>'
   +'<a href="dashboard-contract.html" title="Open full negotiation dashboard" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line2);border-radius:8px;color:var(--mut);cursor:pointer;text-decoration:none"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"><path d="M4 20V10M10 20V4M16 20v-7"/><path d="M2 20h20"/></svg></a>'
   +'</div></div>';
- if(mode==='review'){
-  h+=dealReviewExtras();   // 2b: review owns its order (Protection Score headline, Key issues, versions). ZOPA/pricing stays in Negotiate - not duplicated here.
+ if(mode==='overview'){
+  h+=dealOverviewModeHTML();   // decision headline: Protection Score + Go/No-Go + Conditions + Total-deal ZOPA/TCO
+ }else if(mode==='strategy'){
+  h+=dealStrategyHTML();       // Negotiate breakout 1: strategy + positions (playbook w/ tier toggle, red lines, sequencing, SME/MSA collapsed)
+ }else if(mode==='pricing'){
+  h+=dealPricingHTML();        // Negotiate breakout 2: levers hero + ZOPA + counter + prep, dense depth collapsed
+ }else if(mode==='review'){
+  h+=dealReviewExtras();       // full contract review (findings, Protection & Coverage, vendor tactics, versions)
  }else if(mode==='proforma'){
-  h+=dealProFormaExtras();   // pro-forma is its OWN Deal sub-tab (Negotiate / Pro-forma / Review): summary + full model + scenarios + sensitivity + Excel export. Recomputes from the same Negotiate pricing.
- }else{
-  h+=dealIssuesHTML();
-  if(mode==='negotiate') h+=dealNegotiateExtras();
-  else if(mode==='renew') h+=dealRenewExtras();
-  if(mode==='negotiate') h+=dealNegPrepCardHTML();   // additive: prep summary card ABOVE the ZOPA section
-  if(mode==='negotiate') h+=dealRateCardHTML();      // CAT.1: contracted rate card (hide-until-data)
+  h+=dealProFormaExtras();     // pro-forma is its own sub-tab: summary + P&L/cashflow matrix (default-visible) + scenarios + sensitivity + teardown + Excel export
+ }else if(mode==='renew'){
+  h+=dealRenewExtras();
   h+=dealPricingPersist();
  }
  setTimeout(dealPostRender,0);   // fire the live loads after this HTML is mounted
@@ -937,7 +989,7 @@ function dealRfxHTML(){
 }
 function pricingHTML(){var P=PRICING;
  let h='<p class="dashintro"><b>Pricing intelligence · '+PROJECTS[CURPROJ].supplier+'</b>, gathered market benchmarks, the proposal normalized to a comparable unit, and a reconciliation when the supplier changes the pricing model. Reflect-only.</p>';
- h+='<div class="sect"><div class="secthd"><div class="t">Benchmarks · gathered</div><button class="btn btn-ghost btn-sm" onclick="toast(\'Re-gathering benchmarks from the internal price base + market sources (demo)\')">Re-gather</button></div><div class="card" style="padding:4px 6px"><table class="agenda"><thead><tr><th>Line item</th><th>Acme</th><th>Market median</th><th>Range</th><th>Read</th></tr></thead><tbody>'+
+ h+='<div class="sect"><div class="secthd"><div class="t">Benchmarks · gathered</div><button class="btn btn-ghost btn-sm" onclick="toast(\'Re-gathering benchmarks from the internal price base + market sources (demo)\')">Re-gather</button></div><div class="card" style="padding:4px 6px"><table class="agenda"><thead><tr><th>Line item</th><th>Visier</th><th>Market median</th><th>Range</th><th>Read</th></tr></thead><tbody>'+
    P.benchmarks.map(function(b){return '<tr><td class="iss">'+b.item+'</td><td>'+(b.flag==='over'?'<span class="driftv">'+b.ours+'</span>':b.ours)+'</td><td>'+b.med+'</td><td style="color:var(--mut2);white-space:nowrap">'+b.lo+' to '+b.hi+'</td><td><span class="gsev '+(b.flag==='over'?'med':'low')+'">'+b.note+'</span></td></tr>';}).join('')+'</tbody></table></div><div class="spnote">Benchmarks gathered from Lilly\'s internal price base plus external market sources. Items above the median become the negotiation targets.</div></div>';
  h+='<div class="sect"><div class="secthd"><div class="t">Proposal · normalized</div></div><div class="card"><div class="normrow"><div class="normk">As proposed</div><div class="normv">'+P.normalize.raw+'</div></div><div class="normarrow">↓ normalized</div><div class="normrow on"><div class="normk">Comparable unit</div><div class="normv"><b>'+P.normalize.normalized+'</b></div></div><div class="spnote">'+P.normalize.note+'</div></div></div>';
  var R=P.reconcile;

@@ -93,8 +93,8 @@ function obligationsRegisterHTML(){
 }
 // ---- Renewal intelligence, downstream end of the thread (links to Savings) ----
 // #E9: at the 120-day notice window, auto-draft the renewal OPENING from the leverage points
-function draftRenewalOpening(){var R=pvData('deal.renewal',RENEWAL),to=(typeof SUPPLIER_CONTACT!=='undefined')?SUPPLIER_CONTACT.email:'sam@acme.ai',first=(typeof SUPPLIER_CONTACT!=='undefined')?SUPPLIER_CONTACT.name.split(' ')[0]:'Sam';
- CHAT.push({who:llm+' assistant',av:'✦',cls:'ai',model:llm,tm:nowStamp(),tx:'We are at the 120-day renewal window. Here is a renewal opening to Acme built from the leverage points - review and send when you are happy:',draft:{to:to,subj:'Acme x Lilly - renewal of the analytics MSA (expires '+R.expiry+')',body:'Hi '+first+',\n\nWe are opening the renewal conversation ahead of the '+R.expiry+' expiry. We value the partnership and want to extend, with a few adjustments:\n\n- Renewal pricing: we need a CPI or 3% cap. The current then-current-list term is open-ended and the last indicative implied +9%.\n- We are open to a longer (4-year) term in exchange for a step-down on the annual fee.\n- We have two near-parity alternatives in view, so we would like the renewal to be competitive on price.\n\nCould we get 30 minutes next week to walk through it?\n\nThanks,\nMarc'}});renderChat(($('#csearch')||{}).value||'');}
+function draftRenewalOpening(){var R=pvData('deal.renewal',RENEWAL),to=(typeof SUPPLIER_CONTACT!=='undefined')?SUPPLIER_CONTACT.email:'sam@visier.com',first=(typeof SUPPLIER_CONTACT!=='undefined')?SUPPLIER_CONTACT.name.split(' ')[0]:'Sam';
+ CHAT.push({who:llm+' assistant',av:'✦',cls:'ai',model:llm,tm:nowStamp(),tx:'We are at the 120-day renewal window. Here is a renewal opening to Visier built from the leverage points - review and send when you are happy:',draft:{to:to,subj:'Visier x Lilly - renewal of the analytics MSA (expires '+R.expiry+')',body:'Hi '+first+',\n\nWe are opening the renewal conversation ahead of the '+R.expiry+' expiry. We value the partnership and want to extend, with a few adjustments:\n\n- Renewal pricing: we need a CPI or 3% cap. The current then-current-list term is open-ended and the last indicative implied +9%.\n- We are open to a longer (4-year) term in exchange for a step-down on the annual fee.\n- We have two near-parity alternatives in view, so we would like the renewal to be competitive on price.\n\nCould we get 30 minutes next week to walk through it?\n\nThanks,\nMarc'}});renderChat(($('#csearch')||{}).value||'');}
 function renewalHTML(){const R=pvData('deal.renewal',RENEWAL);
  let h='<p class="dashintro"><b>Renewal intelligence · '+PROJECTS[CURPROJ].supplier+'</b>, the renew / renegotiate / recompete read assembled from spend, performance, compliance and market. Reflect-only.</p>';
  h+=threadBar('renewal');
@@ -103,7 +103,7 @@ function renewalHTML(){const R=pvData('deal.renewal',RENEWAL);
    [['Expiry',R.expiry+' · '+R.window],['Spend / commitment',R.spend],['Performance',R.perf],['Compliance',R.compliance],['Market alternatives',R.market],['Price exposure',R.price]].map(function(r){return '<tr><td class="iss">'+r[0]+'</td><td>'+r[1]+'</td></tr>';}).join('')+'</tbody></table></div></div>';
  h+='<div class="sect"><div class="secthd"><div class="t">Savings model</div><button class="btn btn-ghost btn-sm" onclick="modelSavings()">Model savings</button></div><div class="card"><div id="savmodel">'+savingsModelHTML()+'</div>'+
    '<div class="savlock"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--mut2);fill:none;stroke-width:2;flex:none"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span>This is a <b>negotiation model</b>, not a commitment. A modeled saving can only be <b>committed once the contract is executed</b>, so the number that lands in the Savings tracker is the realized one.</span></div>'+
-   '<button class="btn btn-primary btn-sm" '+(R.executed?'onclick="commitSaving('+renewalSaving()+',\'Acme renewal\')"':'disabled title="Available once the contract is executed"')+'>'+(R.executed?'Commit realized saving →':'Commit locked until executed 🔒')+'</button>'+
+   '<button class="btn btn-primary btn-sm" '+(R.executed?'onclick="commitSaving('+renewalSaving()+',\'Visier renewal\')"':'disabled title="Available once the contract is executed"')+'>'+(R.executed?'Commit realized saving →':'Commit locked until executed 🔒')+'</button>'+
    '<div class="obfoot" style="margin-top:11px"><span class="threadlink" onclick="tab(\'obligations\')">← driven by the non-renewal notice obligation</span><span class="threadlink" onclick="location.href=\'savings.html\'">→ Savings tracker</span></div></div></div>';
  return h;
 }
@@ -142,7 +142,7 @@ function pushSystem(name){var sy=(typeof name==='number')?SYSDATA.systems[name]:
 // Negotiate / Review / Renew modes + a persistent Pricing layer. Project-aware: Renew shows
 // only on renewal projects; RFx projects get per-supplier MSA lanes with a CONDITIONAL award.
 // Each key issue appears ONCE carrying both the negotiation stance and the contract-review read.
-var DEAL_MODE='negotiate';
+var DEAL_MODE='overview';   // approved IA landing: Overview / Strategy & Positions / Pricing & Commercial / Pro-forma / Review
 // per line item: market low/median/high, our target->walk-away band, and the supplier's current ask.
 // cadence drives the TCO roll-up; bench matches a PRICING.benchmarks row; read = Theo's one-line take.
 const ZOPA_LINES=_PVTR.zopa||[];

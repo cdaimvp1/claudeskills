@@ -223,15 +223,15 @@ function draftBlockHTML(){var _sc=pvData('contact',SUPPLIER_CONTACT);var cur=cvC
   '<div class="sect" style="margin-top:13px"><div class="secthd"><div class="t">Negotiation reply · Outlook draft</div></div><div class="draftcard">'+
    '<label class="rtl"><input type="checkbox" id="replythread" checked><span>Reply on the existing thread with '+_sc.name+'<span class="rtlrec">recommended</span></span></label>'+
    '<div class="dkv"><span>To</span><b>'+_sc.name+' &lt;'+_sc.email+'&gt;</b></div>'+
-   '<div class="dkv"><span>Subject</span><b>RE: Acme x Lilly MSA · '+cur.v+'</b></div>'+
+   '<div class="dkv"><span>Subject</span><b>RE: Visier x Lilly MSA · '+cur.v+'</b></div>'+
    rl+
    '<div class="draftbody">Hi '+first+',\n\nThanks for the last turn. Attached is '+cur.v+' with our responses to your edits; the key changes this turn are summarized above. In short: we held the liability cap at 1x with a PI carve-out, added a prior-approval right on sub-processors, proposed a CPI-capped renewal, and conceded the venue.\n\nHappy to walk through any of it.\n\nBest,\nMarc</div>'+
-   '<div class="attchip"><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="#2B579A" stroke-width="2"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/></svg><b>MSA_Acme_'+cur.v+'.docx</b><span>attached · current version</span></div>'+
+   '<div class="attchip"><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="#2B579A" stroke-width="2"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/></svg><b>MSA_Visier_'+cur.v+'.docx</b><span>attached · current version</span></div>'+
   '</div></div>'+
   '<button class="btn btn-primary btn-sm" style="margin-top:11px" onclick="openOutlookDraft()"><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m4 7 8 6 8-6"/></svg>Open draft in Outlook</button>'+
   '<div class="anote">Theo auto-drafts the negotiation reply (cover note + redline summary) and attaches '+cur.v+'. Nothing is sent on your behalf; you review and send in Outlook.</div>';
 }
-function openOutlookDraft(){var r=document.getElementById('replythread');toast('Opened in Outlook · '+(r&&r.checked?'reply on the existing Acme thread':'new email')+' · '+cvCurrent().v+' attached. Review and send.');closeDrawer();}
+function openOutlookDraft(){var r=document.getElementById('replythread');toast('Opened in Outlook · '+(r&&r.checked?'reply on the existing Visier thread':'new email')+' · '+cvCurrent().v+' attached. Review and send.');closeDrawer();}
 // ===== #232 SUPPLIER PAPER -> LILLY TEMPLATE (deviation redline) + MULTI-MSA TYING =====
 const PAPER = _PVDEAL.paper || { onSupplierPaper: false, deviations: [] };
 var MSAS = _PVDEAL.msas || [];
@@ -242,7 +242,7 @@ function paperSectionHTML(){var P=pvData('paper',PAPER);var _sc=pvData('contact'
   '<div class="card"><div class="papertop"><div class="papertxt">This draft arrived on <b>'+_sc.company+'\'s paper</b>. Theo maps it onto the <b>Lilly template</b> and redlines every deviation ('+P.deviations.length+' found, '+hi+' high), so you negotiate from our standard, not theirs.</div><button class="btn btn-primary btn-sm" onclick="mapToTemplate()">Map to Lilly template</button></div>'+
   '<div class="devlist">'+devRowsHTML()+'</div></div>'+
   '<div class="secthd" style="margin-top:14px"><div class="t">Governing MSA · this work order</div></div><div class="card"><div class="msalist">'+msa+'</div><div class="spnote">Multi-MSA: Theo suggests the governing agreement for this work order; the sourcing rep confirms. The work order inherits the tied MSA\'s terms unless re-tied.</div></div>'+
-  '<div class="secthd" style="margin-top:14px"><div class="t">Order form / SOW</div></div><div class="card"><div class="papertop"><div class="papertxt">Theo can draft the <b>Work Order / SOW on Lilly paper</b> from Acme\'s proposal: services, fees, SLAs and data terms pulled across onto our template, tied to the governing MSA. You confirm the few open fields.</div><button class="btn btn-primary btn-sm" onclick="runSkill(\'order-form\')">Draft order form</button></div></div></div>';
+  '<div class="secthd" style="margin-top:14px"><div class="t">Order form / SOW</div></div><div class="card"><div class="papertop"><div class="papertxt">Theo can draft the <b>Work Order / SOW on Lilly paper</b> from Visier\'s proposal: services, fees, SLAs and data terms pulled across onto our template, tied to the governing MSA. You confirm the few open fields.</div><button class="btn btn-primary btn-sm" onclick="runSkill(\'order-form\')">Draft order form</button></div></div></div>';
 }
 function mapToTemplate(){var P=PAPER;var hi=P.deviations.filter(function(x){return x.sev==='high';}).length;
  $('#drawer').innerHTML='<div class="dh"><div><h3>Map to Lilly template</h3><div class="dsub">'+SUPPLIER_CONTACT.company+' paper to Lilly standard</div></div><div class="dc" onclick="closeDrawer()">×</div></div><div class="db"><p class="narr">Theo aligns each section of the supplier\'s paper to the Lilly template and redlines the deviations. <b>'+P.deviations.length+' deviations</b> found, '+hi+' high-severity.</p><div class="devlist">'+devRowsHTML()+'</div><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="genTemplateRedline()">Generate Lilly-template redline</button><div style="font-size:var(--fz-meta);color:var(--mut2);font-style:italic;margin-top:9px">Produces a redline that converts the supplier paper to the Lilly template, attributed to Theo for Lilly. You review it in Word.</div></div>';
@@ -255,20 +255,20 @@ function tieMSA(id){var _m=pvData('msas',MSAS);_m.forEach(function(m){m.tied=(m.
 var INBOUND = _PVDEAL.inbound || { pending: false, from: {} };
 function inboundCardHTML(){var I=pvData('inbound',INBOUND);var _sc=pvData('contact',SUPPLIER_CONTACT);if(!I.pending)return '';
  return '<div class="inbound"><div class="inbh"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/></svg><div><div class="inbt">Inbound from '+I.from.name+'</div><div class="inbs">'+I.from.email+' · '+I.received+'</div></div><span class="inbmatch">Matched to this project</span></div>'+
-  '<div class="inbbody">Theo read a reply on the Acme thread, grabbed the attachment <b>'+I.attachment+'</b>, and matched it to <b>'+I.matchedProject+'</b> ('+I.matchBy+'). Known supplier on an active project, so it is not spam.'+(I.onSupplierPaper?' <b>Detected: on '+_sc.company+'\'s paper</b>, not the Lilly template - so Theo offers to map it on ingest.':'')+'</div>'+
+  '<div class="inbbody">Theo read a reply on the Visier thread, grabbed the attachment <b>'+I.attachment+'</b>, and matched it to <b>'+I.matchedProject+'</b> ('+I.matchBy+'). Known supplier on an active project, so it is not spam.'+(I.onSupplierPaper?' <b>Detected: on '+_sc.company+'\'s paper</b>, not the Lilly template - so Theo offers to map it on ingest.':'')+'</div>'+
   (I.onSupplierPaper
     ? '<div class="inbacts"><button class="btn btn-primary btn-sm" onclick="ingestAndConvert()">Ingest &amp; map to Lilly template</button><button class="btn btn-ghost btn-sm" onclick="ingestInbound()">Ingest as-is (keep their paper)</button><button class="btn btn-ghost btn-sm" onclick="dismissInbound()">Not now</button></div>'
     : '<div class="inbacts"><button class="btn btn-primary btn-sm" onclick="ingestInbound()">Ingest as new version</button><button class="btn btn-ghost btn-sm" onclick="dismissInbound()">Not now</button></div>')+
   '<div class="inbnote">Theo only ingests from <b>known suppliers on active projects</b> and never auto-creates a project from an inbound email. Unrecognized senders are held for triage, not actioned.</div></div>';
 }
-function ingestInbound(){var I=INBOUND;cvAddVersion({v:'v'+(pvData('deal.cversions',CVERSIONS).versions.length+1),by:'Acme · '+I.from.name,side:'supplier',date:slaDate(0),note:'Inbound redline grabbed from the Acme email thread ('+I.attachment+').',st:'Received'});
+function ingestInbound(){var I=INBOUND;cvAddVersion({v:'v'+(pvData('deal.cversions',CVERSIONS).versions.length+1),by:'Visier · '+I.from.name,side:'supplier',date:slaDate(0),note:'Inbound redline grabbed from the Visier email thread ('+I.attachment+').',st:'Received'});
  SUPPLIER_CONTACT.name=I.from.name;SUPPLIER_CONTACT.email=I.from.email;  // store/refresh the supplier contact
- INBOUND.pending=false;toast('Ingested '+I.attachment+' as a new version · stored '+I.from.name+' <'+I.from.email+'> as the Acme contact');rerenderDeal();}
+ INBOUND.pending=false;toast('Ingested '+I.attachment+' as a new version · stored '+I.from.name+' <'+I.from.email+'> as the Visier contact');rerenderDeal();}
 function dismissInbound(){INBOUND.pending=false;toast('Left the inbound draft in the thread; you can ingest it later');rerenderDeal();}
 // Ingest a supplier-paper draft AND, at that moment, present the convert-to-Lilly-template decision.
 function ingestAndConvert(){ingestInbound();setTimeout(function(){if(typeof mapToTemplate==='function')mapToTemplate();},140);}
 // open the attributed redline (tracked changes authored as "Theo for Lilly", co-authored in Word Online)
-function openRedlines(){toast('Opening MSA_Acme_redline_v3.docx in Word Online · tracked changes attributed to "Theo for Lilly" · permissions inherited from the project library');}
+function openRedlines(){toast('Opening MSA_Visier_redline_v3.docx in Word Online · tracked changes attributed to "Theo for Lilly" · permissions inherited from the project library');}
 // ===== #135 PUSH TO LEAH, reflect-only queue-submit to the CLM system of record =====
 // Additive; the contract-review UI is untouched. Offered ONLY where the contract type
 // is MSA / CDA / MSA-amendment (the server's LEAH_PUSHABLE_CONTRACT_TYPES allow-set) —
@@ -385,7 +385,7 @@ function contractHTML(){const C=pvData('deal.contract',CONTRACT);const col=score
  h+=`<div class="sect"><div class="secthd"><div class="t">Protection gaps</div></div>${C.gaps.map(function(g){return `<div class="gap"><span class="gsev ${g.sev}">${g.sevt}</span><div class="gm"><div class="gn">${g.n}</div><div class="gd">${g.d}</div><div class="gfix"><b>Redline:</b> ${g.fix}</div>${GAP_THREAD[g.n]?`<div style="margin-top:7px"><span class="threadlink" onclick="tab('${GAP_THREAD[g.n].id}')">${GAP_THREAD[g.n].l}</span></div>`:''}</div></div>`;}).join('')}</div>`;
  h+=`<div class="sect"><div class="secthd"><div class="t">Top redlines</div><a href="javascript:void(0)" onclick="openRedlines()" style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:#2B579A;text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="#2B579A" stroke-width="2" style="width:13px;height:13px"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/></svg>Open in Word</a></div>
   <ol class="redlist">${C.gaps.map(function(g){return `<li><div class="rlh"><span class="rlsec">${g.sec||''}</span><span class="rln">${g.n}</span><span class="gsev ${g.sev}">${g.sevt}</span></div><div class="rld">${g.fix}</div></li>`;}).join('')}</ol>
-  <div class="rlartifact"><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="#2B579A" stroke-width="2"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/></svg><div class="rla"><b>MSA_Acme_redline_v3.docx</b><span>Tracked changes attributed to <b>Theo for Lilly</b> · shared via Word Online · accept, edit or reject each change in Word</span></div></div></div>`;
+  <div class="rlartifact"><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="#2B579A" stroke-width="2"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/></svg><div class="rla"><b>MSA_Visier_redline_v3.docx</b><span>Tracked changes attributed to <b>Theo for Lilly</b> · shared via Word Online · accept, edit or reject each change in Word</span></div></div></div>`;
  h+=cvSectionHTML();
  return h+lifeBar('contract');
 }

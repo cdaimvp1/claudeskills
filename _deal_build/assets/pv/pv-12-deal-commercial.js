@@ -77,12 +77,12 @@ function cmCounterHTML(){
   var favLbl=fav==='strong'?'Strongly favors Lilly':fav==='fair'?'Favors Lilly':'Modest';
   return '<tr><td class="cmask">'+escD(t.give)+'</td><td>'+escD(t.gv)+'</td><td class="cmask">'+escD(t.get)+'</td><td class="cmimp">'+cm$(t.getv)+'</td><td><span class="cmnet '+(fav==='modest'?'mut':'good')+'">'+escD(favLbl)+'</span></td></tr>';
  }).join('');
- var pay='<table class="cmtbl"><thead><tr><th>We give</th><th>Give-value to Acme</th><th>We get</th><th>Get-value to Lilly</th><th>Net read</th></tr></thead><tbody>'+payRows+'</tbody></table>';
+ var pay='<table class="cmtbl"><thead><tr><th>We give</th><th>Give-value to Visier</th><th>We get</th><th>Get-value to Lilly</th><th>Net read</th></tr></thead><tbody>'+payRows+'</tbody></table>';
  return '<div class="sect">'+cmHd('Ranked counter-proposal','ranked by $ impact · priority pill')+
   '<div class="spnote" style="margin-bottom:8px">Prioritized counter-asks mapped to dollar impact over the 3-yr term (renewal / usage items shown as annual exposure). Must-have = red, High / Med = amber / grey. Reflect-only; the rep decides what to table.</div>'+
   '<div class="card" style="padding:4px 6px">'+counters+'</div>'+
   '<div class="cmsubh">Trade payoff matrix</div>'+
-  '<div class="spnote" style="margin-bottom:8px">Quantified give × get pairings, what each concession is worth to Acme against what it wins for Lilly. Non-cash gives are labeled; favorable trades are shown in blue.</div>'+
+  '<div class="spnote" style="margin-bottom:8px">Quantified give × get pairings, what each concession is worth to Visier against what it wins for Lilly. Non-cash gives are labeled; favorable trades are shown in blue.</div>'+
   '<div class="card" style="padding:4px 6px">'+pay+'</div></div>';
 }
 // ---- ITEM 10a: value-at-risk + assumptions register ----
@@ -181,7 +181,7 @@ function cmLeverHTML(){
 function cmVolumeHTML(){
  var cards=[
   {h:'Consolidation sizing',c:'var(--plum)',p:'400 seats across 3 Lilly entities today. Two more entities in scope would add ~250 seats (→ ~650), crossing into the next volume tier. Consolidating the spend under one agreement is the leverage: one negotiation, one rate, a larger commitment to price against.'},
-  {h:'Multi-year commitment value',c:'var(--plum)',p:'A 3-year commitment is ~$2.1M of bankable revenue to Acme versus a 1-year deal. That certainty, not a higher fee, is the trade currency for the license step-down and the renewal cap. Price against the term, not the sticker.'},
+  {h:'Multi-year commitment value',c:'var(--plum)',p:'A 3-year commitment is ~$2.1M of bankable revenue to Visier versus a 1-year deal. That certainty, not a higher fee, is the trade currency for the license step-down and the renewal cap. Price against the term, not the sticker.'},
   {h:'Growth-trigger tiering',c:'#B45309',p:'Propose per-seat pricing that steps DOWN as seats grow: 1–400 @ $1,300, 401–600 @ $1,150 (~88%), 601+ @ $1,050 (~81%). Aligns price with Lilly expansion instead of a flat rate that ignores volume growth.'}
  ];
  var body=cards.map(function(c){return '<div class="cmvol" style="border-left:4px solid '+c.c+'"><h4>'+escD(c.h)+'</h4><p>'+escD(c.p)+'</p></div>';}).join('');
@@ -195,7 +195,7 @@ function cmEmailHTML(){
  var toneRow='<div class="cmtone-row"><span class="cmtone-lbl">Tone</span>'+NEG_TONES.map(function(x){var on=x===t;return '<button class="cmtone-btn'+(on?' on':'')+'" onclick="cmSetEmailTone(\''+x+'\')">'+escD(x)+'</button>';}).join('')+'</div>';
  var asks='<ul class="cmem-asks">'+EM.asks.map(function(a){return '<li>'+escD(a)+'</li>';}).join('')+'</ul>';
  var email='<div class="cmem"><div class="cmem-h"><span class="cmem-k">Subject</span><span class="cmem-v">'+escD(EM.subject)+'</span></div>'+
-   '<div class="cmem-body"><p>Hi [Acme lead],</p><p>'+escD(tn.open)+'</p>'+asks+'<p>'+escD(tn.close)+'</p><p>Best regards,<br>[Rep] · Lilly Sourcing</p></div>'+
+   '<div class="cmem-body"><p>Hi [Visier lead],</p><p>'+escD(tn.open)+'</p>'+asks+'<p>'+escD(tn.close)+'</p><p>Best regards,<br>[Rep] · Lilly Sourcing</p></div>'+
    '<div class="cmem-actions"><button class="btn btn-ghost btn-sm" onclick="cmEmailAct(\'copy\')">Copy draft</button><button class="btn btn-ghost btn-sm" onclick="cmEmailAct(\'save\')">Save to drafts</button><span class="cmem-draft">Draft, not sent</span></div></div>';
  return '<div class="sect" id="cmEmailSect">'+cmHd('Counter-email, draft','5-persona tone-matched · draft-don’t-send')+
   '<div class="spnote" style="margin-bottom:10px">Same substance, five personas, the asks never change, only the framing. This is a draft for the rep; nothing is sent.</div>'+toneRow+email+'</div>';
@@ -215,6 +215,27 @@ function dealCommercialExtras(){
   cmLeverHTML()+
   cmVolumeHTML()+
   cmEmailHTML()+
+ '</div>';
+}
+// ── Deal sub-mode 2: PRICING & COMMERCIAL (the numbers) ──────────────────────
+// Negotiate breakout part 2 (approved IA): the Levers & Protection-Score model is
+// the HERO (interactive live price<->protection tradeoff), ZOPA by line item +
+// Total-deal ZOPA/TCO and the ranked counter + trade matrix are surfaced near the
+// top, with the negotiation-prep summary card; the denser depth (pricing-model rec,
+// benchmark bands, discount waterfall, value-at-risk, volume leverage, counter-email
+// draft) collapses behind one on-demand expander. Reflect-only; nothing is sent.
+function dealPricingHTML(){
+ ensureCmCss();
+ var banner='<div class="cmbanner"><span class="cmbadge">Commercial analysis</span><span>Reflect-only · illustrative demo figures · benchmark bands gated at N&ge;5 · the counter-email is a draft. Positive framing is shown in blue, never green.</span></div>';
+ var depth='<details class="dfold"><summary>Pricing depth · model recommendation · benchmark bands · discount waterfall · value-at-risk · volume leverage · counter-email draft</summary>'+
+   cmPricingModelHTML()+cmBenchmarkHTML()+cmWaterfallHTML()+cmVarAssumeHTML()+cmVolumeHTML()+cmEmailHTML()+'</details>';
+ return '<div class="cmwrap">'+banner+
+   cmLeverHTML()+            // HERO: levers & Protection-Score model (interactive)
+   (typeof dealNegPrepCardHTML==='function'?dealNegPrepCardHTML():'')+   // negotiation-prep summary card (compact)
+   (typeof dealPricingPersist==='function'?dealPricingPersist():'')+     // ZOPA by line item + Total-deal ZOPA/TCO
+   cmCounterHTML()+          // ranked counter-proposal + trade matrix
+   depth+
+   (typeof dealRateCardHTML==='function'?dealRateCardHTML():'')+         // contracted rate card (hide-until-data)
  '</div>';
 }
 /* ===========================================================================
@@ -614,12 +635,12 @@ function dealProFormaCardHTML(){
    : '<div class="pfhead"><span class="pfhk">Total cost of ownership · '+escD(String(payload.horizonYears))+'-yr, as proposed</span><span class="pfhv">'+escD(pfUsd(tcoNum))+'</span></div>';
   var rows=comps.map(function(c){return '<tr><td class="pk">'+escD(c.label)+'</td><td class="pv">'+(c.amt>0?escD(pfUsd(c.amt)):'<span class="pfsub">none modeled</span>')+'</td></tr>';}).join('');
   rows+='<tr class="pftotal"><td class="pk">Total (TCO)</td><td class="pv">'+(tcoNum===null?pfNa('add cost inputs'):escD(pfUsd(tcoNum)))+'</td></tr>';
-  var detail=DEAL_PF_OPEN?pfDetailHTML(payload,live):'';
+  var detail=pfDetailHTML(payload,live);   // P&L/cashflow matrix + Insights are now DEFAULT-visible; only line-item granularity stays behind the toggle
   body='<div class="card">'+head+'<table class="pfkv">'+rows+'</table>'+detail+
    '<div class="pfnote">Reflect-only. Stays in sync with the Negotiate pricing: it recomputes from the same lines whenever the Deal view rerenders after a pricing change. A directional model on stated assumptions; Finance owns the numbers, and nothing is committed here.</div></div>';
  }
  return '<div class="sect" id="dealProFormaCard"><div class="secthd"><div class="t">Pro-forma / TCO</div><div>'+
-  '<button class="btn btn-ghost btn-sm" onclick="pfExportCsv()">Export to Excel</button> <button class="btn btn-ghost btn-sm" onclick="pfCardToggle()">'+(DEAL_PF_OPEN?'Close full model':'Open full model')+'</button>'+
+  '<button class="btn btn-ghost btn-sm" onclick="pfExportCsv()">Export to Excel</button> <button class="btn btn-ghost btn-sm" onclick="pfCardToggle()">'+(DEAL_PF_OPEN?'Hide line items':'Show line items')+'</button>'+
  '</div></div>'+body+'</div>';
 }
 // Pro-forma redesign (#39): the full model reads like a real financial statement -
@@ -677,11 +698,14 @@ function pfDetailHTML(payload,live){
  var whatif='<div class="pfdh">What-if · discount rate (present value)</div><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><input type="range" min="0" max="15" step="0.5" value="'+PF_DISC+'" oninput="pfSetDisc(this.value)" style="flex:1;min-width:160px"><span style="font:700 12px var(--mono,monospace);color:var(--plum);white-space:nowrap">NPV: '+npvDisplay+'</span></div><div class="pfnote">Slide the discount rate to reprice the '+years+'-yr cashflow to present value. 0% = the undiscounted total.</div>';
  // ---- computed insights ----
  var ins=pfInsights(payload).map(function(x){return '<li>'+x+'</li>';}).join('');
+ // Line-item granularity is the ONLY thing behind the toggle now; the P&L/cashflow
+ // matrix + Insights render by default (surfaced per the approved IA).
+ var liSection=DEAL_PF_OPEN?('<div class="pfdh">Line items · over the '+escD(String(years))+'-yr horizon</div><table class="pfkv">'+liRows+'</table>'):'';
  return '<div class="pfdetail">'+
-  '<div class="pfdh">Line items · over the '+escD(String(years))+'-yr horizon</div><table class="pfkv">'+liRows+'</table>'+
   '<div class="pfdh">P&amp;L / cashflow by year</div>'+matrix+
   whatif+
   '<div class="pfdh">Insights</div><ul class="bullets" style="margin-top:4px">'+ins+'</ul>'+
+  liSection+
   '<div class="pfnote">Use Export to Excel for the full workbook (line items, the year-by-year P&amp;L, scenarios) for Finance review. Directional; Finance owns the committed numbers.</div>'+
  '</div>';
 }

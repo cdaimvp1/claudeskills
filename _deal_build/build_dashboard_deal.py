@@ -166,7 +166,7 @@ LILLYAPI_STUB_JS = (
 )
 
 BOOT_SCRIPT = (
-    "curtab='deal';DEAL_MODE='negotiate';CURPROJ='acme';"
+    "curtab='deal';DEAL_MODE='overview';CURPROJ='acme';"
     "(function(){function go(){try{"
     "if(typeof rerenderDeal==='function'){rerenderDeal();}"
     "else{document.getElementById('tabbody').innerHTML=dealHTML();}"

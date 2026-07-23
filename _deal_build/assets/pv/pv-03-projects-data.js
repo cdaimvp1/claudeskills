@@ -1,5 +1,5 @@
 const PROJECTS={
- acme:{title:'AI-powered employee-analytics platform',code:'P-1042',type:'New supplier engagement · sole-source',cci:'orange',cciLabel:'Orange',tco:'$1.8M TCO',supplier:'Acme Analytics',short:'Acme · sole-source',
+ acme:{title:'AI-powered employee-analytics platform',code:'P-1042',type:'New supplier engagement · sole-source',cci:'orange',cciLabel:'Orange',tco:'$1.8M TCO',supplier:'Visier',short:'Visier · sole-source',
   // traits descriptor (LOCKED design): the base tabs/workflow compose off these, not off a per-type copy.
   // Values here match what the legacy type-regex predicates return, so derivation is behavior-preserving.
   // hasExecutedContract:false, net-new sole-source engagement, no executed MSA on file yet, so the

@@ -33,7 +33,7 @@
     domain: {
       negprep: {
         target: '$540K/yr', walk: '$640K/yr', zone: '$540–640K/yr',
-        leverage: 'Moderate-to-strong on Lilly\'s side: it is a sole-source candidate but multi-year, multi-entity, and a marquee pharma logo Acme wants publicly. Their leverage: switching cost and the bespoke HR data mapping. Best lever is the 3-year term + expansion roadmap traded against price and liability.',
+        leverage: 'Moderate-to-strong on Lilly\'s side: it is a sole-source candidate but multi-year, multi-entity, and a marquee pharma logo Visier wants publicly. Their leverage: switching cost and the bespoke HR data mapping. Best lever is the 3-year term + expansion roadmap traded against price and liability.',
         agenda: [
           { iss: 'Annual fee', target: '$540K/yr (3-yr lock)', fallback: '$600K with year-1 ramp credit', hs: '> $640K/yr' },
           { iss: 'Liability cap', target: '2× fees, no carve-out limit on PI breach', fallback: '1.5× fees, PI breach uncapped', hs: '< 1× fees' },
@@ -41,16 +41,16 @@
           { iss: 'Data / sub-processors', target: 'Lilly DPA, prior-approval on sub-processors', fallback: 'notice + objection right', hs: 'no sub-processor control' },
           { iss: 'Price protection', target: 'CPI-capped renewals (≤3%)', fallback: 'fixed yr-1 renewal', hs: 'uncapped uplift' }
         ],
-        talking: ['Anchor on the 3-year, multi-entity commitment, that is the value Acme is buying.', 'Reference the marquee-logo / case-study value to Acme as a non-cash concession.', 'Bundle price and liability: concede a higher fee only against a stronger PI-breach cap.', 'Keep the convenience-exit on the table as a walk signal, not a giveaway.'],
+        talking: ['Anchor on the 3-year, multi-entity commitment, that is the value Visier is buying.', 'Reference the marquee-logo / case-study value to Visier as a non-cash concession.', 'Bundle price and liability: concede a higher fee only against a stronger PI-breach cap.', 'Keep the convenience-exit on the table as a walk signal, not a giveaway.'],
         redlines: ['No cap below 1× fees, and PI-breach liability must never be capped at the standard cap.', 'Lilly DPA + Standard Contractual Clauses are non-negotiable for employee PI.', 'No auto-renewal without an explicit, CPI-capped renewal price.']
       },
       contract: {
         score: 72,
-        $src: { score: [stub('Contract protection scoring, reflect-only read of the Acme MSA', 1)] },
+        $src: { score: [stub('Contract protection scoring, reflect-only read of the Visier MSA', 1)] },
         summary: 'Protection Score reflects how well the current draft protects Lilly (0–100, higher is better). The MSA is broadly sound but three protection gaps hold the score down, liability cap, sub-processor control, and renewal pricing. Closing the two high-severity gaps would lift it into the 80s.',
         gaps: [
-          { sev: 'high', sevt: 'High', sec: '§4', n: 'Liability cap below playbook', d: '§4 caps Acme\'s liability at 2× fees but applies the same cap to a personal-data breach. Lilly playbook requires PI-breach liability to sit outside the general cap.', fix: 'Carve PI-breach liability out of the §4 cap (uncapped, or a separate higher cap).' },
-          { sev: 'high', sevt: 'High', sec: '§11', n: 'Sub-processors not controlled', d: '§11 lets Acme appoint sub-processors with notice only. For employee PI this needs a prior-approval right.', fix: 'Insert a prior-approval right plus an annual audit right (Lilly DPA cl. 7).' },
+          { sev: 'high', sevt: 'High', sec: '§4', n: 'Liability cap below playbook', d: '§4 caps Visier\'s liability at 2× fees but applies the same cap to a personal-data breach. Lilly playbook requires PI-breach liability to sit outside the general cap.', fix: 'Carve PI-breach liability out of the §4 cap (uncapped, or a separate higher cap).' },
+          { sev: 'high', sevt: 'High', sec: '§11', n: 'Sub-processors not controlled', d: '§11 lets Visier appoint sub-processors with notice only. For employee PI this needs a prior-approval right.', fix: 'Insert a prior-approval right plus an annual audit right (Lilly DPA cl. 7).' },
           { sev: 'med', sevt: 'Medium', sec: '§3', n: 'Uncapped renewal uplift', d: '§3 renews at "then-current list price" with no cap, exposing Lilly to open-ended increases.', fix: 'Cap renewal uplift at CPI or 3%, whichever is lower.' },
           { sev: 'low', sevt: 'Low', sec: '§18', n: 'Governing-law venue', d: '§18 specifies the supplier\'s home venue. Minor: playbook prefers a neutral or Lilly-favourable venue.', fix: 'Propose a neutral venue. Low priority.' }
         ]
@@ -342,7 +342,7 @@
         'Uncapped renewal uplift': { id: 'renewal', l: '→ feeds the Renewal recommendation' }
       },
       terms: {
-        base: 'MSA · Acme Analytics · executed 2024-08-01',
+        base: 'MSA · Visier · executed 2024-08-01',
         amendments: [
           { n: 'Amendment 1', date: '2025-02-14', chg: 'Work Order 2 added, seats 250→400; pricing tier updated.' },
           { n: 'Amendment 2', date: '2025-09-30', chg: 'Term extended 2→3 yrs; renewal-pricing clause replaced.' },
@@ -351,9 +351,9 @@
         effective: [
           { term: 'Annual fee', val: '$600K / yr', src: 'Amendment 1', doc: 'Amendment 1', clause: '§2 Pricing', date: '2025-02-14', quote: 'Seats are increased from 250 to 400 and the annual fee is set at $600,000, billed annually in advance.', flag: '' },
           { term: 'Term / expiry', val: '3 yrs → expires 2027-08-01', src: 'Amendment 2', doc: 'Amendment 2', clause: '§1 Term', date: '2025-09-30', quote: 'The Term is extended from two (2) to three (3) years and now expires on 2027-08-01.', flag: '' },
-          { term: 'Renewal pricing', val: 'then-current list, UNCAPPED', src: 'Amendment 2', doc: 'Amendment 2', clause: '§3 Renewal', date: '2025-09-30', quote: 'Section 6 (Renewal) of the Base MSA is deleted and replaced: each renewal term prices at Acme\'s then-current list price. (Base MSA had capped renewals at CPI.)', flag: 'drift' },
+          { term: 'Renewal pricing', val: 'then-current list, UNCAPPED', src: 'Amendment 2', doc: 'Amendment 2', clause: '§3 Renewal', date: '2025-09-30', quote: 'Section 6 (Renewal) of the Base MSA is deleted and replaced: each renewal term prices at Visier\'s then-current list price. (Base MSA had capped renewals at CPI.)', flag: 'drift' },
           { term: 'Liability cap', val: '2× fees (PI breach inside cap)', src: 'Base MSA §4', doc: 'Base MSA', clause: '§4 Limitation of Liability', date: '2024-08-01', quote: 'Except for the excluded claims in §4.3, each party\'s aggregate liability shall not exceed two times (2x) the fees paid in the prior twelve (12) months. No PI carve-out was added.', flag: 'drift' },
-          { term: 'Sub-processors', val: 'notice-only', src: 'CO 3 · DPA', doc: 'Change Order 3 · DPA', clause: 'DPA clause 5', date: '2026-03-12', quote: 'Acme may engage sub-processors on prior written notice to Lilly; Lilly may object within ten (10) business days. (No prior-approval right.)', flag: 'drift' },
+          { term: 'Sub-processors', val: 'notice-only', src: 'CO 3 · DPA', doc: 'Change Order 3 · DPA', clause: 'DPA clause 5', date: '2026-03-12', quote: 'Visier may engage sub-processors on prior written notice to Lilly; Lilly may object within ten (10) business days. (No prior-approval right.)', flag: 'drift' },
           { term: 'Data protection', val: 'Lilly DPA + SCCs', src: 'CO 3', doc: 'Change Order 3', clause: 'DPA + Annex II', date: '2026-03-12', quote: 'The Lilly Data Processing Addendum and the EU Standard Contractual Clauses (module 2) are incorporated by reference for all processing of employee personal data.', flag: '' }
         ],
         conflicts: [
@@ -365,15 +365,15 @@
         { ob: 'Non-renewal notice window', type: 'Commercial', party: 'lilly', due: '2027-05-03', days: 111, win: 120, sev: 'high',
           d: '90-day non-renewal notice; the decision window opens 120 days before expiry. Miss it and the contract auto-renews at the uncapped list price.', cons: 'The contract auto-renews at the uncapped then-current list price for a full further term.', action: 'Calendar the 120-day window; decide renew / renegotiate / exit before 2027-05-03.', from: 'Uncapped renewal uplift', links: 'renewal', doc: 'Amendment 2', clause: '§3 Renewal', quote: 'Either party may give notice of non-renewal no later than ninety (90) days before the end of the then-current term.' },
         { ob: 'Sub-processor audit right', type: 'Legal', party: 'lilly', due: '2026-09-15', days: 81, win: 90, sev: 'med',
-          d: 'Annual audit right over Acme\'s sub-processors (DPA cl. 7). The exercise window opens in Q3.', cons: 'Un-audited sub-processors keep handling employee PI; residual data risk goes unchecked for another year.', action: 'Exercise the annual audit in Q3 (30-day written notice to Acme).', from: 'Sub-processors not controlled', links: 'contract', doc: 'Change Order 3 · DPA', clause: 'DPA clause 7', quote: 'Lilly may audit Acme\'s sub-processors no more than once per year on thirty (30) days written notice.' },
+          d: 'Annual audit right over Visier\'s sub-processors (DPA cl. 7). The exercise window opens in Q3.', cons: 'Un-audited sub-processors keep handling employee PI; residual data risk goes unchecked for another year.', action: 'Exercise the annual audit in Q3 (30-day written notice to Visier).', from: 'Sub-processors not controlled', links: 'contract', doc: 'Change Order 3 · DPA', clause: 'DPA clause 7', quote: 'Lilly may audit Visier\'s sub-processors no more than once per year on thirty (30) days written notice.' },
         { ob: 'SOC 2 Type II report', type: 'Legal', party: 'supplier', due: '2026-07-20', days: 24, win: 30, sev: 'low',
-          d: 'Annual SOC 2 Type II report due from Acme; chase if it is not received inside the 30-day window.', cons: 'No current assurance over Acme\'s controls; Lilly may suspend new processing until it is provided.', action: 'Chase Acme if the report is not received inside the 30-day window.', from: null, links: 'contract', doc: 'Base MSA', clause: '§9 Security', quote: 'Acme shall provide its current SOC 2 Type II report annually within thirty (30) days of issuance.' },
+          d: 'Annual SOC 2 Type II report due from Visier; chase if it is not received inside the 30-day window.', cons: 'No current assurance over Visier\'s controls; Lilly may suspend new processing until it is provided.', action: 'Chase Visier if the report is not received inside the 30-day window.', from: null, links: 'contract', doc: 'Base MSA', clause: '§9 Security', quote: 'Visier shall provide its current SOC 2 Type II report annually within thirty (30) days of issuance.' },
         { ob: 'Personal-data breach notification', type: 'Legal', party: 'supplier', due: null, timing: 'Within 24h of discovery', sev: 'high',
-          d: 'Acme must notify Lilly within 24 hours of a known personal-data breach. Event-triggered, no calendar date, but a hard 24-hour clock once discovered.', cons: 'Lilly cannot mitigate or meet its own regulator deadlines in time; regulatory and reputational harm.', action: 'Confirm the 24-hour breach-notification path is tested and single-owned on both sides.', from: 'Sub-processors not controlled', links: 'contract', doc: 'Change Order 3 · DPA', clause: 'DPA clause 9', quote: 'Acme shall notify Lilly without undue delay and in any event within twenty-four (24) hours of becoming aware of a Personal Data Breach.' },
+          d: 'Visier must notify Lilly within 24 hours of a known personal-data breach. Event-triggered, no calendar date, but a hard 24-hour clock once discovered.', cons: 'Lilly cannot mitigate or meet its own regulator deadlines in time; regulatory and reputational harm.', action: 'Confirm the 24-hour breach-notification path is tested and single-owned on both sides.', from: 'Sub-processors not controlled', links: 'contract', doc: 'Change Order 3 · DPA', clause: 'DPA clause 9', quote: 'Visier shall notify Lilly without undue delay and in any event within twenty-four (24) hours of becoming aware of a Personal Data Breach.' },
         { ob: 'Service-level review (QBR)', type: 'Performance', party: 'mutual', due: '2026-09-30', days: 96, win: 90, sev: 'low',
           d: 'Quarterly review of SLA attainment (uptime >= 99.5%, support response times). Two minor SLA misses in the last 12 months, no escalations.', cons: 'SLA drift goes unreviewed and earned service credits are never claimed.', action: 'Hold the quarterly review; log attainment and any credits due under Annex I.', from: null, links: null, doc: 'Base MSA', clause: '§5 Service Levels', quote: 'The parties shall meet quarterly to review service-level attainment; sustained breach triggers the service credits set out in Annex I.' },
         { ob: 'Insurance certificate refresh', type: 'Financial', party: 'supplier', due: '2026-08-01', days: 36, win: 60, sev: 'med',
-          d: 'Updated cyber + E&O certificates are due annually; the current certificate expires 2026-08-01.', cons: 'Coverage cannot be verified; potential uninsured exposure if an incident lands in the gap.', action: 'Request the refreshed cyber + E&O certificate before 2026-08-01.', from: null, links: null, doc: 'Base MSA', clause: '§12 Insurance', quote: 'Acme shall maintain cyber and E&O cover of not less than $5M and furnish certificates of insurance annually.' },
+          d: 'Updated cyber + E&O certificates are due annually; the current certificate expires 2026-08-01.', cons: 'Coverage cannot be verified; potential uninsured exposure if an incident lands in the gap.', action: 'Request the refreshed cyber + E&O certificate before 2026-08-01.', from: null, links: null, doc: 'Base MSA', clause: '§12 Insurance', quote: 'Visier shall maintain cyber and E&O cover of not less than $5M and furnish certificates of insurance annually.' },
         { ob: 'Annual fee true-up vs CPI cap', type: 'Financial', party: 'lilly', due: '2027-02-14', days: 231, win: 120, sev: 'low',
           d: 'On each anniversary, confirm any fee uplift stays within the negotiated cap (target: CPI or 3%). The current renewal term is uncapped until redlined.', cons: 'An uplift above the intended cap slips through; open-ended cost creep over the term.', action: 'On each anniversary, confirm the uplift stays within CPI / 3%.', from: 'Uncapped renewal uplift', links: 'savings', doc: 'Amendment 1', clause: '§2 Pricing', quote: 'Fees may be adjusted annually; any adjustment shall not exceed the cap in §2.3 (currently uncapped, pending amendment).' },
         { ob: 'Prompt payment of annual invoice', type: 'Financial', party: 'lilly', due: '2026-08-15', days: 50, win: 60, sev: 'low',
@@ -439,12 +439,12 @@
     // every one of these edits lands on the working copy, never this seed.
     // ======================================================================
     deal: {
-      cversions: { doc: 'MSA_Acme', repApproved: false, repApprover: 'Marc Lane', closed: false, versions: [
+      cversions: { doc: 'MSA_Visier', repApproved: false, repApprover: 'Marc Lane', closed: false, versions: [
         { v: 'v1', by: 'Lilly · Theo draft', actor: 'Theo (for Marc Lane)', side: 'lilly', chan: 'internal', date: '2026-06-24 14:02', note: 'Initial MSA on Lilly paper with 12 playbook redlines.', hash: 'a3f1c9', sp: 'SP 1.0', st: 'Sent' },
-        { v: 'v2', by: 'Acme', actor: 'Sam Rivera · Acme', side: 'supplier', chan: 'graph', date: '2026-06-26 09:18', note: 'Accepted 7, countered 5 (liability cap, sub-processors).', hash: '7b22e4', sp: 'SP 2.0', st: 'Received' },
+        { v: 'v2', by: 'Visier', actor: 'Sam Rivera · Visier', side: 'supplier', chan: 'graph', date: '2026-06-26 09:18', note: 'Accepted 7, countered 5 (liability cap, sub-processors).', hash: '7b22e4', sp: 'SP 2.0', st: 'Received' },
         { v: 'v3', by: 'Lilly · Theo redline', actor: 'Theo (for Marc Lane)', side: 'lilly', chan: 'internal', date: '2026-06-28 08:40', note: 'Held the 1x liability cap + PI carve-out; conceded the venue.', hash: 'f09a17', sp: 'SP 3.0', st: 'Current' }
       ] },
-      supplierContact: { name: 'Sam Rivera', email: 'sam@acme.ai', company: 'Acme Analytics' },
+      supplierContact: { name: 'Sam Rivera', email: 'sam@visier.com', company: 'Visier' },
       contractComments: [
         { who: 'Marc Lane', txt: 'Hold the 1x liability cap; do not signal any flexibility here.', aud: 'internal' },
         { who: 'Leah Carter', txt: 'Fallback on sub-processors is prior-approval, else a 10-day objection window.', aud: 'internal' },
@@ -458,18 +458,18 @@
       ],
       paper: { onSupplierPaper: true, deviations: [
         { sec: 'Limitation of liability', supplier: 'Mutual cap at 1x fees, no PI carve-out', lilly: '1x cap with PI-breach carved OUT of the cap', sev: 'high' },
-        { sec: 'IP ownership', supplier: 'Acme retains all models trained on Lilly data', lilly: 'Lilly owns outputs derived from Lilly data', sev: 'high' },
-        { sec: 'Data protection', supplier: 'Acme standard DPA', lilly: 'Lilly DPA + EU SCCs (employee PI)', sev: 'high' },
-        { sec: 'Governing law / venue', supplier: 'California (Acme home)', lilly: 'Delaware (neutral) or Indiana', sev: 'med' },
+        { sec: 'IP ownership', supplier: 'Visier retains all models trained on Lilly data', lilly: 'Lilly owns outputs derived from Lilly data', sev: 'high' },
+        { sec: 'Data protection', supplier: 'Visier standard DPA', lilly: 'Lilly DPA + EU SCCs (employee PI)', sev: 'high' },
+        { sec: 'Governing law / venue', supplier: 'Supplier home venue (illustrative)', lilly: 'Delaware (neutral) or Indiana', sev: 'med' },
         { sec: 'Termination', supplier: 'For cause only, 90-day cure', lilly: 'Adds termination for convenience, 30-day notice', sev: 'med' }
       ] },
       msas: [
-        { id: 'msa-acme-2024', name: 'Acme MSA (2024)', scope: 'Analytics + data services', status: 'Active', match: true, tied: true },
-        { id: 'msa-acme-emea', name: 'Acme MSA - EMEA (2023)', scope: 'EU entities only', status: 'Active', match: false, tied: false }
+        { id: 'msa-acme-2024', name: 'Visier MSA (2024)', scope: 'Analytics + data services', status: 'Active', match: true, tied: true },
+        { id: 'msa-acme-emea', name: 'Visier MSA - EMEA (2023)', scope: 'EU entities only', status: 'Active', match: false, tied: false }
       ],
-      inbound: { pending: true, from: { name: 'Sam Rivera', email: 'sam@acme.ai' }, received: 'today · 9:12 AM',
-        attachment: 'MSA_Acme_Acme-redline.docx', matchedProject: 'P-1042 · Acme Analytics',
-        matchBy: 'sender sam@acme.ai matches the Acme contact on this active project', onSupplierPaper: true }
+      inbound: { pending: true, from: { name: 'Sam Rivera', email: 'sam@visier.com' }, received: 'today · 9:12 AM',
+        attachment: 'MSA_Visier_Visier-redline.docx', matchedProject: 'P-1042 · Visier',
+        matchBy: 'sender sam@visier.com matches the Visier contact on this active project', onSupplierPaper: true }
     }
   };
 
@@ -480,7 +480,7 @@
   // Illustrative reflect-only mock; mutable literals land on the clone, seed stays pristine.
   // ======================================================================
   S.projectView.landscape = [
- {n:'Acme Analytics',id:'acme_a',incumbent:true,sub:'Incumbent candidate · sole-source under review',fit:88,fitc:'hi',
+ {n:'Visier',id:'acme_a',incumbent:true,sub:'Incumbent candidate · sole-source under review',fit:88,fitc:'hi',
   note:'Purpose-built AI employee-analytics platform; SOC 2 Type II (self-reported), Entra SSO, US hosting. Strongest functional fit; the only candidate already mapped to Lilly\'s HR data model.',
   tags:['credible public sources · not validated','SOC 2 (self-reported)','US · AWS'],
   reqFit:{people:5,integ:4,privacy:4,security:4,adoption:4,commercial:4},
@@ -491,9 +491,9 @@
   riskSubNarr:{security:{k_breach:'No public breach or material incident on record; a clean history holds this low.',k_cert:'SOC 2 Type II is self-reported and ISO 27001 is not held, the field-high certification watch, to be closed by an independent attestation before award.',k_pi:'Employee-PI handling is purpose-built and looks sound, with only routine residual exposure.',k_vuln:'Vulnerability management and pen-test cadence appear adequate for the estate.'},privacy:{kp_gdpr:'US-only hosting raises a GDPR transfer question for EU employee data that a DPA and SCCs would need to close.',kp_council:'Works-council / co-determination handling is unproven for a bespoke deployment; a mild elevated watch in EU entities.',kp_resid:'No EU data-residency region today; residency for EU employee data is the open privacy item.'},financial:{kf_scale:'A small, specialised vendor well under $100M on an illustrative external read; scale is the elevated factor.',kf_runway:'Venture-backed with adequate but not deep runway; a mild watch across a multi-year commitment.',kf_owner:'Independent, VC-backed ownership is stable but concentrated.'},lockin:{kl_portab:'The bespoke HR mapping should be made contractually portable so export is not blocked.',kl_exit:'Exit and data-egress terms are standard supplier paper and must be negotiated up front.',kl_eco:'A single specialised vendor for people analytics is a manageable concentration.'},support:{ks_sla:'SLA guarantees are workable today; specific uptime credits to be pinned in the schedule.',ks_cover:'24x7 global coverage should be validated beyond the current US business-hours pattern.',ks_ir:'Incident-response and RCA processes exist; RCA depth is the item to confirm.'}},
   financials:{revenue:'Illustrative: est. <$100M revenue (external estimate · not validated)',growth:'Illustrative: ~40% YoY (early-growth · not validated)',margin:'Illustrative: SaaS gross margin ~70% (not validated)',arr:'Illustrative: ARR in the tens of millions (not validated)',cash:'Illustrative: VC-backed; adequate runway (not validated)',guidance:'Private; no public guidance'},
   deepDive:{
-   overview:'Acme Analytics is a purpose-built AI employee-analytics / people-analytics platform, the incumbent candidate under a sole-source review. It already carries a bespoke mapping to Lilly\'s HR data model, which is the core reason the engagement is framed sole-source rather than competitive.',
-   identity:{legal:'Acme Analytics, Inc.',parent:'Independent / VC-backed (no ultimate parent)',ownership:'Private · VC-backed',ticker:null,jurisdiction:'Delaware, US',confidence:'Confirmed',delivery:'Managed cloud SaaS (US · AWS)'},
-   offerings:[{name:'Acme People Analytics',note:'Core workforce analytics and dashboards over an employee/org data model.'},{name:'Acme Attrition AI',note:'Predictive attrition / flight-risk and driver analysis.'},{name:'Acme DEI & Pay Equity',note:'Diversity, pay-equity and representation analytics.'},{name:'Acme Connect',note:'HRIS / ATS / payroll connectors and the Lilly HR-model mapping.'}],
+   overview:'Visier is a people / workforce-analytics platform (founded 2010, headquartered in Vancouver, British Columbia; privately held / VC-backed), used by large enterprises for workforce insight. Here it is the incumbent candidate under a sole-source review, already carrying a bespoke mapping to Lilly\'s HR data model, which is the core reason the engagement is framed sole-source rather than competitive.',
+   identity:{legal:'Visier Inc.',parent:'Independent / VC-backed (no ultimate parent)',ownership:'Private · VC-backed',ticker:null,jurisdiction:'British Columbia, Canada',confidence:'Confirmed',delivery:'Managed cloud SaaS (US · AWS)'},
+   offerings:[{name:'Visier People Analytics',note:'Core workforce analytics and dashboards over an employee/org data model.'},{name:'Visier Attrition AI',note:'Predictive attrition / flight-risk and driver analysis.'},{name:'Visier DEI & Pay Equity',note:'Diversity, pay-equity and representation analytics.'},{name:'Visier Connect',note:'HRIS / ATS / payroll connectors and the Lilly HR-model mapping.'}],
    news:[{date:'2026-04',headline:'Ships a natural-language "ask your workforce data" feature',note:'Illustrative; strengthens the self-service story.'},{date:'2026-01',headline:'Raises a growth round from existing VC backers',note:'Illustrative external read; not validated.'},{date:'2025-09',headline:'Still US-only hosting; EU region on the roadmap',note:'Illustrative; relevant to the residency watch.'}],
    lillyFit:{relation:'Active incumbent',strategic:'supports',pharma:'SOC 2 Type II is self-reported and ISO 27001 is not held; employee-PI and US/EU residency for EU staff would need a formal privacy screen before an expansion (a risk signal, not a routed screen).',value:'Deepest functional fit and the only vendor already mapped to Lilly\'s HR model; the next move is to close the certification and EU-residency gaps and benchmark the sole-source price before committing.'},
    whyLilly:'Strongest functional fit in the field and the only candidate already mapped to Lilly\'s HR data model, which is what makes a sole-source path defensible. The open items are an independent SOC 2 attestation, ISO 27001, and an EU data-residency story.',
@@ -649,14 +649,14 @@
  {key:'ip',title:'IP ownership (Lilly-derived outputs)',cat:'Legal',tier:'hold-firm',compliance:true,
   complianceNote:'The executed AI Standard §3.5 bars Lilly Content from cross-client model training. Deploy this citation to anchor the ownership ask across the package.',
   accept:'41% · N=19 (emerging AI clause)',confidence:'Med',
-  position:'Lilly owns outputs and derivatives created from Lilly data; Acme keeps its background models. No Lilly Content trains cross-client / General Use models.',
+  position:'Lilly owns outputs and derivatives created from Lilly data; Visier keeps its background models. No Lilly Content trains cross-client / General Use models.',
   target:'Lilly owns outputs derived from Lilly data',fallback:'Joint ownership of derived outputs',hs:'Supplier owns all models trained on Lilly data',
   args:['Call/HR data is Lilly Content under the AI Standard, not Usage Data.','AI Standard §3.5 bars Lilly Content as Supplier Training Content.','Client-dedicated tuning preserves accuracy without crossing into cross-client models.'],
   pushback:'Model training across clients is how we maintain platform accuracy.',
   rebuttal:'Client-dedicated model tuning preserves accuracy for Lilly without using Lilly Content for General Use models, which §3.5 prohibits.',
   tones:{
    Standard:'The WO is silent on ownership of models trained on Lilly data. We need Lilly to own outputs derived from Lilly data, with no Lilly Content used for cross-client models.',
-   Collaborative:'We want to make sure the IP terms honor the AI Standard we both signed. Could we confirm Lilly owns outputs derived from Lilly data, while Acme keeps its background models?',
+   Collaborative:'We want to make sure the IP terms honor the AI Standard we both signed. Could we confirm Lilly owns outputs derived from Lilly data, while Visier keeps its background models?',
    Aggressive:'The ownership gap is not acceptable. Add a clause: Lilly owns outputs and derivatives from Lilly data, and no Lilly Content trains General Use models. AI Standard §3.5 requires it.',
    Curious:'Which models do the Lilly-derived outputs improve today? The AI Standard treats our data as Lilly Content under §3.5 - can you confirm it never flows to cross-client models?',
    Astonished:'We are surprised the WO is silent on who owns models trained on Lilly data, given AI Standard §3.5 squarely bars Lilly Content from Supplier Training Content.'
@@ -670,7 +670,7 @@
   pushback:'Prior approval slows our operations; notice with an objection window is our standard.',
   rebuttal:'For employee PI, prior approval is the baseline; if speed is the concern, we can pre-approve a named list and require approval only for additions. The Lilly DPA and SCCs are non-negotiable.',
   tones:{
-   Standard:'MSA §11 lets Acme add sub-processors on notice only. Employee PI needs a prior-approval right plus an annual audit right under the Lilly DPA, with EU SCCs.',
+   Standard:'MSA §11 lets Visier add sub-processors on notice only. Employee PI needs a prior-approval right plus an annual audit right under the Lilly DPA, with EU SCCs.',
    Collaborative:'For employee PI we would like to align on prior approval for sub-processors and an annual audit right. Could we adopt the Lilly DPA and SCCs so we are both covered?',
    Aggressive:'Notice-only sub-processor rights are unacceptable for employee PI. Insert prior approval, an annual audit right, the Lilly DPA and EU SCCs. This is non-negotiable.',
    Curious:'How do you vet new sub-processors today? For employee PI we need prior approval rather than an objection window - can you accommodate the Lilly DPA and SCCs?',
@@ -694,7 +694,7 @@
   accept:'52% · N=61 (discount acceptance at this band)',confidence:'Med',
   position:'Target $540K/yr on a 3-year lock. A higher fee is only on the table against a stronger PI-breach cap or a longer term.',
   target:'$540K/yr (3-yr lock)',fallback:'$600K with a year-1 ramp credit',hs:'> $640K/yr',
-  args:['The 3-year, multi-entity commitment is the value Acme is buying - price against that.','Our benchmark target is $540K/yr; the ask sits above the market band.','The marquee case-study value is a non-cash concession Acme gains.'],
+  args:['The 3-year, multi-entity commitment is the value Visier is buying - price against that.','Our benchmark target is $540K/yr; the ask sits above the market band.','The marquee case-study value is a non-cash concession Visier gains.'],
   pushback:'The platform scope and the bespoke HR data mapping justify the premium.',
   rebuttal:'We recognize the mapping effort - trade it against the 3-year lock or a stronger PI-breach cap, not a higher steady-state fee. Fallback is $600K with a year-1 ramp credit.',
   tones:{
@@ -708,7 +708,7 @@
   accept:'71% · N=52',confidence:'High',
   position:'3-year term with a 30-day termination for convenience, added to the MSA for-cause framework. The multi-year commitment is the trade currency for price.',
   target:'3 yrs + 30-day termination for convenience',fallback:'2 yrs + 60-day notice',hs:'No convenience exit',
-  args:['A 3-year commitment is real, bankable value for Acme; it earns the convenience exit.','30-day notice is standard for a SaaS engagement of this profile.','Lilly needs an orderly exit path if strategy or scope changes.'],
+  args:['A 3-year commitment is real, bankable value for Visier; it earns the convenience exit.','30-day notice is standard for a SaaS engagement of this profile.','Lilly needs an orderly exit path if strategy or scope changes.'],
   pushback:'A convenience exit undermines the revenue certainty the multi-year term gives us.',
   rebuttal:'The 3-year commitment already gives you certainty; a 30-day convenience exit with notice is a normal counterbalance. Fallback is 2 years with 60-day notice.',
   tones:{
@@ -726,17 +726,17 @@
   pushback:'Our standard contracts specify our home venue.',
   rebuttal:'Understood - this is low priority for us and a candidate to concede for goodwill if you hold firm.',
   tones:{
-   Standard:'MSA §18 specifies Acme home venue. We prefer a neutral venue such as Delaware, but this is a low-priority point.',
+   Standard:'MSA §18 specifies Visier home venue. We prefer a neutral venue such as Delaware, but this is a low-priority point.',
    Collaborative:'A neutral venue like Delaware would suit us both. That said, this is not a sticking point and we can be flexible.',
-   Aggressive:'We would prefer a neutral Delaware venue over Acme home turf, though we are not going to hold the deal on it.',
+   Aggressive:'We would prefer a neutral Delaware venue over Visier home turf, though we are not going to hold the deal on it.',
    Curious:'Is there a reason venue is set to your home courts? A neutral Delaware forum would work - but happy to hear your view.',
-   Astonished:'We noticed venue defaults to Acme home courts; a neutral forum is more typical, though this is minor.'
+   Astonished:'We noticed venue defaults to Visier home courts; a neutral forum is more typical, though this is minor.'
   }},
  {key:'confid',title:'Confidentiality / NDA scope',cat:'Legal',msaCovered:true,
-  msaRef:'Acme MSA §12 (Confidentiality)',
+  msaRef:'Visier MSA §12 (Confidentiality)',
   msaNote:'The executed MSA sets mutual confidentiality with survival for personal information. No separate WO position is needed.'},
  {key:'audit',title:'Audit & records rights',cat:'Data-protection',msaCovered:true,
-  msaRef:'Acme MSA §14 (Audit & Records)',
+  msaRef:'Visier MSA §14 (Audit & Records)',
   msaNote:'The MSA already grants Lilly annual audit and records-inspection rights; a WO audit position would duplicate coverage.'}
 ],
     seq: [
@@ -747,28 +747,28 @@
   moves:['If the fee is resisted: move to $600K with a year-1 ramp credit, traded for the 3-year lock.','If the renewal cap is resisted: accept a fixed year-1 renewal price rather than then-current list.','If IP ownership is resisted: accept joint ownership of derived outputs.','If prior-approval on sub-processors is resisted: accept notice + a 10-business-day objection right - but never drop the Lilly DPA or SCCs.'],
   risk:'Low-Medium. Hold the two red lines (PI-breach carve-out, Lilly DPA/SCCs) regardless of commercial movement.'},
  {cls:'r3',title:'Round 3 · Escalate the red lines',obj:'If the two red lines remain open, escalate rather than concede them.',
-  moves:['Escalate the PI-breach liability carve-out and the Lilly DPA/SCCs to the Contracts COE.','Offer a separate, higher PI-breach cap tied to Acme cyber-policy limits as the only movement on liability.','Pause the signature step until the red lines resolve; nothing binds Lilly before execution.'],
+  moves:['Escalate the PI-breach liability carve-out and the Lilly DPA/SCCs to the Contracts COE.','Offer a separate, higher PI-breach cap tied to Visier cyber-policy limits as the only movement on liability.','Pause the signature step until the red lines resolve; nothing binds Lilly before execution.'],
   risk:'Medium. These positions are compliance-grounded; do not trade them for commercial terms.'}
 ],
     batna: {
  head:'BATNA / escalation path',
- body:'This is a sole-source continuation for a marquee, multi-year, multi-entity Acme engagement - no vendor switch is contemplated. Lilly leverage: the 3-year commitment, the multi-entity expansion roadmap, and the public case-study value Acme wants; Acme leverage: switching cost and the bespoke HR data mapping. If Acme refuses the PI-breach carve-out or the Lilly DPA/SCCs, escalate through the Contracts COE to the Global Procurement Attorney and, if needed, Acme GC. The AI Standard §3.5 and Lilly DPA positions are contractually grounded and backed by Mailbox_Privacy_Contracts. Overall leverage: Moderate-to-strong on Lilly side.'
+ body:'This is a sole-source continuation for a marquee, multi-year, multi-entity Visier engagement - no vendor switch is contemplated. Lilly leverage: the 3-year commitment, the multi-entity expansion roadmap, and the public case-study value Visier wants; Visier leverage: switching cost and the bespoke HR data mapping. If Visier refuses the PI-breach carve-out or the Lilly DPA/SCCs, escalate through the Contracts COE to the Global Procurement Attorney and, if needed, Visier GC. The AI Standard §3.5 and Lilly DPA positions are contractually grounded and backed by Mailbox_Privacy_Contracts. Overall leverage: Moderate-to-strong on Lilly side.'
 },
     sme: [
  {name:'Legal AIPC / Privacy Contracts',mail:'Mailbox_Privacy_Contracts@lilly.com',tag:'Standard',
   from:['Sub-processors / data','IP ownership'],
   topic:'Sub-processor control and Lilly DPA/SCCs for employee PI; AI Standard §3.5 on Lilly-derived models.',
-  brief:'This Acme engagement processes employee personal information through an AI analytics platform. The base MSA §11 lets Acme add sub-processors on notice only, and Change Order 3 (DPA clause 5) gives Lilly a 10-day objection but no prior-approval right. For employee PI we need prior approval plus an annual audit right under the Lilly DPA, with EU SCCs. Separately, AI Standard §3.5 bars Lilly Content from being used as Supplier Training Content, which grounds the ask that Lilly own outputs derived from Lilly data and that no Lilly Content trains cross-client models. Please confirm the interpretation and review the proposed clause language before Round 1.',
+  brief:'This Visier engagement processes employee personal information through an AI analytics platform. The base MSA §11 lets Visier add sub-processors on notice only, and Change Order 3 (DPA clause 5) gives Lilly a 10-day objection but no prior-approval right. For employee PI we need prior approval plus an annual audit right under the Lilly DPA, with EU SCCs. Separately, AI Standard §3.5 bars Lilly Content from being used as Supplier Training Content, which grounds the ask that Lilly own outputs derived from Lilly data and that no Lilly Content trains cross-client models. Please confirm the interpretation and review the proposed clause language before Round 1.',
   asks:['Confirm the prior-approval + annual-audit position for sub-processors is required for employee PI.','Confirm AI Standard §3.5 supports Lilly ownership of Lilly-derived outputs and the no-cross-client-training restriction.','Advise whether the Lilly DPA + EU SCCs must attach to the WO or can be incorporated by reference.']},
  {name:'Global Procurement Attorney',mail:'Mailbox_Legal_Contracts@lilly.com',tag:'Standard',
   from:['Liability cap','Term & exit'],
   topic:'PI-breach liability carve-out from the §4 cap; termination-for-convenience terms.',
-  brief:'MSA §4 caps aggregate liability at 2x fees and currently applies the same cap to a personal-data breach. Lilly playbook LP-04 requires PI-breach liability to sit outside the general cap because regulatory exposure for an employee-PI breach routinely exceeds 2x annual fees. We plan to hold the PI-breach carve-out as a red line and, if resisted, offer a separate higher PI-breach cap tied to Acme cyber-policy limits rather than a fully uncapped position. We also want to add a 30-day termination for convenience to the MSA for-cause framework. Please review the carve-out language and the convenience-exit wording.',
-  asks:['Confirm the PI-breach carve-out from the §4 cap is a hold-firm red line for this data type.','Advise on an acceptable separate PI-breach cap tied to Acme cyber-policy limits as the fallback.','Review the 30-day termination-for-convenience clause against the MSA for-cause framework.']},
+  brief:'MSA §4 caps aggregate liability at 2x fees and currently applies the same cap to a personal-data breach. Lilly playbook LP-04 requires PI-breach liability to sit outside the general cap because regulatory exposure for an employee-PI breach routinely exceeds 2x annual fees. We plan to hold the PI-breach carve-out as a red line and, if resisted, offer a separate higher PI-breach cap tied to Visier cyber-policy limits rather than a fully uncapped position. We also want to add a 30-day termination for convenience to the MSA for-cause framework. Please review the carve-out language and the convenience-exit wording.',
+  asks:['Confirm the PI-breach carve-out from the §4 cap is a hold-firm red line for this data type.','Advise on an acceptable separate PI-breach cap tied to Visier cyber-policy limits as the fallback.','Review the 30-day termination-for-convenience clause against the MSA for-cause framework.']},
  {name:'Cyber ISS Review',mail:'Cyber_ISS_Review@lilly.com',tag:'Standard',
   from:['Sub-processors / data'],
   topic:'SFTP/API integration security and the data-escrow decision for employee-PI data flows.',
-  brief:'The engagement moves employee-PI records to Acme via SFTP/API into a cloud-hosted analytics platform. Given the volume and sensitivity, we need Cyber to confirm the integration meets ISS requirements and to weigh the data-escrow decision. This informs the sub-processor and data-protection positions above - if residual risk is high, prior-approval on sub-processors becomes non-negotiable. Please review before we set the Round 1 data-protection asks.',
+  brief:'The engagement moves employee-PI records to Visier via SFTP/API into a cloud-hosted analytics platform. Given the volume and sensitivity, we need Cyber to confirm the integration meets ISS requirements and to weigh the data-escrow decision. This informs the sub-processor and data-protection positions above - if residual risk is high, prior-approval on sub-processors becomes non-negotiable. Please review before we set the Round 1 data-protection asks.',
   asks:['Confirm the SFTP/API integration meets ISS requirements per MSA §3.2.3.','Advise whether a data-escrow arrangement is appropriate for this data volume and sensitivity.','Flag any residual risk that should harden the sub-processor prior-approval position.']}
 ]
   };
@@ -834,8 +834,8 @@
  {ask:'Hold premium support at $55K/yr target',why:'In line with market; do not trade it away for a headline license cut.',impact:15000,prio:'Med'}
 ],
     trades: [
- {give:'3-year term lock',gv:'Revenue certainty, high value to Acme (non-cash to Lilly)',get:'License step-down to $1,300/seat',getv:240000},
- {give:'Public case study + logo',gv:'Marketing value to Acme (non-cash)',get:'Implementation fixed-fee cap',getv:35000},
+ {give:'3-year term lock',gv:'Revenue certainty, high value to Visier (non-cash to Lilly)',get:'License step-down to $1,300/seat',getv:240000},
+ {give:'Public case study + logo',gv:'Marketing value to Visier (non-cash)',get:'Implementation fixed-fee cap',getv:35000},
  {give:'Faster payment (Net-30 from Net-45)',gv:'~$4K/yr cost of capital to Lilly',get:'2–3% headline discount',getv:54000},
  {give:'Drop the sandbox / non-prod tier',gv:'Scope trim (low value to Lilly)',get:'Hold the per-seat rate at target',getv:15000}
 ],
@@ -877,7 +877,7 @@
   sub:'Hold premium support at the $55K/yr target.',sav:5000,y1f:1,prot:1}
 ],
     email: {
- subject:'Acme Analytics, Work Order pricing & terms (Lilly review)',
+ subject:'Visier, Work Order pricing & terms (Lilly review)',
  asks:[
   'Per-seat license at $1,300 on the 3-year lock (from $1,500)',
   'Implementation at an $85K fixed-fee cap, replacing the $185/hr overflow',
@@ -924,7 +924,7 @@
  {k:'Performance SLAs met',ok:true,note:'Uptime and support within tolerance; no open credits.'}
 ]},
     rateCards: {
- 'Acme Analytics':{contract:'MSA-ACME-2026',expires:'2029-01-31',
+ 'Visier':{contract:'MSA-VISIER-2026',expires:'2029-01-31',
   note:'Rates locked for the 3-year MSA term; the annual rate-card true-up against market is a tracked obligation.',
   lines:[
    {item:'Platform subscription (per seat)',rate:'$1,500 / seat / yr',unit:'per seat, annual'},
@@ -957,55 +957,55 @@
   };
   S.projectView.docsComms = {
     commLog: [
- {id:'cm-1',date:'2026-06-28',time:'2:14 PM',channel:'email',topic:'pricing',facing:'supplier-facing',sentiment:'neu',state:'included',parties:['Sam Okoro (Acme)','Marc Lane'],subject:'Revised pricing for the 3-yr term',summary:'Acme sent a revised quote holding the per-seat rate but adding a 3% annual uplift.',detail:'Acme returned a revised pricing sheet after the last call. The per-seat rate holds at $1,500 but they added a 3% annual uplift and a longer payment term. Flagged for the ZOPA.'},
- {id:'cm-7',date:'2026-06-26',time:'9:02 AM',channel:'teams',topic:'pricing',facing:'supplier-facing',sentiment:'neu',state:'included',parties:['Sam Okoro (Acme)','Marc Lane'],subject:'Heads-up: revised quote on its way',summary:'Teams message from Acme flagging the revised pricing sheet would follow by email.',detail:'A short Teams message from Acme letting the team know the revised quote was coming by email later that day. Logged for the record.'},
- {id:'cm-2',date:'2026-06-22',time:'10:30 AM',channel:'meeting',topic:'negotiation',facing:'supplier-facing',sentiment:'pos',state:'included',parties:['Sam Okoro (Acme)','Marc Lane','Priya Shah'],subject:'Kickoff negotiation call',summary:'Constructive kickoff; agreed to exchange the security questionnaire and a revised quote.',detail:'First negotiation call. Tone constructive. Acme agreed to return the security questionnaire and a revised quote within the week. No commitments on price yet.'},
- {id:'cm-3',date:'2026-06-15',time:'4:48 PM',channel:'email',topic:'security',facing:'supplier-facing',sentiment:'neu',state:'included',parties:['Marc Lane','Sam Okoro (Acme)'],subject:'Security questionnaire request',summary:'Sent the WwTP security questionnaire; asked for the SOC 2 report and data-residency confirmation.',detail:'Sent Acme the security questionnaire on behalf of the WwTP review. Requested the current SOC 2 Type II report and written confirmation of US data residency.'},
- {id:'cm-4',date:'2026-06-10',time:'11:05 AM',channel:'email',topic:'legal',facing:'supplier-facing',sentiment:'neg',unresolved:true,deadline:'2026-06-20',state:'included',parties:['Dana Kim (Acme Legal)','Marc Lane'],subject:'Pushback on the AI addendum',summary:'Acme legal pushed back on the AI addendum language; the thread is unresolved past its deadline.',detail:'Acme legal objected to the standalone AI addendum, proposing to fold the terms into the MSA body. No agreement reached; the thread is past the stated response deadline and needs a reply.'},
- {id:'cm-5',date:'2026-05-30',time:'1:20 PM',channel:'meeting',topic:'commitment',facing:'supplier-facing',sentiment:'pos',state:'included',parties:['Sam Okoro (Acme)','Marc Lane'],subject:'Implementation scoping',summary:'Acme committed to a fixed implementation scope; logged as a commitment, not yet in the contract.',detail:'Scoping call. Acme committed verbally to a fixed implementation fee if signed by quarter end. Logged as a commitment for the contract; not yet papered.'},
- {id:'cm-6',date:'2026-04-15',time:'6:41 PM',channel:'call',topic:'relationship',facing:'supplier-facing',sentiment:'neu',offChannel:true,state:'included',parties:['Sam Okoro (Acme)','Marc Lane'],subject:'Personal-line call',summary:'Brief call on a personal line; flagged as off the procurement-controlled channel.',detail:'A short call reportedly took place on a personal line rather than the procurement-controlled channel. Off-channel contact is a communications-discipline concern; routed to the rep, the Lead, and Legal. Surface-only, nothing adjudicated.'},
+ {id:'cm-1',date:'2026-06-28',time:'2:14 PM',channel:'email',topic:'pricing',facing:'supplier-facing',sentiment:'neu',state:'included',parties:['Sam Okoro (Visier)','Marc Lane'],subject:'Revised pricing for the 3-yr term',summary:'Visier sent a revised quote holding the per-seat rate but adding a 3% annual uplift.',detail:'Visier returned a revised pricing sheet after the last call. The per-seat rate holds at $1,500 but they added a 3% annual uplift and a longer payment term. Flagged for the ZOPA.'},
+ {id:'cm-7',date:'2026-06-26',time:'9:02 AM',channel:'teams',topic:'pricing',facing:'supplier-facing',sentiment:'neu',state:'included',parties:['Sam Okoro (Visier)','Marc Lane'],subject:'Heads-up: revised quote on its way',summary:'Teams message from Visier flagging the revised pricing sheet would follow by email.',detail:'A short Teams message from Visier letting the team know the revised quote was coming by email later that day. Logged for the record.'},
+ {id:'cm-2',date:'2026-06-22',time:'10:30 AM',channel:'meeting',topic:'negotiation',facing:'supplier-facing',sentiment:'pos',state:'included',parties:['Sam Okoro (Visier)','Marc Lane','Priya Shah'],subject:'Kickoff negotiation call',summary:'Constructive kickoff; agreed to exchange the security questionnaire and a revised quote.',detail:'First negotiation call. Tone constructive. Visier agreed to return the security questionnaire and a revised quote within the week. No commitments on price yet.'},
+ {id:'cm-3',date:'2026-06-15',time:'4:48 PM',channel:'email',topic:'security',facing:'supplier-facing',sentiment:'neu',state:'included',parties:['Marc Lane','Sam Okoro (Visier)'],subject:'Security questionnaire request',summary:'Sent the WwTP security questionnaire; asked for the SOC 2 report and data-residency confirmation.',detail:'Sent Visier the security questionnaire on behalf of the WwTP review. Requested the current SOC 2 Type II report and written confirmation of US data residency.'},
+ {id:'cm-4',date:'2026-06-10',time:'11:05 AM',channel:'email',topic:'legal',facing:'supplier-facing',sentiment:'neg',unresolved:true,deadline:'2026-06-20',state:'included',parties:['Dana Kim (Visier Legal)','Marc Lane'],subject:'Pushback on the AI addendum',summary:'Visier legal pushed back on the AI addendum language; the thread is unresolved past its deadline.',detail:'Visier legal objected to the standalone AI addendum, proposing to fold the terms into the MSA body. No agreement reached; the thread is past the stated response deadline and needs a reply.'},
+ {id:'cm-5',date:'2026-05-30',time:'1:20 PM',channel:'meeting',topic:'commitment',facing:'supplier-facing',sentiment:'pos',state:'included',parties:['Sam Okoro (Visier)','Marc Lane'],subject:'Implementation scoping',summary:'Visier committed to a fixed implementation scope; logged as a commitment, not yet in the contract.',detail:'Scoping call. Visier committed verbally to a fixed implementation fee if signed by quarter end. Logged as a commitment for the contract; not yet papered.'},
+ {id:'cm-6',date:'2026-04-15',time:'6:41 PM',channel:'call',topic:'relationship',facing:'supplier-facing',sentiment:'neu',offChannel:true,state:'included',parties:['Sam Okoro (Visier)','Marc Lane'],subject:'Personal-line call',summary:'Brief call on a personal line; flagged as off the procurement-controlled channel.',detail:'A short call reportedly took place on a personal line rather than the procurement-controlled channel. Off-channel contact is a communications-discipline concern; routed to the rep, the Lead, and Legal. Surface-only, nothing adjudicated.'},
  // ---- Review queue: candidates Theo surfaced but did NOT auto-include. Human-gated (Add / Skip). ----
- {id:'cm-c1',date:'2026-06-25',time:'8:57 AM',channel:'email',topic:'relationship',facing:'internal',sentiment:'neg',state:'candidate',personal:true,parties:['Priya Shah','Marc Lane'],subject:'Re: honestly, Jordan is hard to work with on this',summary:'Internal note venting about a teammate; mentions the Acme RFx deadline in a single line.',detail:'This internal email is largely a personal complaint about a colleague’s working style. It happens to reference the Acme RFx deadline in one line, which is why it surfaced. Theo held it as a candidate rather than filing it to the supplier record, it reads personal and its bearing on the RFx is marginal. A human decides whether it belongs here.'},
- {id:'cm-c2',date:'2026-06-20',time:'3:12 PM',channel:'teams',topic:'relationship',facing:'internal',sentiment:'neu',state:'candidate',parties:['Dev Rao','Marc Lane'],subject:'Did you see Acme in the analyst round-up?',summary:'Teams message forwarding an analyst round-up that name-checks Acme; relevance to this RFx is unclear.',detail:'A colleague forwarded an analyst round-up that mentions Acme among several vendors. It may or may not bear on this sourcing event. Held as a candidate for a human to decide rather than auto-filed.'}
+ {id:'cm-c1',date:'2026-06-25',time:'8:57 AM',channel:'email',topic:'relationship',facing:'internal',sentiment:'neg',state:'candidate',personal:true,parties:['Priya Shah','Marc Lane'],subject:'Re: honestly, Jordan is hard to work with on this',summary:'Internal note venting about a teammate; mentions the Visier RFx deadline in a single line.',detail:'This internal email is largely a personal complaint about a colleague’s working style. It happens to reference the Visier RFx deadline in one line, which is why it surfaced. Theo held it as a candidate rather than filing it to the supplier record, it reads personal and its bearing on the RFx is marginal. A human decides whether it belongs here.'},
+ {id:'cm-c2',date:'2026-06-20',time:'3:12 PM',channel:'teams',topic:'relationship',facing:'internal',sentiment:'neu',state:'candidate',parties:['Dev Rao','Marc Lane'],subject:'Did you see Visier in the analyst round-up?',summary:'Teams message forwarding an analyst round-up that name-checks Visier; relevance to this RFx is unclear.',detail:'A colleague forwarded an analyst round-up that mentions Visier among several vendors. It may or may not bear on this sourcing event. Held as a candidate for a human to decide rather than auto-filed.'}
 ]
   };
   S.projectView.boot = {
     tree: [
  {f:'Contracts',files:[
-   {n:'MSA_Acme_draft_v3.docx',c:'DOC',st:'In review',cls:'draft',created:'2026-06-24',modified:'2026-06-27',ret:{c:'WORKING',p:'working copy - no long-term retention (supersede on execution)'},desc:'Working draft of the Acme master services agreement, in Legal review against the Lilly playbook; a working copy that supersedes once the contract is executed.'}
+   {n:'MSA_Visier_draft_v3.docx',c:'DOC',st:'In review',cls:'draft',created:'2026-06-24',modified:'2026-06-27',ret:{c:'WORKING',p:'working copy - no long-term retention (supersede on execution)'},desc:'Working draft of the Visier master services agreement, in Legal review against the Lilly playbook; a working copy that supersedes once the contract is executed.'}
  ],sub:[
    {f:'Executed',files:[],sub:[
      {f:'2024',files:[
-       {n:'MSA_Acme_2024_executed.pdf',c:'PDF',st:'Executed',tier:'cold',created:'2024-03-14',modified:'2024-03-14',ret:{c:'CONTRACT-ACTIVE',p:'retain 10 years post-expiration'},desc:'Fully executed 2024 Acme master agreement with both signatures, the governing contract of record; archived to cold storage and retained 10 years post-expiration.'}
+       {n:'MSA_Visier_2024_executed.pdf',c:'PDF',st:'Executed',tier:'cold',created:'2024-03-14',modified:'2024-03-14',ret:{c:'CONTRACT-ACTIVE',p:'retain 10 years post-expiration'},desc:'Fully executed 2024 Visier master agreement with both signatures, the governing contract of record; archived to cold storage and retained 10 years post-expiration.'}
      ]}
    ]}
  ]},
  {f:'Sourcing',files:[],sub:[]},
  {f:'Onboarding',files:[
-   {n:'MSA_Acme_amendment1.docx',c:'DOC',st:'Filed',created:'2026-05-30',modified:'2026-05-30',ret:{c:'CONTRACT-ACTIVE',p:'retain 10 years post-expiration'},misfiled:{to:'Contracts',why:'A contract amendment is sitting in Onboarding. By name and content (an MSA amendment) it belongs in Contracts, with the master agreement.'},desc:'First amendment to the Acme master agreement. Currently filed under Onboarding but reads as a Contracts record, so it is flagged as possibly misfiled.'}
+   {n:'MSA_Visier_amendment1.docx',c:'DOC',st:'Filed',created:'2026-05-30',modified:'2026-05-30',ret:{c:'CONTRACT-ACTIVE',p:'retain 10 years post-expiration'},misfiled:{to:'Contracts',why:'A contract amendment is sitting in Onboarding. By name and content (an MSA amendment) it belongs in Contracts, with the master agreement.'},desc:'First amendment to the Visier master agreement. Currently filed under Onboarding but reads as a Contracts record, so it is flagged as possibly misfiled.'}
  ],sub:[
    {f:'Screening',files:[
-     {n:'Acme_W-9.pdf',c:'PDF',st:'Filed',created:'2026-06-10',modified:'2026-06-10',ret:{c:'COMPLIANCE-EVIDENCE',p:'retain per the underlying obligation'},desc:'Supplier W-9 tax form collected during onboarding; retained as compliance evidence per the underlying obligation.'},
-     {n:'Acme_SOC2.pdf',c:'PDF',st:'Filed',created:'2026-06-11',modified:'2026-06-11',ret:{c:'COMPLIANCE-EVIDENCE',p:'retain per the underlying obligation'},desc:'Acme SOC 2 Type II attestation supplied for the Cyber security review as third-party assurance evidence.'}
+     {n:'Visier_W-9.pdf',c:'PDF',st:'Filed',created:'2026-06-10',modified:'2026-06-10',ret:{c:'COMPLIANCE-EVIDENCE',p:'retain per the underlying obligation'},desc:'Supplier W-9 tax form collected during onboarding; retained as compliance evidence per the underlying obligation.'},
+     {n:'Visier_SOC2.pdf',c:'PDF',st:'Filed',created:'2026-06-11',modified:'2026-06-11',ret:{c:'COMPLIANCE-EVIDENCE',p:'retain per the underlying obligation'},desc:'Visier SOC 2 Type II attestation supplied for the Cyber security review as third-party assurance evidence.'}
    ]}
  ]},
  {f:'Reviews',files:[
    {n:'ISS_security_questionnaire.docx',c:'DOC',st:'Awaiting',cls:'need',created:'2026-06-20',modified:'2026-06-26',ret:{c:'COMPLIANCE-EVIDENCE',p:'retain per the underlying obligation'},desc:'Information Security questionnaire awaiting the supplier response; the Cyber review gate depends on it before it can clear.'}
  ]},
  {f:'Risk & deviation approvals',files:[
-   {n:'Risk_acceptance_Acme_residual.docx',c:'DOC',st:'Draft',cls:'draft',created:'2026-06-25',modified:'2026-06-28',ret:{c:'WORKING',p:'working copy - no long-term retention (supersede on execution)'},desc:'Draft risk-acceptance memo for the residual Cyber finding, prepared for owner and Information Security sign-off.'},
+   {n:'Risk_acceptance_Visier_residual.docx',c:'DOC',st:'Draft',cls:'draft',created:'2026-06-25',modified:'2026-06-28',ret:{c:'WORKING',p:'working copy - no long-term retention (supersede on execution)'},desc:'Draft risk-acceptance memo for the residual Cyber finding, prepared for owner and Information Security sign-off.'},
    {n:'Policy_deviation_approval_request.pdf',c:'PDF',st:'Pending',cls:'need',created:'2026-06-22',modified:'2026-06-22',ret:{c:'COMPLIANCE-EVIDENCE',p:'retain per the underlying obligation'},desc:'Policy-deviation approval request pending review; retained as compliance evidence for the exception.'},
    {n:'Cross-border_SCC_TIA.pdf',c:'PDF',st:'Filed',created:'2026-06-18',modified:'2026-06-18',ret:{c:'COMPLIANCE-EVIDENCE',p:'retain per the underlying obligation'},desc:'Standard Contractual Clauses and transfer impact assessment covering the cross-border employee-PI transfer.'}
  ]},
  {f:'(root)',files:[
-   {n:'Acme_Analytics_Proposal.pdf',c:'PDF',st:'Filed',created:'2026-06-19',modified:'2026-06-21',ret:{c:'SOURCING-RECORD',p:'retain 7 years post-award'},desc:'Acme analytics proposal that seeded this engagement; retained as a sourcing record for 7 years post-award.'}
+   {n:'Visier_Analytics_Proposal.pdf',c:'PDF',st:'Filed',created:'2026-06-19',modified:'2026-06-21',ret:{c:'SOURCING-RECORD',p:'retain 7 years post-award'},desc:'Visier analytics proposal that seeded this engagement; retained as a sourcing record for 7 years post-award.'}
  ]}
 ],
     liveSla: [
  {n:'WwTP risk · supplier questionnaire',sys:'Aravo',node:'t-wwtp',el:9,sla:10,proj:12,st:'over',stt:'Overdue',note:'awaiting supplier',
-  wait:[{who:'Acme (supplier)',act:'Return the completed WwTP questionnaire'},{who:'Dan Reed · WwTP analyst',act:'Issue the residual-risk determination'}]},
+  wait:[{who:'Visier (supplier)',act:'Return the completed WwTP questionnaire'},{who:'Dan Reed · WwTP analyst',act:'Issue the residual-risk determination'}]},
  {n:'Cyber → ISS questionnaire',sys:'ServiceNow',node:'r-cyber',el:6,sla:8,proj:9,st:'warn',stt:'In danger',note:'out to supplier',
-  wait:[{who:'Acme (supplier)',act:'Complete the ISS security questionnaire'},{who:'James Wright · Security reviewer',act:'Review the responses and sign off'}]},
+  wait:[{who:'Visier (supplier)',act:'Complete the ISS security questionnaire'},{who:'James Wright · Security reviewer',act:'Review the responses and sign off'}]},
  {n:'Legal, MSA contractual review',sys:'LEAH',node:'r-legal',el:3,sla:7,proj:6,st:'ok',stt:'On track',note:'reviewing terms',
   wait:[{who:'Leah Carter · Legal counsel',act:'Finish the MSA terms review against the playbook'}]},
  {n:'Supplier enablement · SAP vendor ID',sys:'Ariba SLP',node:'t-enable',el:2,sla:12,proj:8,st:'ok',stt:'On track',note:'SAP vendor ID being issued',
@@ -1050,7 +1050,7 @@
     },
     sysData: {
  captured:[
-  ['Supplier','Acme Analytics (new) · US'],
+  ['Supplier','Visier (new) · US'],
   ['Need','AI employee-analytics platform · 400 seats · 3 yr'],
   ['Spend','$1.8M TCO ($600K / yr)'],
   ['CCI classification','Orange · employee PI'],
@@ -1059,27 +1059,27 @@
   ['Owner / Rep','Priya Shah / Marc Lane']
  ],
  systems:[
-  {sys:'Aravo',need:'Third-party risk (WwTP) record',ready:false,fields:[['Supplier legal name','Acme Analytics, Inc.','intake'],['Data types processed','Employee PI','intake'],['Hosting region','US (AWS us-east)','SOC 2'],['Sub-processor list','needed','gap']]},
-  {sys:'ServiceNow',need:'Security review (ISS) ticket',ready:false,fields:[['Engagement','Acme analytics platform','intake'],['Data classification','Orange','intake'],['SSO / SAML','Entra ID','proposal'],['Last pen-test date','needed','gap']]},
-  {sys:'Ariba',need:'Supplier (SLP) + PR record',ready:true,fields:[['Supplier','Acme Analytics','intake'],['Category','IT Services','intake'],['Spend band','$1.8M','intake'],['Payment terms','Net 45','proposal']]},
-  {sys:'SAP',need:'Vendor master ID',ready:false,fields:[['Legal name','Acme Analytics, Inc.','intake'],['Tax ID (W-9)','on file','onboarding'],['Remit-to address','needed','gap'],['Banking details','needed','gap']]},
-  {sys:'LEAH',need:'Contract (CLM) record',ready:true,fields:[['Counterparty','Acme Analytics','intake'],['Contract type','MSA + initial WO','intake'],['Governing MSA','Acme MSA (2024)','contract'],['Term','3 yr','proposal']]}
+  {sys:'Aravo',need:'Third-party risk (WwTP) record',ready:false,fields:[['Supplier legal name','Visier, Inc.','intake'],['Data types processed','Employee PI','intake'],['Hosting region','US (AWS us-east)','SOC 2'],['Sub-processor list','needed','gap']]},
+  {sys:'ServiceNow',need:'Security review (ISS) ticket',ready:false,fields:[['Engagement','Visier analytics platform','intake'],['Data classification','Orange','intake'],['SSO / SAML','Entra ID','proposal'],['Last pen-test date','needed','gap']]},
+  {sys:'Ariba',need:'Supplier (SLP) + PR record',ready:true,fields:[['Supplier','Visier','intake'],['Category','IT Services','intake'],['Spend band','$1.8M','intake'],['Payment terms','Net 45','proposal']]},
+  {sys:'SAP',need:'Vendor master ID',ready:false,fields:[['Legal name','Visier, Inc.','intake'],['Tax ID (W-9)','on file','onboarding'],['Remit-to address','needed','gap'],['Banking details','needed','gap']]},
+  {sys:'LEAH',need:'Contract (CLM) record',ready:true,fields:[['Counterparty','Visier','intake'],['Contract type','MSA + initial WO','intake'],['Governing MSA','Visier MSA (2024)','contract'],['Term','3 yr','proposal']]}
  ]
     },
     zopa: [
- {item:'Licenses (per seat / yr)',unit:'seat',lo:1150,med:1350,hi:1650,ask:1500,target:1300,walk:1450,cadence:'seat-yr',bench:'Platform subscription',read:'Top of range and above median; anchor to the target and trade a longer term for a per-seat step-down.',$src:{ask:[stub('Supplier per-seat license ask, Acme proposal (reflect-only)',1)]}},
+ {item:'Licenses (per seat / yr)',unit:'seat',lo:1150,med:1350,hi:1650,ask:1500,target:1300,walk:1450,cadence:'seat-yr',bench:'Platform subscription',read:'Top of range and above median; anchor to the target and trade a longer term for a per-seat step-down.',$src:{ask:[stub('Supplier per-seat license ask, Visier proposal (reflect-only)',1)]}},
  {item:'Implementation (one-time)',unit:'K',lo:70,med:90,hi:140,ask:120,target:85,walk:110,cadence:'one-time',bench:'Implementation (one-time)',read:'33% above median and highly negotiable; push toward the $85K target or a fixed-fee cap.'},
  {item:'Premium support (per yr)',unit:'K',lo:45,med:65,hi:85,ask:60,target:55,walk:70,cadence:'yr',bench:'Premium support',read:'In line with market; hold near target, do not trade it away for a headline license cut.'}
     ],
-    dealTco: { seats:400, years:3, $src:{ seats:[stub('Deal volume, Acme Work Order seat count (proposal)',1)], years:[stub('Deal term, 3-year MSA (proposal)',1)] } },
+    dealTco: { seats:400, years:3, $src:{ seats:[stub('Deal volume, Visier Work Order seat count (proposal)',1)], years:[stub('Deal term, 3-year MSA (proposal)',1)] } },
     issues: [
  {name:'Annual fee / unit price',cat:'Commercial',sev:'med',sec:'',neg:{target:'$540K/yr (3-yr lock)',fallback:'$600K with yr-1 ramp credit',hs:'> $640K/yr'},review:null},
  {name:'Liability cap',cat:'Legal',sev:'high',sec:'§4',neg:{target:'2x fees, no carve-out limit on PI breach',fallback:'1.5x fees, PI breach uncapped',hs:'< 1x fees'},review:{d:'§4 caps liability at 2x fees but applies the same cap to a personal-data breach.',fix:'Carve PI-breach liability out of the §4 cap (uncapped or a separate higher cap).',evidence:'"Except for the excluded claims in §4.3, each party\'s aggregate liability shall not exceed two times (2x) the fees paid in the prior twelve (12) months. No PI carve-out was added."',xref:'Base MSA §4 (Limitation of Liability); Lilly playbook LP-04',impact:'A personal-data breach could exceed the 2x-fees cap; the cap would limit Lilly\'s recovery for exactly the harm employee PI creates.',loc:'Base MSA §4, Limitation of Liability'},paper:{supplier:'Mutual cap at 1x fees, no PI carve-out',lilly:'1x cap with PI-breach carved OUT of the cap'}},
- {name:'IP ownership',cat:'Legal',sev:'high',sec:'',neg:{target:'Lilly owns outputs derived from Lilly data',fallback:'joint ownership of derived outputs',hs:'supplier owns all models trained on Lilly data'},review:{d:'The supplier retains all models trained on Lilly data; Lilly should own the outputs derived from Lilly data.',fix:'Add an IP clause: Lilly owns outputs and derivatives created from Lilly data.',evidence:'The Work Order is silent on ownership of models trained on Lilly data; MSA §9 grants Acme its background IP and does not assign Lilly-derived model outputs to Lilly.',xref:'Base MSA §9 (Intellectual Property); Work Order (silent)',impact:'Ambiguity over ownership of models and outputs derived from Lilly data; potential cross-client reuse of Lilly-tuned models.',loc:'Base MSA §9 / Work Order (no ownership clause)'},paper:{supplier:'Acme retains all models trained on Lilly data',lilly:'Lilly owns outputs derived from Lilly data'}},
- {name:'Sub-processors / data',cat:'Data-protection',sev:'high',sec:'§11',neg:{target:'Lilly DPA, prior-approval on sub-processors',fallback:'notice + objection right',hs:'no sub-processor control'},review:{d:'§11 lets the supplier appoint sub-processors with notice only; employee PI needs a prior-approval right.',fix:'Insert a prior-approval right plus an annual audit right (Lilly DPA cl. 7).',evidence:'"Acme may engage sub-processors on prior written notice to Lilly; Lilly may object within ten (10) business days." (No prior-approval right.)',xref:'Change Order 3 · DPA clause 5; Lilly DPA cl. 7 (audit right)',impact:'Acme can add a sub-processor over Lilly\'s objection; employee PI could reach an unvetted party before Lilly can act.',loc:'Change Order 3 · DPA clause 5'},paper:{supplier:'Acme standard DPA',lilly:'Lilly DPA + EU SCCs (employee PI)'}},
- {name:'Renewal pricing',cat:'Commercial',sev:'med',sec:'§3',neg:{target:'CPI-capped renewals (<= 3%)',fallback:'fixed yr-1 renewal',hs:'uncapped uplift'},review:{d:'§3 renews at then-current list price with no cap, exposing Lilly to open-ended increases.',fix:'Cap renewal uplift at CPI or 3%, whichever is lower.',evidence:'"Section 6 (Renewal) of the Base MSA is deleted and replaced: each renewal term prices at Acme\'s then-current list price." (Base MSA had capped renewals at CPI.)',xref:'Amendment 2 §3 (Renewal); Base MSA §6 (superseded)',impact:'Open-ended renewal uplift, the last indicative quote implied +9%; unbounded exposure across the 3-year term.',loc:'Amendment 2 §3 (replacing Base MSA §6)'}},
+ {name:'IP ownership',cat:'Legal',sev:'high',sec:'',neg:{target:'Lilly owns outputs derived from Lilly data',fallback:'joint ownership of derived outputs',hs:'supplier owns all models trained on Lilly data'},review:{d:'The supplier retains all models trained on Lilly data; Lilly should own the outputs derived from Lilly data.',fix:'Add an IP clause: Lilly owns outputs and derivatives created from Lilly data.',evidence:'The Work Order is silent on ownership of models trained on Lilly data; MSA §9 grants Visier its background IP and does not assign Lilly-derived model outputs to Lilly.',xref:'Base MSA §9 (Intellectual Property); Work Order (silent)',impact:'Ambiguity over ownership of models and outputs derived from Lilly data; potential cross-client reuse of Lilly-tuned models.',loc:'Base MSA §9 / Work Order (no ownership clause)'},paper:{supplier:'Visier retains all models trained on Lilly data',lilly:'Lilly owns outputs derived from Lilly data'}},
+ {name:'Sub-processors / data',cat:'Data-protection',sev:'high',sec:'§11',neg:{target:'Lilly DPA, prior-approval on sub-processors',fallback:'notice + objection right',hs:'no sub-processor control'},review:{d:'§11 lets the supplier appoint sub-processors with notice only; employee PI needs a prior-approval right.',fix:'Insert a prior-approval right plus an annual audit right (Lilly DPA cl. 7).',evidence:'"Visier may engage sub-processors on prior written notice to Lilly; Lilly may object within ten (10) business days." (No prior-approval right.)',xref:'Change Order 3 · DPA clause 5; Lilly DPA cl. 7 (audit right)',impact:'Visier can add a sub-processor over Lilly\'s objection; employee PI could reach an unvetted party before Lilly can act.',loc:'Change Order 3 · DPA clause 5'},paper:{supplier:'Visier standard DPA',lilly:'Lilly DPA + EU SCCs (employee PI)'}},
+ {name:'Renewal pricing',cat:'Commercial',sev:'med',sec:'§3',neg:{target:'CPI-capped renewals (<= 3%)',fallback:'fixed yr-1 renewal',hs:'uncapped uplift'},review:{d:'§3 renews at then-current list price with no cap, exposing Lilly to open-ended increases.',fix:'Cap renewal uplift at CPI or 3%, whichever is lower.',evidence:'"Section 6 (Renewal) of the Base MSA is deleted and replaced: each renewal term prices at Visier\'s then-current list price." (Base MSA had capped renewals at CPI.)',xref:'Amendment 2 §3 (Renewal); Base MSA §6 (superseded)',impact:'Open-ended renewal uplift, the last indicative quote implied +9%; unbounded exposure across the 3-year term.',loc:'Amendment 2 §3 (replacing Base MSA §6)'}},
  {name:'Term & exit',cat:'Legal',sev:'med',sec:'',neg:{target:'3 yrs + 30-day termination for convenience',fallback:'2 yrs + 60-day',hs:'no convenience exit'},review:null,paper:{supplier:'For cause only, 90-day cure',lilly:'Adds termination for convenience, 30-day notice'}},
- {name:'Governing-law venue',cat:'Legal',sev:'low',sec:'§18',neg:{target:'Neutral or Lilly-favourable venue',fallback:'supplier venue with carve-outs',hs:''},review:{d:'§18 specifies the supplier home venue; playbook prefers neutral or Lilly-favourable.',fix:'Propose a neutral venue (Delaware). Low priority.',evidence:'"§18 designates the courts of California (Acme\'s home venue) as the exclusive forum for disputes arising under this Agreement."',xref:'Base MSA §18 (Governing Law & Venue)',impact:'Disputes would be litigated on Acme\'s home turf; a minor cost and leverage disadvantage.',loc:'Base MSA §18'},paper:{supplier:'California (Acme home)',lilly:'Delaware (neutral) or Indiana'}}
+ {name:'Governing-law venue',cat:'Legal',sev:'low',sec:'§18',neg:{target:'Neutral or Lilly-favourable venue',fallback:'supplier venue with carve-outs',hs:''},review:{d:'§18 specifies the supplier home venue; playbook prefers neutral or Lilly-favourable.',fix:'Propose a neutral venue (Delaware). Low priority.',evidence:'"§18 designates the courts of British Columbia (Visier\'s home venue) as the exclusive forum for disputes arising under this Agreement."',xref:'Base MSA §18 (Governing Law & Venue)',impact:'Disputes would be litigated on Visier\'s home turf; a minor cost and leverage disadvantage.',loc:'Base MSA §18'},paper:{supplier:'British Columbia (Visier home)',lilly:'Delaware (neutral) or Indiana'}}
     ]
   };
 

@@ -146,12 +146,15 @@ try {
   anyFail = true;
 }
 
-// ---- 3-mode dealHTML() render ----
-const MODES = ['negotiate', 'proforma', 'review'];
+// ---- 5-mode dealHTML() render (approved IA: Overview / Strategy & Positions /
+// Pricing & Commercial / Pro-forma / Review) ----
+const MODES = ['overview', 'strategy', 'pricing', 'proforma', 'review'];
 const MARKERS = {
-  negotiate: /ZOPA|Position playbook|Negotiation strategy/,
-  proforma: /Pro-forma|Open full model/,
-  review: /Protection Score|Go\/No-Go|Findings/,
+  overview: /Go\/No-Go|Protection score|Total-deal ZOPA/i,
+  strategy: /Position playbook|Negotiation strategy|Red lines/i,
+  pricing: /ZOPA|Levers|Commercial analysis/i,
+  proforma: /Pro-forma|cashflow by year/i,
+  review: /Protection &amp; coverage|Go\/No-Go|Findings/i,
 };
 const modeHtml = {};
 

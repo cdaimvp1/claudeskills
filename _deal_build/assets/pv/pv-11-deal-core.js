@@ -234,6 +234,27 @@ function dealNegotiateExtras(){var N=pvData('deal.negprep',NEGPREP);ensureNegLeg
   negMsaCoveredHTML()+
   dealCommercialExtras();   // Wave 5b: Commercial analysis depth (items 7-10, 12), AFTER the legal blocks
 }
+// ── Deal sub-mode 1: STRATEGY & POSITIONS (the argument content) ──────────────
+// Negotiate breakout part 1 (approved IA): Negotiation Strategy with leverage +
+// talking points folded into one banner, Red Lines as a pinned strip, the Position
+// Playbook (with a group-by-tier view toggle that replaces the standalone Position
+// Map), Concession Sequencing + BATNA, and SME + MSA-covers collapsed on-demand.
+// Reflect-only; all quotes/briefs are drafts for the human, nothing is sent.
+function dealStrategyHTML(){
+ var N=pvData('deal.negprep',NEGPREP);ensureNegLegalCss();
+ var redstrip='<div class="sect ngredstrip"><div class="secthd"><div class="t">Red lines · do not cross</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">pinned · hold these</span></div><ul class="bullets">'+N.redlines.map(function(t){return '<li class="redline-li">'+escD(t)+'</li>';}).join('')+'</ul></div>';
+ var leverTalk='<div class="sect"><div class="secthd"><div class="t">Leverage &amp; talking points</div><a class="dlk" href="negotiation-practice.html" onclick="practicePreload();return false;" title="Preloads this project into the private practice sandbox">Practice this negotiation →</a></div>'
+  +'<p class="cnote">'+escD(N.leverage)+'</p>'
+  +'<ul class="bullets">'+N.talking.map(function(t){return '<li>'+escD(t)+'</li>';}).join('')+'</ul></div>';
+ var smeFold='<details class="dfold"><summary>SME pre-engagement · brief + numbered asks (route before Round 1)</summary>'+negSmeHTML()+'</details>';
+ return negStrategyHTML()+
+  redstrip+
+  leverTalk+
+  negPlaybookHTML()+
+  negSequencingHTML()+
+  smeFold+
+  negMsaCoveredHTML();
+}
 // Fold-in (Deal / Negotiation Strategy group): concession sequencing - give the
 // low-cost, high-value trades first, in order. Reflect-only; illustrative.
 function dealConcessionSeqHTML(){
@@ -351,7 +372,13 @@ function ensureNegLegalCss(){ if(document.getElementById('neg-legal-css'))return
  '.ngmsa-card{border:1px solid var(--line2,#E0DCD5);border-radius:10px;padding:10px 12px;margin-top:9px;background:var(--surface)}'+
  '.ngmsa-card .mt{font-weight:700;font-size:12.5px;color:var(--ink,#1A1A1A)}'+
  '.ngmsa-card .mr{font:600 11px var(--mono,monospace);color:var(--plum);margin:3px 0}'+
- '.ngmsa-card .mn{font-size:12px;line-height:1.45;color:var(--mut,#3E3933)}'
+ '.ngmsa-card .mn{font-size:12px;line-height:1.45;color:var(--mut,#3E3933)}'+
+ '.ngview-toggle{display:inline-flex;gap:6px}'+
+ '.ngredstrip .bullets{margin:0}.ngredstrip{border-left:3px solid #C8202E;padding-left:12px}'+
+ '.dfold{border:1px solid var(--line2,#E0DCD5);border-radius:11px;background:var(--surface);margin:0 0 12px;padding:0 4px}'+
+ '.dfold>summary{cursor:pointer;list-style:revert;padding:11px 12px;font:700 12.5px var(--sans,system-ui,sans-serif);color:var(--mut,#3E3933)}'+
+ '.dfold[open]>summary{border-bottom:1px solid var(--line,#EEE);margin-bottom:8px;color:var(--ink,#1A1A1A)}'+
+ '.dfold .sect{margin-top:0}'
  ; document.head.appendChild(s);
 }
 function negOpenPositions(){return NEG_POSITIONS.filter(function(p){return !p.msaCovered;});}
@@ -373,15 +400,19 @@ function negStrategyHTML(){
    '<div class="ngkpi"><div class="v" style="color:#B45309">'+compliance+'</div><div class="l">Compliance leverage</div></div>'+
   '</div>';
  var posture='<div class="ngposture"><h4>Opening posture: collaborative but firm on MSA alignment and PI protections</h4>'+
-   '<p>'+escD('This is a sole-source continuation for a marquee, multi-year Acme engagement. Frame the asks as aligning the Work Order with the MSA and AI Standard both parties already executed, not as new demands. Lead with the venue concession and the MSA/DPA-alignment items to build early agreement, then hold firm on the two red lines - the PI-breach liability carve-out and the Lilly DPA/SCCs. The AI Standard §3.5 position is the item with compliance teeth; use it to anchor the ownership ask and the whole package.')+'</p></div>';
+   '<p>'+escD('This is a sole-source continuation for a marquee, multi-year Visier engagement. Frame the asks as aligning the Work Order with the MSA and AI Standard both parties already executed, not as new demands. Lead with the venue concession and the MSA/DPA-alignment items to build early agreement, then hold firm on the two red lines - the PI-breach liability carve-out and the Lilly DPA/SCCs. The AI Standard §3.5 position is the item with compliance teeth; use it to anchor the ownership ask and the whole package.')+'</p></div>';
  var tiles='<div class="ngtiers">'+NEG_TIER_ORDER.map(function(t){var m=NEG_TIER[t];return '<div class="ngtier '+m.cls+'"><div class="v">'+counts[t]+'</div><div class="l">'+escD(m.short)+'</div></div>';}).join('')+'</div>';
  return '<div class="sect"><div class="secthd"><div class="t">Negotiation strategy</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">4-tier position taxonomy · reflect-only</span></div>'+kpis+posture+tiles+'</div>';
 }
 // ITEM 2, Playbook: 5-persona tone toggle that live-repaints per-position quotes,
 // plus Position / Arguments / Likely pushback / Rebuttal / Fallback, an acceptance
 // (+N) badge and a confidence stamp. negSetTone re-renders only the playbook body.
+var negPlaybookView='playbook';   // 'playbook' = full argument cards · 'tier' = grouped-by-tier position map (folds the old standalone Position Map in as a view toggle)
+function negPlaybookBodyFor(){return negPlaybookView==='tier'?negPositionMapInner():negPlaybookInner();}
+function negSetView(v){negPlaybookView=v;var el=document.getElementById('negPlaybookBody');if(el)el.innerHTML=negPlaybookBodyFor();var tg=document.getElementById('negViewToggle');if(tg)tg.innerHTML=negViewToggleInner();}
+function negViewToggleInner(){return ['playbook','tier'].map(function(v){var on=v===negPlaybookView;return '<button class="ngtone-btn'+(on?' on':'')+'" onclick="negSetView(\''+v+'\')">'+(v==='playbook'?'Playbook':'By tier')+'</button>';}).join('');}
 function negPlaybookHTML(){
- return '<div class="sect"><div class="secthd"><div class="t">Position playbook</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">argument · predicted pushback · rebuttal · fallback</span></div><div id="negPlaybookBody">'+negPlaybookInner()+'</div></div>';
+ return '<div class="sect"><div class="secthd"><div class="t">Position playbook</div><span id="negViewToggle" class="ngview-toggle">'+negViewToggleInner()+'</span></div><div id="negPlaybookBody">'+negPlaybookBodyFor()+'</div></div>';
 }
 function negPlaybookInner(){
  var tone=negPlaybookTone;
@@ -411,7 +442,7 @@ function negPosBlock(p,tone){
 function negSetTone(t){negPlaybookTone=t;var el=document.getElementById('negPlaybookBody');if(el)el.innerHTML=negPlaybookInner();}
 // ITEM 3, Position map grouped by the 4 tiers; each card = target + fallback +
 // acceptance badge + compliance-position styling (red left border + tag).
-function negPositionMapHTML(){
+function negPositionMapInner(){
  var open=negOpenPositions();
  var groups=NEG_TIER_ORDER.map(function(t){
   var items=open.filter(function(p){return p.tier===t;});
@@ -428,7 +459,11 @@ function negPositionMapHTML(){
   }).join('');
   return '<div class="ngpm-h" style="color:'+m.c+'">'+escD(m.short)+' ('+items.length+')</div>'+cards;
  }).join('');
- return '<div class="sect"><div class="secthd"><div class="t">Position map</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">grouped by tier · target · fallback · acceptance</span></div>'+groups+'</div>';
+ return '<div class="ngtone-note spnote" style="margin-bottom:10px">Same positions, grouped by tier: target, fallback and acceptance at a glance. Toggle back to Playbook for the full argument / pushback / rebuttal on each.</div>'+groups;
+}
+// retained wrapper (no longer called as its own section; the tier view is now a toggle inside the Playbook)
+function negPositionMapHTML(){
+ return '<div class="sect"><div class="secthd"><div class="t">Position map</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">grouped by tier · target · fallback · acceptance</span></div>'+negPositionMapInner()+'</div>';
 }
 // ITEM 4, Multi-round concession sequencing (R1/R2/R3) + BATNA card. Replaces the
 // single give/get table (dealConcessionSeqHTML, retained but no longer called).
@@ -464,7 +499,7 @@ function negMsaCoveredHTML(){
  var inner;
  if(negShowMsaCovered){
   var cards=msa.map(function(p){return '<div class="ngmsa-card"><div class="mt">'+escD(p.title)+'</div><div class="mr">'+escD(p.msaRef||'')+'</div><div class="mn">'+escD(p.msaNote||'')+'</div></div>';}).join('');
-  inner='<div class="ngmsa-note">'+msa.length+' position'+(msa.length===1?'':'s')+' suppressed because the executed Acme MSA (2024) already resolves them. Showing them below - they are not open negotiation items.</div>'+cards+'<button class="ngmsa-toggle" onclick="negToggleMsa()">Hide MSA-covered positions</button>';
+  inner='<div class="ngmsa-note">'+msa.length+' position'+(msa.length===1?'':'s')+' suppressed because the executed Visier MSA (2024) already resolves them. Showing them below - they are not open negotiation items.</div>'+cards+'<button class="ngmsa-toggle" onclick="negToggleMsa()">Hide MSA-covered positions</button>';
  }else{
   inner='<div class="ngmsa-note">'+msa.length+' position'+(msa.length===1?'':'s')+' the governing MSA already resolves are suppressed from the open list above, so the negotiation focuses only on genuinely-open items ('+escD(msa.map(function(p){return p.title;}).join(', '))+').</div><button class="ngmsa-toggle" onclick="negToggleMsa()">Show MSA-covered positions</button>';
  }
