@@ -436,7 +436,7 @@
   --warn-bg:#FBF1DA; --warn-fg:#8A5A00; --warn-bar:#B45309;
   --info-bg:#E8EEF6; --info-fg:#0F3A85; --info-bar:#0F3A85;
   --danger-bg:#FBE7E3; --danger-fg:#B41E16; --danger-bar:#E1251B;
-  --pri:#0F3A85; --pri-soft:#2E5E9E; --sec:#0E6E87; --emph:#C15E19; --emph-soft:#E9D3BE;
+  --pri:#0F3A85; --pri-soft:#2E5E9E; --sec:#0E6E87; --emph:#C15E19; --emph-soft:#E9D3BE; --emph-t:#F4E7DA;
   --ent-nimbus:#123C82; --ent-cirrus:#2F6E6B; --ent-helio:#7A2436;
   --topbar-bg:#EEF0EC; --topbar-fg:#1A1A1A; --topbar-line:#C9C3B8;
   --r-sm:6px; --r-md:10px; --r-lg:14px; --r-pill:30px;
@@ -540,6 +540,68 @@ a{color:inherit}
 .rank-fill.lead{box-shadow:inset 0 0 0 2px var(--emph)}
 .rank-val{font-family:var(--font-mono); font-size:13px; text-align:right; font-variant-numeric:tabular-nums}
 .tag-emph{display:inline-block; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--emph); border:1px solid var(--emph); border-radius:var(--r-pill); padding:1px 6px; font-weight:700; margin-left:4px}
+
+/* ---- Recommendation ranked table -------------------------------------- */
+.rec-tbl{width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:2px}
+.rec-tbl th{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--mut); font-weight:600; text-align:left; padding:6px 8px; border-bottom:1px solid var(--line2)}
+.rec-tbl th.n{text-align:right}
+.rec-tbl td{padding:8px; border-bottom:1px solid var(--line); vertical-align:middle}
+.rec-tbl tbody tr:last-child td{border-bottom:none}
+.rec-tbl td.n{font-family:var(--font-mono); font-variant-numeric:tabular-nums; text-align:right; font-weight:600}
+.rec-tbl td.sup{font-weight:700}
+.rec-tbl td.comp{color:var(--pri); font-weight:800}
+.rec-tbl tr.lead td{background:var(--emph-t)}
+.rec-tbl .rseg{font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:var(--mut)}
+.rec-tbl .rdot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; vertical-align:middle}
+.rec-shortlist{margin:9px 0 2px; padding:9px 12px; border-radius:var(--r-md); background:var(--info-bg); border-left:3px solid var(--pri); font-size:12px; line-height:1.5; color:var(--ink2)}
+.rec-shortlist b{color:var(--pri)}
+
+/* ---- Competitive Dynamics & Head-to-Head (ported from platform pv.css .cdyn-*) */
+.cdyn-race{display:flex; align-items:center; gap:11px; font-size:12.5px; color:var(--mut); border-radius:8px; padding:9px 13px; margin-bottom:14px; line-height:1.45}
+.cdyn-race b{color:var(--ink)}
+.cdyn-race .rk{font:800 8.5px var(--font-mono); text-transform:uppercase; letter-spacing:.05em; flex:none}
+.cdyn-h2h{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:8px}
+.cdyn-side{text-align:center}
+.cdyn-side .nm{font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; gap:6px}
+.cdyn-side .nm .dot{width:9px; height:9px; border-radius:50%}
+.cdyn-side .comp{font:800 30px var(--font-sans); letter-spacing:-.02em; line-height:1.1; margin-top:3px; font-variant-numeric:tabular-nums}
+.cdyn-side .cl{font:700 8.5px var(--font-mono); text-transform:uppercase; letter-spacing:.04em; color:var(--mut2)}
+.cdyn-mid{text-align:center; min-width:90px}
+.cdyn-mid .arrow{font-size:15px; line-height:1}
+.cdyn-mid .lead{font-size:10.5px; color:var(--mut2)}
+.cdyn-mid .amt{font:800 15px var(--font-sans); font-variant-numeric:tabular-nums}
+.cdyn-sub{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; font-size:11.5px; color:var(--mut); margin:0 0 16px}
+.cdyn-sub b{color:var(--ink)}
+.cdyn-cards{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px}
+.cdyn-vc{flex:1; min-width:230px; border:1px solid var(--line2); border-radius:11px; overflow:hidden; background:var(--surface)}
+.cdyn-vc-h{display:flex; align-items:center; gap:8px; padding:9px 13px; border-bottom:1px solid var(--line)}
+.cdyn-vc-h .dot{width:10px; height:10px; border-radius:50%; flex:none}
+.cdyn-vc-h .nm{font-weight:700; font-size:13.5px}
+.cdyn-vc-h .rib{margin-left:auto; font:700 7.5px var(--font-mono); text-transform:uppercase; letter-spacing:.04em; padding:2px 7px; border-radius:20px}
+.cdyn-kv{padding:2px 13px 8px}
+.cdyn-kv .r{display:grid; grid-template-columns:78px 1fr; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); font-size:11.5px; line-height:1.4}
+.cdyn-kv .r:last-child{border-bottom:none}
+.cdyn-kv .k{font:700 9px var(--font-mono); text-transform:uppercase; letter-spacing:.03em; color:var(--mut2); padding-top:2px}
+.cdyn-kv .v small{color:var(--mut2)}
+.cdyn-cmphd{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:2px 0 8px}
+.cdyn-cmphd .t{font:800 9.5px var(--font-mono); text-transform:uppercase; letter-spacing:.05em; color:var(--mut2)}
+.cdyn-cmphd .lg{font-size:11px; color:var(--mut2); white-space:nowrap}
+.cdyn-dvg{border:1px solid var(--line); border-radius:9px; overflow:hidden}
+.cdyn-trow{display:grid; grid-template-columns:44px 1fr 190px 1fr 44px; align-items:center; border-bottom:1px solid var(--line)}
+.cdyn-trow:last-child{border-bottom:none}
+.cdyn-tsc{font:800 12.5px var(--font-mono); padding:6px 9px; font-variant-numeric:tabular-nums}
+.cdyn-tsc.l{text-align:right}
+.cdyn-tsc.r{text-align:left}
+.cdyn-tbw{height:13px; display:flex; align-items:center}
+.cdyn-tbw.l{justify-content:flex-end; padding-right:2px}
+.cdyn-tbw.r{justify-content:flex-start; padding-left:2px}
+.cdyn-tbar{height:11px; border-radius:3px}
+.cdyn-tmid{text-align:center; padding:5px 8px; border-left:1px solid var(--line); border-right:1px solid var(--line)}
+.cdyn-tmid .nm{font-size:11.5px; font-weight:600; line-height:1.2; color:var(--ink)}
+.cdyn-tmid .dl{font:800 10px var(--font-mono); margin-top:2px; letter-spacing:.02em; font-variant-numeric:tabular-nums}
+.cdyn-note{border-left:3px solid var(--line2); background:var(--nested); border-radius:0 var(--r-md) var(--r-md) 0; padding:11px 14px; margin-top:14px; font-size:12.5px; color:var(--ink2); line-height:1.5}
+.cdyn-note b{color:var(--ink)}
+@media(max-width:720px){.cdyn-trow{grid-template-columns:32px 1fr 118px 1fr 32px}.cdyn-tsc{font-size:11px; padding:5px 4px}.cdyn-tmid{padding:5px 4px}.cdyn-tmid .nm{font-size:10.5px}.cdyn-side .comp{font-size:24px}.cdyn-sub{gap:10px}}
 
 /* ---- Segmentation quadrant -------------------------------------------- */
 .seg-plane{width:100%; height:auto; display:block}
@@ -1235,6 +1297,7 @@ var state = {
   execFocus:"nimbus",
   heatFocus:null, heatExpanded:{},
   riskFocus:null, riskExpanded:{},
+  h2hA:0, h2hB:1,
   rfxOpen:false, rfxSel:["nimbus","cirrus","helio"], rfxAdded:[], rfxSent:false
 };
 
@@ -1242,6 +1305,119 @@ function vendorRankItems(){
   return VENDORS.map(function(v){
     return {id:v.id, name:v.short, color:vColor(v), value:overallFit(v.id), lead:v.recommended};
   });
+}
+
+/* ===========================================================================
+   COMPOSITE + HEAD-TO-HEAD  (ported from the platform supplier-landscape engine:
+   fit is expressed 0-100 = weighted mean x 20; composite = fit x (1 - risk/5),
+   the same risk-discounted score the platform ranks on. Rank = best composite.)
+   ======================================================================== */
+function round2(n){ return Math.round(n*100)/100; }
+function fnWord(nm){ return String(nm||"").split(" ")[0]; }
+function fit100Of(vId){ return round2(overallFit(vId)*20); }
+function compositeOf(vId){ var f=overallFit(vId)*20, r=overallRisk(vId); return round2(f*Math.max(0,1-r/5)); }
+function rankedByComposite(){
+  return VENDORS.slice().sort(function(a,b){
+    return compositeOf(b.id)-compositeOf(a.id) || overallFit(b.id)-overallFit(a.id) || overallRisk(a.id)-overallRisk(b.id);
+  });
+}
+function h2hPick(which, idx){
+  idx = parseInt(idx,10); if(isNaN(idx)) return;
+  if(which==="a") state.h2hA=idx; else state.h2hB=idx;
+  renderExec();
+}
+/* key-tradeoff prose, ported 1:1 from the platform pvH2HTradeoff */
+function h2hTradeoff(A,B,per,leadId,fitDelta,riskDelta){
+  var parts=[];
+  if(A.fitScore!==B.fitScore){ var fhi=A.fitScore>B.fitScore?A:B, flo=(fhi===A)?B:A; parts.push(fhi.name+" carries the higher weighted fit ("+fhi.fitScore+" vs "+flo.fitScore+"/100)"); }
+  else parts.push("weighted fit is level ("+A.fitScore+"/100)");
+  if(A.riskScore!==B.riskScore){ var rlo=A.riskScore<B.riskScore?A:B, rhi=(rlo===A)?B:A; parts.push(rlo.name+" carries the lower risk roll-up ("+rlo.riskScore+" vs "+rhi.riskScore+"/5)"); }
+  else parts.push("risk roll-ups are level ("+A.riskScore+"/5)");
+  var aLeads=per.filter(function(d){return d.delta>0;}).sort(function(x,y){return y.delta-x.delta;});
+  var bLeads=per.filter(function(d){return d.delta<0;}).sort(function(x,y){return x.delta-y.delta;});
+  var reqPart="";
+  if(aLeads[0]) reqPart+=A.name+" leads on "+aLeads[0].label+" (+"+aLeads[0].delta+")";
+  if(aLeads[0]&&bLeads[0]) reqPart+="; ";
+  if(bLeads[0]) reqPart+=B.name+" leads on "+bLeads[0].label+" ("+bLeads[0].delta+")";
+  var winner=leadId?(((leadId===A.id)?A:B).name+" leads overall by composite"):"the two are level on composite";
+  return parts.join(", ")+". "+(reqPart?reqPart+". ":"")+A.name+" leads "+aLeads.length+" of "+per.length+" requirements, "+B.name+" leads "+bLeads.length+"; "+winner+". Weigh the category deltas against Lilly's priorities; advisory only, no winner is selected.";
+}
+/* Competitive Dynamics & Head-to-Head, ported from the platform pvDynamicsHtml:
+   race-line callout, a Compare picker, the head-to-head band, the delta sub-line,
+   two vendor pillar cards, and the per-requirement diverging (tornado) chart. */
+function renderDynamicsHtml(){
+  var order = rankedByComposite().map(function(v,i){
+    return { v:v, id:v.id, name:v.name, short:v.short, rank:i+1,
+      fitScore:fit100Of(v.id), riskScore:round2(overallRisk(v.id)), compositeScore:compositeOf(v.id) };
+  });
+  var byId={}; order.forEach(function(o){ byId[o.id]=o; });
+  var nameOf=function(id){ return byId[id]?byId[id].name:id; };
+  var body;
+  if(order.length<2){
+    body='<div class="small muted" style="margin-top:14px">A head-to-head needs at least two candidate suppliers.</div>';
+  } else {
+    if(state.h2hA>=order.length || state.h2hA<0) state.h2hA=0;
+    if(state.h2hB>=order.length || state.h2hB<0) state.h2hB=Math.min(1,order.length-1);
+    if(state.h2hB===state.h2hA) state.h2hB=(state.h2hA+1)%order.length;
+    var A=order[state.h2hA], B=order[state.h2hB];
+    var accentA=vColor(A.v), accentB=vColor(B.v);
+    var fn=fnWord;
+    var rankLbl=function(o){ return "#"+o.rank; };
+    var optsFor=function(sel){ return order.map(function(x,i){ return '<option value="'+i+'"'+(i===sel?" selected":"")+'>'+esc(rankLbl(x)+" "+x.name)+'</option>'; }).join(""); };
+    var selStyle="font:600 12.5px var(--font-sans);color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:7px 10px;min-width:190px";
+    // per-requirement deltas (one row per weighted category, scores on the 0-5 scale)
+    var per=CATEGORIES.map(function(c){
+      var sa=round2(catScore(c.id,A.id)), sb=round2(catScore(c.id,B.id));
+      return { label:c.name, scoreA:sa, scoreB:sb, delta:round2(sa-sb) };
+    });
+    var fitDelta=round2(A.fitScore-B.fitScore), riskDelta=round2(A.riskScore-B.riskScore), compDelta=round2(A.compositeScore-B.compositeScore);
+    var leadId=A.compositeScore>B.compositeScore?A.id:(B.compositeScore>A.compositeScore?B.id:null);
+    var aLead=A.compositeScore>B.compositeScore, bLead=B.compositeScore>A.compositeScore;
+    var winsA=per.filter(function(d){return d.delta>0;}).length, winsB=per.filter(function(d){return d.delta<0;}).length;
+    // race-line: how close is the field at the top
+    var lead0=order[0], lead1=order[1];
+    var gap=(order.length>=2)?round2(lead0.compositeScore-lead1.compositeScore):null;
+    var contenders=order.filter(function(a){ return (lead0.compositeScore-a.compositeScore)<=5; }).length;
+    var clear=(gap!=null&&gap>=10)||order.length<=1;
+    var raceLbl=clear?"Clear leader":(contenders>=3?"Broad field":"Close race");
+    var raceText=clear
+      ? '<b>'+esc(lead0.name)+'</b> leads the field by <b>'+esc(gap!=null?gap:"n/a")+'</b> composite, a decisive gap; the RFx largely confirms it.'
+      : '#1 <b>'+esc(lead0.name)+'</b> leads #2 <b>'+esc(lead1?lead1.name:"n/a")+'</b> by just <b>'+esc(gap!=null?gap:"n/a")+'</b> composite'+(contenders>=1?', <b>'+esc(contenders)+'</b> within striking distance':'')+'. Price &amp; terms will decide it.';
+    var raceLine='<div class="cdyn-race" style="'+(clear?"background:var(--info-bg);border-left:3px solid var(--pri)":"background:var(--emph-t);border-left:3px solid var(--emph)")+'"><span class="rk" style="color:'+(clear?"var(--pri)":"var(--emph)")+'">'+esc(raceLbl)+'</span><span>'+raceText+'</span></div>';
+    var picker='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px"><span style="font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)">Compare</span><select onchange="h2hPick(\'a\',this.value)" aria-label="First vendor" style="'+selStyle+'">'+optsFor(state.h2hA)+'</select><span style="font-size:11px;font-weight:700;color:var(--mut2)">vs</span><select onchange="h2hPick(\'b\',this.value)" aria-label="Second vendor" style="'+selStyle+'">'+optsFor(state.h2hB)+'</select></div>';
+    var mid=aLead?'<div class="arrow" style="color:'+accentA+'">&#9668;</div><div class="lead">'+esc(fn(A.name))+' leads by</div><div class="amt" style="color:'+accentA+'">'+esc(Math.abs(compDelta))+'</div>'
+      :bLead?'<div class="arrow" style="color:'+accentB+'">&#9658;</div><div class="lead">'+esc(fn(B.name))+' leads by</div><div class="amt" style="color:'+accentB+'">'+esc(Math.abs(compDelta))+'</div>'
+      :'<div class="lead" style="margin-top:8px">Level on composite</div>';
+    var h2hBand='<div class="cdyn-h2h"><div class="cdyn-side"><div class="nm"><span class="dot" style="background:'+accentA+'"></span>'+esc(A.name)+'</div><div class="comp" style="color:'+(aLead?accentA:"var(--mut)")+'">'+esc(A.compositeScore)+'</div><div class="cl">Composite</div></div><div class="cdyn-mid">'+mid+'</div><div class="cdyn-side"><div class="nm"><span class="dot" style="background:'+accentB+'"></span>'+esc(B.name)+'</div><div class="comp" style="color:'+(bLead?accentB:"var(--mut)")+'">'+esc(B.compositeScore)+'</div><div class="cl">Composite</div></div></div>';
+    var fitSub=fitDelta>0?'<span style="color:'+accentA+';font-weight:700">'+esc(fn(A.name))+' +'+esc(fitDelta)+'</span>':fitDelta<0?'<span style="color:'+accentB+';font-weight:700">'+esc(fn(B.name))+' +'+esc(round2(-fitDelta))+'</span>':'<span style="color:var(--mut2)">level</span>';
+    var riskSub=Math.abs(riskDelta)<0.05?'<span style="color:var(--mut2);font-weight:700">&#8776; even ('+(riskDelta>0?"+":"")+esc(riskDelta)+')</span>':riskDelta<0?'<b>'+esc(fn(A.name))+' lower ('+esc(riskDelta)+')</b>':'<b>'+esc(fn(B.name))+' lower (+'+esc(riskDelta)+')</b>';
+    var h2hSub='<div class="cdyn-sub"><span>Fit '+fitSub+'</span><span>Risk '+riskSub+'</span><span>Requirements won <b>'+esc(fn(A.name))+' '+winsA+'</b> &middot; <b>'+esc(fn(B.name))+' '+winsB+'</b></span><span>Leads composite <b>'+esc(leadId?nameOf(leadId):"tie")+'</b></span></div>';
+    var pillar=function(o,accent,isLead){
+      var v=o.v, p=v.profile||{};
+      var fin=(p.fin&&p.fin.revenue)?p.fin.revenue:(p.financial||"--");
+      var row=function(k,val){ return '<div class="r"><span class="k">'+k+'</span><span class="v">'+esc(val)+'</span></div>'; };
+      var rib=isLead?'<span class="rib" style="background:'+accent+';color:#fff">Leads composite</span>':'<span class="rib" style="background:var(--surface);color:var(--mut2);border:1px solid var(--line2)">Runner-up</span>';
+      return '<div class="cdyn-vc"'+(isLead?' style="border-color:'+accent+';box-shadow:0 0 0 1px '+accent+' inset"':'')+'><div class="cdyn-vc-h" style="background:'+accent+'14"><span class="dot" style="background:'+accent+'"></span><span class="nm">'+esc(v.name)+'</span>'+rib+'</div><div class="cdyn-kv"><div class="r"><span class="k">Fit / Risk</span><span class="v"><b>'+esc(o.fitScore)+'</b><small>/100</small> &middot; risk '+esc(o.riskScore)+'<small>/5</small></span></div>'+row("HQ",p.hq||"--")+row("Financials",fin)+row("Integration",p.integration||"--")+row("Contract",p.contractFlex||"--")+'</div></div>';
+    };
+    var cards='<div class="cdyn-cards">'+pillar(A,accentA,leadId===A.id)+pillar(B,accentB,leadId===B.id)+'</div>';
+    // per-requirement centered tornado: A owns the left half, B the right, delta on the axis
+    var maxAbs=per.reduce(function(m,d){ return Math.max(m,Math.abs(d.delta)); },0)||1;
+    var dvgRows=per.map(function(d){
+      var aw=d.delta>0, bw=d.delta<0, w=Math.round(Math.abs(d.delta)/maxAbs*100);
+      var dcol=aw?accentA:(bw?accentB:"var(--mut2)");
+      return '<div class="cdyn-trow" style="background:linear-gradient(90deg,'+accentA+'12,transparent 34%,transparent 66%,'+accentB+'12)">'
+        +'<div class="cdyn-tsc l" style="color:'+accentA+'">'+esc(d.scoreA)+'</div>'
+        +'<div class="cdyn-tbw l">'+(aw?'<div class="cdyn-tbar" style="width:'+w+'%;background:'+accentA+'"></div>':'')+'</div>'
+        +'<div class="cdyn-tmid"><div class="nm">'+esc(d.label)+'</div><div class="dl" style="color:'+dcol+'">'+(d.delta>0?"+":"")+esc(d.delta)+'</div></div>'
+        +'<div class="cdyn-tbw r">'+(bw?'<div class="cdyn-tbar" style="width:'+w+'%;background:'+accentB+'"></div>':'')+'</div>'
+        +'<div class="cdyn-tsc r" style="color:'+accentB+'">'+esc(d.scoreB)+'</div></div>';
+    }).join("");
+    var cmpHd='<div class="cdyn-cmphd"><span class="t">Per-requirement, where each one wins</span><span class="lg"><span style="color:'+accentA+';font-weight:700">&#9668; '+esc(fn(A.name))+'</span> &nbsp; <span style="color:'+accentB+';font-weight:700">'+esc(fn(B.name))+' &#9658;</span></span></div>';
+    var dvg='<div class="cdyn-dvg">'+dvgRows+'</div>';
+    var tradeoff='<div class="cdyn-note"><b>Key tradeoff.</b> '+esc(h2hTradeoff(A,B,per,leadId,fitDelta,riskDelta))+'</div>';
+    body=raceLine+picker+h2hBand+h2hSub+cards+cmpHd+dvg+tradeoff;
+  }
+  return '<div class="card"><div class="card-hd"><span class="ct">Competitive Dynamics &amp; Head-to-Head</span></div>'+body+'</div>';
 }
 
 /* ---- Executive Summary ------------------------------------------------- */
@@ -1270,14 +1446,34 @@ function renderExec(){
     + ', the value option: strongest on commercial and TCO terms but weakest on governance, portability and residency, with the field\'s highest lock-in risk.</p></div>';
 
   // Recommendation (left) + Ranking (right)
+  // Ranked TABLE, best-composite-first, with the #1 row highlighted (platform parity).
+  var rc = rankedByComposite();
+  var recSecond = rc[1] || rc[0];
+  var recTable = '<table class="rec-tbl"><thead><tr><th>Supplier</th><th>Segment</th><th class="n">Composite</th><th class="n">Fit</th><th class="n">Risk</th></tr></thead><tbody>'
+    + rc.map(function(v,i){
+        var isLd=(i===0);
+        return '<tr'+(isLd?' class="lead"':'')+'>'
+          + '<td class="sup"><span class="rdot" style="background:'+vColor(v)+'"></span>'+esc(v.name)+(isLd?' <span class="tag-emph">Recommended</span>':'')+'</td>'
+          + '<td class="rseg">'+esc(segmentOf(v.id))+'</td>'
+          + '<td class="n comp">'+Math.round(compositeOf(v.id))+'</td>'
+          + '<td class="n">'+Math.round(overallFit(v.id)*20)+'</td>'
+          + '<td class="n">'+num(overallRisk(v.id),1)+'</td>'
+          + '</tr>';
+      }).join("")
+    + '</tbody></table>';
+  // "Shortlist to advance" callout, vendors within a competitive band of the top composite.
+  var comps = rc.map(function(v){ return {v:v, comp:Math.round(compositeOf(v.id))}; });
+  var topComp = comps.reduce(function(m,x){ return Math.max(m,x.comp); }, 0);
+  var slBandPts = Math.max(8, Math.round(topComp*0.10));
+  var shortlist = comps.filter(function(x){ return (topComp-x.comp)<=slBandPts; });
+  var slBand = '<div class="rec-shortlist"><b>Shortlist to advance:</b> '+shortlist.map(function(x){return esc(x.v.name);}).join(", ")
+    + '. Within '+slBandPts+' composite points of the top ('+topComp+'); the rest of the field falls outside the competitive band.</div>';
   var rec = '<div class="card accent"><div class="card-hd"><span class="ct">Recommendation</span></div>'
-    + '<div class="panel" style="border-left:4px solid var(--emph)"><div style="font-weight:800;font-size:15px">'+esc(lead.name)
-    + ' <span class="tag-emph">Recommended lead</span></div>'
-    + '<p class="small" style="margin:6px 0 0;color:var(--ink2)">Top of the field on functional depth, security and performance, at the lowest risk, and contractually flexible. Anchor an RFx around it.</p></div>'
-    + '<div style="margin-top:10px"><div class="eyebrow" style="margin-bottom:5px">Suggested RFx slate (3-5)</div>'
-    + '<div class="chips">'+ranked.map(function(v){return '<span class="chip" style="border-left:3px solid '+vColor(v)+'">'+esc(v.name)+'</span>';}).join("")+'</div></div>'
+    + recTable + slBand
+    + '<div style="margin-top:12px"><div class="eyebrow" style="margin-bottom:5px">Suggested RFx slate (3-5)</div>'
+    + '<div class="chips">'+rc.map(function(v){return '<span class="chip" style="border-left:3px solid '+vColor(v)+'">'+esc(v.name)+'</span>';}).join("")+'</div></div>'
     + '<div style="margin-top:10px"><div class="eyebrow" style="margin-bottom:3px">Secondary</div>'
-    + '<div class="small" style="color:var(--ink2)">'+esc(second.name)+' - include to press the field on governance, openness and price.</div></div>'
+    + '<div class="small" style="color:var(--ink2)">'+esc(recSecond.name)+' - include to press the field on governance, openness and price.</div></div>'
     + '<div style="margin-top:14px"><button class="btn btn-start" id="startRfx">Start an RFx &rarr;</button></div>'
     + '<div class="small muted" style="margin-top:8px">Advisory only. A slate assembled here is a draft that routes to the sourcing rep for approval before any RFx is created.</div>'
     + '</div>';

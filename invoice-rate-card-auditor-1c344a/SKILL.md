@@ -182,7 +182,7 @@ State this scope plainly in the audit report's methodology section (see Delivera
 - **market-rate-benchmarking** answers "is the contracted rate good compared to the external market." This skill never benchmarks against the market; it only checks internal consistency, whether the INVOICED rate matches the CONTRACTED rate (and its contractual escalation), regardless of whether that contracted rate is itself competitive.
 - **should-cost-builder** builds a bottoms-up "what should this cost" model from first principles, independent of any specific contract. This skill never estimates a cost from scratch; it audits actuals against an existing, already-negotiated contract and rate card.
 - **commercial-negotiation-prep** builds a forward negotiation strategy and counter-offer. This skill's questioned-amount findings and dispute notice are backward-looking (what was already billed) and can feed a renewal negotiation, but this skill does not itself build the negotiation plan.
-- **executive-summary-package** / **decision-deck** are downstream consumers of this skill's findings ledger for governance approvals or executive readouts; this skill does not produce those formats itself.
+- **executive-summary-package** is a downstream consumer of this skill's findings ledger for governance approvals or executive readouts; this skill does not produce that format itself.
 
 ## Kernel Wiring (HARD RULE, no model arithmetic, G11)
 

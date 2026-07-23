@@ -764,7 +764,7 @@ The single source of truth for the Deal Room dashboard. The structure is LOCKED 
 
 ## House style (locked; identical to every other suite dashboard)
 
-Pull exact values from the foundation's `brand-colors.md` and `dashboard-components.md` (both inlined in lilly-brand-assets-1c344a): dark charcoal header (`#212121`) with a Lilly-red (`#E1251B`) left rule and eyebrow, Bold Blue (`#0F3A85`) as the positive/primary accent, Georgia serif titles and large numbers, Arial body, no green or teal anywhere in the status palette (the sole documented exception is decision-deck's PPTX Slide Template, which does not apply here). Reuse the shared component library verbatim: `Metric`, `Card`, `STable`, `Pillar`, `StateBanner`, plus the Deal-Room-specific `IssuePill` and `DirectionPill` defined in the reference JSX below (built with the same color-token discipline as the foundation's `SevPill`/`PrioPill`, no new hexes introduced).
+Pull exact values from the foundation's `brand-colors.md` and `dashboard-components.md` (both inlined in lilly-brand-assets-1c344a): dark charcoal header (`#212121`) with a Lilly-red (`#E1251B`) left rule and eyebrow, Bold Blue (`#0F3A85`) as the positive/primary accent, Georgia serif titles and large numbers, Arial body, no green or teal anywhere in the status palette. Reuse the shared component library verbatim: `Metric`, `Card`, `STable`, `Pillar`, `StateBanner`, plus the Deal-Room-specific `IssuePill` and `DirectionPill` defined in the reference JSX below (built with the same color-token discipline as the foundation's `SevPill`/`PrioPill`, no new hexes introduced).
 
 ## The four locked tabs
 

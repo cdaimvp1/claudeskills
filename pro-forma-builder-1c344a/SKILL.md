@@ -6,8 +6,8 @@ description: >
   projections, savings waterfall vs current state, TCO, NPV, ROI, payback, and sensitivity.
   Produces a formula-driven workbook (and optional dashboard). Standalone, and the financial
   engine other skills draw on for deal economics: commercial-negotiation-prep, lilly-contract-review
-  commercial analysis, evaluation-engine (the TCO/financial case for shortlisted suppliers), and
-  decision-deck. Triggers on "build a pro forma", "build a financial model", "business case model",
+  commercial analysis, and evaluation-engine (the TCO/financial case for shortlisted suppliers).
+  Triggers on "build a pro forma", "build a financial model", "business case model",
   "TCO model", "NPV / ROI / payback", "savings model", "model the financials", "cost model for this
   deal", "five-year cost projection".
 metadata:
@@ -210,7 +210,7 @@ The NPV, escalation, and related financial figures produced above are computed b
 **Workbook generation wiring (HARD RULE).** The native deliverable `pro_forma_model.xlsx` is produced by calling the vendored `pro_forma_generator.py` (in this skill's own directory) with the validated Assumptions register object as input, never by hand-assembling the workbook cell-by-cell in the moment. `pro_forma_generator.py` validates the register, computes the Python-side ground truth via `numeric_kernel.py`'s `npv()` / `escalate()` (per the convention above), asserts the Year-1-discounting and waterfall-reconciliation invariants, and writes every tab (Assumptions, Cost Buildup, Scenario Projection, Savings Waterfall, TCO Summary, NPV-ROI-Payback, Sensitivity) as live Excel formulas that independently re-derive the same figures. Call `generate_pro_forma_workbook(assumptions_register, output_path)` (or its component functions `validate_assumptions()` / `compute_ground_truth()` / `build_workbook()` individually when only part of the pipeline is needed) rather than writing `openpyxl` calls directly in this skill's own workflow. If the generator raises `AssumptionsValidationError` or `ReconciliationError`, do not deliver a workbook: surface the raised message (a missing or NEEDS_INPUT field, or a failed reconciliation) and resolve it, per Rule 1 and Rule 5, rather than hand-patching around the failure. If `pro_forma_generator.py` cannot be read (missing or corrupted), fall back to hand-building the workbook per the Financial Methodology conventions above and disclose plainly in the output that the vendored generator was unavailable this run.
 
 **Assumptions register schema (centralized; Rule 3).**
-Maintain one register driving every formula. Emit it as a portable JSON block alongside the workbook so downstream skills (decision-deck, executive-summary-package, evaluation-engine) reuse the exact assumptions without re-deriving them:
+Maintain one register driving every formula. Emit it as a portable JSON block alongside the workbook so downstream skills (executive-summary-package, evaluation-engine) reuse the exact assumptions without re-deriving them:
 ```json
 {
   "currency": "USD",
@@ -255,7 +255,7 @@ Any field with no confirmed value carries `"status": "NEEDS_INPUT"` and is surfa
 
 ## Integration
 - **Consumes:** market-rate-benchmarking (external rate anchors), should-cost-builder (bottoms-up cost), commercial-negotiation-prep (counter-offer economics), lilly-contract-review (deal terms), evaluation-engine (the shortlisted suppliers and weighted rankings, as enriching context for which suppliers to model).
-- **Feeds:** decision-deck (the financial-case slides), executive-summary-package (deal value), commercial-negotiation-prep (TCO and walk-away economics), and evaluation-engine (the sourced, math-shown TCO/financial-case figures it consumes rather than re-deriving).
+- **Feeds:** executive-summary-package (deal value), commercial-negotiation-prep (TCO and walk-away economics), and evaluation-engine (the sourced, math-shown TCO/financial-case figures it consumes rather than re-deriving).
 - **Direction note (evaluation-engine):** the relationship is two-way and consistent with evaluation-engine's own text. Evaluation-engine hands the shortlist to pro-forma-builder for the full TCO/financial case, then consumes pro-forma's figures back into its recommendation. Pro-forma-builder owns the financial math; evaluation-engine owns the weighted selection score. Neither re-derives the other's numbers.
 
 ## SUITE SPECIFICS -- pro-forma-builder

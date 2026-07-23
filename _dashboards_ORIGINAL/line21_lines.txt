@@ -1,0 +1,5541 @@
+`+o.stack}return{value:e
+source:t
+stack:i
+digest:null}}function Ro(e
+t
+n){return{value:e
+source:null
+stack:n??null
+digest:t??null}}function hl(e
+t){try{console.error(t.value)}catch(n){setTimeout(function(){throw n})}}var hp=typeof WeakMap=="function"?WeakMap:Map;function Tc(e
+t
+n){n=rt(-1
+n)
+n.tag=3
+n.payload={element:null};var r=t.value;return n.callback=function(){Li||(Li=!0
+Al=r)
+hl(e
+t)}
+n}function Lc(e
+t
+n){n=rt(-1
+n)
+n.tag=3;var r=e.type.getDerivedStateFromError;if(typeof r=="function"){var i=t.value;n.payload=function(){return r(i)}
+n.callback=function(){hl(e
+t)}}var o=e.stateNode;return o!==null&&typeof o.componentDidCatch=="function"&&(n.callback=function(){hl(e
+t)
+typeof r!="function"&&(At===null?At=new Set([this]):At.add(this));var l=t.stack;this.componentDidCatch(t.value
+{componentStack:l!==null?l:""})})
+n}function Ws(e
+t
+n){var r=e.pingCache;if(r===null){r=e.pingCache=new hp;var i=new Set;r.set(t
+i)}else i=r.get(t)
+i===void 0&&(i=new Set
+r.set(t
+i));i.has(n)||(i.add(n)
+e=Ip.bind(null
+e
+t
+n)
+t.then(e
+e))}function Bs(e){do{var t;if((t=e.tag===13)&&(t=e.memoizedState
+t=t!==null?t.dehydrated!==null:!0)
+t)return e;e=e.return}while(e!==null);return null}function $s(e
+t
+n
+r
+i){return(e.mode&1)===0?(e===t?e.flags|=65536:(e.flags|=128
+n.flags|=131072
+n.flags&=-52805
+n.tag===1&&(n.alternate===null?n.tag=17:(t=rt(-1
+1)
+t.tag=2
+Et(n
+t
+1)))
+n.lanes|=1)
+e):(e.flags|=65536
+e.lanes=i
+e)}var gp=st.ReactCurrentOwner
+ve=!1;function me(e
+t
+n
+r){t.child=e===null?nc(t
+null
+n
+r):Cn(t
+e.child
+n
+r)}function Hs(e
+t
+n
+r
+i){n=n.render;var o=t.ref;return yn(t
+i)
+r=ra(e
+t
+n
+r
+o
+i)
+n=ia()
+e!==null&&!ve?(t.updateQueue=e.updateQueue
+t.flags&=-2053
+e.lanes&=~i
+at(e
+t
+i)):(H&&n&&Gl(t)
+t.flags|=1
+me(e
+t
+r
+i)
+t.child)}function Us(e
+t
+n
+r
+i){if(e===null){var o=n.type;return typeof o=="function"&&!ma(o)&&o.defaultProps===void 0&&n.compare===null&&n.defaultProps===void 0?(t.tag=15
+t.type=o
+Pc(e
+t
+o
+r
+i)):(e=li(n.type
+null
+r
+t
+t.mode
+i)
+e.ref=t.ref
+e.return=t
+t.child=e)}if(o=e.child
+(e.lanes&i)===0){var l=o.memoizedProps;if(n=n.compare
+n=n!==null?n:sr
+n(l
+r)&&e.ref===t.ref)return at(e
+t
+i)}return t.flags|=1
+e=Lt(o
+r)
+e.ref=t.ref
+e.return=t
+t.child=e}function Pc(e
+t
+n
+r
+i){if(e!==null){var o=e.memoizedProps;if(sr(o
+r)&&e.ref===t.ref)if(ve=!1
+t.pendingProps=r=o
+(e.lanes&i)!==0)(e.flags&131072)!==0&&(ve=!0);else return t.lanes=e.lanes
+at(e
+t
+i)}return gl(e
+t
+n
+r
+i)}function Ic(e
+t
+n){var r=t.pendingProps
+i=r.children
+o=e!==null?e.memoizedState:null;if(r.mode==="hidden")if((t.mode&1)===0)t.memoizedState={baseLanes:0
+cachePool:null
+transitions:null}
+D(fn
+Ce)
+Ce|=n;else{if((n&1073741824)===0)return e=o!==null?o.baseLanes|n:n
+t.lanes=t.childLanes=1073741824
+t.memoizedState={baseLanes:e
+cachePool:null
+transitions:null}
+t.updateQueue=null
+D(fn
+Ce)
+Ce|=e
+null;t.memoizedState={baseLanes:0
+cachePool:null
+transitions:null}
+r=o!==null?o.baseLanes:n
+D(fn
+Ce)
+Ce|=r}else o!==null?(r=o.baseLanes|n
+t.memoizedState=null):r=n
+D(fn
+Ce)
+Ce|=r;return me(e
+t
+i
+n)
+t.child}function Mc(e
+t){var n=t.ref;(e===null&&n!==null||e!==null&&e.ref!==n)&&(t.flags|=512
+t.flags|=2097152)}function gl(e
+t
+n
+r
+i){var o=we(n)?Ut:de.current;return o=wn(t
+o)
+yn(t
+i)
+n=ra(e
+t
+n
+r
+o
+i)
+r=ia()
+e!==null&&!ve?(t.updateQueue=e.updateQueue
+t.flags&=-2053
+e.lanes&=~i
+at(e
+t
+i)):(H&&r&&Gl(t)
+t.flags|=1
+me(e
+t
+n
+i)
+t.child)}function js(e
+t
+n
+r
+i){if(we(n)){var o=!0;yi(t)}else o=!1;if(yn(t
+i)
+t.stateNode===null)ri(e
+t)
+Ac(t
+n
+r)
+ml(t
+n
+r
+i)
+r=!0;else if(e===null){var l=t.stateNode
+u=t.memoizedProps;l.props=u;var c=l.context
+p=n.contextType;typeof p=="object"&&p!==null?p=_e(p):(p=we(n)?Ut:de.current
+p=wn(t
+p));var g=n.getDerivedStateFromProps
+a=typeof g=="function"||typeof l.getSnapshotBeforeUpdate=="function";a||typeof l.UNSAFE_componentWillReceiveProps!="function"&&typeof l.componentWillReceiveProps!="function"||(u!==r||c!==p)&&Fs(t
+l
+r
+p)
+ht=!1;var f=t.memoizedState;l.state=f
+Ci(t
+r
+l
+i)
+c=t.memoizedState
+u!==r||f!==c||Se.current||ht?(typeof g=="function"&&(pl(t
+n
+g
+r)
+c=t.memoizedState)
+(u=ht||Ds(t
+n
+u
+r
+f
+c
+p))?(a||typeof l.UNSAFE_componentWillMount!="function"&&typeof l.componentWillMount!="function"||(typeof l.componentWillMount=="function"&&l.componentWillMount()
+typeof l.UNSAFE_componentWillMount=="function"&&l.UNSAFE_componentWillMount())
+typeof l.componentDidMount=="function"&&(t.flags|=4194308)):(typeof l.componentDidMount=="function"&&(t.flags|=4194308)
+t.memoizedProps=r
+t.memoizedState=c)
+l.props=r
+l.state=c
+l.context=p
+r=u):(typeof l.componentDidMount=="function"&&(t.flags|=4194308)
+r=!1)}else{l=t.stateNode
+ic(e
+t)
+u=t.memoizedProps
+p=t.type===t.elementType?u:$e(t.type
+u)
+l.props=p
+a=t.pendingProps
+f=l.context
+c=n.contextType
+typeof c=="object"&&c!==null?c=_e(c):(c=we(n)?Ut:de.current
+c=wn(t
+c));var v=n.getDerivedStateFromProps;(g=typeof v=="function"||typeof l.getSnapshotBeforeUpdate=="function")||typeof l.UNSAFE_componentWillReceiveProps!="function"&&typeof l.componentWillReceiveProps!="function"||(u!==a||f!==c)&&Fs(t
+l
+r
+c)
+ht=!1
+f=t.memoizedState
+l.state=f
+Ci(t
+r
+l
+i);var w=t.memoizedState;u!==a||f!==w||Se.current||ht?(typeof v=="function"&&(pl(t
+n
+v
+r)
+w=t.memoizedState)
+(p=ht||Ds(t
+n
+p
+r
+f
+w
+c)||!1)?(g||typeof l.UNSAFE_componentWillUpdate!="function"&&typeof l.componentWillUpdate!="function"||(typeof l.componentWillUpdate=="function"&&l.componentWillUpdate(r
+w
+c)
+typeof l.UNSAFE_componentWillUpdate=="function"&&l.UNSAFE_componentWillUpdate(r
+w
+c))
+typeof l.componentDidUpdate=="function"&&(t.flags|=4)
+typeof l.getSnapshotBeforeUpdate=="function"&&(t.flags|=1024)):(typeof l.componentDidUpdate!="function"||u===e.memoizedProps&&f===e.memoizedState||(t.flags|=4)
+typeof l.getSnapshotBeforeUpdate!="function"||u===e.memoizedProps&&f===e.memoizedState||(t.flags|=1024)
+t.memoizedProps=r
+t.memoizedState=w)
+l.props=r
+l.state=w
+l.context=c
+r=p):(typeof l.componentDidUpdate!="function"||u===e.memoizedProps&&f===e.memoizedState||(t.flags|=4)
+typeof l.getSnapshotBeforeUpdate!="function"||u===e.memoizedProps&&f===e.memoizedState||(t.flags|=1024)
+r=!1)}return yl(e
+t
+n
+r
+o
+i)}function yl(e
+t
+n
+r
+i
+o){Mc(e
+t);var l=(t.flags&128)!==0;if(!r&&!l)return i&&Ps(t
+n
+!1)
+at(e
+t
+o);r=t.stateNode
+gp.current=t;var u=l&&typeof n.getDerivedStateFromError!="function"?null:r.render();return t.flags|=1
+e!==null&&l?(t.child=Cn(t
+e.child
+null
+o)
+t.child=Cn(t
+null
+u
+o)):me(e
+t
+u
+o)
+t.memoizedState=r.state
+i&&Ps(t
+n
+!0)
+t.child}function Nc(e){var t=e.stateNode;t.pendingContext?Ls(e
+t.pendingContext
+t.pendingContext!==t.context):t.context&&Ls(e
+t.context
+!1)
+Zl(e
+t.containerInfo)}function Vs(e
+t
+n
+r
+i){return kn()
+Ql(i)
+t.flags|=256
+me(e
+t
+n
+r)
+t.child}var vl={dehydrated:null
+treeContext:null
+retryLane:0};function Sl(e){return{baseLanes:e
+cachePool:null
+transitions:null}}function zc(e
+t
+n){var r=t.pendingProps
+i=U.current
+o=!1
+l=(t.flags&128)!==0
+u;if((u=l)||(u=e!==null&&e.memoizedState===null?!1:(i&2)!==0)
+u?(o=!0
+t.flags&=-129):(e===null||e.memoizedState!==null)&&(i|=1)
+D(U
+i&1)
+e===null)return dl(t)
+e=t.memoizedState
+e!==null&&(e=e.dehydrated
+e!==null)?((t.mode&1)===0?t.lanes=1:e.data==="$!"?t.lanes=8:t.lanes=1073741824
+null):(l=r.children
+e=r.fallback
+o?(r=t.mode
+o=t.child
+l={mode:"hidden"
+children:l}
+(r&1)===0&&o!==null?(o.childLanes=0
+o.pendingProps=l):o=Hi(l
+r
+0
+null)
+e=Ht(e
+r
+n
+null)
+o.return=t
+e.return=t
+o.sibling=e
+t.child=o
+t.child.memoizedState=Sl(n)
+t.memoizedState=vl
+e):aa(t
+l));if(i=e.memoizedState
+i!==null&&(u=i.dehydrated
+u!==null))return yp(e
+t
+l
+r
+u
+i
+n);if(o){o=r.fallback
+l=t.mode
+i=e.child
+u=i.sibling;var c={mode:"hidden"
+children:r.children};return(l&1)===0&&t.child!==i?(r=t.child
+r.childLanes=0
+r.pendingProps=c
+t.deletions=null):(r=Lt(i
+c)
+r.subtreeFlags=i.subtreeFlags&14680064)
+u!==null?o=Lt(u
+o):(o=Ht(o
+l
+n
+null)
+o.flags|=2)
+o.return=t
+r.return=t
+r.sibling=o
+t.child=r
+r=o
+o=t.child
+l=e.child.memoizedState
+l=l===null?Sl(n):{baseLanes:l.baseLanes|n
+cachePool:null
+transitions:l.transitions}
+o.memoizedState=l
+o.childLanes=e.childLanes&~n
+t.memoizedState=vl
+r}return o=e.child
+e=o.sibling
+r=Lt(o
+{mode:"visible"
+children:r.children})
+(t.mode&1)===0&&(r.lanes=n)
+r.return=t
+r.sibling=null
+e!==null&&(n=t.deletions
+n===null?(t.deletions=[e]
+t.flags|=16):n.push(e))
+t.child=r
+t.memoizedState=null
+r}function aa(e
+t){return t=Hi({mode:"visible"
+children:t}
+e.mode
+0
+null)
+t.return=e
+e.child=t}function Kr(e
+t
+n
+r){return r!==null&&Ql(r)
+Cn(t
+e.child
+null
+n)
+e=aa(t
+t.pendingProps.children)
+e.flags|=2
+t.memoizedState=null
+e}function yp(e
+t
+n
+r
+i
+o
+l){if(n)return t.flags&256?(t.flags&=-257
+r=Ro(Error(y(422)))
+Kr(e
+t
+l
+r)):t.memoizedState!==null?(t.child=e.child
+t.flags|=128
+null):(o=r.fallback
+i=t.mode
+r=Hi({mode:"visible"
+children:r.children}
+i
+0
+null)
+o=Ht(o
+i
+l
+null)
+o.flags|=2
+r.return=t
+o.return=t
+r.sibling=o
+t.child=r
+(t.mode&1)!==0&&Cn(t
+e.child
+null
+l)
+t.child.memoizedState=Sl(l)
+t.memoizedState=vl
+o);if((t.mode&1)===0)return Kr(e
+t
+l
+null);if(i.data==="$!"){if(r=i.nextSibling&&i.nextSibling.dataset
+r)var u=r.dgst;return r=u
+o=Error(y(419))
+r=Ro(o
+r
+void 0)
+Kr(e
+t
+l
+r)}if(u=(l&e.childLanes)!==0
+ve||u){if(r=ne
+r!==null){switch(l&-l){case 4:i=2;break;case 16:i=8;break;case 64:case 128:case 256:case 512:case 1024:case 2048:case 4096:case 8192:case 16384:case 32768:case 65536:case 131072:case 262144:case 524288:case 1048576:case 2097152:case 4194304:case 8388608:case 16777216:case 33554432:case 67108864:i=32;break;case 536870912:i=268435456;break;default:i=0}i=(i&(r.suspendedLanes|l))!==0?0:i
+i!==0&&i!==o.retryLane&&(o.retryLane=i
+lt(e
+i)
+Ve(r
+e
+i
+-1))}return pa()
+r=Ro(Error(y(421)))
+Kr(e
+t
+l
+r)}return i.data==="$?"?(t.flags|=128
+t.child=e.child
+t=Mp.bind(null
+e)
+i._reactRetry=t
+null):(e=o.treeContext
+xe=xt(i.nextSibling)
+Ee=t
+H=!0
+Ue=null
+e!==null&&(Me[Ne++]=tt
+Me[Ne++]=nt
+Me[Ne++]=jt
+tt=e.id
+nt=e.overflow
+jt=t)
+t=aa(t
+r.children)
+t.flags|=4096
+t)}function Gs(e
+t
+n){e.lanes|=t;var r=e.alternate;r!==null&&(r.lanes|=t)
+fl(e.return
+t
+n)}function _o(e
+t
+n
+r
+i){var o=e.memoizedState;o===null?e.memoizedState={isBackwards:t
+rendering:null
+renderingStartTime:0
+last:r
+tail:n
+tailMode:i}:(o.isBackwards=t
+o.rendering=null
+o.renderingStartTime=0
+o.last=r
+o.tail=n
+o.tailMode=i)}function Rc(e
+t
+n){var r=t.pendingProps
+i=r.revealOrder
+o=r.tail;if(me(e
+t
+r.children
+n)
+r=U.current
+(r&2)!==0)r=r&1|2
+t.flags|=128;else{if(e!==null&&(e.flags&128)!==0)e:for(e=t.child;e!==null;){if(e.tag===13)e.memoizedState!==null&&Gs(e
+n
+t);else if(e.tag===19)Gs(e
+n
+t);else if(e.child!==null){e.child.return=e
+e=e.child;continue}if(e===t)break e;for(;e.sibling===null;){if(e.return===null||e.return===t)break e;e=e.return}e.sibling.return=e.return
+e=e.sibling}r&=1}if(D(U
+r)
+(t.mode&1)===0)t.memoizedState=null;else switch(i){case"forwards":for(n=t.child
+i=null;n!==null;)e=n.alternate
+e!==null&&xi(e)===null&&(i=n)
+n=n.sibling;n=i
+n===null?(i=t.child
+t.child=null):(i=n.sibling
+n.sibling=null)
+_o(t
+!1
+i
+n
+o);break;case"backwards":for(n=null
+i=t.child
+t.child=null;i!==null;){if(e=i.alternate
+e!==null&&xi(e)===null){t.child=i;break}e=i.sibling
+i.sibling=n
+n=i
+i=e}_o(t
+!0
+n
+null
+o);break;case"together":_o(t
+!1
+null
+null
+void 0);break;default:t.memoizedState=null}return t.child}function ri(e
+t){(t.mode&1)===0&&e!==null&&(e.alternate=null
+t.alternate=null
+t.flags|=2)}function at(e
+t
+n){if(e!==null&&(t.dependencies=e.dependencies)
+Gt|=t.lanes
+(n&t.childLanes)===0)return null;if(e!==null&&t.child!==e.child)throw Error(y(153));if(t.child!==null){for(e=t.child
+n=Lt(e
+e.pendingProps)
+t.child=n
+n.return=t;e.sibling!==null;)e=e.sibling
+n=n.sibling=Lt(e
+e.pendingProps)
+n.return=t;n.sibling=null}return t.child}function vp(e
+t
+n){switch(t.tag){case 3:Nc(t)
+kn();break;case 5:oc(t);break;case 1:we(t.type)&&yi(t);break;case 4:Zl(t
+t.stateNode.containerInfo);break;case 10:var r=t.type._context
+i=t.memoizedProps.value;D(wi
+r._currentValue)
+r._currentValue=i;break;case 13:if(r=t.memoizedState
+r!==null)return r.dehydrated!==null?(D(U
+U.current&1)
+t.flags|=128
+null):(n&t.child.childLanes)!==0?zc(e
+t
+n):(D(U
+U.current&1)
+e=at(e
+t
+n)
+e!==null?e.sibling:null);D(U
+U.current&1);break;case 19:if(r=(n&t.childLanes)!==0
+(e.flags&128)!==0){if(r)return Rc(e
+t
+n);t.flags|=128}if(i=t.memoizedState
+i!==null&&(i.rendering=null
+i.tail=null
+i.lastEffect=null)
+D(U
+U.current)
+r)break;return null;case 22:case 23:return t.lanes=0
+Ic(e
+t
+n)}return at(e
+t
+n)}var _c
+wl
+Oc
+Dc;_c=function(e
+t){for(var n=t.child;n!==null;){if(n.tag===5||n.tag===6)e.appendChild(n.stateNode);else if(n.tag!==4&&n.child!==null){n.child.return=n
+n=n.child;continue}if(n===t)break;for(;n.sibling===null;){if(n.return===null||n.return===t)return;n=n.return}n.sibling.return=n.return
+n=n.sibling}};wl=function(){};Oc=function(e
+t
+n
+r){var i=e.memoizedProps;if(i!==r){e=t.stateNode
+Bt(Xe.current);var o=null;switch(n){case"input":i=Uo(e
+i)
+r=Uo(e
+r)
+o=[];break;case"select":i=V({}
+i
+{value:void 0})
+r=V({}
+r
+{value:void 0})
+o=[];break;case"textarea":i=Go(e
+i)
+r=Go(e
+r)
+o=[];break;default:typeof i.onClick!="function"&&typeof r.onClick=="function"&&(e.onclick=hi)}Qo(n
+r);var l;n=null;for(p in i)if(!r.hasOwnProperty(p)&&i.hasOwnProperty(p)&&i[p]!=null)if(p==="style"){var u=i[p];for(l in u)u.hasOwnProperty(l)&&(n||(n={})
+n[l]="")}else p!=="dangerouslySetInnerHTML"&&p!=="children"&&p!=="suppressContentEditableWarning"&&p!=="suppressHydrationWarning"&&p!=="autoFocus"&&(tr.hasOwnProperty(p)?o||(o=[]):(o=o||[]).push(p
+null));for(p in r){var c=r[p];if(u=i?.[p]
+r.hasOwnProperty(p)&&c!==u&&(c!=null||u!=null))if(p==="style")if(u){for(l in u)!u.hasOwnProperty(l)||c&&c.hasOwnProperty(l)||(n||(n={})
+n[l]="");for(l in c)c.hasOwnProperty(l)&&u[l]!==c[l]&&(n||(n={})
+n[l]=c[l])}else n||(o||(o=[])
+o.push(p
+n))
+n=c;else p==="dangerouslySetInnerHTML"?(c=c?c.__html:void 0
+u=u?u.__html:void 0
+c!=null&&u!==c&&(o=o||[]).push(p
+c)):p==="children"?typeof c!="string"&&typeof c!="number"||(o=o||[]).push(p
+""+c):p!=="suppressContentEditableWarning"&&p!=="suppressHydrationWarning"&&(tr.hasOwnProperty(p)?(c!=null&&p==="onScroll"&&W("scroll"
+e)
+o||u===c||(o=[])):(o=o||[]).push(p
+c))}n&&(o=o||[]).push("style"
+n);var p=o;(t.updateQueue=p)&&(t.flags|=4)}};Dc=function(e
+t
+n
+r){n!==r&&(t.flags|=4)};function Bn(e
+t){if(!H)switch(e.tailMode){case"hidden":t=e.tail;for(var n=null;t!==null;)t.alternate!==null&&(n=t)
+t=t.sibling;n===null?e.tail=null:n.sibling=null;break;case"collapsed":n=e.tail;for(var r=null;n!==null;)n.alternate!==null&&(r=n)
+n=n.sibling;r===null?t||e.tail===null?e.tail=null:e.tail.sibling=null:r.sibling=null}}function ue(e){var t=e.alternate!==null&&e.alternate.child===e.child
+n=0
+r=0;if(t)for(var i=e.child;i!==null;)n|=i.lanes|i.childLanes
+r|=i.subtreeFlags&14680064
+r|=i.flags&14680064
+i.return=e
+i=i.sibling;else for(i=e.child;i!==null;)n|=i.lanes|i.childLanes
+r|=i.subtreeFlags
+r|=i.flags
+i.return=e
+i=i.sibling;return e.subtreeFlags|=r
+e.childLanes=n
+t}function Sp(e
+t
+n){var r=t.pendingProps;switch(ql(t)
+t.tag){case 2:case 16:case 15:case 0:case 11:case 7:case 8:case 12:case 9:case 14:return ue(t)
+null;case 1:return we(t.type)&&gi()
+ue(t)
+null;case 3:return r=t.stateNode
+xn()
+B(Se)
+B(de)
+ta()
+r.pendingContext&&(r.context=r.pendingContext
+r.pendingContext=null)
+(e===null||e.child===null)&&(qr(t)?t.flags|=4:e===null||e.memoizedState.isDehydrated&&(t.flags&256)===0||(t.flags|=1024
+Ue!==null&&(Pl(Ue)
+Ue=null)))
+wl(e
+t)
+ue(t)
+null;case 5:ea(t);var i=Bt(pr.current);if(n=t.type
+e!==null&&t.stateNode!=null)Oc(e
+t
+n
+r
+i)
+e.ref!==t.ref&&(t.flags|=512
+t.flags|=2097152);else{if(!r){if(t.stateNode===null)throw Error(y(166));return ue(t)
+null}if(e=Bt(Xe.current)
+qr(t)){r=t.stateNode
+n=t.type;var o=t.memoizedProps;switch(r[Ye]=t
+r[dr]=o
+e=(t.mode&1)!==0
+n){case"dialog":W("cancel"
+r)
+W("close"
+r);break;case"iframe":case"object":case"embed":W("load"
+r);break;case"video":case"audio":for(i=0;i<Gn.length;i++)W(Gn[i]
+r);break;case"source":W("error"
+r);break;case"img":case"image":case"link":W("error"
+r)
+W("load"
+r);break;case"details":W("toggle"
+r);break;case"input":Za(r
+o)
+W("invalid"
+r);break;case"select":r._wrapperState={wasMultiple:!!o.multiple}
+W("invalid"
+r);break;case"textarea":ts(r
+o)
+W("invalid"
+r)}Qo(n
+o)
+i=null;for(var l in o)if(o.hasOwnProperty(l)){var u=o[l];l==="children"?typeof u=="string"?r.textContent!==u&&(o.suppressHydrationWarning!==!0&&Gr(r.textContent
+u
+e)
+i=["children"
+u]):typeof u=="number"&&r.textContent!==""+u&&(o.suppressHydrationWarning!==!0&&Gr(r.textContent
+u
+e)
+i=["children"
+""+u]):tr.hasOwnProperty(l)&&u!=null&&l==="onScroll"&&W("scroll"
+r)}switch(n){case"input":Rr(r)
+es(r
+o
+!0);break;case"textarea":Rr(r)
+ns(r);break;case"select":case"option":break;default:typeof o.onClick=="function"&&(r.onclick=hi)}r=i
+t.updateQueue=r
+r!==null&&(t.flags|=4)}else{l=i.nodeType===9?i:i.ownerDocument
+e==="http://www.w3.org/1999/xhtml"&&(e=cu(n))
+e==="http://www.w3.org/1999/xhtml"?n==="script"?(e=l.createElement("div")
+e.innerHTML="<script><\/script>"
+e=e.removeChild(e.firstChild)):typeof r.is=="string"?e=l.createElement(n
+{is:r.is}):(e=l.createElement(n)
+n==="select"&&(l=e
+r.multiple?l.multiple=!0:r.size&&(l.size=r.size))):e=l.createElementNS(e
+n)
+e[Ye]=t
+e[dr]=r
+_c(e
+t
+!1
+!1)
+t.stateNode=e;e:{switch(l=Ko(n
+r)
+n){case"dialog":W("cancel"
+e)
+W("close"
+e)
+i=r;break;case"iframe":case"object":case"embed":W("load"
+e)
+i=r;break;case"video":case"audio":for(i=0;i<Gn.length;i++)W(Gn[i]
+e);i=r;break;case"source":W("error"
+e)
+i=r;break;case"img":case"image":case"link":W("error"
+e)
+W("load"
+e)
+i=r;break;case"details":W("toggle"
+e)
+i=r;break;case"input":Za(e
+r)
+i=Uo(e
+r)
+W("invalid"
+e);break;case"option":i=r;break;case"select":e._wrapperState={wasMultiple:!!r.multiple}
+i=V({}
+r
+{value:void 0})
+W("invalid"
+e);break;case"textarea":ts(e
+r)
+i=Go(e
+r)
+W("invalid"
+e);break;default:i=r}Qo(n
+i)
+u=i;for(o in u)if(u.hasOwnProperty(o)){var c=u[o];o==="style"?pu(e
+c):o==="dangerouslySetInnerHTML"?(c=c?c.__html:void 0
+c!=null&&du(e
+c)):o==="children"?typeof c=="string"?(n!=="textarea"||c!=="")&&nr(e
+c):typeof c=="number"&&nr(e
+""+c):o!=="suppressContentEditableWarning"&&o!=="suppressHydrationWarning"&&o!=="autoFocus"&&(tr.hasOwnProperty(o)?c!=null&&o==="onScroll"&&W("scroll"
+e):c!=null&&Nl(e
+o
+c
+l))}switch(n){case"input":Rr(e)
+es(e
+r
+!1);break;case"textarea":Rr(e)
+ns(e);break;case"option":r.value!=null&&e.setAttribute("value"
+""+Pt(r.value));break;case"select":e.multiple=!!r.multiple
+o=r.value
+o!=null?pn(e
+!!r.multiple
+o
+!1):r.defaultValue!=null&&pn(e
+!!r.multiple
+r.defaultValue
+!0);break;default:typeof i.onClick=="function"&&(e.onclick=hi)}switch(n){case"button":case"input":case"select":case"textarea":r=!!r.autoFocus;break e;case"img":r=!0;break e;default:r=!1}}r&&(t.flags|=4)}t.ref!==null&&(t.flags|=512
+t.flags|=2097152)}return ue(t)
+null;case 6:if(e&&t.stateNode!=null)Dc(e
+t
+e.memoizedProps
+r);else{if(typeof r!="string"&&t.stateNode===null)throw Error(y(166));if(n=Bt(pr.current)
+Bt(Xe.current)
+qr(t)){if(r=t.stateNode
+n=t.memoizedProps
+r[Ye]=t
+(o=r.nodeValue!==n)&&(e=Ee
+e!==null))switch(e.tag){case 3:Gr(r.nodeValue
+n
+(e.mode&1)!==0);break;case 5:e.memoizedProps.suppressHydrationWarning!==!0&&Gr(r.nodeValue
+n
+(e.mode&1)!==0)}o&&(t.flags|=4)}else r=(n.nodeType===9?n:n.ownerDocument).createTextNode(r)
+r[Ye]=t
+t.stateNode=r}return ue(t)
+null;case 13:if(B(U)
+r=t.memoizedState
+e===null||e.memoizedState!==null&&e.memoizedState.dehydrated!==null){if(H&&xe!==null&&(t.mode&1)!==0&&(t.flags&128)===0)ec()
+kn()
+t.flags|=98560
+o=!1;else if(o=qr(t)
+r!==null&&r.dehydrated!==null){if(e===null){if(!o)throw Error(y(318));if(o=t.memoizedState
+o=o!==null?o.dehydrated:null
+!o)throw Error(y(317));o[Ye]=t}else kn()
+(t.flags&128)===0&&(t.memoizedState=null)
+t.flags|=4;ue(t)
+o=!1}else Ue!==null&&(Pl(Ue)
+Ue=null)
+o=!0;if(!o)return t.flags&65536?t:null}return(t.flags&128)!==0?(t.lanes=n
+t):(r=r!==null
+r!==(e!==null&&e.memoizedState!==null)&&r&&(t.child.flags|=8192
+(t.mode&1)!==0&&(e===null||(U.current&1)!==0?J===0&&(J=3):pa()))
+t.updateQueue!==null&&(t.flags|=4)
+ue(t)
+null);case 4:return xn()
+wl(e
+t)
+e===null&&ur(t.stateNode.containerInfo)
+ue(t)
+null;case 10:return Yl(t.type._context)
+ue(t)
+null;case 17:return we(t.type)&&gi()
+ue(t)
+null;case 19:if(B(U)
+o=t.memoizedState
+o===null)return ue(t)
+null;if(r=(t.flags&128)!==0
+l=o.rendering
+l===null)if(r)Bn(o
+!1);else{if(J!==0||e!==null&&(e.flags&128)!==0)for(e=t.child;e!==null;){if(l=xi(e)
+l!==null){for(t.flags|=128
+Bn(o
+!1)
+r=l.updateQueue
+r!==null&&(t.updateQueue=r
+t.flags|=4)
+t.subtreeFlags=0
+r=n
+n=t.child;n!==null;)o=n
+e=r
+o.flags&=14680066
+l=o.alternate
+l===null?(o.childLanes=0
+o.lanes=e
+o.child=null
+o.subtreeFlags=0
+o.memoizedProps=null
+o.memoizedState=null
+o.updateQueue=null
+o.dependencies=null
+o.stateNode=null):(o.childLanes=l.childLanes
+o.lanes=l.lanes
+o.child=l.child
+o.subtreeFlags=0
+o.deletions=null
+o.memoizedProps=l.memoizedProps
+o.memoizedState=l.memoizedState
+o.updateQueue=l.updateQueue
+o.type=l.type
+e=l.dependencies
+o.dependencies=e===null?null:{lanes:e.lanes
+firstContext:e.firstContext})
+n=n.sibling;return D(U
+U.current&1|2)
+t.child}e=e.sibling}o.tail!==null&&Q()>An&&(t.flags|=128
+r=!0
+Bn(o
+!1)
+t.lanes=4194304)}else{if(!r)if(e=xi(l)
+e!==null){if(t.flags|=128
+r=!0
+n=e.updateQueue
+n!==null&&(t.updateQueue=n
+t.flags|=4)
+Bn(o
+!0)
+o.tail===null&&o.tailMode==="hidden"&&!l.alternate&&!H)return ue(t)
+null}else 2*Q()-o.renderingStartTime>An&&n!==1073741824&&(t.flags|=128
+r=!0
+Bn(o
+!1)
+t.lanes=4194304);o.isBackwards?(l.sibling=t.child
+t.child=l):(n=o.last
+n!==null?n.sibling=l:t.child=l
+o.last=l)}return o.tail!==null?(t=o.tail
+o.rendering=t
+o.tail=t.sibling
+o.renderingStartTime=Q()
+t.sibling=null
+n=U.current
+D(U
+r?n&1|2:n&1)
+t):(ue(t)
+null);case 22:case 23:return fa()
+r=t.memoizedState!==null
+e!==null&&e.memoizedState!==null!==r&&(t.flags|=8192)
+r&&(t.mode&1)!==0?(Ce&1073741824)!==0&&(ue(t)
+t.subtreeFlags&6&&(t.flags|=8192)):ue(t)
+null;case 24:return null;case 25:return null}throw Error(y(156
+t.tag))}function wp(e
+t){switch(ql(t)
+t.tag){case 1:return we(t.type)&&gi()
+e=t.flags
+e&65536?(t.flags=e&-65537|128
+t):null;case 3:return xn()
+B(Se)
+B(de)
+ta()
+e=t.flags
+(e&65536)!==0&&(e&128)===0?(t.flags=e&-65537|128
+t):null;case 5:return ea(t)
+null;case 13:if(B(U)
+e=t.memoizedState
+e!==null&&e.dehydrated!==null){if(t.alternate===null)throw Error(y(340));kn()}return e=t.flags
+e&65536?(t.flags=e&-65537|128
+t):null;case 19:return B(U)
+null;case 4:return xn()
+null;case 10:return Yl(t.type._context)
+null;case 22:case 23:return fa()
+null;case 24:return null;default:return null}}var br=!1
+ce=!1
+kp=typeof WeakSet=="function"?WeakSet:Set
+C=null;function dn(e
+t){var n=e.ref;if(n!==null)if(typeof n=="function")try{n(null)}catch(r){G(e
+t
+r)}else n.current=null}function kl(e
+t
+n){try{n()}catch(r){G(e
+t
+r)}}var qs=!1;function Cp(e
+t){if(il=fi
+e=Hu()
+Vl(e)){if("selectionStart"in e)var n={start:e.selectionStart
+end:e.selectionEnd};else e:{n=(n=e.ownerDocument)&&n.defaultView||window;var r=n.getSelection&&n.getSelection();if(r&&r.rangeCount!==0){n=r.anchorNode;var i=r.anchorOffset
+o=r.focusNode;r=r.focusOffset;try{n.nodeType
+o.nodeType}catch{n=null;break e}var l=0
+u=-1
+c=-1
+p=0
+g=0
+a=e
+f=null;t:for(;;){for(var v;a!==n||i!==0&&a.nodeType!==3||(u=l+i)
+a!==o||r!==0&&a.nodeType!==3||(c=l+r)
+a.nodeType===3&&(l+=a.nodeValue.length)
+(v=a.firstChild)!==null;)f=a
+a=v;for(;;){if(a===e)break t;if(f===n&&++p===i&&(u=l)
+f===o&&++g===r&&(c=l)
+(v=a.nextSibling)!==null)break;a=f
+f=a.parentNode}a=v}n=u===-1||c===-1?null:{start:u
+end:c}}else n=null}n=n||{start:0
+end:0}}else n=null;for(ol={focusedElem:e
+selectionRange:n}
+fi=!1
+C=t;C!==null;)if(t=C
+e=t.child
+(t.subtreeFlags&1028)!==0&&e!==null)e.return=t
+C=e;else for(;C!==null;){t=C;try{var w=t.alternate;if((t.flags&1024)!==0)switch(t.tag){case 0:case 11:case 15:break;case 1:if(w!==null){var x=w.memoizedProps
+q=w.memoizedState
+m=t.stateNode
+d=m.getSnapshotBeforeUpdate(t.elementType===t.type?x:$e(t.type
+x)
+q);m.__reactInternalSnapshotBeforeUpdate=d}break;case 3:var h=t.stateNode.containerInfo;h.nodeType===1?h.textContent="":h.nodeType===9&&h.documentElement&&h.removeChild(h.documentElement);break;case 5:case 6:case 4:case 17:break;default:throw Error(y(163))}}catch(S){G(t
+t.return
+S)}if(e=t.sibling
+e!==null){e.return=t.return
+C=e;break}C=t.return}return w=qs
+qs=!1
+w}function Xn(e
+t
+n){var r=t.updateQueue;if(r=r!==null?r.lastEffect:null
+r!==null){var i=r=r.next;do{if((i.tag&e)===e){var o=i.destroy;i.destroy=void 0
+o!==void 0&&kl(t
+n
+o)}i=i.next}while(i!==r)}}function Bi(e
+t){if(t=t.updateQueue
+t=t!==null?t.lastEffect:null
+t!==null){var n=t=t.next;do{if((n.tag&e)===e){var r=n.create;n.destroy=r()}n=n.next}while(n!==t)}}function Cl(e){var t=e.ref;if(t!==null){var n=e.stateNode;e.tag
+e=n
+typeof t=="function"?t(e):t.current=e}}function Fc(e){var t=e.alternate;t!==null&&(e.alternate=null
+Fc(t))
+e.child=null
+e.deletions=null
+e.sibling=null
+e.tag===5&&(t=e.stateNode
+t!==null&&(delete t[Ye]
+delete t[dr]
+delete t[sl]
+delete t[ip]
+delete t[op]))
+e.stateNode=null
+e.return=null
+e.dependencies=null
+e.memoizedProps=null
+e.memoizedState=null
+e.pendingProps=null
+e.stateNode=null
+e.updateQueue=null}function Wc(e){return e.tag===5||e.tag===3||e.tag===4}function Qs(e){e:for(;;){for(;e.sibling===null;){if(e.return===null||Wc(e.return))return null;e=e.return}for(e.sibling.return=e.return
+e=e.sibling;e.tag!==5&&e.tag!==6&&e.tag!==18;){if(e.flags&2||e.child===null||e.tag===4)continue e;e.child.return=e
+e=e.child}if(!(e.flags&2))return e.stateNode}}function xl(e
+t
+n){var r=e.tag;if(r===5||r===6)e=e.stateNode
+t?n.nodeType===8?n.parentNode.insertBefore(e
+t):n.insertBefore(e
+t):(n.nodeType===8?(t=n.parentNode
+t.insertBefore(e
+n)):(t=n
+t.appendChild(e))
+n=n._reactRootContainer
+n!=null||t.onclick!==null||(t.onclick=hi));else if(r!==4&&(e=e.child
+e!==null))for(xl(e
+t
+n)
+e=e.sibling;e!==null;)xl(e
+t
+n)
+e=e.sibling}function El(e
+t
+n){var r=e.tag;if(r===5||r===6)e=e.stateNode
+t?n.insertBefore(e
+t):n.appendChild(e);else if(r!==4&&(e=e.child
+e!==null))for(El(e
+t
+n)
+e=e.sibling;e!==null;)El(e
+t
+n)
+e=e.sibling}var re=null
+He=!1;function pt(e
+t
+n){for(n=n.child;n!==null;)Bc(e
+t
+n)
+n=n.sibling}function Bc(e
+t
+n){if(Je&&typeof Je.onCommitFiberUnmount=="function")try{Je.onCommitFiberUnmount(Ni
+n)}catch{}switch(n.tag){case 5:ce||dn(n
+t);case 6:var r=re
+i=He;re=null
+pt(e
+t
+n)
+re=r
+He=i
+re!==null&&(He?(e=re
+n=n.stateNode
+e.nodeType===8?e.parentNode.removeChild(n):e.removeChild(n)):re.removeChild(n.stateNode));break;case 18:re!==null&&(He?(e=re
+n=n.stateNode
+e.nodeType===8?Lo(e.parentNode
+n):e.nodeType===1&&Lo(e
+n)
+lr(e)):Lo(re
+n.stateNode));break;case 4:r=re
+i=He
+re=n.stateNode.containerInfo
+He=!0
+pt(e
+t
+n)
+re=r
+He=i;break;case 0:case 11:case 14:case 15:if(!ce&&(r=n.updateQueue
+r!==null&&(r=r.lastEffect
+r!==null))){i=r=r.next;do{var o=i
+l=o.destroy;o=o.tag
+l!==void 0&&((o&2)!==0||(o&4)!==0)&&kl(n
+t
+l)
+i=i.next}while(i!==r)}pt(e
+t
+n);break;case 1:if(!ce&&(dn(n
+t)
+r=n.stateNode
+typeof r.componentWillUnmount=="function"))try{r.props=n.memoizedProps
+r.state=n.memoizedState
+r.componentWillUnmount()}catch(u){G(n
+t
+u)}pt(e
+t
+n);break;case 21:pt(e
+t
+n);break;case 22:n.mode&1?(ce=(r=ce)||n.memoizedState!==null
+pt(e
+t
+n)
+ce=r):pt(e
+t
+n);break;default:pt(e
+t
+n)}}function Ks(e){var t=e.updateQueue;if(t!==null){e.updateQueue=null;var n=e.stateNode;n===null&&(n=e.stateNode=new kp)
+t.forEach(function(r){var i=Np.bind(null
+e
+r);n.has(r)||(n.add(r)
+r.then(i
+i))})}}function Be(e
+t){var n=t.deletions;if(n!==null)for(var r=0;r<n.length;r++){var i=n[r];try{var o=e
+l=t
+u=l;e:for(;u!==null;){switch(u.tag){case 5:re=u.stateNode
+He=!1;break e;case 3:re=u.stateNode.containerInfo
+He=!0;break e;case 4:re=u.stateNode.containerInfo
+He=!0;break e}u=u.return}if(re===null)throw Error(y(160));Bc(o
+l
+i)
+re=null
+He=!1;var c=i.alternate;c!==null&&(c.return=null)
+i.return=null}catch(p){G(i
+t
+p)}}if(t.subtreeFlags&12854)for(t=t.child;t!==null;)$c(t
+e)
+t=t.sibling}function $c(e
+t){var n=e.alternate
+r=e.flags;switch(e.tag){case 0:case 11:case 14:case 15:if(Be(t
+e)
+Ke(e)
+r&4){try{Xn(3
+e
+e.return)
+Bi(3
+e)}catch(x){G(e
+e.return
+x)}try{Xn(5
+e
+e.return)}catch(x){G(e
+e.return
+x)}}break;case 1:Be(t
+e)
+Ke(e)
+r&512&&n!==null&&dn(n
+n.return);break;case 5:if(Be(t
+e)
+Ke(e)
+r&512&&n!==null&&dn(n
+n.return)
+e.flags&32){var i=e.stateNode;try{nr(i
+"")}catch(x){G(e
+e.return
+x)}}if(r&4&&(i=e.stateNode
+i!=null)){var o=e.memoizedProps
+l=n!==null?n.memoizedProps:o
+u=e.type
+c=e.updateQueue;if(e.updateQueue=null
+c!==null)try{u==="input"&&o.type==="radio"&&o.name!=null&&su(i
+o)
+Ko(u
+l);var p=Ko(u
+o);for(l=0;l<c.length;l+=2){var g=c[l]
+a=c[l+1];g==="style"?pu(i
+a):g==="dangerouslySetInnerHTML"?du(i
+a):g==="children"?nr(i
+a):Nl(i
+g
+a
+p)}switch(u){case"input":jo(i
+o);break;case"textarea":uu(i
+o);break;case"select":var f=i._wrapperState.wasMultiple;i._wrapperState.wasMultiple=!!o.multiple;var v=o.value;v!=null?pn(i
+!!o.multiple
+v
+!1):f!==!!o.multiple&&(o.defaultValue!=null?pn(i
+!!o.multiple
+o.defaultValue
+!0):pn(i
+!!o.multiple
+o.multiple?[]:""
+!1))}i[dr]=o}catch(x){G(e
+e.return
+x)}}break;case 6:if(Be(t
+e)
+Ke(e)
+r&4){if(e.stateNode===null)throw Error(y(162));i=e.stateNode
+o=e.memoizedProps;try{i.nodeValue=o}catch(x){G(e
+e.return
+x)}}break;case 3:if(Be(t
+e)
+Ke(e)
+r&4&&n!==null&&n.memoizedState.isDehydrated)try{lr(t.containerInfo)}catch(x){G(e
+e.return
+x)}break;case 4:Be(t
+e)
+Ke(e);break;case 13:Be(t
+e)
+Ke(e)
+i=e.child
+i.flags&8192&&(o=i.memoizedState!==null
+i.stateNode.isHidden=o
+!o||i.alternate!==null&&i.alternate.memoizedState!==null||(ca=Q()))
+r&4&&Ks(e);break;case 22:if(g=n!==null&&n.memoizedState!==null
+e.mode&1?(ce=(p=ce)||g
+Be(t
+e)
+ce=p):Be(t
+e)
+Ke(e)
+r&8192){if(p=e.memoizedState!==null
+(e.stateNode.isHidden=p)&&!g&&(e.mode&1)!==0)for(C=e
+g=e.child;g!==null;){for(a=C=g;C!==null;){switch(f=C
+v=f.child
+f.tag){case 0:case 11:case 14:case 15:Xn(4
+f
+f.return);break;case 1:dn(f
+f.return);var w=f.stateNode;if(typeof w.componentWillUnmount=="function"){r=f
+n=f.return;try{t=r
+w.props=t.memoizedProps
+w.state=t.memoizedState
+w.componentWillUnmount()}catch(x){G(r
+n
+x)}}break;case 5:dn(f
+f.return);break;case 22:if(f.memoizedState!==null){Ys(a);continue}}v!==null?(v.return=f
+C=v):Ys(a)}g=g.sibling}e:for(g=null
+a=e;;){if(a.tag===5){if(g===null){g=a;try{i=a.stateNode
+p?(o=i.style
+typeof o.setProperty=="function"?o.setProperty("display"
+"none"
+"important"):o.display="none"):(u=a.stateNode
+c=a.memoizedProps.style
+l=c!=null&&c.hasOwnProperty("display")?c.display:null
+u.style.display=fu("display"
+l))}catch(x){G(e
+e.return
+x)}}}else if(a.tag===6){if(g===null)try{a.stateNode.nodeValue=p?"":a.memoizedProps}catch(x){G(e
+e.return
+x)}}else if((a.tag!==22&&a.tag!==23||a.memoizedState===null||a===e)&&a.child!==null){a.child.return=a
+a=a.child;continue}if(a===e)break e;for(;a.sibling===null;){if(a.return===null||a.return===e)break e;g===a&&(g=null)
+a=a.return}g===a&&(g=null)
+a.sibling.return=a.return
+a=a.sibling}}break;case 19:Be(t
+e)
+Ke(e)
+r&4&&Ks(e);break;case 21:break;default:Be(t
+e)
+Ke(e)}}function Ke(e){var t=e.flags;if(t&2){try{e:{for(var n=e.return;n!==null;){if(Wc(n)){var r=n;break e}n=n.return}throw Error(y(160))}switch(r.tag){case 5:var i=r.stateNode;r.flags&32&&(nr(i
+"")
+r.flags&=-33);var o=Qs(e);El(e
+o
+i);break;case 3:case 4:var l=r.stateNode.containerInfo
+u=Qs(e);xl(e
+u
+l);break;default:throw Error(y(161))}}catch(c){G(e
+e.return
+c)}e.flags&=-3}t&4096&&(e.flags&=-4097)}function xp(e
+t
+n){C=e
+Hc(e
+t
+n)}function Hc(e
+t
+n){for(var r=(e.mode&1)!==0;C!==null;){var i=C
+o=i.child;if(i.tag===22&&r){var l=i.memoizedState!==null||br;if(!l){var u=i.alternate
+c=u!==null&&u.memoizedState!==null||ce;u=br;var p=ce;if(br=l
+(ce=c)&&!p)for(C=i;C!==null;)l=C
+c=l.child
+l.tag===22&&l.memoizedState!==null?Js(i):c!==null?(c.return=l
+C=c):Js(i);for(;o!==null;)C=o
+Hc(o
+t
+n)
+o=o.sibling;C=i
+br=u
+ce=p}bs(e
+t
+n)}else(i.subtreeFlags&8772)!==0&&o!==null?(o.return=i
+C=o):bs(e
+t
+n)}}function bs(e){for(;C!==null;){var t=C;if((t.flags&8772)!==0){var n=t.alternate;try{if((t.flags&8772)!==0)switch(t.tag){case 0:case 11:case 15:ce||Bi(5
+t);break;case 1:var r=t.stateNode;if(t.flags&4&&!ce)if(n===null)r.componentDidMount();else{var i=t.elementType===t.type?n.memoizedProps:$e(t.type
+n.memoizedProps);r.componentDidUpdate(i
+n.memoizedState
+r.__reactInternalSnapshotBeforeUpdate)}var o=t.updateQueue;o!==null&&Rs(t
+o
+r);break;case 3:var l=t.updateQueue;if(l!==null){if(n=null
+t.child!==null)switch(t.child.tag){case 5:n=t.child.stateNode;break;case 1:n=t.child.stateNode}Rs(t
+l
+n)}break;case 5:var u=t.stateNode;if(n===null&&t.flags&4){n=u;var c=t.memoizedProps;switch(t.type){case"button":case"input":case"select":case"textarea":c.autoFocus&&n.focus();break;case"img":c.src&&(n.src=c.src)}}break;case 6:break;case 4:break;case 12:break;case 13:if(t.memoizedState===null){var p=t.alternate;if(p!==null){var g=p.memoizedState;if(g!==null){var a=g.dehydrated;a!==null&&lr(a)}}}break;case 19:case 17:case 21:case 22:case 23:case 25:break;default:throw Error(y(163))}ce||t.flags&512&&Cl(t)}catch(f){G(t
+t.return
+f)}}if(t===e){C=null;break}if(n=t.sibling
+n!==null){n.return=t.return
+C=n;break}C=t.return}}function Ys(e){for(;C!==null;){var t=C;if(t===e){C=null;break}var n=t.sibling;if(n!==null){n.return=t.return
+C=n;break}C=t.return}}function Js(e){for(;C!==null;){var t=C;try{switch(t.tag){case 0:case 11:case 15:var n=t.return;try{Bi(4
+t)}catch(c){G(t
+n
+c)}break;case 1:var r=t.stateNode;if(typeof r.componentDidMount=="function"){var i=t.return;try{r.componentDidMount()}catch(c){G(t
+i
+c)}}var o=t.return;try{Cl(t)}catch(c){G(t
+o
+c)}break;case 5:var l=t.return;try{Cl(t)}catch(c){G(t
+l
+c)}}}catch(c){G(t
+t.return
+c)}if(t===e){C=null;break}var u=t.sibling;if(u!==null){u.return=t.return
+C=u;break}C=t.return}}var Ep=Math.ceil
+Ti=st.ReactCurrentDispatcher
+sa=st.ReactCurrentOwner
+Re=st.ReactCurrentBatchConfig
+M=0
+ne=null
+K=null
+ie=0
+Ce=0
+fn=Nt(0)
+J=0
+yr=null
+Gt=0
+$i=0
+ua=0
+Zn=null
+ye=null
+ca=0
+An=1/0
+Ze=null
+Li=!1
+Al=null
+At=null
+Yr=!1
+St=null
+Pi=0
+er=0
+Tl=null
+ii=-1
+oi=0;function he(){return(M&6)!==0?Q():ii!==-1?ii:ii=Q()}function Tt(e){return(e.mode&1)===0?1:(M&2)!==0&&ie!==0?ie&-ie:ap.transition!==null?(oi===0&&(oi=Au())
+oi):(e=z
+e!==0||(e=window.event
+e=e===void 0?16:zu(e.type))
+e)}function Ve(e
+t
+n
+r){if(50<er)throw er=0
+Tl=null
+Error(y(185));vr(e
+n
+r)
+((M&2)===0||e!==ne)&&(e===ne&&((M&2)===0&&($i|=n)
+J===4&&yt(e
+ie))
+ke(e
+r)
+n===1&&M===0&&(t.mode&1)===0&&(An=Q()+500
+Di&&zt()))}function ke(e
+t){var n=e.callbackNode;uf(e
+t);var r=di(e
+e===ne?ie:0);if(r===0)n!==null&&os(n)
+e.callbackNode=null
+e.callbackPriority=0;else if(t=r&-r
+e.callbackPriority!==t){if(n!=null&&os(n)
+t===1)e.tag===0?lp(Xs.bind(null
+e)):Ju(Xs.bind(null
+e))
+np(function(){(M&6)===0&&zt()})
+n=null;else{switch(Tu(r)){case 1:n=Dl;break;case 4:n=xu;break;case 16:n=ci;break;case 536870912:n=Eu;break;default:n=ci}n=bc(n
+Uc.bind(null
+e))}e.callbackPriority=t
+e.callbackNode=n}}function Uc(e
+t){if(ii=-1
+oi=0
+(M&6)!==0)throw Error(y(327));var n=e.callbackNode;if(vn()&&e.callbackNode!==n)return null;var r=di(e
+e===ne?ie:0);if(r===0)return null;if((r&30)!==0||(r&e.expiredLanes)!==0||t)t=Ii(e
+r);else{t=r;var i=M;M|=2;var o=Vc();(ne!==e||ie!==t)&&(Ze=null
+An=Q()+500
+$t(e
+t));do try{Lp();break}catch(u){jc(e
+u)}while(!0);bl()
+Ti.current=o
+M=i
+K!==null?t=0:(ne=null
+ie=0
+t=J)}if(t!==0){if(t===2&&(i=Zo(e)
+i!==0&&(r=i
+t=Ll(e
+i)))
+t===1)throw n=yr
+$t(e
+0)
+yt(e
+r)
+ke(e
+Q())
+n;if(t===6)yt(e
+r);else{if(i=e.current.alternate
+(r&30)===0&&!Ap(i)&&(t=Ii(e
+r)
+t===2&&(o=Zo(e)
+o!==0&&(r=o
+t=Ll(e
+o)))
+t===1))throw n=yr
+$t(e
+0)
+yt(e
+r)
+ke(e
+Q())
+n;switch(e.finishedWork=i
+e.finishedLanes=r
+t){case 0:case 1:throw Error(y(345));case 2:Dt(e
+ye
+Ze);break;case 3:if(yt(e
+r)
+(r&130023424)===r&&(t=ca+500-Q()
+10<t)){if(di(e
+0)!==0)break;if(i=e.suspendedLanes
+(i&r)!==r){he()
+e.pingedLanes|=e.suspendedLanes&i;break}e.timeoutHandle=al(Dt.bind(null
+e
+ye
+Ze)
+t);break}Dt(e
+ye
+Ze);break;case 4:if(yt(e
+r)
+(r&4194240)===r)break;for(t=e.eventTimes
+i=-1;0<r;){var l=31-je(r);o=1<<l
+l=t[l]
+l>i&&(i=l)
+r&=~o}if(r=i
+r=Q()-r
+r=(120>r?120:480>r?480:1080>r?1080:1920>r?1920:3e3>r?3e3:4320>r?4320:1960*Ep(r/1960))-r
+10<r){e.timeoutHandle=al(Dt.bind(null
+e
+ye
+Ze)
+r);break}Dt(e
+ye
+Ze);break;case 5:Dt(e
+ye
+Ze);break;default:throw Error(y(329))}}}return ke(e
+Q())
+e.callbackNode===n?Uc.bind(null
+e):null}function Ll(e
+t){var n=Zn;return e.current.memoizedState.isDehydrated&&($t(e
+t).flags|=256)
+e=Ii(e
+t)
+e!==2&&(t=ye
+ye=n
+t!==null&&Pl(t))
+e}function Pl(e){ye===null?ye=e:ye.push.apply(ye
+e)}function Ap(e){for(var t=e;;){if(t.flags&16384){var n=t.updateQueue;if(n!==null&&(n=n.stores
+n!==null))for(var r=0;r<n.length;r++){var i=n[r]
+o=i.getSnapshot;i=i.value;try{if(!Ge(o()
+i))return!1}catch{return!1}}}if(n=t.child
+t.subtreeFlags&16384&&n!==null)n.return=t
+t=n;else{if(t===e)break;for(;t.sibling===null;){if(t.return===null||t.return===e)return!0;t=t.return}t.sibling.return=t.return
+t=t.sibling}}return!0}function yt(e
+t){for(t&=~ua
+t&=~$i
+e.suspendedLanes|=t
+e.pingedLanes&=~t
+e=e.expirationTimes;0<t;){var n=31-je(t)
+r=1<<n;e[n]=-1
+t&=~r}}function Xs(e){if((M&6)!==0)throw Error(y(327));vn();var t=di(e
+0);if((t&1)===0)return ke(e
+Q())
+null;var n=Ii(e
+t);if(e.tag!==0&&n===2){var r=Zo(e);r!==0&&(t=r
+n=Ll(e
+r))}if(n===1)throw n=yr
+$t(e
+0)
+yt(e
+t)
+ke(e
+Q())
+n;if(n===6)throw Error(y(345));return e.finishedWork=e.current.alternate
+e.finishedLanes=t
+Dt(e
+ye
+Ze)
+ke(e
+Q())
+null}function da(e
+t){var n=M;M|=1;try{return e(t)}finally{M=n
+M===0&&(An=Q()+500
+Di&&zt())}}function qt(e){St!==null&&St.tag===0&&(M&6)===0&&vn();var t=M;M|=1;var n=Re.transition
+r=z;try{if(Re.transition=null
+z=1
+e)return e()}finally{z=r
+Re.transition=n
+M=t
+(M&6)===0&&zt()}}function fa(){Ce=fn.current
+B(fn)}function $t(e
+t){e.finishedWork=null
+e.finishedLanes=0;var n=e.timeoutHandle;if(n!==-1&&(e.timeoutHandle=-1
+tp(n))
+K!==null)for(n=K.return;n!==null;){var r=n;switch(ql(r)
+r.tag){case 1:r=r.type.childContextTypes
+r!=null&&gi();break;case 3:xn()
+B(Se)
+B(de)
+ta();break;case 5:ea(r);break;case 4:xn();break;case 13:B(U);break;case 19:B(U);break;case 10:Yl(r.type._context);break;case 22:case 23:fa()}n=n.return}if(ne=e
+K=e=Lt(e.current
+null)
+ie=Ce=t
+J=0
+yr=null
+ua=$i=Gt=0
+ye=Zn=null
+Wt!==null){for(t=0;t<Wt.length;t++)if(n=Wt[t]
+r=n.interleaved
+r!==null){n.interleaved=null;var i=r.next
+o=n.pending;if(o!==null){var l=o.next;o.next=i
+r.next=l}n.pending=r}Wt=null}return e}function jc(e
+t){do{var n=K;try{if(bl()
+ti.current=Ai
+Ei){for(var r=j.memoizedState;r!==null;){var i=r.queue;i!==null&&(i.pending=null)
+r=r.next}Ei=!1}if(Vt=0
+te=Y=j=null
+Jn=!1
+mr=0
+sa.current=null
+n===null||n.return===null){J=1
+yr=t
+K=null;break}e:{var o=e
+l=n.return
+u=n
+c=t;if(t=ie
+u.flags|=32768
+c!==null&&typeof c=="object"&&typeof c.then=="function"){var p=c
+g=u
+a=g.tag;if((g.mode&1)===0&&(a===0||a===11||a===15)){var f=g.alternate;f?(g.updateQueue=f.updateQueue
+g.memoizedState=f.memoizedState
+g.lanes=f.lanes):(g.updateQueue=null
+g.memoizedState=null)}var v=Bs(l);if(v!==null){v.flags&=-257
+$s(v
+l
+u
+o
+t)
+v.mode&1&&Ws(o
+p
+t)
+t=v
+c=p;var w=t.updateQueue;if(w===null){var x=new Set;x.add(c)
+t.updateQueue=x}else w.add(c);break e}else{if((t&1)===0){Ws(o
+p
+t)
+pa();break e}c=Error(y(426))}}else if(H&&u.mode&1){var q=Bs(l);if(q!==null){(q.flags&65536)===0&&(q.flags|=256)
+$s(q
+l
+u
+o
+t)
+Ql(En(c
+u));break e}}o=c=En(c
+u)
+J!==4&&(J=2)
+Zn===null?Zn=[o]:Zn.push(o)
+o=l;do{switch(o.tag){case 3:o.flags|=65536
+t&=-t
+o.lanes|=t;var m=Tc(o
+c
+t);zs(o
+m);break e;case 1:u=c;var d=o.type
+h=o.stateNode;if((o.flags&128)===0&&(typeof d.getDerivedStateFromError=="function"||h!==null&&typeof h.componentDidCatch=="function"&&(At===null||!At.has(h)))){o.flags|=65536
+t&=-t
+o.lanes|=t;var S=Lc(o
+u
+t);zs(o
+S);break e}}o=o.return}while(o!==null)}qc(n)}catch(E){t=E
+K===n&&n!==null&&(K=n=n.return);continue}break}while(!0)}function Vc(){var e=Ti.current;return Ti.current=Ai
+e===null?Ai:e}function pa(){(J===0||J===3||J===2)&&(J=4)
+ne===null||(Gt&268435455)===0&&($i&268435455)===0||yt(ne
+ie)}function Ii(e
+t){var n=M;M|=2;var r=Vc();(ne!==e||ie!==t)&&(Ze=null
+$t(e
+t));do try{Tp();break}catch(i){jc(e
+i)}while(!0);if(bl()
+M=n
+Ti.current=r
+K!==null)throw Error(y(261));return ne=null
+ie=0
+J}function Tp(){for(;K!==null;)Gc(K)}function Lp(){for(;K!==null&&!Zd();)Gc(K)}function Gc(e){var t=Kc(e.alternate
+e
+Ce);e.memoizedProps=e.pendingProps
+t===null?qc(e):K=t
+sa.current=null}function qc(e){var t=e;do{var n=t.alternate;if(e=t.return
+(t.flags&32768)===0){if(n=Sp(n
+t
+Ce)
+n!==null){K=n;return}}else{if(n=wp(n
+t)
+n!==null){n.flags&=32767
+K=n;return}if(e!==null)e.flags|=32768
+e.subtreeFlags=0
+e.deletions=null;else{J=6
+K=null;return}}if(t=t.sibling
+t!==null){K=t;return}K=t=e}while(t!==null);J===0&&(J=5)}function Dt(e
+t
+n){var r=z
+i=Re.transition;try{Re.transition=null
+z=1
+Pp(e
+t
+n
+r)}finally{Re.transition=i
+z=r}return null}function Pp(e
+t
+n
+r){do vn();while(St!==null);if((M&6)!==0)throw Error(y(327));n=e.finishedWork;var i=e.finishedLanes;if(n===null)return null;if(e.finishedWork=null
+e.finishedLanes=0
+n===e.current)throw Error(y(177));e.callbackNode=null
+e.callbackPriority=0;var o=n.lanes|n.childLanes;if(cf(e
+o)
+e===ne&&(K=ne=null
+ie=0)
+(n.subtreeFlags&2064)===0&&(n.flags&2064)===0||Yr||(Yr=!0
+bc(ci
+function(){return vn()
+null}))
+o=(n.flags&15990)!==0
+(n.subtreeFlags&15990)!==0||o){o=Re.transition
+Re.transition=null;var l=z;z=1;var u=M;M|=4
+sa.current=null
+Cp(e
+n)
+$c(n
+e)
+Yf(ol)
+fi=!!il
+ol=il=null
+e.current=n
+xp(n
+e
+i)
+ef()
+M=u
+z=l
+Re.transition=o}else e.current=n;if(Yr&&(Yr=!1
+St=e
+Pi=i)
+o=e.pendingLanes
+o===0&&(At=null)
+rf(n.stateNode
+r)
+ke(e
+Q())
+t!==null)for(r=e.onRecoverableError
+n=0;n<t.length;n++)i=t[n]
+r(i.value
+{componentStack:i.stack
+digest:i.digest});if(Li)throw Li=!1
+e=Al
+Al=null
+e;return(Pi&1)!==0&&e.tag!==0&&vn()
+o=e.pendingLanes
+(o&1)!==0?e===Tl?er++:(er=0
+Tl=e):er=0
+zt()
+null}function vn(){if(St!==null){var e=Tu(Pi)
+t=Re.transition
+n=z;try{if(Re.transition=null
+z=16>e?16:e
+St===null)var r=!1;else{if(e=St
+St=null
+Pi=0
+(M&6)!==0)throw Error(y(331));var i=M;for(M|=4
+C=e.current;C!==null;){var o=C
+l=o.child;if((C.flags&16)!==0){var u=o.deletions;if(u!==null){for(var c=0;c<u.length;c++){var p=u[c];for(C=p;C!==null;){var g=C;switch(g.tag){case 0:case 11:case 15:Xn(8
+g
+o)}var a=g.child;if(a!==null)a.return=g
+C=a;else for(;C!==null;){g=C;var f=g.sibling
+v=g.return;if(Fc(g)
+g===p){C=null;break}if(f!==null){f.return=v
+C=f;break}C=v}}}var w=o.alternate;if(w!==null){var x=w.child;if(x!==null){w.child=null;do{var q=x.sibling;x.sibling=null
+x=q}while(x!==null)}}C=o}}if((o.subtreeFlags&2064)!==0&&l!==null)l.return=o
+C=l;else e:for(;C!==null;){if(o=C
+(o.flags&2048)!==0)switch(o.tag){case 0:case 11:case 15:Xn(9
+o
+o.return)}var m=o.sibling;if(m!==null){m.return=o.return
+C=m;break e}C=o.return}}var d=e.current;for(C=d;C!==null;){l=C;var h=l.child;if((l.subtreeFlags&2064)!==0&&h!==null)h.return=l
+C=h;else e:for(l=d;C!==null;){if(u=C
+(u.flags&2048)!==0)try{switch(u.tag){case 0:case 11:case 15:Bi(9
+u)}}catch(E){G(u
+u.return
+E)}if(u===l){C=null;break e}var S=u.sibling;if(S!==null){S.return=u.return
+C=S;break e}C=u.return}}if(M=i
+zt()
+Je&&typeof Je.onPostCommitFiberRoot=="function")try{Je.onPostCommitFiberRoot(Ni
+e)}catch{}r=!0}return r}finally{z=n
+Re.transition=t}}return!1}function Zs(e
+t
+n){t=En(n
+t)
+t=Tc(e
+t
+1)
+e=Et(e
+t
+1)
+t=he()
+e!==null&&(vr(e
+1
+t)
+ke(e
+t))}function G(e
+t
+n){if(e.tag===3)Zs(e
+e
+n);else for(;t!==null;){if(t.tag===3){Zs(t
+e
+n);break}else if(t.tag===1){var r=t.stateNode;if(typeof t.type.getDerivedStateFromError=="function"||typeof r.componentDidCatch=="function"&&(At===null||!At.has(r))){e=En(n
+e)
+e=Lc(t
+e
+1)
+t=Et(t
+e
+1)
+e=he()
+t!==null&&(vr(t
+1
+e)
+ke(t
+e));break}}t=t.return}}function Ip(e
+t
+n){var r=e.pingCache;r!==null&&r.delete(t)
+t=he()
+e.pingedLanes|=e.suspendedLanes&n
+ne===e&&(ie&n)===n&&(J===4||J===3&&(ie&130023424)===ie&&500>Q()-ca?$t(e
+0):ua|=n)
+ke(e
+t)}function Qc(e
+t){t===0&&((e.mode&1)===0?t=1:(t=Dr
+Dr<<=1
+(Dr&130023424)===0&&(Dr=4194304)));var n=he();e=lt(e
+t)
+e!==null&&(vr(e
+t
+n)
+ke(e
+n))}function Mp(e){var t=e.memoizedState
+n=0;t!==null&&(n=t.retryLane)
+Qc(e
+n)}function Np(e
+t){var n=0;switch(e.tag){case 13:var r=e.stateNode
+i=e.memoizedState;i!==null&&(n=i.retryLane);break;case 19:r=e.stateNode;break;default:throw Error(y(314))}r!==null&&r.delete(t)
+Qc(e
+n)}var Kc;Kc=function(e
+t
+n){if(e!==null)if(e.memoizedProps!==t.pendingProps||Se.current)ve=!0;else{if((e.lanes&n)===0&&(t.flags&128)===0)return ve=!1
+vp(e
+t
+n);ve=(e.flags&131072)!==0}else ve=!1
+H&&(t.flags&1048576)!==0&&Xu(t
+Si
+t.index);switch(t.lanes=0
+t.tag){case 2:var r=t.type;ri(e
+t)
+e=t.pendingProps;var i=wn(t
+de.current);yn(t
+n)
+i=ra(null
+t
+r
+e
+i
+n);var o=ia();return t.flags|=1
+typeof i=="object"&&i!==null&&typeof i.render=="function"&&i.$$typeof===void 0?(t.tag=1
+t.memoizedState=null
+t.updateQueue=null
+we(r)?(o=!0
+yi(t)):o=!1
+t.memoizedState=i.state!==null&&i.state!==void 0?i.state:null
+Xl(t)
+i.updater=Wi
+t.stateNode=i
+i._reactInternals=t
+ml(t
+r
+e
+n)
+t=yl(null
+t
+r
+!0
+o
+n)):(t.tag=0
+H&&o&&Gl(t)
+me(null
+t
+i
+n)
+t=t.child)
+t;case 16:r=t.elementType;e:{switch(ri(e
+t)
+e=t.pendingProps
+i=r._init
+r=i(r._payload)
+t.type=r
+i=t.tag=Rp(r)
+e=$e(r
+e)
+i){case 0:t=gl(null
+t
+r
+e
+n);break e;case 1:t=js(null
+t
+r
+e
+n);break e;case 11:t=Hs(null
+t
+r
+e
+n);break e;case 14:t=Us(null
+t
+r
+$e(r.type
+e)
+n);break e}throw Error(y(306
+r
+""))}return t;case 0:return r=t.type
+i=t.pendingProps
+i=t.elementType===r?i:$e(r
+i)
+gl(e
+t
+r
+i
+n);case 1:return r=t.type
+i=t.pendingProps
+i=t.elementType===r?i:$e(r
+i)
+js(e
+t
+r
+i
+n);case 3:e:{if(Nc(t)
+e===null)throw Error(y(387));r=t.pendingProps
+o=t.memoizedState
+i=o.element
+ic(e
+t)
+Ci(t
+r
+null
+n);var l=t.memoizedState;if(r=l.element
+o.isDehydrated)if(o={element:r
+isDehydrated:!1
+cache:l.cache
+pendingSuspenseBoundaries:l.pendingSuspenseBoundaries
+transitions:l.transitions}
+t.updateQueue.baseState=o
+t.memoizedState=o
+t.flags&256){i=En(Error(y(423))
+t)
+t=Vs(e
+t
+r
+n
+i);break e}else if(r!==i){i=En(Error(y(424))
+t)
+t=Vs(e
+t
+r
+n
+i);break e}else for(xe=xt(t.stateNode.containerInfo.firstChild)
+Ee=t
+H=!0
+Ue=null
+n=nc(t
+null
+r
+n)
+t.child=n;n;)n.flags=n.flags&-3|4096
+n=n.sibling;else{if(kn()
+r===i){t=at(e
+t
+n);break e}me(e
+t
+r
+n)}t=t.child}return t;case 5:return oc(t)
+e===null&&dl(t)
+r=t.type
+i=t.pendingProps
+o=e!==null?e.memoizedProps:null
+l=i.children
+ll(r
+i)?l=null:o!==null&&ll(r
+o)&&(t.flags|=32)
+Mc(e
+t)
+me(e
+t
+l
+n)
+t.child;case 6:return e===null&&dl(t)
+null;case 13:return zc(e
+t
+n);case 4:return Zl(t
+t.stateNode.containerInfo)
+r=t.pendingProps
+e===null?t.child=Cn(t
+null
+r
+n):me(e
+t
+r
+n)
+t.child;case 11:return r=t.type
+i=t.pendingProps
+i=t.elementType===r?i:$e(r
+i)
+Hs(e
+t
+r
+i
+n);case 7:return me(e
+t
+t.pendingProps
+n)
+t.child;case 8:return me(e
+t
+t.pendingProps.children
+n)
+t.child;case 12:return me(e
+t
+t.pendingProps.children
+n)
+t.child;case 10:e:{if(r=t.type._context
+i=t.pendingProps
+o=t.memoizedProps
+l=i.value
+D(wi
+r._currentValue)
+r._currentValue=l
+o!==null)if(Ge(o.value
+l)){if(o.children===i.children&&!Se.current){t=at(e
+t
+n);break e}}else for(o=t.child
+o!==null&&(o.return=t);o!==null;){var u=o.dependencies;if(u!==null){l=o.child;for(var c=u.firstContext;c!==null;){if(c.context===r){if(o.tag===1){c=rt(-1
+n&-n)
+c.tag=2;var p=o.updateQueue;if(p!==null){p=p.shared;var g=p.pending;g===null?c.next=c:(c.next=g.next
+g.next=c)
+p.pending=c}}o.lanes|=n
+c=o.alternate
+c!==null&&(c.lanes|=n)
+fl(o.return
+n
+t)
+u.lanes|=n;break}c=c.next}}else if(o.tag===10)l=o.type===t.type?null:o.child;else if(o.tag===18){if(l=o.return
+l===null)throw Error(y(341));l.lanes|=n
+u=l.alternate
+u!==null&&(u.lanes|=n)
+fl(l
+n
+t)
+l=o.sibling}else l=o.child;if(l!==null)l.return=o;else for(l=o;l!==null;){if(l===t){l=null;break}if(o=l.sibling
+o!==null){o.return=l.return
+l=o;break}l=l.return}o=l}me(e
+t
+i.children
+n)
+t=t.child}return t;case 9:return i=t.type
+r=t.pendingProps.children
+yn(t
+n)
+i=_e(i)
+r=r(i)
+t.flags|=1
+me(e
+t
+r
+n)
+t.child;case 14:return r=t.type
+i=$e(r
+t.pendingProps)
+i=$e(r.type
+i)
+Us(e
+t
+r
+i
+n);case 15:return Pc(e
+t
+t.type
+t.pendingProps
+n);case 17:return r=t.type
+i=t.pendingProps
+i=t.elementType===r?i:$e(r
+i)
+ri(e
+t)
+t.tag=1
+we(r)?(e=!0
+yi(t)):e=!1
+yn(t
+n)
+Ac(t
+r
+i)
+ml(t
+r
+i
+n)
+yl(null
+t
+r
+!0
+e
+n);case 19:return Rc(e
+t
+n);case 22:return Ic(e
+t
+n)}throw Error(y(156
+t.tag))};function bc(e
+t){return Cu(e
+t)}function zp(e
+t
+n
+r){this.tag=e
+this.key=n
+this.sibling=this.child=this.return=this.stateNode=this.type=this.elementType=null
+this.index=0
+this.ref=null
+this.pendingProps=t
+this.dependencies=this.memoizedState=this.updateQueue=this.memoizedProps=null
+this.mode=r
+this.subtreeFlags=this.flags=0
+this.deletions=null
+this.childLanes=this.lanes=0
+this.alternate=null}function ze(e
+t
+n
+r){return new zp(e
+t
+n
+r)}function ma(e){return e=e.prototype
+!(!e||!e.isReactComponent)}function Rp(e){if(typeof e=="function")return ma(e)?1:0;if(e!=null){if(e=e.$$typeof
+e===Rl)return 11;if(e===_l)return 14}return 2}function Lt(e
+t){var n=e.alternate;return n===null?(n=ze(e.tag
+t
+e.key
+e.mode)
+n.elementType=e.elementType
+n.type=e.type
+n.stateNode=e.stateNode
+n.alternate=e
+e.alternate=n):(n.pendingProps=t
+n.type=e.type
+n.flags=0
+n.subtreeFlags=0
+n.deletions=null)
+n.flags=e.flags&14680064
+n.childLanes=e.childLanes
+n.lanes=e.lanes
+n.child=e.child
+n.memoizedProps=e.memoizedProps
+n.memoizedState=e.memoizedState
+n.updateQueue=e.updateQueue
+t=e.dependencies
+n.dependencies=t===null?null:{lanes:t.lanes
+firstContext:t.firstContext}
+n.sibling=e.sibling
+n.index=e.index
+n.ref=e.ref
+n}function li(e
+t
+n
+r
+i
+o){var l=2;if(r=e
+typeof e=="function")ma(e)&&(l=1);else if(typeof e=="string")l=5;else e:switch(e){case tn:return Ht(n.children
+i
+o
+t);case zl:l=8
+i|=8;break;case Wo:return e=ze(12
+n
+t
+i|2)
+e.elementType=Wo
+e.lanes=o
+e;case Bo:return e=ze(13
+n
+t
+i)
+e.elementType=Bo
+e.lanes=o
+e;case $o:return e=ze(19
+n
+t
+i)
+e.elementType=$o
+e.lanes=o
+e;case ou:return Hi(n
+i
+o
+t);default:if(typeof e=="object"&&e!==null)switch(e.$$typeof){case ru:l=10;break e;case iu:l=9;break e;case Rl:l=11;break e;case _l:l=14;break e;case mt:l=16
+r=null;break e}throw Error(y(130
+e==null?e:typeof e
+""))}return t=ze(l
+n
+t
+i)
+t.elementType=e
+t.type=r
+t.lanes=o
+t}function Ht(e
+t
+n
+r){return e=ze(7
+e
+r
+t)
+e.lanes=n
+e}function Hi(e
+t
+n
+r){return e=ze(22
+e
+r
+t)
+e.elementType=ou
+e.lanes=n
+e.stateNode={isHidden:!1}
+e}function Oo(e
+t
+n){return e=ze(6
+e
+null
+t)
+e.lanes=n
+e}function Do(e
+t
+n){return t=ze(4
+e.children!==null?e.children:[]
+e.key
+t)
+t.lanes=n
+t.stateNode={containerInfo:e.containerInfo
+pendingChildren:null
+implementation:e.implementation}
+t}function _p(e
+t
+n
+r
+i){this.tag=t
+this.containerInfo=e
+this.finishedWork=this.pingCache=this.current=this.pendingChildren=null
+this.timeoutHandle=-1
+this.callbackNode=this.pendingContext=this.context=null
+this.callbackPriority=0
+this.eventTimes=So(0)
+this.expirationTimes=So(-1)
+this.entangledLanes=this.finishedLanes=this.mutableReadLanes=this.expiredLanes=this.pingedLanes=this.suspendedLanes=this.pendingLanes=0
+this.entanglements=So(0)
+this.identifierPrefix=r
+this.onRecoverableError=i
+this.mutableSourceEagerHydrationData=null}function ha(e
+t
+n
+r
+i
+o
+l
+u
+c){return e=new _p(e
+t
+n
+u
+c)
+t===1?(t=1
+o===!0&&(t|=8)):t=0
+o=ze(3
+null
+null
+t)
+e.current=o
+o.stateNode=e
+o.memoizedState={element:r
+isDehydrated:n
+cache:null
+transitions:null
+pendingSuspenseBoundaries:null}
+Xl(o)
+e}function Op(e
+t
+n){var r=3<arguments.length&&arguments[3]!==void 0?arguments[3]:null;return{$$typeof:en
+key:r==null?null:""+r
+children:e
+containerInfo:t
+implementation:n}}function Yc(e){if(!e)return It;e=e._reactInternals;e:{if(Kt(e)!==e||e.tag!==1)throw Error(y(170));var t=e;do{switch(t.tag){case 3:t=t.stateNode.context;break e;case 1:if(we(t.type)){t=t.stateNode.__reactInternalMemoizedMergedChildContext;break e}}t=t.return}while(t!==null);throw Error(y(171))}if(e.tag===1){var n=e.type;if(we(n))return Yu(e
+n
+t)}return t}function Jc(e
+t
+n
+r
+i
+o
+l
+u
+c){return e=ha(n
+r
+!0
+e
+i
+o
+l
+u
+c)
+e.context=Yc(null)
+n=e.current
+r=he()
+i=Tt(n)
+o=rt(r
+i)
+o.callback=t??null
+Et(n
+o
+i)
+e.current.lanes=i
+vr(e
+i
+r)
+ke(e
+r)
+e}function Ui(e
+t
+n
+r){var i=t.current
+o=he()
+l=Tt(i);return n=Yc(n)
+t.context===null?t.context=n:t.pendingContext=n
+t=rt(o
+l)
+t.payload={element:e}
+r=r===void 0?null:r
+r!==null&&(t.callback=r)
+e=Et(i
+t
+l)
+e!==null&&(Ve(e
+i
+l
+o)
+ei(e
+i
+l))
+l}function Mi(e){return e=e.current
+e.child?(e.child.tag===5
+e.child.stateNode):null}function eu(e
+t){if(e=e.memoizedState
+e!==null&&e.dehydrated!==null){var n=e.retryLane;e.retryLane=n!==0&&n<t?n:t}}function ga(e
+t){eu(e
+t)
+(e=e.alternate)&&eu(e
+t)}function Dp(){return null}var Xc=typeof reportError=="function"?reportError:function(e){console.error(e)};function ya(e){this._internalRoot=e}ji.prototype.render=ya.prototype.render=function(e){var t=this._internalRoot;if(t===null)throw Error(y(409));Ui(e
+t
+null
+null)};ji.prototype.unmount=ya.prototype.unmount=function(){var e=this._internalRoot;if(e!==null){this._internalRoot=null;var t=e.containerInfo;qt(function(){Ui(null
+e
+null
+null)})
+t[ot]=null}};function ji(e){this._internalRoot=e}ji.prototype.unstable_scheduleHydration=function(e){if(e){var t=Iu();e={blockedOn:null
+target:e
+priority:t};for(var n=0;n<gt.length&&t!==0&&t<gt[n].priority;n++);gt.splice(n
+0
+e)
+n===0&&Nu(e)}};function va(e){return!(!e||e.nodeType!==1&&e.nodeType!==9&&e.nodeType!==11)}function Vi(e){return!(!e||e.nodeType!==1&&e.nodeType!==9&&e.nodeType!==11&&(e.nodeType!==8||e.nodeValue!==" react-mount-point-unstable "))}function tu(){}function Fp(e
+t
+n
+r
+i){if(i){if(typeof r=="function"){var o=r;r=function(){var p=Mi(l);o.call(p)}}var l=Jc(t
+r
+e
+0
+null
+!1
+!1
+""
+tu);return e._reactRootContainer=l
+e[ot]=l.current
+ur(e.nodeType===8?e.parentNode:e)
+qt()
+l}for(;i=e.lastChild;)e.removeChild(i);if(typeof r=="function"){var u=r;r=function(){var p=Mi(c);u.call(p)}}var c=ha(e
+0
+!1
+null
+null
+!1
+!1
+""
+tu);return e._reactRootContainer=c
+e[ot]=c.current
+ur(e.nodeType===8?e.parentNode:e)
+qt(function(){Ui(t
+c
+n
+r)})
+c}function Gi(e
+t
+n
+r
+i){var o=n._reactRootContainer;if(o){var l=o;if(typeof i=="function"){var u=i;i=function(){var c=Mi(l);u.call(c)}}Ui(t
+l
+e
+i)}else l=Fp(n
+t
+e
+i
+r);return Mi(l)}Lu=function(e){switch(e.tag){case 3:var t=e.stateNode;if(t.current.memoizedState.isDehydrated){var n=Vn(t.pendingLanes);n!==0&&(Fl(t
+n|1)
+ke(t
+Q())
+(M&6)===0&&(An=Q()+500
+zt()))}break;case 13:qt(function(){var r=lt(e
+1);if(r!==null){var i=he();Ve(r
+e
+1
+i)}})
+ga(e
+1)}};Wl=function(e){if(e.tag===13){var t=lt(e
+134217728);if(t!==null){var n=he();Ve(t
+e
+134217728
+n)}ga(e
+134217728)}};Pu=function(e){if(e.tag===13){var t=Tt(e)
+n=lt(e
+t);if(n!==null){var r=he();Ve(n
+e
+t
+r)}ga(e
+t)}};Iu=function(){return z};Mu=function(e
+t){var n=z;try{return z=e
+t()}finally{z=n}};Yo=function(e
+t
+n){switch(t){case"input":if(jo(e
+n)
+t=n.name
+n.type==="radio"&&t!=null){for(n=e;n.parentNode;)n=n.parentNode;for(n=n.querySelectorAll("input[name="+JSON.stringify(""+t)+'][type="radio"]')
+t=0;t<n.length;t++){var r=n[t];if(r!==e&&r.form===e.form){var i=Oi(r);if(!i)throw Error(y(90));au(r)
+jo(r
+i)}}}break;case"textarea":uu(e
+n);break;case"select":t=n.value
+t!=null&&pn(e
+!!n.multiple
+t
+!1)}};gu=da;yu=qt;var Wp={usingClientEntryPoint:!1
+Events:[wr
+ln
+Oi
+mu
+hu
+da]}
+$n={findFiberByHostInstance:Ft
+bundleType:0
+version:"18.3.1"
+rendererPackageName:"react-dom"}
+Bp={bundleType:$n.bundleType
+version:$n.version
+rendererPackageName:$n.rendererPackageName
+rendererConfig:$n.rendererConfig
+overrideHookState:null
+overrideHookStateDeletePath:null
+overrideHookStateRenamePath:null
+overrideProps:null
+overridePropsDeletePath:null
+overridePropsRenamePath:null
+setErrorHandler:null
+setSuspenseHandler:null
+scheduleUpdate:null
+currentDispatcherRef:st.ReactCurrentDispatcher
+findHostInstanceByFiber:function(e){return e=wu(e)
+e===null?null:e.stateNode}
+findFiberByHostInstance:$n.findFiberByHostInstance||Dp
+findHostInstancesForRefresh:null
+scheduleRefresh:null
+scheduleRoot:null
+setRefreshHandler:null
+getCurrentFiber:null
+reconcilerVersion:"18.3.1-next-f1338f8080-20240426"};if(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__<"u"&&(Hn=__REACT_DEVTOOLS_GLOBAL_HOOK__
+!Hn.isDisabled&&Hn.supportsFiber))try{Ni=Hn.inject(Bp)
+Je=Hn}catch{}var Hn;Le.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=Wp;Le.createPortal=function(e
+t){var n=2<arguments.length&&arguments[2]!==void 0?arguments[2]:null;if(!va(t))throw Error(y(200));return Op(e
+t
+null
+n)};Le.createRoot=function(e
+t){if(!va(e))throw Error(y(299));var n=!1
+r=""
+i=Xc;return t!=null&&(t.unstable_strictMode===!0&&(n=!0)
+t.identifierPrefix!==void 0&&(r=t.identifierPrefix)
+t.onRecoverableError!==void 0&&(i=t.onRecoverableError))
+t=ha(e
+1
+!1
+null
+null
+n
+!1
+r
+i)
+e[ot]=t.current
+ur(e.nodeType===8?e.parentNode:e)
+new ya(t)};Le.findDOMNode=function(e){if(e==null)return null;if(e.nodeType===1)return e;var t=e._reactInternals;if(t===void 0)throw typeof e.render=="function"?Error(y(188)):(e=Object.keys(e).join("
+")
+Error(y(268
+e)));return e=wu(t)
+e=e===null?null:e.stateNode
+e};Le.flushSync=function(e){return qt(e)};Le.hydrate=function(e
+t
+n){if(!Vi(t))throw Error(y(200));return Gi(null
+e
+t
+!0
+n)};Le.hydrateRoot=function(e
+t
+n){if(!va(e))throw Error(y(405));var r=n!=null&&n.hydratedSources||null
+i=!1
+o=""
+l=Xc;if(n!=null&&(n.unstable_strictMode===!0&&(i=!0)
+n.identifierPrefix!==void 0&&(o=n.identifierPrefix)
+n.onRecoverableError!==void 0&&(l=n.onRecoverableError))
+t=Jc(t
+null
+e
+1
+n??null
+i
+!1
+o
+l)
+e[ot]=t.current
+ur(e)
+r)for(e=0;e<r.length;e++)n=r[e]
+i=n._getVersion
+i=i(n._source)
+t.mutableSourceEagerHydrationData==null?t.mutableSourceEagerHydrationData=[n
+i]:t.mutableSourceEagerHydrationData.push(n
+i);return new ji(t)};Le.render=function(e
+t
+n){if(!Vi(t))throw Error(y(200));return Gi(null
+e
+t
+!1
+n)};Le.unmountComponentAtNode=function(e){if(!Vi(e))throw Error(y(40));return e._reactRootContainer?(qt(function(){Gi(null
+null
+e
+!1
+function(){e._reactRootContainer=null
+e[ot]=null})})
+!0):!1};Le.unstable_batchedUpdates=da;Le.unstable_renderSubtreeIntoContainer=function(e
+t
+n
+r){if(!Vi(n))throw Error(y(200));if(e==null||e._reactInternals===void 0)throw Error(y(38));return Gi(e
+t
+n
+!1
+r)};Le.version="18.3.1-next-f1338f8080-20240426"});var nd=qe((dm
+td)=>{"use strict";function ed(){if(!(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__>"u"||typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE!="function"))try{__REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(ed)}catch(e){console.error(e)}}ed()
+td.exports=Zc()});var id=qe(Sa=>{"use strict";var rd=nd();Sa.createRoot=rd.createRoot
+Sa.hydrateRoot=rd.hydrateRoot;var fm});var ld=qe(qi=>{"use strict";var $p=Mn()
+Hp=Symbol.for("react.element")
+Up=Symbol.for("react.fragment")
+jp=Object.prototype.hasOwnProperty
+Vp=$p.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner
+Gp={key:!0
+ref:!0
+__self:!0
+__source:!0};function od(e
+t
+n){var r
+i={}
+o=null
+l=null;n!==void 0&&(o=""+n)
+t.key!==void 0&&(o=""+t.key)
+t.ref!==void 0&&(l=t.ref);for(r in t)jp.call(t
+r)&&!Gp.hasOwnProperty(r)&&(i[r]=t[r]);if(e&&e.defaultProps)for(r in t=e.defaultProps
+t)i[r]===void 0&&(i[r]=t[r]);return{$$typeof:Hp
+type:e
+key:o
+ref:l
+props:i
+_owner:Vp.current}}qi.Fragment=Up;qi.jsx=od;qi.jsxs=od});var Cr=qe((hm
+ad)=>{"use strict";ad.exports=ld()});function xa(){let[e
+t]=(0
+Pn.useState)("review")
+[n
+r]=(0
+Pn.useState)({review:"Overview"
+legal:"Strategy"
+commercial:"Cost Build"})
+[i
+o]=(0
+Pn.useState)("Standard")
+[l
+u]=(0
+Pn.useState)("party")
+[c
+p]=(0
+Pn.useState)("list")
+g=(a
+f)=>r(v=>({...v
+[a]:f}));return(0
+s.jsxs)("div"
+{style:{fontFamily:"Arial
+sans-serif"
+background:wa
+minHeight:"100vh"
+color:b}
+children:[(0
+s.jsxs)("div"
+{style:{background:b
+padding:"16px 24px"
+borderLeft:`4px solid ${$}`}
+children:[(0
+s.jsx)("div"
+{style:{fontSize:11
+fontWeight:700
+color:$
+letterSpacing:1.5
+textTransform:"uppercase"}
+children:"Lilly Contract Review: Work Order"})
+(0
+s.jsxs)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:22
+color:Z
+marginTop:4}
+children:[k.supplier
+" - "
+k.doc]})
+(0
+s.jsxs)("div"
+{style:{display:"flex"
+gap:8
+marginTop:8
+flexWrap:"wrap"
+alignItems:"center"}
+children:[(0
+s.jsx)(Yi
+{t:"MSA VERIFIED"
+bg:_})
+(0
+s.jsx)(Yi
+{t:"AI STANDARD"
+bg:R})
+(0
+s.jsx)(Yi
+{t:"SPS VERIFIED"
+bg:_})
+(0
+s.jsxs)("span"
+{style:{fontSize:12
+color:X
+marginLeft:8}
+children:[k.value
+" | "
+k.term
+" | May 25
+ 2026"]})]})]})
+(0
+s.jsx)("div"
+{style:{display:"flex"
+gap:0
+background:Z
+borderBottom:`2px solid ${le}`
+paddingLeft:24}
+children:[["review"
+"Contract Review"]
+["legal"
+"Legal Negotiation"]
+["commercial"
+"Commercial Analysis"]].map(([a
+f])=>(0
+s.jsx)("button"
+{onClick:()=>t(a)
+style:{padding:"12px 24px"
+border:"none"
+borderBottom:e===a?`3px solid ${$}`:"3px solid transparent"
+background:"none"
+fontFamily:"Georgia
+serif"
+fontSize:15
+fontWeight:e===a?700:400
+color:e===a?b:I
+cursor:"pointer"}
+children:f}
+a))})
+(0
+s.jsxs)("div"
+{style:{maxWidth:980
+margin:"0 auto"
+padding:"20px 24px"}
+children:[e==="review"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(ka
+{tabs:["Overview"
+"Risk Heatmap"
+"Findings"
+"Protection & Coverage"
+"Obligations"
+"Vendor Tactics"
+"Documents"]
+active:n.review
+set:a=>g("review"
+a)})
+n.review==="Overview"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(xr
+{items:[[k.value
+"Annual Value"
+b]
+[k.hardStops
+"Hard Stops"
+_]
+["1-2"
+"Est. Rounds"
+R]]})
+(0
+s.jsxs)("div"
+{style:{display:"grid"
+gridTemplateColumns:"1fr 1.3fr"
+gap:14
+marginBottom:14}
+children:[(0
+s.jsx)(De
+{border:cd(k.riskScore)
+title:"Protection Score"
+children:(0
+s.jsx)(Jp
+{value:k.riskScore})})
+(0
+s.jsx)(De
+{border:R
+title:"Score Methodology"
+note:"G9 formula
+ risk-scoring.md"
+children:(0
+s.jsxs)("div"
+{style:{fontSize:12
+color:I
+lineHeight:1.7}
+children:["Starts at 100 (no risk). Deducts by finding severity weighted against combined protection. 9 of 14 categories are Covered by the verified MSA (3 Confirm
+ 2 Gap)
+ so most findings represent clarifications or restorations of existing MSA protections
+ not unprotected gaps. Zero Hard Stops. The 3 HIGH findings are: an editing error (volume period)
+ an MSA-template restoration (SLA)
+ and a compliance clarification (HITL/AI Standard). Total deductions: 36 points (see Risk Heatmap calculation)
+ so 100 minus 36 equals 64."
+(0
+s.jsx)("br"
+{})
+(0
+s.jsx)("br"
+{})
+"MSA-governed findings carry reduced deductions because the MSA provides the fallback position (HIGH -3 to -5
+ MEDIUM -2 to -3
+ LOW -1); the five standalone findings have no MSA analog and so take the full Standalone-column ranges (HIGH -7 to -10
+ MEDIUM -4 to -6
+ LOW -2 to -3). Scale: 75-100 Low
+ 50-74 Moderate
+ 25-49 High
+ 0-24 Critical. This review lands in Moderate."]})})]})
+(0
+s.jsxs)(Fe
+{bg:Zi
+bc:_
+children:[(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:15
+fontWeight:700
+marginBottom:6}
+children:"Go/No-Go: SIGN WITH MODIFICATIONS"})
+(0
+s.jsx)("p"
+{style:{margin:0}
+children:"WO 10 is commercially reasonable at $617
+953/year ($3.43/call at 15K/month). Three high-risk items require resolution: (1) missing volume period
+ (2) SLA degraded 150 bps from MSA template
+ (3) HITL training data ambiguity under AI Standard. A fourth finding (annual prepay eroding TfC value) affects financial exposure. The MSA provides strong baseline protections: 9 of 14 categories Covered
+ 3 to Confirm
+ 2 with residual Gaps. Zero Hard Stops. Recommend resolving high-risk items and signing."})]})
+(0
+s.jsx)(De
+{border:R
+bg:bt
+title:"Governing Agreement Status"
+children:(0
+s.jsx)("p"
+{style:{margin:0
+fontSize:13
+lineHeight:1.6}
+children:"MSA (MPT 5.0
+ June 7
+ 2024) read in full. Exhibits A (Definitions)
+ B (SaaS)
+ C (AI Standard)
+ SPS all incorporated and verified. This is WO 10
+ indicating a mature relationship. All definition traces completed: Lilly Information
+ Usage Data
+ Work Product
+ Lilly Content
+ Supplier Training Content
+ Lilly Trained Models
+ Automated System. Every finding in this review cross-references the governing documents."})})
+(0
+s.jsx)(ut
+{title:"Conditions Before Signature"})
+["Restore missing volume period ('per month')"
+"Restore SLA to MSA Exhibit B defaults (99.50% monthly)"
+"Add HITL training data restriction per AI Standard \xA73.5"
+"Resolve prepay/TfC exposure (pro-rata refund or quarterly billing)"].map((a
+f)=>(0
+s.jsxs)("div"
+{style:{display:"flex"
+gap:8
+alignItems:"baseline"
+marginBottom:6}
+children:[(0
+s.jsx)(fe
+{t:`${f+1}`
+bg:$})
+(0
+s.jsx)("span"
+{style:{fontSize:13}
+children:a})]}
+f))]})
+n.review==="Risk Heatmap"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(Pe
+{headers:["Category"
+"Status"
+"Source / Notes"]
+rows:k.coverage.map(a=>[(0
+s.jsx)("b"
+{children:a.cat})
+(0
+s.jsx)(fe
+{t:a.s
+bg:bi[a.s]||I})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.src})])})
+(0
+s.jsx)("div"
+{style:{display:"flex"
+gap:16
+marginTop:12}
+children:[["HIGH"
+k.findings.filter(a=>a.t==="HIGH").length]
+["MEDIUM"
+k.findings.filter(a=>a.t==="MEDIUM").length]
+["LOW"
+k.findings.filter(a=>a.t==="LOW").length]].map(([a
+f])=>(0
+s.jsxs)("div"
+{style:{flex:1
+textAlign:"center"
+padding:12
+background:Z
+borderRadius:8
+border:`1px solid ${le}`}
+children:[(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:24
+fontWeight:700
+color:Ki[a]}
+children:f})
+(0
+s.jsxs)("div"
+{style:{fontSize:11
+color:I}
+children:[a
+" RISK"]})]}
+a))})
+(0
+s.jsxs)(Fe
+{bg:bt
+bc:I
+children:[(0
+s.jsx)("b"
+{children:"Severity vs. coverage read:"})
+" of the "
+k.findings.filter(a=>a.t==="HIGH").length
+" HIGH findings
+ only #2 (SLA) traces to one of the two true Gap categories (SLA/Performance); #3 (HITL) traces to a Confirm-level category (AI Governance) and #1 (volume period) is a WO-specific drafting issue with no MSA analog. Most MEDIUM findings are standalone WO terms (Delivery
+ Commercial) rather than absent MSA protection; #5 (model ownership) and #4 (prepay/TfC) both trace to Confirm-level categories (IP Ownership
+ Commitment). See the Covered/Confirm/Gap rollup on the Protection & Coverage sub-tab for the full 14-category picture."]})]})
+n.review==="Findings"&&(0
+s.jsx)(s.Fragment
+{children:["HIGH"
+"MEDIUM"
+"LOW"].map(a=>(0
+s.jsxs)("div"
+{children:[(0
+s.jsxs)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:16
+fontWeight:700
+color:Ki[a]
+marginBottom:8
+marginTop:16}
+children:[a
+" RISK ("
+k.findings.filter(f=>f.t===a).length
+")"]})
+k.findings.filter(f=>f.t===a).map(f=>(0
+s.jsxs)(De
+{border:Ki[f.t]
+children:[(0
+s.jsxs)("div"
+{style:{display:"flex"
+justifyContent:"space-between"
+alignItems:"center"
+marginBottom:6
+flexWrap:"wrap"
+gap:4}
+children:[(0
+s.jsxs)("span"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:14
+fontWeight:700}
+children:["#"
+f.id
+": "
+f.title]})
+(0
+s.jsxs)("div"
+{children:[(0
+s.jsx)(fe
+{t:f.t
+bg:Ki[f.t]})
+(0
+s.jsx)(fe
+{t:f.v?"VERIFIED":"ASSUMED"
+bg:f.v?_:F})]})]})
+(0
+s.jsxs)("div"
+{style:{fontSize:13
+lineHeight:1.6
+marginBottom:4}
+children:[(0
+s.jsx)("b"
+{children:"Evidence:"})
+" "
+f.ev]})
+(0
+s.jsxs)("div"
+{style:{fontSize:13
+lineHeight:1.6
+marginBottom:4}
+children:[(0
+s.jsx)("b"
+{children:"MSA Cross-Ref:"})
+" "
+f.msa]})
+(0
+s.jsxs)("div"
+{style:{fontSize:13
+lineHeight:1.6
+marginBottom:4}
+children:[(0
+s.jsx)("b"
+{children:"Impact:"})
+" "
+f.impact]})
+(0
+s.jsxs)("div"
+{style:{fontSize:13
+lineHeight:1.6
+color:R}
+children:[(0
+s.jsx)("b"
+{children:"Action:"})
+" "
+f.action]})
+(0
+s.jsxs)("div"
+{style:{fontSize:11
+color:X
+marginTop:4}
+children:["Category: "
+f.cat
+" | Location: "
+f.where]})]}
+f.id))]}
+a))})
+n.review==="Protection & Coverage"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)("p"
+{style:{fontSize:13
+color:I
+marginBottom:12}
+children:"Scored on COMBINED protection (MSA + Exhibits + WO). Per Anti-Drift Rule 9."})
+(0
+s.jsxs)("div"
+{style:{display:"grid"
+gridTemplateColumns:"1fr 1fr"
+gap:14
+marginBottom:16}
+children:[(0
+s.jsxs)("div"
+{children:[(0
+s.jsx)("div"
+{style:{display:"flex"
+gap:10
+marginBottom:10}
+children:["Covered"
+"Confirm"
+"Gap"].map(a=>{let f=k.coverage.filter(v=>v.s===a).length;return(0
+s.jsxs)("div"
+{style:{flex:1
+textAlign:"center"
+padding:12
+background:Z
+borderRadius:8
+border:`1px solid ${le}`}
+children:[(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:24
+fontWeight:700
+color:bi[a]}
+children:f})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+color:I}
+children:a.toUpperCase()})]}
+a)})})
+(0
+s.jsx)("div"
+{style:{display:"flex"
+height:22
+borderRadius:6
+overflow:"hidden"
+border:`1px solid ${le}`}
+children:["Covered"
+"Confirm"
+"Gap"].map(a=>{let f=k.coverage.filter(w=>w.s===a).length;if(f===0)return null;let v=Math.round(f/k.coverage.length*100);return(0
+s.jsx)("div"
+{title:`${a}: ${f} of ${k.coverage.length} (${v}%)`
+style:{flex:`${f} 0 0`
+background:bi[a]
+display:"flex"
+alignItems:"center"
+justifyContent:"center"
+fontSize:10
+color:Z
+fontWeight:700}
+children:v>=10?`${v}%`:""}
+a)})})
+(0
+s.jsxs)("div"
+{style:{fontSize:11
+color:I
+marginTop:6}
+children:[k.coverage.length
+" categories assessed against the combined MSA + Exhibit + WO protection."]})]})
+(0
+s.jsxs)(Fe
+{bg:bt
+bc:R
+children:[(0
+s.jsx)("b"
+{children:"Coverage posture:"})
+" "
+k.coverage.filter(a=>a.s==="Covered").length
+" of "
+k.coverage.length
+" categories ("
+Math.round(k.coverage.filter(a=>a.s==="Covered").length/k.coverage.length*100)
+"%) are fully Covered by the verified MSA and Exhibits
+ so most findings in this review are clarifications or restorations of existing protection rather than fresh gaps. "
+k.coverage.filter(a=>a.s==="Confirm").length
+" categories need a Confirm-level follow-up (AI Governance
+ IP Ownership
+ Commitment) before signature. Only "
+k.coverage.filter(a=>a.s==="Gap").length
+" categories (SLA/Performance
+ Flexibility) show a genuine Gap with no fallback in the governing documents
+ which is why those two drive a disproportionate share of the Protection Score deduction."]})]})
+(0
+s.jsx)(Pe
+{headers:["#"
+"Category"
+"Status"
+"Governing Document Source"]
+rows:k.coverage.map((a
+f)=>[f+1
+(0
+s.jsx)("b"
+{children:a.cat})
+(0
+s.jsx)(fe
+{t:a.s
+bg:bi[a.s]||I})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.src})])})]})
+n.review==="Obligations"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)("p"
+{style:{fontSize:13
+color:I
+marginBottom:8}
+children:"Extracted from WO 10 and governing MSA/Exhibits. Per Step 6.5 obligation extraction."})
+(0
+s.jsx)(xr
+{items:[[k.obligations.filter(a=>a.who==="Supplier A").length
+"Supplier Obligations"
+F]
+[k.obligations.filter(a=>a.who==="Lilly").length
+"Lilly Obligations"
+R]
+[k.obligations.filter(a=>a.who==="Both").length
+"Mutual"
+I]
+[k.obligations.filter(a=>a.status==="Missing Timeline").length
+"Missing Timeline"
+$]]})
+(0
+s.jsxs)("div"
+{style:{display:"grid"
+gridTemplateColumns:"1.3fr 1fr"
+gap:14
+marginBottom:16}
+children:[(0
+s.jsxs)("div"
+{children:[(0
+s.jsx)("div"
+{style:{fontSize:11
+fontWeight:700
+color:I
+textTransform:"uppercase"
+letterSpacing:"0.04em"
+marginBottom:8}
+children:"Tracked Dates & Deadlines"})
+(0
+s.jsx)("div"
+{style:{display:"flex"
+gap:8
+overflowX:"auto"
+paddingBottom:4}
+children:k.obligations.slice().sort((a
+f)=>a.days-f.days).map((a
+f)=>(0
+s.jsxs)("div"
+{style:{flexShrink:0
+minWidth:132
+background:Z
+border:`1px solid ${le}`
+borderTop:`3px solid ${ud(a.days)}`
+borderRadius:6
+padding:"8px 10px"}
+children:[(0
+s.jsx)("div"
+{style:{fontSize:10
+fontWeight:700
+color:ud(a.days)}
+children:em(a.days)})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+fontWeight:600
+marginTop:3
+lineHeight:1.3}
+children:a.what})
+(0
+s.jsx)("div"
+{style:{fontSize:10
+color:X
+marginTop:3}
+children:a.who})]}
+f))})]})
+(0
+s.jsxs)(Fe
+{bg:bt
+bc:I
+children:[(0
+s.jsx)("b"
+{children:"Deadline risk:"})
+" "
+k.obligations.filter(a=>a.days===0).length
+" obligations carry continuous
+ 1-2 business day compliance triggers (AE reporting
+ breach notice
+ privacy forwarding) that should be treated as always-live rather than calendar dates. The nearest fixed-calendar items are the anti-corruption training deadline and the Aug/Sep 2026 payment tranche
+ both roughly 90 days out. "
+k.obligations.filter(a=>a.days>=8e3).length
+" obligations are open-ended or on-demand (insurance certificate
+ data return
+ TfC notice) and should be tracked as standing triggers
+ not dates. The furthest-dated item is the MSA renewal notice window ahead of the 2029 expiration."]})]})
+(0
+s.jsxs)("div"
+{style:{display:"flex"
+alignItems:"center"
+gap:8
+marginBottom:10}
+children:[(0
+s.jsx)("span"
+{style:{fontSize:11
+fontWeight:700
+color:I
+textTransform:"uppercase"}
+children:"Sort:"})
+[["party"
+"By Party"]
+["date"
+"By Date"]].map(([a
+f])=>(0
+s.jsx)("button"
+{onClick:()=>u(a)
+style:{padding:"6px 14px"
+borderRadius:20
+border:l===a?`2px solid ${R}`:`1px solid ${le}`
+background:l===a?wa:Z
+fontWeight:l===a?700:400
+color:l===a?R:I
+cursor:"pointer"
+fontSize:12}
+children:f}
+a))]})
+l==="party"?(0
+s.jsxs)(s.Fragment
+{children:[k.obligations.filter(a=>a.who==="Supplier A").length>0&&(0
+s.jsx)(ut
+{title:"Supplier Obligations"})
+(0
+s.jsx)(Pe
+{headers:["Obligation"
+"When"
+"Source"
+"Consequence"
+"Type"]
+rows:k.obligations.filter(a=>a.who==="Supplier A").map(a=>[(0
+s.jsx)("span"
+{style:{fontWeight:600}
+children:a.what})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.when})
+(0
+s.jsxs)("span"
+{children:[(0
+s.jsx)("span"
+{style:{fontSize:12
+color:R}
+children:a.src})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+color:X
+fontStyle:"italic"
+marginTop:2}
+children:a.quote})]})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.consequence})
+(0
+s.jsx)(fe
+{t:a.type
+bg:a.status==="Missing Timeline"?$:a.type==="Compliance"||a.type==="Notice Period"?F:_})])})
+(0
+s.jsx)(ut
+{title:"Lilly Obligations"})
+(0
+s.jsx)(Pe
+{headers:["Obligation"
+"When"
+"Source"
+"Consequence"
+"Type"]
+rows:k.obligations.filter(a=>a.who==="Lilly").map(a=>[(0
+s.jsx)("span"
+{style:{fontWeight:600}
+children:a.what})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.when})
+(0
+s.jsxs)("span"
+{children:[(0
+s.jsx)("span"
+{style:{fontSize:12
+color:R}
+children:a.src})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+color:X
+fontStyle:"italic"
+marginTop:2}
+children:a.quote})]})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.consequence})
+(0
+s.jsx)(fe
+{t:a.type
+bg:a.type==="Payment Deadline"?F:_})])})]}):(0
+s.jsx)(s.Fragment
+{children:(0
+s.jsx)(Pe
+{headers:["Obligation"
+"Who"
+"When"
+"Source"
+"Type"]
+rows:k.obligations.slice().sort((a
+f)=>a.days-f.days).map(a=>[(0
+s.jsx)("span"
+{style:{fontWeight:600}
+children:a.what})
+(0
+s.jsx)(fe
+{t:a.who
+bg:a.who==="Supplier A"?F:R})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.when})
+(0
+s.jsxs)("span"
+{children:[(0
+s.jsx)("span"
+{style:{fontSize:12
+color:R}
+children:a.src})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+color:X
+fontStyle:"italic"
+marginTop:2}
+children:a.quote})]})
+(0
+s.jsx)(fe
+{t:a.type
+bg:a.status==="Missing Timeline"?$:a.type==="Compliance"||a.type==="Notice Period"?F:_})])})})
+(0
+s.jsxs)(Fe
+{bg:Yt
+bc:F
+children:[(0
+s.jsx)("b"
+{children:"Imbalance Analysis:"})
+" "
+k.obligations.filter(a=>a.who==="Supplier A").length
+" supplier obligations vs "
+k.obligations.filter(a=>a.who==="Lilly").length
+" Lilly obligations. Ratio is within normal range (no 3:1 imbalance flag). However
+ 1 supplier obligation has a missing timeline (SFTP/API setup) that should be addressed in acceptance criteria."]})
+(0
+s.jsxs)(Fe
+{bg:Qi
+bc:$
+children:[(0
+s.jsx)("b"
+{children:"Missing Standard Obligations (Negotiation Gaps):"})
+" No SLA reporting cadence defined (SLA exists but no quarterly report obligation). No subcontractor notification for HITL personnel changes. No insurance certificate renewal trigger (on-demand only). Recommend adding SLA quarterly reporting to WO."]})]})
+n.review==="Vendor Tactics"&&(0
+s.jsx)(s.Fragment
+{children:(0
+s.jsx)(Pe
+{headers:["Category"
+"Status"
+"Triggering Text"]
+rows:k.tactics.map(a=>[a.cat
+(0
+s.jsx)(fe
+{t:a.s
+bg:a.s==="FLAG"?F:_})
+a.note||(0
+s.jsx)("span"
+{style:{color:X}
+children:"None detected"})])})})
+n.review==="Documents"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)("p"
+{style:{fontSize:13
+color:I
+marginBottom:8}
+children:"Document family across the MSA + WO relationship
+ plus the compliance-evidence gate for this review. Sourced from SharePoint/OneDrive where connected; upload otherwise."})
+(0
+s.jsx)(xr
+{items:[[k.docs.length
+"Documents in Family"
+b]
+[k.docs.filter(a=>a.status==="Executed"||a.status==="Filed").length
+"Executed / Filed"
+_]
+[k.docs.filter(a=>a.status==="Draft"||a.status==="Under Review").length
+"Draft / Under Review"
+F]
+[k.requiredEvidence.filter(a=>Ji(a.item)==="Awaiting").length
+"Evidence Awaiting"
+$]]})
+(0
+s.jsx)(ut
+{title:"Document Register"})
+(0
+s.jsx)("div"
+{style:{display:"flex"
+gap:8
+marginBottom:10}
+children:[["list"
+"List"]
+["tree"
+"Folder Tree"]].map(([a
+f])=>(0
+s.jsx)("button"
+{onClick:()=>p(a)
+style:{padding:"6px 14px"
+borderRadius:20
+border:c===a?`2px solid ${R}`:`1px solid ${le}`
+background:c===a?wa:Z
+fontWeight:c===a?700:400
+color:c===a?R:I
+cursor:"pointer"
+fontSize:12}
+children:f}
+a))})
+(0
+s.jsxs)("div"
+{style:{display:"grid"
+gridTemplateColumns:"1.4fr 1fr"
+gap:14
+marginBottom:16}
+children:[(0
+s.jsx)("div"
+{children:c==="list"?(0
+s.jsx)(Pe
+{headers:["Document"
+"Type"
+"Status"
+"Date"
+"Value"
+"Owner"
+"Retention"]
+rows:k.docs.map(a=>[(0
+s.jsx)("span"
+{style:{fontWeight:600}
+children:a.name})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.type})
+(0
+s.jsx)(fe
+{t:a.status
+bg:a.status==="Executed"||a.status==="Filed"?_:a.status==="Draft"?F:a.status==="Under Review"?R:I})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.date})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.value?a.value:(0
+s.jsx)("span"
+{style:{color:X}
+children:"-"})})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.owner})
+(0
+s.jsxs)("span"
+{children:[(0
+s.jsx)(fe
+{t:Zp(a.type)
+bg:I})
+(0
+s.jsx)("div"
+{style:{fontSize:10
+color:X
+marginTop:2}
+children:"Draft
+ confirm with records SME"})]})])}):(0
+s.jsx)("div"
+{children:[...new Set(k.docs.map(a=>a.folder))].sort().map(a=>(0
+s.jsxs)("div"
+{children:[(0
+s.jsx)(Kp
+{title:a})
+k.docs.filter(f=>f.folder===a).map((f
+v)=>(0
+s.jsxs)("div"
+{style:{display:"flex"
+justifyContent:"space-between"
+alignItems:"center"
+padding:"5px 0 5px 14px"
+fontSize:12
+borderBottom:`1px solid ${le}`}
+children:[(0
+s.jsx)("span"
+{children:f.name})
+(0
+s.jsxs)("span"
+{style:{display:"flex"
+gap:6
+alignItems:"center"}
+children:[(0
+s.jsx)("span"
+{style:{color:X}
+children:f.date})
+(0
+s.jsx)(fe
+{t:f.status
+bg:f.status==="Executed"||f.status==="Filed"?_:f.status==="Draft"?F:f.status==="Under Review"?R:I})]})]}
+v))]}
+a))})})
+(0
+s.jsxs)(Fe
+{bg:bt
+bc:R
+children:[(0
+s.jsx)("b"
+{children:"Document family analysis:"})
+" "
+k.docs.filter(a=>a.status==="Executed"||a.status==="Filed").length
+" of "
+k.docs.length
+" documents in the family are executed or filed. WO 10 (this review) remains Under Review; the prior WO 9 term is fully executed
+ giving a clean continuation precedent. One Risk & Deviation Approval item
+ the data escrow decision memo
+ is still in Draft and should be finalized before WO 10 signature
+ since the SME Pre-Engagement brief to Cyber ISS Review depends on it. Retention classes are a draft lookup by document type; confirm against the records-retention schedule before relying on them."]})]})
+(0
+s.jsx)(ut
+{title:"Compliance Evidence Checklist"})
+(0
+s.jsxs)("div"
+{style:{display:"grid"
+gridTemplateColumns:"1.4fr 1fr"
+gap:14}
+children:[(0
+s.jsx)(Pe
+{headers:["Required Evidence"
+"Status"
+"Blocks"]
+rows:k.requiredEvidence.map(a=>{let f=Ji(a.item);return[(0
+s.jsx)("span"
+{style:{fontWeight:600}
+children:a.item})
+(0
+s.jsx)(fe
+{t:f
+bg:tm[f]})
+(0
+s.jsx)("span"
+{style:{fontSize:12}
+children:a.gate})]})})
+(0
+s.jsxs)(Fe
+{bg:Qi
+bc:$
+children:[(0
+s.jsx)("b"
+{children:"Evidence gate analysis:"})
+" "
+k.requiredEvidence.filter(a=>Ji(a.item)==="Awaiting").length
+" items are Awaiting (SCC/TIA
+ Data Residency Screen
+ Risk Acceptance Memo) and block Privacy Office and Risk & Deviation sign-off. The Data Escrow Decision Memo is Draft
+ blocking Cyber ISS sign-off
+ the same open item flagged in the SME Pre-Engagement brief on the Legal Negotiation panel. "
+k.requiredEvidence.filter(a=>Ji(a.item)==="Filed").length
+" items are Filed and clear. An item is never marked Filed without a matching document on record."]})]})]})]})
+e==="legal"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(ka
+{tabs:["Strategy"
+"Playbook"
+"Position Map"
+"Concession Sequencing"
+"SME Pre-Engagement"]
+active:n.legal
+set:a=>g("legal"
+a)})
+n.legal==="Strategy"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(xr
+{items:[["Low"
+"Difficulty"
+_]
+["0"
+"Red Lines"
+_]
+[String(k.playbook.length)
+"Total Positions"
+b]
+["1"
+"Compliance Leverage (AI Std)"
+F]]})
+(0
+s.jsxs)(Fe
+{bg:Yt
+bc:F
+children:[(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:14
+fontWeight:700
+marginBottom:6}
+children:"Opening Posture: Collaborative but Firm on MSA Alignment"})
+(0
+s.jsx)("p"
+{style:{margin:0
+fontSize:13
+lineHeight:1.6}
+children:'This is WO 10 under a mature MSA relationship. Frame all asks as "aligning the WO with our existing MSA framework
+" not as new demands. The SLA restoration and HITL clarification enforce protections already negotiated. The volume period is an editing error. Lead with that to build early agreement
+ concede the June 15 deadline to signal urgency
+ then address the substantive items. The AI Standard \xA73.5 position is the one item with compliance teeth; use it as leverage for the entire package.'})]})
+(0
+s.jsx)("div"
+{style:{display:"grid"
+gridTemplateColumns:"repeat(4
+1fr)"
+gap:8
+marginTop:12}
+children:[["HOLD FIRM"
+k.playbook.filter(a=>!a.term.includes("June 15")&&!a.term.includes("Custom model")&&!a.term.includes("AE detection")).length
+F
+Yt]
+["TRADE"
+k.playbook.filter(a=>a.trade).length
+ct
+"#FFF8E1"]
+["CONCEDE"
+2
+_
+Zi]
+["RED LINE"
+0
+$
+Qi]].map(([a
+f
+v
+w])=>(0
+s.jsxs)("div"
+{style:{background:w
+border:`2px solid ${v}`
+borderRadius:8
+textAlign:"center"
+padding:12}
+children:[(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:20
+fontWeight:700
+color:v}
+children:f})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+color:I}
+children:a})]}
+a))})]})
+n.legal==="Playbook"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsxs)("div"
+{style:{display:"flex"
+alignItems:"center"
+gap:8
+marginBottom:16
+flexWrap:"wrap"}
+children:[(0
+s.jsx)("span"
+{style:{fontSize:13
+fontWeight:700}
+children:"Argument Tone:"})
+nm.map(a=>(0
+s.jsx)("button"
+{onClick:()=>o(a)
+style:{padding:"6px 14px"
+borderRadius:20
+border:i===a?`2px solid ${Xi[a]}`:`1px solid ${le}`
+background:i===a?"#F8FAFC":Z
+fontWeight:i===a?700:400
+color:i===a?Xi[a]:I
+cursor:"pointer"
+fontSize:12}
+children:a}
+a))]})
+(0
+s.jsx)("p"
+{style:{fontSize:12
+color:I
+marginBottom:16}
+children:"Each position below shows arguments
+ predicted supplier pushback
+ your rebuttal
+ and fallback. Toggle the tone above to see how the same position sounds in each persona. The substance never changes; only the framing."})
+k.playbook.map((a
+f)=>(0
+s.jsxs)("div"
+{style:{border:`1px solid ${le}`
+background:Z
+borderRadius:8
+overflow:"hidden"
+marginBottom:14}
+children:[(0
+s.jsxs)("div"
+{style:{background:b
+color:Z
+fontFamily:"Georgia
+serif"
+fontWeight:700
+padding:"10px 16px"
+fontSize:14
+display:"flex"
+justifyContent:"space-between"
+alignItems:"center"}
+children:[(0
+s.jsx)("span"
+{children:a.term})
+a.acc&&(0
+s.jsx)("span"
+{style:{fontSize:11
+background:"rgba(255
+255
+255
+0.15)"
+padding:"2px 8px"
+borderRadius:10}
+children:a.acc})]})
+(0
+s.jsxs)("div"
+{style:{padding:16
+fontSize:13
+lineHeight:1.6}
+children:[(0
+s.jsxs)("div"
+{style:{background:"#F0F4FF"
+borderRadius:6
+padding:"10px 14px"
+marginBottom:10
+borderLeft:`4px solid ${Xi[i]}`}
+children:[(0
+s.jsxs)("div"
+{style:{fontSize:10
+fontWeight:700
+textTransform:"uppercase"
+color:Xi[i]
+marginBottom:4}
+children:[i
+" Tone"]})
+(0
+s.jsx)("div"
+{style:{fontSize:13
+lineHeight:1.6}
+children:a.personas[i]})]})
+(0
+s.jsxs)("div"
+{style:{marginBottom:8}
+children:[(0
+s.jsx)("span"
+{style:{color:_
+fontWeight:700
+textTransform:"uppercase"
+fontSize:10}
+children:"Position: "})
+a.pos]})
+(0
+s.jsxs)("div"
+{style:{marginBottom:8}
+children:[(0
+s.jsx)("span"
+{style:{color:I
+fontWeight:700
+textTransform:"uppercase"
+fontSize:10}
+children:"Arguments"})
+a.args.map((v
+w)=>(0
+s.jsxs)("div"
+{style:{display:"flex"
+gap:6
+marginTop:3}
+children:[(0
+s.jsx)("span"
+{style:{color:$
+flexShrink:0}
+children:">"})
+(0
+s.jsx)("span"
+{children:v})]}
+w))]})
+(0
+s.jsxs)("div"
+{style:{marginBottom:8}
+children:[(0
+s.jsx)("span"
+{style:{color:F
+fontWeight:700
+textTransform:"uppercase"
+fontSize:10}
+children:"Likely Pushback: "})
+a.push]})
+(0
+s.jsxs)("div"
+{style:{marginBottom:8}
+children:[(0
+s.jsx)("span"
+{style:{color:b
+fontWeight:700
+textTransform:"uppercase"
+fontSize:10}
+children:"Rebuttal: "})
+a.reb||"N/A"]})
+(0
+s.jsxs)("div"
+{children:[(0
+s.jsx)("span"
+{style:{color:X
+fontWeight:700
+textTransform:"uppercase"
+fontSize:10}
+children:"Fallback: "})
+a.fall]})
+a.trade&&(0
+s.jsxs)("div"
+{style:{marginTop:6
+color:ct
+fontSize:12}
+children:[(0
+s.jsx)("b"
+{children:"Trade against:"})
+" "
+a.trade]})]})]}
+f))]})
+n.legal==="Position Map"&&(0
+s.jsx)(s.Fragment
+{children:[{tier:"HOLD FIRM"
+c:F
+items:k.playbook.filter(a=>!a.trade&&a.fall!=="None. This is a compliance position under the executed AI Standard."&&!a.term.includes("June 15"))}
+{tier:"HOLD FIRM (Compliance)"
+c:$
+items:k.playbook.filter(a=>a.fall&&a.fall.includes("compliance"))}
+{tier:"STRATEGIC TRADE"
+c:ct
+items:k.playbook.filter(a=>a.trade)}
+{tier:"CONCEDE"
+c:_
+items:k.playbook.filter(a=>a.term.includes("June 15"))}].filter(a=>a.items.length>0).map(a=>(0
+s.jsxs)("div"
+{children:[(0
+s.jsxs)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:15
+fontWeight:700
+color:a.c
+marginBottom:8
+marginTop:16}
+children:[a.tier
+" ("
+a.items.length
+")"]})
+a.items.map((f
+v)=>(0
+s.jsxs)(De
+{border:a.c
+children:[(0
+s.jsxs)("div"
+{style:{display:"flex"
+justifyContent:"space-between"
+alignItems:"center"
+marginBottom:4
+flexWrap:"wrap"
+gap:4}
+children:[(0
+s.jsx)("span"
+{style:{fontWeight:700
+fontSize:13}
+children:f.term})
+f.acc&&(0
+s.jsxs)("span"
+{style:{fontSize:11
+color:X}
+children:["Acceptance: "
+f.acc]})]})
+(0
+s.jsxs)("div"
+{style:{background:"#FAFAFA"
+borderRadius:4
+padding:"7px 10px"
+marginBottom:6}
+children:[(0
+s.jsx)("span"
+{style:{fontSize:10
+fontWeight:700
+color:X
+textTransform:"uppercase"}
+children:"Position"})
+(0
+s.jsx)("div"
+{style:{fontSize:12
+marginTop:2
+lineHeight:1.5}
+children:f.pos})]})
+f.fall&&(0
+s.jsxs)("div"
+{style:{background:a.tier.includes("CONCEDE")?Zi:Yt
+borderRadius:4
+padding:"5px 10px"
+marginBottom:4}
+children:[(0
+s.jsx)("span"
+{style:{fontSize:10
+fontWeight:700
+color:X
+textTransform:"uppercase"}
+children:"Fallback"})
+(0
+s.jsx)("div"
+{style:{fontSize:12
+marginTop:2
+lineHeight:1.5}
+children:f.fall})]})
+f.trade&&(0
+s.jsxs)("div"
+{style:{fontSize:12
+color:ct}
+children:[(0
+s.jsx)("b"
+{children:"Trade:"})
+" "
+f.trade]})]}
+v))]}
+a.tier))})
+n.legal==="Concession Sequencing"&&(0
+s.jsxs)(s.Fragment
+{children:[k.sequencing.map((a
+f)=>(0
+s.jsxs)(De
+{border:a.c
+children:[(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:15
+fontWeight:700
+color:a.c
+marginBottom:8}
+children:a.round})
+(0
+s.jsxs)("div"
+{style:{background:a.bg
+borderRadius:4
+padding:"6px 10px"
+marginBottom:8}
+children:[(0
+s.jsx)("span"
+{style:{fontSize:10
+fontWeight:700
+color:X
+textTransform:"uppercase"}
+children:"Objective"})
+(0
+s.jsx)("div"
+{style:{fontSize:13
+fontWeight:600
+marginTop:2}
+children:a.goal})]})
+a.items.map((v
+w)=>(0
+s.jsxs)("div"
+{style:{padding:"3px 0"
+fontSize:13
+display:"flex"
+gap:6
+lineHeight:1.5}
+children:[(0
+s.jsx)("span"
+{style:{color:a.c
+fontWeight:700
+flexShrink:0}
+children:">"})
+(0
+s.jsx)("span"
+{children:v})]}
+w))
+(0
+s.jsxs)("div"
+{style:{marginTop:8
+paddingTop:6
+borderTop:"1px solid #F4F4F5"}
+children:[(0
+s.jsx)("span"
+{style:{fontSize:10
+fontWeight:700
+color:X
+textTransform:"uppercase"}
+children:"Key risk"})
+(0
+s.jsx)("div"
+{style:{fontSize:12
+color:I
+marginTop:2}
+children:a.risk})]})]}
+f))
+(0
+s.jsxs)(Fe
+{bg:Qi
+bc:$
+children:[(0
+s.jsx)("b"
+{children:"BATNA / Escalation:"})
+" If Supplier A refuses SLA restoration and HITL clarification
+ escalate through Contracts COE (or your affiliate escalation path) to engage Erika Sylvester (Supplier A GC) directly. The AI Standard positions are contractually grounded and backed by Mailbox_Privacy_Contracts. No alternative vendor switching is contemplated; this is a continuation WO."]})]})
+n.legal==="SME Pre-Engagement"&&(0
+s.jsx)(s.Fragment
+{children:k.smes.map((a
+f)=>(0
+s.jsxs)(De
+{border:R
+children:[(0
+s.jsxs)("div"
+{style:{display:"flex"
+justifyContent:"space-between"
+alignItems:"flex-start"
+marginBottom:8
+flexWrap:"wrap"
+gap:6}
+children:[(0
+s.jsxs)("div"
+{children:[(0
+s.jsx)("div"
+{style:{fontWeight:700
+fontSize:14}
+children:a.name})
+(0
+s.jsx)("div"
+{style:{fontSize:12
+color:R}
+children:a.email})]})
+(0
+s.jsx)(Yi
+{t:a.urgency
+bg:a.urgency==="Urgent"?$:I})]})
+(0
+s.jsxs)("div"
+{style:{fontSize:13
+marginBottom:6}
+children:[(0
+s.jsx)("b"
+{children:"Topic:"})
+" "
+a.topic]})
+(0
+s.jsx)("div"
+{style:{fontSize:13
+marginBottom:8
+lineHeight:1.6}
+children:a.brief})
+(0
+s.jsx)(ut
+{title:"Specific Asks"})
+a.asks.map((v
+w)=>(0
+s.jsxs)("div"
+{style:{display:"flex"
+gap:6
+marginBottom:4
+fontSize:13}
+children:[(0
+s.jsxs)("span"
+{style:{color:R
+fontWeight:700}
+children:[w+1
+"."]})
+(0
+s.jsx)("span"
+{children:v})]}
+w))]}
+f))})]})
+e==="commercial"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(ka
+{tabs:["Cost Build"
+"Benchmarks"
+"Counter-Proposal"
+"Discount Architecture"
+"Renewal Strategy"]
+active:n.commercial
+set:a=>g("commercial"
+a)})
+n.commercial==="Cost Build"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(xr
+{items:[["$617
+953"
+"Annual Net"
+b]
+["$3.43"
+"Per Call (15K/mo)"
+R]
+["PASSED"
+"Arithmetic"
+_]
+["$617
+953"
+"TfC Exposure"
+$]]})
+(0
+s.jsx)(Pe
+{headers:["Component"
+"Annual Cost"
+"% of Total"]
+rows:k.pricing.components.map(a=>[a.n
+(0
+s.jsx)("span"
+{style:{fontWeight:600
+color:a.v<0?_:b}
+children:a.v<0?`-$${Math.abs(a.v).toLocaleString()}`:`$${a.v.toLocaleString()}`})
+a.p])})
+(0
+s.jsx)(De
+{border:R
+title:"Payment Structure"
+children:(0
+s.jsx)("div"
+{style:{fontSize:13
+lineHeight:1.6}
+children:"First 4 months (Twilio/Scriptly): $205
+984 at execution. Remaining 8 months (Genesys/LSC): $411
+969 Aug/Sep 2026. Proration verified (4/12 + 8/12). MSA payment terms are Net-60 (\xA74.4); annual prepay deviates from standard."})})
+(0
+s.jsx)(ut
+{title:"Value at Risk"})
+(0
+s.jsx)(Pe
+{headers:["Risk Category"
+"$ Exposure"
+"Notes"]
+rows:[["Prepay + TfC exposure"
+"$617
+953"
+"Annual prepay; MSA \xA713.4 liability up to 12 mo"]
+["Discount expiry (June 15)"
+"$264
+837"
+"30% discount lost if execution slips"]
+["Volume mismatch"
+"Unquantifiable"
+"Cannot calculate without confirmed volume period"]
+["Migration service gap"
+"TBD"
+"No SLA or continuity guarantee for Twilio-to-Genesys cutover"]]})
+(0
+s.jsx)(ut
+{title:"Assumptions Register"})
+(0
+s.jsx)(Pe
+{headers:["#"
+"Assumption"
+"Risk if Broken"
+"Bearer"
+"Protection"]
+rows:[["1"
+"Volume = 15K calls/month"
+"Overpay if lower; no overage if higher"
+"Lilly"
+"None"]
+["2"
+"Telephony migration succeeds"
+"Service gap
+ data loss"
+"Shared"
+"None"]
+["3"
+"Annual prepay + June 15"
+"Lose $265K discount or lock $618K"
+"Lilly"
+"Conditional"]
+["4"
+"12 Insight Sessions delivered"
+"Under-delivery"
+"Lilly"
+"'Up to' qualifier only"]
+["5"
+"AI model accuracy stable"
+"Degraded insights
+ missed AEs"
+"Lilly"
+"No accuracy SLA"]]})]})
+n.commercial==="Benchmarks"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsxs)(Fe
+{bg:Yt
+bc:F
+children:[(0
+s.jsx)("b"
+{children:"Benchmark Confidence: LOW."})
+" Supplier A is private with no published pricing. Healthcare conversational intelligence is niche. External rates are estimates from public materials and may not reflect enterprise deals. Recommend commercial-negotiation-prep for primary market research if deeper benchmarking needed."]})
+(0
+s.jsx)(Pe
+{headers:["Platform"
+"Rate Range"
+"Scope"
+"Notes"]
+rows:[["Supplier A (this WO)"
+"$3.43/call"
+"Healthcare AI + HITL + 12 insight sessions + enterprise support"
+"Assumes 15K/month"]
+["CallMiner Eureka"
+"$2.50-5.00/call"
+"Generic contact center speech analytics"
+"No healthcare AI
+ no HITL"]
+["Observe.AI"
+"$3.00-6.00/call"
+"Agent assist + QA + coaching"
+"No healthcare-specific models"]
+["NICE CXone Analytics"
+"$1.50-4.00/call"
+"Volume-dependent
+ basic analytics tier"
+"Enterprise pricing varies widely"]
+["Verint Speech Analytics"
+"$2.00-5.50/call"
+"Enterprise analytics + compliance"
+"Compliance focus
+ not healthcare AI"]]})
+(0
+s.jsx)("p"
+{style:{fontSize:12
+color:I}
+children:"The $3.43/call rate is mid-range for enterprise speech analytics. The inclusion of 12 dedicated insight sessions ($47
+496)
+ HITL model management ($0 in WO)
+ and enterprise support ($115
+154) differentiates from pure SaaS analytics pricing. Comparable packages from competitors would likely price higher for equivalent scope."})]})
+n.commercial==="Counter-Proposal"&&(0
+s.jsx)(s.Fragment
+{children:(0
+s.jsx)(Pe
+{headers:["Ask"
+"Why It Matters / $ Impact"
+"Priority"]
+rows:k.pricing.counter.map(a=>[(0
+s.jsx)("b"
+{children:a[0]})
+a[1]
+(0
+s.jsx)(fe
+{t:a[2]
+bg:a[2]==="Must-have"?$:a[2]==="High"?F:ct})])})})
+n.commercial==="Discount Architecture"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(ut
+{title:"Discount Waterfall"})
+k.pricing.waterfall.map((a
+f)=>(0
+s.jsxs)("div"
+{style:{display:"flex"
+gap:12
+marginBottom:8
+alignItems:"stretch"}
+children:[(0
+s.jsx)("div"
+{style:{width:200
+flexShrink:0
+textAlign:"right"
+padding:"8px 12px"
+background:f===k.pricing.waterfall.length-1?b:f===0?"#F8FAFC":bt
+color:f===k.pricing.waterfall.length-1?Z:b
+borderRadius:6
+fontWeight:700
+fontSize:13
+display:"flex"
+alignItems:"center"
+justifyContent:"flex-end"}
+children:a.val})
+(0
+s.jsxs)("div"
+{style:{flex:1
+padding:"8px 12px"
+background:Z
+border:`1px solid ${le}`
+borderRadius:6}
+children:[(0
+s.jsx)("div"
+{style:{fontWeight:600
+fontSize:13}
+children:a.layer})
+(0
+s.jsx)("div"
+{style:{fontSize:12
+color:I
+marginTop:2}
+children:a.note})]})]}
+f))
+(0
+s.jsxs)(Fe
+{bg:Yt
+bc:ct
+children:[(0
+s.jsx)("b"
+{children:"Leverage Insight:"})
+" Four discount layers totaling roughly 55% off implied list. This is aggressive discounting that suggests either market-entry pricing to deepen the Lilly relationship
+ or inflated list prices designed to make discounts look generous. Either way
+ it signals significant pricing flexibility. In a renewal or recompete
+ Lilly has room to push for deeper net discounts or to decouple the 30% from the execution date condition."]})]})
+n.commercial==="Renewal Strategy"&&(0
+s.jsxs)(s.Fragment
+{children:[(0
+s.jsx)(De
+{border:_
+title:"Price Protection in Place"
+children:(0
+s.jsx)("div"
+{style:{fontSize:13
+lineHeight:1.6}
+children:"MSA Exhibit B \xA74.1: fees constant for 5 years (through June 2029). After that
+ increases capped at lesser of 5% or CPI. This WO falls entirely within the rate lock period. No escalation risk for this term."})})
+(0
+s.jsx)(De
+{border:R
+title:"Governance Carry-Forward"
+children:(0
+s.jsx)("div"
+{style:{fontSize:13
+lineHeight:1.6}
+children:"If renewed (WO 11)
+ carry forward: (1) HITL training data restriction
+ (2) restored SLA
+ (3) AE detection process
+ (4) explicit custom model ownership. Consider MSA amendment if relationship scales further."})})
+(0
+s.jsx)(De
+{border:ct
+title:"Volume Optimization"
+children:(0
+s.jsx)("div"
+{style:{fontSize:13
+lineHeight:1.6}
+children:"Current flat rate does not incentivize volume growth. For renewal
+ negotiate tiered pricing: first 15K at current rate
+ 15K-25K at 85%
+ 25K+ at 75%. Align pricing with Lilly Direct's growth trajectory."})})
+(0
+s.jsx)(De
+{border:I
+title:"Forward Lock Recommendations"
+children:(0
+s.jsx)("div"
+{style:{fontSize:13
+lineHeight:1.6}
+children:"Lock quarterly billing in WO 11 to eliminate prepay/TfC exposure. Add annual model accuracy review with minimum thresholds. Define migration SLA template for future telephony changes. Add SLA quarterly reporting as a standard WO provision."})})]})]})]})
+(0
+s.jsxs)("div"
+{style:{background:b
+padding:"12px 24px"
+marginTop:32
+display:"flex"
+justifyContent:"space-between"
+alignItems:"center"
+flexWrap:"wrap"
+gap:8}
+children:[(0
+s.jsx)("div"
+{style:{fontSize:11
+color:X}
+children:"Governing: MPT 5.0 MSA (Jun 7
+ 2024) + Exhibits A
+ B
+ C + SPS | Procurement guidance
+ not legal advice"})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+color:X}
+children:"Eli Lilly and Company: Confidential | 2026 | lilly-contract-review canonical dashboard v3.2"})]})]})}var Pn
+s
+$
+b
+_
+bt
+Yt
+Qi
+Zi
+le
+I
+X
+R
+F
+ct
+qp
+Z
+wa
+Ki
+bi
+Qp
+fe
+Yi
+De
+Fe
+ka
+Pe
+xr
+ut
+Kp
+Ca
+bp
+sd
+Yp
+cd
+Jp
+Xp
+Zp
+em
+ud
+k
+Ji
+tm
+nm
+Xi
+dd=wd(()=>{Pn=Rt(Mn())
+s=Rt(Cr())
+$="#E1251B"
+b="#212121"
+_="#0F3A85"
+bt="#E4EBF1"
+Yt="#FFF0D8"
+Qi="#FFF5F5"
+Zi="#D4E5F7"
+le="#E2E8F0"
+I="#71717A"
+X="#A1A1AA"
+R="#1D4ED8"
+F="#B45309"
+ct="#854D0E"
+qp="#7030A0"
+Z="#FFFFFF"
+wa="#F8FAFC"
+Ki={HIGH:$
+MEDIUM:F
+LOW:_}
+bi={Covered:_
+Confirm:F
+Gap:$}
+Qp=({v:e
+l:t
+c:n=b})=>(0
+s.jsxs)("div"
+{style:{textAlign:"center"
+padding:"12px 8px"}
+children:[(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:28
+fontWeight:700
+color:n}
+children:e})
+(0
+s.jsx)("div"
+{style:{fontSize:11
+color:I
+marginTop:4}
+children:t})]})
+fe=({t:e
+bg:t
+fg:n=Z})=>(0
+s.jsx)("span"
+{style:{display:"inline-block"
+padding:"2px 10px"
+borderRadius:12
+fontSize:11
+fontWeight:600
+background:t
+color:n
+marginRight:4}
+children:e})
+Yi=({t:e
+bg:t})=>(0
+s.jsx)("span"
+{style:{display:"inline-block"
+padding:"4px 12px"
+borderRadius:4
+fontSize:12
+fontWeight:600
+background:t
+color:Z
+marginRight:6}
+children:e})
+De=({children:e
+border:t
+bg:n=Z
+title:r
+note:i})=>(0
+s.jsxs)("div"
+{style:{background:n
+borderLeft:`4px solid ${t||le}`
+borderRadius:"0 6px 6px 0"
+padding:"14px 16px"
+marginBottom:10
+boxShadow:"0 1px 3px rgba(0
+0
+0
+0.06)"}
+children:[r&&(0
+s.jsxs)("div"
+{style:{display:"flex"
+justifyContent:"space-between"
+alignItems:"baseline"
+marginBottom:8}
+children:[(0
+s.jsx)("span"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:14
+fontWeight:700}
+children:r})
+i&&(0
+s.jsx)("span"
+{style:{fontSize:11
+color:X}
+children:i})]})
+e]})
+Fe=({children:e
+bg:t=bt
+bc:n=le})=>(0
+s.jsx)("div"
+{style:{background:t
+borderLeft:`4px solid ${n}`
+padding:"14px 18px"
+borderRadius:"0 6px 6px 0"
+marginBottom:14
+fontSize:13
+lineHeight:1.6}
+children:e})
+ka=({tabs:e
+active:t
+set:n})=>(0
+s.jsx)("div"
+{style:{display:"flex"
+gap:0
+borderBottom:`2px solid ${le}`
+marginBottom:16
+overflowX:"auto"}
+children:e.map(r=>(0
+s.jsx)("button"
+{onClick:()=>n(r)
+style:{padding:"8px 16px"
+border:"none"
+borderBottom:t===r?`3px solid ${$}`:"3px solid transparent"
+background:"none"
+fontSize:13
+fontWeight:t===r?700:400
+color:t===r?b:I
+cursor:"pointer"
+whiteSpace:"nowrap"}
+children:r}
+r))})
+Pe=({headers:e
+rows:t})=>(0
+s.jsxs)("table"
+{style:{width:"100%"
+borderCollapse:"collapse"
+fontSize:13
+marginBottom:16}
+children:[(0
+s.jsx)("thead"
+{children:(0
+s.jsx)("tr"
+{children:e.map((n
+r)=>(0
+s.jsx)("th"
+{style:{background:b
+color:Z
+padding:"8px 10px"
+textAlign:"left"
+fontWeight:600
+fontSize:12}
+children:n}
+r))})})
+(0
+s.jsx)("tbody"
+{children:t.map((n
+r)=>(0
+s.jsx)("tr"
+{style:{background:r%2===0?Z:"#F8FAFC"}
+children:n.map((i
+o)=>(0
+s.jsx)("td"
+{style:{padding:"8px 10px"
+borderBottom:`1px solid ${le}`
+verticalAlign:"top"}
+children:i}
+o))}
+r))})]})
+xr=({items:e})=>(0
+s.jsx)("div"
+{style:{display:"grid"
+gridTemplateColumns:`repeat(${e.length}
+1fr)`
+gap:12
+marginBottom:20}
+children:e.map(([t
+n
+r]
+i)=>(0
+s.jsx)("div"
+{style:{background:Z
+borderRadius:8
+border:`1px solid ${le}`
+padding:4}
+children:(0
+s.jsx)(Qp
+{v:t
+l:n
+c:r})}
+i))})
+ut=({title:e})=>(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:16
+fontWeight:700
+marginBottom:10
+marginTop:20
+color:b}
+children:e})
+Kp=({title:e})=>(0
+s.jsx)("div"
+{style:{fontFamily:"Georgia
+serif"
+fontSize:13
+fontWeight:700
+color:R
+marginTop:14
+marginBottom:4
+paddingBottom:4
+borderBottom:`1px solid ${le}`}
+children:e})
+Ca=(e
+t
+n
+r)=>{let i=r*Math.PI/180;return{x:e+n*Math.cos(i)
+y:t-n*Math.sin(i)}}
+bp=(e
+t
+n
+r
+i)=>{let o=180-r/100*180
+l=180-i/100*180
+u=Ca(e
+t
+n
+o)
+c=Ca(e
+t
+n
+l);return`M ${u.x.toFixed(2)} ${u.y.toFixed(2)} A ${n} ${n} 0 0 1 ${c.x.toFixed(2)} ${c.y.toFixed(2)}`}
+sd=[[0
+25
+$
+"Critical"]
+[25
+50
+F
+"High"]
+[50
+75
+ct
+"Moderate"]
+[75
+100
+_
+"Low"]]
+Yp=e=>e>=75?"Low":e>=50?"Moderate":e>=25?"High":"Critical"
+cd=e=>e>=75?_:e>=50?ct:e>=25?F:$
+Jp=({value:e})=>{let o=180-e/100*180
+l=Ca(100
+104
+74
+o)
+u=Yp(e)
+c=cd(e);return(0
+s.jsxs)("div"
+{style:{textAlign:"center"}
+children:[(0
+s.jsxs)("svg"
+{viewBox:"0 0 200 118"
+style:{width:"100%"
+maxWidth:260
+display:"block"
+margin:"0 auto"}
+children:[sd.map(p=>(0
+s.jsx)("path"
+{d:bp(100
+104
+78
+p[0]
+p[1])
+stroke:p[2]
+strokeWidth:16
+fill:"none"}
+p[0]))
+(0
+s.jsx)("line"
+{x1:100
+y1:104
+x2:l.x
+y2:l.y
+stroke:b
+strokeWidth:3
+strokeLinecap:"round"})
+(0
+s.jsx)("circle"
+{cx:100
+cy:104
+r:6
+fill:b})
+(0
+s.jsx)("text"
+{x:100
+y:72
+textAnchor:"middle"
+style:{fontFamily:"Georgia
+serif"
+fontSize:34
+fontWeight:700
+fill:c}
+children:e})
+(0
+s.jsx)("text"
+{x:100
+y:90
+textAnchor:"middle"
+style:{fontFamily:"Arial"
+fontSize:11
+fill:I}
+children:"out of 100"})]})
+(0
+s.jsx)(fe
+{t:`${u.toUpperCase()} PROTECTION`
+bg:c})
+(0
+s.jsx)("div"
+{style:{display:"flex"
+justifyContent:"center"
+gap:10
+marginTop:10
+flexWrap:"wrap"}
+children:sd.map(p=>(0
+s.jsxs)("div"
+{style:{display:"flex"
+alignItems:"center"
+gap:4
+fontSize:10
+color:I}
+children:[(0
+s.jsx)("span"
+{style:{width:8
+height:8
+borderRadius:2
+background:p[2]
+display:"inline-block"}})
+p[3]
+" "
+p[0]
+"-"
+p[1]===100?100:p[1]-1]}
+p[3]))})]})}
+Xp={MSA:"CONTRACT-ACTIVE"
+Exhibit:"CONTRACT-ACTIVE"
+Addendum:"CONTRACT-ACTIVE"
+WO:"CONTRACT-ACTIVE"
+Invoice:"WORKING"
+"Compliance Evidence":"COMPLIANCE-EVIDENCE"
+"Risk & Deviation Approval":"COMPLIANCE-EVIDENCE"}
+Zp=e=>Xp[e]||"WORKING"
+em=e=>e===0?"Continuous / 1-2 day trigger":e>=8e3?"On demand / conditional":e>=365?`~${Math.round(e/30)} mo out`:`${e}d out`
+ud=e=>e===0?$:e<=120?F:e<=400?R:I
+k={supplier:"Supplier A"
+doc:"Work Order 10: Conversational Intelligence (illustrative)"
+value:"$617
+953/yr"
+term:"Signature to Jun 2
+ 2027 (~12 mo)"
+riskScore:64
+hardStops:0
+findings:[{id:1
+t:"HIGH"
+title:"Missing call volume period"
+where:"Section 1.1
+ para 3"
+ev:`"up to 15
+000 recorded calls per [blank]" with tracked deletion of 'month' found in XML. Blocks entitlement verification and per-unit economics ($3.43/call at 15K/mo vs $41.20 at 15K/yr).`
+msa:"N/A (WO-specific)"
+v:!0
+impact:"Entire pricing basis unverifiable."
+action:"Restore 'per month.' Confirm with Supplier A."
+cat:"Scope"}
+{id:2
+t:"HIGH"
+title:"SLA degraded 150 bps from MSA template"
+where:"WO Sections 6.1-6.2"
+ev:"WO: 98% annual
+ 5% credit. MSA Exhibit B \xA75.1/7.4: 99.50% monthly
+ 5% credit
+ material breach at <98% for 3/12 months. Annual measurement hides individual bad months. Exclusion list broader than MSA Force Majeure."
+msa:"Exhibit B \xA75.1
+ \xA77.4
+ \xA77.4.1 (VERIFIED)"
+v:!0
+impact:"150 bps degradation + annual averaging + broad exclusions = substantially weakened SLA."
+action:"Restore Exhibit B defaults. Narrow exclusions to FM only."
+cat:"SLA"}
+{id:3
+t:"HIGH"
+title:"HITL training data use ambiguity (AI Standard conflict)"
+where:"WO Section 1.1 (HITL/Supervised Training)"
+ev:"WO describes HITL to 'improve model accuracy' without specifying which models. Definition trace: call recordings = Lilly Information (A.1.19)
+ NOT Usage Data (A.1.37). Lilly Content per AI Standard. \xA73.5 bars use as Supplier Training Content. Supplier A Addendum A discloses General Use Models (cross-client) and Client-Dedicated Models (Lilly-specific). If HITL feedback from Lilly data flows to General Use Models
+ violates \xA73.5."
+msa:"AI Standard \xA72
+ \xA73.5; MSA A.1.19
+ A.1.37; Addendum A \xA73 (VERIFIED)"
+v:!0
+impact:"Potential unauthorized use of Lilly data for cross-client model improvement."
+action:"Add clause: HITL on Lilly Content improves only Client-Dedicated Models."
+cat:"AI/Data"}
+{id:4
+t:"MEDIUM"
+title:"Annual prepayment erodes TfC value"
+where:"Pricing; Table 2 billing"
+ev:"$205
+984 at execution + $411
+969 Aug/Sep. 30% discount conditioned on annual prepay. MSA \xA74.4 is Net-60. MSA \xA713.4: on TfC for SaaS
+ Lilly liable for unused remainder up to 12 months. Combined with prepayment
+ up to $617
+953 may be unrecoverable on early termination."
+msa:"MSA \xA74.4
+ \xA713.4 (VERIFIED)"
+v:!0
+impact:"$617
+953 at risk if Lilly terminates for convenience after annual prepayment."
+action:"Negotiate pro-rata refund on TfC
+ or switch to quarterly billing."
+cat:"Commercial"}
+{id:5
+t:"MEDIUM"
+title:"Custom AI model ownership not explicit in WO"
+where:"WO Table 1 (Custom Classifiers
+ Quality Models
+ autoscoring)"
+ev:"Custom models = Work Product (MSA A.1.39) + Lilly Trained Models (AI Standard \xA72/\xA715). Both assign to Lilly. WO silent on this. In SaaS context where models run on vendor infra
+ explicit language prevents portability/deletion disputes."
+msa:"MSA \xA79.1.2
+ AI Standard \xA715 (VERIFIED)"
+v:!0
+impact:"Ambiguity about model ownership
+ portability
+ deletion at WO end."
+action:"Add explicit ownership + export/deletion clause."
+cat:"IP"}
+{id:6
+t:"MEDIUM"
+title:"No AE/product complaint detection process at scale"
+where:"WO scope vs MSA \xA73.8"
+ev:"180K calls/yr with patients
+ HCPs
+ caregivers. MSA \xA73.8: 1-biz-day AE reporting. WO AI models cover experience
+ friction
+ quality but not AE detection. At 0.1-0.5% AE signal rate: 180-900 potential AE calls/yr. 5% false negative = 9-45 missed AE signals."
+msa:"MSA \xA73.8 (VERIFIED)"
+v:!0
+impact:"Regulatory risk from AI misclassification at scale."
+action:"Add AE flag classifier + quarterly reporting."
+cat:"Pharma"}
+{id:7
+t:"MEDIUM"
+title:"Telephony migration without transition plan"
+where:"WO Table 2"
+ev:"Billing split: Twilio/Scriptly (4 mo) then Genesys/LSC (8 mo). No timeline
+ acceptance criteria
+ continuity guarantee
+ or risk allocation."
+msa:"N/A"
+v:!0
+impact:"Service gap and data loss risk during cutover."
+action:"Add migration section."
+cat:"Delivery"}
+{id:8
+t:"MEDIUM"
+title:"June 15 execution deadline is a discount-expiry pressure lever"
+where:"WO Table 1 (Additional Discounts)"
+ev:"$264
+837 discount (30%) conditioned on annual payment + execution by June 15. Creates artificial urgency that may compress FRAP or SME review."
+msa:"N/A"
+v:!0
+impact:"$264
+837 at risk if execution slips."
+action:"Extend deadline through Lilly approval cycle."
+cat:"Commercial"}
+{id:9
+t:"MEDIUM"
+title:"Missing acceptance criteria"
+where:"WO (absent)"
+ev:"MSA Exhibit B WO Template \xA71.5 requires acceptance criteria. None in WO. SFTP/API integration with two telephony platforms needs formal go-live gate."
+msa:"Exhibit B Attachment 2 \xA71.5 (VERIFIED)"
+v:!0
+impact:"No formal acceptance gate for implementation."
+action:"Add acceptance criteria per deliverable."
+cat:"Delivery"}
+{id:10
+t:"LOW"
+title:"Contradictory expense language"
+where:"WO Section 1.4"
+ev:"States both 'no additional compensation for expenses' and 'will be compensated for expenses per Agreement.' Template artifact."
+msa:"N/A"
+v:!0
+impact:"Ambiguity only."
+action:"Delete second sentence."
+cat:"Commercial"}
+{id:11
+t:"LOW"
+title:"'Up to' qualifier on Insight Sessions"
+where:"WO Section 1.1"
+ev:"'Up to twelve (12)' creates ceiling
+ not floor. No minimum delivery commitment."
+msa:"N/A"
+v:!0
+impact:"Supplier A could deliver fewer than 12."
+action:"Change to 'twelve (12)' without 'up to.'"
+cat:"Scope"}]
+coverage:[{cat:"Termination"
+s:"Covered"
+src:"MSA \xA713.1
+ \xA713.4 (TfC 120 days
+ for cause 30-day cure)"}
+{cat:"SLA/Performance"
+s:"Gap"
+src:"WO degrades Exhibit B defaults (Finding #2)"}
+{cat:"Data Protection"
+s:"Covered"
+src:"SPS via MSA \xA73.2.2; SPS Exhibit A completed; BAA status: confirm"}
+{cat:"AI Governance"
+s:"Confirm"
+src:"Exhibit C in place; HITL needs WO clarification (Finding #3)"}
+{cat:"Security"
+s:"Covered"
+src:"ISS via MSA \xA73.2.3"}
+{cat:"Audit Rights"
+s:"Covered"
+src:"MSA \xA711.4 (annual
+ 10 biz day notice)"}
+{cat:"IP Ownership"
+s:"Confirm"
+src:"MSA \xA79.1.2 + AI Std \xA715; custom models need explicit WO clause (#5)"}
+{cat:"Indemnification"
+s:"Covered"
+src:"MSA \xA714 (mutual
+ IP infringement included)"}
+{cat:"Liability"
+s:"Covered"
+src:"MSA \xA715 (general >$3M; data/privacy 5x/$10M; broad carve-outs)"}
+{cat:"Insurance"
+s:"Covered"
+src:"MSA \xA716 (CGL $1M/$3M
+ Prof $2M
+ Cyber $10M
+ Umbrella $2M)"}
+{cat:"Renewal/Price"
+s:"Covered"
+src:"MSA \xA71.2 + Exhibit B \xA74.1 (5-yr lock
+ CPI/5% cap)"}
+{cat:"Flexibility"
+s:"Gap"
+src:"No volume reduction or scope adjustment mechanism"}
+{cat:"Pharma-Specific"
+s:"Covered"
+src:"MSA \xA73.8 (AE 1 biz day)
+ \xA73.9 (debarment)
+ \xA73.7 (sanctions)"}
+{cat:"Commitment"
+s:"Confirm"
+src:"Fixed annual; MSA \xA713.4 caps TfC at 12 mo; prepay risk (#4)"}]
+obligations:[{what:"AE/Product Complaint reporting"
+who:"Supplier A"
+when:"Within 1 business day of awareness"
+src:"MSA \xA73.8"
+quote:'"Supplier shall notify Lilly of any Adverse Event or Product Complaint of which it becomes aware within one (1) business day."'
+days:0
+consequence:"Regulatory violation; potential FDA action"
+type:"Compliance"
+status:"Active"}
+{what:"Confidentiality breach notification"
+who:"Supplier A"
+when:"Within 24 hours of awareness"
+src:"MSA \xA710.4"
+quote:'"Supplier shall notify Lilly within twenty-four (24) hours of discovering any unauthorized access to Confidential Information."'
+days:0
+consequence:"Lilly unable to mitigate; potential regulatory/reputational harm"
+type:"Notice Period"
+status:"Active"}
+{what:"Privacy Communication forwarding"
+who:"Supplier A"
+when:"Within 72 hours"
+src:"SPS \xA73.3"
+quote:'"Supplier shall forward any Privacy Communication received from a data subject to Lilly within seventy-two (72) hours of receipt."'
+days:0
+consequence:"Failure to comply with data subject rights"
+type:"Compliance"
+status:"Active"}
+{what:"Personal Data Breach notification"
+who:"Supplier A"
+when:"Within 72 hours of discovery"
+src:"SPS \xA73.5"
+quote:'"Supplier shall notify Lilly without undue delay
+ and in no event later than seventy-two (72) hours
+ after becoming aware of a Personal Data Breach."'
+days:0
+consequence:"Regulatory violation; Supplier A bears all breach costs"
+type:"Notice Period"
+status:"Active"}
+{what:"Anti-corruption training + evidence"
+who:"Supplier A"
+when:"Within 90 days of execution
+ then annually"
+src:"MSA \xA77.2"
+quote:'"Supplier shall complete anti-corruption training and provide evidence of completion within ninety (90) days of the Effective Date and annually thereafter."'
+days:90
+consequence:"Compliance gap; potential FCPA exposure"
+type:"Compliance Certification"
+status:"Active"}
+{what:"Diversity purchasing report"
+who:"Supplier A"
+when:"Quarterly (within 25 days of request
+ max 1/quarter)"
+src:"MSA \xA78.1"
+quote:`"Supplier shall provide a diversity purchasing report within twenty-five (25) days of Lilly's request
+ not more than once per quarter."`
+days:95
+consequence:"Not specified"
+type:"SLA Reporting"
+status:"Active"}
+{what:"MSA renewal notice"
+who:"Lilly"
+when:"30 days prior to term/renewal expiration (MSA expires Jul 1
+ 2029)"
+src:"MSA \xA71.2"
+quote:'"Either party may decline renewal by providing written notice at least thirty (30) days prior to the end of the then-current Term."'
+days:1103
+consequence:"MSA expires; WOs survive independently but no new WOs"
+type:"Renewal Window"
+status:"Future (2029)"}
+{what:"Insurance certificate"
+who:"Supplier A"
+when:"Upon Lilly request"
+src:"MSA \xA716.10"
+quote:`"Supplier shall furnish a certificate of insurance evidencing the coverage required herein promptly upon Lilly's request."`
+days:9e3
+consequence:"Lilly cannot verify coverage; potential uninsured exposure"
+type:"Insurance Requirement"
+status:"On Demand"}
+{what:"Audit cooperation"
+who:"Supplier A"
+when:"10 business days advance notice
+ max 1/year"
+src:"MSA \xA711.4"
+quote:`"Lilly may audit Supplier's records and facilities upon ten (10) business days' notice
+ not more than once annually absent cause."`
+days:365
+consequence:"Corrective action plan within 30 days of findings"
+type:"Audit Right"
+status:"Annual"}
+{what:"Data return/destruction post-termination"
+who:"Supplier A"
+when:"Within 90 days of WO termination"
+src:"Exhibit B \xA711.4"
+quote:'"Supplier shall return or destroy all Lilly Information within ninety (90) days of termination or expiration of the applicable Work Order."'
+days:9500
+consequence:"Lilly cannot recover data; Supplier A cannot refuse return regardless of disputes"
+type:"Data Obligation"
+status:"At Termination"}
+{what:"Record retention post-MSA"
+who:"Supplier A"
+when:"1 year after MSA Term expires; 90-day destruction notice"
+src:"MSA \xA711.3"
+quote:`"Supplier shall retain records for one (1) year following expiration of the Term and shall provide ninety (90) days' notice prior to destruction."`
+days:9999
+consequence:"Lilly may request delivery instead of destruction"
+type:"Data Obligation"
+status:"Post-Term"}
+{what:"Deliver up to 12 Insight Sessions"
+who:"Supplier A"
+when:"Annually
+ mutually agreeable dates"
+src:"WO \xA71.1"
+quote:'"Supplier will deliver up to twelve (12) Insight Sessions annually on dates mutually agreed by the parties."'
+days:180
+consequence:"Not specified (no minimum; 'up to' qualifier)"
+type:"Milestone Deliverable"
+status:"Active"}
+{what:"SFTP/API integration setup"
+who:"Supplier A"
+when:"Not specified (no target date)"
+src:"WO \xA71.3"
+quote:'"Supplier will establish SFTP and API connectivity to the telephony platforms identified in Table 2."'
+days:9200
+consequence:"Not specified"
+type:"Milestone Deliverable"
+status:"Missing Timeline"}
+{what:"Payment: First 4 months"
+who:"Lilly"
+when:"At contract execution"
+src:"WO Table 2"
+quote:'"Lilly will remit payment for the first four (4) months of service upon execution of this Work Order."'
+days:0
+consequence:"Not specified"
+type:"Payment Deadline"
+status:"At Execution"}
+{what:"Payment: Remaining 8 months"
+who:"Lilly"
+when:"Aug/Sep 2026"
+src:"WO Table 2"
+quote:'"Lilly will remit payment for the remaining eight (8) months of service in August/September 2026."'
+days:95
+consequence:"Not specified"
+type:"Payment Deadline"
+status:"Aug/Sep 2026"}
+{what:"TfC notice to Supplier A"
+who:"Lilly"
+when:"120 days before desired termination"
+src:"MSA \xA713.4"
+quote:`"Lilly may terminate for convenience upon one hundred twenty (120) days' prior written notice to Supplier."`
+days:8800
+consequence:"Lilly liable for unused SaaS remainder up to 12 months"
+type:"Notice Period"
+status:"If Needed"}]
+docs:[{name:"Master Services Agreement (MPT 5.0)"
+type:"MSA"
+status:"Executed"
+date:"Jun 7
+ 2024"
+value:null
+owner:"Legal AIPC"
+folder:"Contracts / Executed / 2024"}
+{name:"Exhibit A - Definitions"
+type:"Exhibit"
+status:"Executed"
+date:"Jun 7
+ 2024"
+value:null
+owner:"Legal AIPC"
+folder:"Contracts / Executed / 2024"}
+{name:"Exhibit B - SaaS Terms"
+type:"Exhibit"
+status:"Executed"
+date:"Jun 7
+ 2024"
+value:null
+owner:"Legal AIPC"
+folder:"Contracts / Executed / 2024"}
+{name:"Exhibit C - AI Standard Addendum"
+type:"Exhibit"
+status:"Executed"
+date:"Jun 7
+ 2024"
+value:null
+owner:"Legal AIPC"
+folder:"Contracts / Executed / 2024"}
+{name:"Supplier Privacy Standard Exhibit A"
+type:"Addendum"
+status:"Executed"
+date:"Jun 7
+ 2024"
+value:null
+owner:"Privacy Office"
+folder:"Contracts / Executed / 2024"}
+{name:"Work Order 9: Conversational Intelligence (prior term)"
+type:"WO"
+status:"Executed"
+date:"Jun 2
+ 2025"
+value:"$583
+200/yr"
+owner:"Marc Lane (Procurement)"
+folder:"Contracts / Executed / 2025"}
+{name:"Work Order 10: Conversational Intelligence (this review)"
+type:"WO"
+status:"Under Review"
+date:"Drafted May 20
+ 2026"
+value:"$617
+953/yr"
+owner:"Marc Lane (Procurement)"
+folder:"Sourcing / Bids"}
+{name:"SOC 2 Type II Report"
+type:"Compliance Evidence"
+status:"Filed"
+date:"Mar 2026"
+value:null
+owner:"Cyber ISS"
+folder:"Reviews"}
+{name:"ISS Security Questionnaire"
+type:"Compliance Evidence"
+status:"Filed"
+date:"Apr 2026"
+value:null
+owner:"Cyber ISS"
+folder:"Reviews"}
+{name:"W-9"
+type:"Compliance Evidence"
+status:"Filed"
+date:"Jun 2024"
+value:null
+owner:"AP / Vendor Master"
+folder:"Reviews"}
+{name:"Data Escrow Decision Memo"
+type:"Risk & Deviation Approval"
+status:"Draft"
+date:"May 2026"
+value:null
+owner:"Cyber ISS Review"
+folder:"Risk & deviation approvals"}
+{name:"Invoice batch Q2 FY26"
+type:"Invoice"
+status:"Filed"
+date:"Apr 2026"
+value:"$205
+984"
+owner:"Accounts Payable"
+folder:"Sourcing / Bids"}]
+requiredEvidence:[{item:"W-9"
+gate:"Vendor Master / Payment Setup"}
+{item:"SOC 2 Type II Report"
+gate:"Cyber ISS Sign-off"}
+{item:"ISS Security Questionnaire"
+gate:"Cyber ISS Sign-off"}
+{item:"Data Escrow Decision Memo"
+gate:"Cyber ISS Sign-off"}
+{item:"SCC / Transfer Impact Assessment (TIA)"
+gate:"Privacy Office Sign-off"}
+{item:"Data Residency Screen"
+gate:"Privacy Office Sign-off"}
+{item:"Risk Acceptance Memo"
+gate:"Risk & Deviation Approval"}]
+tactics:[{cat:"Pricing Integrity"
+s:"FLAG"
+note:"Multi-layer discount (40-60% line + 30% blanket) obscures true list-to-net"}
+{cat:"Deliverable Ambiguity"
+s:"FLAG"
+note:"Missing volume period; 'up to' on sessions"}
+{cat:"Timeline Manipulation"
+s:"FLAG"
+note:"June 15 deadline for 30% discount"}
+{cat:"Resource Substitution"
+s:"CLEAR"
+note:""}
+{cat:"Responsibility Shifting"
+s:"FLAG"
+note:"Broad SLA exclusions shift availability risk to Lilly"}
+{cat:"Hidden Recurring Costs"
+s:"FLAG"
+note:"Enterprise Success $115K: may overlap with MSA-baseline support obligations"}
+{cat:"Contractual Conflicts"
+s:"FLAG"
+note:"Contradictory expense language; annual prepay vs Net-60 MSA terms"}
+{cat:"Compliance/Security Gaps"
+s:"CLEAR"
+note:"MSA exhibits comprehensive"}
+{cat:"Dependency Inflation"
+s:"CLEAR"
+note:""}
+{cat:"Hidden Scope Reduction"
+s:"CLEAR"
+note:""}
+{cat:"Approval Manipulation"
+s:"CLEAR"
+note:""}
+{cat:"Effort Padding"
+s:"CLEAR"
+note:"Fixed-price SaaS
+ not T&M"}]
+playbook:[{term:"Volume period (15
+000/month)"
+pos:"Restore 'per month.' Confirm $617
+953 covers 180K calls/year."
+args:["Tracked deletion of 'month' in document XML confirms original intent."
+"Per-unit economics ($3.43/call) only work at monthly volume."
+"Entitlement verification is blocked without this clarification."]
+push:"None expected. This is an editing error."
+reb:"N/A"
+fall:"If Supplier A claims a different period
+ request per-call rate card to recalculate."
+personas:{Standard:"The volume period appears to have been inadvertently deleted during editing. Please confirm this should read 'per month' so we can verify entitlements."
+Collaborative:"We noticed the volume period dropped out during drafting. Could we confirm it should read 'per month'? That way we're both working from the same entitlement basis."
+Aggressive:"The entitlement clause is incomplete. Insert 'per month' after 'recorded calls per.' We cannot evaluate pricing without a defined volume period."
+Curious:"We see '15
+000 recorded calls per' without a unit period. Can you clarify what was intended? We want to make sure our per-unit economics are aligned with your pricing model."
+Astonished:"We're surprised the volume period is missing from the entitlement clause. This is a fundamental pricing term. We assume this should read 'per month' based on the deleted text we found
+ but need your confirmation."}}
+{term:"SLA: restore MSA Exhibit B defaults"
+pos:"99.50% monthly uptime
+ 5% credit below that
+ material breach at <98% for 3/12 months. Exclusions limited to MSA Force Majeure (\xA717)."
+args:["The MSA SaaS Exhibit (\xA75.1
+ \xA77.4) sets these as the default framework."
+"98% annual allows individual months to drop far below without triggering credits."
+"The exclusion list is broader than MSA Force Majeure and could excuse most downtime events."
+"'Third-party acts' exclusion is a catch-all that could encompass cloud provider outages Supplier A should own."]
+push:"Our infrastructure can't guarantee 99.5%. The 98% annual is realistic for our platform. The exclusions are standard."
+reb:"The exclusions in the MSA SaaS Exhibit Section 5.2 already address legitimate carve-outs. If infrastructure constraints exist
+ let's discuss 99.0% monthly as a compromise
+ but annual measurement and the broad exclusion list are not acceptable."
+fall:"99.0% monthly (not annual). Narrow exclusions to FM only. Retain material breach trigger at <98% for 3/12."
+acc:"67% (industry standard for SaaS
+ N=42)"
+personas:{Standard:"The proposed SLA departs from our MSA SaaS Exhibit framework. We require monthly measurement at 99.50% with exclusions limited to Force Majeure per MSA Section 17."
+Collaborative:"We'd like to align the SLA with our existing MSA framework
+ which both parties agreed to. Could we work together to find a threshold that's realistic for your infrastructure while maintaining monthly measurement?"
+Aggressive:"This SLA is unacceptable. It drops 150 basis points from our agreed MSA framework and shifts to annual measurement that masks individual bad months. Restore Exhibit B Section 7.4 defaults."
+Curious:"Can you help us understand why the SLA was set at 98% annual rather than using the MSA SaaS Exhibit framework? Is there an infrastructure constraint we should be aware of?"
+Astonished:"We're quite surprised to see the SLA set at 98% annually when our MSA SaaS Exhibit establishes 99.50% monthly as the baseline. This is a significant departure from the framework we negotiated."}}
+{term:"HITL training: Lilly-only models"
+pos:"All HITL and Supervised Training on Lilly Content improves only Client-Dedicated Models per Addendum A. No Lilly Content used for General Use Models."
+args:["AI Standard \xA73.5 already bars Lilly Content as Supplier Training Content."
+"Definition trace: call recordings = Lilly Information (A.1.19)
+ not Usage Data (A.1.37). Usage Data explicitly excludes Lilly Information."
+"Addendum A discloses General Use Models trained on 'anonymized pool including a wide range of healthcare interactions.' Lilly data must not flow there."
+"A one-line confirmation costs nothing if Supplier A already complies."]
+push:"Human labels are 'Usage Data' under A.1.37 that we can use to improve the platform."
+reb:"Usage Data is defined as 'usage and operations data...including query logs and metadata' and explicitly excludes Lilly Information. Human labels derived from reviewing Lilly call recordings are derived from Lilly Content
+ not operational telemetry. The definition trace is unambiguous."
+fall:"None. This is a compliance position under the executed AI Standard."
+acc:"43% (N=28
+ emerging clause)"
+personas:{Standard:"Per AI Standard Section 3.5
+ Lilly Content cannot be used as Supplier Training Content. Please add a clause confirming HITL feedback from Lilly data improves only Client-Dedicated Models."
+Collaborative:"We want to make sure both parties are comfortable with how HITL training data flows. Our AI Standard requires that Lilly Content only improve Lilly-dedicated models. Could we add a brief clause confirming this is already your practice?"
+Aggressive:"The AI Standard is clear: Lilly Content is not Supplier Training Content. The HITL section must explicitly restrict training feedback to Client-Dedicated Models. This is non-negotiable."
+Curious:"The HITL section describes improving 'model accuracy' but doesn't specify which models. Can you confirm whether HITL feedback from Lilly data flows only to our dedicated models
+ or also to your general platform models?"
+Astonished:"We're concerned that the HITL description doesn't distinguish between your General Use Models and Client-Dedicated Models. Given that our AI Standard explicitly bars use of Lilly Content for supplier training
+ this omission is surprising."}}
+{term:"Prepay/TfC: pro-rata refund"
+pos:"If Lilly exercises TfC
+ pro-rata refund of prepaid unused fees."
+args:["MSA \xA713.4 says Lilly liable for unused SaaS remainder up to 12 months
+ so prepaid fees may be unrecoverable."
+"Annual prepay of $617
+953 combined with TfC liability creates maximum financial exposure."
+"MSA \xA74.4 is Net-60; annual prepay deviates from standard payment terms."]
+push:"The 30% discount is the consideration for annual prepay. Can't have the discount and the refund."
+reb:"Then let's discuss quarterly billing at a reduced discount (e.g.
+ 20%) that preserves some savings while eliminating the prepay/TfC exposure."
+fall:"Quarterly billing at 20% discount instead of 30%. Eliminates prepay risk."
+acc:"55% (N=31)"
+personas:{Standard:"Annual prepayment combined with MSA Section 13.4 creates up to $617
+953 in unrecoverable exposure on termination for convenience. We require either a pro-rata refund clause or quarterly billing."
+Collaborative:"We'd like to find a structure that works for both sides. The annual prepay creates a TfC exposure we need to manage. Would quarterly billing with an adjusted discount be workable?"
+Aggressive:"We will not prepay $617
+953 without a refund mechanism on early termination. Either add a pro-rata refund clause or switch to quarterly billing."
+Curious:"How does annual prepayment interact with the TfC provisions in our MSA? We want to understand whether prepaid fees are recoverable if we exercise termination for convenience."
+Astonished:"We're surprised the WO requires annual prepayment given that our MSA establishes Net-60 payment terms. Combined with the TfC provisions
+ this creates significant unrecoverable exposure."}}
+{term:"Custom model ownership"
+pos:"Explicit WO clause: all custom models trained on Lilly data = Work Product (MSA \xA79.1.2) + Lilly Trained Models (AI Standard \xA715)
+ owned by Lilly
+ with export and deletion obligations."
+args:["MSA already assigns Work Product; the ask is clarification
+ not a new right."
+"In SaaS context
+ models run on vendor infrastructure
+ making explicit ownership language important for portability."
+"AI Standard \xA715 independently assigns Lilly Automated Property to Lilly."]
+push:"Our platform doesn't support model export. The models are embedded in our infrastructure."
+reb:"Understood
+ but ownership and export are separate questions. We need ownership confirmed now; export mechanics can be addressed in a technical addendum. At minimum
+ deletion at termination must be confirmed."
+fall:"Written email confirmation that custom models are Work Product under \xA79.1.2
+ without WO language. Deletion at termination confirmed."
+trade:"Concede Insight Sessions minimum (#11) or June 15 deadline (#8)."
+acc:"61% (N=35)"
+personas:{Standard:"Please add a clause confirming that Custom Classifiers
+ Custom Quality Models
+ and Custom autoscoring models trained on Lilly data are Work Product per MSA Section 9.1.2 and Lilly Trained Models per AI Standard Section 15."
+Collaborative:"We think both parties would benefit from explicit clarity on custom model ownership. Our MSA already addresses this through the Work Product assignment
+ so this is really just making the implicit explicit."
+Aggressive:"Custom models trained on Lilly data are Lilly property under two independent assignment clauses. Add explicit confirmation to the WO."
+Curious:"Can you describe how custom models trained on our data are managed in your infrastructure? We want to understand the ownership and portability picture so we can align the WO language."
+Astonished:"We're surprised there's no ownership clause for the custom models
+ given that both our MSA and AI Standard independently assign these to Lilly."}}
+{term:"AE detection at scale"
+pos:"Configure AE/product complaint classifier. Flag potential AEs within 1 business day. Quarterly accuracy reporting."
+args:["At 180K calls/year
+ even 0.1% AE rate = 180 potential AE conversations."
+"5% false negative rate = 9 missed AEs per year at that volume."
+"MSA \xA73.8 covers reactive reporting; this is proactive screening at AI scale."]
+push:"Our AI models aren't trained for AE detection. That would require new development."
+reb:"Your topic classification models already identify 'fulfillment barriers' and 'competitive intel.' Configuring a flag for safety-related language patterns is comparable scope. We're not asking for a medical-grade diagnostic; we need a screening flag that routes calls to human PV review."
+fall:"Quarterly report on potential AE/PC flags surfaced by existing topic models
+ without a dedicated classifier SLA."
+trade:"Concede June 15 deadline (#8)."
+acc:"38% (N=22
+ pharma-specific)"
+personas:{Standard:"Given the volume of healthcare conversations processed (180K/year)
+ we need an AE detection process. Please configure a classifier to flag potential adverse event signals and route them within 1 business day."
+Collaborative:"We'd like to work together on an approach to AE detection that fits within your existing model architecture. At 180K calls per year
+ proactive screening would benefit both parties from a compliance standpoint."
+Aggressive:"At 180K calls/year with patient and HCP conversations
+ proactive AE detection is a regulatory necessity. Add a classifier with quarterly accuracy reporting."
+Curious:"Your AI models classify by sentiment
+ theme
+ and quality. Have you considered whether those models could also flag potential adverse event signals? At our call volume
+ this would be valuable for pharmacovigilance."
+Astonished:"We're struck that a healthcare-specific AI platform processing 180K patient/HCP calls per year doesn't include adverse event detection as a standard feature."}}
+{term:"June 15 discount deadline extension"
+pos:"Extend the 30% discount through Lilly's approval cycle."
+args:["$264
+837 discount is significant and worth preserving."
+"The deadline compresses FRAP and review timelines."]
+push:"This is an end-of-quarter offer. We can't hold pricing indefinitely."
+reb:"We're committed to closing promptly. A 30-day extension from today gives both sides time to finalize without compressing quality review."
+fall:"Accept June 15 if all other items can be resolved in a single round."
+acc:"72% (N=18)"
+personas:{Standard:"We request extending the 30% discount deadline to allow completion of our review and approval process."
+Collaborative:"We're eager to close quickly and preserve the discount. Could we extend the deadline by 30 days to ensure both parties can complete their review processes?"
+Aggressive:"The June 15 deadline is artificial. Extend the discount through our approval cycle or we will evaluate the deal at the undiscounted price."
+Curious:"Can you help us understand the constraint behind the June 15 deadline? Is there flexibility if we can commit to executing within a defined window?"
+Astonished:"We're surprised by a hard deadline that could force us to choose between a thorough review and a $264
+837 discount. We'd expect more flexibility in a mature partnership."}}]
+sequencing:[{round:"Round 1: Collaborative alignment"
+c:_
+bg:Zi
+goal:"Resolve all items in a single collaborative exchange"
+items:["Lead with volume period fix (#1) as goodwill/editing correction."
+"Present SLA restoration (#2) as 'aligning with our MSA framework we already agreed to.'"
+"Present HITL clause (#3) as 'clarifying the AI Standard both parties executed.'"
+"Concede June 15 deadline (#8) immediately to signal flexibility and urgency to close."
+"Request acceptance criteria (#9) and migration plan (#7)."
+"Raise prepay/TfC issue (#4): offer quarterly billing at 20% as alternative."]
+risk:"Low. Most items are error corrections or MSA alignment
+ not new asks."}
+{round:"Round 2: Deploy fallbacks if needed"
+c:F
+bg:Yt
+goal:"Close remaining items with calibrated fallbacks"
+items:["If SLA resisted: offer 99.0% monthly (do NOT accept annual measurement or broad exclusions)."
+"If custom model ownership resisted: accept email confirmation instead of WO clause."
+"Trade Insight Sessions minimum (#11) for AE detection process (#6)."
+"If prepay/TfC resisted: accept quarterly billing at reduced discount as compromise."]
+risk:"Low-Medium. If Round 1 is collaborative
+ Round 2 should be cleanup only."}]
+smes:[{name:"Legal AIPC / Privacy Contracts"
+email:"Mailbox_Privacy_Contracts@lilly.com"
+topic:"AI Standard \xA73.5 interpretation: HITL training data use"
+urgency:"Standard"
+brief:"Supplier A processes ~180K Lilly Direct calls/year using proprietary AI. Their AI Standard disclosure (Exhibit C Addendum A) describes three model types: General Use (cross-client)
+ Client-Dedicated (Lilly-specific)
+ and External Dataset. The WO HITL section describes training to 'improve model accuracy' without specifying which models. Definition trace shows call data is Lilly Content (not Usage Data per A.1.37 explicit exclusion)
+ so \xA73.5 bars its use as Supplier Training Content. We plan to add a WO clause restricting HITL to Client-Dedicated Models only. Please confirm our interpretation is correct and review the proposed clause language."
+asks:["Confirm AI Standard \xA73.5 interpretation re: HITL training data classification"
+"Review proposed HITL restriction clause language"
+"Advise whether Addendum A disclosure is sufficient or needs amendment"]}
+{name:"Contracts COE (or affiliate escalation path)"
+email:""
+topic:"TfC/prepay exposure: pro-rata refund vs quarterly billing"
+urgency:"Standard"
+brief:"WO 10 requires annual prepayment of $617
+953 ($205
+984 at execution + $411
+969 Aug/Sep). The 30% discount ($264
+837) is conditioned on annual prepay. MSA \xA713.4 states that on TfC for SaaS subscriptions
+ Lilly remains liable for unused remainder up to 12 months. Combined with prepayment
+ up to $617
+953 may be unrecoverable if Lilly terminates for convenience. MSA \xA74.4 standard payment terms are Net-60; annual prepay deviates. Two paths: (1) add a pro-rata refund clause for unused prepaid fees on TfC
+ or (2) switch to quarterly billing at a reduced discount (~20%). Please advise on preferred approach."
+asks:["Advise on pro-rata refund clause vs quarterly billing for TfC exposure"
+"Confirm whether annual prepay deviation from Net-60 needs additional approval"]}
+{name:"Cyber ISS Review"
+email:"Cyber_ISS_Review@lilly.com"
+topic:"Data escrow decision; SFTP/API integration security review"
+urgency:"Standard"
+brief:"WO 10 involves SFTP/API file transfer of Lilly Direct call recordings to Supplier A's Azure-hosted platform (Central US
+ East US
+ East US 2). The WO checked 'No' on data escrow. Given the volume (180K calls/year with patient/HCP/caregiver conversations)
+ please confirm: (1) data escrow decision is appropriate
+ and (2) SFTP/API integration meets ISS requirements."
+asks:["Confirm data escrow 'No' is appropriate for this scope"
+"Review SFTP/API integration security posture"]}]
+pricing:{pre:882790
+disc:264837
+net:617953
+components:[{n:"Platform (Insights+Quality)"
+v:49340
+p:"5.6%"}
+{n:"AI Compute (Insights+Quality)"
+v:670800
+p:"76.0%"}
+{n:"Professional Services"
+v:162650
+p:"18.4%"}
+{n:"30% Discount"
+v:-264837
+p:"-30.0%"}]
+waterfall:[{layer:"Gross list (implied)"
+val:"~$1.96M"
+note:"Estimated from stated 40-60% line-item discounts"}
+{layer:"Layer 1: Line-item discounts (40-60%)"
+val:"-~$1.08M"
+note:"Applied per line; waived items ($0) absorb cost into remaining lines"}
+{layer:"Subtotal after Layer 1"
+val:"$882
+790"
+note:"Sum of discounted line items"}
+{layer:"Layer 2: Blanket 30%"
+val:"-$264
+837"
+note:"Conditioned on annual prepay + June 15 execution"}
+{layer:"Net annual"
+val:"$617
+953"
+note:"Final price after all layers"}]
+counter:[["Confirm 'per month' volume"
+"Entire pricing basis unverifiable without it"
+"Must-have"]
+["Pro-rata TfC refund or quarterly billing"
+"Up to $617
+953 unrecoverable on early termination"
+"High"]
+["Remove/extend June 15 deadline"
+"$264
+837 at risk if review takes longer"
+"Med"]
+["Separate Enterprise Success from baseline MSA support"
+"$115
+154 may overlap with MSA-standard obligations"
+"Med"]
+["Quarterly billing at ~20% discount"
+"Reduces prepay risk while preserving savings"
+"Med"]]}}
+Ji=e=>{let t=k.docs.find(n=>n.name.toLowerCase().indexOf(e.toLowerCase())>=0||e.toLowerCase().indexOf(n.name.toLowerCase())>=0);return t?t.status==="Draft"?"Draft":t.status==="Filed"||t.status==="Executed"?"Filed":"Pending":"Awaiting"}
+tm={Filed:_
+Draft:F
+Pending:F
+Awaiting:$}
+nm=["Standard"
+"Collaborative"
+"Aggressive"
+"Curious"
+"Astonished"]
+Xi={Standard:b
+Collaborative:_
+Aggressive:$
+Curious:R
+Astonished:qp}});var im=qe(()=>{var ym=Rt(Mn())
+fd=Rt(id());dd();var pd=Rt(Cr())
+rm=(0
+fd.createRoot)(document.getElementById("root"));rm.render((0
+pd.jsx)(xa
+{}))});im();})();

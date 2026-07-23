@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Executive Summary Package - DOCX Preview</title>
+<style>
+  :root{
+    --lilly-blue:#0F3A85;
+    --lilly-blue-dark:#0A2A61;
+    --muted-grey:#8A969E;
+    --rule-grey:#B9C2CC;
+    --table-head:#E9EDF1;
+    --page-bg:#DCE1E6;
+    --ink:#1A1A1A;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--page-bg);
+    color:var(--ink);
+    font-family:Calibri,'Segoe UI',Arial,sans-serif;
+  }
+
+  /* ---------- outer chrome (preview wrapper, not part of the document) ---------- */
+  .chrome-top{
+    background:var(--lilly-blue);
+    color:#fff;
+    padding:14px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+  .chrome-top .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .chrome-top .brand .mark{
+    width:30px;height:30px;border-radius:6px;
+    background:#fff;color:var(--lilly-blue);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:15px;font-family:Georgia,serif;
+    flex:none;
+  }
+  .chrome-top .brand .titles .t1{font-size:14px;font-weight:700;letter-spacing:.2px;}
+  .chrome-top .brand .titles .t2{font-size:11.5px;opacity:.85;}
+  .chrome-top .meta{
+    display:flex;align-items:center;gap:14px;font-size:12px;
+  }
+  .pill{
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.35);
+    color:#fff;
+    padding:4px 11px;
+    border-radius:999px;
+    font-size:11.5px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .chrome-sub{
+    background:#EEF1F4;
+    border-bottom:1px solid var(--rule-grey);
+    padding:9px 28px;
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:12px;
+    color:#4B5966;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .chrome-sub b{color:#28313A;}
+
+  .doc-note{
+    max-width:8.5in;
+    margin:18px auto 0;
+    padding:10px 16px;
+    background:#fff;
+    border:1px solid var(--rule-grey);
+    border-left:4px solid var(--lilly-blue);
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:11.5px;
+    color:#3D4952;
+    line-height:1.5;
+  }
+
+  /* ---------- the simulated printed page(s) ---------- */
+  .sheet-stack{
+    padding:22px 16px 48px;
+  }
+  .page{
+    width:8.5in;
+    min-height:11in;
+    margin:0 auto 26px;
+    background:#fff;
+    box-shadow:0 2px 6px rgba(20,30,40,.12), 0 14px 34px rgba(20,30,40,.16);
+    position:relative;
+    padding:0.75in 1in 0.9in;
+    font-size:11pt;
+    line-height:1.42;
+    color:#161616;
+  }
+  .page-headline{
+    position:absolute;
+    top:0.4in;
+    right:1in;
+    font-size:7.5pt;
+    letter-spacing:.6px;
+    color:var(--muted-grey);
+    text-transform:uppercase;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+  .page-cont{
+    font-size:8pt;
+    color:var(--muted-grey);
+    font-style:italic;
+    margin-bottom:14px;
+  }
+  .page-footer{
+    position:absolute;
+    bottom:0.45in;
+    left:0; right:0;
+    text-align:center;
+    font-size:9pt;
+    color:#9AA3AA;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+
+  h1.doc-title{
+    font-size:14pt;
+    font-weight:700;
+    margin:0 0 4px;
+    color:#111;
+  }
+  .source-line{
+    font-size:9pt;
+    font-style:italic;
+    color:var(--muted-grey);
+    margin:0 0 16px;
+  }
+  p{margin:0 0 10px;}
+  .opening{margin-bottom:16px;}
+
+  .sec-head{
+    font-weight:700;
+    margin:0 0 6px;
+    display:block;
+  }
+  section.doc-sec{margin-bottom:15px;}
+
+  ul.plain{margin:0 0 4px 0;padding-left:20px;}
+  ul.plain li{margin-bottom:4px;}
+  ul.plain.tight li{margin-bottom:3px;}
+
+  table.fin{
+    width:100%;
+    border-collapse:collapse;
+    margin:8px 0 8px;
+    font-size:10.5pt;
+  }
+  table.fin th{
+    background:var(--table-head);
+    border:1px solid var(--rule-grey);
+    text-align:left;
+    padding:5px 10px;
+    font-weight:700;
+  }
+  table.fin td{
+    border:1px solid var(--rule-grey);
+    padding:5px 10px;
+  }
+  table.fin td.num, table.fin th.num{text-align:right;}
+  table.fin tr.total td{font-weight:700;border-top:2px solid #8892A0;}
+  .fin-note{font-size:9.5pt;color:#4B5560;margin-top:2px;}
+
+  .gov-block{margin-top:2px;}
+  .gov-sub{font-weight:700;margin:12px 0 6px;}
+  .gov-row{margin:0 0 4px;}
+  .gov-row b{font-weight:700;}
+
+  .rule{border:none;border-top:1px solid var(--rule-grey);margin:16px 0;}
+
+  .databasis{
+    margin-top:18px;
+    font-size:8pt;
+    color:var(--muted-grey);
+    font-family:Calibri,'Segoe UI',Arial,sans-serif;
+    line-height:1.5;
+  }
+  .databasis .confirm-line{margin-top:3px;}
+  .databasis b{font-weight:700;color:var(--muted-grey);}
+
+  @media print{
+    .chrome-top,.chrome-sub,.doc-note{display:none;}
+    html,body{background:#fff;}
+    .sheet-stack{padding:0;}
+    .page{box-shadow:none;margin:0;width:auto;min-height:auto;}
+  }
+
+  @media (max-width:900px){
+    .page{width:100%;padding:0.6in 0.5in 0.8in;}
+    .page-headline{right:0.5in;}
+  }
+</style>
+</head>
+<body>
+
+<div class="chrome-top">
+  <div class="brand">
+    <div class="mark">L</div>
+    <div class="titles">
+      <div class="t1">Lilly Procurement Skills Suite</div>
+      <div class="t2">executive-summary-package - illustrative DOCX rendering</div>
+    </div>
+  </div>
+  <div class="meta">
+    <span class="pill">Skill v2.3</span>
+    <span class="pill">Status: Ready for Submission</span>
+  </div>
+</div>
+<div class="chrome-sub">
+  <div><b>File:</b> Kinaxis_Corporation_ATC_Executive_Summary.docx &nbsp;|&nbsp; US Letter, 1&quot; margins, Calibri 11pt</div>
+  <div><b>Companion file:</b> Kinaxis_Corporation_ATC_Executive_Summary.md (identical content, no tables)</div>
+</div>
+
+<div class="doc-note">
+  This is an illustrative rendering of the skill's fixed executive-summary skeleton, populated with the skill's
+  own worked example (Kinaxis renewal, $17M total value, ATC user grade P4/M2). Section order, the Source
+  Documents line, the plain-prose no-color body rule, the Governance &amp; Approvals block, and the Data Basis
+  &amp; Confirmations footer are locked by the skill and do not change run to run.
+</div>
+
+<div class="sheet-stack">
+
+  <!-- ===================== PAGE 1 ===================== -->
+  <div class="page">
+    <div class="page-headline">Lilly Confidential - Internal Use Only</div>
+
+    <h1 class="doc-title">Executive Summary: Kinaxis RapidResponse Supply Chain Planning Platform - 3-Year Renewal</h1>
+    <p class="source-line">Source Document: Kinaxis Master Services Agreement (executed May 12, 2026).</p>
+
+    <p class="opening">Your approval is requested for <b>$17,000,000</b> over a 3-year term with Kinaxis Corporation for the renewal of the RapidResponse supply chain planning platform. This renewal extends Lilly's existing demand planning, supply planning, and integrated business planning capabilities without interruption, and adds a new S&amp;OP scenario-modeling module for two additional manufacturing sites. The agreement aligns with Lilly's supply chain digital resilience strategy and consolidates prior point-tool spend under a single platform.</p>
+
+    <section class="doc-sec">
+      <span class="sec-head">Request Overview</span>
+      <p>This request covers the multi-year renewal and expansion of the RapidResponse platform following the original 2021 deployment. It adds S&amp;OP scenario modeling and extends platform coverage to two additional manufacturing sites in North America and EMEA that currently plan on manual, spreadsheet-based processes. No new legal entity, data residency, or integration architecture change is introduced by this renewal.</p>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Background &amp; Justification</span>
+      <p>Lilly has used the Kinaxis RapidResponse platform since 2021 for demand planning, supply planning, and integrated business planning across its global manufacturing network. The current agreement expires May 31, 2026. This renewal ensures uninterrupted planning operations through May 2029 and extends the platform to two manufacturing sites that currently rely on manual, spreadsheet-based planning outside the concurrent planning model used elsewhere in the network. Continued use of RapidResponse avoids a multi-year re-platforming effort and preserves five years of configured planning logic, system integrations, and user training investment.</p>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Key Capabilities and Value</span>
+      <p>Key capabilities and value from this renewal include:</p>
+      <ul class="plain">
+        <li>Concurrent planning across demand, supply, and inventory in a single data model, reducing plan-to-replan cycle time from days to hours</li>
+        <li>Coverage for approximately 340 named users across Supply Chain, Manufacturing, and Commercial Planning</li>
+        <li>SOC 2 Type II and ISO 27001 certified hosting, meeting Lilly's data security requirements for planning data</li>
+        <li>Fixed annual fee with a capped per-user escalator, protecting budget predictability through May 2029</li>
+        <li>New S&amp;OP scenario-modeling module supports Lilly's stated strategic priority of supply chain digital resilience</li>
+        <li>Single-vendor consolidation avoids the integration and reconciliation cost of a multi-tool planning stack</li>
+      </ul>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Scope of Agreement</span>
+      <ul class="plain">
+        <li><b>Platform:</b> Kinaxis RapidResponse (SaaS) - Demand Planning, Supply Planning, Integrated Business Planning, and S&amp;OP Scenario Modeling modules</li>
+        <li><b>Users Covered:</b> approximately 340 named users across Supply Chain, Manufacturing, and Commercial Planning</li>
+        <li><b>Modules Included:</b> Demand Planning; Supply Planning; Integrated Business Planning; S&amp;OP Scenario Modeling (new)</li>
+        <li><b>Geography:</b> North America and EMEA manufacturing network, including two additional sites added under this renewal</li>
+        <li><b>Term:</b> June 1, 2026 through May 31, 2029 (3 years)</li>
+        <li><b>Support Level:</b> 24x7 Severity 1 coverage with a 2-hour response SLA</li>
+      </ul>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Financial Summary</span>
+      <table class="fin">
+        <thead>
+          <tr><th>Period</th><th class="num">Fee</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Year 1 (Jun 2026 - May 2027)</td><td class="num">$5,100,000</td></tr>
+          <tr><td>Year 2 (Jun 2027 - May 2028)</td><td class="num">$5,780,000</td></tr>
+          <tr><td>Year 3 (Jun 2028 - May 2029)</td><td class="num">$6,120,000</td></tr>
+          <tr class="total"><td>Total</td><td class="num">$17,000,000</td></tr>
+        </tbody>
+      </table>
+      <p class="fin-note">Year 1 reflects phased onboarding at the two new manufacturing sites; Year 3 reflects full deployment at the contracted 340-user count. Year-over-year increases reflect both the 3.3% annual per-user escalator and volume growth as the two new sites reach full user counts; see Pricing &amp; Terms below.</p>
+    </section>
+
+    <div class="page-footer">1</div>
+  </div>
+
+  <!-- ===================== PAGE 2 ===================== -->
+  <div class="page">
+    <div class="page-headline">Lilly Confidential - Internal Use Only</div>
+    <p class="page-cont">Executive Summary: Kinaxis RapidResponse Supply Chain Planning Platform - 3-Year Renewal (continued)</p>
+
+    <section class="doc-sec">
+      <span class="sec-head">Pricing &amp; Terms</span>
+      <ul class="plain">
+        <li>Per-user annual fee increases are capped at 3.3%, applied to the base fee in Years 2 and 3</li>
+        <li>Fee increases beyond the 3.3% cap shown in the table above reflect volume growth as the two new sites complete onboarding, not a change to the per-user rate</li>
+        <li>Support and hosting are included in the annual fee; there is no separate infrastructure line item</li>
+        <li>Named-user licenses may be exchanged within the same product family at no additional cost, up to a 10% swap per contract year</li>
+      </ul>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Key Contract Benefits</span>
+      <ul class="plain">
+        <li>$1,240,000 negotiated reduction (6.8%) versus Kinaxis's initial renewal quote of $18,240,000</li>
+        <li>Per-user annual escalator capped at 3.3%, versus the 6% standard renewal uplift Kinaxis initially proposed</li>
+        <li>S&amp;OP Scenario Modeling module added at no incremental license cost for the first contract year</li>
+        <li>24x7 Severity 1 support with a 2-hour response SLA, an upgrade from the prior agreement's business-hours-only coverage</li>
+        <li>No termination-for-convenience payout penalty in Years 2 and 3, versus a 50% remaining-term payout obligation under the prior agreement</li>
+      </ul>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Key Contract Risks / Considerations</span>
+      <ul class="plain">
+        <li>No termination-for-convenience right in Year 1; exit before June 2027 requires payment of the full Year 1 fee</li>
+        <li>The 3.3% per-user escalator applies regardless of realized planning-cycle-time improvement, so the fee is not tied to measured value</li>
+        <li>Full realization of the negotiated value depends on completing onboarding at the two new manufacturing sites within Year 1; a delayed rollout pushes the ROI case into Year 2</li>
+        <li>Price Change Mechanism is inferred from renewal-pricing language rather than a separately labeled clause; see Data Basis &amp; Confirmations below</li>
+      </ul>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Business Case</span>
+      <p>This renewal secures uninterrupted planning operations for Lilly's global manufacturing network and extends concurrent planning discipline to two sites currently on manual, spreadsheet-based processes. It aligns with Lilly's strategic goals for supply chain digital resilience and operational excellence, and avoids the multi-year re-platforming cost and business disruption of switching planning vendors.</p>
+    </section>
+
+    <section class="doc-sec">
+      <span class="sec-head">Cost Efficiency</span>
+      <p>The negotiated renewal reflects a $1,240,000 reduction (6.8%) against Kinaxis's initial quote of $18,240,000, and a per-user escalator capped at 3.3% against the 6% uplift Kinaxis initially proposed, an estimated $410,000 in avoided cost over the 3-year term.</p>
+    </section>
+
+    <hr class="rule">
+
+    <section class="doc-sec gov-block">
+      <span class="sec-head">Governance &amp; Approvals</span>
+
+      <p class="gov-sub">ATS (Business Side)</p>
+      <p class="gov-row"><b>ATS Approver(s):</b> Priya Nair (M5/R12); Daniel Ostrowski (M6); Karen Whitfield (M7)</p>
+      <p class="gov-row"><b>Budget Owner(s):</b> Priya Nair</p>
+      <p class="gov-row"><b>Budget Approved by Budget Owner:</b> Yes</p>
+      <p class="gov-row"><b>Budgeted Amount:</b> $17,000,000</p>
+      <p class="gov-row"><b>Stakeholders:</b> Priya Nair; Daniel Ostrowski; Marcus Feldman (IT Business Partner); Aisha Kapoor (Supply Chain Planning Lead)</p>
+      <p class="gov-row"><b>Business Owner(s):</b> Priya Nair</p>
+      <p class="gov-row"><b>Comments / Instructions to Business Owner(s):</b> No action is required. This notification is for your awareness only.</p>
+
+      <p class="gov-sub">ATC (Procurement Side)</p>
+      <p class="gov-row"><b>ATC Approver:</b> Rachel Kim (P5/M3); Thomas Vance (P6/M4)</p>
+      <p class="gov-row"><b>Procurement Contact:</b> Marc Lane</p>
+      <p class="gov-row"><b>Effective Date:</b> June 1, 2026</p>
+      <p class="gov-row"><b>Payment / Discount Terms:</b> Net 60</p>
+      <p class="gov-row"><b>Price Change Mechanism:</b> 3.3% annual cap on per-user renewal fees</p>
+      <p class="gov-row"><b>Financial Risk Rating:</b> SER Score 78 (Acceptable)</p>
+      <p class="gov-row"><b>Other Contract Elements:</b> None</p>
+    </section>
+
+    <div class="databasis">
+      Data Basis: 11 of 13 fields extracted verbatim from the source document; 2 user-confirmed; 1 inferred - flagged [CONFIRM] below.
+      <div class="confirm-line"><b>[CONFIRM]</b> Price Change Mechanism - inferred from renewal-pricing language in Section 4.2, not a labeled clause (Confidence: Medium)</div>
+    </div>
+
+    <div class="page-footer">2</div>
+  </div>
+
+</div>
+
+</body>
+</html>

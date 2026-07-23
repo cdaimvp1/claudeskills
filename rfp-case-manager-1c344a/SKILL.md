@@ -145,7 +145,6 @@ You are an **RFP Case Officer**. Your job is to maintain the operational state o
 This skill handles **workflow state and operational coordination**. It does NOT:
 - Generate RFP artifacts (rfp-engine does that)
 - Score supplier responses (rfp-response-analysis and evaluation-engine do that)
-- Build executive decks (decision-deck does that)
 - Negotiate contracts (lilly-contract-review and commercial-negotiation-prep do that)
 
 Stay in scope. When asked to do something outside scope, hand off to the appropriate skill.
@@ -344,7 +343,7 @@ This workflow does NOT emit a folder schematic for the user to execute. The Team
 
 2. **Capture the basics from the user** in a single batched question set: RFP title, supplier list, key dates, current phase.
 
-3. **Ingest any uploaded files** in the conversation or Project knowledge: RFP package, draft requirements, prior decision deck, supplier landscape output, anything case-relevant.
+3. **Ingest any uploaded files** in the conversation or Project knowledge: RFP package, draft requirements, supplier landscape output, anything case-relevant.
 
 4. **Build `_case_file.json`** from the user input + uploads:
    - `case_id`, `case_title`, no `sharepoint_site_url` (unbound)
@@ -538,7 +537,7 @@ This mode scrapes the bound Team and the user's mail/chat for activity since the
 
 | Upstream | This skill | Downstream |
 |----------|------------|------------|
-| rfp-engine (via case_handoff.json), supplier-landscape, category-strategy | rfp-case-manager | rfp-response-analysis, evaluation-engine, decision-deck |
+| rfp-engine (via case_handoff.json), supplier-landscape, category-strategy | rfp-case-manager | rfp-response-analysis, evaluation-engine |
 
 ## Global Guardrails
 
@@ -845,7 +844,7 @@ Standard agenda, attendees, and duration per RFP phase. The Schedule workflow us
 | Reference | Reference check call window | 30 min per reference | Lead (or delegate) | Structured reference questionnaire; verify supplier claims; capture risks |
 | BAFO | BAFO request issuance | async + 30 min brief | Lead | Issue best-and-final-offer request; clarify what is being asked; restate deadline |
 | BAFO | BAFO response review | 60 min | Lead, Approver (preview), Evaluators | Compare BAFO deltas; update commercial scoring; prepare recommendation |
-| Decision | Final selection meeting | 60 min | Lead, all Evaluators | Consolidated scorecard review; recommendation; risks and mitigations; route to evaluation-engine / decision-deck for the formal artifacts |
+| Decision | Final selection meeting | 60 min | Lead, all Evaluators | Consolidated scorecard review; recommendation; risks and mitigations; route to evaluation-engine for the formal artifacts |
 | Decision | Executive approval review | 30 min | Lead, Approver(s) | Present recommendation and rationale; obtain approval per the threshold-driven chain; record decision |
 | Close | Award notification call (selected) | 30 min | Lead | Notify the selected supplier; outline next steps and contract handoff |
 | Close | Debrief calls (non-selected) | 30 min each | Lead | Provide fair, non-comparative feedback; thank the bidder; close the loop |

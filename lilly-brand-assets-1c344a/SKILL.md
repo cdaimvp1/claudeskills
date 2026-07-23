@@ -210,7 +210,7 @@ below; if they ever disagree, the tables are authoritative and this block is the
   },
   "chartPalette": ["#E1251B", "#0F3A85", "#521207", "#F58E7D", "#FFC709", "#99BFE5"],
   "noGreen": true,
-  "greenException": "decision-deck Slide Template (PPTX) only"
+  "greenException": null
 }
 ```
 
@@ -255,15 +255,16 @@ tint as text color, and always place dark text (#212121) or a dark status text t
 a positive and a negative cell sit adjacent, rely on the label ("Pass" / "Fail") plus the icon, not only
 the blue-vs-red distinction.
 
-## The one documented green/teal exception (decision-deck Slide Template only)
+## The Slide Template green/teal allowance (currently unused)
 
-The suite-wide no-green rule has exactly ONE documented exception: the **Slide Template** house style used
-by **decision-deck** (PPTX) only. Lilly's official executive-deck template palette legitimately includes
-sage `#C6DCD8` and uses greens/teals for positive data, to match the corporate slide masters. This applies
-ONLY inside decision-deck PPTX output. It does NOT apply to any dashboard, DOCX report, or status palette,
-all of which remain strictly green-free per the Canonical Status Palette above. The sage and the deck
-greens/teals listed in the Slide Template house style are therefore permitted in that one context and are
-the sole exception to the Prohibited Colors list below.
+The suite-wide no-green rule has exactly ONE documented allowance: the **Slide Template** house style,
+matching Lilly's official executive-deck slide masters, which legitimately includes sage `#C6DCD8` and
+uses greens/teals for positive data. This allowance applies ONLY inside Slide Template PPTX output. It
+does NOT apply to any dashboard, DOCX report, or status palette, all of which remain strictly green-free
+per the Canonical Status Palette above. No shipped skill currently produces Slide Template output:
+decision-deck, the prior and only consumer of this house style, has been retired. The allowance stays
+documented here, unused, for any future PPTX-producing skill that adopts the Slide Template house style;
+it is not activated for any skill by default.
 
 ## DOCX Design Colors
 
@@ -299,11 +300,11 @@ Where green was previously used, substitute:
 - Positive/success backgrounds: use Neutral Sky (#D4E5F7)
 - Chart series that was green: use Bold Brown (#521207)
 
-**Sole documented exception:** decision-deck's Slide Template (PPTX) house style may use sage `#C6DCD8`
-and the deck's greens/teals for positive data, because it mirrors Lilly's official slide masters. See
-"The one documented green/teal exception" above. That exception is scoped to decision-deck PPTX output
-only; it never applies to dashboards, DOCX reports, or the Canonical Status Palette, which stay
-green-free. No skill other than decision-deck may use a green.
+**Sole documented allowance:** the Slide Template (PPTX) house style may use sage `#C6DCD8` and
+greens/teals for positive data, because it mirrors Lilly's official slide masters. See "The Slide
+Template green/teal allowance" above. That allowance is scoped to Slide Template PPTX output only;
+it never applies to dashboards, DOCX reports, or the Canonical Status Palette, which stay green-free.
+No shipped skill currently produces Slide Template output, so no skill may use a green today.
 
 ## Logo Path
 All Lilly logos are in this skill's `assets/logos/` folder. Use Black or Red variants on light backgrounds, White on dark. Backgrounds are transparent. (Single-file install: read logos from the bundled `assets/logos/` directory, not from any `/mnt/...` path.)
@@ -333,7 +334,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Cartes
 > status-role tokens are required to be unique. Use `BLU` for positive-signal text and `OK` for
 > positive-signal backgrounds.
 > Do not declare a `GRN` token and do not introduce off-palette greens. (The single documented green
-> exception, decision-deck's Slide Template, does not use this dashboard token set.)
+> allowance, the Slide Template house style, does not use this dashboard token set, and no shipped
+> skill currently produces Slide Template output.)
 
 ```jsx
 const R = "#E1251B", DK = "#212121", BRN = "#521207",
@@ -1216,8 +1218,8 @@ The deliberately plain Lilly-approved approval format. NOT a magazine piece.
 
 Lilly's deck template palette, distinct from the report palette.
 
-- **Used by:** decision-deck (PPTX) only.
-- **Palette:** panels cream `#FFF0D8` / peach `#FDD1B0` / sage `#C6DCD8` / white; headers dark `#212121` / gold `#FFC709` / sage / peach; data greens/teals positive, reds negative, amber caution, purple/navy scenarios (full set in `references/design-system.md` within decision-deck).
+- **Used by:** no shipped skill currently. Its prior and only consumer, decision-deck, has been retired; this house style remains documented, unused, for any future PPTX-producing skill.
+- **Palette:** panels cream `#FFF0D8` / peach `#FDD1B0` / sage `#C6DCD8` / white; headers dark `#212121` / gold `#FFC709` / sage / peach; data greens/teals positive, reds negative, amber caution, purple/navy scenarios.
 - **Type/chrome:** LAYOUT_WIDE, locked template set, size-to-content components, narrative 30-50% of slide area, headlines state insights not topics.
 - **Why different:** it matches Lilly's official slide templates, not the report system. Keep PPTX in this style and reports/dashboards in the Magazine style.
 

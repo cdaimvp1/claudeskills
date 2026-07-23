@@ -1,0 +1,558 @@
+<title>Decision Deck - PPTX Preview</title>
+<style>
+  :root{
+    --blue:#0F3A85;
+    --red:#E1251B;
+    --brown:#521207;
+    --grey:#8A969E;
+    --stone:#E4EBF1;
+    --sky:#D4E5F7;
+    --cream:#FFF0D8;
+    --peach:#FDD1B0;
+    --sage:#C6DCD8;
+    --gold:#FFC709;
+    --amber:#B45309;
+    --rose:#FDE8E5;
+    --coral:#F58E7D;
+    --azure:#99BFE5;
+    --black:#212121;
+    --white:#FFFFFF;
+    --page-bg:#EEF1F4;
+    --font-display:Georgia,"Times New Roman",serif;
+    --font-body:Calibri,"Segoe UI",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--page-bg);
+    font-family:var(--font-body);
+    color:var(--black);
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  /* ---------- Page header / legend (outside the deck) ---------- */
+  .page-head{
+    background:var(--white);
+    border:1px solid var(--stone);
+    border-left:6px solid var(--blue);
+    border-radius:4px;
+    padding:22px 26px 20px;
+    margin-bottom:26px;
+  }
+  .page-head .eyebrow{
+    font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);font-weight:700;margin-bottom:6px;
+  }
+  .page-head h1{
+    font-family:var(--font-display);font-size:24px;margin:0 0 6px;color:var(--black);font-weight:700;
+  }
+  .page-head p{margin:4px 0;font-size:13.5px;line-height:1.5;color:#374151;max-width:900px;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:12px;}
+  .meta-chip{
+    font-size:11.5px;background:var(--stone);color:var(--black);padding:4px 10px;border-radius:100px;font-weight:600;
+  }
+  .meta-chip.blue{background:var(--sky);color:var(--blue);}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--stone);
+  }
+  .legend-title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--grey);font-weight:700;margin-right:4px;}
+  .swatch{display:flex;align-items:center;gap:6px;font-size:12px;color:#374151;}
+  .swatch i{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.08);}
+  .legend-note{font-size:11.5px;color:var(--grey);font-style:italic;width:100%;margin-top:4px;}
+
+  /* ---------- Deck grid ---------- */
+  .deck-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(460px,1fr));
+    gap:34px;
+  }
+  .slide-unit{background:var(--white);border-radius:6px;padding:12px 12px 14px;box-shadow:0 1px 3px rgba(16,24,40,.06),0 10px 24px -12px rgba(16,24,40,.18);}
+  .slide-mat{
+    background:linear-gradient(180deg,#fbfbfc,#f2f3f5);
+    border:1px solid #dfe3e8;
+    border-radius:4px;
+    padding:14px;
+  }
+  .slide-scale{
+    position:relative;width:100%;aspect-ratio:1280/720;overflow:hidden;
+    background:#fff;border:1px solid #d7dbe0;box-shadow:0 2px 10px rgba(16,24,40,.16);
+  }
+  .slide-card{
+    position:absolute;top:0;left:0;width:1280px;height:720px;
+    transform-origin:top left;font-family:var(--font-body);color:var(--black);
+    display:flex;flex-direction:column;
+  }
+  .slide-caption{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding:0 2px;}
+  .slide-caption .cap-l{font-size:13px;font-weight:700;color:var(--black);}
+  .slide-caption .cap-r{font-size:11px;color:var(--grey);}
+  .slide-caption .cap-sub{display:block;font-size:11px;color:var(--grey);font-weight:400;margin-top:2px;}
+
+  /* ---------- Bars (template chrome) ---------- */
+  .bar{flex:0 0 auto;display:flex;align-items:center;padding:0 57.6px;}
+  .bar-top{height:105.6px;}
+  .bar-bottom{height:55.68px;font-size:12.5px;justify-content:space-between;}
+  .headline{font-family:var(--font-display);font-weight:700;font-size:29px;line-height:1.18;letter-spacing:.01em;text-transform:uppercase;}
+  .content-zone{flex:1 1 auto;height:558.72px;background:#fff;padding:22px 57.6px 18px;overflow:hidden;}
+  .footer-conf{font-weight:600;}
+  .footer-logo{font-family:var(--font-display);font-style:italic;font-weight:700;font-size:15px;letter-spacing:.02em;}
+  .footer-page{font-weight:700;}
+
+  /* template color modifiers */
+  .tpl-8 .bar-top,.tpl-8 .bar-bottom{background:var(--black);color:#fff;}
+  .tpl-8 .bar-bottom .footer-logo{color:#fff;}
+
+  .tpl-6 .bar-top,.tpl-6 .bar-bottom{background:var(--sage);color:var(--black);}
+
+  .tpl-7 .bar-top{background:var(--peach);color:var(--black);}
+  .tpl-7 .bar-bottom{background:#fffaf3;color:var(--grey);border-top:1px solid var(--stone);font-weight:400;}
+  .tpl-7 .bar-bottom .footer-logo{color:var(--brown);}
+
+  .tpl-4 .bar-top,.tpl-4 .bar-bottom{background:var(--black);color:#fff;}
+  .tpl-4 .content-zone{padding:0;display:flex;}
+  .tpl-4 .panel-left{width:576px;flex:0 0 auto;background:var(--peach);padding:24px 30px;}
+  .tpl-4 .panel-right{flex:1 1 auto;background:#fff;padding:24px 34px;}
+
+  /* ---------- Generic content components ---------- */
+  h2.section-label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--grey);font-weight:700;margin:0 0 8px;}
+  .two-col{display:flex;gap:34px;height:100%;}
+  .col{flex:1 1 0;min-width:0;}
+  ul.plain{list-style:none;margin:0;padding:0;}
+  ul.plain li{position:relative;padding-left:16px;margin-bottom:7px;font-size:14.5px;line-height:1.38;color:#20242b;}
+  ul.plain li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:1px;background:var(--blue);}
+  ul.plain.on-dark li{color:#f1f2f4;}
+  ul.plain.on-dark li::before{background:var(--gold);}
+  ul.plain.risk li::before{background:var(--red);}
+
+  .divider{height:1px;background:var(--stone);margin:12px 0;}
+
+  .badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:3px;}
+  .badge-blue{background:var(--blue);color:#fff;}
+  .badge-outline{border:1px solid var(--grey);color:var(--grey);background:transparent;}
+
+  table.matrix{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.matrix th{background:var(--black);color:#fff;text-align:left;font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.02em;padding:8px 12px;}
+  table.matrix td{padding:9px 12px;border-bottom:1px solid var(--stone);vertical-align:top;}
+  table.matrix tr.recommended td{background:var(--sky);}
+  table.matrix td.score{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--blue);white-space:nowrap;}
+  table.matrix td.name{font-weight:700;white-space:nowrap;}
+
+  .callout{border-radius:4px;padding:14px 18px;font-size:14px;line-height:1.45;}
+  .callout-sky{background:var(--sky);border-left:4px solid var(--blue);}
+  .callout-cream{background:var(--cream);border-left:4px solid var(--amber);}
+  .callout-dark{background:var(--black);color:#fff;border-left:4px solid var(--gold);}
+
+  .kv-row{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--stone);}
+  .kv-row.total{font-weight:700;border-bottom:none;border-top:2px solid var(--black);margin-top:2px;padding-top:8px;}
+  .kv-row .k{color:#374151;}
+  .kv-row .v{font-weight:700;}
+
+  .bar-meter-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12.5px;}
+  .bar-meter-row .lbl{width:150px;flex:0 0 auto;color:#374151;font-weight:600;}
+  .bar-meter-track{flex:1 1 auto;height:11px;background:var(--stone);border-radius:2px;overflow:hidden;display:flex;}
+  .bar-meter-fill{height:100%;}
+  .bar-meter-val{width:34px;flex:0 0 auto;text-align:right;font-weight:700;font-size:12px;}
+
+  .check-item{display:flex;align-items:flex-start;gap:9px;margin-bottom:8px;font-size:14px;line-height:1.4;}
+  .check-box{width:14px;height:14px;flex:0 0 auto;margin-top:2px;border:2px solid var(--blue);border-radius:2px;}
+  .check-mark{width:14px;height:14px;flex:0 0 auto;margin-top:2px;border-radius:50%;background:var(--blue);position:relative;}
+  .check-mark::after{content:"";position:absolute;left:4px;top:2px;width:4px;height:7px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(40deg);}
+
+  .kpi-strip{display:flex;gap:14px;margin-bottom:14px;}
+  .kpi{flex:1;background:var(--stone);border-radius:4px;padding:10px 14px;}
+  .kpi .kpi-val{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--blue);}
+  .kpi .kpi-lbl{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:.03em;font-weight:600;}
+
+  .foot-note{font-size:11.5px;color:var(--grey);font-style:italic;line-height:1.4;}
+
+  .profile-card{background:#fff;border-radius:4px;padding:14px 16px;box-shadow:0 4px 10px rgba(0,0,0,.08);}
+  .profile-card .logo-box{width:64px;height:64px;border-radius:4px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:20px;margin-bottom:12px;}
+  .profile-card .p-row{font-size:12.5px;padding:4px 0;border-bottom:1px solid var(--stone);display:flex;justify-content:space-between;}
+  .profile-card .p-row .k{color:var(--grey);}
+  .profile-card .p-row .v{font-weight:700;}
+
+  .stat-inline{font-family:var(--font-display);font-weight:700;color:var(--blue);}
+
+  @media (max-width:640px){
+    .headline{font-size:24px;}
+    .two-col{flex-direction:column;gap:10px;}
+  }
+
+  .page-foot{max-width:1180px;margin:34px auto 0;font-size:12px;color:var(--grey);text-align:center;line-height:1.6;}
+  .page-foot strong{color:#374151;}
+</style>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="eyebrow">HTML preview of PPTX output | decision-deck (v2.4, suite v10.6.6)</div>
+    <h1>Enterprise Third-Party Risk Management Platform Selection</h1>
+    <p>Six representative slides from a 10-slide executive deck, rendered from the skill's own illustrative example: an evaluation of three suppliers for an enterprise Third-Party Risk Management (TPRM) platform, recommending "Vendor B." Arc: <strong>Preset A, RFP Award Decision</strong> (Problem-Solution-Ask). Audience: Procurement Council / CIO. Tone: Balanced. All figures are illustrative, as labeled in the skill's own reference material, and reconcile per the skill's numbers-reconcile note.</p>
+    <div class="meta-row">
+      <span class="meta-chip blue">Slides shown: 1, 3, 4, 5, 6, 10 of 10</span>
+      <span class="meta-chip">Templates used: 4, 6, 7, 8 of 8 locked templates</span>
+      <span class="meta-chip">Fonts: Georgia (headings) / Calibri (body)</span>
+      <span class="meta-chip">Aspect: 16:9, 13.33in x 7.5in</span>
+    </div>
+    <div class="legend">
+      <span class="legend-title">Active brand palette (current)</span>
+      <span class="swatch"><i style="background:#0F3A85"></i>Bold Blue #0F3A85 - primary / positive status</span>
+      <span class="swatch"><i style="background:#E1251B"></i>Lilly Red #E1251B - negative / CTA</span>
+      <span class="swatch"><i style="background:#521207"></i>Bold Brown #521207 - secondary accent</span>
+      <span class="swatch"><i style="background:#B45309"></i>Amber #B45309 - caution</span>
+      <span class="swatch"><i style="background:#8A969E"></i>Bold Grey #8A969E - neutral / muted</span>
+      <span class="swatch"><i style="background:#C6DCD8;border-color:#9db8b3"></i>Sage #C6DCD8 - template chrome only</span>
+      <span class="legend-note">No green appears in any data, status, or sentiment color. The one documented exception, Sage (#C6DCD8), is used only for template panel/header chrome (Templates 5 and 6), never for data or status. Status colors here are blue (positive/funded), amber (caution) and red (negative) - never green.</span>
+    </div>
+  </div>
+
+  <div class="deck-grid">
+
+    <!-- SLIDE 1: DECISION ASK - Template 8 (full-width dark bars) -->
+    <div class="slide-unit">
+      <div class="slide-mat">
+        <div class="slide-scale">
+          <div class="slide-card tpl-8">
+            <div class="bar bar-top">
+              <div class="headline">Approve Selection of Vendor B for Enterprise TPRM</div>
+            </div>
+            <div class="content-zone">
+              <div class="two-col">
+                <div class="col">
+                  <h2 class="section-label">Decision Requested</h2>
+                  <ul class="plain">
+                    <li>Approve selection of Vendor B as the enterprise Third-Party Risk Management platform</li>
+                    <li>Contract value: <span class="stat-inline">$2.4M</span> over 5 years</li>
+                  </ul>
+                  <div class="divider"></div>
+                  <div class="callout callout-sky">
+                    Current manual TPRM process cannot scale to meet Q3 regulatory audit requirements. This is the trigger for the decision, not a background item.
+                  </div>
+                </div>
+                <div class="col">
+                  <h2 class="section-label">If Approved</h2>
+                  <ul class="plain">
+                    <li>Automated vendor risk workflow live across 2,500+ third parties</li>
+                    <li>Target start: April 2026</li>
+                  </ul>
+                  <h2 class="section-label" style="margin-top:16px;">If Delayed</h2>
+                  <ul class="plain risk">
+                    <li>Q3 regulatory audit requirements unmet under current manual process</li>
+                    <li>Estimated remediation cost of $500K+ (illustrative)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="bar bar-bottom">
+              <span class="footer-conf">Lilly Confidential - Internal Use Only</span>
+              <span class="footer-logo">Lilly</span>
+              <span class="footer-page">1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-caption">
+        <span class="cap-l">Slide 1 | Decision Ask
+          <span class="cap-sub">Type #18, Strategy/Decision | Preset A step 1</span>
+        </span>
+        <span class="cap-r">Template 8 | full-width dark bars</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: OPTIONS CONSIDERED / OPTIONS MATRIX - Template 6 (full-width sage bars) -->
+    <div class="slide-unit">
+      <div class="slide-mat">
+        <div class="slide-scale">
+          <div class="slide-card tpl-6">
+            <div class="bar bar-top">
+              <div class="headline">3 Suppliers Evaluated; Vendor B Recommended</div>
+            </div>
+            <div class="content-zone">
+              <table class="matrix">
+                <thead>
+                  <tr><th style="width:22%;">Supplier</th><th style="width:12%;">Score</th><th>Assessment</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="recommended">
+                    <td class="name">Vendor B <span class="badge badge-blue">Recommended</span></td>
+                    <td class="score">4.2</td>
+                    <td>Best pharma / life sciences fit; largest third-party risk exchange (18K+ assessments); proven at enterprise scale.</td>
+                  </tr>
+                  <tr>
+                    <td class="name">Vendor A</td>
+                    <td class="score" style="color:var(--grey);">3.8</td>
+                    <td>Strong second place. Higher cost and less pharma-specific positioning than Vendor B.</td>
+                  </tr>
+                  <tr>
+                    <td class="name">ProcessUnity</td>
+                    <td class="score" style="color:var(--grey);">3.6</td>
+                    <td>Viable but smaller company; raised integration concerns during evaluation.</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="divider"></div>
+              <div class="two-col">
+                <div class="col">
+                  <span class="foot-note">Evaluation methodology: RFP with 45 requirements, 3 finalist demos, 2 scoring rounds.</span>
+                </div>
+                <div class="col">
+                  <span class="foot-note">Why others not selected: Vendor A on cost and pharma fit; ProcessUnity on scale and integration risk.</span>
+                </div>
+              </div>
+            </div>
+            <div class="bar bar-bottom">
+              <span class="footer-conf">Lilly Confidential - Internal Use Only</span>
+              <span class="footer-logo">Lilly</span>
+              <span class="footer-page">3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-caption">
+        <span class="cap-l">Slide 3 | Options Considered
+          <span class="cap-sub">Type #20, Options Matrix | Preset A step 3</span>
+        </span>
+        <span class="cap-r">Template 6 | full-width sage bars</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: RECOMMENDED SUPPLIER - Template 4 (two-panel peach/dark) -->
+    <div class="slide-unit">
+      <div class="slide-mat">
+        <div class="slide-scale">
+          <div class="slide-card tpl-4">
+            <div class="bar bar-top">
+              <div class="headline">Vendor B: Best-Fit Solution for Enterprise TPRM</div>
+            </div>
+            <div class="content-zone">
+              <div class="panel-left">
+                <h2 class="section-label">Company Profile</h2>
+                <div class="profile-card">
+                  <div class="logo-box">VB</div>
+                  <div class="p-row"><span class="k">Headquarters</span><span class="v">Atlanta, GA</span></div>
+                  <div class="p-row"><span class="k">Employees</span><span class="v">2,500+</span></div>
+                  <div class="p-row"><span class="k">Revenue</span><span class="v">$500M+ ARR</span></div>
+                  <div class="p-row" style="border-bottom:none;"><span class="k">Customers</span><span class="v">14,000+ globally</span></div>
+                </div>
+              </div>
+              <div class="panel-right">
+                <h2 class="section-label">Why Vendor B</h2>
+                <div class="check-item"><span class="check-mark"></span><span>Strongest pharma / life sciences industry positioning of the three finalists</span></div>
+                <div class="check-item"><span class="check-mark"></span><span>Third-Party Risk Exchange (18K+ assessments) cuts assessment workload by 40%</span></div>
+                <div class="check-item"><span class="check-mark"></span><span>Integrated privacy and compliance platform, not a bolt-on module</span></div>
+                <div class="check-item"><span class="check-mark"></span><span>Proven enterprise scale across 14,000+ customers globally</span></div>
+                <div class="divider"></div>
+                <div class="callout callout-sky">
+                  <strong>Strategic alignment:</strong> supports our digital transformation strategy and the GRC platform consolidation initiative.
+                </div>
+              </div>
+            </div>
+            <div class="bar bar-bottom">
+              <span class="footer-conf">Lilly Confidential - Internal Use Only</span>
+              <span class="footer-logo">Lilly</span>
+              <span class="footer-page">5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-caption">
+        <span class="cap-l">Slide 5 | Recommended Supplier
+          <span class="cap-sub">Type #21, Recommendation | Preset A step 5</span>
+        </span>
+        <span class="cap-r">Template 4 | two-panel peach / dark</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: EVALUATION SUMMARY - Template 8 (full-width dark bars) -->
+    <div class="slide-unit">
+      <div class="slide-mat">
+        <div class="slide-scale">
+          <div class="slide-card tpl-8">
+            <div class="bar bar-top">
+              <div class="headline">Vendor B Scored Highest Across Key Criteria</div>
+            </div>
+            <div class="content-zone">
+              <div class="bar-meter-row"><span class="lbl">Functional</span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:80%;background:var(--blue);"></div></div><span class="bar-meter-val">B</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:70%;background:var(--brown);"></div></div><span class="bar-meter-val">A</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:60%;background:var(--grey);"></div></div><span class="bar-meter-val">PU</span></div>
+
+              <div class="bar-meter-row" style="margin-top:12px;"><span class="lbl">Technical</span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:70%;background:var(--blue);"></div></div><span class="bar-meter-val">B</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:80%;background:var(--brown);"></div></div><span class="bar-meter-val">A</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:60%;background:var(--grey);"></div></div><span class="bar-meter-val">PU</span></div>
+
+              <div class="bar-meter-row" style="margin-top:12px;"><span class="lbl">Security</span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:80%;background:var(--blue);"></div></div><span class="bar-meter-val">B</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:70%;background:var(--brown);"></div></div><span class="bar-meter-val">A</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:70%;background:var(--grey);"></div></div><span class="bar-meter-val">PU</span></div>
+
+              <div class="bar-meter-row" style="margin-top:12px;"><span class="lbl">Commercial</span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:70%;background:var(--blue);"></div></div><span class="bar-meter-val">B</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:60%;background:var(--brown);"></div></div><span class="bar-meter-val">A</span></div>
+              <div class="bar-meter-row"><span class="lbl"></span>
+                <div class="bar-meter-track"><div class="bar-meter-fill" style="width:80%;background:var(--grey);"></div></div><span class="bar-meter-val">PU</span></div>
+
+              <div class="divider"></div>
+              <div class="two-col">
+                <div class="col" style="flex:0 0 auto;display:flex;gap:16px;">
+                  <span style="font-size:12.5px;"><b style="color:var(--blue);">B</b> Vendor B: 4.2</span>
+                  <span style="font-size:12.5px;"><b style="color:var(--brown);">A</b> Vendor A: 3.8</span>
+                  <span style="font-size:12.5px;"><b style="color:var(--grey);">PU</b> ProcessUnity: 3.6</span>
+                </div>
+                <div class="col">
+                  <span class="foot-note" style="color:#c6c9cd;">Key differentiators: pharma industry fit favors Vendor B significantly; Vendor B's exchange is the largest assessment network; Vendor A leads on integration, Vendor B is adequate.</span>
+                </div>
+              </div>
+            </div>
+            <div class="bar bar-bottom">
+              <span class="footer-conf">Lilly Confidential - Internal Use Only</span>
+              <span class="footer-logo">Lilly</span>
+              <span class="footer-page">4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-caption">
+        <span class="cap-l">Slide 4 | Evaluation Summary
+          <span class="cap-sub">Type #22, Evaluation Summary | Preset A step 4</span>
+        </span>
+        <span class="cap-r">Template 8 | full-width dark bars</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: FINANCIAL IMPACT - Template 7 (peach top bar only) -->
+    <div class="slide-unit">
+      <div class="slide-mat">
+        <div class="slide-scale">
+          <div class="slide-card tpl-7">
+            <div class="bar bar-top">
+              <div class="headline">$2.4M Investment Over 5 Years; $800K Annual Savings</div>
+            </div>
+            <div class="content-zone">
+              <div class="two-col">
+                <div class="col">
+                  <h2 class="section-label">Cost Summary</h2>
+                  <div class="kv-row"><span class="k">Year 1</span><span class="v">$800K</span></div>
+                  <div class="kv-row"><span class="k">Year 2</span><span class="v">$400K</span></div>
+                  <div class="kv-row"><span class="k">Year 3</span><span class="v">$400K</span></div>
+                  <div class="kv-row"><span class="k">Year 4</span><span class="v">$400K</span></div>
+                  <div class="kv-row"><span class="k">Year 5</span><span class="v">$400K</span></div>
+                  <div class="kv-row total"><span class="k">Total</span><span class="v">$2.4M</span></div>
+                  <div style="margin-top:10px;"><span class="badge badge-blue">Funded</span> <span class="foot-note">in FY26 IT Capital Plan</span></div>
+                </div>
+                <div class="col">
+                  <h2 class="section-label">Value Drivers (annual)</h2>
+                  <div class="kv-row"><span class="k">Labor savings</span><span class="v">$500K/yr</span></div>
+                  <div class="kv-row"><span class="k">Risk reduction</span><span class="v">$200K/yr</span></div>
+                  <div class="kv-row"><span class="k">Compliance avoidance</span><span class="v">$100K/yr</span></div>
+                  <div class="kv-row total"><span class="k">Total savings</span><span class="v">$800K/yr</span></div>
+                  <div class="kpi-strip" style="margin-top:12px;">
+                    <div class="kpi"><div class="kpi-val">3.0 yrs</div><div class="kpi-lbl">Payback</div></div>
+                    <div class="kpi"><div class="kpi-val">$1.2M</div><div class="kpi-lbl">5-Yr NPV (illustrative)</div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <span class="foot-note">Payback basis: $800K/yr savings vs. $2.4M cumulative cost; net cumulative position turns positive at end of Year 3 (3.0 yrs). Assumes 100 users in Year 1 growing to 250 by Year 3; implementation includes data migration; excludes integration development (separate budget).</span>
+            </div>
+            <div class="bar bar-bottom">
+              <span class="footer-conf">Lilly Confidential - Internal Use Only</span>
+              <span class="footer-logo">Lilly</span>
+              <span class="footer-page">6</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-caption">
+        <span class="cap-l">Slide 6 | Financial Impact
+          <span class="cap-sub">Type #3, TCO Comparison | Preset A step 6</span>
+        </span>
+        <span class="cap-r">Template 7 | peach top bar only</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: RECOMMENDATION RECAP - Template 7 (peach top bar only) -->
+    <div class="slide-unit">
+      <div class="slide-mat">
+        <div class="slide-scale">
+          <div class="slide-card tpl-7">
+            <div class="bar bar-top">
+              <div class="headline">Recommendation: Approve Vendor B Selection</div>
+            </div>
+            <div class="content-zone">
+              <div class="callout callout-dark">
+                <strong>We recommend approval of Vendor B as the enterprise TPRM solution.</strong>
+                <ul class="plain on-dark" style="margin-top:10px;">
+                  <li>Best fit for pharma requirements among the 3 suppliers evaluated</li>
+                  <li>Strongest evaluation score: 4.2 / 5.0</li>
+                  <li>$2.4M investment over 5 years; 3.0-year payback</li>
+                  <li>Manageable risk profile; no high-severity risks identified</li>
+                </ul>
+              </div>
+              <div class="two-col" style="margin-top:16px;">
+                <div class="col">
+                  <h2 class="section-label">Decision Requested</h2>
+                  <div class="check-item"><span class="check-box"></span><span>Approve selection of Vendor B</span></div>
+                  <div class="check-item"><span class="check-box"></span><span>Authorize contract negotiation to proceed</span></div>
+                  <div class="check-item"><span class="check-box"></span><span>Confirm budget allocation ($2.4M / 5 years)</span></div>
+                </div>
+                <div class="col">
+                  <h2 class="section-label">Next Step</h2>
+                  <p style="font-size:14px;margin:0;">Contract execution targeting <b>August 2026</b>, ahead of the September 2026 go-live.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bar bar-bottom">
+              <span class="footer-conf">Lilly Confidential - Internal Use Only</span>
+              <span class="footer-logo">Lilly</span>
+              <span class="footer-page">10</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-caption">
+        <span class="cap-l">Slide 10 | Recommendation Recap
+          <span class="cap-sub">Type #25, Recommendation Recap | Preset A step 10 (closing)</span>
+        </span>
+        <span class="cap-r">Template 7 | peach top bar only</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-foot">
+    Static HTML preview generated to represent the PPTX a run of <strong>decision-deck</strong> would produce, using the skill's own illustrative example content, house fonts (Georgia / Calibri) and current locked brand palette (Bold Blue #0F3A85 primary, no green in status). Self-contained: no external stylesheets, scripts, fonts, or network calls.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  function fit(){
+    var scales = document.querySelectorAll('.slide-scale');
+    for (var i=0;i<scales.length;i++){
+      var holder = scales[i];
+      var card = holder.querySelector('.slide-card');
+      var w = holder.getBoundingClientRect().width;
+      if (w > 0 && card){
+        var s = w/1280;
+        card.style.transform = 'scale(' + s + ')';
+      }
+    }
+  }
+  window.addEventListener('resize', fit);
+  document.addEventListener('DOMContentLoaded', fit);
+  window.addEventListener('load', fit);
+  fit();
+  setTimeout(fit, 50);
+  setTimeout(fit, 250);
+})();
+</script>

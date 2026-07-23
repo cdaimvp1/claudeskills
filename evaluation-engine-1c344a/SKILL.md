@@ -236,8 +236,7 @@ ask_user_input_v0(questions=[{
     "Q&A response compilation",
     "Clarification request letters",
     "BAFO request",
-    "Debrief preparation",
-    "Business case deck (handoff to decision-deck)"
+    "Debrief preparation"
   ]
 }])
 ```
@@ -253,7 +252,6 @@ After response, map their selection to file generation:
 - **Clarification request letters** -> `clarification_requests.docx`
 - **BAFO request** -> `bafo_request.docx`
 - **Debrief preparation** -> `debrief_prep.docx`
-- **Business case deck** -> hands off to `decision-deck` to produce a branded PPTX (this skill does not produce the deck inline)
 
 Record the selected set in `output_selection`. Only generate the selected artifacts in Phase 6. Other artifacts in the Outputs table are skipped entirely (not generated then withheld; not generated at all). Token cost is paid only for what the user wants.
 
@@ -570,7 +568,7 @@ See the Scoring Methodology reference (inlined below) for scale definitions and 
 
 | Upstream | This skill | Downstream |
 |----------|------------|------------|
-| rfp-engine, rfp-response-analysis (handoff payload), rfp-case-manager (case file) | evaluation-engine | decision-deck, contract negotiation chain |
+| rfp-engine, rfp-response-analysis (handoff payload), rfp-case-manager (case file) | evaluation-engine | contract negotiation chain |
 
 ## Scoring Matrix Improvement Suggestions
 
@@ -1262,15 +1260,5 @@ Low-confidence items generate a note in the evaluation report: "The following sc
 
 ## Pipeline Continuity
 
-The handoff's `pipeline_metadata.auto_advance` field instructs evaluation-engine on whether to auto-advance downstream when complete.
-
-If `auto_advance = true`:
-- On completion of the evaluation report and all outputs, notify the user that the pipeline is ready to advance to `decision-deck`
-- Present a transition summary: "Evaluation complete. Ready to advance to decision-deck for the executive presentation. Proceed?"
-- Wait for user confirmation before invoking decision-deck (natural pause point - user may need to review evaluation before escalating)
-- Note: decision-deck v2 uses a story-first workflow. It will read the evaluation data model, ask the user about the audience and desired conclusion, then draft a text storyboard in the chat for iteration before building any slides. The evaluation report data feeds the deck but does not determine its structure - the user's story does.
-
-If `auto_advance = false`:
-- Deliver outputs and stop
-- Do not invoke downstream skills
+The handoff's `pipeline_metadata.auto_advance` field instructs evaluation-engine on whether to auto-advance downstream when complete. Evaluation-engine's former auto-advance target, decision-deck, has been retired and has no replacement: this skill has no defined downstream skill to auto-invoke today. Regardless of the `auto_advance` value, deliver the evaluation report and all selected outputs, then stop. Do not invoke a downstream skill automatically; if the user wants a downstream artifact built from these results (for example an executive summary or the next stage of a negotiation), point them to it explicitly rather than auto-advancing.
 

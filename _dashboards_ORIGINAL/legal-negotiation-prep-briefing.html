@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Legal Negotiation Prep - DOCX Briefing Preview</title>
+<style>
+  :root{
+    --lilly-red:#E1251B;
+    --dark-red:#521207;
+    --charcoal:#212121;
+    --bold-blue:#0F3A85;
+    --amber:#B45309;
+    --gold:#854D0E;
+    --stone:#E4EBF1;
+    --offwhite:#F4F7FB;
+    --tier-red-bg:#FDE8E5;
+    --tier-hold-bg:#FEF3C4;
+    --tier-trade-bg:#FFF0D8;
+    --tier-concede-bg:#D4E5F7;
+    --gray-9:#666666;
+    --gray-line:#C9CFD6;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#DEE2E7;
+    font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;
+    color:var(--charcoal);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- harness chrome (outside the simulated document) ---------- */
+  .harness-bar{
+    background:var(--charcoal);
+    color:#F4F7FB;
+    padding:14px 22px;
+    font-size:12.5px;
+    line-height:1.5;
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 22px;
+    align-items:baseline;
+    border-bottom:3px solid var(--lilly-red);
+  }
+  .harness-bar strong{color:#fff; font-size:13.5px;}
+  .harness-bar .sep{color:#8A969E;}
+  .harness-bar .tag{
+    background:var(--bold-blue);
+    color:#fff;
+    border-radius:3px;
+    padding:2px 8px;
+    font-size:10.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+
+  .doc-viewer{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:28px;
+    padding:34px 16px 60px;
+  }
+
+  .page{
+    background:#ffffff;
+    width:816px;
+    max-width:100%;
+    min-height:1056px;
+    box-shadow:0 2px 5px rgba(0,0,0,.18), 0 14px 34px rgba(0,0,0,.16);
+    position:relative;
+    padding:0 0 46px 0;
+    overflow:hidden;
+  }
+  .page-inner{ padding:0 58px; }
+  .page-number-label{
+    position:absolute;
+    bottom:16px; right:20px;
+    font-size:9pt; color:var(--gray-9);
+  }
+  .page-footer-strip{
+    position:absolute;
+    bottom:16px; left:20px; right:20px;
+    display:flex; justify-content:space-between;
+    font-size:9pt; color:var(--gray-9);
+    border-top:1px solid var(--gray-line);
+    padding-top:6px;
+  }
+  .page-header-strip{
+    padding:16px 58px 8px;
+    text-align:right;
+    font-size:9pt;
+    font-style:italic;
+    color:var(--gray-9);
+    border-bottom:1px solid var(--gray-line);
+    margin-bottom:22px;
+  }
+
+  /* ---------- Title page ---------- */
+  .title-bar{
+    background:var(--dark-red);
+    color:#fff;
+    padding:26px 58px 22px;
+    text-align:center;
+  }
+  .title-bar .wordmark{
+    font-family:Georgia,"Times New Roman",serif;
+    font-style:italic;
+    font-size:22px;
+    letter-spacing:.02em;
+  }
+  .title-bar .wordmark small{
+    display:block;
+    font-family:Calibri,Arial,sans-serif;
+    font-style:normal;
+    font-size:9.5px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#E8C6C1;
+    margin-top:3px;
+  }
+  .title-block{ text-align:center; padding:40px 58px 8px; }
+  .title-block h1{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:26px;
+    color:var(--charcoal);
+    margin:0 0 8px;
+    letter-spacing:.01em;
+  }
+  .title-block .conf{
+    color:var(--lilly-red);
+    font-weight:700;
+    font-size:11.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+  }
+  .title-block .doctype{
+    margin-top:18px;
+    font-size:11.5px;
+    color:var(--gray-9);
+  }
+
+  .meta-table{
+    margin:30px 58px 0;
+    background:var(--stone);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .meta-table table{ width:100%; border-collapse:collapse; }
+  .meta-table td{
+    padding:9px 18px;
+    font-size:10.5px;
+    vertical-align:top;
+    border-bottom:1px solid #D3DEE8;
+  }
+  .meta-table tr:last-child td{ border-bottom:none; }
+  .meta-table td.k{
+    width:170px;
+    font-weight:700;
+    color:var(--bold-blue);
+  }
+
+  /* ---------- KPI row ---------- */
+  .kpi-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    margin:28px 58px 0;
+    border:1px solid var(--gray-line);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .kpi-cell{
+    padding:16px 12px;
+    text-align:center;
+    border-right:1px solid var(--gray-line);
+  }
+  .kpi-cell:last-child{ border-right:none; }
+  .kpi-num{ font-size:29px; font-weight:700; line-height:1.1; }
+  .kpi-label{ margin-top:5px; font-size:8.7pt; color:var(--gray-9); letter-spacing:.02em; }
+  .kpi-sub{ font-size:8pt; color:#8A969E; margin-top:2px;}
+
+  /* ---------- Callout ---------- */
+  .callout{
+    background:var(--stone);
+    border-left:4px solid var(--bold-blue);
+    padding:16px 20px;
+    font-size:10.5px;
+    line-height:1.5;
+  }
+  .callout h2{
+    margin:0 0 10px;
+    font-size:12pt;
+    color:var(--charcoal);
+    font-weight:700;
+  }
+  .callout .row{ margin-bottom:8px; }
+  .callout .row:last-child{ margin-bottom:0; }
+  .callout .lbl{ font-weight:700; color:var(--bold-blue); }
+  .callout ol,.callout ul{ margin:4px 0 0 18px; padding:0; }
+  .callout li{ margin-bottom:3px; }
+
+  /* ---------- Position Map & MSA Coverage panel ---------- */
+  .posmap-panel{ margin-top:26px; }
+  .posmap-heading{
+    font-size:12pt; font-weight:700; color:var(--bold-blue);
+    margin:0 0 4px; padding-bottom:6px; border-bottom:2px solid var(--bold-blue);
+  }
+  .posmap-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:14px;
+  }
+  .quad-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:1fr 1fr;
+    gap:8px;
+  }
+  .quad-cell{
+    border-radius:2px;
+    padding:10px 11px;
+    font-size:9.3pt;
+    min-height:100px;
+  }
+  .quad-cell.q-red{ background:var(--tier-red-bg); border-left:4px solid var(--lilly-red);}
+  .quad-cell.q-hold{ background:var(--tier-hold-bg); border-left:4px solid var(--amber);}
+  .quad-cell.q-trade{ background:var(--tier-trade-bg); border-left:4px solid var(--gold);}
+  .quad-cell.q-concede{ background:var(--tier-concede-bg); border-left:4px solid var(--bold-blue);}
+  .quad-cell .qhead{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;}
+  .quad-cell .qtitle{ font-weight:700; font-size:8.6pt; text-transform:uppercase; letter-spacing:.03em;}
+  .quad-cell .qcount{ font-weight:700; font-size:15px;}
+  .quad-cell ul{ margin:0; padding-left:14px; }
+  .quad-cell li{ margin-bottom:2px; }
+
+  .msa-covers h3{
+    font-size:10.5pt; margin:0 0 8px; color:var(--charcoal); font-weight:700;
+  }
+  .msa-item{
+    padding:7px 0;
+    border-bottom:1px solid #E2E7EC;
+    font-size:9.2pt;
+  }
+  .msa-item:last-child{ border-bottom:none; }
+  .msa-item .pname{ font-weight:700; }
+  .msa-item .pcite{ color:#8A969E; font-weight:600; margin-left:4px; }
+  .msa-rollup{
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px solid #C9CFD6;
+    color:var(--bold-blue);
+    font-weight:700;
+    font-size:9.2pt;
+  }
+  .posmap-narrative{
+    margin-top:16px;
+    background:var(--offwhite);
+    border-left:4px solid var(--gray-line);
+    padding:13px 18px;
+    font-size:9.6pt;
+    line-height:1.55;
+  }
+  .posmap-narrative .snap{ margin-top:9px; font-weight:700; color:var(--bold-blue); }
+
+  /* ---------- Section badges ---------- */
+  .section-badge{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    border-bottom:2px solid var(--gray-line);
+    padding-bottom:12px;
+    margin:0 0 20px;
+  }
+  .section-badge .num{
+    font-size:34px; font-weight:800; color:var(--lilly-red); min-width:64px;
+  }
+  .section-badge .stitle{ font-size:14pt; font-weight:700; color:var(--bold-blue); }
+  .section-badge .ssub{ display:block; font-size:9pt; font-weight:400; color:var(--gray-9); margin-top:2px;}
+
+  .unnumbered-panel-title{
+    font-size:12.5pt; font-weight:700; color:var(--charcoal);
+    border-bottom:2px solid var(--charcoal);
+    padding-bottom:8px; margin:0 0 18px;
+  }
+
+  /* ---------- Position cards ---------- */
+  .pcard{
+    border-radius:2px;
+    padding:14px 18px 16px;
+    margin-bottom:16px;
+    font-size:9.6pt;
+    line-height:1.5;
+  }
+  .pcard.red{ background:var(--tier-red-bg); border-left:5px solid var(--lilly-red); }
+  .pcard.hold{ background:var(--tier-hold-bg); border-left:5px solid var(--amber); }
+  .pcard.trade{ background:var(--tier-trade-bg); border-left:5px solid var(--gold); }
+  .pcard.concede{ background:var(--tier-concede-bg); border-left:5px solid var(--bold-blue); padding:10px 16px 12px; }
+
+  .pcard-head{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    margin-bottom:8px;
+  }
+  .pcard-title{ font-weight:700; font-size:11pt; color:var(--charcoal); }
+  .pcard-playbook{ display:block; font-size:8.4pt; font-weight:400; color:var(--gray-9); margin-top:1px;}
+
+  .badge-pill{
+    display:inline-block; color:#fff; font-weight:700; font-size:8pt;
+    letter-spacing:.04em; text-transform:uppercase; padding:3px 9px; border-radius:11px;
+    white-space:nowrap;
+  }
+  .badge-pill.red{ background:var(--lilly-red); }
+  .badge-pill.hold{ background:var(--amber); }
+  .badge-pill.trade{ background:var(--gold); }
+  .badge-pill.concede{ background:var(--bold-blue); }
+
+  .tag-pill{
+    display:inline-block; font-size:7.6pt; font-weight:700; letter-spacing:.03em;
+    padding:1.5px 7px; border-radius:9px; color:#fff; text-transform:uppercase; margin-left:6px;
+  }
+  .tag-pill.accepted{ background:var(--bold-blue); }
+  .tag-pill.rejected{ background:var(--lilly-red); }
+  .tag-pill.nodata{ background:var(--gray-9); }
+
+  .fld{ margin-top:7px; }
+  .fld .k{ font-weight:700; color:var(--charcoal); }
+  .fld ol{ margin:4px 0 0 18px; padding:0; }
+  .fld li{ margin-bottom:3px; }
+
+  .concede-line{ font-size:9.4pt; }
+  .concede-line .k{ font-weight:700; }
+
+  /* ---------- tactics view ---------- */
+  .tactic-row{
+    border:1px solid var(--gray-line);
+    border-radius:2px;
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  .tactic-row .thead{
+    background:var(--stone);
+    padding:7px 14px;
+    font-weight:700;
+    font-size:10.3pt;
+    color:var(--bold-blue);
+  }
+  .tactic-row .tbody{ padding:10px 14px; font-size:9.3pt; line-height:1.5;}
+  .tactic-row .fld{ margin-top:5px; }
+
+  /* ---------- leverage / compliance ---------- */
+  .leverage-kpi{
+    display:flex; align-items:baseline; gap:14px;
+    background:var(--offwhite); border-left:4px solid var(--bold-blue);
+    padding:12px 18px; margin-bottom:16px; font-size:9.6pt;
+  }
+  .leverage-kpi .big{ font-size:26px; font-weight:800; color:var(--bold-blue); }
+  .finding-card{
+    border:1px solid var(--gray-line); border-left:5px solid var(--amber);
+    border-radius:2px; padding:13px 17px; font-size:9.5pt; line-height:1.5; margin-bottom:14px;
+  }
+  .finding-card .fid{ font-weight:700; font-size:10.5pt; }
+  .finding-card .fimpact{ color:var(--lilly-red); font-weight:700; margin-left:8px; }
+  .finding-card .fld{ margin-top:6px; }
+  .caution{
+    margin-top:8px; padding:7px 11px; background:var(--tier-hold-bg);
+    border-left:3px solid var(--amber); font-size:8.9pt; font-style:italic;
+  }
+
+  /* ---------- concession timeline ---------- */
+  .timeline-row{
+    border-radius:2px; padding:13px 18px; margin-bottom:12px; font-size:9.6pt; line-height:1.55;
+  }
+  .timeline-row.r1{ border-left:5px solid var(--bold-blue); background:var(--offwhite); }
+  .timeline-row.r2{ border-left:5px solid var(--gold); background:var(--tier-trade-bg); }
+  .timeline-row.r3{ border-left:5px solid var(--lilly-red); background:var(--tier-red-bg); }
+  .timeline-row .rlabel{ font-weight:700; font-size:10.6pt; margin-bottom:6px; display:block;}
+  .deadlock-box{
+    background:var(--stone); border-left:4px solid var(--charcoal);
+    padding:13px 18px; font-size:9.5pt; line-height:1.55; margin-top:6px;
+  }
+  .deadlock-box .k{ font-weight:700; }
+
+  /* ---------- SME table ---------- */
+  .sme-table{ width:100%; border-collapse:collapse; font-size:8.9pt; }
+  .sme-table th{
+    background:var(--bold-blue); color:#fff; text-align:left; padding:8px 9px; font-size:8.6pt;
+    text-transform:uppercase; letter-spacing:.02em;
+  }
+  .sme-table td{ padding:9px 9px; border-bottom:1px solid var(--gray-line); vertical-align:top; line-height:1.4;}
+  .sme-table tr.priority td{ background:var(--tier-concede-bg); }
+  .sme-table td.narrow{ width:15%; }
+
+  /* ---------- Quick Reference Card ---------- */
+  .qr-header{
+    background:var(--dark-red); color:#fff; text-align:center;
+    padding:20px 40px; margin-bottom:0;
+  }
+  .qr-header .t1{ font-size:20px; font-weight:800; letter-spacing:.1em; }
+  .qr-header .t2{ font-size:9.5px; margin-top:4px; color:#E8C6C1; letter-spacing:.06em; }
+  .qr-grid{
+    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;
+    gap:1px; background:var(--gray-line); margin:0 58px; margin-top:20px;
+  }
+  .qr-cell{ padding:15px 17px; font-size:9.3pt; line-height:1.5; }
+  .qr-cell.red{ background:var(--tier-red-bg); }
+  .qr-cell.hold{ background:var(--tier-hold-bg); }
+  .qr-cell.trade{ background:var(--tier-trade-bg); }
+  .qr-cell.concede{ background:var(--tier-concede-bg); }
+  .qr-cell h4{ margin:0 0 9px; font-size:10.7pt; text-transform:uppercase; letter-spacing:.03em; }
+  .qr-cell.red h4{ color:var(--lilly-red); }
+  .qr-cell.hold h4{ color:var(--amber); }
+  .qr-cell.trade h4{ color:var(--gold); }
+  .qr-cell.concede h4{ color:var(--bold-blue); }
+  .qr-cell ul{ margin:0; padding-left:16px; }
+  .qr-cell li{ margin-bottom:6px; }
+  .qr-footer{
+    margin:0 58px; margin-top:1px;
+    background:var(--charcoal); color:#F4F7FB;
+    padding:14px 20px; font-size:9pt; line-height:1.5;
+  }
+  .qr-footer .flabel{ color:#F3B7B0; font-weight:700; text-transform:uppercase; font-size:8pt; letter-spacing:.05em; }
+  .qr-footer .frow{ margin-bottom:6px; }
+  .qr-footer .frow:last-child{ margin-bottom:0; }
+
+  h2.body-h2{ font-size:12pt; font-weight:700; color:var(--charcoal); margin:0 0 10px; }
+  p.lead{ font-size:9.7pt; line-height:1.55; margin:0 0 16px; color:var(--charcoal); }
+</style>
+</head>
+<body>
+
+<div class="harness-bar">
+  <strong>HTML PREVIEW</strong>
+  <span class="sep">|</span>
+  <span>legal-negotiation-prep-1c344a - representative DOCX briefing output</span>
+  <span class="sep">|</span>
+  <span>Illustrative example from the skill's own reference files: Nimbus Cloud Technologies</span>
+  <span class="tag">Static mockup, not the live skill</span>
+</div>
+
+<div class="doc-viewer">
+
+<!-- ================= PAGE 1: TITLE + KPI + EXEC SUMMARY + POSITION MAP ================= -->
+<div class="page">
+  <div class="title-bar">
+    <div class="wordmark">Eli Lilly and Company
+      <small>Global IT Procurement</small>
+    </div>
+  </div>
+  <div class="title-block">
+    <h1>LEGAL NEGOTIATION BRIEFING</h1>
+    <div class="conf">Confidential - Lilly Internal Use Only</div>
+    <div class="doctype">Nimbus_Cloud_Technologies_Negotiation_Briefing_v1.docx</div>
+  </div>
+
+  <div class="meta-table">
+    <table>
+      <tr><td class="k">Supplier</td><td>Nimbus Cloud Technologies</td></tr>
+      <tr><td class="k">Contract Type</td><td>Renewal (Work Order under the existing Master Services Agreement)</td></tr>
+      <tr><td class="k">Estimated Value</td><td>$4.2M over a 3-year term (Large / Strategic band)</td></tr>
+      <tr><td class="k">Category</td><td>Managed Cloud Hosting &amp; IT Professional Services</td></tr>
+      <tr><td class="k">Scope</td><td>Renewal of managed cloud hosting, 24/7 infrastructure support, and IT professional services staff augmentation supporting Lilly's R&amp;D data platform; governed by the existing Nimbus MSA (executed March 2024).</td></tr>
+      <tr><td class="k">Prepared</td><td>July 22, 2026</td></tr>
+      <tr><td class="k">Prepared For</td><td>Procurement Lead, Global IT Category</td></tr>
+    </table>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-cell">
+      <div class="kpi-num" style="color:var(--gold);">High</div>
+      <div class="kpi-label">DIFFICULTY PREDICTION</div>
+      <div class="kpi-sub">2 prior negotiations, 35% first-pass rejection</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-num" style="color:var(--lilly-red);">3</div>
+      <div class="kpi-label">RED LINES</div>
+      <div class="kpi-sub">Hold absolutely, no concession</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-num" style="color:var(--charcoal);">14</div>
+      <div class="kpi-label">TOTAL POSITIONS</div>
+      <div class="kpi-sub">3 Red / 5 Hold / 4 Trade / 2 Concede</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-num" style="color:var(--bold-blue);">$140K</div>
+      <div class="kpi-label">COMPLIANCE LEVERAGE</div>
+      <div class="kpi-sub">1 finding, rate card violations</div>
+    </div>
+  </div>
+
+  <div class="page-inner" style="margin-top:24px;">
+    <div class="callout">
+      <h2>Executive Summary</h2>
+      <div class="row"><span class="lbl">Negotiation Difficulty Prediction:</span> High. Based on 2 prior Nimbus negotiations (2022 MSA, 2024 amendment) where the supplier rejected roughly 35% of standard positions on first pass, combined with 3 Red Line positions and a contract value approaching the $5M pre-engagement threshold.</div>
+      <div class="row"><span class="lbl">Position Count by Tier:</span> Red Lines 3, Hold Firm 5, Strategic Trade 4, Easy Concede 2.</div>
+      <div class="row"><span class="lbl">Compliance Leverage Available:</span> Yes - $140,000 in rate card violations identified across 1 finding (Finding CD-2026-0417; see Section 05).</div>
+      <div class="row"><span class="lbl">SME Pre-Engagement Needed:</span> Yes - Cyber_ISS_Review@Lilly.com (data residency) and the Global Procurement Attorney, Jonathan Burleigh (sanctions / export control, contract value). Full plan in Section 07.</div>
+      <div class="row"><span class="lbl">Key Risks:</span>
+        <ol>
+          <li>EU/UK Data Residency Commitment is a new Red Line at the WO level; Nimbus has never been asked to commit to in-region-only processing, so their reaction is untested.</li>
+          <li>Contract value ($4.2M) sits near the $5M SME pre-engagement threshold, so a scope change during negotiation could trigger a second pre-engagement cycle.</li>
+          <li>The $140K compliance finding is under partial dispute (~35%) per Nimbus's initial response; treat its persuasive weight as Medium confidence until reconciled.</li>
+        </ol>
+      </div>
+      <div class="row"><span class="lbl">Recommended Opening Posture:</span> Assertive-collaborative. Open firm on the 3 Red Lines and lead with the rate-card finding to set a factual, non-punitive tone, while proactively signaling flexibility on the 2 Easy Concede items in the first exchange.</div>
+    </div>
+
+    <div class="posmap-panel">
+      <div class="posmap-heading">Position Map &amp; MSA Coverage</div>
+      <div class="posmap-grid">
+        <div>
+          <div class="quad-grid">
+            <div class="quad-cell q-red">
+              <div class="qhead"><span class="qtitle">Red Line</span><span class="qcount">3</span></div>
+              <ul>
+                <li>EU/UK Data Residency Commitment</li>
+                <li>Sanctions &amp; Export Control Compliance</li>
+                <li>72-Hour Breach Notification Trigger</li>
+              </ul>
+            </div>
+            <div class="quad-cell q-hold">
+              <div class="qhead"><span class="qtitle">Hold Firm</span><span class="qcount">5</span></div>
+              <ul>
+                <li>Liability Cap Tied to Fees Paid</li>
+                <li>Termination for Cause Cure Period</li>
+                <li>+3 more</li>
+              </ul>
+            </div>
+            <div class="quad-cell q-trade">
+              <div class="qhead"><span class="qtitle">Strategic Trade</span><span class="qcount">4</span></div>
+              <ul>
+                <li>Change Order Markup Rate</li>
+                <li>Insurance Aggregate Limits</li>
+                <li>+2 more</li>
+              </ul>
+            </div>
+            <div class="quad-cell q-concede">
+              <div class="qhead"><span class="qtitle">Easy Concede</span><span class="qcount">2</span></div>
+              <ul>
+                <li>Invoice Frequency</li>
+                <li>Auto-Renewal Notice Window</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="msa-covers">
+          <h3>MSA Already Covers (4 provisions)</h3>
+          <div class="msa-item"><span class="pname">Audit Rights</span><span class="pcite">MSA Section 11</span><br>Comprehensive audit rights already in place, 30 days notice, annual, extends to subcontractors; the Section 05 rate-card leverage deploys against this existing clause rather than a new one.</div>
+          <div class="msa-item"><span class="pname">Confidentiality &amp; Data Protection</span><span class="pcite">MSA Section 14</span><br>Mutual confidentiality and Lilly Information handling terms already meet Lilly standard.</div>
+          <div class="msa-item"><span class="pname">Insurance Minimums</span><span class="pcite">MSA Section 9</span><br>Cyber, E&amp;O, and general liability minimums already at Lilly's required levels.</div>
+          <div class="msa-item"><span class="pname">Governing Law &amp; Dispute Resolution</span><span class="pcite">MSA Section 22</span><br>Delaware law and the escalation / arbitration path already fixed.</div>
+          <div class="msa-rollup">Playbook sections evaluated: 18. Resolved at MSA level: 4. Carried to this WO negotiation: 14.</div>
+        </div>
+      </div>
+      <div class="posmap-narrative">
+        The governing Nimbus MSA (executed March 2024; Sections 9, 11, 14, and 22 verified this session) already resolves audit, confidentiality, insurance, and dispute-resolution terms, which is why this WO briefing carries 14 positions instead of the full 18-section playbook. The MSA's confidentiality clause does not address where data physically resides, so EU/UK Data Residency Commitment surfaces as a new Red Line at the WO level despite the MSA's otherwise strong confidentiality coverage.
+        <div class="snap">SME Pre-Engagement Snapshot: 2 of 3 Red Lines carry a pre-engagement recommendation - EU/UK Data Residency to Cyber_ISS_Review@Lilly.com (non-standard scope) and Sanctions &amp; Export Control Compliance to the Global Procurement Attorney (contract value near the $5M threshold). Full brief and timing in Section 07.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 1</span></div>
+</div>
+
+<!-- ================= PAGE 2: SECTION 01 RED LINES ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="page-inner">
+    <div class="section-badge">
+      <div class="num">01</div>
+      <div><div class="stitle">Red Lines</div><span class="ssub">Tier 1 - Hold absolutely. No concession. Pre-engage SME if supplier likely to push.</span></div>
+    </div>
+
+    <div class="pcard red">
+      <div class="pcard-head">
+        <div class="pcard-title">EU/UK Data Residency Commitment<span class="pcard-playbook">Playbook S14.2 - Data Privacy &amp; Cross-Border Transfer</span></div>
+        <div><span class="badge-pill red">Red Line</span><span class="tag-pill nodata">No Data</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Position:</span> All Lilly Information and Usage Data originating from EU/UK data subjects must be processed and stored exclusively within EU/UK data centers; no cross-border transfer to Nimbus's US-based processing environment without a valid transfer mechanism (Standard Contractual Clauses) reviewed by Lilly Legal.</div>
+      <div class="fld"><span class="k">Why Non-Negotiable:</span> GDPR Articles 44-49 cross-border transfer restrictions; Lilly's Global Privacy Standard requires in-region processing for EU/UK personal data absent an approved transfer mechanism.</div>
+      <div class="fld"><span class="k">Relevant Regulation:</span> GDPR (EU) 2016/679, UK GDPR.</div>
+      <div class="fld"><span class="k">Supplier History:</span> No prior history; this is a new commitment not previously requested of Nimbus. Category benchmark is approximately 55% first-pass acceptance for cloud infrastructure suppliers when data residency is requested at renewal (Medium confidence, category-level pattern).</div>
+      <div class="fld"><span class="k">If Supplier Pushes Back:</span>
+        <ol>
+          <li>Cite GDPR Articles 44-49 and Lilly's Global Privacy Standard; in-region processing is the default posture, not a negotiable enhancement.</li>
+          <li>Escalate to Cyber_ISS_Review@Lilly.com for a technical feasibility discussion if Nimbus claims their EU region lacks capacity or feature parity.</li>
+          <li>Final position: this is a Hard Stop; walk away if necessary.</li>
+        </ol>
+      </div>
+      <div class="fld"><span class="k">SME Contact:</span> Cyber_ISS_Review@Lilly.com - Pre-Engagement: Recommended (non-standard scope; engage before first draft exchange).</div>
+    </div>
+
+    <div class="pcard red">
+      <div class="pcard-head">
+        <div class="pcard-title">Sanctions &amp; Export Control Compliance<span class="pcard-playbook">Playbook S02.1 - Regulatory &amp; Trade Compliance</span></div>
+        <div><span class="badge-pill red">Red Line</span><span class="tag-pill accepted">Accepted</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Position:</span> Nimbus and any subcontractor or fourth-party processor must represent and warrant it is not a Sanctioned Person, is not owned or controlled by a Sanctioned Person, and will not use any Sanctioned Person or Sanctioned Country infrastructure to deliver the Services.</div>
+      <div class="fld"><span class="k">Why Non-Negotiable:</span> OFAC sanctions regulations and FCPA exposure; Lilly's Global Trade Compliance policy prohibits any exception for supplier or subcontractor sanctions screening.</div>
+      <div class="fld"><span class="k">Relevant Regulation:</span> OFAC, FCPA.</div>
+      <div class="fld"><span class="k">Supplier History:</span> Nimbus accepted equivalent language in the 2024 MSA amendment without material redline; standard boilerplate for this supplier.</div>
+      <div class="fld"><span class="k">If Supplier Pushes Back:</span>
+        <ol>
+          <li>Cite OFAC and Lilly's Global Trade Compliance policy; note this is standard language already accepted in the governing MSA amendment.</li>
+          <li>Escalate to the Global Procurement Attorney if Nimbus proposes narrowing the subcontractor flow-down.</li>
+          <li>Final position: this is a Hard Stop; walk away if necessary, though risk is low given prior acceptance.</li>
+        </ol>
+      </div>
+      <div class="fld"><span class="k">SME Contact:</span> Jonathan Burleigh, Global Procurement Attorney (legal.procurement@lilly.com) - Pre-Engagement: Recommended (contract value approaching the $5M threshold on a multi-year renewal).</div>
+    </div>
+
+    <div class="pcard red">
+      <div class="pcard-head">
+        <div class="pcard-title">72-Hour Breach Notification Trigger<span class="pcard-playbook">Playbook S14.7 - Data Security &amp; Incident Response</span></div>
+        <div><span class="badge-pill red">Red Line</span><span class="tag-pill rejected">Rejected</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Position:</span> Nimbus must notify Lilly within 72 hours of discovering any actual or reasonably suspected security incident affecting Lilly Information, regardless of Nimbus's own internal materiality assessment.</div>
+      <div class="fld"><span class="k">Why Non-Negotiable:</span> GDPR Article 33 (72-hour supervisory authority notification) flows down to processors; Lilly cannot meet its own regulatory notification clock if Nimbus's trigger is slower or discretionary.</div>
+      <div class="fld"><span class="k">Relevant Regulation:</span> GDPR Article 33; HIPAA Breach Notification Rule where applicable.</div>
+      <div class="fld"><span class="k">Supplier History:</span> Nimbus proposed 5 business days in the 2022 MSA negotiation, citing internal investigation timelines; Lilly held firm and the MSA already carries a 72-hour trigger at the MSA level. This WO position confirms the same trigger applies to WO-specific data flows.</div>
+      <div class="fld"><span class="k">If Supplier Pushes Back:</span>
+        <ol>
+          <li>Cite GDPR Article 33 and the existing MSA precedent - Nimbus already conceded this in 2022.</li>
+          <li>Escalate to the Global Procurement Attorney if Nimbus argues the WO scope falls outside the MSA's incident definition.</li>
+          <li>Final position: this is a Hard Stop; walk away if necessary, though precedent strongly favors holding without escalation.</li>
+        </ol>
+      </div>
+      <div class="fld"><span class="k">SME Contact:</span> Cyber_ISS_Review@Lilly.com - Pre-Engagement: Not Needed (2022 MSA precedent makes this a low-risk confirmation).</div>
+    </div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 2</span></div>
+</div>
+
+<!-- ================= PAGE 3: SECTION 02 HOLD FIRM ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="page-inner">
+    <div class="section-badge">
+      <div class="num">02</div>
+      <div><div class="stitle">Hold Firm Positions</div><span class="ssub">Tier 2 - Open with standard. Defend vigorously. Fallback only under significant pressure and approval.</span></div>
+    </div>
+
+    <div class="pcard hold">
+      <div class="pcard-head">
+        <div class="pcard-title">Liability Cap Tied to Fees Paid</div>
+        <div><span class="badge-pill hold">Hold Firm</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Standard Position:</span> Aggregate liability capped at 2x total fees paid in the 12 months preceding the claim, with an uncapped carve-out for confidentiality breach, IP infringement, and gross negligence / willful misconduct.</div>
+      <div class="fld"><span class="k">Acceptable Fallback:</span> 1.5x fees paid, provided the carve-outs remain fully uncapped.</div>
+      <div class="fld"><span class="k">Unacceptable:</span> A flat cap below 1x annual fees, or any cap that folds the confidentiality / IP / gross-negligence carve-outs inside its ceiling.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 62% (N=8, Medium confidence) - category-level pattern for managed hosting suppliers of similar size.</div>
+      <div class="fld"><span class="k">Supplier-Specific History:</span> Nimbus opened at 1x fees paid with no carve-outs in the 2022 MSA negotiation; settled at 2x with carve-outs after two rounds.</div>
+      <div class="fld"><span class="k">Predicted Pushback:</span> "Our standard terms cap liability at 1x annual fees across all engagements, including this renewal."</div>
+      <div class="fld"><span class="k">Compliance Leverage:</span> Finding CD-2026-0417, $140K in rate card violations (Section 05). Talking point: "Given the rate-card discrepancies identified in the current term, a liability structure with real carve-outs protects both parties going forward."</div>
+      <div class="fld"><span class="k">Negotiation Guidance:</span> Open at 2x with full carve-outs. If Pushed: cite the 2022 precedent. Fallback Trigger: after two rounds of resistance. Trade Value: High - do not trade without a Tier 2 or better return.</div>
+    </div>
+
+    <div class="pcard hold">
+      <div class="pcard-head">
+        <div class="pcard-title">Termination for Cause Cure Period</div>
+        <div><span class="badge-pill hold">Hold Firm</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Standard Position:</span> 15-day cure period for material breach, with immediate (no-cure) termination rights for a breach of confidentiality, data protection, or sanctions / export-control obligations.</div>
+      <div class="fld"><span class="k">Acceptable Fallback:</span> 30-day cure period for general material breach; no-cure carve-outs remain non-negotiable.</div>
+      <div class="fld"><span class="k">Unacceptable:</span> A cure period longer than 30 days, or extending cure rights to the no-cure carve-out categories.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 71% (N=7, Medium confidence).</div>
+      <div class="fld"><span class="k">Supplier-Specific History:</span> No Nimbus-specific data; category benchmark applied.</div>
+      <div class="fld"><span class="k">Predicted Pushback:</span> "45 days is standard in our master services agreements with enterprise clients."</div>
+      <div class="fld"><span class="k">Negotiation Guidance:</span> Open at 15 days. If Pushed: move to 30 days. Fallback Trigger: if Nimbus ties this to a Tier 3 concession. Trade Value: Medium - good candidate to receive a Tier 3 trade.</div>
+    </div>
+
+    <div class="pcard hold">
+      <div class="pcard-head">
+        <div class="pcard-title">Data Deletion &amp; Return on Termination</div>
+        <div><span class="badge-pill hold">Hold Firm</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Standard Position:</span> Nimbus must return or certify destruction of all Lilly Information within 30 days of termination, with a signed certificate of destruction and no retention exception beyond standard backup rotation (max 90 days, disaster-recovery purposes only).</div>
+      <div class="fld"><span class="k">Acceptable Fallback:</span> 45 days for return / destruction if Nimbus documents a specific technical constraint.</div>
+      <div class="fld"><span class="k">Unacceptable:</span> An indefinite or undefined backup retention window, or return contingent on final invoice payment.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 58% (N=6, Medium confidence).</div>
+      <div class="fld"><span class="k">Predicted Pushback:</span> "Our backup systems retain data for up to 12 months as part of standard disaster recovery architecture."</div>
+      <div class="fld"><span class="k">Negotiation Guidance:</span> Open at 30 days. If Pushed: 45 days with a documented constraint. Fallback Trigger: only with written technical justification. Trade Value: Medium.</div>
+    </div>
+
+    <div class="pcard hold">
+      <div class="pcard-head">
+        <div class="pcard-title">Service Level Credits &amp; Remedies</div>
+        <div><span class="badge-pill hold">Hold Firm</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Standard Position:</span> Monthly SLA credits scaled by severity (up to 15% of monthly fees for sustained Severity 1 outages), with a right to terminate for cause after 3 consecutive months of missed Severity 1 SLAs.</div>
+      <div class="fld"><span class="k">Acceptable Fallback:</span> 10% cap on monthly credits if the 3-strike termination trigger is preserved.</div>
+      <div class="fld"><span class="k">Unacceptable:</span> SLA credits as sole and exclusive remedy with no termination trigger regardless of repeated failures.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 66% (N=5, Medium confidence).</div>
+      <div class="fld"><span class="k">Supplier-Specific History:</span> Nimbus accepted a 12% credit cap with a 3-strike trigger in the 2024 amendment for a different work order.</div>
+      <div class="fld"><span class="k">Predicted Pushback:</span> "Credits are the sole remedy under our standard SLA framework; we don't offer termination rights tied to service levels."</div>
+      <div class="fld"><span class="k">Negotiation Guidance:</span> Open at 15%. If Pushed: cite the 2024 amendment precedent (12%). Fallback Trigger: settle at 10-12% only if the 3-strike trigger holds. Trade Value: Medium-High.</div>
+    </div>
+
+    <div class="pcard hold">
+      <div class="pcard-head">
+        <div class="pcard-title">Subcontractor Flow-Down Obligations</div>
+        <div><span class="badge-pill hold">Hold Firm</span></div>
+      </div>
+      <div class="fld"><span class="k">Lilly Standard Position:</span> All Lilly-specific obligations (data protection, sanctions compliance, confidentiality, audit rights, breach notification) must flow down in writing to every subcontractor and fourth-party processor Nimbus uses, with Nimbus remaining fully liable for subcontractor performance.</div>
+      <div class="fld"><span class="k">Acceptable Fallback:</span> Flow-down limited to subcontractors with direct access to Lilly Information, provided Nimbus retains full liability.</div>
+      <div class="fld"><span class="k">Unacceptable:</span> Any flow-down exception leaving a data-access subcontractor outside the obligation set, or any dilution of Nimbus's liability for subcontractor acts.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 69% (N=6, Medium confidence).</div>
+      <div class="fld"><span class="k">Predicted Pushback:</span> "Some of our infrastructure partners operate under their own compliance frameworks and won't sign bespoke flow-down language."</div>
+      <div class="fld"><span class="k">Negotiation Guidance:</span> Open at full flow-down. If Pushed: narrow to data-access subcontractors. Fallback Trigger: only with full retained liability. Trade Value: Medium.</div>
+    </div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 3</span></div>
+</div>
+
+<!-- ================= PAGE 4: SECTION 03 STRATEGIC TRADE ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="page-inner">
+    <div class="section-badge">
+      <div class="num">03</div>
+      <div><div class="stitle">Strategic Trade Positions</div><span class="ssub">Tier 3 - Open with standard. Prepared to move to fallback. Use as trading chips for Tier 2 holds.</span></div>
+    </div>
+
+    <div class="pcard trade">
+      <div class="pcard-head">
+        <div class="pcard-title">Change Order Markup Rate</div>
+        <div><span class="badge-pill trade">Strategic Trade</span></div>
+      </div>
+      <div class="fld"><span class="k">Standard Position:</span> Change order markup capped at 10% over documented cost for out-of-scope work.</div>
+      <div class="fld"><span class="k">Fallback Position:</span> 15% markup cap.</div>
+      <div class="fld"><span class="k">Risk of Fallback:</span> Low - modest cost exposure on infrequent change orders, no structural risk.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 48% (N=5, Medium confidence).</div>
+      <div class="fld"><span class="k">Predicted Outcome:</span> Likely settles at 12-15% markup based on category pattern.</div>
+      <div class="fld"><span class="k">Trade Strategy:</span> Best Traded For: Termination for Cause Cure Period (Tier 2). Framing: "We can be flexible on the change order markup if we can align on a tighter cure period for material breach." Timing: Round 2.</div>
+    </div>
+
+    <div class="pcard trade">
+      <div class="pcard-head">
+        <div class="pcard-title">Insurance Aggregate Limits</div>
+        <div><span class="badge-pill trade">Strategic Trade</span></div>
+      </div>
+      <div class="fld"><span class="k">Standard Position:</span> $10M aggregate cyber liability coverage, $5M per-occurrence.</div>
+      <div class="fld"><span class="k">Fallback Position:</span> $7M aggregate if per-occurrence stays at $5M.</div>
+      <div class="fld"><span class="k">Risk of Fallback:</span> Low-Medium - reduced aggregate ceiling on a low-frequency risk given MSA Section 9 minimums already verified adequate at the per-occurrence level.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 52% (N=4, Medium confidence).</div>
+      <div class="fld"><span class="k">Predicted Outcome:</span> Likely settles at $7M-$8M aggregate.</div>
+      <div class="fld"><span class="k">Trade Strategy:</span> Best Traded For: Liability Cap Tied to Fees Paid (Tier 2). Framing: "We have room to move on the aggregate insurance limit if the liability cap structure with full carve-outs stays intact." Timing: Round 2.</div>
+    </div>
+
+    <div class="pcard trade">
+      <div class="pcard-head">
+        <div class="pcard-title">Force Majeure Definition Scope</div>
+        <div><span class="badge-pill trade">Strategic Trade</span></div>
+      </div>
+      <div class="fld"><span class="k">Standard Position:</span> Force majeure limited to events genuinely beyond either party's reasonable control; explicitly excludes Nimbus-side labor disputes and third-party supplier failures within Nimbus's control to remediate.</div>
+      <div class="fld"><span class="k">Fallback Position:</span> Include Nimbus-side labor disputes if Nimbus commits to a business continuity / failover plan disclosure.</div>
+      <div class="fld"><span class="k">Risk of Fallback:</span> Low - primarily a definitional scope concession with a compensating disclosure obligation.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 44% (N=5, Medium confidence).</div>
+      <div class="fld"><span class="k">Predicted Outcome:</span> Likely settles with labor disputes included in exchange for continuity plan disclosure.</div>
+      <div class="fld"><span class="k">Trade Strategy:</span> Best Traded For: Termination for Convenience retention (part of the Tier 2 termination position set). Framing: "We can broaden the force majeure definition if Lilly retains unrestricted termination for convenience." Timing: Round 2 or Final Round.</div>
+    </div>
+
+    <div class="pcard trade">
+      <div class="pcard-head">
+        <div class="pcard-title">Publicity &amp; Reference Rights</div>
+        <div><span class="badge-pill trade">Strategic Trade</span></div>
+      </div>
+      <div class="fld"><span class="k">Standard Position:</span> No use of the Lilly name, logo, or reference in any Nimbus marketing, case study, or investor material without prior written approval from Lilly Communications for each specific use.</div>
+      <div class="fld"><span class="k">Fallback Position:</span> Standing approval for a single pre-agreed reference-customer listing (name only, no logo, no case study detail), revocable at any time.</div>
+      <div class="fld"><span class="k">Risk of Fallback:</span> Low - limited brand exposure, easily revocable.</div>
+      <div class="fld"><span class="k">Historical Acceptance Rate:</span> 51% (N=4, Medium confidence).</div>
+      <div class="fld"><span class="k">Predicted Outcome:</span> Likely settles at the name-only reference-listing fallback.</div>
+      <div class="fld"><span class="k">Trade Strategy:</span> Best Traded For: Data Deletion &amp; Return on Termination (Tier 2). Framing: "We can offer a limited reference listing if Nimbus tightens the post-termination data return timeline." Timing: Round 1 or Round 2.</div>
+    </div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 4</span></div>
+</div>
+
+<!-- ================= PAGE 5: SECTION 04 EASY CONCEDE + TACTICS VIEW ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="page-inner">
+    <div class="section-badge">
+      <div class="num">04</div>
+      <div><div class="stitle">Easy Concede Positions</div><span class="ssub">Tier 4 - Concede early to build goodwill and create reciprocity pressure.</span></div>
+    </div>
+
+    <div class="pcard concede">
+      <div class="pcard-head">
+        <div class="pcard-title">Invoice Frequency</div>
+        <div><span class="badge-pill concede">Easy Concede</span></div>
+      </div>
+      <div class="concede-line"><span class="k">Standard Position / Concession / Risk:</span> Lilly's standard is monthly invoicing; Nimbus prefers quarterly. Concede to quarterly. Risk is minimal - cash flow timing only, no reconciliation exposure given existing audit rights (MSA Section 11).</div>
+      <div class="concede-line" style="margin-top:6px;"><span class="k">Why Concede Early:</span> Low value to Lilly, moderate value to Nimbus; historical pattern shows suppliers rarely accept monthly invoicing when quarterly is their standard.</div>
+      <div class="concede-line" style="margin-top:6px;"><span class="k">Timing:</span> Concede in Round 1, proactively.</div>
+    </div>
+
+    <div class="pcard concede">
+      <div class="pcard-head">
+        <div class="pcard-title">Auto-Renewal Notice Window</div>
+        <div><span class="badge-pill concede">Easy Concede</span></div>
+      </div>
+      <div class="concede-line"><span class="k">Standard Position / Concession / Risk:</span> Lilly's standard is a 120-day non-renewal notice; concede to Nimbus's requested 90-day window. Risk is minimal - Lilly's category planning cycle already tracks renewals at the 6-month mark, well ahead of either window.</div>
+      <div class="concede-line" style="margin-top:6px;"><span class="k">Why Concede Early:</span> Low value to Lilly, moderate value to Nimbus; category pattern shows this term is rarely worth contesting.</div>
+      <div class="concede-line" style="margin-top:6px;"><span class="k">Timing:</span> Concede in Round 1, proactively.</div>
+    </div>
+
+    <div style="margin-top:30px;">
+      <div class="unnumbered-panel-title">Negotiation Tactics View (Legal Terms)</div>
+      <p class="lead">Cross-cut of the same tier-classified positions above, re-read by legal term instead of by tier. Introduces no new positions or data.</p>
+
+      <div class="tactic-row">
+        <div class="thead">Liability</div>
+        <div class="tbody">
+          <div class="fld"><span class="k">Your Position:</span> Aggregate cap at 2x fees paid (12 months), uncapped carve-outs for confidentiality, IP, and gross negligence (Liability Cap Tied to Fees Paid, Tier 2).</div>
+          <div class="fld"><span class="k">Argument Options:</span> (1) The cap scales proportionally with the relationship's size and risk. (2) The uncapped carve-outs protect only the highest-severity failure modes. (3) The $140K rate-card finding shows why a liability structure with real teeth matters.</div>
+          <div class="fld"><span class="k">Likely Supplier Pushback:</span> "Our standard terms cap liability at 1x annual fees across all engagements."</div>
+          <div class="fld"><span class="k">Your Rebuttal:</span> The 2022 MSA precedent already established 2x with carve-outs for this relationship; this WO should not regress below that precedent.</div>
+          <div class="fld"><span class="k">Fallback:</span> 1.5x fees paid if carve-outs remain fully uncapped.</div>
+        </div>
+      </div>
+
+      <div class="tactic-row">
+        <div class="thead">Indemnity</div>
+        <div class="tbody">
+          <div class="fld"><span class="k">Your Position:</span> Subcontractor flow-down preserves Nimbus's full liability for subcontractor acts (Subcontractor Flow-Down Obligations, Tier 2).</div>
+          <div class="fld"><span class="k">Argument Options:</span> (1) Lilly's relationship is with Nimbus, not its subcontractors; liability cannot be diluted by a supply-chain layer Lilly did not select. (2) Flow-down scoped to data-access subcontractors is a reasonable, auditable boundary.</div>
+          <div class="fld"><span class="k">Likely Supplier Pushback:</span> "Some infrastructure partners won't sign bespoke flow-down language and operate under their own frameworks."</div>
+          <div class="fld"><span class="k">Your Rebuttal:</span> Nimbus's liability for those partners is unaffected by what the partners will sign directly with Lilly; that is a subcontractor-management problem for Nimbus, not a basis for weakening Lilly's protection.</div>
+          <div class="fld"><span class="k">Fallback:</span> Flow-down limited to data-access subcontractors, with full retained liability.</div>
+        </div>
+      </div>
+
+      <div class="tactic-row">
+        <div class="thead">IP</div>
+        <div class="tbody">
+          <div class="fld"><span class="k">Your Position:</span> Standard Lilly IP ownership terms apply to Work Product; no new position generated at the WO level (playbook resolved at the MSA level).</div>
+          <div class="fld"><span class="k">Argument Options:</span> (1) MSA-level IP terms already cover WO deliverables under the existing Work Product definition. (2) No WO-specific customization of Nimbus's platform creates joint IP.</div>
+          <div class="fld"><span class="k">Likely Supplier Pushback:</span> None anticipated - no historical friction on this term with Nimbus.</div>
+          <div class="fld"><span class="k">Your Rebuttal:</span> Not applicable; hold as-is per the MSA.</div>
+          <div class="fld"><span class="k">Fallback:</span> Not applicable.</div>
+        </div>
+      </div>
+
+      <div class="tactic-row">
+        <div class="thead">Data / Privacy</div>
+        <div class="tbody">
+          <div class="fld"><span class="k">Your Position:</span> EU/UK Data Residency Commitment and the 72-Hour Breach Notification Trigger (both Red Line, Section 01).</div>
+          <div class="fld"><span class="k">Argument Options:</span> (1) GDPR Articles 44-49 and Article 33 are baseline regulatory floors, not optional enhancements. (2) The MSA's confidentiality clause (Section 14) covers data handling in principle but not physical residency, which is why this surfaces at the WO level.</div>
+          <div class="fld"><span class="k">Likely Supplier Pushback:</span> "Our EU region may not have full feature parity" (residency); "internal investigation timelines need 5 business days" (breach notification, per 2022 history).</div>
+          <div class="fld"><span class="k">Your Rebuttal:</span> Feature-parity gaps are a scoping/technical discussion, not a basis to relax the residency requirement; the 2022 MSA already set the 72-hour precedent.</div>
+          <div class="fld"><span class="k">Fallback:</span> None - both are Hard Stops.</div>
+        </div>
+      </div>
+
+      <div class="tactic-row">
+        <div class="thead">Termination (including Termination for Convenience)</div>
+        <div class="tbody">
+          <div class="fld"><span class="k">Your Position:</span> 15-day cure period with no-cure carve-outs (Termination for Cause, Tier 2); Force Majeure scope excludes Nimbus-side labor disputes unless a continuity plan is disclosed (Tier 3).</div>
+          <div class="fld"><span class="k">Argument Options:</span> (1) A short cure period protects Lilly's operational continuity for R&amp;D-supporting infrastructure. (2) Termination-for-convenience retention is reasonable given the multi-year renewal term.</div>
+          <div class="fld"><span class="k">Likely Supplier Pushback:</span> "45 days is standard in our enterprise MSAs."</div>
+          <div class="fld"><span class="k">Your Rebuttal:</span> 30 days is already a fallback concession from Lilly's 15-day opening; 45 days exceeds Lilly's operational risk tolerance for R&amp;D-supporting infrastructure.</div>
+          <div class="fld"><span class="k">Fallback:</span> 30-day cure period; broadened force majeure scope in exchange for continuity plan disclosure and retained termination-for-convenience rights.</div>
+        </div>
+      </div>
+
+      <div class="tactic-row">
+        <div class="thead">Warranties</div>
+        <div class="tbody">
+          <div class="fld"><span class="k">Your Position:</span> Data Deletion &amp; Return on Termination functions as a post-term warranty obligation; Service Level Credits &amp; Remedies functions as an ongoing performance warranty (both Tier 2).</div>
+          <div class="fld"><span class="k">Argument Options:</span> (1) A defined destruction certificate closes the loop on data warranties at exit. (2) SLA credits paired with a termination trigger create a real performance warranty, not just a rebate mechanism.</div>
+          <div class="fld"><span class="k">Likely Supplier Pushback:</span> "Backup systems retain data up to 12 months" (deletion); "credits are the sole remedy" (SLA).</div>
+          <div class="fld"><span class="k">Your Rebuttal:</span> A documented technical constraint can support a modest extension (30 to 45 days) but not an indefinite window; sole-remedy credits without a termination trigger leave Lilly with no recourse for chronic failure.</div>
+          <div class="fld"><span class="k">Fallback:</span> 45-day deletion window with documented justification; 10-12% credit cap with the 3-strike termination trigger preserved.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 5</span></div>
+</div>
+
+<!-- ================= PAGE 6: SECTION 05 COMPLIANCE LEVERAGE ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="page-inner">
+    <div class="section-badge">
+      <div class="num">05</div>
+      <div><div class="stitle">Compliance Leverage Briefing</div><span class="ssub">Always renders. Findings used factually, not punitively - the goal is better terms, not punishment.</span></div>
+    </div>
+
+    <p class="lead"><span style="font-weight:700;">Source:</span> Manual upload - FY2025 rate-card compliance audit provided by the Lilly IT Category Manager (external audit report; not generated by this suite). <span style="font-weight:700;">Analysis Period:</span> January 2025 - December 2025.</p>
+
+    <div class="leverage-kpi">
+      <div class="big">$140,000</div>
+      <div>Total identified impact across 1 finding</div>
+    </div>
+
+    <div class="finding-card">
+      <div class="fld" style="margin-top:0;"><span class="fid">Finding CD-2026-0417</span><span class="fimpact">$140,000 impact - Severity: Medium-High</span></div>
+      <div class="fld"><span class="k">Summary:</span> Invoiced rates for 3 IT professional services staff-augmentation roles exceeded the contracted rate card by 8-14% across 11 months of the current term, identified via a manual rate-card reconciliation.</div>
+      <div class="fld"><span class="k">Leverage Target:</span> Liability Cap Tied to Fees Paid (Section 02); deploys against the already-resolved Audit Rights clause at MSA Section 11 rather than creating a new position.</div>
+      <div class="fld"><span class="k">Talking Point:</span> "In our review of the current agreement period, we identified $140,000 in rate card discrepancies. To ensure alignment going forward, we need a liability and audit structure that lets both parties verify invoiced rates against contracted rates without dispute."</div>
+      <div class="fld"><span class="k">Deployment Timing:</span> Round 2 (Mid-Negotiation), before discussing the liability cap position.</div>
+      <div class="caution"><span style="font-weight:700;">Dispute Status Caution:</span> Nimbus's initial response disputes approximately 35% of the identified amount as "scope-authorized rate adjustments." Treat the full $140K as Medium confidence until reconciled; lead with the undisputed portion (approximately $91,000) if precision is challenged.</div>
+    </div>
+
+    <div class="fld" style="margin-top:14px;"><span class="k">Leverage Deployment Sequence:</span>
+      <ol>
+        <li>Raise the $140K finding factually at the start of Round 2, before any liability cap discussion.</li>
+        <li>Tie it explicitly to the existing MSA Section 11 audit rights - this strengthens an already-resolved provision rather than opening a new one.</li>
+        <li>Use it as the stated rationale for holding firm on the Liability Cap Tied to Fees Paid position specifically, not as general pressure across unrelated terms.</li>
+      </ol>
+    </div>
+    <div class="fld"><span class="k">Framing Note:</span> Deploy factually, not punitively - frame as "ensuring the new agreement prevents the issues we have both experienced," not as an accusation.</div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 6</span></div>
+</div>
+
+<!-- ================= PAGE 7: SECTION 06 FALLBACK SEQUENCING ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="page-inner">
+    <div class="section-badge">
+      <div class="num">06</div>
+      <div><div class="stitle">Fallback Sequencing Strategy</div><span class="ssub">Concession sequence map and deadlock / BATNA escalation path.</span></div>
+    </div>
+
+    <div class="timeline-row r1">
+      <span class="rlabel">Round 1 - Opening (Build Goodwill)</span>
+      Concede Invoice Frequency (quarterly) and Auto-Renewal Notice Window (90 days) proactively in the first draft response. Goal: establish a collaborative tone while anchoring on the 3 Red Lines and the Termination for Cause Cure Period opener.
+    </div>
+    <div class="timeline-row r2">
+      <span class="rlabel">Round 2 - Mid-Negotiation (Strategic Trades)</span>
+      Deploy the $140K rate-card finding before discussing the Liability Cap position. Propose linked trades: Change Order Markup Rate for Termination for Cause Cure Period; Insurance Aggregate Limits for Liability Cap Tied to Fees Paid; Publicity &amp; Reference Rights for Data Deletion &amp; Return on Termination. Hold all 3 Red Lines and any remaining Tier 2 firmly.
+    </div>
+    <div class="timeline-row r3">
+      <span class="rlabel">Round 3 - Final Push</span>
+      Move to fallback only on remaining Tier 2 positions if necessary and with Category Manager approval (30-day cure period, 1.5x liability cap, 45-day data deletion window, 10-12% SLA credit cap). No movement on the 3 Red Lines - escalate to Cyber_ISS_Review@Lilly.com or the Global Procurement Attorney if Nimbus insists. Frame the final package as balanced: "We've moved on 6 of 14 positions; this is a balanced agreement that protects both parties."
+    </div>
+
+    <div class="deadlock-box">
+      <span class="k">If Deadlocked:</span> Escalation path - IT Category Manager, then the Global Procurement Attorney (Jonathan Burleigh), then the R&amp;D business sponsor as last resort.
+      <br><span class="k">BATNA:</span> Lilly has 2 qualified alternative managed-hosting suppliers identified in the most recent supplier landscape review, with an estimated 4-6 month transition timeline; switching cost is Medium given the platform's R&amp;D data integration depth. Do not reveal this BATNA to Nimbus.
+    </div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 7</span></div>
+</div>
+
+<!-- ================= PAGE 8: SECTION 07 SME PRE-ENGAGEMENT ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="page-inner">
+    <div class="section-badge">
+      <div class="num">07</div>
+      <div><div class="stitle">SME Pre-Engagement Plan</div><span class="ssub">Bold Blue row highlighting marks items needed before the first draft is exchanged.</span></div>
+    </div>
+
+    <table class="sme-table">
+      <thead>
+        <tr><th>SME Name</th><th>Email</th><th>Topic</th><th>Reason</th><th class="narrow">Timing</th><th>Brief</th><th>Ask</th></tr>
+      </thead>
+      <tbody>
+        <tr class="priority">
+          <td>Cyber / Information Security Review</td>
+          <td>Cyber_ISS_Review@Lilly.com</td>
+          <td>EU/UK Data Residency Commitment</td>
+          <td>Non-standard scope; first time Nimbus has been asked to commit to in-region-only processing; technical feasibility of Nimbus's EU region needs validation.</td>
+          <td class="narrow">Before first draft exchange</td>
+          <td>Nimbus renewal ($4.2M, 3-year) requires EU/UK Data Residency as a new Red Line at the WO level. Need confirmation Nimbus's EU region has feature parity with their US environment before presenting this as non-negotiable.</td>
+          <td>Confirm technical feasibility and flag any known gaps in Nimbus's EU region capability before negotiation opens.</td>
+        </tr>
+        <tr class="priority">
+          <td>Jonathan Burleigh</td>
+          <td>legal.procurement@lilly.com</td>
+          <td>Sanctions &amp; Export Control Compliance</td>
+          <td>Contract value ($4.2M) approaching the $5M pre-engagement threshold; multi-year renewal warrants a confirmatory legal touchpoint despite low position risk.</td>
+          <td class="narrow">Before first draft exchange</td>
+          <td>Nimbus renewal at $4.2M over 3 years. Sanctions / export control language mirrors the 2024 MSA amendment Nimbus already accepted. Requesting a brief confirmatory review given proximity to the $5M threshold.</td>
+          <td>Confirm no material changes needed to standard language; flag if the multi-year term changes the risk profile.</td>
+        </tr>
+        <tr>
+          <td>IT Category Manager</td>
+          <td>category desk</td>
+          <td>Liability Cap / Rate Card Finding Reconciliation</td>
+          <td>The $140K rate-card finding carries a disputed portion (~35%); reconciling the undisputed amount strengthens the leverage talking point.</td>
+          <td class="narrow">Before Round 2</td>
+          <td>Finding CD-2026-0417 identifies $140K in rate card discrepancies; Nimbus disputes ~35% as scope-authorized adjustments. Need a reconciled, defensible figure before deploying this as leverage.</td>
+          <td>Reconcile the disputed portion and confirm the defensible floor figure ($91K minimum) before Round 2.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 8</span></div>
+</div>
+
+<!-- ================= PAGE 9: QUICK REFERENCE CARD (final page) ================= -->
+<div class="page">
+  <div class="page-header-strip">Nimbus Cloud Technologies - Negotiation Briefing</div>
+  <div class="qr-header">
+    <div class="t1">QUICK REFERENCE</div>
+    <div class="t2">CARRY THIS PAGE INTO THE ROOM - NIMBUS CLOUD TECHNOLOGIES RENEWAL</div>
+  </div>
+
+  <div class="qr-grid">
+    <div class="qr-cell red">
+      <h4>Red Lines (do not concede)</h4>
+      <ul>
+        <li>EU/UK Data Residency Commitment - in-region processing only; walk away if Nimbus cannot commit.</li>
+        <li>Sanctions &amp; Export Control Compliance - standard language already accepted in 2024; hold as-is.</li>
+        <li>72-Hour Breach Notification Trigger - MSA precedent from 2022; confirm at WO level.</li>
+      </ul>
+    </div>
+    <div class="qr-cell hold">
+      <h4>Hold Firm (defend, fallback with approval)</h4>
+      <ul>
+        <li>Liability Cap - open 2x fees paid with full carve-outs, fallback 1.5x.</li>
+        <li>Termination Cure Period - open 15 days, fallback 30 days.</li>
+        <li>Data Deletion on Termination - open 30 days, fallback 45 days if documented.</li>
+        <li>SLA Credits &amp; Remedies - open 15% cap, fallback 10-12% if 3-strike trigger holds.</li>
+        <li>Subcontractor Flow-Down - open full flow-down, fallback data-access-only scope.</li>
+      </ul>
+    </div>
+    <div class="qr-cell trade">
+      <h4>Trade Chips (use to secure holds)</h4>
+      <ul>
+        <li>Change Order Markup Rate - trade for Termination Cure Period.</li>
+        <li>Insurance Aggregate Limits - trade for Liability Cap.</li>
+        <li>Force Majeure Scope - trade for Termination for Convenience retention.</li>
+        <li>Publicity &amp; Reference Rights - trade for Data Deletion timeline.</li>
+      </ul>
+    </div>
+    <div class="qr-cell concede">
+      <h4>Goodwill Concessions (offer early)</h4>
+      <ul>
+        <li>Invoice Frequency - concede to quarterly in Round 1.</li>
+        <li>Auto-Renewal Notice Window - concede to 90 days in Round 1.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qr-footer">
+    <div class="frow"><span class="flabel">Leverage Points:</span> $140,000 in rate card violations (Finding CD-2026-0417) - use when discussing the Liability Cap Tied to Fees Paid position.</div>
+    <div class="frow"><span class="flabel">Escalation Contacts:</span> Cyber_ISS_Review@Lilly.com - EU/UK Data Residency and breach notification. Jonathan Burleigh, Global Procurement Attorney - sanctions / export control and final-package sign-off.</div>
+  </div>
+  <div class="page-footer-strip"><span>Eli Lilly and Company - Confidential - Internal Use Only</span><span>Page 9</span></div>
+</div>
+
+</div>
+</body>
+</html>

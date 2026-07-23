@@ -5,9 +5,8 @@ This bundle is the v10.6.6 suite plus the **July 2026 expansion**: net-new skill
 
 ## What's new in the July 2026 expansion
 
-**Net-new skills (6)**
+**Net-new skills (5)**
 - **scope-sow-architect** - diagnoses/builds/repairs a Statement of Work (weighted 0-100 Scope Definition Score, boundary/RACI/acceptance/rate-card, issuance-ready rewrite). Distinct from lilly-contract-review (work-definition quality, not legal protection).
-- **procurement-options-analysis** - compares up to ten paths for one decision (buy/build/expand/reuse/consolidate/defer/RFI/RFP/direct-negotiate/pilot), scored and reconciled against evidence gaps, into a recommended path.
 - **sole-source-challenge** - challenges a proposed sole-source pick (unique capability, competition, urgency, alternatives, constraint) into a Defensibility verdict + justification or a weak-rationale finding with alternatives.
 - **invoice-rate-card-auditor** - line-level invoice audit vs the contract/rate-card/PO/timesheets (rate/escalation/duplicate/questioned-amount, kernel-backed math) + a draft dispute notice.
 - **deal-room** - a working negotiation deal space that consolidates positions and hands off at close.
@@ -63,7 +62,7 @@ Theo's Field Guide reads the existing `field_guide_state.json` (v10.6.x) or migr
 
 ## Package contents
 
-- 32 `.skill` files (26 from the v10.6.6 suite + the 6 net-new July skills)
+- 30 `.skill` files (25 from the v10.6.6 suite + the 5 net-new July skills; decision-deck and procurement-options-analysis, previously part of this suite, have been retired)
 - `lilly-procurement-kernels-1c344a/` shipped as a maintainer **reference folder** (the canonical numeric kernel + MAINTENANCE notes) - it is already vendored into every consuming skill, so it is not an installed skill
 - `README.md` (this file), `INSTALL.md`, and `_PACKAGE_MANIFEST.md` (SHA256 of every SKILL.md + .skill) at the bundle root
 - The branded user manual `.docx` at the bundle root (a human reference, not installed)

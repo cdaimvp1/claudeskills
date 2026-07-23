@@ -6,7 +6,7 @@ description: >
   map, market position, financial signals, risk posture, prior Lilly relationship history, fit
   against the stated need, and a recommended next move. Standalone, and the per-supplier brief
   other skills draw on (supplier-landscape entries, rfp-response-analysis, evaluation-engine,
-  category-strategy, decision-deck). Triggers on "profile this supplier", "deep dive on [vendor]",
+  category-strategy). Triggers on "profile this supplier", "deep dive on [vendor]",
   "vendor brief on", "supplier overview for", "tell me about [supplier]", "is [vendor] a fit for",
   "what do we know about [supplier]", "supplier one-pager", "vendor profile".
   BOUNDARY: this skill profiles ONE named supplier in depth. For a market-wide "who are the top
@@ -345,7 +345,6 @@ This skill feeds:
 - **rfp-engine / rfp-response-analysis:** advance the supplier into an RFx with the profile pre-loaded.
 - **evaluation-engine:** carry the profile's risk + capability data into scoring.
 - **category-strategy:** add as a supplier-of-interest into the category dashboard.
-- **decision-deck:** lift the recommendation block straight into a leadership deck.
 
 **BOUNDARY vs evaluation-engine (scoring authority).** This skill's `lilly_fit.capability_score` and `recommendation.verdict` are this skill's own standalone-use output: when a user asks for a deep dive on its own, that score and verdict are the primary deliverable. When the profile feeds an active RFx evaluation, those same figures become descriptive signal only, not a competing score: evaluation-engine is the sole owner of the official score and the official award recommendation for an RFx (see evaluation-engine's own Scoring Authority statement). Do not present this skill's verdict as if it settles or overrides an in-flight evaluation-engine scoring run; feed the capability and risk data in, but the official number and the official recommendation are evaluation-engine's to make.
 
@@ -413,7 +412,7 @@ A consuming skill should treat any field with `confidence: "Low"` or a `RESEARCH
 End every run with:
 - Headline judgment in one line ("Proceed to shortlist with cyber-screen condition", etc.)
 - Top open questions or upgrade items
-- Which adjacent skill this should feed (supplier-landscape entry / RFP shortlist / decision deck / etc.)
+- Which adjacent skill this should feed (supplier-landscape entry / RFP shortlist / etc.)
 
 ---
 

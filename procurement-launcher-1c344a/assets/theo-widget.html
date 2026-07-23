@@ -1,5 +1,5 @@
 
-<!-- Theo launcher widget (v2.4 split-panel layout, footer stamp v2.9) - pass this verbatim to
+<!-- Theo launcher widget (v2.4 split-panel layout, footer stamp v2.10) - pass this verbatim to
      visualize:show_widget as widget_code. Split-panel master-detail. Left: collapsible sections
      with skill rows (32px row indent). Right: sticky info panel showing the open section's
      description by default, switching to per-row 4-block detail (What it does / How to use /
@@ -7,7 +7,7 @@
      section open at a time. All sections start collapsed. Search filters row title + what +
      trigger; matching sections auto-expand; non-matching sections hidden; empty-state when no
      matches. Header: Sacramento Theo wordmark + vertical divider + subtitle + ? button + 165px
-     search. Footer: black with white t-rex emoji (left) + "Theo v2.9" (right). All row data-t
+     search. Footer: black with white t-rex emoji (left) + "Theo v2.10" (right). All row data-t
      trigger phrases are parameter-free so a click fires a complete phrase. Row click fires
      sendPrompt(data-t); if sendPrompt is absent it copies the phrase to the clipboard; ? button
      fires the teach mode trigger. -->
@@ -89,9 +89,8 @@
 </ul>
 </details>
 <details class="th-sec" data-sec="2. Sourcing / RFx" data-desc="Running RFx events from kickoff to award. Supplier search and deep-dives, RFx package creation, in-flight case management, response analysis, scoring, and award letters.">
-<summary>2. Sourcing / RFx <span class="th-cnt">(8)</span></summary>
+<summary>2. Sourcing / RFx <span class="th-cnt">(7)</span></summary>
 <ul class="th-list">
-<li class="th-row" data-t="options analysis" data-what="Decides WHICH PATH to take for one request: buy externally, build internally, expand incumbent, reuse existing, consolidate, defer, run RFI, run RFP, direct-negotiate-with-validation, or pilot-first. Scores each applicable path on cost, time, feasibility, switching burden, risk, and optionality." data-howto="Describe the request; no file needed. Claude screens all ten paths, scores the applicable ones, and reconciles the top score against evidence gaps before recommending." data-output="An options matrix, a recommended-path narrative, a decision workbook, and a dashboard. Hands the chosen path to supplier-landscape, rfp-engine, pro-forma-builder, or decision-deck."><span class="th-title">Procurement Options Analysis</span><span class="th-go">&rsaquo;</span></li>
 <li class="th-row" data-t="find vendors" data-what="Researches and shortlists supplier options for a new sourcing need." data-howto="Describe what you need to source. Claude searches Lilly's existing supplier base plus the broader market." data-output="A Top-10 shortlist DOCX with capability profiles and fit assessments."><span class="th-title">Supplier Search</span><span class="th-go">&rsaquo;</span></li>
 <li class="th-row" data-t="profile this supplier" data-what="Builds a defensible profile of one supplier across identity, capability, market, risk, and Lilly fit." data-howto="Name the supplier you want analyzed. Claude does the research." data-output="A profile DOCX. Useful for sole-source justification or pre-RFx homework."><span class="th-title">Single-Supplier Deep Dive</span><span class="th-go">&rsaquo;</span></li>
 <li class="th-row" data-t="challenge this sole source" data-what="Challenges a proposed single-supplier pick before it is defended: unique capability, was competition run, real vs self-created urgency, alternatives, the lock-in constraint, and how price is validated without competition. Weighs it into a Defensibility verdict." data-howto="Name the proposed sole-source supplier and the need. Claude challenges the rationale and, if it is weak, ranks the alternatives." data-output="A defensibility verdict with a justification packet (if defensible) or ranked alternatives and a next action (if weak). Feeds executive-summary-package, or supplier-landscape/rfp-engine on a weak verdict."><span class="th-title">Sole-Source Challenge</span><span class="th-go">&rsaquo;</span></li>
@@ -118,20 +117,14 @@
 <li class="th-row" data-t="audit this invoice" data-what="Audits a set of invoices against the executed contract/SOW, rate card, PO, and timesheets: rate and role/level mismatches, escalation-cap breaches, hours/quantity discrepancies, duplicates, unsupported charges, and the total questioned amount." data-howto="Upload the invoices plus the executed contract/SOW, rate card, PO, and timesheets. Rate and escalation math run through the vendored numeric kernel, never guesswork." data-output="A line-level exception audit with a kernel-verified questioned amount and a draft supplier dispute notice."><span class="th-title">Invoice &amp; Rate-Card Auditor</span><span class="th-go">&rsaquo;</span></li>
 </ul>
 </details>
-<details class="th-sec" data-sec="5. Decision Deck" data-desc="Building executive PPTX decks that frame any procurement decision for leadership approval.">
-<summary>5. Decision Deck <span class="th-cnt">(1)</span></summary>
-<ul class="th-list">
-<li class="th-row" data-t="build a deck" data-what="Builds an executive PPTX deck to frame a procurement decision for leadership approval." data-howto="Give Claude any inputs (evaluation results, dashboards, financial models, prior analysis). Claude drafts a storyboard for your review before building." data-output="A branded PPTX deck. Decision-oriented, not pitch-deck."><span class="th-title">Build a Decision Deck</span><span class="th-go">&rsaquo;</span></li>
-</ul>
-</details>
-<details class="th-sec" data-sec="6. Executive Summary" data-desc="ATC and ATS executive summaries from a contract or work order for the Lilly approval workflow.">
-<summary>6. Executive Summary <span class="th-cnt">(1)</span></summary>
+<details class="th-sec" data-sec="5. Executive Summary" data-desc="ATC and ATS executive summaries from a contract or work order for the Lilly approval workflow.">
+<summary>5. Executive Summary <span class="th-cnt">(1)</span></summary>
 <ul class="th-list">
 <li class="th-row" data-t="ATC summary" data-what="Generates the executive summary required for the Lilly approval workflow on a contract or work order." data-howto="Upload the contract or work order. Claude extracts the key terms and risks." data-output="A 2-page DOCX summary with the FRAP approval chain, key terms, financial impact, and risk highlights."><span class="th-title">Build an ATC Summary</span><span class="th-go">&rsaquo;</span></li>
 </ul>
 </details>
-<details class="th-sec" data-sec="7. Personal Command Center" data-desc="Skills that wrap around your day-to-day procurement work: writing voice profile, open my field guide, process navigation, timeline and workflow estimates, and meeting prep.">
-<summary>7. Personal Command Center <span class="th-cnt">(6)</span></summary>
+<details class="th-sec" data-sec="6. Personal Command Center" data-desc="Skills that wrap around your day-to-day procurement work: writing voice profile, open my field guide, process navigation, timeline and workflow estimates, and meeting prep.">
+<summary>6. Personal Command Center <span class="th-cnt">(6)</span></summary>
 <ul class="th-list">
 <li class="th-row" data-t="build my voice profile" data-what="Captures your writing voice from sent mail and uses it to draft replies, emails, and messages." data-howto="First run extracts your voice from Outlook sent mail. Later runs draft or audit content." data-output="A voice profile artifact plus drafted responses in your style on demand."><span class="th-title">Voice Profile</span><span class="th-go">&rsaquo;</span></li>
 <li class="th-row" data-t="open my field guide" data-what="The work-graph personal command center. Organizes your work as Issues (not as a flat inbox digest). Tracks state, owners, evidence, and the next move per Issue." data-howto="Run on demand. Reads your inbox, calendar, and Teams via M365 connector. Optional hashtag protocol for explicit state signaling. Stale-review walkthrough cleans up quiet items in a few taps." data-output="An inline widget dashboard with 5 fixed sections (Action Needed, Waiting On, Today/Tomorrow, Stale, Snoozed) and real clickable action buttons per Issue."><span class="th-title">🦖 Theo's Field Guide</span><span class="th-go">&rsaquo;</span></li>
@@ -158,7 +151,7 @@
 </div>
 </aside>
 </div>
-<footer class="th-ft"><span class="th-ft-rex">🦖</span><span class="th-ft-ver">Theo v2.9</span></footer>
+<footer class="th-ft"><span class="th-ft-rex">🦖</span><span class="th-ft-ver">Theo v2.10</span></footer>
 </div>
 <script>
 (function(){

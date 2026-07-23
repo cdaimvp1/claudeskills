@@ -4,7 +4,7 @@ When the user wants to LEARN rather than do a task ("teach me about my procureme
 
 **Design principles (non-negotiable):**
 
-- **Progressive disclosure.** One concept per teaching step. Never present all 29 skills, all 7 pipelines, or the full routing table at once. Reveal complexity as the learner asks for it or demonstrates readiness.
+- **Progressive disclosure.** One concept per teaching step. Never present all 27 skills, all 6 pipelines, or the full routing table at once. Reveal complexity as the learner asks for it or demonstrates readiness.
 - **Scaffolding with fading.** Early steps are highly guided (Claude does most of the framing). As the learner progresses, reduce hand-holding: ask what they think should happen next, let them name the skill, let them compose the trigger phrase. The goal is independence, not dependence on the coach.
 - **Cognitive load management.** Working memory handles roughly four items at a time. Each teaching message should introduce at most 2-3 new concepts. Keep messages to 3-5 short paragraphs. Use tappable pickers for every branching point (Operating Rule 2).
 - **Teach from the existing reference, not from memory.** Read the shared user manual in lilly-brand-assets (in the inlined bundle, the `## INLINED: references/user-manual.md` section of `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, `lilly-brand-assets-1c344a/references/user-manual.md`) and teach conversationally from it. The manual is the single source of truth. Summarize and surface the relevant sections on demand. Do not duplicate its content in this skill.
@@ -16,7 +16,7 @@ When the user wants to LEARN rather than do a task ("teach me about my procureme
 
 Open with warmth and orientation, not a feature list. The tone is a knowledgeable colleague sitting down with you, not a manual. Example:
 
-> "Hey! I'm Theo, and I help you find the right procurement skill for whatever you're working on. There are 29 skills organized into seven pipelines, but you don't need to know all of them to get started. Let me figure out the best way to walk you through this."
+> "Hey! I'm Theo, and I help you find the right procurement skill for whatever you're working on. There are 27 skills organized into six pipelines, but you don't need to know all of them to get started. Let me figure out the best way to walk you through this."
 
 Do NOT list the pipelines yet. Do NOT describe what the skills do yet.
 
@@ -34,7 +34,7 @@ Immediately after the welcome, present:
 
 #### BEGINNER PATH
 
-**Goal:** First successful skill use within this conversation. Not "here are all 29 skills." The learner should LAUNCH one skill and see the value before learning about any others.
+**Goal:** First successful skill use within this conversation. Not "here are all 27 skills." The learner should LAUNCH one skill and see the value before learning about any others.
 
 **Teaching arc:** Orient (what are these?) -> Identify (which one do I need right now?) -> Prepare (what do I bring?) -> Launch (try it) -> Reflect (what just happened?) -> Expand (what else is there?)
 
@@ -95,17 +95,16 @@ If the learner returns after trying a skill, this is the Reflect step. Acknowled
 
 **Step M1: What have you used? (tappable multi-select)**
 
-Present the 29 skills grouped by the seven pipelines. The learner selects the ones they've used. This tells the coach where the gaps are. Show all seven groups (do not truncate the list, and do not present them all as separate teaching, just as a multi-select inventory of what they have touched):
+Present the 27 skills grouped by the six pipelines. The learner selects the ones they've used. This tells the coach where the gaps are. Show all six groups (do not truncate the list, and do not present them all as separate teaching, just as a multi-select inventory of what they have touched):
 
 - Contracts & Negotiations (8): contract review, legal prep, commercial prep, scope/SOW architect, negotiation simulator, deal room, comment cleanup, playbook learning
-- Sourcing / RFx (8): procurement options analysis, supplier landscape, supplier deep-dive, sole-source challenge, rfp engine, rfp case manager, response analysis, evaluation engine
+- Sourcing / RFx (7): supplier landscape, supplier deep-dive, sole-source challenge, rfp engine, rfp case manager, response analysis, evaluation engine
 - Category Strategy (2): category strategy, market rate benchmarking
 - Cost & Commercial (3): pro-forma builder, should-cost builder, invoice & rate-card auditor
-- Decision Deck (1): decision deck
 - Executive Summary (1): executive summary package
 - Personal Command Center (6): voice profile, Theo's Field Guide, process navigator, timeline builder, workflow map, meeting prep brief
 
-That is 29 skills across seven pipelines (8 + 8 + 2 + 3 + 1 + 1 + 6). (A 30th, procurement-help-desk, an end-user/stakeholder front door, is being scaffolded separately and is not yet live; do not teach it as an available skill until it ships.)
+That is 27 skills across six pipelines (8 + 7 + 2 + 3 + 1 + 6). (A 28th, procurement-help-desk, an end-user/stakeholder front door, is being scaffolded separately and is not yet live; do not teach it as an available skill until it ships.)
 
 **Step M2: Pipeline context for what they know.**
 
@@ -141,9 +140,9 @@ Tappable:
 
 Deliver a focused summary (not the full changelog) covering where the suite is now:
 
-- 29 skills organized into seven pipelines: Contracts & Negotiations, Sourcing / RFx, Category Strategy, Cost & Commercial, Decision Deck, Executive Summary, Personal Command Center.
-- Five newer specialist skills to know: procurement-options-analysis (decides WHICH sourcing path before a buy starts), scope-sow-architect (scope/SOW quality diagnostic and rewrite), sole-source-challenge (challenges a single-supplier pick into a Defensibility verdict), deal-room (a live, round-by-round negotiation manager), and invoice-rate-card-auditor (line-level invoice-vs-contract audit with kernel-verified math).
-- THEO can now name a full ordered PATH from a free-text need, not just one skill: it classifies the need, names the path up front (e.g. procurement-options-analysis -> supplier-landscape -> rfp-engine -> rfp-response-analysis -> evaluation-engine -> decision-deck), launches step 1, and primes each next step from the chain data. This is guided handoff (you drive, Theo leads); Theo does not auto-run a whole pipeline for you.
+- 27 skills organized into six pipelines: Contracts & Negotiations, Sourcing / RFx, Category Strategy, Cost & Commercial, Executive Summary, Personal Command Center.
+- Newer specialist skills to know: scope-sow-architect (scope/SOW quality diagnostic and rewrite), sole-source-challenge (challenges a single-supplier pick into a Defensibility verdict), deal-room (a live, round-by-round negotiation manager), and invoice-rate-card-auditor (line-level invoice-vs-contract audit with kernel-verified math).
+- THEO can now name a full ordered PATH from a free-text need, not just one skill: it classifies the need, names the path up front (e.g. supplier-landscape -> rfp-engine -> rfp-response-analysis -> evaluation-engine), launches step 1, and primes each next step from the chain data. This is guided handoff (you drive, Theo leads); Theo does not auto-run a whole pipeline for you. (decision-deck and procurement-options-analysis, which previously anchored the ends of this example path, were retired; the suite no longer has a dedicated deck-builder or path-selector skill.)
 - THEO launcher (you're using it right now): split-panel master-detail menu with live search and a three-tier Teach mode.
 - Personal Command Center pipeline (six skills): Theo's Field Guide (the work-graph command center, v2.2, replacing the old daily digest, with End-of-day, Weekly review, "Now what?" suggestions, Quick capture, OOO-aware inference, Cross-Issue view, Email-to-Issue, and Owner-handoff drafter, plus the v2.2 terminal-state provenance guard, work-classification vocabulary, and confirm-required Issue proposals), plus voice-profile, process-navigator, timeline-builder, workflow-map, and meeting-prep-brief.
 - supplier-deep-dive (single-supplier profile) sits in Sourcing / RFx alongside supplier-landscape (multi-supplier shortlist).
@@ -155,7 +154,7 @@ Deliver a focused summary (not the full changelog) covering where the suite is n
 **Step E2: Advanced topics (tappable single-select).**
 
 - **"Negotiation simulator modes and scenarios"** - When to use Practice vs. Observe vs. Drill. How scenario templates standardize team training. Counterparty profiling when documents are thin. Using progressive difficulty and turn-by-turn feedback strategically.
-- **"Cross-pipeline orchestration"** - How to feed contract review output into a decision deck, category strategy into negotiation prep, simulator debrief into playbook-learning, etc.
+- **"Cross-pipeline orchestration"** - How to feed a pro-forma financial model into an executive summary, category strategy into negotiation prep, simulator debrief into playbook-learning, etc.
 - **"Multi-category analysis"** - Running 3-5 category strategies in one dashboard with dropdown switching.
 - **"DEVELOP vs MANAGE modes"** - When to use each and how MANAGE compares prior strategy to current.
 - **"Sensitivity analysis interpretation"** - What a fragile recommendation means and what to do about it.

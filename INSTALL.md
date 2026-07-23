@@ -1,14 +1,14 @@
 # Lilly Procurement Skills Suite v10.6.6 (July 2026 expansion) - Installation
-**READ THIS FIRST.** This package contains 32 pre-built `.skill` files. Upload this zip and say "Install these skills." Click "Save Skill" on each one as presented. (`lilly-procurement-kernels-1c344a/` is a maintainer reference folder - the canonical numeric kernel, already vendored into consuming skills - not an installed skill; skip it.)
+**READ THIS FIRST.** This package contains 30 pre-built `.skill` files. Upload this zip and say "Install these skills." Click "Save Skill" on each one as presented. (`lilly-procurement-kernels-1c344a/` is a maintainer reference folder - the canonical numeric kernel, already vendored into consuming skills - not an installed skill; skip it.)
 
-> This bundle is the v10.6.6 suite plus the **July 2026 expansion**: 6 net-new skills (scope-sow-architect, procurement-options-analysis, sole-source-challenge, invoice-rate-card-auditor, deal-room, and the end-user procurement-help-desk scaffold), interactive dashboards across the suite, the Personal Command Center rework of theos-field-guide, and a guided THEO orchestrator. Built on the v10.6.6 baseline; install order is unchanged (lilly-brand-assets first, procurement-launcher second; the new skills install after the foundations). See README.md for the full change list.
+> This bundle is the v10.6.6 suite plus the **July 2026 expansion**: 5 net-new skills (scope-sow-architect, sole-source-challenge, invoice-rate-card-auditor, deal-room, and the end-user procurement-help-desk scaffold), interactive dashboards across the suite, the Personal Command Center rework of theos-field-guide, and a guided THEO orchestrator. Built on the v10.6.6 baseline; install order is unchanged (lilly-brand-assets first, procurement-launcher second; the new skills install after the foundations). decision-deck and procurement-options-analysis, previously part of this suite, have been retired and are not in this bundle. See README.md for the full change list.
 
 ## Installation Order (MANDATORY)
 
 | # | File | Notes |
 |---|------|-------|
 | 1 | lilly-brand-assets-1c344a.skill | **INSTALL FIRST.** Shared foundation (v10.6.6 - user manual refreshed). |
-| 2 | procurement-launcher-1c344a.skill | **INSTALL SECOND.** THEO v2.9 - now a **guided orchestrator**: state a free-text need and THEO names the full ordered path and hands off step by step (guided handoff, human-in-the-loop). Routes all 29 built skills across 7 pipelines + the pending help-desk. |
+| 2 | procurement-launcher-1c344a.skill | **INSTALL SECOND.** THEO v2.10 - now a **guided orchestrator**: state a free-text need and THEO names the full ordered path and hands off step by step (guided handoff, human-in-the-loop). Routes all 27 built skills across 6 pipelines + the pending help-desk. |
 | 3 | lilly-contract-review-1c344a.skill | v3.5 |
 | 4 | legal-negotiation-prep-1c344a.skill | |
 | 5 | commercial-negotiation-prep-1c344a.skill | |
@@ -23,27 +23,25 @@
 | 14 | rfp-case-manager-1c344a.skill | **v2.2** - intent-driven workflows; optional Microsoft Team binding; hashtag emission (conditional) |
 | 15 | rfp-response-analysis-1c344a.skill | |
 | 16 | evaluation-engine-1c344a.skill | |
-| 17 | decision-deck-1c344a.skill | |
-| 18 | category-strategy-1c344a.skill | |
-| 19 | market-rate-benchmarking-1c344a.skill | |
-| 20 | executive-summary-package-1c344a.skill | |
-| 21 | voice-profile-1c344a.skill | **v1.2** - hashtag emission in DRAFT mode (conditional; off by default) |
-| 22 | **theos-field-guide-1c344a.skill** | **v2.5 - Personal Command Center.** Data-object-first board (defensive JSON island; degrades to your saved graph, never blanks), work-graph KPI strip, filter/lens, abstaining next-best-action, comms convergence view, on-demand renewal/savings/report-card. Skill id + storage key + state-file unchanged (saved graphs preserved). Migrates legacy state on first run. Requires M365 connector. Strongly recommended: run inside a dedicated "Daily Command Center" Claude Project. |
-| 23 | process-navigator-1c344a.skill | |
-| 24 | timeline-builder-1c344a.skill | First-run calibration asks 3 questions. |
-| 25 | workflow-map-1c344a.skill | **v1.2** - optional `issue_id` parameter scopes the map to a Field Guide Issue |
-| 26 | meeting-prep-brief-1c344a.skill | **v1.2** - Related Issues subsection added when matches exist |
+| 17 | category-strategy-1c344a.skill | |
+| 18 | market-rate-benchmarking-1c344a.skill | |
+| 19 | executive-summary-package-1c344a.skill | |
+| 20 | voice-profile-1c344a.skill | **v1.2** - hashtag emission in DRAFT mode (conditional; off by default) |
+| 21 | **theos-field-guide-1c344a.skill** | **v2.5 - Personal Command Center.** Data-object-first board (defensive JSON island; degrades to your saved graph, never blanks), work-graph KPI strip, filter/lens, abstaining next-best-action, comms convergence view, on-demand renewal/savings/report-card. Skill id + storage key + state-file unchanged (saved graphs preserved). Migrates legacy state on first run. Requires M365 connector. Strongly recommended: run inside a dedicated "Daily Command Center" Claude Project. |
+| 22 | process-navigator-1c344a.skill | |
+| 23 | timeline-builder-1c344a.skill | First-run calibration asks 3 questions. |
+| 24 | workflow-map-1c344a.skill | **v1.2** - optional `issue_id` parameter scopes the map to a Field Guide Issue |
+| 25 | meeting-prep-brief-1c344a.skill | **v1.2** - Related Issues subsection added when matches exist |
 
-### Added in the July 2026 expansion (install after the 26 above; order among these does not matter)
+### Added in the July 2026 expansion (install after the 25 above; order among these does not matter)
 
 | # | File | Notes |
 |---|------|-------|
-| 27 | scope-sow-architect-1c344a.skill | SOW diagnose/build/repair; weighted Scope Definition Score + issuance-ready rewrite. |
-| 28 | procurement-options-analysis-1c344a.skill | Buy/build/RFI/RFP/direct-negotiate path comparison -> recommended path. |
-| 29 | sole-source-challenge-1c344a.skill | Challenges a sole-source pick -> Defensibility verdict + justification or alternatives. |
-| 30 | invoice-rate-card-auditor-1c344a.skill | Line-level invoice audit vs contract/rate-card/PO/timesheets + draft dispute notice. |
-| 31 | deal-room-1c344a.skill | Working negotiation deal space; consolidates positions, hands off at close. |
-| 32 | procurement-help-desk-1c344a.skill | **End-user (stakeholder) front door - OFFLINE SCAFFOLD.** Answers "how do I onboard a supplier / check an invoice / open a PO / start a buy / who to contact." Its cited content harvest is **network-gated** (run on the Lilly network; see the network-gated block inside its SKILL.md). Bounded against process-navigator (the rep-facing skill). |
+| 26 | scope-sow-architect-1c344a.skill | SOW diagnose/build/repair; weighted Scope Definition Score + issuance-ready rewrite. |
+| 27 | sole-source-challenge-1c344a.skill | Challenges a sole-source pick -> Defensibility verdict + justification or alternatives. |
+| 28 | invoice-rate-card-auditor-1c344a.skill | Line-level invoice audit vs contract/rate-card/PO/timesheets + draft dispute notice. |
+| 29 | deal-room-1c344a.skill | Working negotiation deal space; consolidates positions, hands off at close. |
+| 30 | procurement-help-desk-1c344a.skill | **End-user (stakeholder) front door - OFFLINE SCAFFOLD.** Answers "how do I onboard a supplier / check an invoice / open a PO / start a buy / who to contact." Its cited content harvest is **network-gated** (run on the Lilly network; see the network-gated block inside its SKILL.md). Bounded against process-navigator (the rep-facing skill). |
 
 **Maintainer reference (not installed):** `lilly-procurement-kernels-1c344a/` ships as a folder (canonical `numeric_kernel.py` + `MAINTENANCE.md`), the single source of truth for the kernel that is vendored into the consuming skills. It has no `SKILL.md` and is not installed through the Skills UI.
 
@@ -53,7 +51,7 @@
 
 This zip contains two kinds of files:
 
-1. **32 `.skill` files at root** - these are what gets installed. Listed in the two tables above. Save each one through the Skills UI. (`lilly-procurement-kernels-1c344a/` is a reference folder, not a `.skill`; skip it.)
+1. **30 `.skill` files at root** - these are what gets installed. Listed in the two tables above. Save each one through the Skills UI. (`lilly-procurement-kernels-1c344a/` is a reference folder, not a `.skill`; skip it.)
 2. **`README.md`, `INSTALL.md`, and the branded user manual `.docx` at root** - reference documents. Read; do not install.
 
 **For Claude during install:** iterate ONLY the `.skill` files at the bundle root in the order listed in the table above. Skip `README.md`, `INSTALL.md`, and the `.docx` user manual - they're for the human reader.
@@ -94,7 +92,7 @@ If you DON'T have a legacy state file (fresh install), Theo's Field Guide starts
 
 After install, start a new conversation in your Daily Command Center Project and try:
 
-- `theo.go` (launcher menu - should show 🦖 Theo's Field Guide row in section 7)
+- `theo.go` (launcher menu - should show 🦖 Theo's Field Guide row in section 6)
 - `open my field guide` or `daily digest` (legacy alias - both work) - triggers Theo's Field Guide
 - `build my voice profile` (voice-profile BUILD)
 - `how do I buy [X]` (process-navigator)

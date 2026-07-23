@@ -77,7 +77,6 @@ Do not assume ARIA is present just because a prior turn used it; re-confirm the 
 | commercial-negotiation-prep | yes | yes | - | Footprint = internal spend history with the supplier; SEC = supplier margin as a lever. |
 | market-rate-benchmarking | yes | yes | - | Footprint powers INTERNAL and RATIONALIZATION modes (cross-vendor rate/spend, redundant-tool consolidation); SEC adds public-supplier pricing context to EXTERNAL mode. |
 | pro-forma-builder | yes | - | yes | Footprint = baseline spend + actual payment terms; Forecast = escalation / run-rate. |
-| decision-deck | yes | yes | - | Live spend numbers; SEC peer/supplier benchmarks for a defensible business case. |
 | rfp-engine | yes | - | - | Seed requirements / pricing template with category baseline spend and incumbent flag. |
 | legal-negotiation-prep | yes | yes | - | Supplier spend/leverage and payment-terms baseline; SEC for financial leverage. |
 | lilly-contract-review | yes | - | - | Commercial-analysis panel only: counterparty active-vendor status, current spend, risk flag, rate context. The legal/redline passes are unchanged and do not use ARIA. |
@@ -97,5 +96,5 @@ merge (large, changes independently of the enforcement content) and a placeholde
 `## INLINED: references/aria-enrichment.md` section states the companion file is the single source
 of truth. To make this layer durable across your next regeneration:
 1. Keep THIS file at `lilly-brand-assets-1c344a/references/aria-enrichment.md` as a companion file; do NOT inline it into the foundation `SKILL.md`.
-2. Add the `ARIA ENRICHMENT (optional)` pointer block to your shared per-skill template / generator, gated to the 15 skills in the table above with each skill's capability list. The pointer is delimited by `<!-- ARIA-ENRICHMENT:START -->` / `<!-- ARIA-ENRICHMENT:END -->` and sits immediately after each skill's YAML front matter, outside the generated SHARED-BLOCK region.
+2. Add the `ARIA ENRICHMENT (optional)` pointer block to your shared per-skill template / generator, gated to the 14 skills in the table above with each skill's capability list. The pointer is delimited by `<!-- ARIA-ENRICHMENT:START -->` / `<!-- ARIA-ENRICHMENT:END -->` and sits immediately after each skill's YAML front matter, outside the generated SHARED-BLOCK region.
 3. Re-run your normal build. No other change is required; the layer is self-contained and removable.

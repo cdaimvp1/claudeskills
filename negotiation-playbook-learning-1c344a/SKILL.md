@@ -387,7 +387,7 @@ When `lilly-contract-review` is invoked and outcome data exists:
 - Flag positions with <40% acceptance rate: "Note: This position is accepted only [X]% of the time for [contract category]. Consider leading with the fallback."
 - Surface supplier-specific history if available: "[Supplier] has rejected this position in [N] of [M] prior negotiations."
 
-### To `decision-deck` / `evaluation-engine`
+### To `evaluation-engine`
 - Supplier negotiation difficulty score feeds into evaluation
 - Negotiation duration benchmarks inform timeline planning
 - Position acceptance patterns inform RFP term structuring
@@ -777,7 +777,7 @@ This is the single source of truth for the ANALYZE-mode visual dashboard. The st
 - **Titles:** Georgia serif. **Body and data labels:** Arial.
 - **Primary accent:** Bold Blue (#0F3A85).
 - **Chart library:** none required; render bars and the heatmap with sized div/SVG elements so the artifact has no external dependency. Use only `useState` (and `useMemo` if a derived sort or rollup is needed).
-- **No green and no teal anywhere in this dashboard's status palette.** The brand no-green rule holds for this skill (the documented sage/teal exception applies only to decision-deck's slide template, not here).
+- **No green and no teal anywhere in this dashboard's status palette.** The brand no-green rule holds for this skill.
 
 ## Status color tokens (locked, all distinct hexes, none green/teal)
 
