@@ -365,7 +365,7 @@ var PVSL_INPUT=null,PVSL_DD=null,PVSL_SHORT={};
    deep-dive vendor + nested sub-tab, and whether the Start-an-RFx picker is open. */
 var PVSL_SUB='exec';          // exec | deep | heatmap | risk
 var PVSL_DDV=null;            // selected vendor id in the Supplier Deep Dive subtab
-var PVSL_DDT='profile';      // profile | solfin | strisk | lilly | reqs
+var PVSL_DDT='reqs';         // reqs | strisk | lilly | profile | solfin (decision-first order)
 var PVSL_RFX_OPEN=false;     // Start-an-RFx picker open?
 var PVSL_RFX_PICK={};        // vendor id -> included in the draft slate
 var PVSL_RFX_SENT=false;     // Pass B: draft routed to sourcing rep (pending approval)?
@@ -1550,6 +1550,159 @@ function pvRevHistSvg(hist){
  }).join('');
  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:460px;height:112px;display:block" role="img" aria-label="Revenue by fiscal period, normalized bar chart">'+bars+'</svg>';
 }
+/* ============ Automated-RFI decision layer (Marc, 2026-07): the Supplier Deep Dive answers ONE
+   question per candidate — do we INVITE this supplier to the RFP, and what must we PROBE if we do.
+   Every value below is DERIVED from EXISTING model fields (coverage /5, subFit must-haves, composite,
+   eligibility, gating, attrs); nothing here re-derives or invents a score. The met/partial/gap bands
+   and the 3.5 knockout line are DISPLAY classifications of the already-computed scores. ============ */
+// top-level accent card (mirrors the local pvCard inside pvDDSection so these helpers can build cards too)
+function pvDDCardTop(icon,title,inner,accent){return '<div class="sa-card" style="border-left:3px solid '+(accent||'var(--ddacc,var(--navy))')+'">'+pvDdCardHd(icon,'<span class="ct">'+title+'</span>')+'<div class="scc-b">'+inner+'</div></div>';}
+function pvStripTags(s){return String(s).replace(/<[^>]+>/g,'').replace(/&rsquo;/g,"'").replace(/&amp;/g,'&').replace(/&middot;/g,'·').replace(/&ge;/g,'>=').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#9888;/g,'').replace(/\s+/g,' ').trim();}
+var PV_RF_MET=4.25,PV_RF_GAP=3.5; // display bands: met >=4.25 · partial 3.50-4.24 · gap <3.50 (a must-have SUB below 3.5 is a knockout)
+// per-requirement met/partial/gap read for ONE candidate + must-have knockout detection (subFit must-subs <3.5)
+function pvReqFitRead(a,cand,input){
+ var defById={};((input&&input.requirements)||[]).forEach(function(r){defById[r.id]=r;});
+ var rows=[],knockouts=[],metCount=0,partialCount=0,gapCount=0;
+ ((a&&a.coverage)||[]).forEach(function(c){
+   var sc=c.score;
+   var state=sc>=PV_RF_MET?'met':(sc>=PV_RF_GAP?'partial':'gap');
+   if(state==='met')metCount++;else if(state==='partial')partialCount++;else gapCount++;
+   var rdef=defById[c.requirementId]||{};
+   var mustSubs=((rdef.subs)||[]).filter(function(s){return s.must;});
+   var subKnock=[];
+   mustSubs.forEach(function(s){
+     var v=(cand&&cand.subFit&&cand.subFit[c.requirementId])?cand.subFit[c.requirementId][s.id]:null;
+     if(v!=null&&isFinite(v)&&v<PV_RF_GAP){subKnock.push({sub:s.label,score:v});knockouts.push({cat:c.label,sub:s.label,score:v});}
+   });
+   rows.push({id:c.requirementId,label:c.label,score:sc,state:state,hasMust:mustSubs.length>0,knockouts:subKnock});
+ });
+ return {rows:rows,metCount:metCount,partialCount:partialCount,gapCount:gapCount,knockouts:knockouts,hasKnockout:knockouts.length>0};
+}
+// competitive shortlist band, REUSING the exact Exec Summary logic (PV_EXEC_AUTH composite -> top -> 10%/8pt band)
+function pvShortlistBand(refl){
+ var L=refl.landscape;
+ var ranked=L.assessments.filter(function(a){return a.rank!=null;}).sort(function(x,y){return x.rank-y.rank;});
+ var recAuth=(typeof PV_EXEC_AUTH!=='undefined'&&PV_EXEC_AUTH)?PV_EXEC_AUTH:{};
+ var comps=ranked.map(function(a){var ra=recAuth[a.id];return {id:a.id,comp:(ra?ra.comp:Math.round(a.compositeScore)),eligible:a.eligible};});
+ var topComp=comps.length?Math.max.apply(null,comps.map(function(x){return x.comp;})):0;
+ var slBandPts=Math.max(8,Math.round(topComp*0.10));
+ var ids={},compOf={};
+ comps.forEach(function(x){compOf[x.id]=x.comp;if(x.eligible&&(topComp-x.comp)<=slBandPts)ids[x.id]=true;});
+ return {ids:ids,topComp:topComp,slBandPts:slBandPts,compOf:compOf};
+}
+// INVITE / HOLD / PASS: eligible+in-band -> invite; disqualified OR (eligible+elevated-risk+open must-have gap) -> pass; else hold
+function pvInviteVerdict(a,cand,input,band,rr){
+ var riskHigh=(input.segmentation&&input.segmentation.riskHigh!=null)?input.segmentation.riskHigh:2.5;
+ var elevated=a.riskScore>=riskHigh;
+ var f5=pvRound(a.fitScore/20,1);
+ var comp=(band.compOf&&band.compOf[a.id]!=null)?band.compOf[a.id]:Math.round(a.compositeScore);
+ var gap=band.topComp-comp;
+ if(!a.eligible||a.rank==null){
+   var reason=(a.disqualifiers&&a.disqualifiers.length)?a.disqualifiers.map(function(d){return d.detail;}).join('; '):'carries a hard disqualifying flag';
+   return {key:'PASS',lbl:'Pass',cls:'pass',why:'Disqualified — '+reason+'. Off the shortlist; do not carry into the RFP.'};
+ }
+ if(elevated&&rr.hasKnockout){
+   var k=rr.knockouts[0];
+   return {key:'PASS',lbl:'Pass',cls:'pass',why:'Eligible but on elevated risk ('+a.riskScore+'/5) with an open must-have gap — '+k.sub+' at '+k.score+'/5. Screen and remediate before any invite.'};
+ }
+ if(band.ids[a.id]){
+   return {key:'INVITE',lbl:'Invite to RFP',cls:'invite',why:'Eligible and inside the competitive band (composite '+comp+', within '+band.slBandPts+' pts of the top) at '+(elevated?'elevated':'contained')+' risk, weighted fit '+f5+'/5'+(rr.hasKnockout?' — confirm the open must-have gap on '+rr.knockouts[0].sub+' in the RFP':'')+'.'};
+ }
+ return {key:'HOLD',lbl:'Hold',cls:'hold',why:'Eligible but outside the competitive band (composite '+comp+', '+gap+' pts behind the top). Hold as a fallback unless the shortlist narrows or requirements shift.'};
+}
+// verdict header, THE answer at the top of the deep dive: chip + composite/fit/risk + met/partial/gap + one-line why
+function pvVerdictHeaderHtml(a,cand,refl,input){
+ var band=pvShortlistBand(refl),rr=pvReqFitRead(a,cand,input),vd=pvInviteVerdict(a,cand,input,band,rr);
+ var f5=pvRound(a.fitScore/20,1);
+ var comp=(band.compOf&&band.compOf[a.id]!=null)?band.compOf[a.id]:Math.round(a.compositeScore);
+ var riskHigh=(input.segmentation&&input.segmentation.riskHigh!=null)?input.segmentation.riskHigh:2.5;
+ var elevated=a.riskScore>=riskHigh;
+ var koChip=rr.hasKnockout?'<span class="ddv-ko">&#9888; '+rr.knockouts.length+' must-have knockout'+(rr.knockouts.length>1?'s':'')+'</span>':'';
+ return '<div class="ddverdict '+vd.cls+'">'+
+   '<div class="ddv-chip"><span class="ddv-eyebrow">RFP decision</span><span class="ddv-lbl">'+escD(vd.lbl)+'</span></div>'+
+   '<div class="ddv-main"><div class="ddv-scores">'+
+     '<span class="ddv-sc"><b>'+escD(comp)+'</b><i>composite</i></span>'+
+     '<span class="ddv-sc"><b>'+escD(f5)+'</b><i>fit /5</i></span>'+
+     '<span class="ddv-sc'+(elevated?' hot':'')+'"><b>'+escD(a.riskScore)+'</b><i>risk /5</i></span>'+
+     '<span class="ddv-sc"><b>'+rr.metCount+' / '+rr.partialCount+' / '+rr.gapCount+'</b><i>met / partial / gap</i></span>'+
+     koChip+
+   '</div><div class="ddv-why">'+escD(vd.why)+'</div></div>'+
+ '</div>';
+}
+// auto-derived open items: partial/gap requirements (must-haves first), gating screens, unconfirmed/missing facts
+function pvOpenQuestionsList(a,cand,input,rr){
+ var dd=cand.deepDive||{};var out=[];
+ rr.knockouts.forEach(function(k){out.push({tag:'Must-have',sev:'ko',
+   html:'Confirm <b>'+escD(k.sub)+'</b> ('+escD(k.cat)+') — our no-contact scan reads '+escD(k.score)+'/5, below the 3.5 must-have threshold. Need current evidence (certification, attestation or a live demo) that this is fully met, or it is a knockout.',
+   plain:'Confirm '+k.sub+' ('+k.cat+'): our scan reads '+k.score+'/5, below the 3.5 must-have threshold. Please provide current evidence (certification, attestation or demo) that this requirement is fully met.'});});
+ rr.rows.filter(function(r){return r.state==='gap'&&!r.knockouts.length;}).forEach(function(r){out.push({tag:'Gap',sev:'gap',
+   html:'Probe <b>'+escD(r.label)+'</b> — scored '+escD(r.score)+'/5 (gap). Ask how the supplier closes this and on what timeline.',
+   plain:'Probe '+r.label+': scored '+r.score+'/5 (gap). How is this closed, and on what timeline?'});});
+ rr.rows.filter(function(r){return r.state==='partial';}).forEach(function(r){out.push({tag:'Partial',sev:'partial',
+   html:'Clarify <b>'+escD(r.label)+'</b> — scored '+escD(r.score)+'/5 (partial). Confirm the specifics and any conditions before relying on it.',
+   plain:'Clarify '+r.label+': scored '+r.score+'/5 (partial). Confirm the specifics and any conditions.'});});
+ (dd.gating||[]).forEach(function(g){out.push({tag:'Screen',sev:'screen',
+   html:'Screen <b>'+escD(g.item)+'</b> — flagged as requiring a formal screen before award if pursued.',
+   plain:'Screen '+g.item+': flagged as requiring a formal screen before award if pursued.'});});
+ [['HQ','hq'],['Founded','founded'],['Financial status','financial'],['Indicative pricing','pricing'],['ESG posture','esg'],['Integration approach','integration']].forEach(function(d){
+   var v=(dd.attrs&&dd.attrs[d[1]]);if(!v||/^data not available$/i.test(String(v).trim())){out.push({tag:'Missing',sev:'data',
+     html:'Provide <b>'+escD(d[0])+'</b> — not available in our scan.',
+     plain:'Provide '+d[0]+': not available in our scan.'});}
+ });
+ var idn=dd.identity||{};if(!idn.confidence||idn.confidence!=='Confirmed'){out.push({tag:'Unconfirmed',sev:'data',
+   html:'Confirm corporate identity & ownership — our firmographic read is illustrative public enrichment, not validated against the vendor master.',
+   plain:'Confirm corporate identity and ownership: our firmographic read is illustrative public enrichment, not yet validated against the vendor master.'});}
+ return out;
+}
+// requirements-fit candidate read (THE STAR): per-requirement met/partial/gap chips + knockout flags
+function pvReqFitCandidateCard(a,cand,input,rr){
+ var dd=cand.deepDive||{};
+ var stMeta={met:{l:'Met',c:'var(--teal-d)',bg:'var(--teal-t)'},partial:{l:'Partial',c:'var(--amber-d)',bg:'var(--ti-amber)'},gap:{l:'Gap',c:'var(--riskred)',bg:'var(--ti-red)'}};
+ var rows=rr.rows.map(function(r){
+   var m=stMeta[r.state];var narr=(dd.reqNarr&&dd.reqNarr[r.id])||'';
+   var koTag=r.knockouts.length?('<div class="rf-ko">&#9888; KNOCKOUT · must-have '+r.knockouts.map(function(k){return escD(k.sub)+' '+escD(k.score)+'/5';}).join(', ')+' below 3.5</div>'):'';
+   var mustTag=(r.hasMust&&!r.knockouts.length)?' <span class="rf-must">must-have</span>':'';
+   return '<tr class="rf-row rf-'+r.state+'">'+
+     '<td class="rf-req"><b>'+escD(r.label)+'</b>'+mustTag+koTag+(narr?'<div class="rf-nr">'+escD(narr)+'</div>':'')+'</td>'+
+     '<td class="rf-sc"><span class="cell" style="'+pvFitBg(r.score)+'">'+escD(r.score)+'</span></td>'+
+     '<td class="rf-st"><span class="rf-chip" style="color:'+m.c+';background:'+m.bg+'">'+m.l+'</span></td>'+
+   '</tr>';
+ }).join('');
+ var summary='<div class="rf-sum">'+
+   '<span class="rf-scount met"><b>'+rr.metCount+'</b> met</span>'+
+   '<span class="rf-scount partial"><b>'+rr.partialCount+'</b> partial</span>'+
+   '<span class="rf-scount gap"><b>'+rr.gapCount+'</b> gap</span>'+
+   (rr.hasKnockout?'<span class="rf-scount ko"><b>'+rr.knockouts.length+'</b> must-have knockout'+(rr.knockouts.length>1?'s':'')+'</span>':'')+
+ '</div>';
+ var inner=summary+
+   '<div class="rf-lede">Automated RFI: <b>'+escD(a.name)+'</b>&rsquo;s capability scored against each requirement <b>without contacting the supplier</b>. Met &ge;4.25/5 &middot; Partial 3.50&ndash;4.24 &middot; Gap &lt;3.50. A <b>must-have</b> below 3.5/5 is a knockout.</div>'+
+   '<div class="mxwrap"><table class="rffit"><thead><tr><th>Requirement</th><th class="c">Fit /5</th><th>Read</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+   '<div class="footbound">Reflect-only landscape estimate from public sources, analyst positions and internal history. Once an RFx is issued, the supplier&rsquo;s own submitted evidence supersedes this read.</div>';
+ return pvDDCardTop('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>','Requirements fit &middot; '+escD(a.name),inner);
+}
+// open-questions panel: the automated RFI's numbered open list
+function pvOpenQuestionsCard(a,cand,input,rr){
+ var qs=pvOpenQuestionsList(a,cand,input,rr);
+ if(!qs.length)return pvDDCardTop('<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 115 0c0 1.7-2.5 2-2.5 4"/><path d="M12 17h.01"/>','Open questions to confirm &middot; '+escD(a.name),'<div class="footbound">No open items: every requirement clears at 4.25/5+, no must-have gap, and the firmographic scan is complete. Standard pre-award confirmations still apply.</div>','var(--teal-d)');
+ var sevMeta={ko:{c:'var(--riskred)',bg:'var(--ti-red)'},gap:{c:'var(--riskred)',bg:'var(--ti-red)'},partial:{c:'var(--amber-d)',bg:'var(--ti-amber)'},screen:{c:'var(--amber-d)',bg:'var(--ti-amber)'},data:{c:'var(--mut2)',bg:'var(--nested)'}};
+ var items=qs.map(function(q,i){var m=sevMeta[q.sev]||sevMeta.data;return '<li class="oq-item"><span class="oq-n">'+(i+1)+'</span><span class="oq-tag" style="color:'+m.c+';background:'+m.bg+'">'+escD(q.tag)+'</span><span class="oq-tx">'+q.html+'</span></li>';}).join('');
+ var inner='<div class="rf-lede">Auto-derived from every partial/gap requirement (must-haves first) and every field the scan could not confirm. This is the automated RFI&rsquo;s open list — <b>what to confirm with '+escD(a.name)+'</b> before or during the RFP.</div><ol class="oqlist">'+items+'</ol>';
+ return pvDDCardTop('<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 115 0c0 1.7-2.5 2-2.5 4"/><path d="M12 17h.01"/>','Open questions to confirm &middot; '+escD(a.name),inner,'var(--amber-d)');
+}
+// request-more-data affordance: a prepared, copy-ready outreach package (NOT a live send)
+function pvRequestDataCard(a,cand,input,rr){
+ var qs=pvOpenQuestionsList(a,cand,input,rr);
+ var P=PROJECTS[CURPROJ]||{};
+ var asks=qs.map(function(q){return pvStripTags(q.plain);});
+ var listHtml=asks.length?('<ol class="rdlist">'+asks.map(function(t){return '<li>'+escD(t)+'</li>';}).join('')+'</ol>'):'<div class="footbound">No outstanding data asks for this supplier.</div>';
+ var copyBlk='';
+ if(asks.length){
+   var full='Subject: '+(P.code||'Sourcing')+' — information request for '+a.name+'\n\nHello '+a.name+' team,\n\nAs part of our '+(P.title||'sourcing')+' evaluation we would like to confirm the following before finalizing our supplier shortlist:\n\n'+asks.map(function(t,i){return (i+1)+'. '+t;}).join('\n')+'\n\nPlease share supporting documentation where available. Thank you.';
+   copyBlk='<div class="rd-copyhd">Copy-ready request</div><textarea class="rd-copy" readonly rows="'+Math.min(20,asks.length+8)+'">'+escD(full)+'</textarea>';
+ }
+ var inner='<div class="rf-lede">A prepared, copy-ready outreach package — exactly what to ask <b>'+escD(a.name)+'</b> for. The skill can turn this into an outreach email; responses (user-provided, or pulled via the <b>M365 connector</b>) flow back to re-enrich this analysis. <b>Prepared only</b> — nothing is sent and no vendor is contacted from this dashboard.</div>'+listHtml+copyBlk;
+ return pvDDCardTop('<path d="M4 4h16v12H5.2L4 17.5z"/><path d="M8 9h8M8 12h5"/>','Request more data &middot; '+escD(a.name),inner);
+}
 function pvDDSection(ddt,a,cand,refl,input){
  var dd=cand.deepDive||{};
  // STAGE DeepDive #2: sub-cards get a colour accent (left border) instead of flowing together under .subt
@@ -1694,8 +1847,13 @@ function pvDDSection(ddt,a,cand,refl,input){
    // were paired side by side via .ddpair purely to save vertical space; that arbitrary 2-up layout is
    // reverted, every card on this tab is single-column full-width again like the rest of the deep dive.
    var sfCards=[];
-   sfCards.push(pvCard('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>','Financial position '+pvSrcTag('ext')+viabBadge,periodCap+(finTiles?'<div class="cosnap">'+finTiles+'</div>':'')+'<div class="pvlede mut">'+escD(dd.finHealth||'')+'</div>'+finLines+(viab?'<div class="footbound" style="margin-top:4px">Viability grade read from the financial-stability signal (runway, margin, scale, standard distress signals): <b style="color:var(--navy)">Safe</b> below 1.75 &middot; <b style="color:var(--amber-d)">Watch</b> 1.75&ndash;3 &middot; <b style="color:var(--riskred)">Distress risk</b> at 3+/5. Reflect-only, illustrative.</div>':''),viab&&viab.c));
-   if(revSvg)sfCards.push(pvCard('<path d="M4 19h16"/><path d="M7 19V10M12 19V5M17 19v-7"/>','Revenue history '+pvSrcTag('ext'),'<div style="max-width:460px">'+revSvg+'</div>'+(revRows?'<div style="overflow-x:auto;margin-top:9px"><table class="pvdl"><tbody>'+revRows+'</tbody></table></div>':'')+'<div class="footbound">Bars are scaled to the reported figures above (normalized to $M for height only); the exact reported text is preserved in each bar\'s tooltip and the table.</div>'));
+   // Automated-RFI redesign (Marc, 2026-07): the revenue-history chart is a MEANINGFUL pairing beside the
+   // financial-position read (the chart visualizes that position), constrained to ~half width via .ddfinpair —
+   // never full-bleed. Owner-sanctioned specific pairing, distinct from the arbitrary 2-ups that were reverted.
+   var finPosCard=pvCard('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>','Financial position '+pvSrcTag('ext')+viabBadge,periodCap+(finTiles?'<div class="cosnap">'+finTiles+'</div>':'')+'<div class="pvlede mut">'+escD(dd.finHealth||'')+'</div>'+finLines+(viab?'<div class="footbound" style="margin-top:4px">Viability grade read from the financial-stability signal (runway, margin, scale, standard distress signals): <b style="color:var(--navy)">Safe</b> below 1.75 &middot; <b style="color:var(--amber-d)">Watch</b> 1.75&ndash;3 &middot; <b style="color:var(--riskred)">Distress risk</b> at 3+/5. Reflect-only, illustrative.</div>':''),viab&&viab.c);
+   var revCard=revSvg?pvCard('<path d="M4 19h16"/><path d="M7 19V10M12 19V5M17 19v-7"/>','Revenue history '+pvSrcTag('ext'),'<div style="max-width:500px">'+revSvg+'</div>'+(revRows?'<div style="overflow-x:auto;margin-top:9px"><table class="pvdl"><tbody>'+revRows+'</tbody></table></div>':'')+'<div class="footbound">Bars are scaled to the reported figures above (normalized to $M for height only); the exact reported text is preserved in each bar\'s tooltip and the table.</div>'):'';
+   if(revCard)sfCards.push('<div class="ddfinpair">'+finPosCard+revCard+'</div>');
+   else sfCards.push(finPosCard);
    var mktCard=pvCard('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>','Market position',mpBlk+solPtr);
    var comCard=pvCard('<path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/>','Commercial estimate <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; illustrative</span>','<div style="overflow-x:auto"><table class="pvdl"><tbody>'+ceRows+'</tbody></table></div><div class="footbound"><b>Illustrative mock, tagged external.</b> Reported figures are owner-sanctioned mock enrichment from credible public sources (not validated). The commercial estimate is a light read to spot <b>price-led vs premium</b> and <b>lock-in / switching exposure</b>, the firm 3-year TCO comes from the RFx bids (normalized pricing) and the Deal pro-forma, and exit terms are settled in negotiation. A genuinely undisclosed figure would read Data not available, never silently invented.</div>',pricePosCol);
    sfCards.push(mktCard);
@@ -1727,7 +1885,10 @@ function pvDDSection(ddt,a,cand,refl,input){
    srCards.push(pvCard('<path d="M12 2l10 18H2z"/><path d="M12 9v5M12 17h.01"/>','Risks',risks||'<div style="font-size:12.5px;color:var(--mut2)">No risks on file.</div>',riskWorstCol));
    if(contractBlk||regBlk)srCards.push(pvCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/>','Contracting &amp; Regulatory',contractBlk+regBlk));
    srCards.push(pvCard('<path d="M3 21h18M6 21V9M12 21V4M18 21v-8"/>','Risk Dimensions <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; 0&ndash;5, higher is worse</span>','<div class="mxwrap"><table class="mx" style="width:100%"><tbody>'+dimRows+'</tbody></table></div><div class="footbound">Narrative risks are reflect-only; a hard flag disqualifies, a soft flag is recorded for review. Dimension scores roll up from the sub-factors on the Risk Assessment subtab.</div>'));
-   return srCards.join('');
+   // Automated-RFI redesign (Marc, 2026-07): framed as "would we engage them" — the risk posture that decides
+   // whether this candidate is safe to bring into the RFP. Strengths stay alongside for a balanced read.
+   var engageLede='<div class="leadnarr" style="border-left-color:var(--ddacc,var(--navy))"><b>Would we engage them?</b> The risk posture and public issues that decide whether '+escD(a.name)+' is safe to invite into the RFP. A hard flag disqualifies; elevated risk with an open must-have gap is a pass.</div>';
+   return engageLede+srCards.join('');
  }
  if(ddt==='lilly'){
    // Lilly Fit (skill Section 5), a synthesis DISTINCT from the scored Requirements Fit. Reuses whyLilly +
@@ -1771,7 +1932,14 @@ function pvDDSection(ddt,a,cand,refl,input){
    // #3 (Marc): drop the whole-field explanatory paragraph, only the data-source (i) is needed, and it now lives
    // to the right of the "Requirements Heatmap" title below. #4 (Marc): the cross-supplier leaders narrative is
    // suppressed here (it belongs on the standalone Requirements Heatmap subtab). Both via pvHeatmapHtml(inDeep).
-   return pvHeatmapHtml(refl,{inDeep:true});
+   // Automated-RFI redesign (Marc, 2026-07): the SELECTED candidate's own met/partial/gap read is the HEADLINE
+   // (the RFI scoring made explicit), followed by the auto-derived Open Questions and a copy-ready Request-more-data
+   // package. The cross-supplier heatmap stays below as the field context.
+   var rr=pvReqFitRead(a,cand,input);
+   return pvReqFitCandidateCard(a,cand,input,rr)+
+     pvOpenQuestionsCard(a,cand,input,rr)+
+     pvRequestDataCard(a,cand,input,rr)+
+     pvHeatmapHtml(refl,{inDeep:true});
  }
  // round-3 (D9): the standalone "Commercial & Ecosystem" sub-subtab is retired, reference clients + partners
  // moved to Profile & Fit; contracting flexibility + regulatory/GxP folded into Strengths & Risks; the
@@ -1785,7 +1953,8 @@ function pvDDSection(ddt,a,cand,refl,input){
 // with every vendor accent). All from the model (heatmap leaders + margin-over-next-best, coverage, risksNarr).
 function pvCompPositionHtml(a,cand,refl,input){
  var L=refl.landscape,dd=(cand&&cand.deepDive)||{};
- var vm=pvVerdictMeta(pvAssessVerdict(a,cand));
+ // Automated-RFI redesign (Marc, 2026-07): the INVITE/HOLD/PASS verdict now lives in the header above, so this
+ // band's badge reframes to the competitive STANDING (rank + segment), not a second verdict label.
  var riskHigh=(input.segmentation&&input.segmentation.riskHigh!=null)?input.segmentation.riskHigh:2.5;
  var elevated=a.riskScore>=riskHigh;
  var hm=L.heatmap||{leaders:{}},reqs=input.requirements||[],reqLabel={};
@@ -1812,14 +1981,15 @@ function pvCompPositionHtml(a,cand,refl,input){
  if(!a.eligible){sentence='Carries a hard flag that removes it from the shortlist, see Strengths &amp; Risks.';}
  else if(a.rank===1){sentence='Strongest requirements fit on offer'+(elevated?' though on elevated risk':' at contained risk')+(topsN?', and tops the field on '+topsN+' of '+totalReqs+' requirements':'')+'.';}
  else {sentence='Ranks #'+a.rank+' on weighted fit ('+fit100+'/100) with '+(elevated?'elevated':'contained')+' risk'+(topsN?', leading the field on '+topsN+' of '+totalReqs:', without topping any single requirement')+'.';}
- var sub=(a.rank!=null?('#'+a.rank+' of '+L.eligibleCount):'disqualified')+' · '+escD(PVSEG_LBL[a.segment]||a.segment);
+ var standing=a.rank!=null?('#'+a.rank):'—';
+ var standSub=escD(PVSEG_LBL[a.segment]||a.segment)+(a.rank!=null?(' · of '+L.eligibleCount+' eligible'):'');
  var shortCat=function(s){return String(s).split(/\s*[&·]\s*/)[0].trim();};
  var leadsHtml=leads.length?leads.slice(0,3).map(function(l){return '<span class="ddcp-mgc" style="color:'+acc+';border-color:'+acc+'66">'+escD(shortCat(l.label))+' +'+escD(l.margin)+'</span>';}).join(''):'<span style="font-size:11.5px;color:var(--mut2)">&mdash; leads no single category</span>';
  var strongHtml=best?(escD(reqLabel[best.requirementId]||best.requirementId)+' '+escD(pvRound(best.score,2))):'&mdash;';
  var watchHtml=w?('<span style="font-weight:700;color:var(--amber-d)">'+escD(w.cat)+'</span> <span class="ddcp-sev '+(w.sev==='high'?'high':'med')+'">'+(w.sev==='high'?'high':w.sev==='med'?'med':'low')+'</span>'):'<span style="font-size:11.5px;color:var(--mut2)">no material watch-item</span>';
  return '<div class="ddcp">'+
    '<div class="ddcp-mast">'+
-     '<div class="ddcp-badge" style="background:'+acc+'"><span class="vv">'+escD(vm.lbl)+'</span><span class="rr">'+sub+'</span></div>'+
+     '<div class="ddcp-badge" style="background:'+acc+'"><span class="vv">'+standing+'</span><span class="rr">'+standSub+'</span></div>'+
      '<div class="ddcp-mid"><span class="ddcp-lbl" style="color:'+acc+'">'+heading+'</span><div class="ddcp-why">'+sentence+'</div></div>'+
      '<div class="ddcp-stats"><div class="ddcp-stat"><b style="color:'+acc+'">'+fit100+'</b><span>Fit/100</span></div><div class="ddcp-stat"><b style="color:'+acc+'">'+escD(a.riskScore)+'</b><span>Risk/5</span></div></div>'+
    '</div>'+
@@ -1840,10 +2010,13 @@ function pvDeepDiveTabHtml(refl,input){
  // (owner: "shade of the supplier's colour") used for band/row fills. Burnt orange stays the emphasis colour.
  var ddc=pvSupColor(a);var ddacc='style="--ddacc:'+ddc+';--ddacc-t:'+ddc+'14"';
  if(!a||!cand||!cand.deepDive){return '<div class="dd" '+ddacc+'>'+bar+'<div class="sa-card"><div class="scc-b">Deep dive is not available for this candidate.</div></div></div>';}
- var tabs=[['profile','Profile'],['solfin','Market & Financials'],['strisk','Strengths & Risks'],['lilly','Lilly Fit'],['reqs','Requirements Fit']];
- var ddt=PVSL_DDT;if(!tabs.some(function(t){return t[0]===ddt;}))ddt='profile';
+ // Automated-RFI redesign (Marc, 2026-07): DECISION content leads. Requirements Fit first (the RFI scoring made
+ // explicit), then the risk "would we engage" read, then why-them, evidence (profile / financials) last.
+ var tabs=[['reqs','Requirements Fit'],['strisk','Risk to Engaging'],['lilly','Why Them'],['profile','Profile'],['solfin','Market & Financials']];
+ var ddt=PVSL_DDT;if(!tabs.some(function(t){return t[0]===ddt;}))ddt='reqs';
  var tabbar='<div class="ddtabs">'+tabs.map(function(t){return '<button class="ddtab'+(ddt===t[0]?' on':'')+'" onclick="pvSetDDT(\''+t[0]+'\')">'+escD(t[1])+'</button>';}).join('')+'</div>';
- return '<div class="dd" '+ddacc+'>'+bar+pvCompPositionHtml(a,cand,refl,input)+tabbar+pvDDSection(ddt,a,cand,refl,input)+'</div>';
+ // Verdict header (the ONE answer: INVITE / HOLD / PASS) sits above the competitive-position band and the tabs.
+ return '<div class="dd" '+ddacc+'>'+bar+pvVerdictHeaderHtml(a,cand,refl,input)+pvCompPositionHtml(a,cand,refl,input)+tabbar+pvDDSection(ddt,a,cand,refl,input)+'</div>';
 }
 /* ---- Landscape tab entry point: deep native surface (nimbus) or thin cards (acme/helios/datapipe) ---- */
 function landscapeThinHTML(){

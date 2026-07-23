@@ -1403,6 +1403,64 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .ddcp-sev.med{color:var(--emph);background:none;border:none;padding:0;font-weight:700}
 .pvsl .ddcp-sev.high{color:var(--riskred);background:var(--pink-t);border:1px solid #E3B4AC}
 @media(max-width:640px){.pvsl .ddcp-mid,.pvsl .ddcp-stats{border-left:none;border-top:1px solid var(--line)}}
+/* ===== Automated-RFI decision layer (Marc, 2026-07): verdict header + requirements-fit read + open questions + request-data ===== */
+.pvsl .ddverdict{display:flex;flex-wrap:wrap;align-items:stretch;border:1px solid var(--line2);border-radius:12px;overflow:hidden;margin-bottom:12px;background:var(--surface)}
+.pvsl .ddverdict.invite{border-color:#9CCBB8}
+.pvsl .ddverdict.hold{border-color:#DCC885}
+.pvsl .ddverdict.pass{border-color:#E4A69F}
+.pvsl .ddv-chip{display:flex;flex-direction:column;justify-content:center;gap:3px;padding:12px 18px;min-width:152px;color:#fff}
+.pvsl .ddverdict.invite .ddv-chip{background:var(--teal-d)}
+.pvsl .ddverdict.hold .ddv-chip{background:var(--amber-d)}
+.pvsl .ddverdict.pass .ddv-chip{background:var(--riskred)}
+.pvsl .ddv-eyebrow{font:700 8.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+.pvsl .ddv-lbl{font:800 18px var(--sans);letter-spacing:-.01em;line-height:1.05}
+.pvsl .ddv-main{flex:1;min-width:240px;padding:11px 16px;display:flex;flex-direction:column;justify-content:center;gap:8px;border-left:1px solid var(--line)}
+.pvsl .ddv-scores{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pvsl .ddv-sc{display:flex;flex-direction:column;line-height:1.1;border:1px solid var(--line);border-radius:8px;padding:5px 11px;background:var(--bg)}
+.pvsl .ddv-sc b{font:800 15px var(--mono);color:var(--ink)}
+.pvsl .ddv-sc i{font:700 8px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);font-style:normal;margin-top:2px}
+.pvsl .ddv-sc.hot b{color:var(--riskred)}
+.pvsl .ddv-ko{font:800 10px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--riskred);background:var(--ti-red);border:1px solid #E4A69F;border-radius:20px;padding:5px 11px;align-self:center}
+.pvsl .ddv-why{font-size:12.5px;color:var(--mut);line-height:1.5}
+@media(max-width:640px){.pvsl .ddv-chip{width:100%}.pvsl .ddv-main{border-left:none;border-top:1px solid var(--line)}}
+/* requirements-fit candidate read (the star) */
+.pvsl .rf-sum{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:11px}
+.pvsl .rf-scount{font:600 11.5px var(--sans);color:var(--mut);border:1px solid var(--line2);border-radius:20px;padding:3px 11px;background:var(--bg)}
+.pvsl .rf-scount b{font-family:var(--mono);font-weight:800;margin-right:3px}
+.pvsl .rf-scount.met b{color:var(--teal-d)}
+.pvsl .rf-scount.partial b{color:var(--amber-d)}
+.pvsl .rf-scount.gap b{color:var(--riskred)}
+.pvsl .rf-scount.ko{color:var(--riskred);background:var(--ti-red);border-color:#E4A69F;font-weight:700}
+.pvsl .rf-lede{font-size:12.5px;color:var(--mut);line-height:1.55;margin:0 0 12px}
+.pvsl .rffit{width:100%;border-collapse:collapse;font-size:13px}
+.pvsl .rffit thead th{font:600 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);text-align:left;padding:8px 12px}
+.pvsl .rffit th.c{text-align:center}
+.pvsl .rffit td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.pvsl .rffit td.rf-sc{text-align:center;width:60px}
+.pvsl .rffit td.rf-st{width:88px}
+.pvsl .rffit .rf-req>b{font-size:13.5px;color:var(--ink)}
+.pvsl .rffit .rf-nr{font-size:11.5px;color:var(--mut);line-height:1.45;margin-top:3px}
+.pvsl .rffit .rf-must{font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);border:1px solid var(--line2);border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+.pvsl .rffit .rf-ko{font:800 10px var(--mono);text-transform:uppercase;letter-spacing:.02em;color:var(--riskred);background:var(--ti-red);border:1px solid #E4A69F;border-radius:6px;padding:3px 8px;margin-top:5px;display:inline-block}
+.pvsl .rffit .rf-chip{font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.03em;border-radius:20px;padding:3px 10px;white-space:nowrap}
+.pvsl .rffit tr.rf-gap td{background:var(--pink-t)}
+/* open questions */
+.pvsl .oqlist{list-style:none;margin:0;padding:0}
+.pvsl .oq-item{display:flex;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5;color:var(--ink)}
+.pvsl .oq-item:first-child{border-top:none}
+.pvsl .oq-n{font:800 11px var(--mono);color:var(--mut2);flex:none;width:20px;text-align:right}
+.pvsl .oq-tag{font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;border-radius:20px;padding:2px 8px;flex:none;white-space:nowrap;align-self:center}
+.pvsl .oq-tx{flex:1}
+.pvsl .oq-tx b{font-weight:700;color:var(--ink)}
+/* request more data */
+.pvsl .rdlist{margin:0 0 12px;padding-left:22px;font-size:12.5px;line-height:1.55;color:var(--ink)}
+.pvsl .rdlist li{margin:5px 0}
+.pvsl .rd-copyhd{font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin:4px 0 6px}
+.pvsl .rd-copy{width:100%;box-sizing:border-box;font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--ink);background:var(--bg);border:1px solid var(--line2);border-radius:9px;padding:11px 13px;resize:vertical}
+/* meaningful pairing: financial position + revenue history side by side, chart never full-bleed */
+.pvsl .ddfinpair{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;margin-bottom:16px}
+.pvsl .ddfinpair>.sa-card{margin-bottom:0}
+@media(max-width:900px){.pvsl .ddfinpair{grid-template-columns:1fr}}
 /* ===== Pass A: 4-subtab shell + Executive Summary + nested Supplier Deep Dive ===== */
 .pvsl .pvsubtabs{display:flex;gap:2px;flex-wrap:wrap;margin:0 0 18px;border-bottom:1px solid var(--line)}
 .pvsl .pvsubtab{font:700 13.5px var(--sans);border:none;background:none;color:var(--mut);padding:10px 16px;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px}
