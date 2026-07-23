@@ -365,7 +365,7 @@ var PVSL_INPUT=null,PVSL_DD=null,PVSL_SHORT={};
    deep-dive vendor + nested sub-tab, and whether the Start-an-RFx picker is open. */
 var PVSL_SUB='exec';          // exec | deep | heatmap | risk
 var PVSL_DDV=null;            // selected vendor id in the Supplier Deep Dive subtab
-var PVSL_DDT='reqs';         // reqs | strisk | lilly | profile | solfin (decision-first order)
+var PVSL_DDT='profile';      // profile | solfin | strisk | lilly | reqs (Marc's intentional order, restored 2026-07-23)
 var PVSL_RFX_OPEN=false;     // Start-an-RFx picker open?
 var PVSL_RFX_PICK={};        // vendor id -> included in the draft slate
 var PVSL_RFX_SENT=false;     // Pass B: draft routed to sourcing rep (pending approval)?
@@ -1689,20 +1689,9 @@ function pvOpenQuestionsCard(a,cand,input,rr){
  var inner='<div class="rf-lede">Auto-derived from every partial/gap requirement (must-haves first) and every field the scan could not confirm. This is the automated RFI&rsquo;s open list — <b>what to confirm with '+escD(a.name)+'</b> before or during the RFP.</div><ol class="oqlist">'+items+'</ol>';
  return pvDDCardTop('<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 115 0c0 1.7-2.5 2-2.5 4"/><path d="M12 17h.01"/>','Open questions to confirm &middot; '+escD(a.name),inner,'var(--amber-d)');
 }
-// request-more-data affordance: a prepared, copy-ready outreach package (NOT a live send)
-function pvRequestDataCard(a,cand,input,rr){
- var qs=pvOpenQuestionsList(a,cand,input,rr);
- var P=PROJECTS[CURPROJ]||{};
- var asks=qs.map(function(q){return pvStripTags(q.plain);});
- var listHtml=asks.length?('<ol class="rdlist">'+asks.map(function(t){return '<li>'+escD(t)+'</li>';}).join('')+'</ol>'):'<div class="footbound">No outstanding data asks for this supplier.</div>';
- var copyBlk='';
- if(asks.length){
-   var full='Subject: '+(P.code||'Sourcing')+' — information request for '+a.name+'\n\nHello '+a.name+' team,\n\nAs part of our '+(P.title||'sourcing')+' evaluation we would like to confirm the following before finalizing our supplier shortlist:\n\n'+asks.map(function(t,i){return (i+1)+'. '+t;}).join('\n')+'\n\nPlease share supporting documentation where available. Thank you.';
-   copyBlk='<div class="rd-copyhd">Copy-ready request</div><textarea class="rd-copy" readonly rows="'+Math.min(20,asks.length+8)+'">'+escD(full)+'</textarea>';
- }
- var inner='<div class="rf-lede">A prepared, copy-ready outreach package — exactly what to ask <b>'+escD(a.name)+'</b> for. The skill can turn this into an outreach email; responses (user-provided, or pulled via the <b>M365 connector</b>) flow back to re-enrich this analysis. <b>Prepared only</b> — nothing is sent and no vendor is contacted from this dashboard.</div>'+listHtml+copyBlk;
- return pvDDCardTop('<path d="M4 4h16v12H5.2L4 17.5z"/><path d="M8 9h8M8 12h5"/>','Request more data &middot; '+escD(a.name),inner);
-}
+// Request-more-data card REMOVED (Marc, 2026-07-23): the copy-ready outreach package belongs in the companion
+// supplier-outreach skill's ACTION layer (it drafts the emails; M365 responses flow back to re-enrich), not as
+// a panel on this reflect-only dashboard. The Open Questions list (what to ask) remains, now on Lilly Fit.
 function pvDDSection(ddt,a,cand,refl,input){
  var dd=cand.deepDive||{};
  // STAGE DeepDive #2: sub-cards get a colour accent (left border) instead of flowing together under .subt
@@ -1717,11 +1706,12 @@ function pvDDSection(ddt,a,cand,refl,input){
    // top-level financials.* / deepDive.company.* value where both exist. Pricing / contract-flex /
    // integration / Gartner move out entirely, they already render on the Financials and Roadmap cards
    // below and repeating the exact same string on the same tab was pure duplication, not enrichment.
-   // De-bubble (Marc, LOCKED): this used to lead with a row of boxed "cosnap" stat-tile mini-cards that
-   // largely duplicated the very key/value table rendered right below them; the tiles are gone and their
-   // facts (headcount, customers, funding) are now plain table rows, no boxes anywhere on this card.
-   // Valuation / market cap is dropped from this card entirely (it has one home only, the Financial
-   // position card on Market & Financials), so it no longer appears in two places at once.
+   // De-bubble (Marc, LOCKED): no boxed "cosnap" stat-tiles here; every fact is a plain key/value row.
+   // Reorganized (Marc, 2026-07-23) into two labeled sub-categories: Corporate identity firmographics (legal
+   // entity first, D&B-style), then a discrete Financial position snapshot (ticker / revenue / profitability /
+   // market cap / funding / ESG). The Financial position SNAPSHOT here is deliberate (D&B company-profile +
+   // Bloomberg-DES convention); the Market & Financials tab holds the DEEP view (multi-year trend table,
+   // revenue chart, commercial estimate) — snapshot vs. detail, not a duplication.
    var idn=dd.identity||{},comp=dd.company||{},pAttrs=dd.attrs||{},finTop=cand.financials||{};
    var idKnown=idn.legal||idn.parent||idn.ownership||idn.ticker||idn.jurisdiction;
    var compKnown=comp.headcount||comp.customers||comp.valuation||comp.funding||comp.founded||comp.footprint||comp.leadership||comp.partners;
@@ -1729,20 +1719,19 @@ function pvDDSection(ddt,a,cand,refl,input){
    if(idKnown||compKnown||pAttrs.hq||pAttrs.founded||pAttrs.financial||pAttrs.esg){
      confMeta=idn.confidence==='Confirmed'?{c:'#0F3A85',bg:'var(--ti-blue)'}:(idn.confidence?{c:'#8A5A00',bg:'var(--ti-amber)'}:null);
      confChip=(idn.confidence&&confMeta)?' <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:20px;color:'+confMeta.c+';background:'+confMeta.bg+';vertical-align:1px">Identity: '+escD(idn.confidence)+'</span>':'';
-     var fundTile=finTop.funding||comp.funding;
-     var icPairs=[
-       [['Headcount',comp.headcount],['Customers',comp.customers]],
-       [['Legal entity',idn.legal],['Parent / owner',idn.parent]],
-       [['Ownership',idn.ownership||finTop.ownership],['Ticker',idn.ticker||(idKnown?'n/a · private':'')]],
-       [['HQ & footprint',comp.footprint||pAttrs.hq],['Jurisdiction',idn.jurisdiction]],
-       [['Founded',comp.founded||pAttrs.founded],['Leadership',comp.leadership]],
-       [['Financial position',pAttrs.financial],['ESG',pAttrs.esg]],
-       [['Funding raised',fundTile],null]
-     ].filter(function(pair){return pair[0][1]||(pair[1]&&pair[1][1]);});
-     var icCell=function(d){if(!d)return '';var val=(d[1]!=null&&d[1]!=='')?d[1]:'Data not available';return '<span class="kk">'+escD(d[0])+'</span><span class="kvv">'+escD(val)+'</span>';};
-     var icRows=icPairs.map(function(pair,r){var single=!pair[1];return '<div class="kar'+(single?' single':'')+(r%2===0?' z':'')+'">'+icCell(pair[0])+(single?'':icCell(pair[1]))+'</div>';}).join('');
-     var partnersLine=comp.partners?'<div class="cosnap-line" style="margin-top:'+(icRows?'9px':'0')+'"><span class="cosnap-k">Partners &amp; ecosystem</span> '+escD(comp.partners)+'</div>':'';
-     icBlk=(icRows?'<div class="pvka">'+icRows+'</div>':'')+partnersLine+
+     // Values read from the enriched fields with light cleaning to split conflated facts (HQ vs footprint,
+     // ticker vs ownership prose); nothing invented — a missing field simply drops its row.
+     var clean=function(v){return (v==null||v==='')?'':String(v);};
+     var beforeSemi=function(v){v=clean(v);return v?v.split(';')[0].trim():'';};
+     var beforeParen=function(v){v=clean(v);return v?v.split('(')[0].trim():'';};
+     var stripLeadHQ=function(v){v=clean(v);return v?v.replace(/^Legal HQ[^;]*;\s*/i,'').trim():'';};
+     var tickerDisp=(clean(idn.ownership).match(/([A-Z]{2,6}\s*:\s*[A-Z.]{1,6})/)||[])[1]||clean(idn.ticker);
+     var idRow=function(k,v){var val=clean(v);if(!val)return '';return '<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.55"><span style="color:var(--mut2);font-weight:600">'+k+'</span><span style="color:var(--ink)">'+escD(val)+'</span></div>';};
+     var idSub=function(t,first){return '<div style="font:700 10px var(--mono,monospace);letter-spacing:.07em;text-transform:uppercase;color:var(--ddacc,var(--navy));margin:'+(first?'2':'18')+'px 0 7px;padding-bottom:5px;border-bottom:2px solid var(--ddacc,var(--navy))">'+t+'</div>';};
+     var corpRows=idRow('Legal entity',idn.legal)+idRow('Ownership / structure',idn.parent||idn.ownership)+idRow('Incorporation',beforeParen(idn.jurisdiction))+idRow('Corporate address',beforeSemi(pAttrs.hq)||beforeSemi(comp.footprint))+idRow('Footprint',stripLeadHQ(comp.footprint))+idRow('Founded',comp.founded||pAttrs.founded)+idRow('Leadership',comp.leadership)+idRow('Headcount',comp.headcount);
+     var finRows=idRow('Listing / ticker',tickerDisp)+idRow('Revenue',beforeSemi(finTop.revenue)||finTop.latestRevenue)+idRow('Profitability',finTop.profitability||beforeSemi(finTop.margin))+idRow('Market cap',beforeSemi(finTop.valuationOrMarketCap)||beforeSemi(comp.valuation))+idRow('Funding raised',finTop.funding||comp.funding)+idRow('ESG',pAttrs.esg);
+     var partnersLine=comp.partners?'<div class="cosnap-line" style="margin-top:12px"><span class="cosnap-k">Partners &amp; ecosystem</span> '+escD(comp.partners)+'</div>':'';
+     icBlk=(corpRows?idSub('Corporate identity',true)+corpRows:'')+(finRows?idSub('Financial position')+finRows:'')+partnersLine+
        '<p class="pvka-note">Identity, ownership and company-scale facts are <b>illustrative</b> reflect-only enrichment (credible public sources &middot; not validated); a live deep dive resolves identity against the Lilly vendor master before asserting a parent, a wrong-company profile is worse than none.</p>';
    }
    // G9 roadmap & vision, a forward-look from the analyst position + the roadmap/extensibility sub-fit
@@ -1787,15 +1776,16 @@ function pvDDSection(ddt,a,cand,refl,input){
    // De-bubble revert (Marc, LOCKED): Offering Profile and Roadmap & Vision were paired side by side via
    // .ddpair purely to save vertical space; that arbitrary 2-up layout is reverted, every card on this tab
    // is single-column full-width again like the rest of the deep dive.
-   var pvCards=[];
-   pvCards.push(pvCard('<path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v6l8 4 8-4V7"/>',escD(a.name)+' &middot; profile','<div class="pvlede">'+escD(dd.overview||'')+'</div><div class="pvlede"><b style="color:var(--emph)">Why this vendor for Lilly.</b> '+escD(dd.whyLilly||'')+'</div>'));
-   if(icBlk)pvCards.push(pvCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/>','Identity &amp; Company '+pvSrcTag('ext')+confChip,icBlk,confMeta&&confMeta.c));
+   // Layout RESTORED per Marc (2026-07-23): full-width Overview + Identity above; then a two-column row with
+   // Offering Profile on the LEFT and Market Presence & History + Roadmap & Vision stacked on the RIGHT.
+   var overviewCard=pvCard('<path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v6l8 4 8-4V7"/>',escD(a.name)+' &middot; profile','<div class="pvlede">'+escD(dd.overview||'')+'</div><div class="pvlede"><b style="color:var(--emph)">Why this vendor for Lilly.</b> '+escD(dd.whyLilly||'')+'</div>');
+   var identityCard=icBlk?pvCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/>','Identity &amp; Company '+pvSrcTag('ext')+confChip,icBlk,confMeta&&confMeta.c):'';
    var offCard=offBlk?pvCard('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>','Offering profile <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; illustrative</span>',offBlk):'';
    var roadCard=roadBlk?pvCard('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','Roadmap &amp; vision '+pvSrcTag('ext'),roadBlk):'';
-   if(offCard)pvCards.push(offCard);
-   if(roadCard)pvCards.push(roadCard);
-   if(extIntBlk)pvCards.push(pvCard('<path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/>','Market Presence &amp; History',extIntBlk));
-   return pvCards.join('');
+   var marketCard=extIntBlk?pvCard('<path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/>','Market Presence &amp; History '+pvSrcTag('ext'),extIntBlk):'';
+   var rightCol=marketCard+roadCard;
+   var cols=(offCard||rightCol)?'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;align-items:start"><div>'+offCard+'</div><div>'+rightCol+'</div></div>':'';
+   return overviewCard+identityCard+cols;
  }
  if(ddt==='solfin'){
    var fin=cand.financials||{};
@@ -1804,10 +1794,19 @@ function pvDDSection(ddt,a,cand,refl,input){
    // the older revenue/growth/margin/arr/cash/guidance sextet showed. Headline scale as stat tiles (prefers
    // the newer, more specific field over its older near-duplicate), the reporting period as a caption, and a
    // revenue-history bar sparkline below. Nothing here is re-derived, every tile/line is a direct field read.
-   var finT=function(v,l){return v?'<div class="cosnap-t"><div class="cosnap-v">'+escD(v)+'</div><div class="cosnap-l">'+escD(l)+'</div></div>':'';};
-   var profFlag=/^not\b/i.test(String(fin.profitability||'').trim());
-   var profTile=fin.profitability?(profFlag?'Not yet GAAP-profitable':'Profitable'):null;
-   var finTiles=finT(fin.latestRevenue,'Latest revenue')+finT(fin.growth,'Growth')+finT(fin.valuationOrMarketCap,'Valuation / market cap')+finT(profTile,'Profitability');
+   // De-bubble (Marc, 2026-07-23): the boxed cosnap stat-tiles ("$1.39B / Latest revenue", "+33% / Growth" ...)
+   // are gone. Financial position is now a clean Bloomberg-FA-style summary TABLE (metric / value as reported),
+   // because the point is a comparable full metric set, not four decorative boxes.
+   var finRow=function(k,v){v=(v==null||v==='')?'':String(v);return v?('<tr><td class="dt" style="white-space:nowrap;vertical-align:top">'+escD(k)+'</td><td class="dd">'+escD(v)+'</td></tr>'):'';};
+   var finSummary='<div style="overflow-x:auto"><table class="pvdl"><tbody>'+
+     finRow('Latest revenue',fin.latestRevenue||fin.revenue)+
+     finRow('Revenue growth',fin.growth)+
+     finRow('Product revenue / ARR',fin.arr)+
+     finRow('Net income / cash flow',fin.margin)+
+     finRow('Profitability',fin.profitability)+
+     finRow('Market capitalization',fin.valuationOrMarketCap||fin.cash)+
+     finRow('Forward guidance',fin.guidance)+
+   '</tbody></table></div>';
    var finLines=(fin.ownership?'<div class="cosnap-line"><span class="cosnap-k">Ownership</span> '+escD(fin.ownership)+'</div>':'')+(fin.funding?'<div class="cosnap-line"><span class="cosnap-k">Funding raised</span> '+escD(fin.funding)+'</div>':'');
    var periodCap=fin.period?'<div style="font-size:11px;color:var(--mut2);margin-bottom:7px">Reporting period &middot; <b style="color:var(--ink);font-weight:700">'+escD(fin.period)+'</b></div>':'';
    var revSvg=pvRevHistSvg(fin.revenueHistory);
@@ -1847,13 +1846,13 @@ function pvDDSection(ddt,a,cand,refl,input){
    // were paired side by side via .ddpair purely to save vertical space; that arbitrary 2-up layout is
    // reverted, every card on this tab is single-column full-width again like the rest of the deep dive.
    var sfCards=[];
-   // Automated-RFI redesign (Marc, 2026-07): the revenue-history chart is a MEANINGFUL pairing beside the
-   // financial-position read (the chart visualizes that position), constrained to ~half width via .ddfinpair —
-   // never full-bleed. Owner-sanctioned specific pairing, distinct from the arbitrary 2-ups that were reverted.
-   var finPosCard=pvCard('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>','Financial position '+pvSrcTag('ext')+viabBadge,periodCap+(finTiles?'<div class="cosnap">'+finTiles+'</div>':'')+'<div class="pvlede mut">'+escD(dd.finHealth||'')+'</div>'+finLines+(viab?'<div class="footbound" style="margin-top:4px">Viability grade read from the financial-stability signal (runway, margin, scale, standard distress signals): <b style="color:var(--navy)">Safe</b> below 1.75 &middot; <b style="color:var(--amber-d)">Watch</b> 1.75&ndash;3 &middot; <b style="color:var(--riskred)">Distress risk</b> at 3+/5. Reflect-only, illustrative.</div>':''),viab&&viab.c);
+   // Financial position leads as a full-width summary TABLE (metric / value); the revenue-history chart follows
+   // as its own full-width card below. (The earlier half-width .ddfinpair pairing suited the compact stat-tiles;
+   // now that those are a full metric table per Marc's de-bubble, the table needs the full width.)
+   var finPosCard=pvCard('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>','Financial position '+pvSrcTag('ext')+viabBadge,periodCap+(dd.finHealth?'<div class="pvlede mut" style="margin-top:0">'+escD(dd.finHealth)+'</div>':'')+finSummary+finLines+(viab?'<div class="footbound" style="margin-top:4px">Viability grade read from the financial-stability signal (runway, margin, scale, standard distress signals): <b style="color:var(--navy)">Safe</b> below 1.75 &middot; <b style="color:var(--amber-d)">Watch</b> 1.75&ndash;3 &middot; <b style="color:var(--riskred)">Distress risk</b> at 3+/5. Reflect-only, illustrative.</div>':''),viab&&viab.c);
    var revCard=revSvg?pvCard('<path d="M4 19h16"/><path d="M7 19V10M12 19V5M17 19v-7"/>','Revenue history '+pvSrcTag('ext'),'<div style="max-width:500px">'+revSvg+'</div>'+(revRows?'<div style="overflow-x:auto;margin-top:9px"><table class="pvdl"><tbody>'+revRows+'</tbody></table></div>':'')+'<div class="footbound">Bars are scaled to the reported figures above (normalized to $M for height only); the exact reported text is preserved in each bar\'s tooltip and the table.</div>'):'';
-   if(revCard)sfCards.push('<div class="ddfinpair">'+finPosCard+revCard+'</div>');
-   else sfCards.push(finPosCard);
+   sfCards.push(finPosCard);
+   if(revCard)sfCards.push(revCard);
    var mktCard=pvCard('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>','Market position',mpBlk+solPtr);
    var comCard=pvCard('<path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/>','Commercial estimate <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; illustrative</span>','<div style="overflow-x:auto"><table class="pvdl"><tbody>'+ceRows+'</tbody></table></div><div class="footbound"><b>Illustrative mock, tagged external.</b> Reported figures are owner-sanctioned mock enrichment from credible public sources (not validated). The commercial estimate is a light read to spot <b>price-led vs premium</b> and <b>lock-in / switching exposure</b>, the firm 3-year TCO comes from the RFx bids (normalized pricing) and the Deal pro-forma, and exit terms are settled in negotiation. A genuinely undisclosed figure would read Data not available, never silently invented.</div>',pricePosCol);
    sfCards.push(mktCard);
@@ -1869,8 +1868,17 @@ function pvDDSection(ddt,a,cand,refl,input){
    var srrow='display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.5;align-items:baseline';
    var strengths=(dd.strengths||[]).map(function(s){return '<div style="'+srrow+'"><span style="color:var(--navy);font-weight:800;flex:none">&#10003;</span><span>'+escD(s)+'</span></div>';}).join('');
    var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#A23A30':rk.sev==='med'?'var(--amber-d)':'#0F3A85';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:15px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
-   var dims=input.riskDimensions||[];var rawRisk=cand.risk||{};
-   var dimRows=dims.map(function(dm){var sc=rawRisk[dm.id];var col=sc==null?'var(--mut2)':sc>=3?'#A23A30':sc>=2?'var(--amber-d)':'#0F3A85';var w=sc==null?0:Math.min(100,sc/5*100);return '<tr><td style="text-align:left;font-weight:600">'+escD(dm.label)+'</td><td style="text-align:right;font-weight:700;color:'+col+';white-space:nowrap">'+(sc==null?'&mdash;':escD(sc)+' / 5')+'</td><td style="width:130px"><div style="height:7px;border-radius:4px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:'+w+'%;background:'+col+'"></i></div></td></tr>';}).join('');
+   var dims=input.riskDimensions||[];var rawRisk=cand.risk||{};var risksN=dd.risksNarr||[];
+   // D&B-style risk read: a score band per dimension, and a plain-English gloss — pulled from the matching
+   // narrative risk where the dimension label shares a keyword with a risksNarr category, else a band read.
+   var bandOf=function(sc){return sc==null?{l:'Not scored',c:'var(--mut2)'}:sc>=3?{l:'Elevated',c:'#A23A30'}:sc>=2?{l:'Moderate',c:'var(--amber-d)'}:{l:'Low',c:'#0F3A85'};};
+   var glossFor=function(dm,sc){
+     var keys=String(dm.label||'').toLowerCase().split(/[ /]+/).filter(function(w){return w.length>4;});
+     var hit=risksN.filter(Boolean).find(function(rk){var c=String(rk.cat||'').toLowerCase();return keys.some(function(w){return c.indexOf(w)>=0;});});
+     if(hit){var t=String(hit.detail||'');var dot=t.indexOf('. ');return dot>0?t.slice(0,dot+1):t;}
+     var b=bandOf(sc);return sc==null?'Not scored on the public signal.':b.l==='Low'?'Contained; no material concern on the public signal.':b.l==='Moderate'?'Watch item; confirm in the RFP before relying on it.':'Elevated; a hard concern to clear before award.';
+   };
+   var dimRows=dims.map(function(dm){var sc=rawRisk[dm.id];var b=bandOf(sc);var col=b.c;var w=sc==null?0:Math.min(100,sc/5*100);return '<tr><td style="text-align:left;font-weight:600;vertical-align:top;white-space:nowrap">'+escD(dm.label)+'</td><td style="text-align:right;font-weight:700;color:'+col+';white-space:nowrap;vertical-align:top">'+(sc==null?'&mdash;':escD(sc)+' / 5')+'</td><td style="width:80px;vertical-align:top"><div style="height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px"><i style="display:block;height:100%;width:'+w+'%;background:'+col+'"></i></div></td><td style="font-size:11.5px;color:var(--mut);line-height:1.45;vertical-align:top;padding-left:10px">'+escD(glossFor(dm,sc))+'</td></tr>';}).join('');
    var com=dd.commercial||{};
    var contractBlk=com.contracting?('<div class="pvlede" style="margin:0 0 10px"><b style="color:var(--mut2)">Contracting flexibility &middot;</b> '+escD(com.contracting)+'</div>'):'';
    var regBlk=com.regulatory?('<div class="pvlede" style="margin:0"><b style="color:var(--mut2)">Regulatory / GxP &middot;</b> '+escD(com.regulatory)+'</div>'):'';
@@ -1885,10 +1893,15 @@ function pvDDSection(ddt,a,cand,refl,input){
    srCards.push(pvCard('<path d="M12 2l10 18H2z"/><path d="M12 9v5M12 17h.01"/>','Risks',risks||'<div style="font-size:12.5px;color:var(--mut2)">No risks on file.</div>',riskWorstCol));
    if(contractBlk||regBlk)srCards.push(pvCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/>','Contracting &amp; Regulatory',contractBlk+regBlk));
    srCards.push(pvCard('<path d="M3 21h18M6 21V9M12 21V4M18 21v-8"/>','Risk Dimensions <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; 0&ndash;5, higher is worse</span>','<div class="mxwrap"><table class="mx" style="width:100%"><tbody>'+dimRows+'</tbody></table></div><div class="footbound">Narrative risks are reflect-only; a hard flag disqualifies, a soft flag is recorded for review. Dimension scores roll up from the sub-factors on the Risk Assessment subtab.</div>'));
-   // Automated-RFI redesign (Marc, 2026-07): framed as "would we engage them" — the risk posture that decides
-   // whether this candidate is safe to bring into the RFP. Strengths stay alongside for a balanced read.
-   var engageLede='<div class="leadnarr" style="border-left-color:var(--ddacc,var(--navy))"><b>Would we engage them?</b> The risk posture and public issues that decide whether '+escD(a.name)+' is safe to invite into the RFP. A hard flag disqualifies; elevated risk with an open must-have gap is a pass.</div>';
-   return engageLede+srCards.join('');
+   // D&B-style risk-assessment redesign (Marc, 2026-07-23): a risk-posture summary line leads (overall band +
+   // elevated/moderate counts), the Strengths/Risks drivers follow, and the Risk Dimensions table now carries a
+   // plain-English READ per score (research's key point: every score gets a sentence, not just a number).
+   var scored=dims.map(function(dm){return rawRisk[dm.id];}).filter(function(s){return s!=null;});
+   var nElev=scored.filter(function(s){return s>=3;}).length,nMod=scored.filter(function(s){return s>=2&&s<3;}).length;
+   var overallSc=a.riskScore!=null?pvRound(a.riskScore,1):(scored.length?pvRound(scored.reduce(function(x,y){return x+y;},0)/scored.length,1):null);
+   var ob=bandOf(overallSc);
+   var postureLine='<div class="leadnarr" style="border-left-color:'+ob.c+'"><b>Risk posture &middot; '+escD(a.name)+' &middot; <span style="color:'+ob.c+'">'+ob.l+(overallSc!=null?' ('+escD(overallSc)+'/5)':'')+'</span>.</b> '+(nElev?nElev+' elevated':'No elevated')+' and '+nMod+' moderate '+(nElev+nMod===1?'dimension':'dimensions')+' across the scored framework; each score carries its read in the table below. A hard flag disqualifies; elevated risk with an open must-have gap is a pass.</div>';
+   return postureLine+srCards.join('');
  }
  if(ddt==='lilly'){
    // Lilly Fit (skill Section 5), a synthesis DISTINCT from the scored Requirements Fit. Reuses whyLilly +
@@ -1920,7 +1933,9 @@ function pvDDSection(ddt,a,cand,refl,input){
    var lfCards=[pvCard('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',escD(a.name)+' &middot; Lilly fit',lfSynth,capR.c)];
    if(hadPharma)lfCards.push(pvCard('<path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/>','Pharma / GxP gates <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; risk signal, not a routed screen</span>',pharmaBlk,'var(--amber-d)'));
    if(hadValue)lfCards.push(pvCard('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>','Value at risk / next move',valueBlk));
-   return lfCards.join('');
+   // Open Questions to confirm now lives here on Lilly Fit (moved off Requirements Fit per Marc): the RFI's open
+   // list of what to confirm with the supplier is a fit / next-step synthesis item, not a scoring artifact.
+   return lfCards.join('')+pvOpenQuestionsCard(a,cand,input,pvReqFitRead(a,cand,input));
  }
  if(ddt==='reqs'){
    // "Requirements Fit", the whole-field multi-supplier heatmap. Reuses pvHeatmapHtml() (the SAME renderer
@@ -1935,10 +1950,10 @@ function pvDDSection(ddt,a,cand,refl,input){
    // Automated-RFI redesign (Marc, 2026-07): the SELECTED candidate's own met/partial/gap read is the HEADLINE
    // (the RFI scoring made explicit), followed by the auto-derived Open Questions and a copy-ready Request-more-data
    // package. The cross-supplier heatmap stays below as the field context.
+   // Open Questions moved to Lilly Fit (Marc); Request-more-data removed entirely (that outreach-drafting is a
+   // companion-skill action, not a dashboard panel). This tab is now the scored read + the field heatmap.
    var rr=pvReqFitRead(a,cand,input);
    return pvReqFitCandidateCard(a,cand,input,rr)+
-     pvOpenQuestionsCard(a,cand,input,rr)+
-     pvRequestDataCard(a,cand,input,rr)+
      pvHeatmapHtml(refl,{inDeep:true});
  }
  // round-3 (D9): the standalone "Commercial & Ecosystem" sub-subtab is retired, reference clients + partners
@@ -2010,10 +2025,11 @@ function pvDeepDiveTabHtml(refl,input){
  // (owner: "shade of the supplier's colour") used for band/row fills. Burnt orange stays the emphasis colour.
  var ddc=pvSupColor(a);var ddacc='style="--ddacc:'+ddc+';--ddacc-t:'+ddc+'14"';
  if(!a||!cand||!cand.deepDive){return '<div class="dd" '+ddacc+'>'+bar+'<div class="sa-card"><div class="scc-b">Deep dive is not available for this candidate.</div></div></div>';}
- // Automated-RFI redesign (Marc, 2026-07): DECISION content leads. Requirements Fit first (the RFI scoring made
- // explicit), then the risk "would we engage" read, then why-them, evidence (profile / financials) last.
- var tabs=[['reqs','Requirements Fit'],['strisk','Risk to Engaging'],['lilly','Why Them'],['profile','Profile'],['solfin','Market & Financials']];
- var ddt=PVSL_DDT;if(!tabs.some(function(t){return t[0]===ddt;}))ddt='reqs';
+ // Tab order RESTORED to Marc's intentional sequence (2026-07-23): Profile is the entry point, then the
+ // evidence (Market & Financials), then Strengths & Risks, Lilly Fit, and the Requirements Fit heatmap last.
+ // The earlier "decision-first" reorder + rename ("Risk to Engaging" / "Why Them") was not requested; reverted.
+ var tabs=[['profile','Profile'],['solfin','Market & Financials'],['strisk','Strengths & Risks'],['lilly','Lilly Fit'],['reqs','Requirements Fit']];
+ var ddt=PVSL_DDT;if(!tabs.some(function(t){return t[0]===ddt;}))ddt='profile';
  var tabbar='<div class="ddtabs">'+tabs.map(function(t){return '<button class="ddtab'+(ddt===t[0]?' on':'')+'" onclick="pvSetDDT(\''+t[0]+'\')">'+escD(t[1])+'</button>';}).join('')+'</div>';
  // Verdict header (the ONE answer: INVITE / HOLD / PASS) sits above the competitive-position band and the tabs.
  return '<div class="dd" '+ddacc+'>'+bar+pvVerdictHeaderHtml(a,cand,refl,input)+pvCompPositionHtml(a,cand,refl,input)+tabbar+pvDDSection(ddt,a,cand,refl,input)+'</div>';
