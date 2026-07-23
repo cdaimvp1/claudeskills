@@ -429,3 +429,19 @@ The one load-bearing unknown is whether a recipe's narrative body can drive Clau
 ---
 
 *End of plan. Do not build until the dashboards/skills optimization is complete and Phase 0's exit gate is green.*
+
+
+---
+
+## Open Questions - RESOLVED (Marc, 2026-07-22)
+
+- **Q1 Fidelity:** SAME OR BETTER, no reduced fidelity for any skill. (confirmed)
+- **Q2 Deliverables:** must work too (same or better) - the real DOCX/XLSX/dashboard bundles port, not just markdown.
+- **Q3 Data sources - EXTENSIBILITY + M365 + graceful degradation (design requirement):**
+  - Build the source layer to be EXTENSIBLE. ARIA may later gain read-only connectors to Ariba / ServiceNow / Aravo / CLM, AND/OR each user may reach that data via their own native Claude Desktop connectors. Neither is assumed present at build time; do not hard-depend on any one source.
+  - M365 MCP connector is a FIRST-CLASS source. Relevant procurement data lives in SharePoint sites, OneDrive, email, MS Teams chats/sites, etc. Every recipe that may need it MUST check the M365 MCP connector is enabled and, if OFF, tell the user to turn it on BEFORE running (mirrors the skills existing Suite Interaction Protocol S1: provide / search M365 / both; and the M365 allow-list Word/Excel/PPT/PowerBI/SharePoint/Fabric/OneDrive/Copilot/Teams/Outlook).
+  - Plan for source-UNAVAILABLE. When M365, a Fabric table, or a future connector is not connected/reachable, the recipe follows the Data-Grounding & Fallback protocol (source harder -> ask user once -> labeled data-gap state -> degrade scope, never fabricate). Adding sources over time must not break recipes; each recipe declares its sources and degrades gracefully when one is absent.
+- **Q4 Kernel-sync ownership:** Marc owns it (deferred).
+- **Q5 MVP seed skills:** clarified = the 1-2 skills we build FIRST to prove the plugin->recipe->deterministic-exec + native-tools + real-deliverable path end to end before scaling to all ~24. Recommendation: invoice-rate-card-auditor + should-cost-builder (most self-contained math), or pro-forma-builder for a tangible XLSX demo. [pick deferred to build start]
+- **Q6 Recipe-dispatch Phase-0 spike:** APPROVED.
+- **Q7 Trust tier / readOnly:** readOnly is INHERENT - there is NO write path to any procurement system of record; the only write ARIA performs is to its own Fabric/data layer. No PO/RFx/SoR write risk exists. Ship procurement as optional+beta for rollout hygiene; readOnly by construction.
