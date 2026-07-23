@@ -428,7 +428,7 @@ function pvDD2FinStatement(fin, st){
 /* marked enrichment slots for licensed D&B/Bloomberg fields we do NOT hold (schema-ready, not faked) */
 function pvDD2FinEnrich(list){
   if (!list || !list.length) return '';
-  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px">'
+  var inner = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px">'
     + list.map(function(e){
         return '<div style="border:1px dashed var(--line2,#c9c4bc);border-radius:9px;padding:10px 12px;background:repeating-linear-gradient(135deg,transparent,transparent 7px,rgba(0,0,0,.02) 7px,rgba(0,0,0,.02) 14px)">'
           + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px"><span style="font-size:12px;font-weight:700;color:var(--ink);line-height:1.3">' + pvAEsc(e.label) + '</span><span style="font:700 8px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--plum,#5C2B50);background:var(--plum-t,#EDDFE9);border-radius:20px;padding:2px 7px;white-space:nowrap;flex:none">' + pvAEsc(e.src) + '</span></div>'
@@ -436,6 +436,7 @@ function pvDD2FinEnrich(list){
           + '<div style="font-size:10px;color:var(--mut2);margin-top:6px;font-style:italic">Awaiting licensed feed</div></div>';
       }).join('') + '</div>'
     + pvDD2Foot('Standard D&amp;B / Bloomberg fields we do not license in this snapshot, shown as schema-ready slots so the profile is explicit about what is evidenced vs. what needs a paid source.');
+  return '<details style="margin-top:-2px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--plum,#5C2B50);padding:2px 0">Show ' + list.length + ' enrichment slots (D&amp;B / Bloomberg) &mdash; not licensed in this snapshot</summary><div style="padding-top:13px">' + inner + '</div></details>';
 }
 function pvDD2FinMkt(x, a, cand, input, refl){
   var dd = cand.deepDive || {}, fin = cand.financials || dd.financials || {}, at = dd.attrs || {};
