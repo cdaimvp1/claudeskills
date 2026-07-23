@@ -113,3 +113,15 @@ Six sub-tabs. This resolves the overloaded Negotiate into two coherent peers (St
 7. **Renewal & Forward Levers:** confirm this is genuinely forward-looking (not a restatement of the current-deal commercial block) before keeping it as a distinct panel.
 
 Source files referenced in the four evaluations: platform `assets/pv/pv-11/12/13-deal-*.js`; `_dashboards_ORIGINAL/lilly-contract-review.html`, `scope-sow-architect.html`; pro-forma-builder dashboard.
+
+---
+
+## Open Questions - RESOLVED (Marc, 2026-07-22)
+
+1. **Negotiate split** -> TWO top-level sub-tabs (Strategy & Positions / Pricing & Commercial). [recommended]
+2. **Pricing source of truth** -> the SUPPLIER proposed pricing is EXTRACTED from supplier-provided documents (email, Excel, PPTX deck, PDF, SOW / order form / work order). That extraction becomes the canonical internal record the commercial/pro-forma model OWNS; Scope Rate Card + Payment sections READ from it (footing exceptions only). Requires a document-extraction step, grounded + never fabricated per the data-grounding protocol.
+3. **Payment-to-deliverable linkage** -> Scope owns milestone->payment; Pro-forma cashflow consumes it. [recommended] CAVEAT (Marc): some pricing models have NO milestones (subscription, usage/consumption, fixed recurring). The reconciliation must DEGRADE GRACEFULLY - show the periodic/consumption payment structure for milestone-less models instead of forcing a milestone map. Ties to the 6 pricing-model types.
+4. **Vendor Tactics** -> CHECK whether the contract-review skill vendor-tactics detection differs materially from the platform live 12-cat scan (Marc: verify before cutting). Cut the skill copy only if not materially different. [comparison check in progress]
+5. **Persona tones** -> trim to Standard / Collaborative / Aggressive. [recommended]
+6. **SME + MSA home** -> fold into Strategy & Positions as collapsed sections. [recommended]
+7. **Renewal & Forward Levers** -> DUAL scope, trait-aware. (a) Current deal: the forward caps we NEGOTIATE IN (price renewal caps, CPI cap, carry-forward). (b) If the project is a RENEWAL (dealIsRenewal trait): ALSO pull existing price-increase-cap language from BOTH the governing MSA AND the existing EXPIRING contract, and verify the proposed renewal deal ADHERES TO or BEATS those caps. New-deal = forward caps we set; renewal = forward caps + compliance check vs MSA + expiring-contract cap language.
