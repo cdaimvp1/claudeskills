@@ -75,4 +75,28 @@ for (const sub of SUBS) {
   }
 }
 
+// Deep-dive inner-tab guard: PVSL_SUB='deep' plus each PVSL_DDT value exercises
+// pvDDSection()'s per-tab branch (profile/solfin/strisk/lilly/reqs), including the
+// infoHover() calls in the lilly/reqs branches that previously threw. Same direct
+// landscapeHTML() call, no pvRerender/live DOM.
+const DDTS = ['profile', 'solfin', 'strisk', 'lilly', 'reqs'];
+
+for (const ddt of DDTS) {
+  ctx.PVSL_SUB = 'deep';
+  ctx.curtab = 'landscape';
+  ctx.PVSL_DDT = ddt;
+  try {
+    const html = ctx.landscapeHTML();
+    if (typeof html !== 'string' || html.length === 0) {
+      console.log('deep/' + ddt, 'FAIL', 'output empty or not a string (len=' + (html && html.length) + ')');
+      anyFail = true;
+      continue;
+    }
+    console.log('deep/' + ddt, 'pass', 'len=' + html.length);
+  } catch (e) {
+    console.log('deep/' + ddt, 'FAIL', (e && e.stack) || e);
+    anyFail = true;
+  }
+}
+
 if (anyFail) process.exit(1);

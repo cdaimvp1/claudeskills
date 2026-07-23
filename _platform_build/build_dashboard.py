@@ -152,17 +152,6 @@ def default_search_subject():
     return subject
 
 
-def initials_for(name):
-    """First+last initials for a topbar avatar (e.g. 'Procurement User' -> 'PU'),
-    matching the platform's own two-letter avatar convention."""
-    parts = [p for p in re.split(r'\s+', name.strip()) if p]
-    if not parts:
-        return ''
-    if len(parts) == 1:
-        return parts[0][:2].upper()
-    return (parts[0][0] + parts[-1][0]).upper()
-
-
 def data_uri(path, mime):
     with open(path, 'rb') as f:
         raw = f.read()
@@ -319,9 +308,19 @@ def build(out_path, user_name='Procurement User', search_subject=None):
     chrome_stub_js = "window.theoHelpOpen=window.theoHelpOpen||function(){};"
 
     safe_user_name = html.escape((user_name or '').strip() or 'Procurement User')
-    safe_initials = html.escape(initials_for((user_name or '').strip() or 'Procurement User'))
     safe_subject = html.escape((search_subject or '').strip())
     safe_eyebrow = html.escape(SEARCH_EYEBROW)
+
+    # Generic user icon for the topbar avatar: a neutral head+shoulders glyph
+    # (Material Design "person" silhouette), currentColor-filled so it inherits
+    # .topbar's white text color exactly like the initials text it replaces --
+    # no new color token introduced. Same .av circle (size/position unchanged).
+    user_icon_svg = (
+        '<svg class="avicon" viewBox="0 0 24 24" width="18" height="18" '
+        'aria-hidden="true" focusable="false"><path fill="currentColor" '
+        'd="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c'
+        '-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'
+    )
 
     # Clean, minimal topbar: LEFT = Lilly logo + Sacramento "Theo" wordmark +
     # static dino mark. RIGHT = just the signed-in user's name/avatar -- no
@@ -335,7 +334,7 @@ def build(out_path, user_name='Procurement User', search_subject=None):
         '</div>'
         '<div class="role">'
         '<div class="who">'
-        '<div class="av" id="av">' + safe_initials + '</div>'
+        '<div class="av" id="av">' + user_icon_svg + '</div>'
         '<div><div class="nm" id="rname">' + safe_user_name + '</div></div>'
         '</div>'
         '</div>'

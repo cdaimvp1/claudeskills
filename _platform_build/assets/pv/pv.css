@@ -1187,19 +1187,31 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .needs b{font-weight:700;letter-spacing:.04em}
 .pvsl .needs span{color:var(--amber-d)}
 .pvsl .plane{position:relative;height:300px;border:1px solid var(--line2);border-radius:12px;background:var(--surface);margin:6px 0 14px;overflow:hidden}
-/* 4 EQUAL quadrant cells (Marc), each a distinct faint tone so the zones read + never blend */
+/* 4 EQUAL quadrant cells (Marc), each a distinct faint tone so the zones read + never blend.
+   Brightened (owner ask, 2026-07): ~8-13% alpha read as near-invisible; bumped to ~22-28% so the
+   four zones clearly read at a glance, same hues, same relative ordering. */
 .pvsl .plane .pq{position:absolute;width:50%;height:50%}
-.pvsl .plane .pq-niche{left:0;top:0;background:rgba(92,43,80,.10)}
-.pvsl .plane .pq-leader{right:0;top:0;background:rgba(18,60,130,.08)}
-.pvsl .plane .pq-caution{left:0;bottom:0;background:rgba(201,162,39,.13)}
-.pvsl .plane .pq-chal{right:0;bottom:0;background:rgba(47,110,107,.11)}
+.pvsl .plane .pq-niche{left:0;top:0;background:rgba(92,43,80,.24)}
+.pvsl .plane .pq-leader{right:0;top:0;background:rgba(18,60,130,.22)}
+.pvsl .plane .pq-caution{left:0;bottom:0;background:rgba(201,162,39,.28)}
+.pvsl .plane .pq-chal{right:0;bottom:0;background:rgba(47,110,107,.25)}
 .pvsl .plane .pdiv-v{position:absolute;top:0;bottom:0;border-left:1px dashed var(--line2)}
 .pvsl .plane .pdiv-h{position:absolute;left:0;right:0;border-top:1px dashed var(--line2)}
 .pvsl .plane .qlab{position:absolute;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
 .pvsl .plane .axlab{position:absolute;font-family:var(--mono);font-size:9.5px;color:var(--mut2)}
 .pvsl .pdot{position:absolute;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;border:2px solid;transform:translate(-50%,-50%);box-shadow:var(--shadow);cursor:default}
 .pvsl .pdot.inc::after{content:"";position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--blue)}
+/* Existing-Lilly-vendor marker (owner ask, 2026-07): a dashed ring around the whole dot, on top of the
+   existing corner badge above, so an incumbent reads at a glance without hunting for the small corner mark. */
+.pvsl .pdot.inc::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px dashed var(--blue);pointer-events:none}
 .pvsl .pdot.dq{background:var(--surface) !important;color:var(--mut2);border:2px dashed var(--line2) !important;text-decoration:line-through}
+/* Segmentation & Differentiators, fit/risk threshold sliders (owner ask, 2026-07) -- sit above the plane */
+.pvsl .segthr{display:flex;flex-wrap:wrap;gap:10px 26px;margin:0 0 12px;padding:10px 14px;border:1px solid var(--line2);border-radius:10px;background:var(--well,var(--bg))}
+.pvsl .segthr-row{display:flex;align-items:center;gap:10px;flex:1 1 210px;min-width:210px}
+.pvsl .segthr-row label{font:700 10px var(--mono);letter-spacing:.03em;text-transform:uppercase;color:var(--mut2);white-space:nowrap}
+.pvsl .segthr-row input[type="range"]{flex:1;accent-color:var(--navy);min-width:70px}
+.pvsl .segthr-v{font:700 12px var(--mono);color:var(--ink);white-space:nowrap;min-width:40px;text-align:right}
+.pvsl .segthr-v small{font-weight:600;color:var(--mut2)}
 .pvsl .segs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:4px}
 .pvsl .segtile{border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:var(--bg)}
 .pvsl .segtile .sl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);display:flex;align-items:center;gap:6px}
@@ -1388,8 +1400,8 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 /* ===== Pass A: 4-subtab shell + Executive Summary + nested Supplier Deep Dive ===== */
 .pvsl .pvsubtabs{display:flex;gap:2px;flex-wrap:wrap;margin:0 0 18px;border-bottom:1px solid var(--line)}
 .pvsl .pvsubtab{font:700 13.5px var(--sans);border:none;background:none;color:var(--mut);padding:10px 16px;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px}
-.pvsl .pvsubtab:hover{color:var(--blue)}
-.pvsl .pvsubtab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.pvsl .pvsubtab:hover{color:var(--ink)}
+.pvsl .pvsubtab.on{color:var(--ink);border-bottom-color:var(--ink)}
 .pvsl .metrics.kpis4{grid-template-columns:repeat(4,1fr)}
 .pvsl .exechd{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
 .pvsl .exechd h2{font-size:19px;font-weight:800;letter-spacing:-.02em;margin:0}
@@ -1654,12 +1666,13 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .ddbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 0 14px}
 .pvsl .ddbar .ddlbl{font:700 10px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
 .pvsl .ddsel{font:600 14.5px var(--sans);border:1.5px solid var(--line2);border-radius:9px;padding:8px 13px;background:var(--surface);color:var(--ink);cursor:pointer;min-width:240px}
-/* #2 (Marc): Deep Dive sub-subtabs match the RFx/Deal segmented control (.dmodes/.dmode), not outlined bubbles:
-   a grey rounded track with the active tab as a raised white segment. */
-.pvsl .ddtabs{display:inline-flex;gap:2px;background:var(--well);border:1px solid var(--line2);border-radius:10px;padding:3px;margin-bottom:14px;max-width:100%;flex-wrap:wrap}
-.pvsl .ddtab{border:0;background:none;font:600 13px var(--sans);color:var(--mut2);border-radius:8px;padding:6px 14px;cursor:pointer;white-space:nowrap}
+/* STAGE DeepDive #1: Deep Dive sub-subtabs now visually MATCH the main .pvsubtab bar (same size/spacing/
+   underline treatment) instead of the segmented-control pill track: a plain row on a bottom rule, inactive =
+   medium grey text, active = ink text + ink bottom underline, no pill/background. */
+.pvsl .ddtabs{display:flex;gap:2px;flex-wrap:wrap;background:none;border:0;border-radius:0;padding:0;margin-bottom:14px;max-width:100%;border-bottom:1px solid var(--line)}
+.pvsl .ddtab{font:700 13.5px var(--sans);border:none;background:none;color:var(--mut);border-radius:0;padding:10px 16px;cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent;margin-bottom:-1px;box-shadow:none}
 .pvsl .ddtab:hover{color:var(--ink)}
-.pvsl .ddtab.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.17)}
+.pvsl .ddtab.on{background:none;color:var(--ink);border-bottom-color:var(--ink);box-shadow:none}
 /* readability lift inside the deep dive (raise contrast + sizes) */
 .pvsl .dd .pvlede{font-size:14.5px;color:var(--ink);line-height:1.64}
 .pvsl .dd .pvlede.mut{color:#4A4540}
@@ -1745,7 +1758,10 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 /* Marc: alternate category sections get a distinct band so they read as separate blocks */
 .pvsl .vrpb .vratrow:nth-of-type(even){background:var(--bg)}
 .pvsl .vratrow:first-child{border-top:none}
-.pvsl .vrathd{display:flex;align-items:center;gap:9px}
+.pvsl .vrathd{display:flex;align-items:center;gap:9px;cursor:pointer}
+/* Heatmap+Risk stage: single-open accordion inside the rationale panel, caret rotates on the open row */
+.pvsl .vrathd .catcaret{width:14px;height:14px;flex:none}
+.pvsl .vrathd.on .catcaret{transform:rotate(90deg);color:var(--blue-d)}
 .pvsl .vratlbl{font-size:13.5px;font-weight:700;color:var(--ink)}
 .pvsl .vratnar{font-size:13px;color:#4A4540;line-height:1.62;margin-top:6px}
 .pvsl .vratsub{display:block;margin-top:6px}
@@ -1765,13 +1781,18 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .pvsl .hmrat-tbl.risk .hmrat-bar i{background:var(--riskred)}
 .pvsl .hmrat-tbl.risk .hmrat-scv{color:var(--ink)}
 /* #6 (Marc → Option B): "Where the decision is made", plain-language read + compact spread table (replaces 3 pill columns) */
+/* Heatmap+Risk stage: now the RIGHT column of the .recwrap beside the rationale accordion (was its own
+   stacked sa-card), so it takes an eyebrow label instead of a full card-hd, and a tighter table/spacing to
+   fit the narrower ~1fr column. */
+.pvsl .frcol-hd{display:flex;align-items:center;gap:7px;font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin:0 0 10px}
+.pvsl .frcol-hd svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2;flex:none}
 .pvsl .fr-lede{font-size:13px;line-height:1.6;color:var(--ink);margin:0 0 13px}
 .pvsl .fr-lede b{font-weight:800;color:var(--navy)}
 .pvsl .fr-warn{color:var(--emph);font-weight:700}
-.pvsl .frtbl{width:100%;border-collapse:collapse;font-size:12.5px}
-.pvsl .frtbl th{text-align:left;font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);padding:6px 10px;border-bottom:1px solid var(--line2)}
+.pvsl .frtbl{width:100%;border-collapse:collapse;font-size:12px}
+.pvsl .frtbl th{text-align:left;font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);padding:5px 8px;border-bottom:1px solid var(--line2)}
 .pvsl .frtbl th.num,.pvsl .frtbl td.num{text-align:right;font-variant-numeric:tabular-nums}
-.pvsl .frtbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
+.pvsl .frtbl td{padding:6px 8px;border-bottom:1px solid var(--line)}
 .pvsl .frdv{font:700 11.5px var(--mono);color:var(--navy)}
 .pvsl .frrole{font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.03em}
 .pvsl .frrole.d{color:var(--navy)}
@@ -1860,6 +1881,10 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 .pvsl .pvdl td.dd{font-size:13.5px;color:var(--ink);font-weight:600;line-height:1.5}
 /* Marc: alternate ROW shading (zebra), not columns */
 .pvsl .pvdl tr:nth-child(even) td{background:var(--ddacc-t,var(--nested))}
+/* STAGE DeepDive #3: offering -> requirement-category tie chip (Profile / Offering profile), existing status
+   tint (--ti-blue) for a matched tie, muted/neutral for no lexical match, no new colour introduced */
+.pvsl .offtie{display:inline-block;margin-top:5px;font:600 10.5px var(--sans);font-weight:600;color:#0F3A85;background:var(--ti-blue);border-radius:20px;padding:2px 9px 2px 8px}
+.pvsl .offtie.mut{color:var(--mut2);background:var(--nested);font-weight:500}
 /* labelled blocks, Commercial & ecosystem (Contracting / Regulatory / Implementation / Integration + clients) */
 .pvsl .pvblocks{border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .pvsl .pvblk{padding:11px 14px;border-top:1px solid var(--line)}
