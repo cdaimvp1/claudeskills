@@ -84,6 +84,9 @@ JS_FILES_IN_ORDER = [
     # primitives). Loaded before pv-07 so the renderers can call it; defines only
     # constants + functions at load (no escD/pvRound calls until render time).
     os.path.join(ASSETS, 'pv', 'pv-07a-assess-model.js'),
+    # Accurate world-atlas 110m land path (PVGEO_LAND), projected equirectangular, for the
+    # Company & Ownership operating-footprint geo map. Must load before pv-07b (pvDD2GeoMap).
+    os.path.join(ASSETS, 'pv-worldmap.js'),
     os.path.join(ASSETS, 'pv', 'pv-07-landscape-render.js'),
     # pv-07b: Supplier Deep Dive v3 (6 visual subtabs on pvAssess). After pv-07 so
     # pvDeepDiveTabHtml can route to pvDD2Section / PVDD2_TABS.

@@ -161,7 +161,41 @@ gap-stated): corporate-family & UBO tree with markers (have partial), operating-
 supply-chain network, comparative financial-statement table, industry-ratio benchmarking, sanctions/watchlist +
 ownership-exposure, ESG scorecard (coverage-only until data), trade-payment / default-risk (D&B — absent, gap-state).
 
+## STATUS: LANDSCAPE DEEP-DIVE PURPOSE REWORK COMPLETE (2026-07-23, second pass)
+All 6 deep-dive subtabs (DD1-DD6) reworked to Marc's detailed change list AND the global rules, self-verified in the
+browser (every subtab looked at, not string-checked):
+- GLOBAL: side-by-side panels are EQUAL HEIGHT via `pvDD2Pair` + `opts.fill`/`opts.maxBody` (taller-of-two, internal
+  scroll on overflow); all value-less methodology captions killed (`pvDD2Foot` neutered to return ''); em dashes gone.
+- DD1 Summary -> TOP SHEET: cut the 8-dim scorecard; Recommendation hero = narrative + 8-pill glance strip (dot by
+  concern) + gate chips; Requirements-fit | Opportunities&concerns equal-height pair; Evidence coverage.
+- DD2 Company: Firmographics MERGED with Identity Verification (fact/value/status-chip table), paired equal-height with
+  a right-branching **horizontal ownership tree** (fixed max-height + scroll); real **geo map** (PVGEO_LAND, projected
+  world-atlas 110m) replacing the hand-drawn one; unplaced/marker notes removed.
+- DD3 Capabilities: heatmap now uses SOLID visible fills (teal/amber/red/gray) + bigger cells + legend; Delivery
+  Readiness | Delivery Dependencies equal-height pair; dependencies use the horizontal tree.
+- DD4 Financial: market-cap column removed from peer comps; Financial Health Bridge | Commercial Model equal-height
+  pair; enrichment collapsed.
+- DD5 Risk: Impact×Likelihood | Top Material Risks register equal-height pair; Risk Posture | Risk Mitigation pair;
+  Material Events. (Mitigation board RESTORED on Risk per the DD5 decision.)
+- DD6 Lilly Fit reframed ("Does this supplier fit Lilly?" / "What must happen before selection"): Lilly-Specific Fit |
+  Internal Relationship pair; Diligence Funnel | Action Board pair (Action Board rebuilt as its own table: wrapping
+  Action column, Gate? = Yes/No, no truncation).
+- EM-DASH ARTIFACT SWEEP: the earlier `—`->`, ` replacement had left stray `, ` placeholders in 6 spots (Action Board
+  gate cell, Mitigation gate cell, H2H fit/delta fallbacks, rank narrative + strip, rev-chart raw labels, criticality
+  default). All replaced with meaningful placeholders (No / Not scored / Not ranked / n/a / Not classified). All 4 JS
+  files pass `node --check`.
+Built `supplier-landscape-PLATFORM.html` (3.29 MB, self-contained). NEW asset `assets/pv-worldmap.js` added to the
+build order. NOT yet committed/pushed at time of writing / Desktop copy pending refresh.
+OPEN (minor, Marc's call): H2H one advisory line still 2-decimal (89.37); ownership horizontal-scroll cutoff polish;
+Deal RETHINK deferred until landscape sign-off (synthesize platform Deal ZOPA/pro-forma/comms + my Deal, fewer tabs,
+comms-synthesis, term-evolution doc map, playbook-grounded positions; must stay a Sonnet-generatable artifact).
+
 ## PROGRESS LOG
 - 2026-07-23  Visual QA loop established (Playwright over http). Financial & Market rebuilt to spec as the exemplar
   (dominant Financial Health trend+metrics · bridge · single peer scatter+read · commercial model · gap-stated detail);
   redundant second quadrant removed; self-verified in browser. Polish items logged under DD4. Gap review written.
+- 2026-07-23 (pass 2)  Deep-dive PURPOSE rework to Marc's change list + global rules: equal-height/scroll pairs, killed
+  methodology captions, real geo map + horizontal ownership/dependency trees, merged Firmographics+Identity, visible
+  heatmap fills, market-cap removed, Summary->top-sheet, Lilly Fit reframed with Internal Relationship + rebuilt Action
+  Board. Then swept 6 residual `, ` placeholders left by the earlier em-dash replacement (all now meaningful). Rebuilt
+  PLATFORM.html; all JS `node --check` clean; every subtab looked at in the browser.

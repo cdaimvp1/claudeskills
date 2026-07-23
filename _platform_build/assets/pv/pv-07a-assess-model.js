@@ -1,5 +1,5 @@
 /* =============================================================================
-   pv-07a-assess-model.js — SHARED ASSESSMENT SPINE (Landscape redesign v3)
+   pv-07a-assess-model.js, SHARED ASSESSMENT SPINE (Landscape redesign v3)
    One source of truth every Landscape tab reads from, so fit / risk / disposition
    / evidence never drift apart across tabs (the inconsistencies Marc caught:
    4.5 vs 89 vs 90, financial "Watch" vs "low"). Pure model + render primitives;
@@ -24,10 +24,10 @@ var THEO_DISPO = {
 // Palette (Marc, LOCKED): teal-primary for good/low, amber moderate, BURNT-ORANGE (--emph) high, red critical,
 // gray unknown/insufficient. No navy-as-primary.
 var THEO_CONCERN = {
-  'Low':                    {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',   fav:0.90},
-  'Strong':                 {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',   fav:0.92},
+  'Low':                    {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',  fav:0.90},
+  'Strong':                 {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',  fav:0.92},
   'Moderate':               {c:'#8A5A00', bg:'var(--ti-amber,#FBF1DA)',fav:0.58},
-  'High':                   {c:'var(--emph,#C15E19)', bg:'#FBEAD9',    fav:0.32},
+  'High':                   {c:'var(--emph,#C15E19)', bg:'#FBEAD9',   fav:0.32},
   'Critical':               {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)', fav:0.15},
   'Insufficient evidence':  {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)', fav:0}
 };
@@ -39,11 +39,11 @@ var THEO_RISKBAND = {
   'Unknown': {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)'}
 };
 var THEO_EVID = {
-  'Verified':         {c:'var(--teal-d,#2F6E6B)', fill:'solid',  key:'verified'},
-  'Partial':          {c:'#8A5A00', fill:'hatch',  key:'partial'},
+  'Verified':         {c:'var(--teal-d,#2F6E6B)', fill:'solid', key:'verified'},
+  'Partial':          {c:'#8A5A00', fill:'hatch', key:'partial'},
   'Supplier asserted':{c:'var(--plum,#5C2B50)', fill:'outline',key:'supplier'},
   'Proxy':            {c:'var(--mut2,#6a655f)', fill:'outline', key:'proxy'},
-  'Missing':          {c:'var(--mut2,#6a655f)', fill:'none',    key:'missing'}
+  'Missing':          {c:'var(--mut2,#6a655f)', fill:'none',   key:'missing'}
 };
 
 /* ---- authored, grounded overrides (per supplier id). Summary-level here; the
@@ -62,35 +62,35 @@ var ASSESS_AUTHORED = {
     // metric table. Every figure is grounded; ratios are CALCULATED from the figures and labelled as such.
     financial: {
       metrics: [
-        {label:'Total revenue',        value:'$4,684M',    period:'FY2026',        conf:'High'},
-        {label:'Revenue (latest qtr)', value:'$1,390M',    period:'Q1 FY2027',     conf:'High'},
-        {label:'Revenue growth',       value:'+29%',       period:'FY2026 YoY',    conf:'High'},
-        {label:'Revenue growth',       value:'+33%',       period:'Q1 FY27 YoY',   conf:'High'},
-        {label:'Product revenue',      value:'$4,470M',    period:'FY2026',        conf:'High'},
-        {label:'Net revenue retention',value:'125%',       period:'FY2026',        conf:'High'},
-        {label:'Non-GAAP net income',  value:'$466M',      period:'FY2026',        conf:'High'},
-        {label:'GAAP net income',      value:'$(1,329)M',  period:'FY2026',        conf:'High'},
-        {label:'Free cash flow',       value:'$1,120M',    period:'FY2026',        conf:'High'},
-        {label:'Market capitalization',value:'$93,200M',   period:'Jul 17 2026',   conf:'High'}
+        {label:'Total revenue',       value:'$4,684M',   period:'FY2026',       conf:'High'},
+        {label:'Revenue (latest qtr)', value:'$1,390M',   period:'Q1 FY2027',    conf:'High'},
+        {label:'Revenue growth',      value:'+29%',      period:'FY2026 YoY',   conf:'High'},
+        {label:'Revenue growth',      value:'+33%',      period:'Q1 FY27 YoY',  conf:'High'},
+        {label:'Product revenue',     value:'$4,470M',   period:'FY2026',       conf:'High'},
+        {label:'Net revenue retention',value:'125%',      period:'FY2026',       conf:'High'},
+        {label:'Non-GAAP net income', value:'$466M',     period:'FY2026',       conf:'High'},
+        {label:'GAAP net income',     value:'$(1,329)M', period:'FY2026',       conf:'High'},
+        {label:'Free cash flow',      value:'$1,120M',   period:'FY2026',       conf:'High'},
+        {label:'Market capitalization',value:'$93,200M',  period:'Jul 17 2026',  conf:'High'}
       ],
       revByYear: [
         {period:'FY2022', value:1219}, {period:'FY2023', value:2066}, {period:'FY2024', value:2806},
         {period:'FY2025', value:3626}, {period:'FY2026', value:4684}
       ],
       ratios: [
-        {label:'FCF margin',         value:'24%',   basis:'FCF / revenue, FY2026'},
-        {label:'Non-GAAP net margin',value:'10%',   basis:'Non-GAAP NI / revenue'},
-        {label:'GAAP net margin',    value:'-28%',  basis:'GAAP NI / revenue (mostly SBC)'},
-        {label:'Revenue CAGR',       value:'+40%',  basis:'FY2022 to FY2026'}
+        {label:'FCF margin',        value:'24%',  basis:'FCF / revenue, FY2026'},
+        {label:'Non-GAAP net margin',value:'10%',  basis:'Non-GAAP NI / revenue'},
+        {label:'GAAP net margin',   value:'-28%', basis:'GAAP NI / revenue (mostly SBC)'},
+        {label:'Revenue CAGR',      value:'+40%', basis:'FY2022 to FY2026'}
       ],
       enrichment: [
-        {label:'Viability / Failure score', src:'D&B',       note:'Predictive failure & business-continuity score for the entity.'},
-        {label:'PAYDEX (trade payment)',    src:'D&B',       note:'Payment performance vs. terms; days-beyond-terms.'},
+        {label:'Viability / Failure score', src:'D&B',      note:'Predictive failure & business-continuity score for the entity.'},
+        {label:'PAYDEX (trade payment)',   src:'D&B',      note:'Payment performance vs. terms; days-beyond-terms.'},
         {label:'1-yr probability of default',src:'Bloomberg', note:'Default risk from market signals + financial statements.'},
         {label:'5-yr CDS / implied spread', src:'Bloomberg', note:'Market-implied credit risk; model vs. market.'},
-        {label:'Liquidity ratios',          src:'Filings',   note:'Current & quick ratios (need balance sheet).'},
-        {label:'Leverage ratios',           src:'Filings',   note:'Debt/equity, interest coverage (need balance sheet).'},
-        {label:'Sector percentile',         src:'Bloomberg', note:'Position vs. industry median / quartiles.'}
+        {label:'Liquidity ratios',         src:'Filings',  note:'Current & quick ratios (need balance sheet).'},
+        {label:'Leverage ratios',          src:'Filings',  note:'Debt/equity, interest coverage (need balance sheet).'},
+        {label:'Sector percentile',        src:'Bloomberg', note:'Position vs. industry median / quartiles.'}
       ]
     },
     gates: [
@@ -99,14 +99,14 @@ var ASSESS_AUTHORED = {
       {kind:'escalate', label:'Tenant credential control', why:'2024 UNC5537 breaches hit customer tenants lacking MFA (Snowflake infra itself not breached); MFA / key-pair / network-policy must be mandated on any Lilly tenant.'}
     ],
     dimensions: [
-      {id:'identity',   label:'Identity & ownership',   concern:'Low',                   confidence:'High',   evidence:'Public, NYSE-listed (SNOW), independent with no parent; contracting entity Snowflake Inc. UBO not applicable (widely held public company).'},
-      {id:'capability', label:'Capability & fit',       concern:'Strong',                confidence:'Medium', evidence:'Gartner MQ Leader; strongest functional shape in the field for a warehouse-led estate. First-party ML is served through partners rather than natively.'},
-      {id:'financial',  label:'Financial viability',    concern:'Low',                   confidence:'High',   evidence:'$4.68B FY2026 revenue (+29% YoY), $1.12B free cash flow, ~$93.2B market cap. Not yet GAAP-profitable (mostly stock-based comp); an active securities class action (Patel v. Snowflake) is a governance item to monitor, not a viability threat.'},
-      {id:'resilience', label:'Operational resilience', concern:'Moderate',              confidence:'Medium', evidence:'Multi-cloud (AWS / Azure / GCP) reduces hyperscaler lock-in, but single-platform concentration plus consumption pricing create switching and cost exposure. Sub-tier dependencies undisclosed.'},
-      {id:'integrity',  label:'Integrity & compliance', concern:'Low',                   confidence:'Low',    evidence:'No adverse sanctions / watchlist signal found in public sources; UBO not applicable. A formal sanctions / watchlist screen has NOT been run — "no issue found" is not the same as screened.'},
-      {id:'quality',    label:'Quality & regulatory',   concern:'Moderate',              confidence:'Medium', evidence:'FedRAMP Moderate, HITRUST CSF, SOC 2 Type II and ISO 27001 are in place. GxP applicability and Lilly US / EU residency scope need a formal screen before award.'},
-      {id:'cyber',      label:'Cyber & privacy',        concern:'Moderate',              confidence:'Medium', evidence:'2024 UNC5537 credential-stuffing hit 165+ customer tenants lacking MFA (Snowflake infrastructure not breached); co-defendant in consolidated litigation (MDL 3126). Tenant security is configuration-dependent — mandate MFA / key-pair / network policy.'},
-      {id:'responsible',label:'Responsible sourcing',   concern:'Insufficient evidence', confidence:'Low',    evidence:'Company-stated net-zero / DEI commitments, not independently validated; no material human-rights / labor / environmental signal found. Not assessed.'}
+      {id:'identity',  label:'Identity & ownership',  concern:'Low',                  confidence:'High',  evidence:'Public, NYSE-listed (SNOW), independent with no parent; contracting entity Snowflake Inc. UBO not applicable (widely held public company).'},
+      {id:'capability', label:'Capability & fit',      concern:'Strong',               confidence:'Medium', evidence:'Gartner MQ Leader; strongest functional shape in the field for a warehouse-led estate. First-party ML is served through partners rather than natively.'},
+      {id:'financial', label:'Financial viability',   concern:'Low',                  confidence:'High',  evidence:'$4.68B FY2026 revenue (+29% YoY), $1.12B free cash flow, ~$93.2B market cap. Not yet GAAP-profitable (mostly stock-based comp); an active securities class action (Patel v. Snowflake) is a governance item to monitor, not a viability threat.'},
+      {id:'resilience', label:'Operational resilience', concern:'Moderate',             confidence:'Medium', evidence:'Multi-cloud (AWS / Azure / GCP) reduces hyperscaler lock-in, but single-platform concentration plus consumption pricing create switching and cost exposure. Sub-tier dependencies undisclosed.'},
+      {id:'integrity', label:'Integrity & compliance', concern:'Low',                  confidence:'Low',   evidence:'No adverse sanctions / watchlist signal found in public sources; UBO not applicable. A formal sanctions / watchlist screen has NOT been run, "no issue found" is not the same as screened.'},
+      {id:'quality',   label:'Quality & regulatory',  concern:'Moderate',             confidence:'Medium', evidence:'FedRAMP Moderate, HITRUST CSF, SOC 2 Type II and ISO 27001 are in place. GxP applicability and Lilly US / EU residency scope need a formal screen before award.'},
+      {id:'cyber',     label:'Cyber & privacy',       concern:'Moderate',             confidence:'Medium', evidence:'2024 UNC5537 credential-stuffing hit 165+ customer tenants lacking MFA (Snowflake infrastructure not breached); co-defendant in consolidated litigation (MDL 3126). Tenant security is configuration-dependent, mandate MFA / key-pair / network policy.'},
+      {id:'responsible',label:'Responsible sourcing',  concern:'Insufficient evidence', confidence:'Low',   evidence:'Company-stated net-zero / DEI commitments, not independently validated; no material human-rights / labor / environmental signal found. Not assessed.'}
     ],
     opportunities: [
       'Strongest functional shape in the field for a warehouse-led estate (Gartner MQ Leader).',
@@ -120,35 +120,35 @@ var ASSESS_AUTHORED = {
     ],
     evidenceCoverage: {verified:48, partial:24, supplier:17, missing:11},
     risks: [
-      {label:'Consumption-cost volatility', impact:'High',   likelihood:'Medium', confidence:'Medium', type:'Commercial',        gate:true,  mitigation:'Model peak concurrency; negotiate committed-use pricing with caps.'},
-      {label:'Data residency (US / EU)',    impact:'High',   likelihood:'Medium', confidence:'Low',    type:'Diligence unknown', gate:true,  mitigation:'Confirm service + support locations for regulated data before award.'},
-      {label:'Tenant credential control',   impact:'Medium', likelihood:'Medium', confidence:'Medium', type:'Lilly exposure',    gate:true,  mitigation:'Mandate MFA / key-pair auth / network policy on any Lilly tenant.'},
-      {label:'Single-platform lock-in',     impact:'Medium', likelihood:'Medium', confidence:'High',   type:'Solution / design',  gate:false, mitigation:'Negotiate portability + exit terms; validate open-table (Iceberg) path.'},
-      {label:'Not yet GAAP-profitable',     impact:'Low',    likelihood:'Low',    confidence:'High',   type:'Supplier-inherent',  gate:false, mitigation:'Monitor; strong free cash flow ($1.12B) and scale offset.'},
-      {label:'Securities class action',     impact:'Low',    likelihood:'Low',    confidence:'Medium', type:'Supplier-inherent',  gate:false, mitigation:'Monitor Patel v. Snowflake governance outcome.'}
+      {label:'Consumption-cost volatility', impact:'High',  likelihood:'Medium', confidence:'Medium', type:'Commercial',       gate:true, mitigation:'Model peak concurrency; negotiate committed-use pricing with caps.'},
+      {label:'Data residency (US / EU)',   impact:'High',  likelihood:'Medium', confidence:'Low',   type:'Diligence unknown', gate:true, mitigation:'Confirm service + support locations for regulated data before award.'},
+      {label:'Tenant credential control',  impact:'Medium', likelihood:'Medium', confidence:'Medium', type:'Lilly exposure',   gate:true, mitigation:'Mandate MFA / key-pair auth / network policy on any Lilly tenant.'},
+      {label:'Single-platform lock-in',    impact:'Medium', likelihood:'Medium', confidence:'High',  type:'Solution / design', gate:false, mitigation:'Negotiate portability + exit terms; validate open-table (Iceberg) path.'},
+      {label:'Not yet GAAP-profitable',    impact:'Low',   likelihood:'Low',   confidence:'High',  type:'Supplier-inherent', gate:false, mitigation:'Monitor; strong free cash flow ($1.12B) and scale offset.'},
+      {label:'Securities class action',    impact:'Low',   likelihood:'Low',   confidence:'Medium', type:'Supplier-inherent', gate:false, mitigation:'Monitor Patel v. Snowflake governance outcome.'}
     ],
     events: [
       {date:'Apr-Jun 2024', title:'UNC5537 customer-credential breach campaign', directness:'Affects the service', resolution:'Several claims dismissed with prejudice Dec 2025; litigation ongoing (MDL 3126).', detail:'Infostealer-harvested credentials accessed 165+ customer tenants lacking MFA; Snowflake infrastructure itself not breached.'},
-      {date:'Feb 2026',      title:'Patel v. Snowflake securities class action filed', directness:'Affects the operating division', resolution:'Ongoing.', detail:'Over a withdrawn 2029 revenue target; a governance matter to track, not a viability threat.'},
-      {date:'~May 2026',     title:'~$6B multi-year AWS partnership announced', directness:'Affects the service', resolution:'Positive signal.', detail:'Deepens multi-cloud footing and marketplace reach.'}
+      {date:'Feb 2026',     title:'Patel v. Snowflake securities class action filed', directness:'Affects the operating division', resolution:'Ongoing.', detail:'Over a withdrawn 2029 revenue target; a governance matter to track, not a viability threat.'},
+      {date:'~May 2026',    title:'~$6B multi-year AWS partnership announced', directness:'Affects the service', resolution:'Positive signal.', detail:'Deepens multi-cloud footing and marketplace reach.'}
     ],
     ownership: {
       treeRoot: {
-        label:'Global ultimate', value:'Snowflake Inc.', note:'Independent — no parent company', tag:'public',
+        label:'Global ultimate', value:'Snowflake Inc.', note:'Independent, no parent company', tag:'public',
         children:[{
           label:'Contracting entity', value:'Snowflake Inc. (NYSE: SNOW)', note:'The entity Lilly would contract with', tag:'entity',
           children:[
-            {label:'Product entity',           value:'Data Cloud',            tag:'offering'},
-            {label:'Product entity',           value:'Snowpark',              tag:'offering'},
-            {label:'Product entity',           value:'Cortex AI',             tag:'offering'},
-            {label:'Marketplace',              value:'Snowflake Marketplace', tag:'offering'},
+            {label:'Product entity',          value:'Data Cloud',           tag:'offering'},
+            {label:'Product entity',          value:'Snowpark',             tag:'offering'},
+            {label:'Product entity',          value:'Cortex AI',            tag:'offering'},
+            {label:'Marketplace',             value:'Snowflake Marketplace', tag:'offering'},
             {label:'Infrastructure dependency',value:'AWS · Azure · GCP', note:'Delivered on hyperscalers', tag:'infra'}
           ]
         }]
       },
       markers: [
         ['Public / private', 'Verified', 'Public (NYSE: SNOW)'],
-        ['Ultimate parent', 'Verified', 'None — independent'],
+        ['Ultimate parent', 'Verified', 'None, independent'],
         ['Beneficial ownership', 'Verified', 'Widely held; no single UBO (n/a)'],
         ['Sanctions / watchlist', 'Missing', 'Formal screen not run'],
         ['Lilly vendor-master match', 'Missing', 'Not checked'],
@@ -162,17 +162,17 @@ var ASSESS_AUTHORED = {
       {name:'Support locations', type:'Support', region:'To confirm for regulated data', conf:'Missing'}
     ],
     deliveryReadiness: [
-      {label:'Product maturity',      state:'Complete'},
-      {label:'Implementation model',  state:'Demonstrated'},
+      {label:'Product maturity',     state:'Complete'},
+      {label:'Implementation model', state:'Demonstrated'},
       {label:'Lilly architecture fit',state:'Partial'},
-      {label:'Capacity at scale',     state:'Proxy'},
-      {label:'Support model',         state:'Needed'}
+      {label:'Capacity at scale',    state:'Proxy'},
+      {label:'Support model',        state:'Needed'}
     ],
     dependencies: {
       root: {
         label:'Lilly analytics workload', value:'Delivered by Snowflake', tag:'entity',
         children:[
-          {label:'Cloud infrastructure',  value:'AWS · Azure · GCP', note:'Multi-cloud; reduces single-hyperscaler lock-in', tag:'infra'},
+          {label:'Cloud infrastructure', value:'AWS · Azure · GCP', note:'Multi-cloud; reduces single-hyperscaler lock-in', tag:'infra'},
           {label:'Implementation partner',value:'Not disclosed', note:'Identify the SI / delivery partner in the RFx', tag:'gap'},
           {label:'Support subcontractor', value:'Not disclosed', note:'Support-location scope to confirm for regulated data', tag:'gap'}
         ]
@@ -182,11 +182,11 @@ var ASSESS_AUTHORED = {
       status:'none',
       summary:'No prior Lilly contractual or performance history found for Snowflake. Treat as a net-new supplier; there is no incumbency to weigh or existing spend to consolidate.',
       slots:[
-        {label:'Existing contracts',   value:'None on file'},
-        {label:'Current annual spend',  value:'None on file'},
-        {label:'Business owner(s)',     value:'To assign'},
+        {label:'Existing contracts',  value:'None on file'},
+        {label:'Current annual spend', value:'None on file'},
+        {label:'Business owner(s)',    value:'To assign'},
         {label:'Prior sourcing events', value:'None on file'},
-        {label:'Supplier performance',  value:'No history'}
+        {label:'Supplier performance', value:'No history'}
       ],
       timeline:[
         {date:'Jul 2026', event:'Entered this analytics-workload-platform sourcing evaluation'}
@@ -195,43 +195,43 @@ var ASSESS_AUTHORED = {
     capabilities: {
       cols: ['Core', 'Integration', 'Security', 'Scale', 'Governance'],
       rows: [
-        {cap:'Data platform / warehouse',   cells:['Confirmed','Confirmed','Confirmed','Confirmed','Partially confirmed']},
-        {cap:'AI / ML (Cortex, Snowpark)',   cells:['Confirmed','Supplier asserted','Not demonstrated','Confirmed','Partially confirmed']},
-        {cap:'SAP / legacy integration',     cells:['Partially confirmed','Partially confirmed','Confirmed','Confirmed','N/A']},
-        {cap:'Regulated / GxP workloads',    cells:['Confirmed','Confirmed','Confirmed','Confirmed','Partially confirmed']}
+        {cap:'Data platform / warehouse',  cells:['Confirmed','Confirmed','Confirmed','Confirmed','Partially confirmed']},
+        {cap:'AI / ML (Cortex, Snowpark)',  cells:['Confirmed','Supplier asserted','Not demonstrated','Confirmed','Partially confirmed']},
+        {cap:'SAP / legacy integration',    cells:['Partially confirmed','Partially confirmed','Confirmed','Confirmed','N/A']},
+        {cap:'Regulated / GxP workloads',   cells:['Confirmed','Confirmed','Confirmed','Confirmed','Partially confirmed']}
       ]
     },
     references: [
-      {name:'Capital One', pharma:false, scale:true,      useCase:true,      verified:true},
-      {name:'Novartis',    pharma:true,  scale:true,      useCase:true,      verified:false},
-      {name:'Sanofi',      pharma:true,  scale:true,      useCase:'partial', verified:false},
-      {name:'IQVIA',       pharma:true,  scale:true,      useCase:true,      verified:false},
-      {name:'Adobe',       pharma:false, scale:true,      useCase:false,     verified:true}
+      {name:'Capital One', pharma:false, scale:true,     useCase:true,     verified:true},
+      {name:'Novartis',   pharma:true, scale:true,     useCase:true,     verified:false},
+      {name:'Sanofi',     pharma:true, scale:true,     useCase:'partial', verified:false},
+      {name:'IQVIA',      pharma:true, scale:true,     useCase:true,     verified:false},
+      {name:'Adobe',      pharma:false, scale:true,     useCase:false,    verified:true}
     ],
     commercialDrivers: [
-      {driver:'Compute',               variability:'High',                    note:'Consumption-based; peak concurrency drives cost'},
-      {driver:'Storage',               variability:'Moderate',                note:'Separated, priced independently'},
-      {driver:'Data transfer / egress',variability:'Potential exposure',      note:'Cross-cloud / cross-region egress'},
-      {driver:'Support',               variability:'Fixed / tiered',          note:'Tiered support plans'},
-      {driver:'Implementation',        variability:'Moderate',                note:'One-time; partner-led'},
-      {driver:'Exit / migration',      variability:'Potentially significant', note:'Single-platform lock-in'}
+      {driver:'Compute',              variability:'High',                   note:'Consumption-based; peak concurrency drives cost'},
+      {driver:'Storage',              variability:'Moderate',               note:'Separated, priced independently'},
+      {driver:'Data transfer / egress',variability:'Potential exposure',     note:'Cross-cloud / cross-region egress'},
+      {driver:'Support',              variability:'Fixed / tiered',         note:'Tiered support plans'},
+      {driver:'Implementation',       variability:'Moderate',               note:'One-time; partner-led'},
+      {driver:'Exit / migration',     variability:'Potentially significant', note:'Single-platform lock-in'}
     ],
     diligence: [
-      {stage:'Research complete',           pct:85},
-      {stage:'Supplier evidence received',  pct:20},
-      {stage:'Security review',             pct:15},
+      {stage:'Research complete',          pct:85},
+      {stage:'Supplier evidence received', pct:20},
+      {stage:'Security review',            pct:15},
       {stage:'Quality / regulatory review', pct:0},
-      {stage:'Financial / TPRM review',     pct:40},
-      {stage:'References validated',        pct:25},
-      {stage:'Contract readiness',          pct:0}
+      {stage:'Financial / TPRM review',    pct:40},
+      {stage:'References validated',       pct:25},
+      {stage:'Contract readiness',         pct:0}
     ],
     actions: [
-      {action:'Model peak consumption and negotiate committed-use caps', owner:'Finance / Sourcing',   gate:true,  status:'Open'},
-      {action:'Confirm US / EU data residency and support locations',    owner:'Supplier',             gate:true,  status:'Open'},
-      {action:'Complete cyber / privacy review; mandate MFA + key-pair', owner:'Information Security',  gate:true,  status:'Not started'},
-      {action:'Validate SAP / legacy integration path',                  owner:'Architecture',         gate:false, status:'Open'},
-      {action:'Obtain independent pharma references',                    owner:'Sourcing',             gate:false, status:'Open'},
-      {action:'Negotiate exit / portability terms',                      owner:'Sourcing / Legal',     gate:false, status:'Not started'}
+      {action:'Model peak consumption and negotiate committed-use caps', owner:'Finance / Sourcing',  gate:true, status:'Open'},
+      {action:'Confirm US / EU data residency and support locations',   owner:'Supplier',            gate:true, status:'Open'},
+      {action:'Complete cyber / privacy review; mandate MFA + key-pair', owner:'Information Security', gate:true, status:'Not started'},
+      {action:'Validate SAP / legacy integration path',                 owner:'Architecture',        gate:false, status:'Open'},
+      {action:'Obtain independent pharma references',                   owner:'Sourcing',            gate:false, status:'Open'},
+      {action:'Negotiate exit / portability terms',                     owner:'Sourcing / Legal',    gate:false, status:'Not started'}
     ]
   }
 };
@@ -242,19 +242,19 @@ function pvAssess(a, cand, input) {
   var auth = ASSESS_AUTHORED[a && a.id] || {};
   var rnd = (typeof pvRound === 'function') ? pvRound : function(n,d){var p=Math.pow(10,d||0);return Math.round(n*p)/p;};
 
-  // FIT — one scale (score5 primary, score100 available)
+  // FIT, one scale (score5 primary, score100 available)
   var f100 = (a && a.fitScore != null) ? a.fitScore : null;
   var f5 = f100 != null ? rnd(f100 / 20, 1) : null;
   var fitLabel = f5 == null ? 'Unknown' : f5 >= 4.25 ? 'High' : f5 >= 3.75 ? 'Moderate-high' : f5 >= 3.0 ? 'Moderate' : 'Low';
 
-  // RISK — semantic + confidence
+  // RISK, semantic + confidence
   var r5 = (a && a.riskScore != null) ? a.riskScore : null;
   var riskLevel = r5 == null ? 'Unknown' : r5 < 1.75 ? 'Low' : r5 < 2.5 ? 'Moderate' : r5 < 3.25 ? 'High' : 'Critical';
 
-  // DIMENSIONS (8) — authored or derived
+  // DIMENSIONS (8), authored or derived
   var dims = auth.dimensions || pvDeriveDimensions(a, cand);
 
-  // GATES — authored or derived
+  // GATES, authored or derived
   var gates = (auth.gates || pvDeriveGates(a, cand, input)).slice();
 
   // DISPOSITION
@@ -278,7 +278,7 @@ function pvAssess(a, cand, input) {
     fit: {score5: f5, score100: f100, label: fitLabel},
     risk: {level: riskLevel, score5: r5 != null ? rnd(r5, 1) : null, confidence: auth.riskConfidence || 'Low'},
     evidenceConfidence: auth.evidenceConfidence || 'Low',
-    criticality: auth.criticality || '—',
+    criticality: auth.criticality || 'Not classified',
     openIssues: openIssues,
     gates: gates,
     dimensions: dims,
@@ -323,14 +323,14 @@ function pvDeriveDimensions(a, cand) {
   var insuf = {c:'Insufficient evidence', cf:'Low'};
   var mk = function(id, label, o, ev){ return {id:id, label:label, concern:o.c, confidence:o.cf, evidence:ev || ''}; };
   return [
-    mk('identity',   'Identity & ownership',   insuf, 'Not independently verified from public sources.'),
-    mk('capability', 'Capability & fit',       capC,  'Derived from the requirements-fit score.'),
-    mk('financial',  'Financial viability',    inv(risk.financial), 'Derived from the financial-stability signal.'),
+    mk('identity',  'Identity & ownership',  insuf, 'Not independently verified from public sources.'),
+    mk('capability', 'Capability & fit',      capC, 'Derived from the requirements-fit score.'),
+    mk('financial', 'Financial viability',   inv(risk.financial), 'Derived from the financial-stability signal.'),
     mk('resilience', 'Operational resilience', inv(risk.lockin != null ? risk.lockin : risk.geo), 'Derived from lock-in / concentration signals.'),
-    mk('integrity',  'Integrity & compliance', insuf, 'No public screening performed.'),
-    mk('quality',    'Quality & regulatory',   insuf, 'No certification / inspection evidence gathered.'),
-    mk('cyber',      'Cyber & privacy',        inv(risk.security), 'Derived from the security-posture signal.'),
-    mk('responsible','Responsible sourcing',   insuf, 'Not assessed.')
+    mk('integrity', 'Integrity & compliance', insuf, 'No public screening performed.'),
+    mk('quality',   'Quality & regulatory',  insuf, 'No certification / inspection evidence gathered.'),
+    mk('cyber',     'Cyber & privacy',       inv(risk.security), 'Derived from the security-posture signal.'),
+    mk('responsible','Responsible sourcing',  insuf, 'Not assessed.')
   ];
 }
 
@@ -479,7 +479,7 @@ function pvDecisionHeaderStrip(x) {
   var rl = THEO_RISKBAND[x.risk.level] || THEO_RISKBAND['Unknown'];
   return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px 22px;align-items:start;background:var(--surface,#fff);border:1px solid var(--line,#E1E0DC);border-radius:14px;padding:16px 20px;box-shadow:var(--shadow,0 1px 4px rgba(38,30,20,.08))">'
     + cell('Recommendation', pvDispBadge(x.disposition))
-    + cell('Rank', x.rank ? (x.rank + ' of ' + (x.ofN || '—')) : '—')
+    + cell('Rank', x.rank ? (x.ofN ? (x.rank + ' of ' + x.ofN) : String(x.rank)) : 'Not ranked')
     + cell('Requirements fit', pvAEsc(x.fit.label) + (x.fit.score5 != null ? ' <span style="font-family:var(--mono,monospace);color:var(--mut,#4A443C);font-weight:600">' + x.fit.score5 + '/5</span>' : ''))
     + cell('Risk posture', '<span style="color:' + rl.c + '">' + pvAEsc(x.risk.level) + '</span>' + (x.risk.score5 != null ? ' <span style="font-family:var(--mono,monospace);color:var(--mut,#4A443C);font-weight:600">' + x.risk.score5 + '</span>' : ''))
     + cell('Evidence confidence', pvAEsc(x.evidenceConfidence) + ' ' + pvConfDots(x.evidenceConfidence))
