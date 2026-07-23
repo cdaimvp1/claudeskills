@@ -4974,10 +4974,13 @@ function pvExecSummaryHtml(refl,input){
  // Overview (Marc, 2026-07-23): a clear supplier FUNNEL instead of the ambiguous "7 scanned / 7-of-7 eligible +
  // 2 eliminated (reads like 9)" mix. Reviewed = assessed field + pre-shortlist eliminations, then passed /
  // screened out / recommended for RFx. Grounded in supplierCount / eligibleCount / eliminations / shortlist.
- var elimN=((L.recommendation&&L.recommendation.eliminations)||(typeof P!=='undefined'&&P&&P.excludedVendors)||[]).length;
+ // elimN must match the eliminations the table actually renders (elimRowsSrc), not the raw
+ // eliminations array — an empty [] is truthy and was masking the illustrative fallback (reviewed read 7 not 9).
+ var elimN=(typeof elimRowsSrc!=='undefined'&&elimRowsSrc)?elimRowsSrc.length:0;
  var reviewedN=(L.supplierCount||0)+elimN;
  var screenedN=Math.max(0,(L.supplierCount||0)-(L.eligibleCount||0))+elimN;
- var rfxN=(typeof shortlistIds!=='undefined'&&shortlistIds&&shortlistIds.length)?shortlistIds.length:(L.eligibleCount||0);
+ // rfxN = the shortlist band (recommended for RFx), not eligibleCount; shortlistIds is a map (no .length).
+ var rfxN=(typeof shortlist!=='undefined'&&shortlist)?shortlist.length:(L.eligibleCount||0);
  var mstrip='<div style="display:flex;gap:12px;flex-wrap:wrap;margin:0 0 16px">'+mtile(reviewedN,'Suppliers reviewed')+mtile(L.eligibleCount,'Passed screen')+mtile(screenedN,'Screened out')+mtile(rfxN,'Recommended for RFx')+'</div>';
  // assembly: scope strip → Eval | Recommendation → segmentation & differentiators (merged) → market structure → dynamics/H2H
  // (Marc: "Across the Field" prose + "Data basis" card removed, redundant with the strip/chips/recommendation.)
