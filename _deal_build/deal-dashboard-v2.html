@@ -3853,24 +3853,6 @@ function lpAchievable(d) {
   return pkgs.reduce((m, p) => Math.max(m, p.resultingProtectionScore || 0), (d.protection && d.protection.score) || 0);
 }
 
-/* ---- must-negotiate marker (non-text dot + tooltip): red = critical/hard-stop,
- * amber = high-impact. issue: hard-stop -> critical; high with a real
- * recommendedPosition -> high. obligation: critical verdict + negotiate -> critical;
- * adverse verdict + negotiate -> high. Balanced/neutral/med/low get no marker. ---- */
-function lpMarkerIssue(iss) {
-  if (iss.priority === 'hard-stop') return { level: 'critical', tip: 'Critical, must be negotiated' };
-  if (iss.priority === 'high' && iss.recommendedPosition && iss.recommendedPosition.trim()) return { level: 'high', tip: 'High impact, negotiate' };
-  return null;
-}
-function lpMarkerObl(o, d) {
-  const a = lpOBA(d)[o.id] || {};
-  if (a.fairnessVerdict === 'critical' && a.negotiate) return { level: 'critical', tip: 'Critical, must be negotiated' };
-  if (a.fairnessVerdict === 'adverse' && a.negotiate) return { level: 'high', tip: 'High impact, negotiate' };
-  return null;
-}
-function lpMarkerHtml(m) {
-  return m ? '<span class="lp-mneg lp-mneg-' + m.level + '" role="img" tabindex="0" title="' + esc(m.tip) + '" aria-label="' + esc(m.tip) + '"></span>' : '';
-}
 
 /* ---- local inline-SVG icon set (self-contained; the live icon() set has no
  * alert/compass/check/arrow). Used for finding-detail zone headers + verdict. ---- */
@@ -4007,7 +3989,7 @@ function lpNavProtections(d) {
       '<div class="lp-acc-find" role="button" tabindex="0" data-gotofinding="' + esc(iss.id) + '" title="Open ' + esc(iss.id) + ' in the register">' +
         '<span class="lp-af-main"><span class="lp-af-title">' + esc(iss.title) + '</span>' +
         '<span class="lp-af-id">' + esc(iss.id) + '</span></span>' +
-        '<span class="lp-af-right">' + lpMarkerHtml(lpMarkerIssue(iss)) + severityPill(iss.priority) + '</span>' +
+        '<span class="lp-af-right">' + severityPill(iss.priority) + '</span>' +
       '</div>').join('');
     return '<details name="lp-prot" class="lp-acc-item"' + (i === openIdx ? ' open' : '') + '>' +
       '<summary class="lp-acc-hd">' +
@@ -4052,7 +4034,7 @@ function lpNavObligations(d) {
       return '<div class="lp-acc-find" role="button" tabindex="0" data-gotofinding="' + esc(o.id) + '" title="Open ' + esc(o.id) + ' in the register">' +
         '<span class="lp-af-main"><span class="lp-af-title">' + esc(lpShort(o.text, 66)) + '</span>' +
         '<span class="lp-obl-sub">' + lpPartyPill(o.party) + flag + '<span class="lp-obl-clause">' + esc(o.clause) + '</span></span></span>' +
-        '<span class="lp-af-right">' + lpMarkerHtml(lpMarkerObl(o, d)) + '</span>' +
+        '<span class="lp-af-right"></span>' +
       '</div>';
     }).join('');
     return '<details name="lp-obl" class="lp-acc-item">' +
@@ -4103,7 +4085,6 @@ function lpRegItems(d) {
 }
 function lpRegRow(item, d, open) {
   const id = item.id, isIssue = item.type === 'issue';
-  const marker = lpMarkerHtml(isIssue ? lpMarkerIssue(item.data) : lpMarkerObl(item.data, d));
   const tag = isIssue ? '<span class="lp-rr-tag lp-tag-issue">Issue</span>' : '<span class="lp-rr-tag lp-tag-obligation">Obligation</span>';
   let title, sub, side;
   if (isIssue) {
@@ -4123,10 +4104,17 @@ function lpRegRow(item, d, open) {
   const detail = isIssue ? lpIssueDetail(item.data, d) : lpObligationDetail(item.data, d);
   return '<tr class="expandable lp-reg-row' + (open ? ' is-open' : '') + '" data-exprow="' + esc(id) + '" data-rowkey="' + esc(id) + '" data-facet="' + esc(facet) + '">' +
       '<td class="lp-td-tag">' + tag + '</td>' +
-      '<td class="lp-td-main"><div class="lp-rr-flex">' + marker + '<span class="lp-rr-body"><span class="lp-rr-title">' + title + '</span><span class="lp-rr-sub">' + sub + '</span></span></div></td>' +
+      '<td class="lp-td-main"><div class="lp-rr-flex"><span class="lp-rr-body"><span class="lp-rr-title">' + title + '</span><span class="lp-rr-sub">' + sub + '</span></span></div></td>' +
       '<td class="lp-td-side">' + side + '</td>' +
     '</tr>' +
     '<tr class="expander-row' + (open ? '' : ' is-hidden') + '" data-expfor="' + esc(id) + '"><td colspan="3"><div class="exp-inner">' + detail + '</div></td></tr>';
+}
+// severity filter chip: the severity ICON (via severityPill, its bg stripped by .cf-sev CSS) +
+// a count, instead of the text label. The word is kept as the button title/aria-label.
+function sevFilterChip(key, count) {
+  const label = { 'hard-stop':'Hard stop', high:'High', medium:'Medium', low:'Low' }[key] || key;
+  return '<button class="chip-filter cf-sev" type="button" data-filterchip="' + key + '" aria-pressed="false" title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
+    severityPill(key) + '<span class="cf-n">' + count + '</span></button>';
 }
 function lpRegister(d) {
   const items = lpRegItems(d);
@@ -4136,10 +4124,10 @@ function lpRegister(d) {
     '<div class="lp-reg-tools"><div class="toolbar">' +
       '<input type="search" placeholder="Search title, clause, category, party&hellip;" data-filter-input data-filter-for="tbl-lp-register" aria-label="Search findings">' +
       '<span class="lp-rf-lab">Severity</span>' +
-      '<button class="chip-filter" type="button" data-filterchip="hard-stop" aria-pressed="false">Hard stop (' + cnt(i => i.sev === 'hard-stop') + ')</button>' +
-      '<button class="chip-filter" type="button" data-filterchip="high" aria-pressed="false">High (' + cnt(i => i.sev === 'high') + ')</button>' +
-      '<button class="chip-filter" type="button" data-filterchip="medium" aria-pressed="false">Medium (' + cnt(i => i.sev === 'medium') + ')</button>' +
-      '<button class="chip-filter" type="button" data-filterchip="low" aria-pressed="false">Low (' + cnt(i => i.sev === 'low') + ')</button>' +
+      sevFilterChip('hard-stop', cnt(i => i.sev === 'hard-stop')) +
+      sevFilterChip('high', cnt(i => i.sev === 'high')) +
+      sevFilterChip('medium', cnt(i => i.sev === 'medium')) +
+      sevFilterChip('low', cnt(i => i.sev === 'low')) +
       '<span class="lp-rf-lab">Type</span>' +
       '<button class="chip-filter" type="button" data-filterchip="issue" aria-pressed="false">Issue (' + cnt(i => i.type === 'issue') + ')</button>' +
       '<button class="chip-filter" type="button" data-filterchip="obligation" aria-pressed="false">Obligation (' + cnt(i => i.type === 'obligation') + ')</button>' +
@@ -4652,9 +4640,6 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-sd.d-medium i{background:var(--sec)}.contract-tab .lp-sd.d-medium{color:var(--sec-tx)}' +
   '.contract-tab .lp-sd.d-low i{background:color-mix(in srgb,var(--sec) 45%,var(--mut2))}.contract-tab .lp-sd.d-low{color:var(--mut2)}' +
   /* must-negotiate marker */
-  '.contract-tab .lp-mneg{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;cursor:help;box-shadow:0 0 0 2px var(--surface)}' +
-  '.contract-tab .lp-mneg-critical{background:var(--danger)}' +
-  '.contract-tab .lp-mneg-high{background:var(--emph)}' +
   /* party / one-sided / balanced pills */
   '.contract-tab .pill.lp-party-supplier{background:var(--plum-t);color:var(--pri-tx)}' +
   '.contract-tab .pill.lp-party-buyer{background:var(--sec-t);color:var(--sec-tx)}' +
@@ -4664,6 +4649,12 @@ const CONTRACT_STYLE =
   '.contract-tab .pill.lp-balanced{background:var(--ok-t);color:var(--ok)}' +
   /* 3. register */
   '.contract-tab .lp-reg-tools .toolbar{margin-bottom:0}' +
+  /* severity filter chips: colored icon + count (the pill bg is stripped so only the icon shows) */
+  '.contract-tab .chip-filter.cf-sev{display:inline-flex;align-items:center;gap:5px;padding-top:3px;padding-bottom:3px}' +
+  '.contract-tab .cf-sev .pill{background:none;border:0;padding:0;gap:0}' +
+  '.contract-tab .cf-sev .sev-ic{width:13px;height:13px}' +
+  '.contract-tab .cf-sev .cf-n{font-variant-numeric:tabular-nums;font-weight:800;color:var(--ink2)}' +
+  '.contract-tab .chip-filter.cf-sev[aria-pressed="true"] .cf-n{color:inherit}' +
   '.contract-tab .lp-rf-lab{font:800 10px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-left:4px}' +
   '.contract-tab .lp-reg-clear{border:1px solid var(--line2);background:var(--surface);color:var(--sec-tx);font:800 11px/1 var(--sans);cursor:pointer;padding:6px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}' +
   '.contract-tab .lp-reg-clear:hover{background:var(--sec-t)}' +
