@@ -504,6 +504,21 @@ Generate using the docx skill (JavaScript/docx-js):
 - Standard Word bullets via numbering config
 - US Letter page size, 1-inch margins
 
+### Word (.docx) report generation wiring (HARD RULE)
+
+The native `executive_summary.docx` deliverable is produced by calling the vendored `executive_summary_generator.py` (in this skill's own directory, python-docx-based) with a validated executive-summary register as input, never by hand-assembling the document paragraph-by-paragraph in the moment. `executive_summary_generator.py` validates the register, computes BOTH the ATC and ATS approval-chain grade sequences by calling `compute_chain()` in the vendored `frap_chain_kernel.py` (the same HARD RULE named in "Kernel wiring" above, "Do not hand-recompute the chain in prose and do not hand-roll a second copy of the algorithm, call the kernel"), asserts the ATC-chain-resolved, ATS-chain-resolved, approver-names-match-chain-length, and Financial-Risk-Rating-integrity invariants, then writes the Section Order 1-15 (Title through Data Basis & Confirmations) as a real `.docx`, and finally re-scans the assembled document to confirm no em dash slipped in and that the Cost Efficiency section is present if and only if savings data was supplied (the task #25 "omit entirely, never write 'No savings identified'" fix, enforced as a code-level check, not just a workflow instruction). Call `generate_executive_summary_docx(register, output_path)` (or its component functions `validate_executive_summary_input()` / `compute_ground_truth()` / `build_document()` individually when only part of the pipeline is needed) rather than writing `python-docx` calls directly in this skill's own workflow. If the generator raises `ExecutiveSummaryValidationError` or `ReconciliationError`, do not deliver a document: surface the raised message (a missing or invalid field, a Financial Summary that does not foot to its stated total, an unresolvable approval chain, or a Financial Risk Rating that was about to be silently defaulted) and resolve it, per Rule 1 and Rule 3, rather than hand-patching around the failure. Approval-chain GRADES are always kernel-computed; approval-chain NAMES are never computed or invented, per "Do NOT hardcode any names" above, the module renders `[To be confirmed]` for any resolved grade with no supplied name. If `executive_summary_generator.py` cannot be read (missing or corrupted), fall back to hand-building the document per the Default Document Structure (inlined above) and disclose plainly in the output that the vendored generator was unavailable this run.
+
+**Invocation.**
+```
+python executive_summary_generator.py --input executive_summary_register.json --output executive_summary.docx
+python executive_summary_generator.py --demo          # self-test: builds both illustrative demo registers'
+                                                        # DOCX files (with savings, and no savings), reopens
+                                                        # both, and asserts every expected section, table, and
+                                                        # value is present (76/76 checks)
+python executive_summary_generator.py                 # no args -> also runs the self-test
+```
+The executive-summary register's JSON shape (deal facts, pre-composed narrative sections, financial figures, and approval-chain facts including the required `table_source` live-fetch-first/vendored-fallback flag) is documented in full in the module docstring at the top of `executive_summary_generator.py`. It consumes narrative content (opening paragraph, background, benefits, risks, and so on) already composed by this skill's own Read First, Ask Second workflow rather than reading the source contract itself, the same "consume, don't re-derive" discipline should-cost-builder and evaluation-engine apply to each other's sourced figures; only the ATC/ATS chain math is delegated to the kernel. Scope note: this generator produces `executive_summary.docx` only, the companion `executive_summary.md` (Output File 2 above) remains a separate deliverable produced through the existing docx-js / Markdown-conversion path, not by this Python module.
+
 ### File 2: Markdown (text only)
 File: `[SupplierName]_ATC_Executive_Summary.md`
 Format: Plain text markdown. Same content as the DOCX -- same sections, same wording, same data.
