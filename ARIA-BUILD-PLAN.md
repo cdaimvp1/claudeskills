@@ -468,3 +468,30 @@ Net: the plan's foundational native+ARIA-orchestration dependence is largely val
 
 ## Risk #1 UPDATE 2 (Marc, 2026-07-22): essentially RESOLVED
 The user is STILL working in Claude Desktop when ARIA is activated - ARIA does not remove or sandbox Claude's native tools. So native web_fetch (the external-research funnel) and native artifact/widget rendering are INHERENTLY AVAILABLE in the session, whether or not a shipped recipe has yet exercised them. The two residual items were 'not yet demonstrated in the recipe corpus', NOT 'not possible'. Net: risk #1 is resolved; the Phase-0 spike becomes a quick pattern/ergonomics confirmation, not a feasibility gate.
+
+---
+
+## ADDENDUM (2026-07-24): Fabric telemetry + feedback-loop research  [DEFERRED]
+
+Read-only research of ARIA_UNIFIED (`C:\Users\marcs\Downloads\ARIA_UNIFIED\ARIA_UNIFIED`); nothing was changed. Captured here for when the ARIA conversion / skills learning-loop work is picked up. ARIA is a Python 3.12 MCP server; telemetry lives in `aria_core/telemetry.py`. STATUS: DEFERRED (aligns with the skill-alignment workstream, which comes AFTER the dashboards are done).
+
+### Does ARIA write to Fabric? Yes (telemetry only).
+Writes telemetry to a Microsoft Fabric **Eventhouse (KQL/Kusto DB)** via streaming-ingestion REST (`aria_core/telemetry.py`). Engineering detail worth copying: events are queued and drained SYNCHRONOUSLY at each tool dispatch, NOT from background/daemon threads, because CrowdStrike EDR silently killed the process when daemon threads POSTed to Kusto. Every event is also mirrored to a local `aria_telemetry.jsonl` (a live ~131-row copy exists on the machine). The data-query tools only READ Fabric; the only thing ARIA writes back is telemetry.
+
+Tables: `tool_calls`, `tool_call_detail`, `recipe_candidates`, `gotcha_candidates`, `corrections`, `session_starts`, `session_summaries`, `auth_state`.
+
+### Does it track how often each skill/tool is called? Yes, comprehensively.
+All tools are instrumented at ONE dispatch hook (`_inject_perf`, via the `require_session` / `require_canon` decorators, instrument-once not per-tool). Per invocation it captures: tool name, a per-session sequential call number, duration, full user identity (upn/domain/function/team), success/failure + error taxonomy, dataset/row-count, whether a curated "Canon" recipe was used, and retry recovery. So per-tool usage counting is already there. Caveat: token/cost/model attribution is stubbed at 0 (the MCP server cannot see Claude-side token usage).
+
+### Feedback / learning loop? Partial, 2 of 3 legs.
+- Auto-emitted candidate signals: `recipe_candidate` (a query that worked, promote), `gotcha_candidate` (a failure, review), `correction` (succeeded right after a failure = the first attempt was wrong). All INFERRED success/failure (rows returned, no error). There is NO explicit thumbs-up/down / accept-reject / edit-tracking event anywhere.
+- Runtime read-back that adapts behavior: ARIA re-downloads curated "Canon" and injects dataset hints / gotcha warnings / auto-blocks bad models.
+- The missing middle: turning candidate rows into updated Canon is done by an EXTERNAL human "Canon Builder" process, not in this repo. Full loop: ARIA emits candidates, then (offline curation, elsewhere) Canon lakehouse is updated, then ARIA re-reads Canon. Only the first and last legs live in ARIA.
+- `aria_usage_insights` / `aria_admin_review` already run KQL over the Eventhouse for adoption / friction / coverage-gap / drift metrics (on-demand).
+
+### What is useful for the skills
+Reuse as-is: the Eventhouse table set (per-invocation counts, identity, latency, success/failure, inferred worked/failed/tried-something-else); and the real asset, the **instrument-once-at-dispatch + bounded-queue + foreground-drain** pattern (portable straight to a skills dispatcher, and it dodges the EDR problem); plus the KQL-over-Eventhouse analytics pattern.
+
+The one real gap for a LEARNING loop (not just usage counting): there is no "was this recommendation followed" signal for any tool. Smallest high-value addition: a single new event type `skill_outcome` (skill, recommendation_id, action in {accepted, rejected, edited, ignored}) emitted where a skill's output is actually acted on. That is the piece that turns counting into learning; nothing in ARIA does it today. True curation/promotion would still need building (ARIA delegates that to people).
+
+Net: ARIA gives usage + inferred-success tracking for free and a battle-tested telemetry pattern to copy, but the explicit outcome signal and the curation step are net-new if the skills are to actually learn.
