@@ -117,6 +117,14 @@ file is produced) + adversarial scan + commit. Locate the skill dir first; verif
   nav severity-mix dots aligned. Both verified in-browser + independent malicious-code scan CLEAN.
   OPEN follow-ups Marc may want: severity pills icon-ONLY (drop the word); slim Overview ZOPA by
   moving Opening/Benchmark read-lines to Economics (shared zopaTotalHTML - needs an Overview flag).
+- DONE (2026-07-24, with Marc): (b7f41f8) severity pills ICON-ONLY (icon+tooltip+sr-label); Overview ZOPA
+  SLIMMED to the Read line (Opening/Benchmark stay in Economics via zopaTotalHTML opts.slim); and the
+  **SCOPE & PERFORMANCE tab REBUILT** to the verify-complete/sound/allocated design (readiness verdict
+  banner + Intended-Scope Reconciliation ledger [intent1] + Delivery Timeline verification + RACI +
+  Shifts-to-Lilly register [intent3] + merged Performance [intent2]; old Dependencies/Acceptance folded
+  in; composes-by-trait). New d.scope seed (intendedScope/assumedScope/categoryNorms/timelineVerification/
+  paymentStructure/shifts). Verified in-browser + independent review CLEAN. See memory
+  project_lilly_theo_deal_scope_performance_intent (design-of-record). Ingestion still MOCKED.
 - DECISIONS PENDING from Marc: adopt the Cross-Doc reframe live? make the Document map click-to-open the
   register row? which more skill dashboards to add to the folder? (ChatGPT analysis reviewed: keep 4-tab
   arch; the real next strategic item is a SKILL-ALIGNMENT SPEC - each skill keeps its standalone/combined
