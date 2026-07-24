@@ -272,10 +272,20 @@ a:hover{text-decoration:underline}
 /* ---- 9. STATUS / SEVERITY PILLS ----------------------------------------- */
 .pill{display:inline-flex; align-items:center; gap:5px; font:700 var(--fz-meta)/1 var(--sans); padding:4px 9px; border-radius:6px; border:1px solid transparent; white-space:nowrap}
 .pill::before{content:""; width:7px; height:7px; border-radius:2px; background:currentColor; flex:none}
-.sev-hard-stop,.pill.danger{background:var(--danger-bg); color:var(--danger-fg); border-color:color-mix(in srgb,var(--danger-bar) 35%,transparent)}
-.sev-high,.pill.warn{background:var(--warn-bg); color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 32%,transparent)}
-.sev-medium,.pill.info{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 28%,transparent)}
-.sev-low,.pill.muted{background:var(--nested); color:var(--mut2); border-color:var(--line2)}
+/* generic status pills keep their semantic colours (red stays reserved for genuine danger/critical) */
+.pill.danger{background:var(--danger-bg); color:var(--danger-fg); border-color:color-mix(in srgb,var(--danger-bar) 35%,transparent)}
+.pill.warn{background:var(--warn-bg); color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 32%,transparent)}
+.pill.info{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 28%,transparent)}
+.pill.muted{background:var(--nested); color:var(--mut2); border-color:var(--line2)}
+/* SEVERITY pills: icon-led ordinal ladder. hard-stop = a gate (stop sign, burnt orange);
+   high/medium/low = a magnitude ramp (arrow-up plum / line teal / arrow-down light-teal).
+   The colored ::before dot is replaced by the severity icon carried in the markup. */
+.pill.sev-hard-stop::before,.pill.sev-high::before,.pill.sev-medium::before,.pill.sev-low::before{display:none}
+.sev-ic{width:11px; height:11px; flex:none}
+.sev-hard-stop{background:color-mix(in srgb,var(--emph) 12%,transparent); color:var(--emph); border-color:color-mix(in srgb,var(--emph) 38%,transparent)}
+.sev-high{background:color-mix(in srgb,var(--plum) 10%,transparent); color:var(--plum); border-color:color-mix(in srgb,var(--plum) 32%,transparent)}
+.sev-medium{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 28%,transparent)}
+.sev-low{background:color-mix(in srgb,var(--sec) 8%,transparent); color:color-mix(in srgb,var(--sec-tx) 58%,var(--mut2)); border-color:var(--line2)}
 .pill.ok{background:var(--ok-bg); color:var(--ok-fg); border-color:color-mix(in srgb,var(--ok-bar) 30%,transparent)}
 /* status shading for scope/SLA rows */
 .st-aligned{color:var(--ok-fg)} .st-partial{color:var(--warn-fg)} .st-deviation{color:var(--danger-fg)} .st-missing{color:var(--mut)}
@@ -1356,9 +1366,20 @@ function coverageBadge(level) {
 
 /* ---------- 3. SEVERITY / STATUS PILLS ------------------------------------ */
 const SEV_LABEL = { 'hard-stop':'Hard stop', high:'High', medium:'Medium', low:'Low' };
+// Severity is icon-led: hard-stop is a GATE (stop sign), high/medium/low a magnitude ramp
+// (arrow-up / straight line / arrow-down). Colour comes from CSS (.sev-*); the icon inherits it
+// via currentColor. The word stays for legibility + carries the aria-label/title.
+const SEV_ICON = {
+  'hard-stop':'<svg class="sev-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"/></svg>',
+  high:'<svg class="sev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  medium:'<svg class="sev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>',
+  low:'<svg class="sev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>'
+};
 function severityPill(priority) {
   const p = priority || 'medium';
-  return '<span class="pill sev-' + esc(p) + '">' + esc(SEV_LABEL[p] || p) + '</span>';
+  const label = SEV_LABEL[p] || p;
+  return '<span class="pill sev-' + esc(p) + '" title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
+    (SEV_ICON[p] || '') + esc(label) + '</span>';
 }
 function statusPill(status, label) {
   const map = { aligned:'ok', partial:'warn', deviation:'danger', missing:'muted',
@@ -4467,10 +4488,11 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-sevmix{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;color:var(--mut2)}' +
   '.contract-tab .lp-sd{display:inline-flex;align-items:center;gap:3px;font-weight:800}' +
   '.contract-tab .lp-sd i{width:8px;height:8px;border-radius:50%;display:inline-block}' +
-  '.contract-tab .lp-sd.d-hard-stop i{background:var(--danger)}.contract-tab .lp-sd.d-hard-stop{color:var(--danger)}' +
-  '.contract-tab .lp-sd.d-high i{background:var(--emph)}.contract-tab .lp-sd.d-high{color:var(--emph-tx)}' +
-  '.contract-tab .lp-sd.d-medium i{background:var(--warn-bar)}.contract-tab .lp-sd.d-medium{color:var(--warn)}' +
-  '.contract-tab .lp-sd.d-low i{background:var(--mut)}.contract-tab .lp-sd.d-low{color:var(--mut2)}' +
+  /* severity-mix dots mirror the severity-pill ramp: hard-stop burnt-orange / high plum / medium teal / low light-teal */
+  '.contract-tab .lp-sd.d-hard-stop i{background:var(--emph)}.contract-tab .lp-sd.d-hard-stop{color:var(--emph)}' +
+  '.contract-tab .lp-sd.d-high i{background:var(--plum)}.contract-tab .lp-sd.d-high{color:var(--plum)}' +
+  '.contract-tab .lp-sd.d-medium i{background:var(--sec)}.contract-tab .lp-sd.d-medium{color:var(--sec-tx)}' +
+  '.contract-tab .lp-sd.d-low i{background:color-mix(in srgb,var(--sec) 45%,var(--mut2))}.contract-tab .lp-sd.d-low{color:var(--mut2)}' +
   /* must-negotiate marker */
   '.contract-tab .lp-mneg{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;cursor:help;box-shadow:0 0 0 2px var(--surface)}' +
   '.contract-tab .lp-mneg-critical{background:var(--danger)}' +

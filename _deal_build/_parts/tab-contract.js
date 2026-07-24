@@ -1038,10 +1038,11 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-sevmix{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;color:var(--mut2)}' +
   '.contract-tab .lp-sd{display:inline-flex;align-items:center;gap:3px;font-weight:800}' +
   '.contract-tab .lp-sd i{width:8px;height:8px;border-radius:50%;display:inline-block}' +
-  '.contract-tab .lp-sd.d-hard-stop i{background:var(--danger)}.contract-tab .lp-sd.d-hard-stop{color:var(--danger)}' +
-  '.contract-tab .lp-sd.d-high i{background:var(--emph)}.contract-tab .lp-sd.d-high{color:var(--emph-tx)}' +
-  '.contract-tab .lp-sd.d-medium i{background:var(--warn-bar)}.contract-tab .lp-sd.d-medium{color:var(--warn)}' +
-  '.contract-tab .lp-sd.d-low i{background:var(--mut)}.contract-tab .lp-sd.d-low{color:var(--mut2)}' +
+  /* severity-mix dots mirror the severity-pill ramp: hard-stop burnt-orange / high plum / medium teal / low light-teal */
+  '.contract-tab .lp-sd.d-hard-stop i{background:var(--emph)}.contract-tab .lp-sd.d-hard-stop{color:var(--emph)}' +
+  '.contract-tab .lp-sd.d-high i{background:var(--plum)}.contract-tab .lp-sd.d-high{color:var(--plum)}' +
+  '.contract-tab .lp-sd.d-medium i{background:var(--sec)}.contract-tab .lp-sd.d-medium{color:var(--sec-tx)}' +
+  '.contract-tab .lp-sd.d-low i{background:color-mix(in srgb,var(--sec) 45%,var(--mut2))}.contract-tab .lp-sd.d-low{color:var(--mut2)}' +
   /* must-negotiate marker */
   '.contract-tab .lp-mneg{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;cursor:help;box-shadow:0 0 0 2px var(--surface)}' +
   '.contract-tab .lp-mneg-critical{background:var(--danger)}' +

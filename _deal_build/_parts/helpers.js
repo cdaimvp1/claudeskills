@@ -124,9 +124,20 @@ function coverageBadge(level) {
 
 /* ---------- 3. SEVERITY / STATUS PILLS ------------------------------------ */
 const SEV_LABEL = { 'hard-stop':'Hard stop', high:'High', medium:'Medium', low:'Low' };
+// Severity is icon-led: hard-stop is a GATE (stop sign), high/medium/low a magnitude ramp
+// (arrow-up / straight line / arrow-down). Colour comes from CSS (.sev-*); the icon inherits it
+// via currentColor. The word stays for legibility + carries the aria-label/title.
+const SEV_ICON = {
+  'hard-stop':'<svg class="sev-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"/></svg>',
+  high:'<svg class="sev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  medium:'<svg class="sev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>',
+  low:'<svg class="sev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>'
+};
 function severityPill(priority) {
   const p = priority || 'medium';
-  return '<span class="pill sev-' + esc(p) + '">' + esc(SEV_LABEL[p] || p) + '</span>';
+  const label = SEV_LABEL[p] || p;
+  return '<span class="pill sev-' + esc(p) + '" title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
+    (SEV_ICON[p] || '') + esc(label) + '</span>';
 }
 function statusPill(status, label) {
   const map = { aligned:'ok', partial:'warn', deviation:'danger', missing:'muted',
