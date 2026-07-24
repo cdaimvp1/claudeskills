@@ -25,13 +25,14 @@
   function pathJump(text) {
     var t = String(text || '').toLowerCase();
     if (/^iss-/.test(t)) return 'tab:contract/sub:terms';
-    if (/^sc-/.test(t)) return 'tab:commercials/sub:scenarios';
-    if (/^cl-/.test(t)) return 'tab:commercials/sub:proposal';
-    if (/^bench-/.test(t)) return 'tab:commercials/sub:benchmarks';
+    // all commercial analyses (lines, scenarios, benchmarks) now live on the Deal Table & ZOPA subtab
+    if (/^sc-/.test(t)) return 'tab:commercials/sub:deal';
+    if (/^cl-/.test(t)) return 'tab:commercials/sub:deal';
+    if (/^bench-/.test(t)) return 'tab:commercials/sub:deal';
     if (t.indexOf('terms & risk') !== -1 || t === 'issues') return 'tab:contract/sub:terms';
     if (t.indexOf('scope') !== -1 || t.indexOf('sla') !== -1) return 'tab:contract/sub:scope';
-    if (t.indexOf('scenario') !== -1) return 'tab:commercials/sub:scenarios';
-    if (t.indexOf('benchmark') !== -1) return 'tab:commercials/sub:benchmarks';
+    if (t.indexOf('scenario') !== -1) return 'tab:commercials/sub:deal';
+    if (t.indexOf('benchmark') !== -1) return 'tab:commercials/sub:deal';
     if (t.indexOf('sources') !== -1) return 'tab:sources/sub:sources';
     return null;
   }

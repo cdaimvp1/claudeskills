@@ -7,10 +7,9 @@
  *
  * Question the tab answers: "What is it worth, what should I pay?"
  *
- * Subtabs (3):
- *   3A  Deal Table & ZOPA   (data-subpanel="commercials/deal")
+ * Subtabs (2):
+ *   3A  Deal Table & ZOPA   (data-subpanel="commercials/deal")   incl. sensitivity + ladder
  *   3B  Pro-forma           (data-subpanel="commercials/proforma")
- *   3C  Scenarios & Sens.   (data-subpanel="commercials/scenarios")
  *
  * Reads ONLY from dashboardData (param d). Every rendered number already lives in
  * data.js (commercialLines / scenarios / benchmarks / assumptions / proforma /
@@ -48,10 +47,6 @@ function npv(cashflows, ratePct) {
 function negPill(level) {
   const lvl = String(level || '').toLowerCase();
   return '<span class="pill ' + (lvl === 'high' ? 'info' : lvl === 'medium' ? 'muted' : 'muted') + '">' + esc(level || '—') + '</span>';
-}
-function compPill(level) {
-  const lvl = String(level || '').toLowerCase();
-  return '<span class="pill ' + (lvl === 'moderate' ? 'info' : 'muted') + '">Comparability: ' + esc(level) + '</span>';
 }
 function confPill(c) {
   const k = String(c || '').toLowerCase();
@@ -145,23 +140,10 @@ function renderRenewalBand(d) {
     insight('Auto-renewal (ISS-04) and the uncapped post-term uplift (ISS-11) compound: a missed 90-day window locks another year at an unbounded increase. A rate lock / CPI cap is the single highest-value commercial protection after the platform discount.', 'warn'),
     { accent: 'emph', icon: 'clock' });
 }
-function renderBenchmarks(d) {
-  const bs = d.benchmarks || [];
-  if (!bs.length) {
-    return gapCard('No comparable benchmark in this session', 'No internal precedent or credible external comparison was available at generation time; no fabricated market percentiles are shown. ' + jumpLink('Gaps →', 'tab:brief'));
-  }
-  // uniform compact strip (was ragged col-4 cards): each comparison is one cell of equal size,
-  // sitting right under the ZOPA because it is the EVIDENCE that makes the target defensible.
-  const cells = bs.map(b => '<div class="bm-cell" id="' + esc(b.id) + '">' +
-    '<div class="bm-cell-t">' + esc(b.item) + '</div>' +
-    '<div class="bm-cell-v mono">' + esc(b.comparisonValue) + '</div>' +
-    '<div class="bm-cell-f">' + compPill(b.comparability) + evidenceChip(b.evidenceType, { sources: [b.sourceId], short: true }) + '</div>' +
-    '<div class="bm-cell-m" title="' + esc(b.explanation) + '">' + esc(b.explanation) + '</div>' +
-  '</div>').join('');
-  return saCard('Benchmarks', '<div class="bm-strip">' + cells + '</div>' +
-    insight('Real comparisons only &mdash; one internal precedent plus a weak-comparability public figure. A prior Visier quote or a competing bid (' + jumpLink('GAP-4', 'tab:brief') + ') would firm the platform-pricing target; until then it stays research-pending.', 'warn'),
-    { accent: 'teal', icon: 'bench', sub: bs.length + ' comparisons &middot; support the target' });
-}
+/* renderBenchmarks retired: the two per-line benchmarks now render as burnt-orange ticks
+ * directly on each ZOPA line, with the methodology + comparability in that line's expand
+ * (zopa.js zopaBenchForLine / zopaLineHTML). No separate benchmark panel. */
+
 /* ---- should-cost: bottoms-up cost build per driver, vs the ask, sizing the headroom ---- */
 function renderShouldCost(d) {
   const scd = d.shouldCost;
@@ -319,7 +301,7 @@ function renderAssumptionsRegister(d) {
         '<dt>Research log</dt><dd style="flex-direction:column;align-items:flex-start;gap:4px">' + log + '</dd></div>';
     }
   }) +
-  insight('Register is read-only here; only the WACC (ASM-5) is interactive, via the discount control above. Editing it re-discounts the NPV live.');
+  insight('Register is read-only here. The WACC (ASM-5) is interactive via the discount control above; employee count (ASM-1) and platform discount (ASM-4) are interactive via the sensitivity drivers on the Deal Table &amp; ZOPA tab.');
 }
 
 /* ---------- 3. 3C, SCENARIOS & SENSITIVITY (all precomputed / static) ---- */
@@ -333,56 +315,10 @@ function renderScenarioWaterfall(d) {
   return waterfall(steps, {}) +
     insight('Each bar is the full 3-year TCV if Lilly holds that position, precomputed from the scenario set. Target is the negotiated goal; max-acceptable is the walk-away (budget ceiling unconfirmed: ' + jumpLink('GAP-3', 'tab:brief') + ').');
 }
-function renderScenarioTable(d) {
-  const cols = [
-    { key: 'name', label: 'Scenario', render: r => '<strong>' + esc(r.name) + '</strong><div class="tiny muted">' + esc(r.basis) + '</div>' },
-    { key: 'y1Total', label: 'Year-1', align: 'num', sortVal: r => r.y1Total, render: r => M(r.y1Total) },
-    { key: 'total', label: '3-yr TCV', align: 'num', sortVal: r => r.total, render: r => M(r.total) },
-    { key: 'evidenceType', label: 'Ev.', render: r => evidenceChip(r.evidenceType, { short: true }) }
-  ];
-  return dataTable(cols, d.scenarios || [], { id: 'cml-scenario-tbl', zebra: true, dense: true, expand: r => insight(r.interpretation) });
-}
-// Precomputed static tornado from proforma.sensitivity (NOT a live recompute).
-function renderTornado(d) {
-  const rows = ((d.proforma || {}).sensitivity || []).slice();
-  if (!rows.length) return gapCard('No sensitivity data', 'Precomputed sensitivity not available in this session.');
-  rows.forEach(r => { r._swing = Math.abs((r.high || 0) - (r.low || 0)); });
-  rows.sort((a, b) => b._swing - a._swing);
-  const dMin = Math.min.apply(null, rows.map(r => r.low));
-  const dMax = Math.max.apply(null, rows.map(r => r.high));
-  const span = (dMax - dMin) || 1;
-  const base = rows[0].base;
-  const basePct = (base - dMin) / span * 100;
-  const body = rows.map(r => {
-    const loPct = (r.low - dMin) / span * 100, hiPct = (r.high - dMin) / span * 100;
-    return '<div class="tor-row"><div class="tor-lbl">' + esc(r.driver) + '<div class="tiny muted mono">' + M(r.low) + ' – ' + M(r.high) + '</div></div>' +
-      '<div class="tor-track"><span class="tor-base" style="left:' + basePct.toFixed(1) + '%"></span>' +
-      '<span class="tor-bar tor-lo" style="left:' + loPct.toFixed(1) + '%;width:' + (basePct - loPct).toFixed(1) + '%"></span>' +
-      '<span class="tor-bar tor-hi" style="left:' + basePct.toFixed(1) + '%;width:' + (hiPct - basePct).toFixed(1) + '%"></span></div></div>';
-  }).join('');
-  return '<div class="tornado">' + body + '</div>' +
-    '<div class="tiny muted" style="margin-top:8px">Centre line = target 3-yr TCV (' + M(base) + '). Teal = lower cost, orange = higher cost. Precomputed static ranges, not a live recompute.</div>';
-}
-function renderVaR(d) {
-  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {}).total;
-  const sens = re => ((d.proforma || {}).sensitivity || []).find(s => new RegExp(re, 'i').test(s.driver)) || {};
-  const disc = sens('discount'), emp = sens('employee');
-  const rows = [
-    { risk: 'Settle at max-acceptable, not target', exposure: M((sc('SC-max') || 0) - (sc('SC-target') || 0)), linked: 'SC-max · ISS-12', ev: 'assumption' },
-    { risk: 'Platform discount not fully achieved', exposure: disc.high != null ? M(disc.high - disc.base) : '—', linked: 'ASM-4 · ISS-12', ev: 'calculated' },
-    { risk: 'Employee count above the 18,000 plan', exposure: emp.high != null ? M(emp.high - emp.base) : '—', linked: 'ASM-1', ev: 'assumption' },
-    { risk: 'Uncapped post-term uplift + auto-renewal (Y4+)', exposure: 'Unbounded (no cap)', linked: 'ISS-04 · ISS-11', ev: 'inference' },
-    { risk: 'FY27 budget ceiling unconfirmed', exposure: 'Walk-away unvalidated', linked: 'GAP-3', ev: 'unavailable' }
-  ];
-  const cols = [
-    { key: 'risk', label: 'Risk driver', render: r => '<strong>' + esc(r.risk) + '</strong>' },
-    { key: 'exposure', label: 'Term exposure', align: 'num', render: r => '<span class="mono">' + esc(r.exposure) + '</span>' },
-    { key: 'linked', label: 'Linked', render: r => '<span class="tiny mono">' + esc(r.linked) + '</span>' },
-    { key: 'ev', label: 'Ev.', render: r => evidenceChip(r.ev, { short: true }) }
-  ];
-  return dataTable(cols, rows, { id: 'cml-var', dense: true }) +
-    insight('Exposures are independent reads, not additive. The largest controllable risk is settling above target; the largest uncontrolled risk is the uncapped post-term uplift.', 'warn');
-}
+/* renderScenarioTable / renderTornado / renderVaR retired with the Scenarios subtab:
+ * the four scenario TCVs are the marks on the total-deal ZOPA bar, the tornado is replaced
+ * by per-line leverage + the live driver sliders on the Deal tab, and value-at-risk was cut
+ * as redundant. renderScenarioWaterfall (above) survives as the Negotiated Value Ladder. */
 
 /* ---------- 4. live recompute (WACC slider -> NPV) ------------------------ */
 function recompute(d) {
@@ -408,18 +344,20 @@ function renderTab_commercials(d) {
   pl.forEach((p, i) => { const c = cf[i] || {}; tsvRows.push([p.year, p.revenue, p.cost, p.net, c.in, c.out, c.cum].join('\t')); });
   const tsv = tsvRows.join('\n');
 
-  /* ---- 3A: Deal Table & ZOPA ---- */
+  /* ---- 3A: Deal Table & ZOPA (reordered: room + renewal on top, then should-cost, the
+       negotiated-value ladder, and the ZOPA last with sensitivity drivers + benchmark ticks) ---- */
   const deal =
-    '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Every commercial line: the supplier ask against Lilly’s target, fallback and walk-away, the per-line zone of possible agreement, and how defensible the price is. ' + coverageBadge('Strong') + '</p></div>' +
+    '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Where the negotiable room is, the supplier ask against Lilly’s target, fallback and walk-away, per-line leverage, and how the number moves with the deal’s drivers. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
-      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing & Benchmarks',
-        window.DealZopa.render(d) + renderDealTotals(d) +
-        collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
-        { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · target → walk-away · supplier ask' }) + '</div>' +
-      '<div class="col-12">' + renderBenchmarks(d) + '</div>' +
-      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
       '<div class="col-6">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-6">' + renderRenewalBand(d) + '</div>' +
+      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
+      '<div class="col-12">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d),
+        { accent: 'plum', icon: 'scenarios', sub: 'supplier ask down to target, step by step' }) + '</div>' +
+      '<div class="col-12">' + saCard('ZOPA by Line Item · Sensitivity & Benchmarks',
+        window.DealZopa.sensitivity(d) + '<div id="cml-zopa-live">' + window.DealZopa.render(d) + '</div>' + renderDealTotals(d) +
+        collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
+        { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · leverage · benchmark ticks · live drivers' }) + '</div>' +
     '</div>';
 
   /* ---- 3B: Pro-forma ---- */
@@ -436,15 +374,9 @@ function renderTab_commercials(d) {
       '<div class="col-12">' + saCard('Assumptions Register', renderAssumptionsRegister(d), { accent: 'emph', icon: 'assume', sub: (d.assumptions || []).length + ' inputs' }) + '</div>' +
     '</div>';
 
-  /* ---- 3C: Scenarios & Sensitivity ---- */
-  const scenarios =
-    '<div class="tab-intro"><h2>Scenarios &amp; Sensitivity</h2><p class="q">The four negotiating positions as full 3-year TCVs, and which drivers move the number most. ' + coverageBadge('Moderate') + '</p></div>' +
-    '<div class="grid">' +
-      '<div class="col-7">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d), { accent: 'plum', icon: 'scenarios' }) + '</div>' +
-      '<div class="col-5">' + saCard('Scenario Comparison', renderScenarioTable(d), { icon: 'target' }) + '</div>' +
-      '<div class="col-7">' + saCard('Sensitivity, Swing on 3-yr TCV', renderTornado(d), { accent: 'emph', icon: 'scale' }) + '</div>' +
-      '<div class="col-5">' + saCard('Value at Risk', renderVaR(d), { accent: 'danger', icon: 'flag' }) + '</div>' +
-    '</div>';
+  /* ---- 3C (Scenarios & Sensitivity) is retired: the Negotiated Value Ladder moved onto the
+       Deal tab, per-line leverage + live driver sliders replaced the tornado, and the scenario
+       comparison + value-at-risk panels were cut as redundant with the ZOPA marks. ---- */
 
   /* ---- scoped styles (only what the base system does not provide) ---- */
   const scopedStyle = '<style>' +
@@ -464,13 +396,8 @@ function renderTab_commercials(d) {
     '.commercials-tab .disc-line{display:flex;justify-content:space-between;gap:10px;font-size:var(--fz-sm);padding:5px 0;border-top:1px solid var(--line)}' +
     '.commercials-tab .disc-line:first-child{border-top:0}' +
     '.commercials-tab .rn-item .kv{margin-top:6px}' +
-    /* benchmarks as a uniform strip */
-    '.commercials-tab .bm-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}' +
-    '.commercials-tab .bm-cell{border:1px solid var(--line2);border-radius:8px;padding:11px 13px;background:var(--surface2)}' +
-    '.commercials-tab .bm-cell-t{font:800 10px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);margin-bottom:5px}' +
-    '.commercials-tab .bm-cell-v{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35}' +
-    '.commercials-tab .bm-cell-f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:7px 0}' +
-    '.commercials-tab .bm-cell-m{font-size:10px;color:var(--mut2);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}' +
+    /* equal-height cards within a grid row (Where the Room Is | Renewal sit level) */
+    '.commercials-tab .grid>[class*="col-"]>.sa-card{height:100%}' +
     /* should-cost bottoms-up bars */
     '.commercials-tab .scst-driver{margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--line)}' +
     '.commercials-tab .scst-driver:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}' +
@@ -487,27 +414,16 @@ function renderTab_commercials(d) {
     '.commercials-tab .scst-lg b{color:var(--ink2)}' +
     '.commercials-tab .rl-item{font-size:var(--fz-sm);line-height:1.45}' +
     '.commercials-tab .npv-svg{width:100%;height:auto;display:block;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm)}' +
-    '.commercials-tab .tornado{display:grid;gap:9px}' +
-    '.commercials-tab .tor-row{display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center}' +
-    '.commercials-tab .tor-lbl{font-size:var(--fz-sm);font-weight:600;color:var(--ink2)}' +
-    '.commercials-tab .tor-track{position:relative;height:22px;background:var(--well);border:1px solid var(--line);border-radius:5px}' +
-    '.commercials-tab .tor-base{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink2);z-index:2}' +
-    '.commercials-tab .tor-bar{position:absolute;top:3px;bottom:3px}' +
-    '.commercials-tab .tor-lo{background:var(--teal-d);border-radius:3px 0 0 3px}' +
-    '.commercials-tab .tor-hi{background:var(--emph);border-radius:0 3px 3px 0}' +
-    '@media (max-width:640px){.commercials-tab .tor-row{grid-template-columns:120px 1fr}}' +
   '</style>';
 
   return scopedStyle + '<div class="commercials-tab">' +
     '<div class="subtabbar" data-subtab-group="commercials"><div class="wrap">' +
       '<button class="subtab-btn" data-subtab="deal" aria-selected="true">' + icon('money') + ' Deal Table &amp; ZOPA</button>' +
       '<button class="subtab-btn" data-subtab="proforma">' + icon('scale') + ' Pro-forma</button>' +
-      '<button class="subtab-btn" data-subtab="scenarios">' + icon('scenarios') + ' Scenarios &amp; Sensitivity</button>' +
     '</div></div>' +
     '<div class="tab-body"><div class="wrap">' +
       '<div data-subpanel="commercials/deal" class="is-active">' + deal + '</div>' +
       '<div data-subpanel="commercials/proforma">' + proforma + '</div>' +
-      '<div data-subpanel="commercials/scenarios">' + scenarios + '</div>' +
     '</div></div>' +
   '</div>';
 }

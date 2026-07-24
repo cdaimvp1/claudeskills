@@ -48,6 +48,25 @@ var ZOPA_CSS =
   '.zopa-viz .zsum::-webkit-details-marker{display:none}' +
   '.zopa-viz .zsum::marker{content:""}' +
   '.zopa-viz .zsum-row{display:flex;align-items:flex-start;gap:8px;flex:0 0 190px;width:190px;min-width:0}' +
+  /* line name + per-line leverage badge stacked in the title column */
+  '.zopa-viz .zsum-txt{display:flex;flex-direction:column;gap:3px;min-width:0}' +
+  '.zopa-viz .zlev{display:inline-flex;align-items:center;gap:5px;font:700 8.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut2)}' +
+  '.zopa-viz .zlev-bar{display:inline-flex;gap:2px}' +
+  '.zopa-viz .zlev-bar i{width:8px;height:5px;border-radius:1px;background:var(--line2)}' +
+  '.zopa-viz .zlev-high .zlev-bar i{background:var(--emph)}' +
+  '.zopa-viz .zlev-med .zlev-bar i:nth-child(-n+2){background:var(--emph)}' +
+  '.zopa-viz .zlev-low .zlev-bar i:nth-child(1){background:var(--emph)}' +
+  '.zopa-viz .zlev-high .zlev-t,.zopa-viz .zlev-med .zlev-t{color:var(--emph-tx)}' +
+  /* sensitivity strip (Economics deal tab) */
+  '.zopa-viz .zopa-sens{border:1px solid var(--line2);border-radius:9px;padding:12px 14px;margin-bottom:14px;background:var(--surface2)}' +
+  '.zopa-viz .zopa-sens-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}' +
+  '.zopa-viz .zss-t{font:700 10px/1.3 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut)}' +
+  '.zopa-viz .zss-reset{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:1px solid var(--line2);border-radius:6px;background:var(--surface);color:var(--mut);cursor:pointer;flex:0 0 auto}' +
+  '.zopa-viz .zss-reset:hover{color:var(--plum);border-color:var(--plum)}' +
+  '.zopa-viz .zss-reset svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}' +
+  '.zopa-viz .zopa-sens-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 20px}' +
+  '.zopa-viz .zopa-sens-live{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line2);font-size:12.5px;line-height:1.5;color:var(--ink2)}' +
+  '.zopa-viz .zopa-sens-live b{color:var(--ink);font-variant-numeric:tabular-nums}' +
   '.zopa-viz .zchev{width:7px;height:7px;margin-top:5px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
   '.zopa-viz .zline[open] .zchev{transform:rotate(45deg)}' +
   '.zopa-viz .zsum:hover .zlname{color:var(--plum)}' +
@@ -127,7 +146,7 @@ function zopaBenchForLine(d, l) {
   if (!b) return null;
   let value = null, note = '';
   if (l.id === 'CL-1') {
-    const emp = l.quantity || assumVal(d, 'ASM-1', 18000);
+    const emp = assumVal(d, 'ASM-1', l.quantity || 18000);   // live: tracks the employee-count driver
     value = 37 * emp;                                     // ~$37/emp/yr 2024 precedent x employee basis
     note = '~$37/employee/yr 2024 precedent x ' + emp.toLocaleString('en-US') + ' employees';
   } else if (l.id === 'CL-2') {
@@ -137,6 +156,41 @@ function zopaBenchForLine(d, l) {
     return null;                                          // no numeric derivation available -> no comp
   }
   return { value: value, note: note, benchId: b.id, comparability: b.comparability, raw: b.comparisonValue, explanation: b.explanation, evidenceType: b.evidenceType };
+}
+
+/* ---------- 1b. live-driver line values + per-line leverage ------------------
+ * zopaLiveLine: the platform subscription (CL-1) responds to the two sensitivity
+ * drivers, employee count (ASM-1) and platform discount (ASM-4). At the plan
+ * baseline it returns the canonical figures byte-for-byte (so the default ZOPA is
+ * unchanged); off-plan it scales ask by the per-employee rate and re-derives target
+ * from the live discount, with walk/fallback held proportional. All other lines are
+ * fixed. Grounded: rate + baseline are read FROM the data, nothing fabricated. */
+function zopaLiveLine(d, l) {
+  const base = { ask: l.supplierAmount, target: l.target, walk: l.maximumAcceptable, fallback: l.fallback };
+  if (l.id !== 'CL-1') return base;
+  const empBase = l.quantity || 18000;
+  const discBase = l.supplierAmount ? Math.round((1 - l.target / l.supplierAmount) * 100) : 18;
+  const emp = assumVal(d, 'ASM-1', empBase), disc = assumVal(d, 'ASM-4', discBase);
+  if (emp === empBase && disc === discBase) return base;   // exact canonical at plan
+  const rate = (l.supplierAmount || 0) / empBase;
+  const ask = Math.round(rate * emp);
+  const target = Math.round(ask * (1 - disc / 100));
+  const askRatio = l.supplierAmount ? ask / l.supplierAmount : 1;
+  return { ask: ask, target: target, walk: Math.round(l.maximumAcceptable * askRatio), fallback: Math.round(l.fallback * askRatio) };
+}
+// leverage = this line's share of the total negotiable room (ask - target) across all lines:
+// where the negotiating effort pays off most. Computed from the plan figures (stable ranking).
+function zopaLeverage(d, l) {
+  const lines = d.commercialLines || [];
+  const room = x => Math.max((x.supplierAmount || 0) - (x.target || 0), 0);
+  const total = lines.reduce((s, x) => s + room(x), 0) || 1;
+  const pct = Math.round(room(l) / total * 100);
+  return { pct: pct, total: total, band: pct >= 30 ? 'high' : (pct >= 10 ? 'med' : 'low') };
+}
+function zopaLeverageBadge(lev) {
+  const label = lev.band === 'high' ? 'High' : (lev.band === 'med' ? 'Med' : 'Low');
+  return '<span class="zlev zlev-' + lev.band + '" title="Share of the total negotiable room across all lines: ' + lev.pct + '%">' +
+    '<span class="zlev-bar"><i></i><i></i><i></i></span><span class="zlev-t">' + label + ' leverage</span></span>';
 }
 
 /* ---------- 2. shared ZOPA bar (marks + on-bar value labels) ---------------
@@ -188,27 +242,32 @@ function zopaBar(cfg) {
 
 /* ---------- 3. per-line ZOPA row (collapsible) ------------------------------ */
 function zopaLineHTML(d, l) {
-  const ask = l.supplierAmount, target = l.target, walk = l.maximumAcceptable, fallback = l.fallback;
+  const live = zopaLiveLine(d, l);          // CL-1 responds to the sensitivity drivers; others static
+  const ask = live.ask, target = live.target, walk = live.walk, fallback = live.fallback;
   // Theo opening: anchor aggressively but credibly BELOW target so there is room to settle
   // up; = target-(walk-target), floored at 15% under target since we hold no market low.
   const open = Math.round(Math.max(target * 0.85, 2 * target - walk));
   const over = ask > walk;                  // supplier ask above our walk-away -> the ONLY red trigger
   const bench = zopaBenchForLine(d, l);
+  const lev = zopaLeverage(d, l);
   const gap = Math.round((1 - open / target) * 100);
   const track = zopaBar({ open: open, target: target, fallback: fallback, walk: walk, ask: ask, over: over, bench: bench ? bench.value : null });
   const mktRow = bench
     ? '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><b>' + M(bench.value) + '</b> - ' + esc(bench.note) + '. ' + esc(bench.raw) + ' · ' + esc(bench.comparability) + ' comparability ' + evidenceChip(bench.evidenceType, { sources: [bench.benchId] }) + '</span></div>'
     : '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><span class="znobench">No market benchmark for this line in session</span> - no external comparison was available, so no market mark is drawn (no lo/hi band fabricated). ' + evidenceChip('unavailable') + '</span></div>';
+  const levRow = '<div class="zdrow"><span class="zdk">Leverage</span><span class="zdv">this line is <b>' + lev.pct + '%</b> of the total negotiable room (' + M(lev.total) + ' across all lines); ' +
+    (lev.band === 'high' ? 'the biggest lever, push hardest here.' : lev.band === 'med' ? 'a moderate lever.' : 'a minor lever.') + ' ' + evidenceChip('calculated', { short: true }) + '</span></div>';
   const detail = '<div class="zline-detail"><div class="zdetail">' +
     '<div class="zdrow"><span class="zdk">Price</span><span class="zdv">supplier ask <b>' + M(ask) + '</b> vs target ' + M(target) + ' · fallback ' + M(fallback) + ' · walk-away ' + M(walk) + ' ' + evidenceChip(l.evidenceType, { sources: l.sourceIds }) + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Theo opening</span><span class="zdv">open at <b>' + M(open) + '</b>, about ' + gap + '% below target, leaving room to settle at ' + M(target) + ' ' + evidenceChip('inference') + '</span></div>' +
-    mktRow +
+    mktRow + levRow +
     '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + (over
         ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
         : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
   '</div></div>';
   return '<details class="zline"><summary class="zsum">' +
-    '<div class="zsum-row"><span class="zchev" aria-hidden="true"></span><span class="zlname">' + esc(l.item) + '</span></div>' +
+    '<div class="zsum-row"><span class="zchev" aria-hidden="true"></span>' +
+      '<span class="zsum-txt"><span class="zlname">' + esc(l.item) + '</span>' + zopaLeverageBadge(lev) + '</span></div>' +
     track + '</summary>' + detail + '</details>';
 }
 
@@ -260,6 +319,51 @@ function renderZopaGantt(d) {
   return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
 }
 
+/* ---------- 4b. sensitivity strip (Economics deal tab) ----------------------
+ * Two drivers, employee count (ASM-1) and platform discount (ASM-4), live-update
+ * the platform line's ZOPA + a plain-language readout via the shared assumptionSlider
+ * and the DealUI recalc bus. renderSensitiveZopa (registered below) repaints on change. */
+function discBaseOf(l) { return l.supplierAmount ? Math.round((1 - l.target / l.supplierAmount) * 100) : 18; }
+function zopaSensReadout(d) {
+  const l = (d.commercialLines || []).find(x => x.id === 'CL-1');
+  if (!l) return '';
+  const empBase = l.quantity || 18000;
+  const emp = assumVal(d, 'ASM-1', empBase), disc = assumVal(d, 'ASM-4', discBaseOf(l)), years = assumVal(d, 'ASM-2', 3);
+  const live = zopaLiveLine(d, l);
+  const rate = Math.round((l.supplierAmount || 0) / empBase);
+  const dY1 = live.target - l.target;
+  const planTerm = l.target * years, liveTerm = live.target * years, dTerm = liveTerm - planTerm;
+  const sign = n => (n > 0 ? '+' : n < 0 ? '−' : '±') + M(Math.abs(n));
+  const offPlan = emp !== empBase || disc !== discBaseOf(l);
+  return 'At <b>' + emp.toLocaleString('en-US') + '</b> employees and <b>' + disc + '%</b> platform discount, the platform line targets <b>' + M(live.target) +
+    '</b>/yr (' + M(rate) + '/emp ask basis). Over the ' + years + '-yr term that is <b>' + M(liveTerm) + '</b> at target' +
+    (offPlan ? ', ' + sign(dTerm) + ' vs the ' + M(planTerm) + ' plan (' + sign(dY1) + '/yr).' : ' (the plan baseline).');
+}
+function zopaSensitivity(d) {
+  const a1 = (d.assumptions || []).find(x => x.id === 'ASM-1');
+  const a4 = (d.assumptions || []).find(x => x.id === 'ASM-4');
+  if (!a1 && !a4) return '';
+  return '<div class="zopa-sens">' +
+    '<div class="zopa-sens-hd"><span class="zss-t">Sensitivity · move a driver to see the ZOPA respond</span>' +
+      '<button class="zss-reset" data-reset-assumptions title="Reset drivers to plan" aria-label="Reset drivers to plan">' + icon('reset') + '</button></div>' +
+    '<div class="zopa-sens-grid">' + (a1 ? assumptionSlider(a1) : '') + (a4 ? assumptionSlider(a4) : '') + '</div>' +
+    '<div id="zopa-sens-live" class="zopa-sens-live">' + zopaSensReadout(d) + '</div>' +
+  '</div>';
+}
+// repaint live bars + readout ONLY when a ZOPA driver (ASM-1 / ASM-4) actually moved, so an
+// unrelated recalc (e.g. the pro-forma WACC slider) never re-renders and collapses expanded rows.
+var _zopaDriverSig = null;
+function renderSensitiveZopa() {
+  const d = global.dashboardData; if (!d) return;
+  const sig = assumVal(d, 'ASM-1', 0) + '|' + assumVal(d, 'ASM-4', 0);
+  if (sig === _zopaDriverSig) return;
+  _zopaDriverSig = sig;
+  const bars = document.getElementById('cml-zopa-live');
+  if (bars) bars.innerHTML = render(d);
+  const out = document.getElementById('zopa-sens-live');
+  if (out) out.innerHTML = zopaSensReadout(d);
+}
+
 /* ---------- 5. public entry ------------------------------------------------- */
 function render(d) {
   injectCss();
@@ -273,6 +377,11 @@ function renderTotal(d) {
   return '<div class="zopa-viz zopa-total-only">' + zopaTotalHTML(d, { slim: true }) + ZOPA_BOTTOM_LEGEND + '</div>';
 }
 
-global.DealZopa = { render: render, renderTotal: renderTotal };
+global.DealZopa = { render: render, renderTotal: renderTotal, sensitivity: zopaSensitivity };
+
+// repaint the live ZOPA whenever a driver (or any assumption) changes, via the shared recalc bus
+if (typeof global.DealUI !== 'undefined' && typeof global.DealUI.onRecalc === 'function') {
+  global.DealUI.onRecalc(renderSensitiveZopa);
+}
 
 })(typeof window !== 'undefined' ? window : this);

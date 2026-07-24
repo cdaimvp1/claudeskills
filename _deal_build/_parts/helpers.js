@@ -307,7 +307,7 @@ function gapCard(title, note) {
 }
 
 /* ---------- 10. jump helper (for building data-jump strings) -------------- */
-// jumpLink(text, target) target: "tab:commercials/sub:scenarios" or "el:SOME-ID"
+// jumpLink(text, target) target: "tab:commercials/sub:deal" or "el:SOME-ID"
 function jumpLink(text, target) {
   return '<span class="jump" data-jump="' + esc(target) + '">' + esc(text) + '</span>';
 }

@@ -101,7 +101,7 @@ const dashboardData = {
       { key: 'high',         label: 'High-priority issues',  value: 7,  tone: 'warn',   jump: 'tab:contract/sub:legal', evidenceType: 'calculated' },
       { key: 'unresolved',   label: 'Open / unresolved',     value: 9,  tone: 'warn',   jump: 'tab:contract/sub:legal', evidenceType: 'calculated' },
       { key: 'signConds',    label: 'Signature conditions',  value: 3,  tone: 'danger', jump: 'tab:brief',              evidenceType: 'inference' },
-      { key: 'tcvGap',       label: 'Target vs ask (3-yr)',  value: '−$0.68M', tone: 'info', jump: 'tab:commercials/sub:scenarios', evidenceType: 'calculated' }
+      { key: 'tcvGap',       label: 'Target vs ask (3-yr)',  value: '−$0.68M', tone: 'info', jump: 'tab:commercials/sub:deal', evidenceType: 'calculated' }
     ]
   },
 

@@ -1552,7 +1552,7 @@ function gapCard(title, note) {
 }
 
 /* ---------- 10. jump helper (for building data-jump strings) -------------- */
-// jumpLink(text, target) target: "tab:commercials/sub:scenarios" or "el:SOME-ID"
+// jumpLink(text, target) target: "tab:commercials/sub:deal" or "el:SOME-ID"
 function jumpLink(text, target) {
   return '<span class="jump" data-jump="' + esc(target) + '">' + esc(text) + '</span>';
 }
@@ -1991,7 +1991,7 @@ const dashboardData = {
       { key: 'high',         label: 'High-priority issues',  value: 7,  tone: 'warn',   jump: 'tab:contract/sub:legal', evidenceType: 'calculated' },
       { key: 'unresolved',   label: 'Open / unresolved',     value: 9,  tone: 'warn',   jump: 'tab:contract/sub:legal', evidenceType: 'calculated' },
       { key: 'signConds',    label: 'Signature conditions',  value: 3,  tone: 'danger', jump: 'tab:brief',              evidenceType: 'inference' },
-      { key: 'tcvGap',       label: 'Target vs ask (3-yr)',  value: '−$0.68M', tone: 'info', jump: 'tab:commercials/sub:scenarios', evidenceType: 'calculated' }
+      { key: 'tcvGap',       label: 'Target vs ask (3-yr)',  value: '−$0.68M', tone: 'info', jump: 'tab:commercials/sub:deal', evidenceType: 'calculated' }
     ]
   },
 
@@ -2988,6 +2988,25 @@ var ZOPA_CSS =
   '.zopa-viz .zsum::-webkit-details-marker{display:none}' +
   '.zopa-viz .zsum::marker{content:""}' +
   '.zopa-viz .zsum-row{display:flex;align-items:flex-start;gap:8px;flex:0 0 190px;width:190px;min-width:0}' +
+  /* line name + per-line leverage badge stacked in the title column */
+  '.zopa-viz .zsum-txt{display:flex;flex-direction:column;gap:3px;min-width:0}' +
+  '.zopa-viz .zlev{display:inline-flex;align-items:center;gap:5px;font:700 8.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut2)}' +
+  '.zopa-viz .zlev-bar{display:inline-flex;gap:2px}' +
+  '.zopa-viz .zlev-bar i{width:8px;height:5px;border-radius:1px;background:var(--line2)}' +
+  '.zopa-viz .zlev-high .zlev-bar i{background:var(--emph)}' +
+  '.zopa-viz .zlev-med .zlev-bar i:nth-child(-n+2){background:var(--emph)}' +
+  '.zopa-viz .zlev-low .zlev-bar i:nth-child(1){background:var(--emph)}' +
+  '.zopa-viz .zlev-high .zlev-t,.zopa-viz .zlev-med .zlev-t{color:var(--emph-tx)}' +
+  /* sensitivity strip (Economics deal tab) */
+  '.zopa-viz .zopa-sens{border:1px solid var(--line2);border-radius:9px;padding:12px 14px;margin-bottom:14px;background:var(--surface2)}' +
+  '.zopa-viz .zopa-sens-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}' +
+  '.zopa-viz .zss-t{font:700 10px/1.3 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut)}' +
+  '.zopa-viz .zss-reset{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:1px solid var(--line2);border-radius:6px;background:var(--surface);color:var(--mut);cursor:pointer;flex:0 0 auto}' +
+  '.zopa-viz .zss-reset:hover{color:var(--plum);border-color:var(--plum)}' +
+  '.zopa-viz .zss-reset svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}' +
+  '.zopa-viz .zopa-sens-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 20px}' +
+  '.zopa-viz .zopa-sens-live{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line2);font-size:12.5px;line-height:1.5;color:var(--ink2)}' +
+  '.zopa-viz .zopa-sens-live b{color:var(--ink);font-variant-numeric:tabular-nums}' +
   '.zopa-viz .zchev{width:7px;height:7px;margin-top:5px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
   '.zopa-viz .zline[open] .zchev{transform:rotate(45deg)}' +
   '.zopa-viz .zsum:hover .zlname{color:var(--plum)}' +
@@ -3067,7 +3086,7 @@ function zopaBenchForLine(d, l) {
   if (!b) return null;
   let value = null, note = '';
   if (l.id === 'CL-1') {
-    const emp = l.quantity || assumVal(d, 'ASM-1', 18000);
+    const emp = assumVal(d, 'ASM-1', l.quantity || 18000);   // live: tracks the employee-count driver
     value = 37 * emp;                                     // ~$37/emp/yr 2024 precedent x employee basis
     note = '~$37/employee/yr 2024 precedent x ' + emp.toLocaleString('en-US') + ' employees';
   } else if (l.id === 'CL-2') {
@@ -3077,6 +3096,41 @@ function zopaBenchForLine(d, l) {
     return null;                                          // no numeric derivation available -> no comp
   }
   return { value: value, note: note, benchId: b.id, comparability: b.comparability, raw: b.comparisonValue, explanation: b.explanation, evidenceType: b.evidenceType };
+}
+
+/* ---------- 1b. live-driver line values + per-line leverage ------------------
+ * zopaLiveLine: the platform subscription (CL-1) responds to the two sensitivity
+ * drivers, employee count (ASM-1) and platform discount (ASM-4). At the plan
+ * baseline it returns the canonical figures byte-for-byte (so the default ZOPA is
+ * unchanged); off-plan it scales ask by the per-employee rate and re-derives target
+ * from the live discount, with walk/fallback held proportional. All other lines are
+ * fixed. Grounded: rate + baseline are read FROM the data, nothing fabricated. */
+function zopaLiveLine(d, l) {
+  const base = { ask: l.supplierAmount, target: l.target, walk: l.maximumAcceptable, fallback: l.fallback };
+  if (l.id !== 'CL-1') return base;
+  const empBase = l.quantity || 18000;
+  const discBase = l.supplierAmount ? Math.round((1 - l.target / l.supplierAmount) * 100) : 18;
+  const emp = assumVal(d, 'ASM-1', empBase), disc = assumVal(d, 'ASM-4', discBase);
+  if (emp === empBase && disc === discBase) return base;   // exact canonical at plan
+  const rate = (l.supplierAmount || 0) / empBase;
+  const ask = Math.round(rate * emp);
+  const target = Math.round(ask * (1 - disc / 100));
+  const askRatio = l.supplierAmount ? ask / l.supplierAmount : 1;
+  return { ask: ask, target: target, walk: Math.round(l.maximumAcceptable * askRatio), fallback: Math.round(l.fallback * askRatio) };
+}
+// leverage = this line's share of the total negotiable room (ask - target) across all lines:
+// where the negotiating effort pays off most. Computed from the plan figures (stable ranking).
+function zopaLeverage(d, l) {
+  const lines = d.commercialLines || [];
+  const room = x => Math.max((x.supplierAmount || 0) - (x.target || 0), 0);
+  const total = lines.reduce((s, x) => s + room(x), 0) || 1;
+  const pct = Math.round(room(l) / total * 100);
+  return { pct: pct, total: total, band: pct >= 30 ? 'high' : (pct >= 10 ? 'med' : 'low') };
+}
+function zopaLeverageBadge(lev) {
+  const label = lev.band === 'high' ? 'High' : (lev.band === 'med' ? 'Med' : 'Low');
+  return '<span class="zlev zlev-' + lev.band + '" title="Share of the total negotiable room across all lines: ' + lev.pct + '%">' +
+    '<span class="zlev-bar"><i></i><i></i><i></i></span><span class="zlev-t">' + label + ' leverage</span></span>';
 }
 
 /* ---------- 2. shared ZOPA bar (marks + on-bar value labels) ---------------
@@ -3128,27 +3182,32 @@ function zopaBar(cfg) {
 
 /* ---------- 3. per-line ZOPA row (collapsible) ------------------------------ */
 function zopaLineHTML(d, l) {
-  const ask = l.supplierAmount, target = l.target, walk = l.maximumAcceptable, fallback = l.fallback;
+  const live = zopaLiveLine(d, l);          // CL-1 responds to the sensitivity drivers; others static
+  const ask = live.ask, target = live.target, walk = live.walk, fallback = live.fallback;
   // Theo opening: anchor aggressively but credibly BELOW target so there is room to settle
   // up; = target-(walk-target), floored at 15% under target since we hold no market low.
   const open = Math.round(Math.max(target * 0.85, 2 * target - walk));
   const over = ask > walk;                  // supplier ask above our walk-away -> the ONLY red trigger
   const bench = zopaBenchForLine(d, l);
+  const lev = zopaLeverage(d, l);
   const gap = Math.round((1 - open / target) * 100);
   const track = zopaBar({ open: open, target: target, fallback: fallback, walk: walk, ask: ask, over: over, bench: bench ? bench.value : null });
   const mktRow = bench
     ? '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><b>' + M(bench.value) + '</b> - ' + esc(bench.note) + '. ' + esc(bench.raw) + ' · ' + esc(bench.comparability) + ' comparability ' + evidenceChip(bench.evidenceType, { sources: [bench.benchId] }) + '</span></div>'
     : '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><span class="znobench">No market benchmark for this line in session</span> - no external comparison was available, so no market mark is drawn (no lo/hi band fabricated). ' + evidenceChip('unavailable') + '</span></div>';
+  const levRow = '<div class="zdrow"><span class="zdk">Leverage</span><span class="zdv">this line is <b>' + lev.pct + '%</b> of the total negotiable room (' + M(lev.total) + ' across all lines); ' +
+    (lev.band === 'high' ? 'the biggest lever, push hardest here.' : lev.band === 'med' ? 'a moderate lever.' : 'a minor lever.') + ' ' + evidenceChip('calculated', { short: true }) + '</span></div>';
   const detail = '<div class="zline-detail"><div class="zdetail">' +
     '<div class="zdrow"><span class="zdk">Price</span><span class="zdv">supplier ask <b>' + M(ask) + '</b> vs target ' + M(target) + ' · fallback ' + M(fallback) + ' · walk-away ' + M(walk) + ' ' + evidenceChip(l.evidenceType, { sources: l.sourceIds }) + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Theo opening</span><span class="zdv">open at <b>' + M(open) + '</b>, about ' + gap + '% below target, leaving room to settle at ' + M(target) + ' ' + evidenceChip('inference') + '</span></div>' +
-    mktRow +
+    mktRow + levRow +
     '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + (over
         ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
         : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
   '</div></div>';
   return '<details class="zline"><summary class="zsum">' +
-    '<div class="zsum-row"><span class="zchev" aria-hidden="true"></span><span class="zlname">' + esc(l.item) + '</span></div>' +
+    '<div class="zsum-row"><span class="zchev" aria-hidden="true"></span>' +
+      '<span class="zsum-txt"><span class="zlname">' + esc(l.item) + '</span>' + zopaLeverageBadge(lev) + '</span></div>' +
     track + '</summary>' + detail + '</details>';
 }
 
@@ -3200,6 +3259,51 @@ function renderZopaGantt(d) {
   return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
 }
 
+/* ---------- 4b. sensitivity strip (Economics deal tab) ----------------------
+ * Two drivers, employee count (ASM-1) and platform discount (ASM-4), live-update
+ * the platform line's ZOPA + a plain-language readout via the shared assumptionSlider
+ * and the DealUI recalc bus. renderSensitiveZopa (registered below) repaints on change. */
+function discBaseOf(l) { return l.supplierAmount ? Math.round((1 - l.target / l.supplierAmount) * 100) : 18; }
+function zopaSensReadout(d) {
+  const l = (d.commercialLines || []).find(x => x.id === 'CL-1');
+  if (!l) return '';
+  const empBase = l.quantity || 18000;
+  const emp = assumVal(d, 'ASM-1', empBase), disc = assumVal(d, 'ASM-4', discBaseOf(l)), years = assumVal(d, 'ASM-2', 3);
+  const live = zopaLiveLine(d, l);
+  const rate = Math.round((l.supplierAmount || 0) / empBase);
+  const dY1 = live.target - l.target;
+  const planTerm = l.target * years, liveTerm = live.target * years, dTerm = liveTerm - planTerm;
+  const sign = n => (n > 0 ? '+' : n < 0 ? '−' : '±') + M(Math.abs(n));
+  const offPlan = emp !== empBase || disc !== discBaseOf(l);
+  return 'At <b>' + emp.toLocaleString('en-US') + '</b> employees and <b>' + disc + '%</b> platform discount, the platform line targets <b>' + M(live.target) +
+    '</b>/yr (' + M(rate) + '/emp ask basis). Over the ' + years + '-yr term that is <b>' + M(liveTerm) + '</b> at target' +
+    (offPlan ? ', ' + sign(dTerm) + ' vs the ' + M(planTerm) + ' plan (' + sign(dY1) + '/yr).' : ' (the plan baseline).');
+}
+function zopaSensitivity(d) {
+  const a1 = (d.assumptions || []).find(x => x.id === 'ASM-1');
+  const a4 = (d.assumptions || []).find(x => x.id === 'ASM-4');
+  if (!a1 && !a4) return '';
+  return '<div class="zopa-sens">' +
+    '<div class="zopa-sens-hd"><span class="zss-t">Sensitivity · move a driver to see the ZOPA respond</span>' +
+      '<button class="zss-reset" data-reset-assumptions title="Reset drivers to plan" aria-label="Reset drivers to plan">' + icon('reset') + '</button></div>' +
+    '<div class="zopa-sens-grid">' + (a1 ? assumptionSlider(a1) : '') + (a4 ? assumptionSlider(a4) : '') + '</div>' +
+    '<div id="zopa-sens-live" class="zopa-sens-live">' + zopaSensReadout(d) + '</div>' +
+  '</div>';
+}
+// repaint live bars + readout ONLY when a ZOPA driver (ASM-1 / ASM-4) actually moved, so an
+// unrelated recalc (e.g. the pro-forma WACC slider) never re-renders and collapses expanded rows.
+var _zopaDriverSig = null;
+function renderSensitiveZopa() {
+  const d = global.dashboardData; if (!d) return;
+  const sig = assumVal(d, 'ASM-1', 0) + '|' + assumVal(d, 'ASM-4', 0);
+  if (sig === _zopaDriverSig) return;
+  _zopaDriverSig = sig;
+  const bars = document.getElementById('cml-zopa-live');
+  if (bars) bars.innerHTML = render(d);
+  const out = document.getElementById('zopa-sens-live');
+  if (out) out.innerHTML = zopaSensReadout(d);
+}
+
 /* ---------- 5. public entry ------------------------------------------------- */
 function render(d) {
   injectCss();
@@ -3213,7 +3317,12 @@ function renderTotal(d) {
   return '<div class="zopa-viz zopa-total-only">' + zopaTotalHTML(d, { slim: true }) + ZOPA_BOTTOM_LEGEND + '</div>';
 }
 
-global.DealZopa = { render: render, renderTotal: renderTotal };
+global.DealZopa = { render: render, renderTotal: renderTotal, sensitivity: zopaSensitivity };
+
+// repaint the live ZOPA whenever a driver (or any assumption) changes, via the shared recalc bus
+if (typeof global.DealUI !== 'undefined' && typeof global.DealUI.onRecalc === 'function') {
+  global.DealUI.onRecalc(renderSensitiveZopa);
+}
 
 })(typeof window !== 'undefined' ? window : this);
 
@@ -5065,10 +5174,9 @@ global.DealTabs.contract = renderTab_contract;
  *
  * Question the tab answers: "What is it worth, what should I pay?"
  *
- * Subtabs (3):
- *   3A  Deal Table & ZOPA   (data-subpanel="commercials/deal")
+ * Subtabs (2):
+ *   3A  Deal Table & ZOPA   (data-subpanel="commercials/deal")   incl. sensitivity + ladder
  *   3B  Pro-forma           (data-subpanel="commercials/proforma")
- *   3C  Scenarios & Sens.   (data-subpanel="commercials/scenarios")
  *
  * Reads ONLY from dashboardData (param d). Every rendered number already lives in
  * data.js (commercialLines / scenarios / benchmarks / assumptions / proforma /
@@ -5106,10 +5214,6 @@ function npv(cashflows, ratePct) {
 function negPill(level) {
   const lvl = String(level || '').toLowerCase();
   return '<span class="pill ' + (lvl === 'high' ? 'info' : lvl === 'medium' ? 'muted' : 'muted') + '">' + esc(level || '—') + '</span>';
-}
-function compPill(level) {
-  const lvl = String(level || '').toLowerCase();
-  return '<span class="pill ' + (lvl === 'moderate' ? 'info' : 'muted') + '">Comparability: ' + esc(level) + '</span>';
 }
 function confPill(c) {
   const k = String(c || '').toLowerCase();
@@ -5203,23 +5307,10 @@ function renderRenewalBand(d) {
     insight('Auto-renewal (ISS-04) and the uncapped post-term uplift (ISS-11) compound: a missed 90-day window locks another year at an unbounded increase. A rate lock / CPI cap is the single highest-value commercial protection after the platform discount.', 'warn'),
     { accent: 'emph', icon: 'clock' });
 }
-function renderBenchmarks(d) {
-  const bs = d.benchmarks || [];
-  if (!bs.length) {
-    return gapCard('No comparable benchmark in this session', 'No internal precedent or credible external comparison was available at generation time; no fabricated market percentiles are shown. ' + jumpLink('Gaps →', 'tab:brief'));
-  }
-  // uniform compact strip (was ragged col-4 cards): each comparison is one cell of equal size,
-  // sitting right under the ZOPA because it is the EVIDENCE that makes the target defensible.
-  const cells = bs.map(b => '<div class="bm-cell" id="' + esc(b.id) + '">' +
-    '<div class="bm-cell-t">' + esc(b.item) + '</div>' +
-    '<div class="bm-cell-v mono">' + esc(b.comparisonValue) + '</div>' +
-    '<div class="bm-cell-f">' + compPill(b.comparability) + evidenceChip(b.evidenceType, { sources: [b.sourceId], short: true }) + '</div>' +
-    '<div class="bm-cell-m" title="' + esc(b.explanation) + '">' + esc(b.explanation) + '</div>' +
-  '</div>').join('');
-  return saCard('Benchmarks', '<div class="bm-strip">' + cells + '</div>' +
-    insight('Real comparisons only &mdash; one internal precedent plus a weak-comparability public figure. A prior Visier quote or a competing bid (' + jumpLink('GAP-4', 'tab:brief') + ') would firm the platform-pricing target; until then it stays research-pending.', 'warn'),
-    { accent: 'teal', icon: 'bench', sub: bs.length + ' comparisons &middot; support the target' });
-}
+/* renderBenchmarks retired: the two per-line benchmarks now render as burnt-orange ticks
+ * directly on each ZOPA line, with the methodology + comparability in that line's expand
+ * (zopa.js zopaBenchForLine / zopaLineHTML). No separate benchmark panel. */
+
 /* ---- should-cost: bottoms-up cost build per driver, vs the ask, sizing the headroom ---- */
 function renderShouldCost(d) {
   const scd = d.shouldCost;
@@ -5377,7 +5468,7 @@ function renderAssumptionsRegister(d) {
         '<dt>Research log</dt><dd style="flex-direction:column;align-items:flex-start;gap:4px">' + log + '</dd></div>';
     }
   }) +
-  insight('Register is read-only here; only the WACC (ASM-5) is interactive, via the discount control above. Editing it re-discounts the NPV live.');
+  insight('Register is read-only here. The WACC (ASM-5) is interactive via the discount control above; employee count (ASM-1) and platform discount (ASM-4) are interactive via the sensitivity drivers on the Deal Table &amp; ZOPA tab.');
 }
 
 /* ---------- 3. 3C, SCENARIOS & SENSITIVITY (all precomputed / static) ---- */
@@ -5391,56 +5482,10 @@ function renderScenarioWaterfall(d) {
   return waterfall(steps, {}) +
     insight('Each bar is the full 3-year TCV if Lilly holds that position, precomputed from the scenario set. Target is the negotiated goal; max-acceptable is the walk-away (budget ceiling unconfirmed: ' + jumpLink('GAP-3', 'tab:brief') + ').');
 }
-function renderScenarioTable(d) {
-  const cols = [
-    { key: 'name', label: 'Scenario', render: r => '<strong>' + esc(r.name) + '</strong><div class="tiny muted">' + esc(r.basis) + '</div>' },
-    { key: 'y1Total', label: 'Year-1', align: 'num', sortVal: r => r.y1Total, render: r => M(r.y1Total) },
-    { key: 'total', label: '3-yr TCV', align: 'num', sortVal: r => r.total, render: r => M(r.total) },
-    { key: 'evidenceType', label: 'Ev.', render: r => evidenceChip(r.evidenceType, { short: true }) }
-  ];
-  return dataTable(cols, d.scenarios || [], { id: 'cml-scenario-tbl', zebra: true, dense: true, expand: r => insight(r.interpretation) });
-}
-// Precomputed static tornado from proforma.sensitivity (NOT a live recompute).
-function renderTornado(d) {
-  const rows = ((d.proforma || {}).sensitivity || []).slice();
-  if (!rows.length) return gapCard('No sensitivity data', 'Precomputed sensitivity not available in this session.');
-  rows.forEach(r => { r._swing = Math.abs((r.high || 0) - (r.low || 0)); });
-  rows.sort((a, b) => b._swing - a._swing);
-  const dMin = Math.min.apply(null, rows.map(r => r.low));
-  const dMax = Math.max.apply(null, rows.map(r => r.high));
-  const span = (dMax - dMin) || 1;
-  const base = rows[0].base;
-  const basePct = (base - dMin) / span * 100;
-  const body = rows.map(r => {
-    const loPct = (r.low - dMin) / span * 100, hiPct = (r.high - dMin) / span * 100;
-    return '<div class="tor-row"><div class="tor-lbl">' + esc(r.driver) + '<div class="tiny muted mono">' + M(r.low) + ' – ' + M(r.high) + '</div></div>' +
-      '<div class="tor-track"><span class="tor-base" style="left:' + basePct.toFixed(1) + '%"></span>' +
-      '<span class="tor-bar tor-lo" style="left:' + loPct.toFixed(1) + '%;width:' + (basePct - loPct).toFixed(1) + '%"></span>' +
-      '<span class="tor-bar tor-hi" style="left:' + basePct.toFixed(1) + '%;width:' + (hiPct - basePct).toFixed(1) + '%"></span></div></div>';
-  }).join('');
-  return '<div class="tornado">' + body + '</div>' +
-    '<div class="tiny muted" style="margin-top:8px">Centre line = target 3-yr TCV (' + M(base) + '). Teal = lower cost, orange = higher cost. Precomputed static ranges, not a live recompute.</div>';
-}
-function renderVaR(d) {
-  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {}).total;
-  const sens = re => ((d.proforma || {}).sensitivity || []).find(s => new RegExp(re, 'i').test(s.driver)) || {};
-  const disc = sens('discount'), emp = sens('employee');
-  const rows = [
-    { risk: 'Settle at max-acceptable, not target', exposure: M((sc('SC-max') || 0) - (sc('SC-target') || 0)), linked: 'SC-max · ISS-12', ev: 'assumption' },
-    { risk: 'Platform discount not fully achieved', exposure: disc.high != null ? M(disc.high - disc.base) : '—', linked: 'ASM-4 · ISS-12', ev: 'calculated' },
-    { risk: 'Employee count above the 18,000 plan', exposure: emp.high != null ? M(emp.high - emp.base) : '—', linked: 'ASM-1', ev: 'assumption' },
-    { risk: 'Uncapped post-term uplift + auto-renewal (Y4+)', exposure: 'Unbounded (no cap)', linked: 'ISS-04 · ISS-11', ev: 'inference' },
-    { risk: 'FY27 budget ceiling unconfirmed', exposure: 'Walk-away unvalidated', linked: 'GAP-3', ev: 'unavailable' }
-  ];
-  const cols = [
-    { key: 'risk', label: 'Risk driver', render: r => '<strong>' + esc(r.risk) + '</strong>' },
-    { key: 'exposure', label: 'Term exposure', align: 'num', render: r => '<span class="mono">' + esc(r.exposure) + '</span>' },
-    { key: 'linked', label: 'Linked', render: r => '<span class="tiny mono">' + esc(r.linked) + '</span>' },
-    { key: 'ev', label: 'Ev.', render: r => evidenceChip(r.ev, { short: true }) }
-  ];
-  return dataTable(cols, rows, { id: 'cml-var', dense: true }) +
-    insight('Exposures are independent reads, not additive. The largest controllable risk is settling above target; the largest uncontrolled risk is the uncapped post-term uplift.', 'warn');
-}
+/* renderScenarioTable / renderTornado / renderVaR retired with the Scenarios subtab:
+ * the four scenario TCVs are the marks on the total-deal ZOPA bar, the tornado is replaced
+ * by per-line leverage + the live driver sliders on the Deal tab, and value-at-risk was cut
+ * as redundant. renderScenarioWaterfall (above) survives as the Negotiated Value Ladder. */
 
 /* ---------- 4. live recompute (WACC slider -> NPV) ------------------------ */
 function recompute(d) {
@@ -5466,18 +5511,20 @@ function renderTab_commercials(d) {
   pl.forEach((p, i) => { const c = cf[i] || {}; tsvRows.push([p.year, p.revenue, p.cost, p.net, c.in, c.out, c.cum].join('\t')); });
   const tsv = tsvRows.join('\n');
 
-  /* ---- 3A: Deal Table & ZOPA ---- */
+  /* ---- 3A: Deal Table & ZOPA (reordered: room + renewal on top, then should-cost, the
+       negotiated-value ladder, and the ZOPA last with sensitivity drivers + benchmark ticks) ---- */
   const deal =
-    '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Every commercial line: the supplier ask against Lilly’s target, fallback and walk-away, the per-line zone of possible agreement, and how defensible the price is. ' + coverageBadge('Strong') + '</p></div>' +
+    '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Where the negotiable room is, the supplier ask against Lilly’s target, fallback and walk-away, per-line leverage, and how the number moves with the deal’s drivers. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
-      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing & Benchmarks',
-        window.DealZopa.render(d) + renderDealTotals(d) +
-        collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
-        { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · target → walk-away · supplier ask' }) + '</div>' +
-      '<div class="col-12">' + renderBenchmarks(d) + '</div>' +
-      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
       '<div class="col-6">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-6">' + renderRenewalBand(d) + '</div>' +
+      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
+      '<div class="col-12">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d),
+        { accent: 'plum', icon: 'scenarios', sub: 'supplier ask down to target, step by step' }) + '</div>' +
+      '<div class="col-12">' + saCard('ZOPA by Line Item · Sensitivity & Benchmarks',
+        window.DealZopa.sensitivity(d) + '<div id="cml-zopa-live">' + window.DealZopa.render(d) + '</div>' + renderDealTotals(d) +
+        collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
+        { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · leverage · benchmark ticks · live drivers' }) + '</div>' +
     '</div>';
 
   /* ---- 3B: Pro-forma ---- */
@@ -5494,15 +5541,9 @@ function renderTab_commercials(d) {
       '<div class="col-12">' + saCard('Assumptions Register', renderAssumptionsRegister(d), { accent: 'emph', icon: 'assume', sub: (d.assumptions || []).length + ' inputs' }) + '</div>' +
     '</div>';
 
-  /* ---- 3C: Scenarios & Sensitivity ---- */
-  const scenarios =
-    '<div class="tab-intro"><h2>Scenarios &amp; Sensitivity</h2><p class="q">The four negotiating positions as full 3-year TCVs, and which drivers move the number most. ' + coverageBadge('Moderate') + '</p></div>' +
-    '<div class="grid">' +
-      '<div class="col-7">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d), { accent: 'plum', icon: 'scenarios' }) + '</div>' +
-      '<div class="col-5">' + saCard('Scenario Comparison', renderScenarioTable(d), { icon: 'target' }) + '</div>' +
-      '<div class="col-7">' + saCard('Sensitivity, Swing on 3-yr TCV', renderTornado(d), { accent: 'emph', icon: 'scale' }) + '</div>' +
-      '<div class="col-5">' + saCard('Value at Risk', renderVaR(d), { accent: 'danger', icon: 'flag' }) + '</div>' +
-    '</div>';
+  /* ---- 3C (Scenarios & Sensitivity) is retired: the Negotiated Value Ladder moved onto the
+       Deal tab, per-line leverage + live driver sliders replaced the tornado, and the scenario
+       comparison + value-at-risk panels were cut as redundant with the ZOPA marks. ---- */
 
   /* ---- scoped styles (only what the base system does not provide) ---- */
   const scopedStyle = '<style>' +
@@ -5522,13 +5563,8 @@ function renderTab_commercials(d) {
     '.commercials-tab .disc-line{display:flex;justify-content:space-between;gap:10px;font-size:var(--fz-sm);padding:5px 0;border-top:1px solid var(--line)}' +
     '.commercials-tab .disc-line:first-child{border-top:0}' +
     '.commercials-tab .rn-item .kv{margin-top:6px}' +
-    /* benchmarks as a uniform strip */
-    '.commercials-tab .bm-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}' +
-    '.commercials-tab .bm-cell{border:1px solid var(--line2);border-radius:8px;padding:11px 13px;background:var(--surface2)}' +
-    '.commercials-tab .bm-cell-t{font:800 10px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);margin-bottom:5px}' +
-    '.commercials-tab .bm-cell-v{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35}' +
-    '.commercials-tab .bm-cell-f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:7px 0}' +
-    '.commercials-tab .bm-cell-m{font-size:10px;color:var(--mut2);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}' +
+    /* equal-height cards within a grid row (Where the Room Is | Renewal sit level) */
+    '.commercials-tab .grid>[class*="col-"]>.sa-card{height:100%}' +
     /* should-cost bottoms-up bars */
     '.commercials-tab .scst-driver{margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--line)}' +
     '.commercials-tab .scst-driver:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}' +
@@ -5545,27 +5581,16 @@ function renderTab_commercials(d) {
     '.commercials-tab .scst-lg b{color:var(--ink2)}' +
     '.commercials-tab .rl-item{font-size:var(--fz-sm);line-height:1.45}' +
     '.commercials-tab .npv-svg{width:100%;height:auto;display:block;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm)}' +
-    '.commercials-tab .tornado{display:grid;gap:9px}' +
-    '.commercials-tab .tor-row{display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center}' +
-    '.commercials-tab .tor-lbl{font-size:var(--fz-sm);font-weight:600;color:var(--ink2)}' +
-    '.commercials-tab .tor-track{position:relative;height:22px;background:var(--well);border:1px solid var(--line);border-radius:5px}' +
-    '.commercials-tab .tor-base{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink2);z-index:2}' +
-    '.commercials-tab .tor-bar{position:absolute;top:3px;bottom:3px}' +
-    '.commercials-tab .tor-lo{background:var(--teal-d);border-radius:3px 0 0 3px}' +
-    '.commercials-tab .tor-hi{background:var(--emph);border-radius:0 3px 3px 0}' +
-    '@media (max-width:640px){.commercials-tab .tor-row{grid-template-columns:120px 1fr}}' +
   '</style>';
 
   return scopedStyle + '<div class="commercials-tab">' +
     '<div class="subtabbar" data-subtab-group="commercials"><div class="wrap">' +
       '<button class="subtab-btn" data-subtab="deal" aria-selected="true">' + icon('money') + ' Deal Table &amp; ZOPA</button>' +
       '<button class="subtab-btn" data-subtab="proforma">' + icon('scale') + ' Pro-forma</button>' +
-      '<button class="subtab-btn" data-subtab="scenarios">' + icon('scenarios') + ' Scenarios &amp; Sensitivity</button>' +
     '</div></div>' +
     '<div class="tab-body"><div class="wrap">' +
       '<div data-subpanel="commercials/deal" class="is-active">' + deal + '</div>' +
       '<div data-subpanel="commercials/proforma">' + proforma + '</div>' +
-      '<div data-subpanel="commercials/scenarios">' + scenarios + '</div>' +
     '</div></div>' +
   '</div>';
 }
