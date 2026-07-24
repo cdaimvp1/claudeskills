@@ -66,8 +66,10 @@ def platform_chrome():
         '.sa-title .dh-sub{font-size:13px;color:var(--mut);margin-top:8px}')
     gutter_css = ('.sa-main{padding:28px 40px 70px;max-width:1320px;margin:0 auto}'
         '@media(max-width:760px){.sa-main{padding:22px 16px 60px}}'
-        # the sticky strip/tabbar must clear the sticky topbar
-        '.sticky-head{top:0}')
+        # the sticky strip/tabbar must clear the 56px sticky topbar (not top:0,
+        # which would stack it ON the topbar and float both mid-page in a
+        # full-page screen capture)
+        '.sticky-head{top:56px}')
     chrome_css = theo_color + fonts + app_shell + chrome['brand_css'] + chrome['foot_css'] + tdino_css + title_css + gutter_css
 
     user_icon = ('<svg class="avicon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">'
@@ -99,7 +101,12 @@ def build(out_path):
     title = deal_title()
 
     html = (
-        '<!doctype html>\n<html lang="en">\n<head>\n'
+        # data-theme="light" MUST be stamped: the Deal's style.css has a
+        # @media(prefers-color-scheme:dark) :root:not([data-theme]) block that
+        # would flip the whole dashboard to dark on a dark-preferring browser.
+        # Stamping light neutralizes it + every html[data-theme=dark] override,
+        # so the page + topbar render light, byte-matching the Landscape build.
+        '<!doctype html>\n<html lang="en" data-theme="light">\n<head>\n'
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         '<title>' + title.replace('<', '&lt;') + '</title>\n'
