@@ -694,6 +694,60 @@ const dashboardData = {
     changeControl: [
       { text: 'Changes require a signed Change Order; supplier estimates effort at standard day-rate.', evidenceType: 'contract' },
       { text: 'No cap on change-order day-rate; ties to ISS-11 uncapped pricing.', evidenceType: 'inference' }
+    ],
+
+    /* ---- intent 1: intended-scope-vs-contract reconciliation ----------------
+     * What Lilly INTENDED to be in scope (gathered from the RFP, the supplier
+     * proposal, email + Teams threads, and user input), reconciled against the
+     * DRAFTED contract. status: in-contract | partial | missing | ambiguous |
+     * contradicted. (Ingestion is mocked with representative seed; the reconcile
+     * LOGIC is real.) This is the tab's centerpiece and the owner's #1 priority. */
+    intendedScope: [
+      { id: 'IS-1', text: 'Onboard 4 core HR data sources (HRIS, payroll, recruiting, learning).', source: 'RFP §3.1', status: 'in-contract', contractRef: 'SOW-01 D1', confidence: 'High', note: 'Requested and present as deliverable D1.', evidenceType: 'contract' },
+      { id: 'IS-2', text: 'Executive + manager dashboard set.', source: 'Proposal §2', status: 'in-contract', contractRef: 'SOW-01 D3', confidence: 'High', note: 'Present as D3 (capped at 12 dashboards).', evidenceType: 'contract' },
+      { id: 'IS-3', text: 'SSO / role-based access integration.', source: 'RFP §5', status: 'in-contract', contractRef: 'SOW-01 D4', confidence: 'High', note: 'Present as D4 (owner marked Joint).', evidenceType: 'contract' },
+      { id: 'IS-4', text: 'Historical data migration, 5 years.', source: 'RFP §3.4', status: 'contradicted', contractRef: 'SOW-01 out-of-scope', confidence: 'High', note: 'RFP asked for 5 years; the SOW EXCLUDES history older than 3 years. Direct conflict, resolve before signature.', evidenceType: 'contract' },
+      { id: 'IS-5', text: 'Exit / transition assistance at end of term.', source: 'Proposal §8 · RFP §9', status: 'missing', contractRef: null, confidence: 'High', note: 'Raised in the RFP and acknowledged in the proposal; no exit-assistance clause in the SOW or MSA.', evidenceType: 'inference' },
+      { id: 'IS-6', text: 'Predictive attrition / flight-risk modeling.', source: 'Proposal §4', status: 'ambiguous', contractRef: 'standard content pack (?)', confidence: 'Moderate', note: 'Proposal implied attrition modeling; the SOW excludes “bespoke predictive models beyond the standard content pack.” Confirm the standard pack covers it.', evidenceType: 'inference' },
+      { id: 'IS-7', text: 'Supplier-assisted data-quality remediation during onboarding.', source: 'Email 2026-07-08', status: 'missing', contractRef: null, confidence: 'Moderate', note: 'Lilly raised this by email; the SOW assumes Lilly provides clean, conformed data (see responsibility shifts).', evidenceType: 'internal' },
+      { id: 'IS-8', text: 'Admin + analyst training.', source: 'RFP §6', status: 'partial', contractRef: 'SOW-01 D5', confidence: 'High', note: 'Present as D5 but with no competency or attendance threshold (acceptance AC-4 undefined).', evidenceType: 'contract' }
+    ],
+    // implicit scope, assumed by Lilly but never written by anyone
+    assumedScope: [
+      { text: 'Production support / SLAs during the pre-go-live implementation phase.', note: 'The SLA register only covers post-go-live; nothing governs availability during onboarding.', evidenceType: 'inference' },
+      { text: 'Knowledge transfer to Lilly’s internal analytics team beyond the 2 training sessions.', note: 'Assumed for self-sufficiency at handover; not a stated deliverable.', evidenceType: 'inference' }
+    ],
+    // Total Recall: what similar category deals (HR-data SaaS) normally include
+    categoryNorms: [
+      { text: 'A signed DPA + EU SCCs for employee personal data.', present: false, note: 'Category-standard for workforce data; referenced but not provided (GAP-1, ISS-03).', evidenceType: 'inference' },
+      { text: 'Exit / transition-assistance clause.', present: false, note: 'Standard in comparable SaaS exits; absent (matches IS-5).', evidenceType: 'inference' },
+      { text: 'Defined data return + deletion on termination.', present: 'partial', note: 'Return implied, deletion window not specified.', evidenceType: 'inference' }
+    ],
+
+    /* ---- intent 1 (timeline): proposed vs contracted delivery ---------------- */
+    timelineVerification: {
+      proposedGoLive: '2026-11-30', contractGoLive: '2027-01-12', deltaWeeks: 6,
+      note: 'The proposal implied go-live by end-November; the SOW schedule lands go-live 6 weeks later (2027-01-12). Confirm the later date is acceptable, or negotiate the schedule back.',
+      evidenceType: 'inference'
+    },
+    // payment structure is a negotiation point, not a mid-project tracker
+    paymentStructure: {
+      milestoneTied: false,
+      note: 'Single fixed implementation fee ($220K ask / $160K target); the SOW does not tie payment to milestone acceptance, so there is no progress-payment lever if a milestone slips or a deliverable is rejected.',
+      evidenceType: 'contract'
+    },
+
+    /* ---- intent 3: where scope shifts responsibility / obligation to Lilly ----
+     * shiftType: effort | cost | risk | dependency ; stance: accept | push-back.
+     * Folds in the buyer-owned dependencies, supplier assumptions, acceptance-by-
+     * silence, and change-control consequences (a scope lens on the shared spine). */
+    shifts: [
+      { id: 'SH-1', text: 'Lilly provides HRIS/payroll extract access within 5 days of kickoff.', source: 'SOW dependency (DEP-1)', shiftType: 'dependency', trigger: 'Kickoff (M1)', stance: 'push-back', note: 'Tight 5-day window; late access slips the whole critical chain. Ask for a supplier-side grace/replan, or widen the window.', evidenceType: 'contract' },
+      { id: 'SH-2', text: 'Supplier assumes Lilly supplies clean, conformed data; remediation is Lilly’s.', source: 'Supplier assumption (proposal)', shiftType: 'effort', trigger: 'Data onboarding (M2)', stance: 'push-back', note: 'The unwritten cost. If data isn’t clean, the effort lands on Lilly; the proposal implied supplier-assisted cleansing (IS-7).', evidenceType: 'inference' },
+      { id: 'SH-3', text: 'Deliverables are deemed accepted after 10 days of silence.', source: 'MSA acceptance clause (ISS-10)', shiftType: 'risk', trigger: 'Each deliverable', stance: 'push-back', note: 'Silence = acceptance puts the QA burden on Lilly against a 10-day clock; require explicit sign-off or extend the window.', evidenceType: 'contract' },
+      { id: 'SH-4', text: 'Change orders billed at an uncapped standard day-rate.', source: 'Change control (ISS-11)', shiftType: 'cost', trigger: 'Any change order', stance: 'push-back', note: 'No cap on change-order rates; scope creep is open-ended cost exposure. Cap the day-rate.', evidenceType: 'inference' },
+      { id: 'SH-5', text: 'SSO / RBAC configuration is “Joint” with no Lilly-side effort estimate.', source: 'SOW deliverable D4', shiftType: 'effort', trigger: 'Dashboards + access (M4)', stance: 'push-back', note: 'Joint ownership with no split of tasks/effort; pin down who does what before M4.', evidenceType: 'contract' },
+      { id: 'SH-6', text: 'Lilly confirms data-classification for employee PII.', source: 'SOW dependency (DEP-2)', shiftType: 'dependency', trigger: 'Before M2', stance: 'accept', note: 'Reasonable buyer obligation; keep, but assign an owner and a date.', evidenceType: 'inference' }
     ]
   },
 

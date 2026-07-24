@@ -789,98 +789,129 @@ function raciCell(val) {
   return '<span class="pill ' + cls + '">' + val + '</span>';
 }
 
-function paymentReconciliationHtml(d) {
-  const cl = (d.commercialLines || []).find(c => c.id === 'CL-2'); // Implementation services (SOW-01)
-  if (!cl) {
-    return gapCard('Milestone payment reconciliation', 'No implementation fee line links to SOW-01 in this session. Payment-to-milestone reconciliation could not be attempted. ' + evidenceChip('unavailable'));
-  }
-  return '<div class="eyebrow" style="margin:12px 0 6px">Payment reconciliation to contract value</div>' +
-    '<div class="kv" style="margin-bottom:6px">' +
-      '<dt>SOW-01 fee (ask)</dt><dd>' + money(cl.supplierAmount) + ' ' + evidenceChip(cl.evidenceType, { short:true, sources: cl.sourceIds }) + '</dd>' +
-      '<dt>SOW-01 fee (target)</dt><dd>' + money(cl.target) + ' ' + evidenceChip('calculated', { short:true }) + '</dd>' +
-    '</div>' +
-    insight('SOW-01 sets delivery timing across ' + ((d.scope && d.scope.milestones) || []).length + ' milestones (M1&ndash;M5) but does not itemize a payment percentage per milestone in the reviewed text. The fee above is billed as a single fixed fee, not milestone-triggered progress payments. Per-milestone reconciliation could not be verified this session.', 'warn') +
-    '<div style="margin-top:4px">' + evidenceChip('unavailable') + '</div>';
+/* ---- scope chips (locked palette: teal/plum/burnt-orange, red only for a true conflict) ---- */
+const SCOPE_STATUS_LABEL = { 'in-contract':'In contract', partial:'Partial', ambiguous:'Ambiguous', missing:'Missing', contradicted:'Contradicted' };
+function scopeStatusChip(s) { return '<span class="sc-st sc-st-' + esc(s) + '">' + esc(SCOPE_STATUS_LABEL[s] || s) + '</span>'; }
+function shiftTypeChip(t) { return '<span class="sc-shift-type">' + esc(t) + '</span>'; }
+function stanceChip(s) { return '<span class="sc-stance sc-stance-' + esc(s) + '">' + esc(s === 'push-back' ? 'Push back' : 'Accept') + '</span>'; }
+function normMark(present) {
+  if (present === true) return '<span class="sc-st sc-st-in-contract">Present</span>';
+  if (present === 'partial') return '<span class="sc-st sc-st-partial">Partial</span>';
+  return '<span class="sc-st sc-st-missing">Missing</span>';
 }
 
-function renderScopePerfFull(d) {
+/* ---- intent rollup: the scope-readiness verdict (complete / sound / fairly allocated) ---- */
+function scopeReadiness(d) {
   const sc = d.scope || {};
+  const is = sc.intendedScope || [];
+  const cnt = k => is.filter(x => x.status === k).length;
+  const missing = cnt('missing'), contradicted = cnt('contradicted'), ambiguous = cnt('ambiguous'), partial = cnt('partial'), inC = cnt('in-contract');
+  const undefinedAcc = (sc.acceptance || []).filter(a => !a.defined).length;
+  const ambiguousRaci = ((sc.raci || {}).rows || []).filter(r => r.ambiguous).length;
+  const slaGaps = (sc.serviceLevels || []).filter(s => s.status === 'deviation' || s.status === 'partial').length;
+  const pushBacks = (sc.shifts || []).filter(s => s.stance === 'push-back').length;
+  const completeK = (missing + contradicted) ? 'deviation' : ((ambiguous + partial) ? 'partial' : 'aligned');
+  const soundK = (undefinedAcc + ambiguousRaci) ? 'deviation' : (slaGaps ? 'partial' : 'aligned');
+  const fairK = pushBacks >= 3 ? 'deviation' : (pushBacks ? 'partial' : 'aligned');
+  const ks = [completeK, soundK, fairK];
+  const vk = ks.indexOf('deviation') !== -1 ? 'deviation' : (ks.indexOf('partial') !== -1 ? 'partial' : 'aligned');
+  const vlabel = vk === 'deviation' ? 'Fix before signature' : (vk === 'partial' ? 'Proceed with conditions' : 'Scope-ready');
+  return { missing, contradicted, ambiguous, partial, inC, undefinedAcc, ambiguousRaci, slaGaps, pushBacks, completeK, soundK, fairK, vk, vlabel, total: is.length };
+}
+function scopeReadinessBanner(d) {
+  const r = scopeReadiness(d);
+  const dim = (name, k, detail) => '<div class="sc-rd-dim">' +
+    '<div class="sc-rd-dn">' + esc(name) + statusPill(k, k === 'aligned' ? 'OK' : (k === 'partial' ? 'Watch' : 'Gaps')) + '</div>' +
+    '<div class="sc-rd-dt">' + detail + '</div></div>';
+  const body = '<div class="sc-readiness">' +
+    dim('Complete', r.completeK, r.inC + ' of ' + r.total + ' intended items in contract &middot; ' + r.missing + ' missing &middot; ' + r.contradicted + ' contradicted') +
+    dim('Sound as drafted', r.soundK, r.undefinedAcc + ' undefined acceptance &middot; ' + r.ambiguousRaci + ' unclear accountability &middot; ' + r.slaGaps + ' SLA gaps') +
+    dim('Fairly allocated', r.fairK, r.pushBacks + ' scope points shift onto Lilly &middot; push back') +
+    '</div>';
+  return saCard('Scope Readiness', body,
+    { icon:'shield', accent: r.vk === 'deviation' ? 'danger' : (r.vk === 'partial' ? 'emph' : 'teal'),
+      sub: '<span class="sc-verdict sc-verdict-' + r.vk + '">' + esc(r.vlabel) + '</span>' });
+}
 
-  /* ---- Delivery timeline (milestones) + deliverables legend + payment reconciliation ---- */
+/* ---- intent 1: intended-scope-vs-contract reconciliation (the centerpiece) ---- */
+function renderReconciliation(d) {
+  const sc = d.scope || {};
+  const cols = [
+    { key:'text', label:'Intended scope', render: r => '<strong>' + esc(r.text) + '</strong><div class="tiny muted">' + esc(r.source) + '</div>' },
+    { key:'status', label:'Status', width:'132px', sortVal: r => r.status, render: r => scopeStatusChip(r.status) },
+    { key:'contractRef', label:'In contract', width:'150px', sort:false, render: r => r.contractRef ? esc(r.contractRef) : '<span class="tiny muted">&mdash;</span>' },
+    { key:'confidence', label:'Conf.', width:'70px', sort:false, render: r => '<span class="tiny">' + esc(r.confidence) + '</span>' }
+  ];
+  const table = dataTable(cols, sc.intendedScope || [], { zebra:true, dense:true, id:'tbl-reconcile',
+    rowClass: r => r.status === 'contradicted' ? 'rowtint-danger' : (r.status === 'missing' ? 'rowtint-warn' : ''),
+    expand: r => '<div class="kv"><dt>Detail</dt><dd>' + esc(r.note) + ' ' + evidenceChip(r.evidenceType, { short:true }) + '</dd></div>' });
+  const assumed = (sc.assumedScope || []).map(a => '<li>' + esc(a.text) + ' <span class="tiny muted">' + esc(a.note) + '</span> ' + evidenceChip(a.evidenceType, { short:true }) + '</li>').join('');
+  const norms = (sc.categoryNorms || []).map(n => '<li>' + normMark(n.present) + ' ' + esc(n.text) + ' <span class="tiny muted">' + esc(n.note) + '</span></li>').join('');
+  const extra = '<div class="sc-recon-extra">' +
+    '<div class="sc-re-col"><div class="eyebrow">Assumed / unwritten (' + (sc.assumedScope || []).length + ')</div><ul class="sc-re-list">' + assumed + '</ul></div>' +
+    '<div class="sc-re-col"><div class="eyebrow">Category norms &middot; Total Recall</div><ul class="sc-re-list">' + norms + '</ul></div>' +
+  '</div>';
+  return saCard('Intended-Scope Reconciliation', table + extra,
+    { icon:'target', accent:'teal', sub: 'is what we asked for actually in the paper?' });
+}
+
+/* ---- intent 1 (timeline verification) + payment structure ---- */
+function renderDeliveryTimeline(d) {
+  const sc = d.scope || {};
   const ms = sc.milestones || [];
-  const ganttRows = ms.map((m, i) => ({ label: m.name, start: m.date, end: m.end, tone: i === 0 ? 'pri' : '', badge: m.id }));
+  const ganttRows = ms.map((m, i) => ({ label: m.name + ' · ' + m.date, start: m.date, end: m.end, tone: i === 0 ? 'pri' : '', badge: m.id }));
   const ganttHtml = ms.length
     ? gantt(ganttRows, { start: ms[0].date, end: ms[ms.length - 1].end })
-    : gapCard('Milestone schedule', 'No dated milestones available in this session.');
-  const delivLegend = '<dl class="kv" style="margin-top:12px">' +
-    (sc.deliverables || []).map(dl => {
-      const m = ms.find(x => x.id === dl.milestone);
-      return '<dt>' + esc(dl.id) + '</dt><dd><strong>' + esc(dl.name) + '</strong> &mdash; ' +
-        (m ? esc(m.name) + ' (' + esc(dl.milestone) + ')' : esc(dl.milestone)) + ' &middot; owner: ' + esc(dl.owner) +
-        ' ' + evidenceChip(dl.evidenceType, { short:true }) + '</dd>';
-    }).join('') + '</dl>';
-  const timelineInsight = insight('Data onboarding (M2) is the schedule’s critical dependency &mdash; every later milestone chains from it, and buyer HRIS/payroll access is due within 5 days of kickoff.', 'warn');
-  const timelineCard = saCard('Delivery Timeline', ganttHtml + delivLegend + timelineInsight + paymentReconciliationHtml(d),
-    { icon:'clock', sub: ms.length + ' milestones &middot; ' + (sc.deliverables || []).length + ' deliverables' });
+    : gapCard('Milestone schedule', 'No dated milestones in this session, so the timeline cannot be verified. ' + evidenceChip('unavailable'));
+  const tv = sc.timelineVerification;
+  const verify = tv ? insight('<strong>Timeline check (proposed vs contract):</strong> ' + esc(tv.note) + ' ' + evidenceChip(tv.evidenceType, { short:true }), 'warn') : '';
+  const pay = sc.paymentStructure ? insight('<strong>Payment structure:</strong> ' + esc(sc.paymentStructure.note) + ' ' + evidenceChip(sc.paymentStructure.evidenceType, { short:true }), sc.paymentStructure.milestoneTied ? '' : 'warn') : '';
+  const crit = insight('<strong>Critical chain:</strong> data onboarding (M2) gates every later milestone; Lilly&rsquo;s HRIS/payroll access is due within 5 days of kickoff (see Shifts to Lilly), and the supplier must provision the production tenant before M2.', 'warn');
+  const legend = '<dl class="kv" style="margin-top:12px">' + (sc.deliverables || []).map(dl => {
+    const m = ms.find(x => x.id === dl.milestone);
+    return '<dt>' + esc(dl.id) + '</dt><dd><strong>' + esc(dl.name) + '</strong> &mdash; ' +
+      (m ? esc(m.name) + ' (' + esc(dl.milestone) + ')' : esc(dl.milestone)) + ' &middot; owner ' + esc(dl.owner) + ' ' + evidenceChip(dl.evidenceType, { short:true }) + '</dd>';
+  }).join('') + '</dl>';
+  return saCard('Delivery Timeline', ganttHtml + verify + pay + crit + legend,
+    { icon:'clock', sub: ms.length + ' milestones &middot; scope containerised per milestone' });
+}
 
-  /* ---- Dependencies & risk ---- */
-  const depCols = [
-    { key:'text', label:'Dependency', render: r => r.text },
-    { key:'owner', label:'Owner', width:'80px', render: r => esc(r.owner) },
-    { key:'risk', label:'Risk', render: r => severityPill(r.risk) },
-    { key:'evidence', label:'Evidence', sort:false, render: r => evidenceChip(r.evidenceType, { short:true }) }
-  ];
-  const depTable = dataTable(depCols, sc.dependencies || [], { zebra:true, dense:true, id:'tbl-dependencies',
-    rowClass: r => r.risk === 'high' ? 'rowtint-danger' : '' });
-  const depCard = saCard('Dependencies & Risk', depTable, { icon:'flag', accent:'danger' });
-
-  /* ---- Scope boundaries + coverage ---- */
-  const inScope = sc.inScope || [], outScope = sc.outOfScope || [];
-  const inList = inScope.map(x => '<li>' + esc(x.text) + ' ' + evidenceChip(x.evidenceType, { short:true }) + '</li>').join('');
-  const outList = outScope.map(x => '<li>' + esc(x.text) + ' ' + evidenceChip(x.evidenceType, { short:true }) + '</li>').join('');
-  const scopeBody =
-    '<p class="card-note" style="margin-top:0"><strong>Objective (scope-definition read):</strong> ' + esc(sc.objective) + ' ' + evidenceChip(sc.objectiveEvidence, { short:true }) + '</p>' +
-    '<div class="divider"></div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">' +
-      '<div><div class="eyebrow" style="margin-bottom:6px">In scope</div><ul style="margin:0;padding-left:18px;line-height:1.7">' + inList + '</ul></div>' +
-      '<div><div class="eyebrow" style="margin-bottom:6px">Out of scope</div><ul style="margin:0;padding-left:18px;line-height:1.7">' + outList + '</ul></div>' +
-    '</div>';
-  const scopeCard = saCard('Scope Boundaries & Coverage', scopeBody,
-    { icon:'target', sub: inScope.length + ' in &middot; ' + outScope.length + ' out' });
-
-  /* ---- Acceptance analysis ---- */
-  const acceptance = sc.acceptance || [];
-  const accCols = [
-    { key:'id', label:'ID', width:'56px' },
-    { key:'deliverable', label:'Deliverable', width:'70px', render: r => esc(r.deliverable) },
-    { key:'criteria', label:'Criteria', sort:false, render: r => r.criteria },
-    { key:'defined', label:'Defined', render: r => r.defined ? statusPill('aligned','Defined') : statusPill('deviation','Not defined'), sortVal: r => r.defined ? 1 : 0 },
-    { key:'evidence', label:'Evidence', sort:false, render: r => evidenceChip(r.evidenceType, { short:true }) }
-  ];
-  const accTable = dataTable(accCols, acceptance, { zebra:true, dense:true, id:'tbl-acceptance',
-    rowClass: r => r.defined ? '' : 'rowtint-warn' });
-  const undefinedCount = acceptance.filter(a => !a.defined).length;
-  const accInsight = insight('<strong>' + undefinedCount + '</strong> of ' + acceptance.length + ' acceptance criteria have no objective pass/fail standard &mdash; links to the deemed-acceptance finding in Legal &amp; Protection.', undefinedCount ? 'warn' : '');
-  const accCard = saCard('Acceptance Analysis', accTable + accInsight, { icon:'flag', accent:'teal' });
-
-  /* ---- RACI ---- */
-  const raci = sc.raci || { roles:[], rows:[] };
-  const raciCols = [{ key:'activity', label:'Activity', sort:false,
-      render: r => '<strong>' + esc(r.activity) + '</strong>' + (r.ambiguous ? ' <span class="pill warn" title="Ambiguous accountability">!</span>' : '') }]
+/* ---- intent 3: RACI + shifts-to-Lilly register ---- */
+function renderRaciPanel(d) {
+  const raci = (d.scope || {}).raci || { roles:[], rows:[] };
+  const cols = [{ key:'activity', label:'Activity', sort:false,
+      render: r => '<strong>' + esc(r.activity) + '</strong>' + (r.ambiguous ? ' <span class="pill warn" title="Unclear accountability">!</span>' : '') }]
     .concat(raci.roles.map((role, i) => ({ key:'role' + i, label: role, sort:false, render: r => raciCell(r.vals[i]) })));
-  const raciRows = raci.rows || [];
-  const raciTable = dataTable(raciCols, raciRows, { zebra:false, dense:true, id:'tbl-raci', sortable:false,
+  const rows = raci.rows || [];
+  const table = dataTable(cols, rows, { zebra:false, dense:true, id:'tbl-raci', sortable:false,
     rowClass: r => r.ambiguous ? 'rowtint-warn' : '',
     expand: r => r.note ? insight(esc(r.note), 'warn') + ' ' + evidenceChip(r.evidenceType, { short:true }) : null });
-  const ambiguousCount = raciRows.filter(r => r.ambiguous).length;
-  const raciLegend = '<div class="tiny muted" style="margin-top:8px">R = Responsible &middot; A = Accountable &middot; C = Consulted &middot; I = Informed. ' +
-    ambiguousCount + ' of ' + raciRows.length + ' activities are flagged (two Accountable owners, or none) &mdash; expand for detail.</div>';
-  const raciCard = saCard('Responsibility (RACI, compact)', raciTable + raciLegend, { icon:'raci', sub: ambiguousCount + ' flagged' });
+  const amb = rows.filter(r => r.ambiguous).length;
+  const legend = '<div class="tiny muted" style="margin-top:8px">R Responsible &middot; A Accountable &middot; C Consulted &middot; I Informed. ' +
+    amb + ' of ' + rows.length + ' activities have unclear accountability (two Accountable, or none) &mdash; expand for detail.</div>';
+  return saCard('Responsibility (RACI)', table + legend, { icon:'raci', sub: amb + ' unclear' });
+}
+function renderShifts(d) {
+  const sc = d.scope || {};
+  const cols = [
+    { key:'text', label:'Scope point that shifts to Lilly', render: r => '<strong>' + esc(r.text) + '</strong><div class="tiny muted">' + esc(r.source) + '</div>' },
+    { key:'shiftType', label:'Shifts', width:'92px', sortVal: r => r.shiftType, render: r => shiftTypeChip(r.shiftType) },
+    { key:'trigger', label:'Trigger', width:'132px', sort:false, render: r => '<span class="tiny">' + esc(r.trigger) + '</span>' },
+    { key:'stance', label:'Stance', width:'104px', sortVal: r => r.stance === 'push-back' ? 1 : 0, render: r => stanceChip(r.stance) }
+  ];
+  const table = dataTable(cols, sc.shifts || [], { zebra:true, dense:true, id:'tbl-shifts',
+    rowClass: r => r.stance === 'push-back' ? 'rowtint-warn' : '',
+    expand: r => '<div class="kv"><dt>Why it matters / how to handle</dt><dd>' + esc(r.note) + ' ' + evidenceChip(r.evidenceType, { short:true }) + '</dd></div>' });
+  const pb = (sc.shifts || []).filter(s => s.stance === 'push-back').length;
+  return saCard('Shifts to Lilly', table, { icon:'flag', accent:'emph', sub: pb + ' to push back' });
+}
 
-  /* ---- SLA/KPI register & change control ---- */
+/* ---- intent 2: performance (SLA/KPI + acceptance gates + change control, merged) ---- */
+function renderPerformance(d) {
+  const sc = d.scope || {};
   const slaCols = [
     { key:'metric', label:'Metric', render: r => esc(r.metric) },
-    { key:'target', label:'Target', render: r => esc(r.target) },
+    { key:'target', label:'Contract', render: r => esc(r.target) },
     { key:'playbook', label:'Playbook', render: r => esc(r.playbook) },
     { key:'remedy', label:'Remedy', sort:false, render: r => esc(r.remedy) },
     { key:'status', label:'Status', render: r => statusPill(r.status) },
@@ -888,16 +919,34 @@ function renderScopePerfFull(d) {
   ];
   const slaTable = dataTable(slaCols, sc.serviceLevels || [], { zebra:true, dense:true, id:'tbl-sla',
     rowClass: r => r.status === 'deviation' ? 'rowtint-danger' : (r.status === 'partial' ? 'rowtint-warn' : '') });
-  const changeHtml = (sc.changeControl || []).map(c => insight(esc(c.text) + ' ' + evidenceChip(c.evidenceType, { short:true }))).join('');
-  const slaCard = saCard('SLA / KPI Register & Change Control', slaTable + '<div class="divider"></div>' + changeHtml, { icon:'shield', accent:'emph' });
+  const accCols = [
+    { key:'deliverable', label:'Deliverable', width:'78px', render: r => esc(r.deliverable) },
+    { key:'criteria', label:'Acceptance criteria', sort:false, render: r => esc(r.criteria) },
+    { key:'defined', label:'Objective?', width:'122px', sortVal: r => r.defined ? 1 : 0, render: r => r.defined ? statusPill('aligned','Defined') : statusPill('deviation','Not defined') }
+  ];
+  const accTable = dataTable(accCols, sc.acceptance || [], { zebra:true, dense:true, id:'tbl-acceptance',
+    rowClass: r => r.defined ? '' : 'rowtint-warn' });
+  const undef = (sc.acceptance || []).filter(a => !a.defined).length;
+  const accNote = insight('<strong>' + undef + '</strong> of ' + (sc.acceptance || []).length + ' acceptance criteria lack an objective pass/fail standard &mdash; ties to the deemed-acceptance finding ' + issueJump('ISS-10') + '.', undef ? 'warn' : '');
+  const change = (sc.changeControl || []).map(c => insight(esc(c.text) + ' ' + evidenceChip(c.evidenceType, { short:true }))).join('');
+  const body = '<div class="eyebrow" style="margin:2px 0 7px">Service levels &amp; KPIs</div>' + slaTable +
+    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Deliverable acceptance gates</div>' + accTable + accNote +
+    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Change control</div>' + change;
+  return saCard('Performance: SLAs, Acceptance & Change Control', body, { icon:'shield', accent:'emph' });
+}
 
+// Scope & Performance composition (services/SOW trait). The invariant backbone (readiness verdict /
+// reconciliation ledger / shifts register) is category-agnostic; the realizing panels below are the
+// services/SOW composition. Goods/capital would compose a parallel set (spec conformance, Incoterms,
+// FAT/SAT) over the same backbone, driven off d.meta.contractSet + category traits.
+function renderScopePerfFull(d) {
   return '<div class="grid">' +
-      '<div class="col-8">' + timelineCard + '</div>' +
-      '<div class="col-4">' + depCard + '</div>' +
-      '<div class="col-6">' + scopeCard + '</div>' +
-      '<div class="col-6">' + accCard + '</div>' +
-      '<div class="col-7">' + raciCard + '</div>' +
-      '<div class="col-5">' + slaCard + '</div>' +
+      '<div class="col-12">' + scopeReadinessBanner(d) + '</div>' +
+      '<div class="col-12">' + renderReconciliation(d) + '</div>' +
+      '<div class="col-12">' + renderDeliveryTimeline(d) + '</div>' +
+      '<div class="col-5">' + renderRaciPanel(d) + '</div>' +
+      '<div class="col-7">' + renderShifts(d) + '</div>' +
+      '<div class="col-12">' + renderPerformance(d) + '</div>' +
     '</div>';
 }
 
@@ -1181,6 +1230,30 @@ const CONTRACT_STYLE =
     '.contract-tab .lp-wf-axis{margin-left:104px}' +
     '.contract-tab .lp-wf-row{grid-template-columns:104px 1fr 44px}' +
   '}' +
+  /* ---- Scope & Performance: readiness verdict, reconciliation ledger, shifts register ---- */
+  '.contract-tab .sc-verdict{font:800 10px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 9px;border-radius:20px}' +
+  '.contract-tab .sc-verdict-aligned{background:var(--sec-t);color:var(--sec-tx)}' +
+  '.contract-tab .sc-verdict-partial{background:color-mix(in srgb,var(--emph) 14%,transparent);color:var(--emph)}' +
+  '.contract-tab .sc-verdict-deviation{background:var(--danger-bg);color:var(--danger-fg)}' +
+  '.contract-tab .sc-readiness{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}' +
+  '.contract-tab .sc-rd-dim{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--surface2)}' +
+  '.contract-tab .sc-rd-dn{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;font-size:13px;color:var(--ink);margin-bottom:6px}' +
+  '.contract-tab .sc-rd-dt{font-size:11px;color:var(--ink2);line-height:1.45}' +
+  '@media(max-width:760px){.contract-tab .sc-readiness{grid-template-columns:1fr}}' +
+  '.contract-tab .sc-st{display:inline-flex;align-items:center;font:800 9.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:6px;border:1px solid transparent;white-space:nowrap}' +
+  '.contract-tab .sc-st-in-contract{background:var(--sec-t);color:var(--sec-tx);border-color:color-mix(in srgb,var(--sec) 28%,transparent)}' +
+  '.contract-tab .sc-st-partial{background:var(--plum-t);color:var(--pri-tx);border-color:color-mix(in srgb,var(--plum) 22%,transparent)}' +
+  '.contract-tab .sc-st-ambiguous{background:color-mix(in srgb,var(--plum) 14%,transparent);color:var(--plum);border-color:color-mix(in srgb,var(--plum) 34%,transparent)}' +
+  '.contract-tab .sc-st-missing{background:color-mix(in srgb,var(--emph) 12%,transparent);color:var(--emph);border-color:color-mix(in srgb,var(--emph) 38%,transparent)}' +
+  '.contract-tab .sc-st-contradicted{background:var(--danger-bg);color:var(--danger-fg);border-color:color-mix(in srgb,var(--danger-bar) 35%,transparent)}' +
+  '.contract-tab .sc-shift-type{display:inline-block;font:800 9px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:var(--nested);color:var(--mut2);border:1px solid var(--line2)}' +
+  '.contract-tab .sc-stance{display:inline-block;font:800 9.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:6px}' +
+  '.contract-tab .sc-stance-push-back{background:color-mix(in srgb,var(--emph) 12%,transparent);color:var(--emph)}' +
+  '.contract-tab .sc-stance-accept{background:var(--sec-t);color:var(--sec-tx)}' +
+  '.contract-tab .sc-recon-extra{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}' +
+  '.contract-tab .sc-re-list{margin:6px 0 0;padding-left:16px;line-height:1.7;font-size:12px;color:var(--ink2)}' +
+  '.contract-tab .sc-re-list li{margin-bottom:5px}' +
+  '@media(max-width:760px){.contract-tab .sc-recon-extra{grid-template-columns:1fr}}' +
   '</style>';
 
 /* ============================================================================

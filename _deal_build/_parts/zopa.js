@@ -217,7 +217,7 @@ function zopaLineHTML(d, l) {
  * SC-target / SC-max), fallback from SC-fallback; opening derived the same
  * way as the per-line opening. No deal-level market benchmark exists in
  * session -> honest gap-state in the detail (no market tick on the bar). */
-function zopaTotalHTML(d) {
+function zopaTotalHTML(d, opts) {
   const sc = id => ((d.scenarios || []).find(s => s.id === id) || {});
   const askS = sc('SC-ask'), tgtS = sc('SC-target'), fbS = sc('SC-fallback'), maxS = sc('SC-max');
   const askTot = askS.total || 0, tgtTot = tgtS.total || 0, walkTot = maxS.total || 0, fbTot = fbS.total || 0;
@@ -228,13 +228,16 @@ function zopaTotalHTML(d) {
   const read = 'Supplier ask ' + M(askTot) + ' sits ' + (over ? 'above' : 'within') + ' the ' + M(walkTot) +
     ' walk-away; the ' + M(tgtTot) + ' target anchors the deal (about ' + M(apart) + ' below ask). The platform subscription is the biggest lever.';
   const track = zopaBar({ open: openTot, target: tgtTot, fallback: fbTot || null, walk: walkTot, ask: askTot, over: over, bench: null });
-  const detail = '<div class="zline-detail"><div class="zdetail">' +
-    '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>' +
-  '</div></div>';
+  // Overview passes { slim:true }: the headline KPI cards already carry ask/target/walk, so the
+  // panel keeps only the synthesized READ line (the analysis) and pushes Opening + Market-benchmark
+  // down to Economics, where the full read-out lives. Economics renders every row.
+  const rowAsk = '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>';
+  const rowOpen = '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>';
+  const rowWalk = '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>';
+  const rowBench = '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>';
+  const rowRead = '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>';
+  const rows = (opts && opts.slim) ? [rowRead] : [rowAsk, rowOpen, rowWalk, rowBench, rowRead];
+  const detail = '<div class="zline-detail"><div class="zdetail">' + rows.join('') + '</div></div>';
   return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCV</span>' +
     '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
     track + detail + '</div>';
@@ -267,7 +270,7 @@ function render(d) {
 // panel so the full line-item ZOPA lives exclusively in Economics (no duplication).
 function renderTotal(d) {
   injectCss();
-  return '<div class="zopa-viz zopa-total-only">' + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND + '</div>';
+  return '<div class="zopa-viz zopa-total-only">' + zopaTotalHTML(d, { slim: true }) + ZOPA_BOTTOM_LEGEND + '</div>';
 }
 
 global.DealZopa = { render: render, renderTotal: renderTotal };

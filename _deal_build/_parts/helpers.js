@@ -136,8 +136,10 @@ const SEV_ICON = {
 function severityPill(priority) {
   const p = priority || 'medium';
   const label = SEV_LABEL[p] || p;
-  return '<span class="pill sev-' + esc(p) + '" title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
-    (SEV_ICON[p] || '') + esc(label) + '</span>';
+  // icon-only chip: the shape + colour carry the severity; the word is kept as a hover title
+  // and a visually-hidden label so tables stay scannable and screen readers still read it.
+  return '<span class="pill sev-' + esc(p) + ' sev-iconly" title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
+    (SEV_ICON[p] || '') + '<span class="sev-sr">' + esc(label) + '</span></span>';
 }
 function statusPill(status, label) {
   const map = { aligned:'ok', partial:'warn', deviation:'danger', missing:'muted',
