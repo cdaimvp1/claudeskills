@@ -443,6 +443,36 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 .ov-stack > .ov-slot > .sa-card{flex:1 1 auto; min-height:0}
 .card-bd-scroll{overflow-y:auto; min-height:0}
 
+/* ---- Overview commercial-headline strip (deal-adaptive KPI cards) ---- */
+.ov-headline{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px}
+.ov-hcard{border:1px solid var(--line2); border-radius:8px; padding:11px 13px; background:var(--surface2)}
+.ov-hcard .ov-hc-lab{font:800 9.5px/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin-bottom:6px}
+.ov-hcard .ov-hc-val{font:800 19px/1.1 var(--sans); color:var(--ink); font-variant-numeric:tabular-nums}
+.ov-hcard .ov-hc-sub{font-size:10.5px; color:var(--mut2); margin-top:5px; display:flex; align-items:center; gap:5px; flex-wrap:wrap}
+@media(max-width:760px){.ov-headline{grid-template-columns:repeat(2,1fr)}}
+
+/* ---- Overview Next Steps: full-width sequenced step-cards ---- */
+.ov-steps{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.ov-step{border:1px solid var(--line); border-radius:9px; padding:13px 14px; background:var(--surface); border-top:3px solid var(--mut2); display:flex; flex-direction:column; gap:8px}
+.ov-step.pri{border-top-color:var(--plum)}
+.ov-step.emph{border-top-color:var(--emph)}
+.ov-step-hd{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.ov-step-n{font:800 10px/1 var(--sans); letter-spacing:.05em; text-transform:uppercase; color:var(--mut)}
+.ov-step-pkg{font-weight:800; font-size:13px; color:var(--ink)}
+.ov-step-move{font-size:12px; color:var(--ink2); line-height:1.42}
+.ov-step-trade{font-size:11px; color:var(--ink2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; background:var(--surface2); border-radius:6px; padding:7px 9px}
+.ov-step-trade b{font:800 8.5px/1 var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--mut2); margin-right:3px}
+.ov-arrow{color:var(--mut2)}
+.ov-step-deltas{display:flex; gap:6px; flex-wrap:wrap}
+.ov-chip{font:800 10px/1 var(--sans); padding:4px 8px; border-radius:11px}
+.ov-chip.prot{background:var(--sec-t); color:var(--sec-tx)}
+.ov-chip.tco{background:var(--plum-t); color:var(--pri-tx)}
+.ov-step-target{font-size:10.5px; color:var(--ink2); line-height:1.4}
+.ov-step-target .ov-tk{font:800 8.5px/1 var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--mut2); display:block; margin-bottom:2px}
+.ov-step-iss{display:flex; gap:5px; flex-wrap:wrap; margin-top:auto; padding-top:4px}
+.ov-iss{font:700 9.5px/1 var(--mono); color:var(--mut); background:var(--nested); border:1px solid var(--line2); border-radius:5px; padding:3px 6px}
+@media(max-width:760px){.ov-steps{grid-template-columns:1fr}}
+
 /* ---- persistent-strip lead cluster: who-has-the-pen chip + coverage pill ---- */
 .summary-strip .wrap{align-items:center}
 .summary-strip .ss-lead{display:flex; align-items:center; gap:10px; flex:none; padding-right:4px}

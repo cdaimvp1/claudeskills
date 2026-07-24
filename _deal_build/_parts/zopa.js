@@ -235,7 +235,7 @@ function zopaTotalHTML(d) {
     '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>' +
   '</div></div>';
-  return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCO</span>' +
+  return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCV</span>' +
     '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
     track + detail + '</div>';
 }
