@@ -125,6 +125,20 @@ file is produced) + adversarial scan + commit. Locate the skill dir first; verif
   in; composes-by-trait). New d.scope seed (intendedScope/assumedScope/categoryNorms/timelineVerification/
   paymentStructure/shifts). Verified in-browser + independent review CLEAN. See memory
   project_lilly_theo_deal_scope_performance_intent (design-of-record). Ingestion still MOCKED.
+- DONE (2026-07-24, with Marc) - 5-PHASE dashboard redesign, each verified in-browser + independent
+  scan CLEAN + committed/pushed:
+  * P1 (263d568) Scope&Perf reconciliation MASTER-DETAIL (Mockup C): requested/assumed/norm/shift
+    folded into one list + rich detail pane (Intended/Contract/Delta/Recommend); readiness->header
+    strip; RACI full-width; delegated data-scpick handler.
+  * P2 (44a7563) Delivery Timeline: dates ON the swim lanes + click-a-milestone detail (deliverables
+    /acceptance/deps) + TRAIT-GATE (no timeline for goods/licenses).
+  * P3 (c5b5b83) L&P: removed must-negotiate dots; severity filter chips -> colored icons + counts.
+  * P4+P5 (b8c1bc9) Sources&Evidence stripped to lead with the actionable gaps register (matrix cut,
+    inventory->collapsible appendix); Economics: ZOPA absorbs the Deal Table (collapsible+totals),
+    benchmarks->uniform strip up top, NEW Should-Cost bottoms-up panel (d.shouldCost), "Discount
+    Architecture"->"Where the Room Is", even-split col-6. Also fixed 4 double-escaped &amp;/&rarr;
+    entities (fca760f). Mockups file _mockups/MOCKUP-scope-merge.html (A/B/C/D).
+  Design decisions confirmed by Marc live: Mockup C; CA/CI adaptive value card + TCV; icon-only severity.
 - DECISIONS PENDING from Marc: adopt the Cross-Doc reframe live? make the Document map click-to-open the
   register row? which more skill dashboards to add to the folder? (ChatGPT analysis reviewed: keep 4-tab
   arch; the real next strategic item is a SKILL-ALIGNMENT SPEC - each skill keeps its standalone/combined
