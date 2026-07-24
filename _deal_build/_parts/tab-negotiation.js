@@ -702,19 +702,24 @@ function renderTab_negotiation(d) {
     '.neg-tab .brief-meta{font-size:var(--fz-sm);color:var(--ink2);margin-bottom:6px}' +
     '</style>';
 
+  // Consistent with every other subtabbed tab (Terms & Review, Economics): the subtab bar sits
+  // directly under the primary nav, and each subtab panel leads with its OWN title + intro
+  // (there is no separate tab-level "Negotiation" heading).
+  const cov = coverageBadge(d.deal.evidenceCoverage);
+  const intro = (h2, q) => '<div class="tab-intro"><h2>' + h2 + '</h2><p class="q">' + q + ' ' + cov + '</p></div>';
+  const posIntro = intro('Positions', 'The 12 legal, commercial and scope terms framed as negotiating positions, each playbook-cited with the supplier stance, our ask, pushback and rebuttal, plus how they bundle and trade together.');
+  const tradeIntro = intro('Trade Plan', 'How do I move them? The give/get packages, concession ladders and round sequence, what to open with, what to trade for what, and the walk-away.');
+  const commsIntro = intro('Communications', 'The traceable thread, every position, ask and commitment keyed to the M365 source it came from, and who currently holds the pen.');
   return scopedStyle + '<div class="neg-tab">' +
-    '<div class="wrap"><div class="tab-intro"><h2>Negotiation</h2>' +
-    '<p class="q">How do I move them? The positions to open with, the trades and packages available, and a traceable record of the thread, all keyed to the same evidence-based issue register that drives Terms &amp; Review and Economics. ' +
-    coverageBadge(d.deal.evidenceCoverage) + '</p></div></div>' +
     '<div class="subtabbar" data-subtab-group="negotiation"><div class="wrap">' +
     '<button class="subtab-btn" data-subtab="positions" aria-selected="true">' + icon('target') + ' Positions</button>' +
     '<button class="subtab-btn" data-subtab="trade">' + icon('trade') + ' Trade Plan</button>' +
     '<button class="subtab-btn" data-subtab="comms">' + icon('sources') + ' Communications</button>' +
     '</div></div>' +
     '<div class="tab-body"><div class="wrap">' +
-    '<div data-subpanel="negotiation/positions" class="is-active">' + buildPositions() + '</div>' +
-    '<div data-subpanel="negotiation/trade">' + buildTradePlan() + '</div>' +
-    '<div data-subpanel="negotiation/comms">' + buildComms() + '</div>' +
+    '<div data-subpanel="negotiation/positions" class="is-active">' + posIntro + buildPositions() + '</div>' +
+    '<div data-subpanel="negotiation/trade">' + tradeIntro + buildTradePlan() + '</div>' +
+    '<div data-subpanel="negotiation/comms">' + commsIntro + buildComms() + '</div>' +
     '</div></div>' +
     '</div>';
 }

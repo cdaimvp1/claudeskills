@@ -289,11 +289,11 @@ function gantt(rows, opts) {
 /* ---------- 8. ASSUMPTION SLIDER (LOCAL) ---------------------------------- */
 // assumptionSlider(a), a is a dashboardData.assumptions[] entry.
 // Emits a range input wired to DealUI; editing updates a.value and runs recalc callbacks.
-function assumptionSlider(a) {
+function assumptionSlider(a, extra) {
   const disp = a.unit === '%' ? a.value + '%' : (a.value.toLocaleString('en-US') + (a.unit ? ' ' + a.unit : ''));
   return '<div class="asm-ctrl">' +
     '<div class="asm-top"><label for="asm-' + esc(a.id) + '">' + esc(a.label) + '</label>' +
-    '<span class="asm-val" data-asm-out="' + esc(a.id) + '">' + esc(disp) + '</span></div>' +
+    '<span class="asm-val" data-asm-out="' + esc(a.id) + '">' + esc(disp) + '</span>' + (extra || '') + '</div>' +
     '<input type="range" id="asm-' + esc(a.id) + '" data-assumption="' + esc(a.id) + '" data-unit="' + esc(a.unit || '') +
     '" min="' + a.min + '" max="' + a.max + '" step="' + a.step + '" value="' + a.value + '">' +
     '<div class="asm-badge">' + evidenceChip(a.evidenceType || a.classification, { short: true }) +

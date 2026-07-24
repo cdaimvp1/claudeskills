@@ -343,12 +343,13 @@ function zopaSensitivity(d) {
   const a1 = (d.assumptions || []).find(x => x.id === 'ASM-1');
   const a4 = (d.assumptions || []).find(x => x.id === 'ASM-4');
   if (!a1 && !a4) return '';
-  return '<div class="zopa-sens">' +
+  injectCss();   // the strip renders OUTSIDE the bars container, so wrap it in .zopa-viz too
+  return '<div class="zopa-viz"><div class="zopa-sens">' +
     '<div class="zopa-sens-hd"><span class="zss-t">Sensitivity · move a driver to see the ZOPA respond</span>' +
       '<button class="zss-reset" data-reset-assumptions title="Reset drivers to plan" aria-label="Reset drivers to plan">' + icon('reset') + '</button></div>' +
     '<div class="zopa-sens-grid">' + (a1 ? assumptionSlider(a1) : '') + (a4 ? assumptionSlider(a4) : '') + '</div>' +
     '<div id="zopa-sens-live" class="zopa-sens-live">' + zopaSensReadout(d) + '</div>' +
-  '</div>';
+  '</div></div>';
 }
 // repaint live bars + readout ONLY when a ZOPA driver (ASM-1 / ASM-4) actually moved, so an
 // unrelated recalc (e.g. the pro-forma WACC slider) never re-renders and collapses expanded rows.

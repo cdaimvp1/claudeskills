@@ -120,8 +120,10 @@ function renderDiscountArchitecture(d) {
     return '<div class="disc-line"><span>' + esc(l.item) + '</span><span class="mono">' + M(dd) + ' · ' + p + '%</span></div>';
   }).join('');
   return saCard('Where the Room Is',
-    barRow('Platform (defensible)', platDisc, maxD, M(platDisc) + ' · ~' + platPct + '%', { color: 'pri', title: 'Platform line discount to internal precedent' }) +
-    barRow('Services & support (loaded)', svcDisc, maxD, M(svcDisc) + ' · ~' + svcPct + '%', { color: 'emph', title: 'Implementation, support, connectors, training' }) +
+    '<div class="disc-summary">' +
+      barRow('Platform (defensible)', platDisc, maxD, M(platDisc) + ' · ~' + platPct + '%', { color: 'pri', title: 'Platform line discount to internal precedent' }) +
+      barRow('Services & support (loaded)', svcDisc, maxD, M(svcDisc) + ' · ~' + svcPct + '%', { color: 'emph', title: 'Implementation, support, connectors, training' }) +
+    '</div>' +
     '<div style="margin-top:10px">' + perLine + '</div>' +
     insight('Where to push: the platform is benchmark-defensible (~' + platPct + '% to the 2024 internal precedent), so the room is in the loaded lines &mdash; implementation, support and connectors carry the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
     { accent: 'plum', icon: 'money', sub: 'the negotiable levers by line ' + evidenceChip('calculated', { short: true }) });
@@ -226,13 +228,13 @@ function renderWaccControl(d) {
   const liveNpv = npv(((d.proforma || {}).cashflowByYear || []).map(y => y.net), wacc);
   const inBand = wacc >= band.target && wacc <= band.ceiling;
   const bandTxt = inBand ? 'Within governance band' : 'Outside governance band (' + band.target + '–' + band.ceiling + '%)';
-  return (a ? assumptionSlider(a) : gapCard('No WACC assumption', 'ASM-5 discount rate not present in this session.')) +
+  const resetBtn = '<button class="btn-icon asm-reset" data-reset-assumptions title="Reset to the governed rate" aria-label="Reset to the governed rate">' + icon('reset') + '</button>';
+  return (a ? assumptionSlider(a, resetBtn) : gapCard('No WACC assumption', 'ASM-5 discount rate not present in this session.')) +
     '<dl class="kv" style="margin-top:10px">' +
       '<dt>Governance band</dt><dd>' + band.target + '%–' + band.ceiling + '% (finance-set) ' +
         '<span class="pill ' + (inBand ? 'ok' : 'warn') + '" id="cml-wacc-band-status">' + bandTxt + '</span></dd>' +
       '<dt>NPV of value case @ WACC</dt><dd class="mono"><span id="cml-npv-live">' + M(liveNpv) + '</span> ' + evidenceChip('calculated', { short: true }) + '</dd>' +
     '</dl>' +
-    '<div class="btn-row"><button class="btn-icon" data-reset-assumptions title="Reset to the governed rate" aria-label="Reset to the governed rate">' + icon('reset') + '</button><span class="tiny muted">reset to the governed rate</span></div>' +
     insight('Moving the WACC re-discounts the modelled net flows live, including the pro-forma table above. Outside the ' + band.target + '–' + band.ceiling + '% finance band the NPV read is indicative only; confirm the governed rate with finance.');
 }
 // SVG NPV-vs-rate curve. Re-rendered on WACC change to move the live marker.
@@ -391,6 +393,12 @@ function renderTab_commercials(d) {
     '.commercials-tab .kpi .k-val{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:3px;color:var(--ink)}' +
     '.commercials-tab .disc-line{display:flex;justify-content:space-between;gap:10px;font-size:var(--fz-sm);padding:5px 0;border-top:1px solid var(--line)}' +
     '.commercials-tab .disc-line:first-child{border-top:0}' +
+    /* the two summary bars: wider label + value columns (thinner bar) so each row is one line */
+    '.commercials-tab .disc-summary .bar-row{grid-template-columns:172px 1fr 96px}' +
+    '.commercials-tab .disc-summary .bl,.commercials-tab .disc-summary .bv{white-space:nowrap}' +
+    /* icon-only reset tucked to the right of a slider heading */
+    '.commercials-tab .asm-reset{width:22px;height:22px;flex:0 0 auto;align-self:center;margin-left:4px}' +
+    '.commercials-tab .asm-reset svg{width:13px;height:13px}' +
     '.commercials-tab .rn-item .kv{margin-top:6px}' +
     /* equal-height cards within a grid row (Where the Room Is | Renewal sit level) */
     '.commercials-tab .grid>[class*="col-"]>.sa-card{height:100%}' +
