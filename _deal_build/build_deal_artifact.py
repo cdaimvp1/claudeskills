@@ -26,10 +26,12 @@ sys.path.insert(0, os.path.join(BUILD_DIR, '..', '_platform_build'))
 import build_dashboard as bd  # noqa: E402  (the Landscape build; source of the platform chrome)
 
 JS_ORDER = [
-    'helpers.js', 'data.js',
+    'helpers.js', 'data.js', 'zopa.js',
     'tab-brief.js', 'tab-contract.js', 'tab-commercials.js', 'tab-negotiation.js',
     'shell.js',
-]  # tab-sources.js intentionally NOT inlined (Sources & Gaps folds into Overview + Economics).
+]  # zopa.js (shared window.DealZopa.render) must load before any tab builder so it
+# exists at mount; tab-sources.js intentionally NOT inlined (Sources & Gaps folds
+# into Overview + Economics).
 
 
 def read(path):

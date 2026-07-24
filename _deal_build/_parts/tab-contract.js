@@ -38,9 +38,9 @@ function cap1(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.sli
 // here, not the old standalone "terms" subtab.
 const JUMP_LEGAL = 'tab:contract/sub:legal';
 const JUMP_MAP = 'tab:contract/sub:map';
-// The old standalone "Sources & Gaps" tab is folded into Overview's evidence &
-// gaps band (see tab-brief.js "Critical Unknowns"); jump there for gap detail.
-const JUMP_GAPS = 'tab:brief';
+// Deep gap/source detail now lives on THIS tab's Sources & Evidence subtab
+// (moved off Overview); every "view gap detail" jump points there.
+const JUMP_GAPS = 'tab:contract/sub:sources';
 
 function issueJump(id, priority) {
   return jumpLink(id, JUMP_LEGAL) + (priority ? ' ' + severityPill(priority) : '');
@@ -50,116 +50,196 @@ function issueJump(id, priority) {
  * SUBTAB 2A, Documents & Conflicts
  * ========================================================================== */
 function docNode(doc, isRoot) {
-  const missing = doc.evidenceType === 'unavailable';
+  const missing = doc.isMissing || doc.evidenceType === 'unavailable';
   const cls = 'ddm-child' + (missing ? ' ddm-missing' : '') + (isRoot ? ' ddm-rootbox' : '');
+  const skey = missing ? 'deviation' : (doc.active === 'Active' ? 'aligned' : 'pending');
   return '<div class="' + cls + '">' +
-    '<div class="ddm-role">' + esc(roleLabel(doc.role)) + '</div>' +
     '<div class="ddm-name">' + esc(doc.name) + '</div>' +
-    '<div class="ddm-meta">' + esc(doc.type) + (doc.pages ? ' &middot; ' + doc.pages + ' pp' : '') +
-      (doc.date ? ' &middot; ' + esc(doc.date) : '') + '</div>' +
-    '<div class="ddm-status">' + esc(doc.status) + '</div>' +
-    '<div class="ddm-bottom">' + evidenceChip(doc.evidenceType, { short:true, sources:[doc.id] }) + '</div>' +
+    '<div class="ddm-meta">' + esc(doc.type) + (doc.precedenceRank ? ' &middot; precedence ' + doc.precedenceRank : '') + '</div>' +
+    '<div class="ddm-bottom">' + statusPill(skey, doc.active) +
+      (doc.controlling ? ' <span class="tiny" style="color:var(--pri-tx);font-weight:700">Controlling</span>' : '') + '</div>' +
   '</div>';
 }
 
 function renderDocMap(d) {
   const docs = d.documents || [];
-  const root = docs.find(x => x.role === 'governing') || docs[0];
-  const children = docs.filter(x => x !== root);
-  const missingDocs = docs.filter(x => x.evidenceType === 'unavailable');
-  const conflicts = d.documentConflicts || [];
+  const root = docs.find(x => x.controlling) || docs.find(x => x.role === 'governing') || docs[0];
+  const inHierarchy = docs.filter(x => x !== root && x.role !== 'correspondence');
+  const missingDocs = docs.filter(x => x.isMissing);
+  const relMeta = d.documentRelevanceMeta || {};
 
+  /* ---- 1. Condensed relationship map (hierarchy only, no narrative blurbs) ---- */
   const treeHtml =
     '<div class="ddm-tree">' +
       '<div class="ddm-root">' + docNode(root, true) + '</div>' +
       '<div class="ddm-branch"></div>' +
-      '<div class="ddm-children">' + children.map(c => docNode(c, false)).join('') + '</div>' +
+      '<div class="ddm-children">' + inHierarchy.map(c => docNode(c, false)).join('') + '</div>' +
     '</div>';
+  const docMapCard = saCard('Document Relationship Map', treeHtml,
+    { icon:'doc', sub: esc(root.type) + ' governs ' + inHierarchy.filter(c => !c.isMissing).length + ' documents &middot; ' + missingDocs.length + ' referenced, not provided' });
 
-  const mapInsights =
-    insight(docs.length + ' documents make up this deal; <strong>' + missingDocs.length +
-      '</strong> (' + missingDocs.map(x => x.type).join(', ') + ') are referenced in the ' + esc(root.name) +
-      ' but were not provided in this session.', 'warn') +
-    insight('The MSA (' + esc(root.id) + ') is the sole governing instrument; the Order Form and SOW-01 operate under it. No amendments or Change Orders exist yet for this new agreement, so there are no term-evolution edges to show. That absence is honest, not a gap.', '');
-
-  const docMapCard = saCard('Document Relationship Map', treeHtml + mapInsights,
-    { icon:'doc', sub: docs.length + ' documents &middot; ' + missingDocs.length + ' unavailable' });
-
-  /* ---- Document family register ---- */
-  const invCols = [
-    { key:'id', label:'ID', width:'64px' },
-    { key:'name', label:'Document', render: r => '<strong>' + esc(r.name) + '</strong>' },
-    { key:'role', label:'Role', render: r => esc(roleLabel(r.role)) },
-    { key:'status', label:'Status', render: r => esc(r.status) },
-    { key:'date', label:'Date', render: r => r.date ? esc(r.date) : '&mdash;', sortVal: r => r.date || '' },
-    { key:'pages', label:'Pages', align:'num', render: r => r.pages != null ? r.pages : '&mdash;' },
-    { key:'evidence', label:'Evidence', sort:false, render: r => evidenceChip(r.evidenceType, { short:true, sources:[r.id] }) }
+  /* ---- 2. Document Family Register: ordered by precedence; carries executed /
+   * expiration / active + controlling and ONE Governing Terms & Precedence column;
+   * the referenced-but-missing components (DPA, Exhibit) are folded in as gap rows. ---- */
+  const ordered = docs.slice().sort((a, b) => precSort(a) - precSort(b));
+  const regCols = [
+    { key:'name', label:'Document', render: r => '<strong>' + esc(r.name) + '</strong><div class="tiny muted">' + esc(r.type) + '</div>' },
+    { key:'executedDate', label:'Executed', width:'116px', sortVal: r => r.executedDate || '', render: r => r.executedDate ? esc(r.executedDate) : '<span class="tiny muted">Not executed</span>' },
+    { key:'expirationDate', label:'Expiration', width:'106px', sortVal: r => r.expirationDate || '', render: r => r.expirationDate ? esc(r.expirationDate) : '<span class="tiny muted">&mdash;</span>' },
+    { key:'active', label:'Status', width:'176px', sortVal: r => r.active || '', render: r => statusPill(statusKey(r), r.active) + (r.controlling ? ' <strong style="color:var(--pri-tx);font-size:var(--fz-meta)">Controlling</strong>' : '') },
+    { key:'prec', label:'Governing terms & precedence', sort:false, render: r => precedenceCell(r) }
   ];
-  const invTable = dataTable(invCols, docs, {
-    zebra:true, dense:true, id:'tbl-doc-inventory',
+  const regTable = dataTable(regCols, ordered, {
+    zebra:true, dense:true, id:'tbl-doc-register',
+    rowClass: r => r.isMissing ? 'rowtint-warn' : '',
     expand: r => {
       const related = (r.relatedTo || []).map(id => { const rd = findDoc(id, d); return rd ? rd.type + ' (' + rd.id + ')' : id; }).join(', ');
       const lim = (r.limitations || []).length ? insight(esc(r.limitations.join(' ')), 'warn') : '';
-      return '<div class="kv"><dt>Source</dt><dd>' + esc(r.sourceType) + '</dd>' +
-        '<dt>Related to</dt><dd>' + (related || '&mdash;') + '</dd></div>' + lim;
+      const basis = r.precedenceBasis ? '<dt>Precedence basis</dt><dd>' + esc(r.precedenceBasis.text) + ' ' + evidenceChip(r.precedenceBasis.evidenceType, { short:true }) + '</dd>' : '';
+      return '<div class="kv">' +
+        '<dt>Relevance</dt><dd>' + cap1(r.relevance) + ': ' + esc(r.relevanceNote) + '</dd>' +
+        '<dt>Source</dt><dd>' + esc(r.sourceType) + '</dd>' +
+        '<dt>Related to</dt><dd>' + (related || '&mdash;') + '</dd>' +
+        basis +
+      '</div>' + lim +
+        (r.isMissing ? '<div class="btn-row">' + jumpLink('View gap detail &rarr;', JUMP_GAPS) + '</div>' : '');
     }
   });
-  const invNote = insight('No document-retention/records-schedule field is carried on this document set in this session. Retention class is not shown below (would render here once available). ' + evidenceChip('unavailable', { short:true }));
-  const invCard = saCard('Document Family Register', invTable + invNote, { icon:'sources', accent:'teal' });
+  const regNote =
+    insight('Rows are ordered by governing precedence. Precedence is our read of a standard MSA + Order Form + SOW structure; no express order-of-precedence clause appeared in the MSA v3 redline this session. ' + evidenceChip('inference', { short:true })) +
+    (relMeta.indirectPresent === false
+      ? insight('<strong>Direct relevance only.</strong> ' + esc(relMeta.indirectNote) + ' ' + evidenceChip(relMeta.evidenceType || 'unavailable', { short:true }))
+      : '');
+  const regCard = saCard('Document Family Register', regTable + regNote,
+    { icon:'sources', accent:'teal', sub: docs.length + ' documents, by precedence' });
 
-  /* ---- Governing terms & precedence ---- */
-  const precRows = docs.map(doc =>
-    '<dt>' + esc(roleLabel(doc.role)) + '</dt><dd><strong>' + esc(doc.type) + '</strong> &mdash; ' + esc(doc.name) +
-      (doc.evidenceType === 'unavailable' ? ' ' + evidenceChip('unavailable', { short:true }) : '') + '</dd>').join('');
-  const precInner = '<dl class="kv">' + precRows + '</dl>' +
-    insight('Precedence inferred from each document’s stated role (governing &rarr; ordering/scope &rarr; data/security); ' +
-      'no explicit order-of-precedence clause appeared in the reviewed text. ' + evidenceChip('inference', { short:true }));
-  const precCard = saCard('Governing Terms & Precedence', precInner, { icon:'scale', accent:'emph' });
+  /* ---- 3. Cross-document conflicts & gaps (redesigned; renderConflicts below) ---- */
+  const conflictsCard = renderConflicts(d);
 
-  /* ---- Cross-document consistency / conflicts. BUG FIX: reads d.documentConflicts[],
-   * never a hardcoded array. relation: 'conflict' | 'changed-by' | 'gap'. ---- */
-  const RELATION_LABEL = { conflict:'Conflict check', 'changed-by':'Changed by', gap:'Gap (missing doc)' };
-  const crossCols = [
-    { key:'docs', label:'Documents', sort:false, render: r => docTypeOf(r.docA, d) + ' &harr; ' + docTypeOf(r.docB, d) },
-    { key:'relation', label:'Dimension', render: r => esc(RELATION_LABEL[r.relation] || r.relation) },
-    { key:'topic', label:'Topic', sort:false, render: r => r.topic },
-    { key:'consistency', label:'Consistency', render: r => r.consistent ? statusPill('aligned','Aligned') : statusPill('deviation','Gap'), sortVal: r => r.consistent ? 1 : 0 },
-    { key:'issue', label:'Linked issue', sort:false, render: r => r.issueId ? issueJump(r.issueId, (d.issues.find(i=>i.id===r.issueId)||{}).priority) : '&mdash;' },
-    { key:'evidence', label:'Evidence', sort:false, render: r => evidenceChip(r.evidenceType, { short:true }) },
-    { key:'note', label:'Note', sort:false, render: r => '<span class="tiny muted">' + esc(r.note) + '</span>' }
-  ];
-  const crossTable = dataTable(crossCols, conflicts, { zebra:true, dense:true, id:'tbl-crossdoc' });
-  const gapRelCount = conflicts.filter(c => !c.consistent).length;
-  const crossInsights =
-    insight('<strong>' + gapRelCount + '</strong> of ' + conflicts.length + ' cross-document checks are not consistent. Every one of them is a <strong>gap created by a missing exhibit</strong> (the DPA or the Security Exhibit), not a contradiction between documents that ARE in session.', gapRelCount ? 'warn' : '') +
-    insight('No directly contradicting clause language was found between the three present documents (MSA, SOW-01, Order Form).');
-  const crossCard = saCard('Cross-Document Consistency & Conflicts', crossTable + crossInsights,
-    { icon:'scale', sub: conflicts.length + ' checks' });
-
-  /* ---- Missing documents (gapCards) ---- */
-  const missingHtml = missingDocs.map(md => {
-    const gap = gapForDocId(md.id, d);
-    const body = '<div class="kv" style="margin-bottom:6px">' +
-      '<dt>Referenced at</dt><dd>' + esc(md.sourceType) + '</dd>' +
-      (gap ? '<dt>Why it matters</dt><dd>' + esc(gap.whyItMatters) + '</dd>' +
-             '<dt>Possible source</dt><dd>' + esc(gap.possibleSource) + '</dd>' : '') +
-      '</div>' +
-      (md.limitations || []).map(l => '<div class="tiny muted">' + esc(l) + '</div>').join('') +
-      '<div style="margin-top:6px">' + evidenceChip('unavailable') + ' ' +
-      jumpLink('View in Critical Unknowns →', JUMP_GAPS) + '</div>';
-    return gapCard(md.type + ', ' + md.name, body);
-  }).join('<div class="divider"></div>');
-  const missingCard = saCard('Missing Documents', missingHtml || '<div class="card-note">No referenced documents are missing.</div>',
-    { icon:'gap', accent:'danger', sub: missingDocs.length + ' unavailable' });
-
-  return '<div class="tab-intro"><h2>Documents &amp; Conflicts</h2><p class="q">Inventory, relationship structure, governing precedence and cross-document gaps for the MSA + SOW-01 + Order Form set. ' +
+  return '<div class="tab-intro"><h2>Documents &amp; Conflicts</h2><p class="q">The document family for this deal, ordered by governing precedence, and the cross-document gaps still to resolve. ' +
     coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + docMapCard + '</div>' +
-      '<div class="col-8">' + invCard + '</div>' +
-      '<div class="col-4">' + precCard + '</div>' +
-      '<div class="col-7">' + crossCard + '</div>' +
-      '<div class="col-5">' + missingCard + '</div>' +
+      '<div class="col-12">' + regCard + '</div>' +
+      '<div class="col-12">' + conflictsCard + '</div>' +
+    '</div>';
+}
+
+/* ---- precedence helpers for the register (order the rows + render the one column) ---- */
+function precSort(doc) {
+  if (doc.precedenceRank) return doc.precedenceRank;   // 1,2,3 for the ranked contracts
+  return doc.isMissing ? 90 : 99;                      // missing components, then correspondence, last
+}
+function statusKey(doc) {
+  if (doc.isMissing) return 'deviation';
+  if (doc.active === 'Active') return 'aligned';
+  if (doc.active === 'In negotiation' || doc.active === 'Draft') return 'pending';
+  return 'muted';
+}
+function precedenceCell(doc) {
+  if (doc.precedenceRank) {
+    const role = doc.controlling ? 'Controlling master' : 'Operates under the MSA';
+    return '<strong>' + doc.precedenceRank + '</strong> <span class="tiny muted">' + role + '</span> ' +
+      evidenceChip((doc.precedenceBasis && doc.precedenceBasis.evidenceType) || 'inference', { short:true });
+  }
+  if (doc.isMissing) return '<span class="tiny muted">Referenced component, rank pending</span> ' + evidenceChip('unavailable', { short:true });
+  return '<span class="tiny muted">Supporting, not governing</span>';
+}
+
+/* ============================================================================
+ * Cross-document conflicts & gaps (redesigned). Surfaces ONLY rows tagged with a
+ * trigger (active-conflict | risk | gap); fully-consistent checks are excluded.
+ * Purpose: flag unresolved gaps + (once they exist) trace term changes across versions.
+ * ========================================================================== */
+const TRIGGER_META = {
+  'active-conflict': { key:'danger', label:'Active conflict', rank:3 },
+  risk:              { key:'warn',   label:'Risk',            rank:2 },
+  gap:               { key:'warn',   label:'Gap',             rank:1 }
+};
+function renderConflicts(d) {
+  const all = d.documentConflicts || [];
+  const shown = all.filter(c => c.trigger).slice().sort((a, b) =>
+    ((TRIGGER_META[b.trigger] || {}).rank || 0) - ((TRIGGER_META[a.trigger] || {}).rank || 0));
+  const excluded = all.length - shown.length;
+  const trigPill = t => { const m = TRIGGER_META[t] || { key:'muted', label:t }; return '<span class="pill ' + m.key + '">' + m.label + '</span>'; };
+  const cols = [
+    { key:'trigger', label:'Trigger', width:'128px', sortVal: r => (TRIGGER_META[r.trigger] || {}).rank || 0, render: r => trigPill(r.trigger) },
+    { key:'topic', label:'Term / clause', render: r => '<strong>' + esc(r.topic) + '</strong>' },
+    { key:'docs', label:'Documents', sort:false, render: r => docTypeOf(r.docA, d) + ' &harr; ' + docTypeOf(r.docB, d) },
+    { key:'note', label:'What is unresolved', sort:false, render: r => '<span class="tiny">' + esc(r.note) + '</span>' },
+    { key:'issue', label:'Linked finding', sort:false, render: r => r.issueId ? issueJump(r.issueId, (d.issues.find(i => i.id === r.issueId) || {}).priority) : '&mdash;' }
+  ];
+  const table = shown.length
+    ? dataTable(cols, shown, { zebra:true, dense:true, id:'tbl-crossdoc' })
+    : gapCard('No active conflicts, risks, or gaps', 'Every cross-document check in session is consistent; nothing to raise.');
+  const gapCount = shown.filter(c => c.trigger === 'gap').length;
+  const insights =
+    insight('<strong>' + shown.length + '</strong> of ' + all.length + ' cross-document checks need resolving' +
+      (shown.length && gapCount === shown.length ? '; all ' + shown.length + ' are <strong>gaps from the two missing exhibits</strong> (DPA, Security Exhibit), not contradictions between documents in session' : '') +
+      '. The ' + excluded + ' fully-consistent checks are not shown. ' + evidenceChip('unavailable', { short:true }), shown.length ? 'warn' : '') +
+    insight('No term-modification history to trace yet: this is a new MSA with no amendments or change orders, and the one version step in session (MSA v2 to v3) held the liability cap unchanged. A row will appear here once a term actually changes across versions.');
+  return saCard('Cross-Document Conflicts & Gaps', table + insights, { icon:'scale', sub: shown.length + ' to resolve' });
+}
+
+/* ============================================================================
+ * SUBTAB 2D, Sources & Evidence, the full evidence ledger moved off Overview
+ * (source inventory + impact-vs-ease matrix + full missing-inputs register).
+ * ========================================================================== */
+function renderSourceInventory(d) {
+  return dataTable([
+    { key:'id', label:'ID', width:'80px' },
+    { key:'label', label:'Source', render: r => '<strong>' + esc(r.label) + '</strong><div class="tiny muted">' + esc(r.detail) + '</div>' },
+    { key:'kind', label:'Kind', render: r => '<span style="text-transform:capitalize">' + esc(r.kind) + '</span>' },
+    { key:'coverage', label:'Areas', align:'num', sortVal: r => r.coverage.length, render: r => String(r.coverage.length) },
+    { key:'evidenceType', label:'Evidence', render: r => evidenceChip(r.evidenceType, { short:true }) }
+  ], d.sources || [], {
+    id:'tc-source-inventory', zebra:true,
+    expand: r => '<div class="kv"><dt>Coverage areas</dt><dd>' + (r.coverage || []).map(a => '<span class="tiny">' + esc(a) + '</span>').join(', ') + '</dd>' +
+      '<dt>Detail</dt><dd>' + esc(r.detail) + '</dd><dt>Evidence</dt><dd>' + evidenceChip(r.evidenceType) + '</dd></div>'
+  });
+}
+function renderGapsMatrix(d) {
+  const points = (d.gaps || []).map(g => ({
+    x: g.ease, y: g.decisionImpact, label: g.id.replace('GAP-', ''),
+    color: g.priority === 'critical' ? 'danger' : g.priority === 'important' ? 'emph' : 'teal',
+    title: g.input + ' (' + g.priority + ') impact ' + g.decisionImpact + '/5, ease ' + g.ease + '/5'
+  }));
+  return matrixPlot(points, {
+    xLabel: 'Ease to obtain →', yLabel: 'Decision impact →', xMax: 5, yMax: 5,
+    quadrants: ['Hard, high stakes', 'Quick win: get first', 'Low priority', 'Easy, low value']
+  });
+}
+function renderAllGapsTable(d) {
+  const rank = { critical:3, important:2, helpful:1 };
+  const gaps = (d.gaps || []).slice().sort((a, b) => {
+    const pr = (rank[b.priority] || 0) - (rank[a.priority] || 0);
+    return pr !== 0 ? pr : (b.decisionImpact || 0) - (a.decisionImpact || 0);
+  });
+  const cols = [
+    { key:'id', label:'ID', width:'74px' },
+    { key:'input', label:'Missing input', render: r => '<strong>' + esc(r.input) + '</strong><div class="tiny muted">' + esc(r.whyItMatters) + '</div>' },
+    { key:'priority', label:'Priority', width:'98px', sortVal: r => rank[r.priority] || 0, render: r => '<span class="pill ' + (r.priority === 'critical' ? 'danger' : r.priority === 'important' ? 'warn' : 'muted') + '">' + esc(r.priority) + '</span>' },
+    { key:'impact', label:'Impact', width:'86px', align:'num', sortVal: r => r.decisionImpact, render: r => heatCell(r.decisionImpact, { scale:5, label:r.decisionImpact, title:'Decision impact ' + r.decisionImpact + '/5' }) },
+    { key:'ease', label:'Ease', width:'80px', align:'num', sortVal: r => r.ease, render: r => heatCell(r.ease, { scale:5, label:r.ease, title:'Ease ' + r.ease + '/5' }) },
+    { key:'src', label:'Possible source', sort:false, render: r => '<span class="tiny muted">' + esc(r.possibleSource || '') + '</span>' }
+  ];
+  return dataTable(cols, gaps, { id:'tc-all-gaps', zebra:true, dense:true });
+}
+function renderSourcesEvidence(d) {
+  const invCard = saCard('Source Inventory',
+    renderSourceInventory(d) + insight('All ' + (d.sources || []).length + ' sources behind this analysis, with the count of analysis areas each one covers. Expand a row for its coverage detail.'),
+    { icon:'sources', accent:'teal', sub: (d.sources || []).length + ' sources' });
+  const matrixCard = saCard('Missing Inputs, Impact vs. Ease', renderGapsMatrix(d),
+    { icon:'gap', sub: (d.gaps || []).length + ' gaps' });
+  const gapsCard = saCard('All Missing Inputs',
+    renderAllGapsTable(d) + insight('The full gap register (Overview shows only the top 5). Quick wins, high decision impact and easy to obtain, are worth closing before the next draft.'),
+    { icon:'flag', accent:'emph', sub: (d.gaps || []).length + ' tracked' });
+  return '<div class="tab-intro"><h2>Sources &amp; Evidence</h2><p class="q">The full evidence ledger behind this deal: every source, and every missing input with how much it would move the decision. ' +
+    coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
+    '<div class="grid">' +
+      '<div class="col-12">' + invCard + '</div>' +
+      '<div class="col-5">' + matrixCard + '</div>' +
+      '<div class="col-7">' + gapsCard + '</div>' +
     '</div>';
 }
 
@@ -594,12 +674,12 @@ function renderScopePerf(d) {
  * ========================================================================== */
 const CONTRACT_STYLE =
   '<style>' +
-  '.contract-tab .ddm-tree{padding:16px 6px 30px}' +
+  '.contract-tab .ddm-tree{padding:10px 6px 16px}' +
   '.contract-tab .ddm-root{display:flex;justify-content:center}' +
   '.contract-tab .ddm-branch{width:2px;height:20px;background:var(--line2);margin:0 auto}' +
   '.contract-tab .ddm-children{position:relative;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:16px}' +
   '.contract-tab .ddm-children::before{content:"";position:absolute;top:0;left:12%;right:12%;height:2px;background:var(--line2)}' +
-  '.contract-tab .ddm-child{position:relative;flex:1 1 160px;max-width:200px;background:var(--surface);border:1px solid var(--line2);' +
+  '.contract-tab .ddm-child{position:relative;flex:1 1 128px;max-width:168px;background:var(--surface);border:1px solid var(--line2);' +
     'border-radius:var(--r-sm);padding:10px 12px;box-shadow:var(--shadow-1)}' +
   '.contract-tab .ddm-child::before{content:"";position:absolute;top:-16px;left:50%;width:2px;height:16px;background:var(--line2)}' +
   '.contract-tab .ddm-child.ddm-missing{background:var(--panel);border-style:dashed}' +
@@ -629,11 +709,13 @@ function renderTab_contract(d) {
       '<button class="subtab-btn" data-subtab="map" aria-selected="true">Documents &amp; Conflicts</button>' +
       '<button class="subtab-btn" data-subtab="legal" aria-selected="false">Legal &amp; Protection</button>' +
       '<button class="subtab-btn" data-subtab="scope" aria-selected="false">Scope &amp; Performance</button>' +
+      '<button class="subtab-btn" data-subtab="sources" aria-selected="false">Sources &amp; Evidence</button>' +
     '</div></div>' +
     '<div class="tab-body"><div class="wrap">' +
       '<div data-subpanel="contract/map" class="is-active">' + renderDocMap(d) + '</div>' +
       '<div data-subpanel="contract/legal">' + renderLegalProtection(d) + '</div>' +
       '<div data-subpanel="contract/scope">' + renderScopePerf(d) + '</div>' +
+      '<div data-subpanel="contract/sources">' + renderSourcesEvidence(d) + '</div>' +
     '</div></div>' +
   '</div>';
 }

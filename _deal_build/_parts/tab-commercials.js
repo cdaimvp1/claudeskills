@@ -27,14 +27,14 @@
 (function (global) {
 'use strict';
 
-/* ---------- 0. local utils (helpers.js owns the exported API) ------------- */
-function clampp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+/* ---------- 0. local utils (helpers.js owns the exported API) -------------
+ * clampp / assumVal / M / benchForLine used to live here too, but they are
+ * used by BOTH this file and the ZOPA render, so they now live in
+ * helpers.js as globals (see the ZOPA extraction to zopa.js, 2026-07-23) and
+ * are referenced here unqualified, same as esc/evidenceChip/money always were. */
 function sumF(arr, f) { return (arr || []).reduce((s, x) => s + (f(x) || 0), 0); }
 function findLine(d, id) { return (d.commercialLines || []).find(l => l.id === id) || {}; }
 function findIssue(d, id) { return (d.issues || []).find(i => i.id === id); }
-function assumVal(d, id, fb) { const a = (d.assumptions || []).find(x => x.id === id); return a ? a.value : fb; }
-// compact money with a clean minus sign (helpers' money() renders "$-350K")
-function M(n) { if (n == null || isNaN(n)) return '—'; return (n < 0 ? '−' : '') + money(Math.abs(n), { compact: true }); }
 function setText(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
 
 // THE only live calculation on this tab. Discounts each year at period i+1, the
@@ -63,13 +63,8 @@ function matPill(m) {
 }
 
 /* ---------- 1. 3A, DEAL TABLE & ZOPA ------------------------------------- */
-// benchmark -> line mapping (BENCH-int is the platform $/emp figure = CL-1;
-// BENCH-svc is the implementation day-rate = CL-2). No line link in the data.
-function benchForLine(d, id) {
-  const map = { 'CL-1': 'BENCH-int', 'CL-2': 'BENCH-svc' };
-  const bid = map[id];
-  return bid ? (d.benchmarks || []).find(b => b.id === bid) : null;
-}
+// benchForLine(d, id) now lives in helpers.js (global): used here by
+// benchChip AND by zopa.js's zopaBenchForLine, so one copy serves both.
 function benchChip(d, id) {
   const b = benchForLine(d, id);
   return b ? '<span class="jump" data-jump="el:' + esc(b.id) + '" title="' + esc(b.item) + '">' + esc(b.comparability) + '</span>'
@@ -95,130 +90,12 @@ function renderDealTable(d) {
         ' <span class="tiny muted">ask is a contract figure; target / fallback / max are calculated positions</span></dd></div>'
   });
 }
-/* --- Rich per-line ZOPA (ported from the platform pv-11 zopaGanttHTML / zopaTcoBand):
- * a horizontal track per line showing the ZOPA zone (target -> walk-away) as a teal band,
- * with positioned marks for target, walk-away, fallback, Theo's opening (burnt-orange) and
- * the supplier ask (plum; red only when it sits above walk-away), plus the matched market
- * benchmark as an ink POINT tick. We hold POINT benchmarks, not a market lo/hi band, so a
- * single market tick is drawn and NEVER a fabricated range; lines with no comp say so. --- */
-
-// Derive the line-level market POINT from the benchmark's OWN stated figures (transparent,
-// no fragile string parsing). CL-1 -> BENCH-int (2024 precedent ~$37/emp/yr, scaled to the
-// employee basis); CL-2 -> BENCH-svc (implementation at the $1,500-1,750/day norm midpoint
-// vs the ~$2,000/day ask). The raw comparisonValue + comparability are surfaced verbatim.
-function zopaBenchForLine(d, l) {
-  const b = benchForLine(d, l.id);
-  if (!b) return null;
-  let value = null, note = '';
-  if (l.id === 'CL-1') {
-    const emp = l.quantity || assumVal(d, 'ASM-1', 18000);
-    value = 37 * emp;                                     // ~$37/emp/yr 2024 precedent x employee basis
-    note = '~$37/employee/yr 2024 precedent x ' + emp.toLocaleString('en-US') + ' employees';
-  } else if (l.id === 'CL-2') {
-    value = Math.round(l.supplierAmount * 1625 / 2000);   // $1,625/day norm midpoint vs the ~$2,000/day ask
-    note = '$1,625/day norm midpoint vs the ' + esc('≈$2,000') + '/day ask';
-  } else {
-    return null;                                          // no numeric derivation available -> no comp
-  }
-  return { value: value, note: note, benchId: b.id, comparability: b.comparability, raw: b.comparisonValue, explanation: b.explanation, evidenceType: b.evidenceType };
-}
-
-function zopaLineHTML(d, l) {
-  const ask = l.supplierAmount, target = l.target, walk = l.maximumAcceptable, fallback = l.fallback;
-  // Theo opening: anchor aggressively but credibly BELOW target so there is room to settle
-  // up; = target-(walk-target), floored at 15% under target since we hold no market low.
-  const open = Math.round(Math.max(target * 0.85, 2 * target - walk));
-  const over = ask > walk;                  // supplier ask above our walk-away -> the ONLY red trigger
-  const bench = zopaBenchForLine(d, l);
-  // Scale = the negotiation span (opening -> ask), plus the benchmark point when present.
-  // No fabricated market band: only the marks we actually hold are placed on the track.
-  const vals = [open, target, walk, ask, fallback];
-  if (bench) vals.push(bench.value);
-  let min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
-  const pad = (max - min) * 0.08 || 1; min -= pad; max += pad;
-  const span = (max - min) || 1;
-  const pos = v => clampp((v - min) / span * 100, 0, 100);
-  const gap = Math.round((1 - open / target) * 100);
-  const track = '<div class="ztrack">' +
-    '<div class="zaxis"></div>' +
-    '<div class="zzopa" style="left:' + pos(target).toFixed(1) + '%;width:' + Math.max(pos(walk) - pos(target), 0).toFixed(1) + '%" title="ZOPA ' + M(target) + ' to ' + M(walk) + '"></div>' +
-    '<div class="ztgt" style="left:' + pos(target).toFixed(1) + '%" title="Target ' + M(target) + '"></div>' +
-    '<div class="zwalk" style="left:' + pos(walk).toFixed(1) + '%" title="Walk-away ' + M(walk) + '"></div>' +
-    (fallback != null ? '<div class="zfb" style="left:' + pos(fallback).toFixed(1) + '%" title="Fallback ' + M(fallback) + '"></div>' : '') +
-    '<div class="zopen" style="left:' + pos(open).toFixed(1) + '%" title="Theo opening ' + M(open) + '"></div>' +
-    '<div class="zask ' + (over ? 'over' : 'ok') + '" style="left:calc(' + pos(ask).toFixed(1) + '% - 5px)" title="Supplier ask ' + M(ask) + '"></div>' +
-    (bench ? '<div class="zbench" style="left:' + pos(bench.value).toFixed(1) + '%" title="Market ' + M(bench.value) + ' (' + esc(bench.comparability) + ' comparability)"></div>' : '') +
-  '</div>';
-  const leg = '<div class="zlleg">' +
-    '<span class="zztgt">ZOPA ' + M(target) + ' to ' + M(walk) + '</span>' +
-    '<span>opening ' + M(open) + '</span>' +
-    '<span>fallback ' + M(fallback) + '</span>' +
-    (bench ? '<span>market ' + M(bench.value) + ' (' + esc(bench.comparability) + ')</span>'
-           : '<span class="znobench">no market benchmark in session</span>') +
-  '</div>';
-  const mktRow = bench
-    ? '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><b>' + M(bench.value) + '</b> - ' + esc(bench.note) + '. ' + esc(bench.raw) + ' · ' + esc(bench.comparability) + ' comparability ' + evidenceChip(bench.evidenceType, { sources: [bench.benchId] }) + '</span></div>'
-    : '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><span class="znobench">No market benchmark for this line in session</span> - no external comparison was available, so no market mark is drawn (no lo/hi band fabricated). ' + evidenceChip('unavailable') + '</span></div>';
-  const detail = '<div class="zdetail">' +
-    '<div class="zdrow"><span class="zdk">Price</span><span class="zdv">supplier ask <b>' + M(ask) + '</b> vs target ' + M(target) + ' · fallback ' + M(fallback) + ' · walk-away ' + M(walk) + ' ' + evidenceChip(l.evidenceType, { sources: l.sourceIds }) + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Theo opening</span><span class="zdv">open at <b>' + M(open) + '</b>, about ' + gap + '% below target, leaving room to settle at ' + M(target) + ' ' + evidenceChip('inference') + '</span></div>' +
-    mktRow +
-    '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + (over
-        ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
-        : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
-  '</div>';
-  return '<div class="zline"><div class="zlhd"><span class="zlname">' + esc(l.item) + '</span>' +
-    '<span class="zlask ' + (over ? 'over' : 'ok') + '">supplier ask ' + M(ask) + (over ? ' · above walk-away' : ' · within range') + '</span></div>' +
-    track + leg + detail + '</div>';
-}
-
-// Total-deal ZOPA / TCO band: whole-deal ask/target/walk totals from the 3-yr scenarios
-// (SC-ask / SC-target / SC-max), fallback from SC-fallback; opening derived the same way as
-// the per-line opening. No deal-level market benchmark exists in session -> honest gap-state.
-function zopaTotalHTML(d) {
-  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {});
-  const askS = sc('SC-ask'), tgtS = sc('SC-target'), fbS = sc('SC-fallback'), maxS = sc('SC-max');
-  const askTot = askS.total || 0, tgtTot = tgtS.total || 0, walkTot = maxS.total || 0, fbTot = fbS.total || 0;
-  const openTot = Math.round(Math.max(tgtTot * 0.85, 2 * tgtTot - walkTot));
-  const over = askTot > walkTot, apart = Math.abs(askTot - tgtTot);
-  const gap = Math.round((1 - openTot / tgtTot) * 100);
-  const emp = assumVal(d, 'ASM-1', 18000), years = assumVal(d, 'ASM-2', 3);
-  const read = 'Supplier ask ' + M(askTot) + ' sits ' + (over ? 'above' : 'within') + ' the ' + M(walkTot) +
-    ' walk-away; the ' + M(tgtTot) + ' target anchors the deal (about ' + M(apart) + ' below ask). The platform subscription is the biggest lever.';
-  const band = '<div class="ztband">' +
-    '<span class="ztchip open">Theo opening ' + M(openTot) + '</span>' +
-    '<span class="ztchip tgt">Target ' + M(tgtTot) + '</span>' +
-    '<span class="ztarrow">to</span>' +
-    '<span class="ztchip walk">Walk-away ' + M(walkTot) + '</span>' +
-    '<span class="ztchip ' + (over ? 'over' : 'ok') + '">Supplier ask ' + M(askTot) + '</span>' +
-  '</div>';
-  const detail = '<div class="zdetail">' +
-    '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>' +
-  '</div>';
-  return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCO</span>' +
-    '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
-    band + detail + '</div>';
-}
-
-const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
-  '<span><i class="zlg zopa"></i>ZOPA (target to walk-away)</span>' +
-  '<span><i class="zlg tgt"></i>target</span>' +
-  '<span><i class="zlg walk"></i>walk-away</span>' +
-  '<span><i class="zlg fb"></i>fallback</span>' +
-  '<span><i class="zlg open"></i>Theo opening</span>' +
-  '<span><i class="zlg ask"></i>supplier ask (red = above walk-away)</span>' +
-  '<span><i class="zlg bench"></i>market benchmark (point)</span>' +
-'</div>';
-
-function renderZopaGantt(d) {
-  const lines = d.commercialLines || [];
-  if (!lines.length) return gapCard('No commercial lines in session', 'No line items to build a ZOPA from.');
-  return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
-}
+/* --- Rich per-line ZOPA + total-deal ZOPA/TCO band now live in zopa.js
+ * (window.DealZopa.render(d)), so the Economics tab and the Overview tab can
+ * render byte-identical output. See zopa.js for zopaBenchForLine /
+ * zopaLineHTML / zopaTotalHTML / ZOPA_BOTTOM_LEGEND / renderZopaGantt and
+ * the .zopa-viz CSS (moved from this file's scoped <style> block below,
+ * 2026-07-23 extraction). --- */
 function renderDealTotals(d) {
   const lines = d.commercialLines || [];
   const askY1 = sumF(lines, l => l.supplierAmount), tgtY1 = sumF(lines, l => l.target), maxY1 = sumF(lines, l => l.maximumAcceptable);
@@ -509,7 +386,7 @@ function renderTab_commercials(d) {
     '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">One normalized view of every commercial line, supplier ask against Lilly’s target, fallback and walk-away, with the per-line zone of possible agreement. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + saCard('Deal Table, Normalized Line Items', renderDealTable(d) + renderDealTotals(d), { accent: 'plum', icon: 'money', sub: (d.commercialLines || []).length + ' lines' }) + '</div>' +
-      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing &amp; Benchmarks', renderZopaGantt(d), { accent: 'plum', icon: 'target', sub: 'target → walk-away · Theo opening · supplier ask · benchmark' }) + '</div>' +
+      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing &amp; Benchmarks', window.DealZopa.render(d), { accent: 'plum', icon: 'target', sub: 'target → walk-away · Theo opening · supplier ask · benchmark' }) + '</div>' +
       '<div class="col-7">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-5">' + renderRenewalBand(d) + '</div>' +
     '</div>' +
@@ -542,57 +419,9 @@ function renderTab_commercials(d) {
   /* ---- scoped styles (only what the base system does not provide) ---- */
   const scopedStyle = '<style>' +
     '.commercials-tab .subtab-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:-2px;margin-right:2px}' +
-    /* rich per-line ZOPA tracks + Total-deal TCO band (ported from platform pv-11, palette-remapped:
-       ZOPA zone = teal, our target/walk/fallback = plum family, opening = burnt-orange, ask = plum
-       or red only when above walk-away, benchmark = neutral ink point). Prefixed so they do not
-       collide with the platform bundle's own .zline/.ztrack classes. */
-    '.commercials-tab .zline{margin:0 0 16px}' +
-    '.commercials-tab .zline:last-of-type{margin-bottom:8px}' +
-    '.commercials-tab .zlhd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:7px}' +
-    '.commercials-tab .zlname{font-weight:700;font-size:var(--fz-sm);color:var(--ink)}' +
-    '.commercials-tab .zlask{font-size:var(--fz-floor);font-weight:700}' +
-    '.commercials-tab .zlask.over{color:var(--danger)}' +
-    '.commercials-tab .zlask.ok{color:var(--teal-d)}' +
-    '.commercials-tab .ztrack{position:relative;height:30px;margin:2px 0}' +
-    '.commercials-tab .zaxis{position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:var(--line2);border-radius:2px}' +
-    '.commercials-tab .zzopa{position:absolute;top:50%;transform:translateY(-50%);height:16px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:4px}' +
-    '.commercials-tab .ztgt,.commercials-tab .zwalk{position:absolute;top:calc(50% - 11px);width:2px;height:22px;background:var(--plum)}' +
-    '.commercials-tab .zwalk{opacity:.5}' +
-    '.commercials-tab .zfb{position:absolute;top:calc(50% - 7px);height:14px;border-left:2px dotted var(--plum);opacity:.75}' +
-    '.commercials-tab .zopen{position:absolute;top:calc(50% - 6px);width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--surface);border:2px solid var(--emph);box-sizing:border-box}' +
-    '.commercials-tab .zask{position:absolute;top:calc(50% - 14px);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
-    '.commercials-tab .zask.over{border-top-color:var(--danger)}' +
-    '.commercials-tab .zbench{position:absolute;top:calc(50% - 12px);width:2px;height:24px;background:var(--ink2)}' +
-    '.commercials-tab .zlleg{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:6px}' +
-    '.commercials-tab .zlleg .zztgt{color:var(--teal-d);font-weight:700}' +
-    '.commercials-tab .znobench{color:var(--mut2);font-style:italic}' +
-    '.commercials-tab .zdetail{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line2);display:grid;gap:5px}' +
-    '.commercials-tab .zdrow{display:flex;gap:10px;font-size:var(--fz-sm);line-height:1.45}' +
-    '.commercials-tab .zdk{flex:0 0 118px;color:var(--mut2);font-weight:700}' +
-    '.commercials-tab .zdv{color:var(--ink2);flex:1;min-width:0}' +
-    '.commercials-tab .zdv b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}' +
-    '.commercials-tab .ztotal{margin-top:14px;padding-top:14px;border-top:2px solid var(--plum)}' +
-    '.commercials-tab .zthd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}' +
-    '.commercials-tab .ztname{font-weight:800;font-size:var(--fz);color:var(--plum)}' +
-    '.commercials-tab .ztsub{font-size:var(--fz-floor);color:var(--mut2)}' +
-    '.commercials-tab .ztband{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}' +
-    '.commercials-tab .ztchip{font-size:var(--fz-sm);font-weight:700;border-radius:30px;padding:5px 12px;white-space:nowrap;font-variant-numeric:tabular-nums}' +
-    '.commercials-tab .ztchip.open{background:var(--surface);border:1.5px solid var(--emph);color:var(--emph)}' +
-    '.commercials-tab .ztchip.tgt{background:var(--teal-t);color:var(--teal-d)}' +
-    '.commercials-tab .ztchip.walk{background:var(--plum-t);color:var(--plum)}' +
-    '.commercials-tab .ztchip.ok{background:var(--teal-t);color:var(--teal-d)}' +
-    '.commercials-tab .ztchip.over{background:var(--danger-t);color:var(--danger)}' +
-    '.commercials-tab .ztarrow{font-size:var(--fz-floor);color:var(--mut2)}' +
-    '.commercials-tab .zopalegend{display:flex;gap:16px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:14px;padding-top:11px;border-top:1px solid var(--line)}' +
-    '.commercials-tab .zopalegend span{display:inline-flex;align-items:center}' +
-    '.commercials-tab .zopalegend i{display:inline-block;margin-right:6px;vertical-align:middle}' +
-    '.commercials-tab .zlg.zopa{width:16px;height:10px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:2px}' +
-    '.commercials-tab .zlg.tgt{width:2px;height:14px;background:var(--plum)}' +
-    '.commercials-tab .zlg.walk{width:2px;height:14px;background:var(--plum);opacity:.5}' +
-    '.commercials-tab .zlg.fb{width:0;height:14px;border-left:2px dotted var(--plum);opacity:.75}' +
-    '.commercials-tab .zlg.open{width:12px;height:12px;background:var(--surface);border:2px solid var(--emph);border-radius:50%;box-sizing:border-box}' +
-    '.commercials-tab .zlg.ask{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
-    '.commercials-tab .zlg.bench{width:2px;height:14px;background:var(--ink2)}' +
+    /* ZOPA track CSS (.zline/.ztrack/.zzopa/.ztotal/.zopalegend/etc.) moved to
+       zopa.js's injected `.zopa-viz` stylesheet as part of the 2026-07-23
+       extraction, so it is no longer scoped under `.commercials-tab` here. */
     '.commercials-tab .deal-totals{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line2)}' +
     '.commercials-tab .deal-totals .dt-col{flex:1 1 180px;min-width:160px}' +
     '.commercials-tab .deal-totals .k-lbl{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;margin-bottom:3px}' +

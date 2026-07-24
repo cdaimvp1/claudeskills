@@ -46,6 +46,23 @@ const pct = (n, d) => (n == null ? '—' : (d ? n.toFixed(d) : Math.round(n)) + 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const uid = (() => { let i = 0; return (p) => (p || 'u') + '-' + (++i); })();
 
+/* ---------- 0b. shared data/format helpers (used by 2+ tab builders) ------
+ * Moved here from tab-commercials.js during the ZOPA extraction (2026-07-23):
+ * each was defined locally in that file but used by BOTH the ZOPA render and
+ * the rest of the Economics tab (and now also by zopa.js), so one global
+ * copy replaces what were two independently-drifting local definitions. --- */
+const clampp = clamp;                                     // alias: same clamp(), the name the ZOPA/Economics code uses
+// compact money with a clean minus sign (money() alone renders "$-350K")
+const M = (n) => { if (n == null || isNaN(n)) return '—'; return (n < 0 ? '−' : '') + money(Math.abs(n), { compact: true }); };
+function assumVal(d, id, fb) { const a = (d.assumptions || []).find(x => x.id === id); return a ? a.value : fb; }
+// benchmark -> line mapping (BENCH-int is the platform $/emp figure = CL-1;
+// BENCH-svc is the implementation day-rate = CL-2). No line link in the data.
+function benchForLine(d, id) {
+  const map = { 'CL-1': 'BENCH-int', 'CL-2': 'BENCH-svc' };
+  const bid = map[id];
+  return bid ? (d.benchmarks || []).find(b => b.id === bid) : null;
+}
+
 /* ---------- 1. ICON LIBRARY (inline SVG, no external assets) -------------- */
 // Usage: icon('scale')  ->  '<svg …>…</svg>'. Add new icons HERE only.
 const ICONS = {
@@ -509,13 +526,15 @@ const DealUI = {
 /* ---------- EXPORTS ------------------------------------------------------- */
 const api = {
   // formatting
-  esc, money, pct, uid, icon,
+  esc, money, pct, uid, icon, M, clampp,
   // evidence + status
   evidenceChip, coverageBadge, severityPill, statusPill,
   // layout
   saCard, insight, dataTable, collapsible, excerpt, gapCard, jumpLink, copyBtn,
   // viz
   miniBar, barRow, heatCell, matrixPlot, waterfall, timeline, gantt, assumptionSlider,
+  // data lookups (used by 2+ tab builders, e.g. tab-commercials.js + zopa.js)
+  assumVal, benchForLine,
   // interaction
   DealUI
 };

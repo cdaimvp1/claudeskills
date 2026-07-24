@@ -1236,6 +1236,23 @@ const pct = (n, d) => (n == null ? '—' : (d ? n.toFixed(d) : Math.round(n)) + 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const uid = (() => { let i = 0; return (p) => (p || 'u') + '-' + (++i); })();
 
+/* ---------- 0b. shared data/format helpers (used by 2+ tab builders) ------
+ * Moved here from tab-commercials.js during the ZOPA extraction (2026-07-23):
+ * each was defined locally in that file but used by BOTH the ZOPA render and
+ * the rest of the Economics tab (and now also by zopa.js), so one global
+ * copy replaces what were two independently-drifting local definitions. --- */
+const clampp = clamp;                                     // alias: same clamp(), the name the ZOPA/Economics code uses
+// compact money with a clean minus sign (money() alone renders "$-350K")
+const M = (n) => { if (n == null || isNaN(n)) return '—'; return (n < 0 ? '−' : '') + money(Math.abs(n), { compact: true }); };
+function assumVal(d, id, fb) { const a = (d.assumptions || []).find(x => x.id === id); return a ? a.value : fb; }
+// benchmark -> line mapping (BENCH-int is the platform $/emp figure = CL-1;
+// BENCH-svc is the implementation day-rate = CL-2). No line link in the data.
+function benchForLine(d, id) {
+  const map = { 'CL-1': 'BENCH-int', 'CL-2': 'BENCH-svc' };
+  const bid = map[id];
+  return bid ? (d.benchmarks || []).find(b => b.id === bid) : null;
+}
+
 /* ---------- 1. ICON LIBRARY (inline SVG, no external assets) -------------- */
 // Usage: icon('scale')  ->  '<svg …>…</svg>'. Add new icons HERE only.
 const ICONS = {
@@ -1699,13 +1716,15 @@ const DealUI = {
 /* ---------- EXPORTS ------------------------------------------------------- */
 const api = {
   // formatting
-  esc, money, pct, uid, icon,
+  esc, money, pct, uid, icon, M, clampp,
   // evidence + status
   evidenceChip, coverageBadge, severityPill, statusPill,
   // layout
   saCard, insight, dataTable, collapsible, excerpt, gapCard, jumpLink, copyBtn,
   // viz
   miniBar, barRow, heatCell, matrixPlot, waterfall, timeline, gantt, assumptionSlider,
+  // data lookups (used by 2+ tab builders, e.g. tab-commercials.js + zopa.js)
+  assumVal, benchForLine,
   // interaction
   DealUI
 };
@@ -1829,14 +1848,66 @@ const dashboardData = {
 
   /* ---- 2. documents -------------------------------------------------------- */
   // role: governing | ordering | scope | data | security | correspondence | reference
+  //
+  // Document Family Register additions (all ADDITIVE, no existing field/value touched):
+  //   executedDate / expirationDate : ISO date or null. This deal is pre-signature, so
+  //     every contract instrument is null; no execution date is assumed or invented.
+  //   active        : 'In negotiation' | 'Active' | 'Referenced, not provided' |
+  //                   'Superseded' | 'Draft'
+  //   controlling   : true ONLY for the master instrument (the MSA).
+  //   relevance     : 'direct' (sits in this deal's precedence chain / is part of this
+  //                   negotiation) | 'indirect' (a different, comparable supplier
+  //                   document outside the chain). No indirect document exists in this
+  //                   session, see documentRelevanceMeta below, nothing here is invented.
+  //   precedenceRank: 1 = controlling, ascending = subordinate; null for indirect and for
+  //                   referenced-but-missing components (rank can't be confirmed unseen).
+  //   precedenceBasis: { text, evidenceType }. No express order-of-precedence clause was
+  //                   found in the MSA v3 redline text captured this session, so every
+  //                   ranked basis below is evidenceType 'inference' (our defensible read
+  //                   of standard MSA + Order Form + SOW structure), never 'contract'.
+  //   isMissing     : true for the two referenced-but-not-provided components (DPA,
+  //                   Security Exhibit) so the register can render them as gap rows.
   documents: [
-    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, evidenceType: 'contract', limitations: [] },
-    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, evidenceType: 'contract', limitations: [] },
-    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, evidenceType: 'contract', limitations: [] },
-    { id: 'DOC-04', name: 'Data Processing Addendum (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'] },
-    { id: 'DOC-05', name: 'Security & Availability Exhibit (Exhibit B)', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'] },
-    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, evidenceType: 'internal', limitations: [] }
+    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, evidenceType: 'contract', limitations: [],
+      executedDate: null, expirationDate: null, active: 'In negotiation', controlling: true, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Master agreement; governs interpretation and sets precedence for the Order Form and SOW beneath it.',
+      precedenceRank: 1,
+      precedenceBasis: { text: 'Ranked as the controlling master instrument; the v3 redline body does not contain an express order-of-precedence clause among the MSA / Order Form / SOW, so this hierarchy is our read, not a quoted contract term.', evidenceType: 'inference' } },
+    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, evidenceType: 'contract', limitations: [],
+      executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Defines the implementation scope and deliverables authorized under the Order Form; no redline round documented for this instrument (unlike the MSA).',
+      precedenceRank: 3,
+      precedenceBasis: { text: 'Ranked below the Order Form as the subordinate scope/services document it details; no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
+    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, evidenceType: 'contract', limitations: [],
+      executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Commercial ordering document; binds the specific subscription, term and fees under the MSA and references SOW-01 for scope.',
+      precedenceRank: 2,
+      precedenceBasis: { text: 'Ranked immediately below the MSA as the work-authorizing instrument that triggers the specific commercial commitment (an Order Form functions as a type of SOW); no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
+    { id: 'DOC-04', name: 'Data Processing Addendum (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'],
+      executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so data-protection terms are never silently assumed.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-05', name: 'Security & Availability Exhibit (Exhibit B)', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'],
+      executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so SLA-credit and security-control terms are never silently assumed.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, evidenceType: 'internal', limitations: [],
+      executedDate: null, expirationDate: null, active: 'Active', controlling: false, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Correspondence evidencing receipt/date of the MSA v3 redline; supports the negotiation timeline, not a governing instrument, so it carries no precedence rank.',
+      precedenceRank: null, precedenceBasis: null }
   ],
+
+  /* ---- 2b. documentRelevanceMeta (honest gap-state for the "indirect / comparable"
+   * tier). No prior Visier SOW, rate card, or other comparable supplier document
+   * actually surfaced this session, so none of the rows above is labelled relevance:
+   * 'indirect', that would be invented. The register renders this flag instead. */
+  documentRelevanceMeta: {
+    indirectPresent: false,
+    indirectNote: 'No indirect-relevant supplier documents (e.g. a prior Visier SOW or rate card) surfaced in session; the commercial benchmark derives from an internal analytics precedent (FIN-01), not a prior Visier contract.',
+    evidenceType: 'unavailable'
+  },
 
   /* ---- 3. issues (THE spine, referenced by id everywhere) ------------------ */
   // category: Liability | Data & Privacy | Commercial | Term & Renewal | Service Levels |
@@ -2067,17 +2138,27 @@ const dashboardData = {
    * relation: 'conflict' | 'changed-by' | 'gap' , names the cross-doc dimension checked;
    *   consistent:true means the two docs align on it, consistent:false means an adverse
    *   finding (a gap from a missing doc, or a genuine contradiction). No amendments/COs
-   *   exist yet (new MSA), so there are no 'changed-by' rows, that is honest, not empty. */
+   *   exist yet (new MSA), so there are no 'changed-by' rows, that is honest, not empty.
+   * trigger: 'active-conflict' | 'risk' | 'gap' | null , drives the redesigned panel,
+   *   which shows only non-null rows. Items where consistent:true are genuinely benign
+   *   (no conflict, no risk, no gap) and get trigger:null so they are excluded from the
+   *   conflicts view; they still exist here for the completeness / consistency record.
+   * termTrace: { term, from, to, viaDoc } would trace a term's value across document
+   *   versions. Omitted on every row below, on purpose: this is a new MSA with no
+   *   amendments or change orders, and the only version history in session (MSA v2 -> v3,
+   *   see comms.events CM-4/CM-6) shows the liability cap HELD at 12 months, not changed,
+   *   and MSA v2 itself is not a row in documents[], so there is no real from/to/viaDoc to
+   *   report without inventing a document id. */
   documentConflicts: [
-    { id: 'DC-1', docA: 'DOC-01', docB: 'DOC-04', topic: 'Data-protection terms', relation: 'gap', consistent: false, issueId: 'ISS-03',
+    { id: 'DC-1', docA: 'DOC-01', docB: 'DOC-04', topic: 'Data-protection terms', relation: 'gap', consistent: false, issueId: 'ISS-03', trigger: 'gap',
       note: 'MSA incorporates a DPA “by reference,” but the DPA text itself is not in session, so the data-protection terms cannot be reconciled.', evidenceType: 'unavailable' },
-    { id: 'DC-2', docA: 'DOC-01', docB: 'DOC-04', topic: 'Sub-processor change control', relation: 'gap', consistent: false, issueId: 'ISS-08',
+    { id: 'DC-2', docA: 'DOC-01', docB: 'DOC-04', topic: 'Sub-processor change control', relation: 'gap', consistent: false, issueId: 'ISS-08', trigger: 'gap',
       note: 'The sub-processor notice/objection mechanism would normally sit in the DPA; unavailable, so it cannot be verified against the MSA body.', evidenceType: 'unavailable' },
-    { id: 'DC-3', docA: 'DOC-01', docB: 'DOC-05', topic: 'SLA credit schedule & security controls', relation: 'gap', consistent: false, issueId: 'ISS-06',
+    { id: 'DC-3', docA: 'DOC-01', docB: 'DOC-05', topic: 'SLA credit schedule & security controls', relation: 'gap', consistent: false, issueId: 'ISS-06', trigger: 'gap',
       note: 'MSA sets the 99.5% uptime target; the credit schedule and security controls sit in the missing Security Exhibit (Exhibit B).', evidenceType: 'unavailable' },
-    { id: 'DC-4', docA: 'DOC-01', docB: 'DOC-03', topic: 'Renewal notice & price', relation: 'conflict', consistent: true, issueId: 'ISS-04',
+    { id: 'DC-4', docA: 'DOC-01', docB: 'DOC-03', topic: 'Renewal notice & price', relation: 'conflict', consistent: true, issueId: 'ISS-04', trigger: null,
       note: 'MSA and Order Form agree; both are silent on a renewal price cap (the deviation is vs. playbook, not between the two documents).', evidenceType: 'contract' },
-    { id: 'DC-5', docA: 'DOC-02', docB: 'DOC-03', topic: 'Fee schedule totals', relation: 'conflict', consistent: true, issueId: 'ISS-12',
+    { id: 'DC-5', docA: 'DOC-02', docB: 'DOC-03', topic: 'Fee schedule totals', relation: 'conflict', consistent: true, issueId: 'ISS-12', trigger: null,
       note: 'Order Form (subscription) and SOW-01 (services) fee lines combine into the Year-1 total; no discrepancy found between the two.', evidenceType: 'calculated' }
   ],
 
@@ -2475,20 +2556,248 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
 </script>
 <script>
 /* =============================================================================
+ * zopa.js, shared ZOPA (Zone of Possible Agreement) visualization for the Deal
+ * artifact. A horizontal track per commercial line showing the ZOPA zone
+ * (target -> walk-away) as a teal band, with positioned marks for target,
+ * walk-away, fallback, Theo's opening (burnt-orange) and the supplier ask
+ * (plum; red only when it sits above walk-away), plus the matched market
+ * benchmark as an ink POINT tick, followed by the total-deal ZOPA / TCO band
+ * and a bottom legend. We hold POINT benchmarks, not a market lo/hi band, so
+ * a single market tick is drawn and NEVER a fabricated range; lines with no
+ * comp say so.
+ *
+ * Extracted verbatim from _parts/tab-commercials.js (2026-07-23) so any tab
+ * that needs the ZOPA renders byte-identical output. Public entry:
+ *   window.DealZopa.render(d)  ->  HTML string, wrapped in <div class="zopa-viz">
+ *
+ * Currently called from the Economics tab (tab-commercials.js, 3A "ZOPA by
+ * Line Item · Pricing & Benchmarks"); the Overview tab's "Total-deal ZOPA"
+ * section can call this same entry point to render the identical viz.
+ *
+ * Depends on GLOBALS exported by helpers.js: esc, evidenceChip, jumpLink,
+ * gapCard, M, assumVal, clampp, benchForLine. Load order MUST be
+ * helpers.js -> data.js -> zopa.js -> the tab builders (see
+ * build_deal_artifact.py JS_ORDER) so window.DealZopa exists before any tab
+ * builder runs at mount.
+ * ========================================================================== */
+(function (global) {
+'use strict';
+
+/* ---------- 0. scoped CSS, injected once into <head> ----------------------
+ * Ported 1:1 from tab-commercials.js's scoped <style> block, rescoped from
+ * `.commercials-tab .X` to `.zopa-viz .X` so it applies wherever the ZOPA is
+ * mounted (tab-agnostic). Palette-remapped from platform pv-11 (ZOPA zone =
+ * teal, our target/walk/fallback = plum family, opening = burnt-orange,
+ * ask = plum or red only when above walk-away, benchmark = neutral ink
+ * point). Guarded + idempotent: safe to call render() from multiple tabs. */
+var ZOPA_CSS =
+  '.zopa-viz .zline{margin:0 0 16px}' +
+  '.zopa-viz .zline:last-of-type{margin-bottom:8px}' +
+  '.zopa-viz .zlhd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:7px}' +
+  '.zopa-viz .zlname{font-weight:700;font-size:var(--fz-sm);color:var(--ink)}' +
+  '.zopa-viz .zlask{font-size:var(--fz-floor);font-weight:700}' +
+  '.zopa-viz .zlask.over{color:var(--danger)}' +
+  '.zopa-viz .zlask.ok{color:var(--teal-d)}' +
+  '.zopa-viz .ztrack{position:relative;height:30px;margin:2px 0}' +
+  '.zopa-viz .zaxis{position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:var(--line2);border-radius:2px}' +
+  '.zopa-viz .zzopa{position:absolute;top:50%;transform:translateY(-50%);height:16px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:4px}' +
+  '.zopa-viz .ztgt,.zopa-viz .zwalk{position:absolute;top:calc(50% - 11px);width:2px;height:22px;background:var(--plum)}' +
+  '.zopa-viz .zwalk{opacity:.5}' +
+  '.zopa-viz .zfb{position:absolute;top:calc(50% - 7px);height:14px;border-left:2px dotted var(--plum);opacity:.75}' +
+  '.zopa-viz .zopen{position:absolute;top:calc(50% - 6px);width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--surface);border:2px solid var(--emph);box-sizing:border-box}' +
+  '.zopa-viz .zask{position:absolute;top:calc(50% - 14px);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
+  '.zopa-viz .zask.over{border-top-color:var(--danger)}' +
+  '.zopa-viz .zbench{position:absolute;top:calc(50% - 12px);width:2px;height:24px;background:var(--ink2)}' +
+  '.zopa-viz .zlleg{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:6px}' +
+  '.zopa-viz .zlleg .zztgt{color:var(--teal-d);font-weight:700}' +
+  '.zopa-viz .znobench{color:var(--mut2);font-style:italic}' +
+  '.zopa-viz .zdetail{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line2);display:grid;gap:5px}' +
+  '.zopa-viz .zdrow{display:flex;gap:10px;font-size:var(--fz-sm);line-height:1.45}' +
+  '.zopa-viz .zdk{flex:0 0 118px;color:var(--mut2);font-weight:700}' +
+  '.zopa-viz .zdv{color:var(--ink2);flex:1;min-width:0}' +
+  '.zopa-viz .zdv b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}' +
+  '.zopa-viz .ztotal{margin-top:14px;padding-top:14px;border-top:2px solid var(--plum)}' +
+  '.zopa-viz .zthd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}' +
+  '.zopa-viz .ztname{font-weight:800;font-size:var(--fz);color:var(--plum)}' +
+  '.zopa-viz .ztsub{font-size:var(--fz-floor);color:var(--mut2)}' +
+  '.zopa-viz .ztband{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}' +
+  '.zopa-viz .ztchip{font-size:var(--fz-sm);font-weight:700;border-radius:30px;padding:5px 12px;white-space:nowrap;font-variant-numeric:tabular-nums}' +
+  '.zopa-viz .ztchip.open{background:var(--surface);border:1.5px solid var(--emph);color:var(--emph)}' +
+  '.zopa-viz .ztchip.tgt{background:var(--teal-t);color:var(--teal-d)}' +
+  '.zopa-viz .ztchip.walk{background:var(--plum-t);color:var(--plum)}' +
+  '.zopa-viz .ztchip.ok{background:var(--teal-t);color:var(--teal-d)}' +
+  '.zopa-viz .ztchip.over{background:var(--danger-t);color:var(--danger)}' +
+  '.zopa-viz .ztarrow{font-size:var(--fz-floor);color:var(--mut2)}' +
+  '.zopa-viz .zopalegend{display:flex;gap:16px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:14px;padding-top:11px;border-top:1px solid var(--line)}' +
+  '.zopa-viz .zopalegend span{display:inline-flex;align-items:center}' +
+  '.zopa-viz .zopalegend i{display:inline-block;margin-right:6px;vertical-align:middle}' +
+  '.zopa-viz .zlg.zopa{width:16px;height:10px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:2px}' +
+  '.zopa-viz .zlg.tgt{width:2px;height:14px;background:var(--plum)}' +
+  '.zopa-viz .zlg.walk{width:2px;height:14px;background:var(--plum);opacity:.5}' +
+  '.zopa-viz .zlg.fb{width:0;height:14px;border-left:2px dotted var(--plum);opacity:.75}' +
+  '.zopa-viz .zlg.open{width:12px;height:12px;background:var(--surface);border:2px solid var(--emph);border-radius:50%;box-sizing:border-box}' +
+  '.zopa-viz .zlg.ask{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
+  '.zopa-viz .zlg.bench{width:2px;height:14px;background:var(--ink2)}';
+
+function injectCss() {
+  if (document.getElementById('zopa-css')) return;   // idempotent: safe across repeated render() calls
+  var s = document.createElement('style');
+  s.id = 'zopa-css';
+  s.textContent = ZOPA_CSS;
+  document.head.appendChild(s);
+}
+
+/* ---------- 1. per-line market-benchmark derivation ------------------------
+ * Derive the line-level market POINT from the benchmark's OWN stated figures
+ * (transparent, no fragile string parsing). CL-1 -> BENCH-int (2024
+ * precedent ~$37/emp/yr, scaled to the employee basis); CL-2 -> BENCH-svc
+ * (implementation at the $1,500-1,750/day norm midpoint vs the ~$2,000/day
+ * ask). The raw comparisonValue + comparability are surfaced verbatim. */
+function zopaBenchForLine(d, l) {
+  const b = benchForLine(d, l.id);
+  if (!b) return null;
+  let value = null, note = '';
+  if (l.id === 'CL-1') {
+    const emp = l.quantity || assumVal(d, 'ASM-1', 18000);
+    value = 37 * emp;                                     // ~$37/emp/yr 2024 precedent x employee basis
+    note = '~$37/employee/yr 2024 precedent x ' + emp.toLocaleString('en-US') + ' employees';
+  } else if (l.id === 'CL-2') {
+    value = Math.round(l.supplierAmount * 1625 / 2000);   // $1,625/day norm midpoint vs the ~$2,000/day ask
+    note = '$1,625/day norm midpoint vs the ' + esc('≈$2,000') + '/day ask';
+  } else {
+    return null;                                          // no numeric derivation available -> no comp
+  }
+  return { value: value, note: note, benchId: b.id, comparability: b.comparability, raw: b.comparisonValue, explanation: b.explanation, evidenceType: b.evidenceType };
+}
+
+/* ---------- 2. per-line ZOPA track ------------------------------------------ */
+function zopaLineHTML(d, l) {
+  const ask = l.supplierAmount, target = l.target, walk = l.maximumAcceptable, fallback = l.fallback;
+  // Theo opening: anchor aggressively but credibly BELOW target so there is room to settle
+  // up; = target-(walk-target), floored at 15% under target since we hold no market low.
+  const open = Math.round(Math.max(target * 0.85, 2 * target - walk));
+  const over = ask > walk;                  // supplier ask above our walk-away -> the ONLY red trigger
+  const bench = zopaBenchForLine(d, l);
+  // Scale = the negotiation span (opening -> ask), plus the benchmark point when present.
+  // No fabricated market band: only the marks we actually hold are placed on the track.
+  const vals = [open, target, walk, ask, fallback];
+  if (bench) vals.push(bench.value);
+  let min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+  const pad = (max - min) * 0.08 || 1; min -= pad; max += pad;
+  const span = (max - min) || 1;
+  const pos = v => clampp((v - min) / span * 100, 0, 100);
+  const gap = Math.round((1 - open / target) * 100);
+  const track = '<div class="ztrack">' +
+    '<div class="zaxis"></div>' +
+    '<div class="zzopa" style="left:' + pos(target).toFixed(1) + '%;width:' + Math.max(pos(walk) - pos(target), 0).toFixed(1) + '%" title="ZOPA ' + M(target) + ' to ' + M(walk) + '"></div>' +
+    '<div class="ztgt" style="left:' + pos(target).toFixed(1) + '%" title="Target ' + M(target) + '"></div>' +
+    '<div class="zwalk" style="left:' + pos(walk).toFixed(1) + '%" title="Walk-away ' + M(walk) + '"></div>' +
+    (fallback != null ? '<div class="zfb" style="left:' + pos(fallback).toFixed(1) + '%" title="Fallback ' + M(fallback) + '"></div>' : '') +
+    '<div class="zopen" style="left:' + pos(open).toFixed(1) + '%" title="Theo opening ' + M(open) + '"></div>' +
+    '<div class="zask ' + (over ? 'over' : 'ok') + '" style="left:calc(' + pos(ask).toFixed(1) + '% - 5px)" title="Supplier ask ' + M(ask) + '"></div>' +
+    (bench ? '<div class="zbench" style="left:' + pos(bench.value).toFixed(1) + '%" title="Market ' + M(bench.value) + ' (' + esc(bench.comparability) + ' comparability)"></div>' : '') +
+  '</div>';
+  const leg = '<div class="zlleg">' +
+    '<span class="zztgt">ZOPA ' + M(target) + ' to ' + M(walk) + '</span>' +
+    '<span>opening ' + M(open) + '</span>' +
+    '<span>fallback ' + M(fallback) + '</span>' +
+    (bench ? '<span>market ' + M(bench.value) + ' (' + esc(bench.comparability) + ')</span>'
+           : '<span class="znobench">no market benchmark in session</span>') +
+  '</div>';
+  const mktRow = bench
+    ? '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><b>' + M(bench.value) + '</b> - ' + esc(bench.note) + '. ' + esc(bench.raw) + ' · ' + esc(bench.comparability) + ' comparability ' + evidenceChip(bench.evidenceType, { sources: [bench.benchId] }) + '</span></div>'
+    : '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><span class="znobench">No market benchmark for this line in session</span> - no external comparison was available, so no market mark is drawn (no lo/hi band fabricated). ' + evidenceChip('unavailable') + '</span></div>';
+  const detail = '<div class="zdetail">' +
+    '<div class="zdrow"><span class="zdk">Price</span><span class="zdv">supplier ask <b>' + M(ask) + '</b> vs target ' + M(target) + ' · fallback ' + M(fallback) + ' · walk-away ' + M(walk) + ' ' + evidenceChip(l.evidenceType, { sources: l.sourceIds }) + '</span></div>' +
+    '<div class="zdrow"><span class="zdk">Theo opening</span><span class="zdv">open at <b>' + M(open) + '</b>, about ' + gap + '% below target, leaving room to settle at ' + M(target) + ' ' + evidenceChip('inference') + '</span></div>' +
+    mktRow +
+    '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + (over
+        ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
+        : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
+  '</div>';
+  return '<div class="zline"><div class="zlhd"><span class="zlname">' + esc(l.item) + '</span>' +
+    '<span class="zlask ' + (over ? 'over' : 'ok') + '">supplier ask ' + M(ask) + (over ? ' · above walk-away' : ' · within range') + '</span></div>' +
+    track + leg + detail + '</div>';
+}
+
+/* ---------- 3. total-deal ZOPA / TCO band -----------------------------------
+ * Whole-deal ask/target/walk totals from the 3-yr scenarios (SC-ask /
+ * SC-target / SC-max), fallback from SC-fallback; opening derived the same
+ * way as the per-line opening. No deal-level market benchmark exists in
+ * session -> honest gap-state. */
+function zopaTotalHTML(d) {
+  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {});
+  const askS = sc('SC-ask'), tgtS = sc('SC-target'), fbS = sc('SC-fallback'), maxS = sc('SC-max');
+  const askTot = askS.total || 0, tgtTot = tgtS.total || 0, walkTot = maxS.total || 0, fbTot = fbS.total || 0;
+  const openTot = Math.round(Math.max(tgtTot * 0.85, 2 * tgtTot - walkTot));
+  const over = askTot > walkTot, apart = Math.abs(askTot - tgtTot);
+  const gap = Math.round((1 - openTot / tgtTot) * 100);
+  const emp = assumVal(d, 'ASM-1', 18000), years = assumVal(d, 'ASM-2', 3);
+  const read = 'Supplier ask ' + M(askTot) + ' sits ' + (over ? 'above' : 'within') + ' the ' + M(walkTot) +
+    ' walk-away; the ' + M(tgtTot) + ' target anchors the deal (about ' + M(apart) + ' below ask). The platform subscription is the biggest lever.';
+  const band = '<div class="ztband">' +
+    '<span class="ztchip open">Theo opening ' + M(openTot) + '</span>' +
+    '<span class="ztchip tgt">Target ' + M(tgtTot) + '</span>' +
+    '<span class="ztarrow">to</span>' +
+    '<span class="ztchip walk">Walk-away ' + M(walkTot) + '</span>' +
+    '<span class="ztchip ' + (over ? 'over' : 'ok') + '">Supplier ask ' + M(askTot) + '</span>' +
+  '</div>';
+  const detail = '<div class="zdetail">' +
+    '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>' +
+    '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>' +
+    '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>' +
+    '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>' +
+    '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>' +
+  '</div>';
+  return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCO</span>' +
+    '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
+    band + detail + '</div>';
+}
+
+const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
+  '<span><i class="zlg zopa"></i>ZOPA (target to walk-away)</span>' +
+  '<span><i class="zlg tgt"></i>target</span>' +
+  '<span><i class="zlg walk"></i>walk-away</span>' +
+  '<span><i class="zlg fb"></i>fallback</span>' +
+  '<span><i class="zlg open"></i>Theo opening</span>' +
+  '<span><i class="zlg ask"></i>supplier ask (red = above walk-away)</span>' +
+  '<span><i class="zlg bench"></i>market benchmark (point)</span>' +
+'</div>';
+
+function renderZopaGantt(d) {
+  const lines = d.commercialLines || [];
+  if (!lines.length) return gapCard('No commercial lines in session', 'No line items to build a ZOPA from.');
+  return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
+}
+
+/* ---------- 4. public entry ------------------------------------------------- */
+function render(d) {
+  injectCss();
+  return '<div class="zopa-viz">' + renderZopaGantt(d) + '</div>';
+}
+
+global.DealZopa = { render: render };
+
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* =============================================================================
  * tab-brief.js, "Overview" tab (Tab 1 of the 4-tab redesign, DEAL-DESIGN-DECISION.md).
  * NO subtabs. Reads ONLY from dashboardData (param d); every fact is looked up
  * from the canonical model, never re-authored. Same issue/scenario/gap OBJECTS
  * the other tabs read; never re-typed (anti-drift by reference).
  *
- * 7 panels (top to bottom):
- *   1. Verdict block          (stance + 3 signature conditions + limitations)
- *   2. Deal snapshot          (key facts from d.deal)
- *   3. State-of-play digest   (who has the pen / last event / next move)
- *   4. Top-5 issues           (hard-stop first, off the issues[] spine)
- *   5. Commercial headline    (Y1 boundaries + 3-yr TCV ZOPA + BATNA floor)
- *   6. Next-actions timeline  (planning only, no assign/send)
- *   7. Evidence & gaps band   (coverage strip + top-5 gaps + full-register expanders;
- *                              compresses the old Sources & Gaps tab into one band)
+ * 7 panels, 4 rows (top to bottom):
+ *   Row 1: Deal snapshot / State-of-play digest / Next-actions timeline
+ *          (three equal columns; key facts, who has the pen, planning sequence)
+ *   Row 2: Recommendation / Top-5 issues
+ *          (stance + 3 signature conditions + limitations; hard-stop first, off the issues[] spine)
+ *   Row 3: Commercial headline + full ZOPA
+ *          (shared DealZopa render: per-line + total-deal ZOPA, plus BATNA floor)
+ *   Row 4: Evidence & gaps band
+ *          (coverage strip + top-5 gaps; full source inventory and impact-vs-ease
+ *           matrix now live in Terms & Review → Sources & Evidence)
  * ========================================================================== */
 (function (global) {
   'use strict';
@@ -2590,8 +2899,7 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
     const top5 = sorted.slice(0, 5);
     const cols = [
       { key: 'priority', label: '', width: '96px', sortVal: r => rankPriority[r.priority] || 0, render: r => severityPill(r.priority) },
-      { key: 'title', label: 'Issue', render: r => `<strong>${esc(r.title)}</strong><div class="tiny muted">${esc(r.category)} · ${esc(r.clause)}</div>` },
-      { key: 'ev', label: 'Evidence', width: '120px', sort: false, render: r => evidenceChip(r.evidenceType, { short: true, sources: r.sourceIds }) }
+      { key: 'title', label: 'Issue', render: r => `<strong>${esc(r.title)}</strong><div class="tiny muted">${esc(r.category)} · ${esc(r.clause)}</div>` }
     ];
     const table = dataTable(cols, top5, {
       id: 'ov-top-issues', zebra: true,
@@ -2615,67 +2923,15 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
 
   /* ============================= 5. COMMERCIAL HEADLINE + TOTAL-DEAL ZOPA ============================= */
   function buildCommercial(d) {
-    const scAsk = d.scenarios.find(s => s.id === 'SC-ask');
-    const scTarget = d.scenarios.find(s => s.id === 'SC-target');
-    const scFallback = d.scenarios.find(s => s.id === 'SC-fallback');
-    const scMax = d.scenarios.find(s => s.id === 'SC-max');
-    const maxY1 = Math.max(scAsk.y1Total, scTarget.y1Total, scFallback.y1Total, scMax.y1Total);
-    const maxTotal = Math.max(scAsk.total, scTarget.total, scFallback.total, scMax.total);
     const batna = d.negotiation.batna;
-    // The BATNA trigger text references the max-acceptable scenario figure directly
-    // ("...cannot be brought at or below the max-acceptable (~$2.80M)"); reuse SC-max.total
-    // rather than asserting a second, independently-typed number for the same walk-away line.
-    const batnaFloor = scMax.total;
-
-    const tcvGapEntry = d.deal.summaryStrip.find(s => s.key === 'tcvGap') ||
-      { label: 'Target vs ask (3-yr)', value: '—', evidenceType: 'calculated' };
-
-    function updateOverviewCommercialNumbers() {
-      const ask = d.scenarios.find(s => s.id === 'SC-ask');
-      const target = d.scenarios.find(s => s.id === 'SC-target');
-      const fallback = d.scenarios.find(s => s.id === 'SC-fallback');
-      const max = d.scenarios.find(s => s.id === 'SC-max');
-      const ids = {
-        'ov-y1-ask': ask.y1Total, 'ov-y1-target': target.y1Total, 'ov-y1-fallback': fallback.y1Total, 'ov-y1-max': max.y1Total,
-        'ov-tcv-target': target.total, 'ov-tcv-fallback': fallback.total, 'ov-tcv-max': max.total, 'ov-tcv-ask': ask.total
-      };
-      Object.keys(ids).forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = money(ids[id], { compact: true });
-      });
-    }
-    if (typeof DealUI !== 'undefined') DealUI.onRecalc(updateOverviewCommercialNumbers);
-
-    const y1Html =
-      barRow('Ask', scAsk.y1Total, maxY1, `<span id="ov-y1-ask">${money(scAsk.y1Total, { compact: true })}</span>`, { color: 'danger' }) +
-      barRow('Target', scTarget.y1Total, maxY1, `<span id="ov-y1-target">${money(scTarget.y1Total, { compact: true })}</span>`, { color: 'pri' }) +
-      barRow('Fallback', scFallback.y1Total, maxY1, `<span id="ov-y1-fallback">${money(scFallback.y1Total, { compact: true })}</span>`, { color: 'teal' }) +
-      barRow('Max acceptable', scMax.y1Total, maxY1, `<span id="ov-y1-max">${money(scMax.y1Total, { compact: true })}</span>`, { color: 'warn' });
-
-    const zopaHtml =
-      barRow('Target', scTarget.total, maxTotal, `<span id="ov-tcv-target">${money(scTarget.total, { compact: true })}</span>`, { color: 'pri' }) +
-      barRow('Fallback', scFallback.total, maxTotal, `<span id="ov-tcv-fallback">${money(scFallback.total, { compact: true })}</span>`, { color: 'teal' }) +
-      barRow('Max acceptable', scMax.total, maxTotal, `<span id="ov-tcv-max">${money(scMax.total, { compact: true })}</span>`, { color: 'warn' }) +
-      barRow('BATNA walk-away trigger', batnaFloor, maxTotal,
-        money(batnaFloor, { compact: true }) + ' ' + evidenceChip(batna.evidenceType, { short: true }), { color: 'warn' }) +
-      barRow('Ask', scAsk.total, maxTotal, `<span id="ov-tcv-ask">${money(scAsk.total, { compact: true })}</span>`, { color: 'danger' });
-
     const batnaNote = insight(
       (batna.hasRealAlternative ? 'A real alternative exists: ' : 'No real alternative exists: ') + esc(batna.alternative) +
       '. Cost of invoking it: ' + esc(batna.costDelta) + '. Trigger: ' + esc(batna.trigger),
       'warn'
     );
-
-    const html = `
-      <div class="eyebrow" style="margin-bottom:7px">Year-1 all-in by scenario</div>
-      ${y1Html}
-      <div class="card-note">${esc(tcvGapEntry.label)}: <strong class="mono">${esc(tcvGapEntry.value)}</strong> ${evidenceChip(tcvGapEntry.evidenceType, { short: true })}</div>
-      <div class="eyebrow" style="margin:14px 0 7px">Total-deal ZOPA (3-yr TCV)</div>
-      ${zopaHtml}
-      ${batnaNote}
-      ${insight('Ask is anchored on platform + support loading; target reflects the internal precedent discount and day-rate norms (see Economics → Benchmarks).')}
-    `;
-    return saCard('Commercial Headline & Total-Deal ZOPA', html, { accent: 'teal', icon: 'money' });
+    // Real per-line + Total-deal ZOPA, shared component (identical to Economics).
+    const zopa = (typeof window !== 'undefined' && window.DealZopa) ? window.DealZopa.render(d) : '';
+    return saCard('Commercial Headline & Total-Deal ZOPA', zopa + batnaNote, { accent: 'teal', icon: 'money' });
   }
 
   /* ============================= 6. NEXT-ACTIONS TIMELINE ============================= */
@@ -2703,7 +2959,7 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
     const header = '<div></div>' + areas.map(a => '<div class="hg-col">' + esc(a) + '</div>').join('');
     const cells = areas.map((a, i) =>
       `<button type="button" style="background:none;border:0;padding:0;cursor:pointer;display:flex;justify-content:center" ` +
-      `data-jump="tab:contract/sub:legal" title="${esc(a)}: ${counts[i]} verified source${counts[i] === 1 ? '' : 's'}">` +
+      `data-jump="tab:contract/sub:sources" title="${esc(a)}: ${counts[i]} verified source${counts[i] === 1 ? '' : 's'}">` +
       heatCell(counts[i], { scale: max, label: String(counts[i]) }) + `</button>`
     ).join('');
 
@@ -2730,43 +2986,12 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
       insight('Top 5 of ' + d.gaps.length + ' tracked gaps, ranked by priority then decision impact. Quick wins (high impact, easy to get) are worth chasing before the next draft.');
   }
 
-  // Expander 1: full source inventory register.
-  function buildFullSourceInventory(d) {
-    return dataTable([
-      { key: 'id', label: 'ID', width: '80px' },
-      { key: 'label', label: 'Source', render: r => `<strong>${esc(r.label)}</strong><div class="tiny muted">${esc(r.detail)}</div>` },
-      { key: 'kind', label: 'Kind', render: r => `<span style="text-transform:capitalize">${esc(r.kind)}</span>` },
-      { key: 'coverage', label: 'Areas', align: 'num', sortVal: r => r.coverage.length, render: r => String(r.coverage.length) },
-      { key: 'evidenceType', label: 'Evidence', render: r => evidenceChip(r.evidenceType, { short: true }) }
-    ], d.sources, {
-      id: 'ov-source-inventory', zebra: true,
-      expand: r => `<div class="kv"><dt>Coverage areas</dt><dd>${r.coverage.map(a => '<span class="tiny">' + esc(a) + '</span>').join(', ')}</dd>` +
-        `<dt>Detail</dt><dd>${esc(r.detail)}</dd><dt>Evidence</dt><dd>${evidenceChip(r.evidenceType)}</dd></div>`
-    });
-  }
-
-  // Expander 2: full impact-vs-ease missing-inputs matrix (all gaps, not just the top 5).
-  function buildFullGapsMatrix(d) {
-    const points = d.gaps.map(g => ({
-      x: g.ease, y: g.decisionImpact, label: g.id.replace('GAP-', ''),
-      color: g.priority === 'critical' ? 'danger' : g.priority === 'important' ? 'emph' : 'teal',
-      title: g.input + ' (' + g.priority + ') impact ' + g.decisionImpact + '/5, ease ' + g.ease + '/5'
-    }));
-    return matrixPlot(points, {
-      xLabel: 'Ease to obtain →', yLabel: 'Decision impact →', xMax: 5, yMax: 5,
-      quadrants: ['Hard, high stakes', 'Quick win: get first', 'Low priority', 'Easy, low value']
-    });
-  }
-
   function buildEvidenceGapsBand(d) {
     const html = `
       ${buildCoverageStrip(d)}
       <div class="eyebrow" style="margin:16px 0 7px">Top 5 critical gaps</div>
       ${buildTopGaps(d)}
-      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
-        ${collapsible('<span>Full source inventory (' + d.sources.length + ')</span>', buildFullSourceInventory(d))}
-        ${collapsible('<span>Impact vs. ease: all missing inputs (' + d.gaps.length + ')</span>', buildFullGapsMatrix(d))}
-      </div>
+      ${insight('The full source inventory (' + d.sources.length + ') and the impact vs. ease matrix for all ' + d.gaps.length + ' missing inputs now live in ' + jumpLink('Terms &amp; Review, Sources &amp; Evidence &rarr;', 'tab:contract/sub:sources') + '.')}
     `;
     return saCard('Evidence & Gaps', html, { icon: 'gap', sub: coverageBadge(d.deal.evidenceCoverage) });
   }
@@ -2783,18 +3008,18 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
       </div>
 
       <div class="grid">
-        <div class="col-8">${buildVerdict(d)}</div>
         <div class="col-4">${buildSnapshot(d)}</div>
-      </div>
-
-      <div class="grid" style="margin-top:16px">
         <div class="col-4">${buildStateOfPlay(d)}</div>
-        <div class="col-8">${buildTopIssues(d)}</div>
+        <div class="col-4">${buildNextActions(d)}</div>
       </div>
 
       <div class="grid" style="margin-top:16px">
-        <div class="col-6">${buildCommercial(d)}</div>
-        <div class="col-6">${buildNextActions(d)}</div>
+        <div class="col-7">${buildVerdict(d)}</div>
+        <div class="col-5">${buildTopIssues(d)}</div>
+      </div>
+
+      <div class="grid" style="margin-top:16px">
+        <div class="col-12">${buildCommercial(d)}</div>
       </div>
 
       <div class="grid" style="margin-top:16px">
@@ -2853,9 +3078,9 @@ function cap1(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.sli
 // here, not the old standalone "terms" subtab.
 const JUMP_LEGAL = 'tab:contract/sub:legal';
 const JUMP_MAP = 'tab:contract/sub:map';
-// The old standalone "Sources & Gaps" tab is folded into Overview's evidence &
-// gaps band (see tab-brief.js "Critical Unknowns"); jump there for gap detail.
-const JUMP_GAPS = 'tab:brief';
+// Deep gap/source detail now lives on THIS tab's Sources & Evidence subtab
+// (moved off Overview); every "view gap detail" jump points there.
+const JUMP_GAPS = 'tab:contract/sub:sources';
 
 function issueJump(id, priority) {
   return jumpLink(id, JUMP_LEGAL) + (priority ? ' ' + severityPill(priority) : '');
@@ -2865,116 +3090,196 @@ function issueJump(id, priority) {
  * SUBTAB 2A, Documents & Conflicts
  * ========================================================================== */
 function docNode(doc, isRoot) {
-  const missing = doc.evidenceType === 'unavailable';
+  const missing = doc.isMissing || doc.evidenceType === 'unavailable';
   const cls = 'ddm-child' + (missing ? ' ddm-missing' : '') + (isRoot ? ' ddm-rootbox' : '');
+  const skey = missing ? 'deviation' : (doc.active === 'Active' ? 'aligned' : 'pending');
   return '<div class="' + cls + '">' +
-    '<div class="ddm-role">' + esc(roleLabel(doc.role)) + '</div>' +
     '<div class="ddm-name">' + esc(doc.name) + '</div>' +
-    '<div class="ddm-meta">' + esc(doc.type) + (doc.pages ? ' &middot; ' + doc.pages + ' pp' : '') +
-      (doc.date ? ' &middot; ' + esc(doc.date) : '') + '</div>' +
-    '<div class="ddm-status">' + esc(doc.status) + '</div>' +
-    '<div class="ddm-bottom">' + evidenceChip(doc.evidenceType, { short:true, sources:[doc.id] }) + '</div>' +
+    '<div class="ddm-meta">' + esc(doc.type) + (doc.precedenceRank ? ' &middot; precedence ' + doc.precedenceRank : '') + '</div>' +
+    '<div class="ddm-bottom">' + statusPill(skey, doc.active) +
+      (doc.controlling ? ' <span class="tiny" style="color:var(--pri-tx);font-weight:700">Controlling</span>' : '') + '</div>' +
   '</div>';
 }
 
 function renderDocMap(d) {
   const docs = d.documents || [];
-  const root = docs.find(x => x.role === 'governing') || docs[0];
-  const children = docs.filter(x => x !== root);
-  const missingDocs = docs.filter(x => x.evidenceType === 'unavailable');
-  const conflicts = d.documentConflicts || [];
+  const root = docs.find(x => x.controlling) || docs.find(x => x.role === 'governing') || docs[0];
+  const inHierarchy = docs.filter(x => x !== root && x.role !== 'correspondence');
+  const missingDocs = docs.filter(x => x.isMissing);
+  const relMeta = d.documentRelevanceMeta || {};
 
+  /* ---- 1. Condensed relationship map (hierarchy only, no narrative blurbs) ---- */
   const treeHtml =
     '<div class="ddm-tree">' +
       '<div class="ddm-root">' + docNode(root, true) + '</div>' +
       '<div class="ddm-branch"></div>' +
-      '<div class="ddm-children">' + children.map(c => docNode(c, false)).join('') + '</div>' +
+      '<div class="ddm-children">' + inHierarchy.map(c => docNode(c, false)).join('') + '</div>' +
     '</div>';
+  const docMapCard = saCard('Document Relationship Map', treeHtml,
+    { icon:'doc', sub: esc(root.type) + ' governs ' + inHierarchy.filter(c => !c.isMissing).length + ' documents &middot; ' + missingDocs.length + ' referenced, not provided' });
 
-  const mapInsights =
-    insight(docs.length + ' documents make up this deal; <strong>' + missingDocs.length +
-      '</strong> (' + missingDocs.map(x => x.type).join(', ') + ') are referenced in the ' + esc(root.name) +
-      ' but were not provided in this session.', 'warn') +
-    insight('The MSA (' + esc(root.id) + ') is the sole governing instrument; the Order Form and SOW-01 operate under it. No amendments or Change Orders exist yet for this new agreement, so there are no term-evolution edges to show. That absence is honest, not a gap.', '');
-
-  const docMapCard = saCard('Document Relationship Map', treeHtml + mapInsights,
-    { icon:'doc', sub: docs.length + ' documents &middot; ' + missingDocs.length + ' unavailable' });
-
-  /* ---- Document family register ---- */
-  const invCols = [
-    { key:'id', label:'ID', width:'64px' },
-    { key:'name', label:'Document', render: r => '<strong>' + esc(r.name) + '</strong>' },
-    { key:'role', label:'Role', render: r => esc(roleLabel(r.role)) },
-    { key:'status', label:'Status', render: r => esc(r.status) },
-    { key:'date', label:'Date', render: r => r.date ? esc(r.date) : '&mdash;', sortVal: r => r.date || '' },
-    { key:'pages', label:'Pages', align:'num', render: r => r.pages != null ? r.pages : '&mdash;' },
-    { key:'evidence', label:'Evidence', sort:false, render: r => evidenceChip(r.evidenceType, { short:true, sources:[r.id] }) }
+  /* ---- 2. Document Family Register: ordered by precedence; carries executed /
+   * expiration / active + controlling and ONE Governing Terms & Precedence column;
+   * the referenced-but-missing components (DPA, Exhibit) are folded in as gap rows. ---- */
+  const ordered = docs.slice().sort((a, b) => precSort(a) - precSort(b));
+  const regCols = [
+    { key:'name', label:'Document', render: r => '<strong>' + esc(r.name) + '</strong><div class="tiny muted">' + esc(r.type) + '</div>' },
+    { key:'executedDate', label:'Executed', width:'116px', sortVal: r => r.executedDate || '', render: r => r.executedDate ? esc(r.executedDate) : '<span class="tiny muted">Not executed</span>' },
+    { key:'expirationDate', label:'Expiration', width:'106px', sortVal: r => r.expirationDate || '', render: r => r.expirationDate ? esc(r.expirationDate) : '<span class="tiny muted">&mdash;</span>' },
+    { key:'active', label:'Status', width:'176px', sortVal: r => r.active || '', render: r => statusPill(statusKey(r), r.active) + (r.controlling ? ' <strong style="color:var(--pri-tx);font-size:var(--fz-meta)">Controlling</strong>' : '') },
+    { key:'prec', label:'Governing terms & precedence', sort:false, render: r => precedenceCell(r) }
   ];
-  const invTable = dataTable(invCols, docs, {
-    zebra:true, dense:true, id:'tbl-doc-inventory',
+  const regTable = dataTable(regCols, ordered, {
+    zebra:true, dense:true, id:'tbl-doc-register',
+    rowClass: r => r.isMissing ? 'rowtint-warn' : '',
     expand: r => {
       const related = (r.relatedTo || []).map(id => { const rd = findDoc(id, d); return rd ? rd.type + ' (' + rd.id + ')' : id; }).join(', ');
       const lim = (r.limitations || []).length ? insight(esc(r.limitations.join(' ')), 'warn') : '';
-      return '<div class="kv"><dt>Source</dt><dd>' + esc(r.sourceType) + '</dd>' +
-        '<dt>Related to</dt><dd>' + (related || '&mdash;') + '</dd></div>' + lim;
+      const basis = r.precedenceBasis ? '<dt>Precedence basis</dt><dd>' + esc(r.precedenceBasis.text) + ' ' + evidenceChip(r.precedenceBasis.evidenceType, { short:true }) + '</dd>' : '';
+      return '<div class="kv">' +
+        '<dt>Relevance</dt><dd>' + cap1(r.relevance) + ': ' + esc(r.relevanceNote) + '</dd>' +
+        '<dt>Source</dt><dd>' + esc(r.sourceType) + '</dd>' +
+        '<dt>Related to</dt><dd>' + (related || '&mdash;') + '</dd>' +
+        basis +
+      '</div>' + lim +
+        (r.isMissing ? '<div class="btn-row">' + jumpLink('View gap detail &rarr;', JUMP_GAPS) + '</div>' : '');
     }
   });
-  const invNote = insight('No document-retention/records-schedule field is carried on this document set in this session. Retention class is not shown below (would render here once available). ' + evidenceChip('unavailable', { short:true }));
-  const invCard = saCard('Document Family Register', invTable + invNote, { icon:'sources', accent:'teal' });
+  const regNote =
+    insight('Rows are ordered by governing precedence. Precedence is our read of a standard MSA + Order Form + SOW structure; no express order-of-precedence clause appeared in the MSA v3 redline this session. ' + evidenceChip('inference', { short:true })) +
+    (relMeta.indirectPresent === false
+      ? insight('<strong>Direct relevance only.</strong> ' + esc(relMeta.indirectNote) + ' ' + evidenceChip(relMeta.evidenceType || 'unavailable', { short:true }))
+      : '');
+  const regCard = saCard('Document Family Register', regTable + regNote,
+    { icon:'sources', accent:'teal', sub: docs.length + ' documents, by precedence' });
 
-  /* ---- Governing terms & precedence ---- */
-  const precRows = docs.map(doc =>
-    '<dt>' + esc(roleLabel(doc.role)) + '</dt><dd><strong>' + esc(doc.type) + '</strong> &mdash; ' + esc(doc.name) +
-      (doc.evidenceType === 'unavailable' ? ' ' + evidenceChip('unavailable', { short:true }) : '') + '</dd>').join('');
-  const precInner = '<dl class="kv">' + precRows + '</dl>' +
-    insight('Precedence inferred from each document’s stated role (governing &rarr; ordering/scope &rarr; data/security); ' +
-      'no explicit order-of-precedence clause appeared in the reviewed text. ' + evidenceChip('inference', { short:true }));
-  const precCard = saCard('Governing Terms & Precedence', precInner, { icon:'scale', accent:'emph' });
+  /* ---- 3. Cross-document conflicts & gaps (redesigned; renderConflicts below) ---- */
+  const conflictsCard = renderConflicts(d);
 
-  /* ---- Cross-document consistency / conflicts. BUG FIX: reads d.documentConflicts[],
-   * never a hardcoded array. relation: 'conflict' | 'changed-by' | 'gap'. ---- */
-  const RELATION_LABEL = { conflict:'Conflict check', 'changed-by':'Changed by', gap:'Gap (missing doc)' };
-  const crossCols = [
-    { key:'docs', label:'Documents', sort:false, render: r => docTypeOf(r.docA, d) + ' &harr; ' + docTypeOf(r.docB, d) },
-    { key:'relation', label:'Dimension', render: r => esc(RELATION_LABEL[r.relation] || r.relation) },
-    { key:'topic', label:'Topic', sort:false, render: r => r.topic },
-    { key:'consistency', label:'Consistency', render: r => r.consistent ? statusPill('aligned','Aligned') : statusPill('deviation','Gap'), sortVal: r => r.consistent ? 1 : 0 },
-    { key:'issue', label:'Linked issue', sort:false, render: r => r.issueId ? issueJump(r.issueId, (d.issues.find(i=>i.id===r.issueId)||{}).priority) : '&mdash;' },
-    { key:'evidence', label:'Evidence', sort:false, render: r => evidenceChip(r.evidenceType, { short:true }) },
-    { key:'note', label:'Note', sort:false, render: r => '<span class="tiny muted">' + esc(r.note) + '</span>' }
-  ];
-  const crossTable = dataTable(crossCols, conflicts, { zebra:true, dense:true, id:'tbl-crossdoc' });
-  const gapRelCount = conflicts.filter(c => !c.consistent).length;
-  const crossInsights =
-    insight('<strong>' + gapRelCount + '</strong> of ' + conflicts.length + ' cross-document checks are not consistent. Every one of them is a <strong>gap created by a missing exhibit</strong> (the DPA or the Security Exhibit), not a contradiction between documents that ARE in session.', gapRelCount ? 'warn' : '') +
-    insight('No directly contradicting clause language was found between the three present documents (MSA, SOW-01, Order Form).');
-  const crossCard = saCard('Cross-Document Consistency & Conflicts', crossTable + crossInsights,
-    { icon:'scale', sub: conflicts.length + ' checks' });
-
-  /* ---- Missing documents (gapCards) ---- */
-  const missingHtml = missingDocs.map(md => {
-    const gap = gapForDocId(md.id, d);
-    const body = '<div class="kv" style="margin-bottom:6px">' +
-      '<dt>Referenced at</dt><dd>' + esc(md.sourceType) + '</dd>' +
-      (gap ? '<dt>Why it matters</dt><dd>' + esc(gap.whyItMatters) + '</dd>' +
-             '<dt>Possible source</dt><dd>' + esc(gap.possibleSource) + '</dd>' : '') +
-      '</div>' +
-      (md.limitations || []).map(l => '<div class="tiny muted">' + esc(l) + '</div>').join('') +
-      '<div style="margin-top:6px">' + evidenceChip('unavailable') + ' ' +
-      jumpLink('View in Critical Unknowns →', JUMP_GAPS) + '</div>';
-    return gapCard(md.type + ', ' + md.name, body);
-  }).join('<div class="divider"></div>');
-  const missingCard = saCard('Missing Documents', missingHtml || '<div class="card-note">No referenced documents are missing.</div>',
-    { icon:'gap', accent:'danger', sub: missingDocs.length + ' unavailable' });
-
-  return '<div class="tab-intro"><h2>Documents &amp; Conflicts</h2><p class="q">Inventory, relationship structure, governing precedence and cross-document gaps for the MSA + SOW-01 + Order Form set. ' +
+  return '<div class="tab-intro"><h2>Documents &amp; Conflicts</h2><p class="q">The document family for this deal, ordered by governing precedence, and the cross-document gaps still to resolve. ' +
     coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + docMapCard + '</div>' +
-      '<div class="col-8">' + invCard + '</div>' +
-      '<div class="col-4">' + precCard + '</div>' +
-      '<div class="col-7">' + crossCard + '</div>' +
-      '<div class="col-5">' + missingCard + '</div>' +
+      '<div class="col-12">' + regCard + '</div>' +
+      '<div class="col-12">' + conflictsCard + '</div>' +
+    '</div>';
+}
+
+/* ---- precedence helpers for the register (order the rows + render the one column) ---- */
+function precSort(doc) {
+  if (doc.precedenceRank) return doc.precedenceRank;   // 1,2,3 for the ranked contracts
+  return doc.isMissing ? 90 : 99;                      // missing components, then correspondence, last
+}
+function statusKey(doc) {
+  if (doc.isMissing) return 'deviation';
+  if (doc.active === 'Active') return 'aligned';
+  if (doc.active === 'In negotiation' || doc.active === 'Draft') return 'pending';
+  return 'muted';
+}
+function precedenceCell(doc) {
+  if (doc.precedenceRank) {
+    const role = doc.controlling ? 'Controlling master' : 'Operates under the MSA';
+    return '<strong>' + doc.precedenceRank + '</strong> <span class="tiny muted">' + role + '</span> ' +
+      evidenceChip((doc.precedenceBasis && doc.precedenceBasis.evidenceType) || 'inference', { short:true });
+  }
+  if (doc.isMissing) return '<span class="tiny muted">Referenced component, rank pending</span> ' + evidenceChip('unavailable', { short:true });
+  return '<span class="tiny muted">Supporting, not governing</span>';
+}
+
+/* ============================================================================
+ * Cross-document conflicts & gaps (redesigned). Surfaces ONLY rows tagged with a
+ * trigger (active-conflict | risk | gap); fully-consistent checks are excluded.
+ * Purpose: flag unresolved gaps + (once they exist) trace term changes across versions.
+ * ========================================================================== */
+const TRIGGER_META = {
+  'active-conflict': { key:'danger', label:'Active conflict', rank:3 },
+  risk:              { key:'warn',   label:'Risk',            rank:2 },
+  gap:               { key:'warn',   label:'Gap',             rank:1 }
+};
+function renderConflicts(d) {
+  const all = d.documentConflicts || [];
+  const shown = all.filter(c => c.trigger).slice().sort((a, b) =>
+    ((TRIGGER_META[b.trigger] || {}).rank || 0) - ((TRIGGER_META[a.trigger] || {}).rank || 0));
+  const excluded = all.length - shown.length;
+  const trigPill = t => { const m = TRIGGER_META[t] || { key:'muted', label:t }; return '<span class="pill ' + m.key + '">' + m.label + '</span>'; };
+  const cols = [
+    { key:'trigger', label:'Trigger', width:'128px', sortVal: r => (TRIGGER_META[r.trigger] || {}).rank || 0, render: r => trigPill(r.trigger) },
+    { key:'topic', label:'Term / clause', render: r => '<strong>' + esc(r.topic) + '</strong>' },
+    { key:'docs', label:'Documents', sort:false, render: r => docTypeOf(r.docA, d) + ' &harr; ' + docTypeOf(r.docB, d) },
+    { key:'note', label:'What is unresolved', sort:false, render: r => '<span class="tiny">' + esc(r.note) + '</span>' },
+    { key:'issue', label:'Linked finding', sort:false, render: r => r.issueId ? issueJump(r.issueId, (d.issues.find(i => i.id === r.issueId) || {}).priority) : '&mdash;' }
+  ];
+  const table = shown.length
+    ? dataTable(cols, shown, { zebra:true, dense:true, id:'tbl-crossdoc' })
+    : gapCard('No active conflicts, risks, or gaps', 'Every cross-document check in session is consistent; nothing to raise.');
+  const gapCount = shown.filter(c => c.trigger === 'gap').length;
+  const insights =
+    insight('<strong>' + shown.length + '</strong> of ' + all.length + ' cross-document checks need resolving' +
+      (shown.length && gapCount === shown.length ? '; all ' + shown.length + ' are <strong>gaps from the two missing exhibits</strong> (DPA, Security Exhibit), not contradictions between documents in session' : '') +
+      '. The ' + excluded + ' fully-consistent checks are not shown. ' + evidenceChip('unavailable', { short:true }), shown.length ? 'warn' : '') +
+    insight('No term-modification history to trace yet: this is a new MSA with no amendments or change orders, and the one version step in session (MSA v2 to v3) held the liability cap unchanged. A row will appear here once a term actually changes across versions.');
+  return saCard('Cross-Document Conflicts & Gaps', table + insights, { icon:'scale', sub: shown.length + ' to resolve' });
+}
+
+/* ============================================================================
+ * SUBTAB 2D, Sources & Evidence, the full evidence ledger moved off Overview
+ * (source inventory + impact-vs-ease matrix + full missing-inputs register).
+ * ========================================================================== */
+function renderSourceInventory(d) {
+  return dataTable([
+    { key:'id', label:'ID', width:'80px' },
+    { key:'label', label:'Source', render: r => '<strong>' + esc(r.label) + '</strong><div class="tiny muted">' + esc(r.detail) + '</div>' },
+    { key:'kind', label:'Kind', render: r => '<span style="text-transform:capitalize">' + esc(r.kind) + '</span>' },
+    { key:'coverage', label:'Areas', align:'num', sortVal: r => r.coverage.length, render: r => String(r.coverage.length) },
+    { key:'evidenceType', label:'Evidence', render: r => evidenceChip(r.evidenceType, { short:true }) }
+  ], d.sources || [], {
+    id:'tc-source-inventory', zebra:true,
+    expand: r => '<div class="kv"><dt>Coverage areas</dt><dd>' + (r.coverage || []).map(a => '<span class="tiny">' + esc(a) + '</span>').join(', ') + '</dd>' +
+      '<dt>Detail</dt><dd>' + esc(r.detail) + '</dd><dt>Evidence</dt><dd>' + evidenceChip(r.evidenceType) + '</dd></div>'
+  });
+}
+function renderGapsMatrix(d) {
+  const points = (d.gaps || []).map(g => ({
+    x: g.ease, y: g.decisionImpact, label: g.id.replace('GAP-', ''),
+    color: g.priority === 'critical' ? 'danger' : g.priority === 'important' ? 'emph' : 'teal',
+    title: g.input + ' (' + g.priority + ') impact ' + g.decisionImpact + '/5, ease ' + g.ease + '/5'
+  }));
+  return matrixPlot(points, {
+    xLabel: 'Ease to obtain →', yLabel: 'Decision impact →', xMax: 5, yMax: 5,
+    quadrants: ['Hard, high stakes', 'Quick win: get first', 'Low priority', 'Easy, low value']
+  });
+}
+function renderAllGapsTable(d) {
+  const rank = { critical:3, important:2, helpful:1 };
+  const gaps = (d.gaps || []).slice().sort((a, b) => {
+    const pr = (rank[b.priority] || 0) - (rank[a.priority] || 0);
+    return pr !== 0 ? pr : (b.decisionImpact || 0) - (a.decisionImpact || 0);
+  });
+  const cols = [
+    { key:'id', label:'ID', width:'74px' },
+    { key:'input', label:'Missing input', render: r => '<strong>' + esc(r.input) + '</strong><div class="tiny muted">' + esc(r.whyItMatters) + '</div>' },
+    { key:'priority', label:'Priority', width:'98px', sortVal: r => rank[r.priority] || 0, render: r => '<span class="pill ' + (r.priority === 'critical' ? 'danger' : r.priority === 'important' ? 'warn' : 'muted') + '">' + esc(r.priority) + '</span>' },
+    { key:'impact', label:'Impact', width:'86px', align:'num', sortVal: r => r.decisionImpact, render: r => heatCell(r.decisionImpact, { scale:5, label:r.decisionImpact, title:'Decision impact ' + r.decisionImpact + '/5' }) },
+    { key:'ease', label:'Ease', width:'80px', align:'num', sortVal: r => r.ease, render: r => heatCell(r.ease, { scale:5, label:r.ease, title:'Ease ' + r.ease + '/5' }) },
+    { key:'src', label:'Possible source', sort:false, render: r => '<span class="tiny muted">' + esc(r.possibleSource || '') + '</span>' }
+  ];
+  return dataTable(cols, gaps, { id:'tc-all-gaps', zebra:true, dense:true });
+}
+function renderSourcesEvidence(d) {
+  const invCard = saCard('Source Inventory',
+    renderSourceInventory(d) + insight('All ' + (d.sources || []).length + ' sources behind this analysis, with the count of analysis areas each one covers. Expand a row for its coverage detail.'),
+    { icon:'sources', accent:'teal', sub: (d.sources || []).length + ' sources' });
+  const matrixCard = saCard('Missing Inputs, Impact vs. Ease', renderGapsMatrix(d),
+    { icon:'gap', sub: (d.gaps || []).length + ' gaps' });
+  const gapsCard = saCard('All Missing Inputs',
+    renderAllGapsTable(d) + insight('The full gap register (Overview shows only the top 5). Quick wins, high decision impact and easy to obtain, are worth closing before the next draft.'),
+    { icon:'flag', accent:'emph', sub: (d.gaps || []).length + ' tracked' });
+  return '<div class="tab-intro"><h2>Sources &amp; Evidence</h2><p class="q">The full evidence ledger behind this deal: every source, and every missing input with how much it would move the decision. ' +
+    coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
+    '<div class="grid">' +
+      '<div class="col-12">' + invCard + '</div>' +
+      '<div class="col-5">' + matrixCard + '</div>' +
+      '<div class="col-7">' + gapsCard + '</div>' +
     '</div>';
 }
 
@@ -3409,12 +3714,12 @@ function renderScopePerf(d) {
  * ========================================================================== */
 const CONTRACT_STYLE =
   '<style>' +
-  '.contract-tab .ddm-tree{padding:16px 6px 30px}' +
+  '.contract-tab .ddm-tree{padding:10px 6px 16px}' +
   '.contract-tab .ddm-root{display:flex;justify-content:center}' +
   '.contract-tab .ddm-branch{width:2px;height:20px;background:var(--line2);margin:0 auto}' +
   '.contract-tab .ddm-children{position:relative;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:16px}' +
   '.contract-tab .ddm-children::before{content:"";position:absolute;top:0;left:12%;right:12%;height:2px;background:var(--line2)}' +
-  '.contract-tab .ddm-child{position:relative;flex:1 1 160px;max-width:200px;background:var(--surface);border:1px solid var(--line2);' +
+  '.contract-tab .ddm-child{position:relative;flex:1 1 128px;max-width:168px;background:var(--surface);border:1px solid var(--line2);' +
     'border-radius:var(--r-sm);padding:10px 12px;box-shadow:var(--shadow-1)}' +
   '.contract-tab .ddm-child::before{content:"";position:absolute;top:-16px;left:50%;width:2px;height:16px;background:var(--line2)}' +
   '.contract-tab .ddm-child.ddm-missing{background:var(--panel);border-style:dashed}' +
@@ -3444,11 +3749,13 @@ function renderTab_contract(d) {
       '<button class="subtab-btn" data-subtab="map" aria-selected="true">Documents &amp; Conflicts</button>' +
       '<button class="subtab-btn" data-subtab="legal" aria-selected="false">Legal &amp; Protection</button>' +
       '<button class="subtab-btn" data-subtab="scope" aria-selected="false">Scope &amp; Performance</button>' +
+      '<button class="subtab-btn" data-subtab="sources" aria-selected="false">Sources &amp; Evidence</button>' +
     '</div></div>' +
     '<div class="tab-body"><div class="wrap">' +
       '<div data-subpanel="contract/map" class="is-active">' + renderDocMap(d) + '</div>' +
       '<div data-subpanel="contract/legal">' + renderLegalProtection(d) + '</div>' +
       '<div data-subpanel="contract/scope">' + renderScopePerf(d) + '</div>' +
+      '<div data-subpanel="contract/sources">' + renderSourcesEvidence(d) + '</div>' +
     '</div></div>' +
   '</div>';
 }
@@ -3490,14 +3797,14 @@ global.DealTabs.contract = renderTab_contract;
 (function (global) {
 'use strict';
 
-/* ---------- 0. local utils (helpers.js owns the exported API) ------------- */
-function clampp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+/* ---------- 0. local utils (helpers.js owns the exported API) -------------
+ * clampp / assumVal / M / benchForLine used to live here too, but they are
+ * used by BOTH this file and the ZOPA render, so they now live in
+ * helpers.js as globals (see the ZOPA extraction to zopa.js, 2026-07-23) and
+ * are referenced here unqualified, same as esc/evidenceChip/money always were. */
 function sumF(arr, f) { return (arr || []).reduce((s, x) => s + (f(x) || 0), 0); }
 function findLine(d, id) { return (d.commercialLines || []).find(l => l.id === id) || {}; }
 function findIssue(d, id) { return (d.issues || []).find(i => i.id === id); }
-function assumVal(d, id, fb) { const a = (d.assumptions || []).find(x => x.id === id); return a ? a.value : fb; }
-// compact money with a clean minus sign (helpers' money() renders "$-350K")
-function M(n) { if (n == null || isNaN(n)) return '—'; return (n < 0 ? '−' : '') + money(Math.abs(n), { compact: true }); }
 function setText(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
 
 // THE only live calculation on this tab. Discounts each year at period i+1, the
@@ -3526,13 +3833,8 @@ function matPill(m) {
 }
 
 /* ---------- 1. 3A, DEAL TABLE & ZOPA ------------------------------------- */
-// benchmark -> line mapping (BENCH-int is the platform $/emp figure = CL-1;
-// BENCH-svc is the implementation day-rate = CL-2). No line link in the data.
-function benchForLine(d, id) {
-  const map = { 'CL-1': 'BENCH-int', 'CL-2': 'BENCH-svc' };
-  const bid = map[id];
-  return bid ? (d.benchmarks || []).find(b => b.id === bid) : null;
-}
+// benchForLine(d, id) now lives in helpers.js (global): used here by
+// benchChip AND by zopa.js's zopaBenchForLine, so one copy serves both.
 function benchChip(d, id) {
   const b = benchForLine(d, id);
   return b ? '<span class="jump" data-jump="el:' + esc(b.id) + '" title="' + esc(b.item) + '">' + esc(b.comparability) + '</span>'
@@ -3558,130 +3860,12 @@ function renderDealTable(d) {
         ' <span class="tiny muted">ask is a contract figure; target / fallback / max are calculated positions</span></dd></div>'
   });
 }
-/* --- Rich per-line ZOPA (ported from the platform pv-11 zopaGanttHTML / zopaTcoBand):
- * a horizontal track per line showing the ZOPA zone (target -> walk-away) as a teal band,
- * with positioned marks for target, walk-away, fallback, Theo's opening (burnt-orange) and
- * the supplier ask (plum; red only when it sits above walk-away), plus the matched market
- * benchmark as an ink POINT tick. We hold POINT benchmarks, not a market lo/hi band, so a
- * single market tick is drawn and NEVER a fabricated range; lines with no comp say so. --- */
-
-// Derive the line-level market POINT from the benchmark's OWN stated figures (transparent,
-// no fragile string parsing). CL-1 -> BENCH-int (2024 precedent ~$37/emp/yr, scaled to the
-// employee basis); CL-2 -> BENCH-svc (implementation at the $1,500-1,750/day norm midpoint
-// vs the ~$2,000/day ask). The raw comparisonValue + comparability are surfaced verbatim.
-function zopaBenchForLine(d, l) {
-  const b = benchForLine(d, l.id);
-  if (!b) return null;
-  let value = null, note = '';
-  if (l.id === 'CL-1') {
-    const emp = l.quantity || assumVal(d, 'ASM-1', 18000);
-    value = 37 * emp;                                     // ~$37/emp/yr 2024 precedent x employee basis
-    note = '~$37/employee/yr 2024 precedent x ' + emp.toLocaleString('en-US') + ' employees';
-  } else if (l.id === 'CL-2') {
-    value = Math.round(l.supplierAmount * 1625 / 2000);   // $1,625/day norm midpoint vs the ~$2,000/day ask
-    note = '$1,625/day norm midpoint vs the ' + esc('≈$2,000') + '/day ask';
-  } else {
-    return null;                                          // no numeric derivation available -> no comp
-  }
-  return { value: value, note: note, benchId: b.id, comparability: b.comparability, raw: b.comparisonValue, explanation: b.explanation, evidenceType: b.evidenceType };
-}
-
-function zopaLineHTML(d, l) {
-  const ask = l.supplierAmount, target = l.target, walk = l.maximumAcceptable, fallback = l.fallback;
-  // Theo opening: anchor aggressively but credibly BELOW target so there is room to settle
-  // up; = target-(walk-target), floored at 15% under target since we hold no market low.
-  const open = Math.round(Math.max(target * 0.85, 2 * target - walk));
-  const over = ask > walk;                  // supplier ask above our walk-away -> the ONLY red trigger
-  const bench = zopaBenchForLine(d, l);
-  // Scale = the negotiation span (opening -> ask), plus the benchmark point when present.
-  // No fabricated market band: only the marks we actually hold are placed on the track.
-  const vals = [open, target, walk, ask, fallback];
-  if (bench) vals.push(bench.value);
-  let min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
-  const pad = (max - min) * 0.08 || 1; min -= pad; max += pad;
-  const span = (max - min) || 1;
-  const pos = v => clampp((v - min) / span * 100, 0, 100);
-  const gap = Math.round((1 - open / target) * 100);
-  const track = '<div class="ztrack">' +
-    '<div class="zaxis"></div>' +
-    '<div class="zzopa" style="left:' + pos(target).toFixed(1) + '%;width:' + Math.max(pos(walk) - pos(target), 0).toFixed(1) + '%" title="ZOPA ' + M(target) + ' to ' + M(walk) + '"></div>' +
-    '<div class="ztgt" style="left:' + pos(target).toFixed(1) + '%" title="Target ' + M(target) + '"></div>' +
-    '<div class="zwalk" style="left:' + pos(walk).toFixed(1) + '%" title="Walk-away ' + M(walk) + '"></div>' +
-    (fallback != null ? '<div class="zfb" style="left:' + pos(fallback).toFixed(1) + '%" title="Fallback ' + M(fallback) + '"></div>' : '') +
-    '<div class="zopen" style="left:' + pos(open).toFixed(1) + '%" title="Theo opening ' + M(open) + '"></div>' +
-    '<div class="zask ' + (over ? 'over' : 'ok') + '" style="left:calc(' + pos(ask).toFixed(1) + '% - 5px)" title="Supplier ask ' + M(ask) + '"></div>' +
-    (bench ? '<div class="zbench" style="left:' + pos(bench.value).toFixed(1) + '%" title="Market ' + M(bench.value) + ' (' + esc(bench.comparability) + ' comparability)"></div>' : '') +
-  '</div>';
-  const leg = '<div class="zlleg">' +
-    '<span class="zztgt">ZOPA ' + M(target) + ' to ' + M(walk) + '</span>' +
-    '<span>opening ' + M(open) + '</span>' +
-    '<span>fallback ' + M(fallback) + '</span>' +
-    (bench ? '<span>market ' + M(bench.value) + ' (' + esc(bench.comparability) + ')</span>'
-           : '<span class="znobench">no market benchmark in session</span>') +
-  '</div>';
-  const mktRow = bench
-    ? '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><b>' + M(bench.value) + '</b> - ' + esc(bench.note) + '. ' + esc(bench.raw) + ' · ' + esc(bench.comparability) + ' comparability ' + evidenceChip(bench.evidenceType, { sources: [bench.benchId] }) + '</span></div>'
-    : '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><span class="znobench">No market benchmark for this line in session</span> - no external comparison was available, so no market mark is drawn (no lo/hi band fabricated). ' + evidenceChip('unavailable') + '</span></div>';
-  const detail = '<div class="zdetail">' +
-    '<div class="zdrow"><span class="zdk">Price</span><span class="zdv">supplier ask <b>' + M(ask) + '</b> vs target ' + M(target) + ' · fallback ' + M(fallback) + ' · walk-away ' + M(walk) + ' ' + evidenceChip(l.evidenceType, { sources: l.sourceIds }) + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Theo opening</span><span class="zdv">open at <b>' + M(open) + '</b>, about ' + gap + '% below target, leaving room to settle at ' + M(target) + ' ' + evidenceChip('inference') + '</span></div>' +
-    mktRow +
-    '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + (over
-        ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
-        : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
-  '</div>';
-  return '<div class="zline"><div class="zlhd"><span class="zlname">' + esc(l.item) + '</span>' +
-    '<span class="zlask ' + (over ? 'over' : 'ok') + '">supplier ask ' + M(ask) + (over ? ' · above walk-away' : ' · within range') + '</span></div>' +
-    track + leg + detail + '</div>';
-}
-
-// Total-deal ZOPA / TCO band: whole-deal ask/target/walk totals from the 3-yr scenarios
-// (SC-ask / SC-target / SC-max), fallback from SC-fallback; opening derived the same way as
-// the per-line opening. No deal-level market benchmark exists in session -> honest gap-state.
-function zopaTotalHTML(d) {
-  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {});
-  const askS = sc('SC-ask'), tgtS = sc('SC-target'), fbS = sc('SC-fallback'), maxS = sc('SC-max');
-  const askTot = askS.total || 0, tgtTot = tgtS.total || 0, walkTot = maxS.total || 0, fbTot = fbS.total || 0;
-  const openTot = Math.round(Math.max(tgtTot * 0.85, 2 * tgtTot - walkTot));
-  const over = askTot > walkTot, apart = Math.abs(askTot - tgtTot);
-  const gap = Math.round((1 - openTot / tgtTot) * 100);
-  const emp = assumVal(d, 'ASM-1', 18000), years = assumVal(d, 'ASM-2', 3);
-  const read = 'Supplier ask ' + M(askTot) + ' sits ' + (over ? 'above' : 'within') + ' the ' + M(walkTot) +
-    ' walk-away; the ' + M(tgtTot) + ' target anchors the deal (about ' + M(apart) + ' below ask). The platform subscription is the biggest lever.';
-  const band = '<div class="ztband">' +
-    '<span class="ztchip open">Theo opening ' + M(openTot) + '</span>' +
-    '<span class="ztchip tgt">Target ' + M(tgtTot) + '</span>' +
-    '<span class="ztarrow">to</span>' +
-    '<span class="ztchip walk">Walk-away ' + M(walkTot) + '</span>' +
-    '<span class="ztchip ' + (over ? 'over' : 'ok') + '">Supplier ask ' + M(askTot) + '</span>' +
-  '</div>';
-  const detail = '<div class="zdetail">' +
-    '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>' +
-    '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>' +
-  '</div>';
-  return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCO</span>' +
-    '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
-    band + detail + '</div>';
-}
-
-const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
-  '<span><i class="zlg zopa"></i>ZOPA (target to walk-away)</span>' +
-  '<span><i class="zlg tgt"></i>target</span>' +
-  '<span><i class="zlg walk"></i>walk-away</span>' +
-  '<span><i class="zlg fb"></i>fallback</span>' +
-  '<span><i class="zlg open"></i>Theo opening</span>' +
-  '<span><i class="zlg ask"></i>supplier ask (red = above walk-away)</span>' +
-  '<span><i class="zlg bench"></i>market benchmark (point)</span>' +
-'</div>';
-
-function renderZopaGantt(d) {
-  const lines = d.commercialLines || [];
-  if (!lines.length) return gapCard('No commercial lines in session', 'No line items to build a ZOPA from.');
-  return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
-}
+/* --- Rich per-line ZOPA + total-deal ZOPA/TCO band now live in zopa.js
+ * (window.DealZopa.render(d)), so the Economics tab and the Overview tab can
+ * render byte-identical output. See zopa.js for zopaBenchForLine /
+ * zopaLineHTML / zopaTotalHTML / ZOPA_BOTTOM_LEGEND / renderZopaGantt and
+ * the .zopa-viz CSS (moved from this file's scoped <style> block below,
+ * 2026-07-23 extraction). --- */
 function renderDealTotals(d) {
   const lines = d.commercialLines || [];
   const askY1 = sumF(lines, l => l.supplierAmount), tgtY1 = sumF(lines, l => l.target), maxY1 = sumF(lines, l => l.maximumAcceptable);
@@ -3972,7 +4156,7 @@ function renderTab_commercials(d) {
     '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">One normalized view of every commercial line, supplier ask against Lilly’s target, fallback and walk-away, with the per-line zone of possible agreement. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + saCard('Deal Table, Normalized Line Items', renderDealTable(d) + renderDealTotals(d), { accent: 'plum', icon: 'money', sub: (d.commercialLines || []).length + ' lines' }) + '</div>' +
-      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing &amp; Benchmarks', renderZopaGantt(d), { accent: 'plum', icon: 'target', sub: 'target → walk-away · Theo opening · supplier ask · benchmark' }) + '</div>' +
+      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing &amp; Benchmarks', window.DealZopa.render(d), { accent: 'plum', icon: 'target', sub: 'target → walk-away · Theo opening · supplier ask · benchmark' }) + '</div>' +
       '<div class="col-7">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-5">' + renderRenewalBand(d) + '</div>' +
     '</div>' +
@@ -4005,57 +4189,9 @@ function renderTab_commercials(d) {
   /* ---- scoped styles (only what the base system does not provide) ---- */
   const scopedStyle = '<style>' +
     '.commercials-tab .subtab-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:-2px;margin-right:2px}' +
-    /* rich per-line ZOPA tracks + Total-deal TCO band (ported from platform pv-11, palette-remapped:
-       ZOPA zone = teal, our target/walk/fallback = plum family, opening = burnt-orange, ask = plum
-       or red only when above walk-away, benchmark = neutral ink point). Prefixed so they do not
-       collide with the platform bundle's own .zline/.ztrack classes. */
-    '.commercials-tab .zline{margin:0 0 16px}' +
-    '.commercials-tab .zline:last-of-type{margin-bottom:8px}' +
-    '.commercials-tab .zlhd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:7px}' +
-    '.commercials-tab .zlname{font-weight:700;font-size:var(--fz-sm);color:var(--ink)}' +
-    '.commercials-tab .zlask{font-size:var(--fz-floor);font-weight:700}' +
-    '.commercials-tab .zlask.over{color:var(--danger)}' +
-    '.commercials-tab .zlask.ok{color:var(--teal-d)}' +
-    '.commercials-tab .ztrack{position:relative;height:30px;margin:2px 0}' +
-    '.commercials-tab .zaxis{position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:var(--line2);border-radius:2px}' +
-    '.commercials-tab .zzopa{position:absolute;top:50%;transform:translateY(-50%);height:16px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:4px}' +
-    '.commercials-tab .ztgt,.commercials-tab .zwalk{position:absolute;top:calc(50% - 11px);width:2px;height:22px;background:var(--plum)}' +
-    '.commercials-tab .zwalk{opacity:.5}' +
-    '.commercials-tab .zfb{position:absolute;top:calc(50% - 7px);height:14px;border-left:2px dotted var(--plum);opacity:.75}' +
-    '.commercials-tab .zopen{position:absolute;top:calc(50% - 6px);width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--surface);border:2px solid var(--emph);box-sizing:border-box}' +
-    '.commercials-tab .zask{position:absolute;top:calc(50% - 14px);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
-    '.commercials-tab .zask.over{border-top-color:var(--danger)}' +
-    '.commercials-tab .zbench{position:absolute;top:calc(50% - 12px);width:2px;height:24px;background:var(--ink2)}' +
-    '.commercials-tab .zlleg{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:6px}' +
-    '.commercials-tab .zlleg .zztgt{color:var(--teal-d);font-weight:700}' +
-    '.commercials-tab .znobench{color:var(--mut2);font-style:italic}' +
-    '.commercials-tab .zdetail{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line2);display:grid;gap:5px}' +
-    '.commercials-tab .zdrow{display:flex;gap:10px;font-size:var(--fz-sm);line-height:1.45}' +
-    '.commercials-tab .zdk{flex:0 0 118px;color:var(--mut2);font-weight:700}' +
-    '.commercials-tab .zdv{color:var(--ink2);flex:1;min-width:0}' +
-    '.commercials-tab .zdv b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}' +
-    '.commercials-tab .ztotal{margin-top:14px;padding-top:14px;border-top:2px solid var(--plum)}' +
-    '.commercials-tab .zthd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}' +
-    '.commercials-tab .ztname{font-weight:800;font-size:var(--fz);color:var(--plum)}' +
-    '.commercials-tab .ztsub{font-size:var(--fz-floor);color:var(--mut2)}' +
-    '.commercials-tab .ztband{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}' +
-    '.commercials-tab .ztchip{font-size:var(--fz-sm);font-weight:700;border-radius:30px;padding:5px 12px;white-space:nowrap;font-variant-numeric:tabular-nums}' +
-    '.commercials-tab .ztchip.open{background:var(--surface);border:1.5px solid var(--emph);color:var(--emph)}' +
-    '.commercials-tab .ztchip.tgt{background:var(--teal-t);color:var(--teal-d)}' +
-    '.commercials-tab .ztchip.walk{background:var(--plum-t);color:var(--plum)}' +
-    '.commercials-tab .ztchip.ok{background:var(--teal-t);color:var(--teal-d)}' +
-    '.commercials-tab .ztchip.over{background:var(--danger-t);color:var(--danger)}' +
-    '.commercials-tab .ztarrow{font-size:var(--fz-floor);color:var(--mut2)}' +
-    '.commercials-tab .zopalegend{display:flex;gap:16px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:14px;padding-top:11px;border-top:1px solid var(--line)}' +
-    '.commercials-tab .zopalegend span{display:inline-flex;align-items:center}' +
-    '.commercials-tab .zopalegend i{display:inline-block;margin-right:6px;vertical-align:middle}' +
-    '.commercials-tab .zlg.zopa{width:16px;height:10px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:2px}' +
-    '.commercials-tab .zlg.tgt{width:2px;height:14px;background:var(--plum)}' +
-    '.commercials-tab .zlg.walk{width:2px;height:14px;background:var(--plum);opacity:.5}' +
-    '.commercials-tab .zlg.fb{width:0;height:14px;border-left:2px dotted var(--plum);opacity:.75}' +
-    '.commercials-tab .zlg.open{width:12px;height:12px;background:var(--surface);border:2px solid var(--emph);border-radius:50%;box-sizing:border-box}' +
-    '.commercials-tab .zlg.ask{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
-    '.commercials-tab .zlg.bench{width:2px;height:14px;background:var(--ink2)}' +
+    /* ZOPA track CSS (.zline/.ztrack/.zzopa/.ztotal/.zopalegend/etc.) moved to
+       zopa.js's injected `.zopa-viz` stylesheet as part of the 2026-07-23
+       extraction, so it is no longer scoped under `.commercials-tab` here. */
     '.commercials-tab .deal-totals{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line2)}' +
     '.commercials-tab .deal-totals .dt-col{flex:1 1 180px;min-width:160px}' +
     '.commercials-tab .deal-totals .k-lbl{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;margin-bottom:3px}' +

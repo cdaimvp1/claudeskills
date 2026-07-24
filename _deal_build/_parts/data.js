@@ -105,14 +105,66 @@ const dashboardData = {
 
   /* ---- 2. documents -------------------------------------------------------- */
   // role: governing | ordering | scope | data | security | correspondence | reference
+  //
+  // Document Family Register additions (all ADDITIVE, no existing field/value touched):
+  //   executedDate / expirationDate : ISO date or null. This deal is pre-signature, so
+  //     every contract instrument is null; no execution date is assumed or invented.
+  //   active        : 'In negotiation' | 'Active' | 'Referenced, not provided' |
+  //                   'Superseded' | 'Draft'
+  //   controlling   : true ONLY for the master instrument (the MSA).
+  //   relevance     : 'direct' (sits in this deal's precedence chain / is part of this
+  //                   negotiation) | 'indirect' (a different, comparable supplier
+  //                   document outside the chain). No indirect document exists in this
+  //                   session, see documentRelevanceMeta below, nothing here is invented.
+  //   precedenceRank: 1 = controlling, ascending = subordinate; null for indirect and for
+  //                   referenced-but-missing components (rank can't be confirmed unseen).
+  //   precedenceBasis: { text, evidenceType }. No express order-of-precedence clause was
+  //                   found in the MSA v3 redline text captured this session, so every
+  //                   ranked basis below is evidenceType 'inference' (our defensible read
+  //                   of standard MSA + Order Form + SOW structure), never 'contract'.
+  //   isMissing     : true for the two referenced-but-not-provided components (DPA,
+  //                   Security Exhibit) so the register can render them as gap rows.
   documents: [
-    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, evidenceType: 'contract', limitations: [] },
-    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, evidenceType: 'contract', limitations: [] },
-    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, evidenceType: 'contract', limitations: [] },
-    { id: 'DOC-04', name: 'Data Processing Addendum (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'] },
-    { id: 'DOC-05', name: 'Security & Availability Exhibit (Exhibit B)', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'] },
-    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, evidenceType: 'internal', limitations: [] }
+    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, evidenceType: 'contract', limitations: [],
+      executedDate: null, expirationDate: null, active: 'In negotiation', controlling: true, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Master agreement; governs interpretation and sets precedence for the Order Form and SOW beneath it.',
+      precedenceRank: 1,
+      precedenceBasis: { text: 'Ranked as the controlling master instrument; the v3 redline body does not contain an express order-of-precedence clause among the MSA / Order Form / SOW, so this hierarchy is our read, not a quoted contract term.', evidenceType: 'inference' } },
+    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, evidenceType: 'contract', limitations: [],
+      executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Defines the implementation scope and deliverables authorized under the Order Form; no redline round documented for this instrument (unlike the MSA).',
+      precedenceRank: 3,
+      precedenceBasis: { text: 'Ranked below the Order Form as the subordinate scope/services document it details; no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
+    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, evidenceType: 'contract', limitations: [],
+      executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Commercial ordering document; binds the specific subscription, term and fees under the MSA and references SOW-01 for scope.',
+      precedenceRank: 2,
+      precedenceBasis: { text: 'Ranked immediately below the MSA as the work-authorizing instrument that triggers the specific commercial commitment (an Order Form functions as a type of SOW); no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
+    { id: 'DOC-04', name: 'Data Processing Addendum (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'],
+      executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so data-protection terms are never silently assumed.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-05', name: 'Security & Availability Exhibit (Exhibit B)', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'],
+      executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so SLA-credit and security-control terms are never silently assumed.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, evidenceType: 'internal', limitations: [],
+      executedDate: null, expirationDate: null, active: 'Active', controlling: false, isMissing: false,
+      relevance: 'direct', relevanceNote: 'Correspondence evidencing receipt/date of the MSA v3 redline; supports the negotiation timeline, not a governing instrument, so it carries no precedence rank.',
+      precedenceRank: null, precedenceBasis: null }
   ],
+
+  /* ---- 2b. documentRelevanceMeta (honest gap-state for the "indirect / comparable"
+   * tier). No prior Visier SOW, rate card, or other comparable supplier document
+   * actually surfaced this session, so none of the rows above is labelled relevance:
+   * 'indirect', that would be invented. The register renders this flag instead. */
+  documentRelevanceMeta: {
+    indirectPresent: false,
+    indirectNote: 'No indirect-relevant supplier documents (e.g. a prior Visier SOW or rate card) surfaced in session; the commercial benchmark derives from an internal analytics precedent (FIN-01), not a prior Visier contract.',
+    evidenceType: 'unavailable'
+  },
 
   /* ---- 3. issues (THE spine, referenced by id everywhere) ------------------ */
   // category: Liability | Data & Privacy | Commercial | Term & Renewal | Service Levels |
@@ -343,17 +395,27 @@ const dashboardData = {
    * relation: 'conflict' | 'changed-by' | 'gap' , names the cross-doc dimension checked;
    *   consistent:true means the two docs align on it, consistent:false means an adverse
    *   finding (a gap from a missing doc, or a genuine contradiction). No amendments/COs
-   *   exist yet (new MSA), so there are no 'changed-by' rows, that is honest, not empty. */
+   *   exist yet (new MSA), so there are no 'changed-by' rows, that is honest, not empty.
+   * trigger: 'active-conflict' | 'risk' | 'gap' | null , drives the redesigned panel,
+   *   which shows only non-null rows. Items where consistent:true are genuinely benign
+   *   (no conflict, no risk, no gap) and get trigger:null so they are excluded from the
+   *   conflicts view; they still exist here for the completeness / consistency record.
+   * termTrace: { term, from, to, viaDoc } would trace a term's value across document
+   *   versions. Omitted on every row below, on purpose: this is a new MSA with no
+   *   amendments or change orders, and the only version history in session (MSA v2 -> v3,
+   *   see comms.events CM-4/CM-6) shows the liability cap HELD at 12 months, not changed,
+   *   and MSA v2 itself is not a row in documents[], so there is no real from/to/viaDoc to
+   *   report without inventing a document id. */
   documentConflicts: [
-    { id: 'DC-1', docA: 'DOC-01', docB: 'DOC-04', topic: 'Data-protection terms', relation: 'gap', consistent: false, issueId: 'ISS-03',
+    { id: 'DC-1', docA: 'DOC-01', docB: 'DOC-04', topic: 'Data-protection terms', relation: 'gap', consistent: false, issueId: 'ISS-03', trigger: 'gap',
       note: 'MSA incorporates a DPA “by reference,” but the DPA text itself is not in session, so the data-protection terms cannot be reconciled.', evidenceType: 'unavailable' },
-    { id: 'DC-2', docA: 'DOC-01', docB: 'DOC-04', topic: 'Sub-processor change control', relation: 'gap', consistent: false, issueId: 'ISS-08',
+    { id: 'DC-2', docA: 'DOC-01', docB: 'DOC-04', topic: 'Sub-processor change control', relation: 'gap', consistent: false, issueId: 'ISS-08', trigger: 'gap',
       note: 'The sub-processor notice/objection mechanism would normally sit in the DPA; unavailable, so it cannot be verified against the MSA body.', evidenceType: 'unavailable' },
-    { id: 'DC-3', docA: 'DOC-01', docB: 'DOC-05', topic: 'SLA credit schedule & security controls', relation: 'gap', consistent: false, issueId: 'ISS-06',
+    { id: 'DC-3', docA: 'DOC-01', docB: 'DOC-05', topic: 'SLA credit schedule & security controls', relation: 'gap', consistent: false, issueId: 'ISS-06', trigger: 'gap',
       note: 'MSA sets the 99.5% uptime target; the credit schedule and security controls sit in the missing Security Exhibit (Exhibit B).', evidenceType: 'unavailable' },
-    { id: 'DC-4', docA: 'DOC-01', docB: 'DOC-03', topic: 'Renewal notice & price', relation: 'conflict', consistent: true, issueId: 'ISS-04',
+    { id: 'DC-4', docA: 'DOC-01', docB: 'DOC-03', topic: 'Renewal notice & price', relation: 'conflict', consistent: true, issueId: 'ISS-04', trigger: null,
       note: 'MSA and Order Form agree; both are silent on a renewal price cap (the deviation is vs. playbook, not between the two documents).', evidenceType: 'contract' },
-    { id: 'DC-5', docA: 'DOC-02', docB: 'DOC-03', topic: 'Fee schedule totals', relation: 'conflict', consistent: true, issueId: 'ISS-12',
+    { id: 'DC-5', docA: 'DOC-02', docB: 'DOC-03', topic: 'Fee schedule totals', relation: 'conflict', consistent: true, issueId: 'ISS-12', trigger: null,
       note: 'Order Form (subscription) and SOW-01 (services) fee lines combine into the Year-1 total; no discrepancy found between the two.', evidenceType: 'calculated' }
   ],
 
