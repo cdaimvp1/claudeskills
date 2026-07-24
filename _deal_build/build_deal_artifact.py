@@ -80,10 +80,7 @@ def platform_chrome():
         '<div class="brand"><img src="' + chrome['lilly_logo_uri'] + '" alt="Lilly"/>'
         '<span class="theomark"><span class="twm">Theo</span>'
         '<img class="tdino" src="' + dino_uri + '" alt="" aria-hidden="true"></span></div>'
-        '<div class="role">'
-        '<div class="who"><div class="av" id="av">' + user_icon + '</div>'
-        '<div><div class="nm" id="rname">Procurement User</div></div></div>'
-        '</div></div>')
+        '</div>')
     return chrome_css, topbar, chrome['footer_html']
 
 

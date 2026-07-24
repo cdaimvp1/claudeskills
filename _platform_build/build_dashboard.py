@@ -190,7 +190,10 @@ def extract_chrome():
     # Marc: remove ALL footer text (staging label + Help Center / Playbook / Give feedback /
     # What's new link bar). Keep an empty footer element only for the bottom gutter it provides.
     footer_inner_html = ''
-    footer_html = '<footer class="theo-foot" role="contentinfo" aria-hidden="true"></footer>'
+    footer_html = ('<footer class="theo-foot" role="contentinfo">'
+        '<span style="display:block;text-align:center;font:600 11px/32px var(--sans,system-ui);'
+        'letter-spacing:.04em;color:var(--mut,#505A64)">'
+        'Lilly Global Procurement | Theo v0.1 - July 2026</span></footer>')
 
     # ---- theomark / Sacramento-wordmark CSS (+ the --dino-filter token) ----
     # theo-brand.js's inject(): the :root chrome tokens (incl. --dino-filter,
@@ -341,12 +344,6 @@ def build(out_path, user_name='Procurement User', search_subject=None):
         '<img src="' + chrome['lilly_logo_uri'] + '" alt="Lilly"/>'
         '<span class="theomark"><span class="twm">Theo</span>'
         '<img class="tdino" src="' + dino_mark_uri + '" alt="" aria-hidden="true"></span>'
-        '</div>'
-        '<div class="role">'
-        '<div class="who">'
-        '<div class="av" id="av">' + user_icon_svg + '</div>'
-        '<div><div class="nm" id="rname">' + safe_user_name + '</div></div>'
-        '</div>'
         '</div>'
         '</div>'
     )
