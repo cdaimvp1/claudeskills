@@ -897,36 +897,69 @@ function scShortDate(s) {
   if (isNaN(dt)) return String(s);
   return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getUTCMonth()] + ' ' + dt.getUTCDate();
 }
+const SC_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// month gridline/axis ticks across the timeline span: one label at the scale start (0%), then a
+// tick at each month boundary inside the span (year appended when the year rolls over at January).
+function scMonthTicks(t0, t1) {
+  const span = (t1 - t0) || 1, out = [];
+  const d0 = new Date(t0);
+  let y = d0.getUTCFullYear(), m = d0.getUTCMonth();
+  out.push({ pos: 0, label: SC_MON[m] + ' ’' + String(y).slice(2), grid: false });
+  m++; if (m > 11) { m = 0; y++; }
+  for (let guard = 0; guard < 60; guard++) {
+    const ts = Date.UTC(y, m, 1);
+    if (ts >= t1) break;
+    out.push({ pos: clamp(((ts - t0) / span) * 100, 0, 100), label: SC_MON[m] + (m === 0 ? ' ’' + String(y).slice(2) : ''), grid: true });
+    m++; if (m > 11) { m = 0; y++; }
+  }
+  return out;
+}
 function scTimelineBars(d) {
   const ms = d.scope.milestones || [];
   const t0 = +new Date(ms[0].date), t1 = +new Date(ms[ms.length - 1].end), span = (t1 - t0) || 1;
   const pos = v => clamp(((+new Date(v) - t0) / span) * 100, 0, 100);
-  return ms.map((m, i) => {
+  const ticks = scMonthTicks(t0, t1);
+  const grid = ticks.filter(t => t.grid).map(t => '<span class="sc-tl-grid" style="left:' + t.pos.toFixed(1) + '%"></span>').join('');
+  const rows = ms.map((m, i) => {
     const a = pos(m.date), b = pos(m.end), w = Math.max(b - a, 7);
     return '<div class="sc-tl-row' + (i === 0 ? ' sc-sel' : '') + '" role="button" tabindex="0" data-scpick="' + esc(m.id) + '" title="Show milestone detail">' +
       '<div class="sc-tl-lab">' + esc(m.name) + '</div>' +
-      '<div class="sc-tl-track">' +
+      '<div class="sc-tl-track">' + grid +
         '<span class="sc-tl-d sc-tl-d1" style="left:' + a.toFixed(1) + '%">' + esc(scShortDate(m.date)) + '</span>' +
         '<span class="sc-tl-d sc-tl-d2" style="left:' + b.toFixed(1) + '%">' + esc(scShortDate(m.end)) + '</span>' +
         '<div class="sc-tl-bar' + (i === 0 ? ' pri' : '') + '" style="left:' + a.toFixed(1) + '%;width:' + w.toFixed(1) + '%"><span class="sc-tl-mid">' + esc(m.id) + '</span></div>' +
       '</div></div>';
   }).join('');
+  const axis = '<div class="sc-tl-axis"><div class="sc-tl-lab"></div><div class="sc-tl-track">' +
+    ticks.map(t => '<span class="sc-tl-tick' + (t.pos <= 1 ? ' at-start' : '') + '" style="left:' + t.pos.toFixed(1) + '%">' + esc(t.label) + '</span>').join('') +
+    '</div></div>';
+  return rows + axis;
 }
 function scMilestoneDetail(d, m) {
   const sc = d.scope || {};
+  const ms = sc.milestones || [];
   const delivs = (sc.deliverables || []).filter(x => x.milestone === m.id);
   const deps = (sc.dependencies || []).filter(x => x.milestone === m.id);
   const accFor = id => (sc.acceptance || []).filter(a => a.deliverable === id);
-  const dRows = delivs.length ? delivs.map(dl => {
+  // phase meta: duration, what gates the milestone, and the derived lead(s)
+  const durWk = Math.max(1, Math.round((+new Date(m.end) - +new Date(m.date)) / 6048e5));
+  const gates = (m.dependsOn || []).map(id => (ms.find(x => x.id === id) || {}).name).filter(Boolean);
+  const owners = Array.from(new Set(delivs.map(x => x.owner).filter(Boolean)));
+  const meta = '<div class="sc-mmeta">' +
+    '<span><i>Duration</i>' + durWk + ' wk' + (durWk === 1 ? '' : 's') + '</span>' +
+    '<span><i>Gated by</i>' + esc(gates.length ? gates.join(', ') : 'Project start') + '</span>' +
+    '<span><i>Lead</i>' + esc(owners.length ? owners.join(' / ') : '—') + '</span></div>';
+  // sections render ONLY when they have content (a kickoff phase has neither, and says so)
+  const dSec = delivs.length ? '<div class="sc-msec-h">Deliverables + acceptance</div>' + delivs.map(dl => {
     const acc = accFor(dl.id).map(a => '<div class="sc-mac">' + (a.defined ? statusPill('aligned', 'Defined') : statusPill('deviation', 'Not defined')) + '<span class="tiny">' + esc(a.criteria) + '</span></div>').join('');
     return '<div class="sc-mdel"><div class="sc-mdel-hd"><span class="sc-tag">' + esc(dl.id) + '</span><strong>' + esc(dl.name) + '</strong><span class="tiny muted">owner ' + esc(dl.owner) + '</span></div>' +
       (acc || '<div class="tiny muted">No acceptance criteria stated.</div>') + '</div>';
-  }).join('') : '<div class="tiny muted">No deliverables mapped to this milestone.</div>';
-  const depRows = deps.length ? deps.map(dep => '<div class="sc-mdep">' + severityPill(dep.risk) + '<span class="tiny">' + esc(dep.text) + ' &middot; owner ' + esc(dep.owner) + '</span></div>').join('') : '<div class="tiny muted">No gating dependencies recorded.</div>';
+  }).join('') : '';
+  const depSec = deps.length ? '<div class="sc-msec-h"' + (delivs.length ? ' style="margin-top:13px"' : '') + '>Dependencies to close this milestone</div>' +
+    deps.map(dep => '<div class="sc-mdep">' + severityPill(dep.risk) + '<span class="tiny">' + esc(dep.text) + ' &middot; owner ' + esc(dep.owner) + '</span></div>').join('') : '';
+  const empty = (!delivs.length && !deps.length) ? '<div class="tiny muted">Phase milestone: no contract deliverables or gating dependencies recorded for this stage.</div>' : '';
   return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(m.id) + '</span><span class="sc-tag">' + esc(scShortDate(m.date)) + ' &rarr; ' + esc(scShortDate(m.end)) + '</span></div>' +
-    '<div class="sc-dl-title">' + esc(m.name) + '</div>' +
-    '<div class="sc-msec-h">Deliverables + acceptance</div>' + dRows +
-    '<div class="sc-msec-h" style="margin-top:13px">Dependencies to close this milestone</div>' + depRows;
+    '<div class="sc-dl-title">' + esc(m.name) + '</div>' + meta + dSec + depSec + empty;
 }
 function renderDeliveryTimeline(d) {
   const sc = d.scope || {};
@@ -958,33 +991,84 @@ function renderRaciPanel(d) {
   return saCard('Responsibility (RACI)', table + legend, { icon:'raci', sub: amb + ' unclear' });
 }
 
-/* ---- intent 2: performance (SLA/KPI + acceptance gates + change control, merged) ---- */
+/* ---- intent 2: performance (SLA/KPI + acceptance gates + change control, merged) ----
+ * Same three-section panel; each commitment now EXPANDS to the depth that was missing:
+ * Remedy · Recommend (+ finding jump) · why. Slimmer columns, detail on click. */
 function renderPerformance(d) {
   const sc = d.scope || {};
+  const recKV = r => '<div class="sc-perf-exp"><dl class="kv">' +
+    (r.remedy != null ? '<dt>Remedy</dt><dd>' + esc(r.remedy) + '</dd>' : '') +
+    '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.recommend) + (r.issueId ? ' ' + issueJump(r.issueId) : '') + '</dd>' +
+    '</dl>' + (r.why ? '<div class="sc-perf-why">' + esc(r.why) + '</div>' : '') + '</div>';
   const slaCols = [
-    { key:'metric', label:'Metric', render: r => esc(r.metric) },
+    { key:'metric', label:'Metric', render: r => '<strong>' + esc(r.metric) + '</strong>' },
     { key:'target', label:'Contract', render: r => esc(r.target) },
     { key:'playbook', label:'Playbook', render: r => esc(r.playbook) },
-    { key:'remedy', label:'Remedy', sort:false, render: r => esc(r.remedy) },
     { key:'status', label:'Status', render: r => statusPill(r.status) },
     { key:'issue', label:'Finding', sort:false, render: r => r.issueId ? issueJump(r.issueId) : '&mdash;' }
   ];
   const slaTable = dataTable(slaCols, sc.serviceLevels || [], { zebra:true, dense:true, id:'tbl-sla',
-    rowClass: r => r.status === 'deviation' ? 'rowtint-danger' : (r.status === 'partial' ? 'rowtint-warn' : '') });
+    rowClass: r => r.status === 'deviation' ? 'rowtint-danger' : (r.status === 'partial' ? 'rowtint-warn' : ''),
+    expand: recKV });
   const accCols = [
-    { key:'deliverable', label:'Deliverable', width:'78px', render: r => esc(r.deliverable) },
+    { key:'deliverable', label:'Deliverable', width:'88px', render: r => esc(r.deliverable) },
     { key:'criteria', label:'Acceptance criteria', sort:false, render: r => esc(r.criteria) },
-    { key:'defined', label:'Objective?', width:'122px', sortVal: r => r.defined ? 1 : 0, render: r => r.defined ? statusPill('aligned','Defined') : statusPill('deviation','Not defined') }
+    { key:'defined', label:'Objective?', width:'118px', sortVal: r => r.defined ? 1 : 0, render: r => r.defined ? statusPill('aligned','Defined') : statusPill('deviation','Not defined') },
+    { key:'issue', label:'Finding', sort:false, width:'78px', render: r => r.issueId ? issueJump(r.issueId) : '&mdash;' }
   ];
   const accTable = dataTable(accCols, sc.acceptance || [], { zebra:true, dense:true, id:'tbl-acceptance',
-    rowClass: r => r.defined ? '' : 'rowtint-warn' });
+    rowClass: r => r.defined ? '' : 'rowtint-warn', expand: recKV });
   const undef = (sc.acceptance || []).filter(a => !a.defined).length;
-  const accNote = insight('<strong>' + undef + '</strong> of ' + (sc.acceptance || []).length + ' acceptance criteria lack an objective pass/fail standard &mdash; ties to the deemed-acceptance finding ' + issueJump('ISS-10') + '.', undef ? 'warn' : '');
-  const change = (sc.changeControl || []).map(c => insight(esc(c.text) + ' ' + evidenceChip(c.evidenceType, { short:true }))).join('');
+  const accNote = insight('<strong>' + undef + '</strong> of ' + (sc.acceptance || []).length + ' acceptance criteria lack an objective pass/fail standard. Expand a row for the recommendation; ties to the deemed-acceptance finding ' + issueJump('ISS-10') + '.', undef ? 'warn' : '');
+  const chgCols = [
+    { key:'item', label:'Change control', render: r => '<strong>' + esc(r.item) + '</strong>' },
+    { key:'terms', label:'Terms', sort:false, render: r => esc(r.terms) },
+    { key:'status', label:'Status', render: r => statusPill(r.status) },
+    { key:'issue', label:'Finding', sort:false, render: r => r.issueId ? issueJump(r.issueId) : '&mdash;' }
+  ];
+  const chgTable = dataTable(chgCols, sc.changeControl || [], { zebra:true, dense:true, id:'tbl-change',
+    rowClass: r => r.status === 'partial' ? 'rowtint-warn' : '',
+    expand: r => '<div class="sc-perf-exp"><dl class="kv">' +
+      '<dt>Playbook</dt><dd>' + esc(r.playbook) + '</dd>' +
+      '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.recommend) + (r.issueId ? ' ' + issueJump(r.issueId) : '') + '</dd>' +
+      '</dl>' + (r.why ? '<div class="sc-perf-why">' + esc(r.why) + '</div>' : '') + '</div>' });
   const body = '<div class="eyebrow" style="margin:2px 0 7px">Service levels &amp; KPIs</div>' + slaTable +
     '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Deliverable acceptance gates</div>' + accTable + accNote +
-    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Change control</div>' + change;
-  return saCard('Performance: SLAs, Acceptance & Change Control', body, { icon:'shield', accent:'emph' });
+    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Change control</div>' + chgTable;
+  return saCard('Performance: SLAs, Acceptance & Change Control', body, { icon:'shield', accent:'emph', sub:'click any row for the recommendation' });
+}
+
+/* ---- intent 1 (SOW-assumptions lens): the premises the SOW is built on (trait-gated).
+ * Distinct from the shifts register (consequences). Grounded: each row cites the clause it
+ * comes from. Renders nothing when no SOW assumptions surfaced (additive, never fabricated). */
+function saLinkedHtml(arr) {
+  if (!arr || !arr.length) return '<span class="sc-fmut">none</span>';
+  return arr.map(function (id) {
+    if (/^ISS/.test(id)) return jumpLink(id + ' →', JUMP_LEGAL);
+    if (/^GAP/.test(id)) return jumpLink(id + ' →', JUMP_GAPS);
+    return '<span class="sc-lk-ref" title="See the reconciliation above">' + esc(id) + '</span>';   // reconciliation / shifts row ref
+  }).join(' · ');
+}
+function renderSowAssumptions(d) {
+  const sa = (d.scope || {}).sowAssumptions || [];
+  if (!sa.length) return '';
+  const onLilly = r => String(r.burden).toLowerCase() === 'lilly';
+  const cols = [
+    { key:'assumption', label:'The SOW assumes', render: r => '<strong>' + esc(r.assumption) + '</strong><div class="tiny muted">' + esc(r.ref) + '</div>' },
+    { key:'burden', label:'Burden', width:'74px', render: r => '<span class="pill ' + (onLilly(r) ? 'warn' : 'muted') + '">' + esc(r.burden) + '</span>' },
+    { key:'risk', label:'Risk if the premise is wrong', sort:false, render: r => '<span class="tiny">' + esc(r.risk) + '</span>' },
+    { key:'ev', label:'Ev.', sort:false, render: r => evidenceChip(r.evidenceType, { short:true }) }
+  ];
+  const table = dataTable(cols, sa, { id:'tbl-sowassume', dense:true, zebra:true,
+    rowClass: r => onLilly(r) ? 'rowtint-warn' : '',
+    expand: r => '<div class="kv">' +
+      '<dt>Presumes</dt><dd>' + esc(r.presumes) + '</dd>' +
+      '<dt>Linked</dt><dd>' + saLinkedHtml(r.linked) + '</dd></div>' });
+  const nLilly = sa.filter(onLilly).length;
+  return saCard('SOW Assumptions (supplier-stated)',
+    table + insight('These are the premises the SOW is built on, not consequences. <strong>' + nLilly + '</strong> of ' + sa.length +
+      ' put the burden on Lilly if they prove untrue. Verify each before relying on the delivery plan; every row cites the clause it comes from. ' + evidenceChip('contract', { short:true }), nLilly ? 'warn' : ''),
+    { icon:'assume', accent:'plum', sub: nLilly + ' shift the burden to Lilly' });
 }
 
 // Scope & Performance composition (services/SOW trait). The invariant backbone (readiness verdict /
@@ -997,8 +1081,10 @@ function renderScopePerfFull(d) {
   // exists (services / SOW). A goods PO or a pure software-license deal has no milestones, so the tab
   // composes WITHOUT the timeline panel (a goods/capital composition would slot its own panel here).
   const hasSchedule = ((d.scope || {}).milestones || []).length > 0;
+  const sowLens = renderSowAssumptions(d);   // '' when no SOW assumptions surfaced (trait-gated)
   return '<div class="grid">' +
       '<div class="col-12">' + renderReconciliation(d) + '</div>' +
+      (sowLens ? '<div class="col-12">' + sowLens + '</div>' : '') +
       (hasSchedule ? '<div class="col-12">' + renderDeliveryTimeline(d) + '</div>' : '') +
       '<div class="col-12">' + renderRaciPanel(d) + '</div>' +
       '<div class="col-12">' + renderPerformance(d) + '</div>' +
@@ -1369,9 +1455,23 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-tl-bar{position:absolute;top:13px;height:16px;border-radius:4px;background:var(--sec);display:flex;align-items:center;justify-content:center;min-width:22px}' +
   '.contract-tab .sc-tl-bar.pri{background:var(--plum)}' +
   '.contract-tab .sc-tl-mid{font:800 9px/1 var(--sans);color:#fff;letter-spacing:.03em}' +
-  '.contract-tab .sc-tl-d{position:absolute;top:0;font:700 9px/1 var(--mono);color:var(--mut);white-space:nowrap}' +
+  '.contract-tab .sc-tl-d{position:absolute;top:0;font:700 9px/1 var(--mono);color:var(--mut);white-space:nowrap;z-index:1}' +
   '.contract-tab .sc-tl-d1{transform:translateX(0)}' +
   '.contract-tab .sc-tl-d2{transform:translateX(-100%)}' +
+  '.contract-tab .sc-tl-bar{z-index:1}' +
+  /* month gridlines behind the bars + a shared month axis under the tracks (same 150px grid) */
+  '.contract-tab .sc-tl-grid{position:absolute;top:2px;bottom:2px;width:1px;background:var(--line);z-index:0}' +
+  '.contract-tab .sc-tl-axis{display:grid;grid-template-columns:150px 1fr;gap:12px;margin-top:2px;padding:6px 4px 0;border-top:1px solid var(--line2)}' +
+  '.contract-tab .sc-tl-axis .sc-tl-track{height:13px}' +
+  '.contract-tab .sc-tl-tick{position:absolute;top:0;font:700 9px/1 var(--mono);color:var(--mut2);white-space:nowrap;transform:translateX(-50%)}' +
+  '.contract-tab .sc-tl-tick.at-start{transform:translateX(0)}' +
+  /* milestone phase-meta strip + performance-row expand depth */
+  '.contract-tab .sc-mmeta{display:flex;flex-wrap:wrap;gap:18px;margin:0 0 12px;padding:8px 12px;background:var(--surface);border:1px solid var(--line2);border-radius:7px}' +
+  '.contract-tab .sc-mmeta span{font-size:12px;color:var(--ink2);font-weight:600}' +
+  '.contract-tab .sc-mmeta i{display:block;font:700 9px/1.5 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);font-style:normal}' +
+  '.contract-tab .sc-perf-rec{font-weight:600;color:var(--ink)}' +
+  '.contract-tab .sc-perf-why{margin-top:6px;font-size:12px;line-height:1.5;color:var(--mut2);font-style:italic}' +
+  '.contract-tab .sc-lk-ref{font:700 10px/1 var(--mono);color:var(--mut2);background:var(--nested);padding:2px 5px;border-radius:4px}' +
   '.contract-tab .sc-tl-detail{border-top:1px solid var(--line);min-height:0}' +
   '.contract-tab .sc-msec-h{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}' +
   '.contract-tab .sc-mdel{border:1px solid var(--line2);border-radius:7px;padding:9px 11px;margin-bottom:8px;background:var(--surface)}' +

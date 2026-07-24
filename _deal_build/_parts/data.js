@@ -665,10 +665,10 @@ const dashboardData = {
       { id: 'M5', name: 'Training & go-live',   date: '2026-12-15', end: '2027-01-12', dependsOn: ['M4'],       evidenceType: 'contract' }
     ],
     acceptance: [
-      { id: 'AC-1', deliverable: 'D1', criteria: 'All 4 sources ingest with <2% record-reject rate over 2 cycles.', defined: true,  evidenceType: 'contract' },
-      { id: 'AC-2', deliverable: 'D2', criteria: 'Validation pack reconciles headcount to HRIS within ±0.5%.',       defined: true,  evidenceType: 'contract' },
-      { id: 'AC-3', deliverable: 'D3', criteria: 'Dashboards render agreed metrics; no objective criteria stated for “agreed”.', defined: false, evidenceType: 'inference' },
-      { id: 'AC-4', deliverable: 'D5', criteria: 'Training delivered; no competency or attendance threshold stated.', defined: false, evidenceType: 'inference' }
+      { id: 'AC-1', deliverable: 'D1', criteria: 'All 4 sources ingest with <2% record-reject rate over 2 cycles.', defined: true,  remedy: 'Re-run the ingest cycle on fail.', issueId: null, recommend: 'Accept: objective and measurable.', why: 'A clear, testable pass/fail standard.', evidenceType: 'contract' },
+      { id: 'AC-2', deliverable: 'D2', criteria: 'Validation pack reconciles headcount to HRIS within ±0.5%.',       defined: true,  remedy: 'Re-validate on fail.', issueId: null, recommend: 'Accept.', why: 'An objective tolerance is stated.', evidenceType: 'contract' },
+      { id: 'AC-3', deliverable: 'D3', criteria: 'Dashboards render agreed metrics; no objective criteria stated for “agreed”.', defined: false, remedy: 'None stated.', issueId: 'ISS-10', recommend: 'Define the metric list plus an explicit sign-off (not silence).', why: 'Acceptance-by-silence shifts the burden onto Lilly against a 10-day clock.', evidenceType: 'inference' },
+      { id: 'AC-4', deliverable: 'D5', criteria: 'Training delivered; no competency or attendance threshold stated.', defined: false, remedy: 'None stated.', issueId: 'ISS-10', recommend: 'Add an attendance / competency bar to “delivered”.', why: 'No measurable completion standard, so the supplier can claim completion regardless of outcome.', evidenceType: 'inference' }
     ],
     dependencies: [
       { id: 'DEP-1', text: 'Buyer provides HRIS/payroll extract access by M1+5 days.', owner: 'Buyer', risk: 'high', milestone: 'M2', evidenceType: 'contract' },
@@ -687,13 +687,13 @@ const dashboardData = {
       ]
     },
     serviceLevels: [
-      { id: 'SL-1', metric: 'Platform uptime', target: '99.5% / month', remedy: '5% credit per 1% miss, capped 15%', playbook: '99.9%', status: 'deviation', issueId: 'ISS-06', evidenceType: 'contract' },
-      { id: 'SL-2', metric: 'Support response (P1)', target: '4 business hours', remedy: 'None stated', playbook: '1 hour, 24×7', status: 'partial', issueId: null, evidenceType: 'contract' },
-      { id: 'SL-3', metric: 'Data refresh latency', target: 'Next-day (T+1)', remedy: 'None stated', playbook: 'T+1 acceptable', status: 'aligned', issueId: null, evidenceType: 'contract' }
+      { id: 'SL-1', metric: 'Platform uptime', target: '99.5% / month', remedy: '5% credit per 1% miss, capped 15%', playbook: '99.9%', status: 'deviation', issueId: 'ISS-06', recommend: 'Tighten to 99.9% and remove the 15% credit cap.', why: 'Below the playbook standard; the 15% cap means chronic misses cost the supplier almost nothing.', evidenceType: 'contract' },
+      { id: 'SL-2', metric: 'Support response (P1)', target: '4 business hours', remedy: 'None stated', playbook: '1 hour, 24×7', status: 'partial', issueId: null, recommend: 'Add a 1-hour, 24×7 P1 target with a credit for misses.', why: 'No stated remedy means no teeth if support is slow on a critical issue.', evidenceType: 'contract' },
+      { id: 'SL-3', metric: 'Data refresh latency', target: 'Next-day (T+1)', remedy: 'None stated', playbook: 'T+1 acceptable', status: 'aligned', issueId: null, recommend: 'Accept as drafted.', why: 'Meets the playbook standard for this class of platform.', evidenceType: 'contract' }
     ],
     changeControl: [
-      { text: 'Changes require a signed Change Order; supplier estimates effort at standard day-rate.', evidenceType: 'contract' },
-      { text: 'No cap on change-order day-rate; ties to ISS-11 uncapped pricing.', evidenceType: 'inference' }
+      { id: 'CC-1', item: 'Change process', terms: 'Changes require a signed Change Order; supplier estimates effort at the standard day-rate.', playbook: 'Signed Change Order required', remedy: 'n/a', status: 'aligned', issueId: null, recommend: 'Accept the process as drafted.', why: 'A signed-CO process is standard and controlled.', evidenceType: 'contract' },
+      { id: 'CC-2', item: 'Change-order pricing', terms: 'No cap on the change-order day-rate.', playbook: 'Capped day-rate', remedy: 'n/a', status: 'partial', issueId: 'ISS-11', recommend: 'Cap the change-order day-rate, or reuse the negotiated platform discount.', why: 'An uncapped rate is open-ended cost exposure on any scope creep.', evidenceType: 'inference' }
     ],
 
     /* ---- intent 1: intended-scope-vs-contract reconciliation ----------------
@@ -742,6 +742,20 @@ const dashboardData = {
       { id: 'SH-4', text: 'Change orders billed at an uncapped standard day-rate.', source: 'Change control (ISS-11)', shiftType: 'cost', trigger: 'Any change order', stance: 'push-back', impact: 'No cap on the change-order rate = open-ended cost exposure on any scope creep.', rec: 'Cap the change-order day-rate (or reuse the platform discount).', owner: 'Category lead', raiseWith: 'Supplier PM', linked: ['ISS-11'], evidenceType: 'inference' },
       { id: 'SH-5', text: 'SSO / RBAC configuration is “Joint” with no Lilly-side effort estimate.', source: 'SOW deliverable D4', shiftType: 'effort', trigger: 'Dashboards + access (M4)', stance: 'push-back', impact: 'Joint ownership with no task split leaves the Lilly-side SSO/RBAC effort unscoped.', rec: 'Split the tasks and estimate the Lilly-side effort before M4.', owner: 'Buyer IT', raiseWith: 'Supplier PM', linked: ['IS-3'], evidenceType: 'contract' },
       { id: 'SH-6', text: 'Lilly confirms data-classification for employee PII.', source: 'SOW dependency (DEP-2)', shiftType: 'dependency', trigger: 'Before M2', stance: 'accept', impact: 'A reasonable buyer obligation, but with no owner/date it can slip M2.', rec: 'Keep it; assign an owner and a due date.', owner: 'Buyer HRIS', raiseWith: 'Supplier PM', linked: [], evidenceType: 'inference' }
+    ],
+
+    /* ---- intent 1 (SOW-assumptions lens): the premises the supplier's SOW is BUILT ON --
+     * Distinct from the shifts register (which lists consequences): these are the things the
+     * SOW takes as given. Each is grounded in a real SOW/MSA clause already quoted in the
+     * reconciliation (never fabricated); `assumption` is the stated/implied premise, `ref` the
+     * clause, `burden` who carries it if the premise is wrong, and `linked` the shift/finding it
+     * drives. Trait-gated: renders only for engagements with a SOW in scope. */
+    sowAssumptions: [
+      { id: 'SA-1', assumption: 'Customer will provide data in a clean, conformed format.', ref: 'SOW-01 assumptions', presumes: 'Lilly’s HR extracts are analysis-ready at handover.', burden: 'Lilly', risk: 'If the extracts need remediation, that effort (and any M2 slip) is Lilly’s; the proposal implied supplier-assisted cleansing.', linked: ['SH-2', 'IS-7'], evidenceType: 'contract' },
+      { id: 'SA-2', assumption: 'SSO / RBAC configuration is a “Joint” responsibility.', ref: 'SOW-01 D4', presumes: 'Lilly supplies unspecified SSO / RBAC configuration effort.', burden: 'Lilly', risk: 'No task split or Lilly-side estimate; the un-scoped config effort surfaces at M4.', linked: ['SH-5', 'IS-3'], evidenceType: 'contract' },
+      { id: 'SA-3', assumption: 'Deliverables are deemed accepted after 10 business days of silence.', ref: 'SOW-01 §5', presumes: 'Lilly actively reviews and rejects within 10 days, or accepts by default.', burden: 'Lilly', risk: 'Silence = acceptance shifts the QA burden onto Lilly against a short clock; D3 and D5 carry no objective standard.', linked: ['SH-3', 'ISS-10'], evidenceType: 'contract' },
+      { id: 'SA-4', assumption: 'Historical data older than three years is out of scope.', ref: 'SOW-01 §4', presumes: 'Three years of history is sufficient for Lilly’s analytics.', burden: 'Lilly', risk: 'Lilly asked for five years (IS-4); the extra two years become a post-signature change order at the uncapped day-rate.', linked: ['IS-4', 'SH-4'], evidenceType: 'contract' },
+      { id: 'SA-5', assumption: 'Service levels apply from the go-live date.', ref: 'MSA §7.2', presumes: 'No availability / support commitment is needed during onboarding.', burden: 'Lilly', risk: 'The whole implementation window is un-SLA’d; an outage during onboarding has no remedy.', linked: ['AS-1'], evidenceType: 'contract' }
     ]
   },
 
