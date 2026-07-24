@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Document Risks — reframed Cross-Document panel (mockup)</title>
+<style>
+/* ============================================================================
+ * Self-contained mockup, Deal dashboard design system (plum / teal / burnt-orange).
+ * No external fonts, no CDNs, no network. Tokens mirror _parts/style.css.
+ * Colour does a job: plum = structure, teal = the constructive ask/output,
+ * burnt-orange = attention, red RESERVED for hard-stop severity only.
+ * ========================================================================== */
+:root{
+  --bg:#E2E6E1; --surface:#FFFFFF; --surface2:#F7F5F1; --nested:#EDEAE3; --well:#E4E0D8;
+  --line:#E3DED6; --line2:#D3CDC3; --ink:#1A1A1A; --ink2:#3A362F; --mut:#505A64; --mut2:#564F48;
+  --plum:#5C2B50; --plum-t:#EDDFE9; --teal-d:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --pri:var(--plum); --pri-t:var(--plum-t); --pri-tx:#5C2B50;
+  --sec:var(--teal-d); --sec-t:var(--teal-t); --sec-tx:#2F6E6B;
+  --emph-tx:#A2500F;
+  --danger:#A23A30; --danger-t:#FBE7E3; --danger-bar:#A23A30;
+  --warn:#8A5A00; --warn-t:#FBF1DA; --warn-bar:#B45309;
+  --ok:#1F7A5A; --ok-t:#DFEEE6; --ok-bar:#1F7A5A;
+  --shadow-1:0 1px 2px rgba(28,28,34,.04),0 5px 14px -4px rgba(28,28,34,.10);
+  --shadow-2:0 2px 4px rgba(28,28,34,.06),0 10px 26px -6px rgba(28,28,34,.16);
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono','Segoe UI Mono','SFMono-Regular',Consolas,'Roboto Mono',monospace;
+  --r:11px; --r-sm:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:13.5px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; padding-bottom:44px}
+h1,h2,h3,h4,p{margin:0}
+button{font-family:inherit}
+
+/* ---- top mockup banner --------------------------------------------------- */
+.mock-banner{background:#2A2732; color:#F2EEF0; font-size:11.5px; letter-spacing:.03em;
+  padding:8px 18px; text-align:center; font-weight:600; border-bottom:2px solid var(--emph)}
+.mock-banner b{color:#F3C89E; font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+
+.wrap{max-width:1080px; margin:0 auto; padding:20px 20px 0}
+.page-eyebrow{font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--mut); font-weight:700}
+.page-title{font-size:20px; font-weight:800; letter-spacing:-.01em; margin:3px 0 2px}
+.page-sub{font-size:12.5px; color:var(--mut); margin-bottom:16px}
+
+/* ---- sa-card ------------------------------------------------------------- */
+.sa-card{position:relative; background:var(--surface); border:1px solid var(--line2);
+  border-radius:var(--r); box-shadow:var(--shadow-1); margin-bottom:16px}
+.sa-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--pri); border-radius:var(--r) 0 0 var(--r)}
+.sa-card.accent-teal::before{background:var(--sec)}
+.sa-card.accent-emph::before{background:var(--emph)}
+.sa-card.accent-warn::before{background:var(--warn-bar)}
+.sa-card.accent-danger::before{background:var(--danger-bar)}
+.card-hd{display:flex; align-items:center; gap:9px; padding:12px 15px; border-bottom:1px solid var(--line2)}
+.card-hd .ch-ic{width:16px; height:16px; flex:none; color:var(--pri-tx)}
+.sa-card.accent-teal .card-hd .ch-ic{color:var(--sec-tx)}
+.sa-card.accent-emph .card-hd .ch-ic{color:var(--emph-tx)}
+.sa-card.accent-danger .card-hd .ch-ic{color:var(--danger)}
+.card-hd .ch-ic svg{width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2}
+.card-hd .ct{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink)}
+.card-hd .cs{margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--mut); font-weight:600; text-align:right}
+.card-bd{padding:15px 16px}
+
+/* ---- evidence chips ------------------------------------------------------ */
+.ev{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.02em; padding:2px 7px;
+  border-radius:11px; border:1px solid var(--line2); background:var(--surface2); color:var(--mut2); white-space:nowrap}
+.ev.ev-contract{background:var(--sec-t); color:var(--sec-tx); border-color:transparent}
+.ev.ev-inference{background:#E4EBF1; color:#2E5E8C; border-color:transparent}
+.ev.ev-calculated{background:var(--emph-t); color:var(--emph-tx); border-color:transparent}
+.ev.ev-unavailable{background:var(--well); color:var(--mut2)}
+
+/* =========================================================================
+ * FRAMING CARD, what this panel shows now (the reframe explainer)
+ * ====================================================================== */
+.frame-lead{font-size:14.5px; font-weight:800; color:var(--ink); line-height:1.38; letter-spacing:-.01em; max-width:70ch}
+.frame-body{font-size:12.5px; color:var(--mut2); line-height:1.56; margin-top:9px; max-width:82ch}
+.frame-body b{color:var(--ink2); font-weight:700}
+
+.frame-stats{display:flex; flex-wrap:wrap; gap:10px; margin:15px 0 2px}
+.fstat{flex:1; min-width:150px; border:1px solid var(--line2); border-radius:9px; padding:12px 14px; background:var(--surface2); position:relative}
+.fstat::before{content:""; position:absolute; left:0; top:11px; bottom:11px; width:3px; border-radius:3px; background:var(--line2)}
+.fstat.s-risk::before{background:var(--danger-bar)}
+.fstat.s-doc::before{background:var(--emph)}
+.fstat.s-clean::before{background:var(--ok-bar)}
+.fstat .fs-n{font-size:25px; font-weight:800; letter-spacing:-.02em; line-height:1; padding-left:9px}
+.fstat.s-risk .fs-n{color:var(--danger)}
+.fstat.s-doc .fs-n{color:var(--emph-tx)}
+.fstat.s-clean .fs-n{color:var(--ok)}
+.fstat .fs-l{font-size:11px; color:var(--mut2); margin-top:6px; font-weight:600; padding-left:9px; line-height:1.35}
+
+.exhibits{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
+.exh{flex:1; min-width:250px; border:1px dashed var(--line2); border-radius:9px; padding:11px 13px; background:var(--well)}
+.exh .exh-t{font-weight:800; font-size:12.5px; color:var(--ink2)}
+.exh .exh-m{font-size:11.5px; color:var(--mut2); margin-top:4px; line-height:1.4}
+.exh .exh-ref{font-family:var(--mono); font-size:10.5px; color:var(--mut); margin-top:7px; display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center}
+.exh .exh-ref .drives{color:var(--emph-tx); font-weight:700}
+
+.frame-legend{display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:15px; padding-top:12px; border-top:1px solid var(--line);
+  font-size:11px; color:var(--mut2)}
+.frame-legend span{display:inline-flex; align-items:center; gap:6px; font-weight:600}
+.frame-legend i{width:11px; height:11px; border-radius:3px; flex:none}
+.frame-legend .i-hs{background:var(--danger-t); border:1px solid var(--danger)}
+.frame-legend .i-hi{background:var(--emph-t); border:1px solid var(--emph)}
+.frame-legend .i-md{background:var(--warn-t); border:1px solid var(--warn-bar)}
+
+/* ---- section heading between cards --------------------------------------- */
+.sec-label{display:flex; align-items:baseline; gap:10px; margin:22px 2px 12px}
+.sec-label .sl-t{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink)}
+.sec-label .sl-s{font-size:11.5px; color:var(--mut)}
+
+/* =========================================================================
+ * RISK CARD, one Open Document Risk (the four things)
+ * ====================================================================== */
+.risk{margin-bottom:14px}
+.risk-hd{display:flex; gap:13px; align-items:flex-start; padding:14px 16px 13px; border-bottom:1px solid var(--line)}
+
+/* 4. LINKED FINDING, the severity chip = the visual handle */
+.sev-chip{flex:none; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:82px;
+  padding:9px 8px; border-radius:9px; text-align:center; line-height:1.05}
+.sev-chip .sc-k{font-size:12.5px; font-weight:800; letter-spacing:.01em}
+.sev-chip .sc-t{font-size:9.5px; font-weight:800; letter-spacing:.05em; margin-top:3px; font-family:var(--mono); opacity:.85}
+.sev-chip.sev-hard-stop{background:var(--danger-t); color:var(--danger)}
+.sev-chip.sev-high{background:var(--emph-t); color:var(--emph-tx)}
+.sev-chip.sev-medium{background:var(--warn-t); color:var(--warn)}
+
+.risk-hd-main{min-width:0; flex:1}
+.risk-order{font-family:var(--mono); font-size:10px; font-weight:800; letter-spacing:.06em; color:var(--mut); text-transform:uppercase}
+.risk-title{font-size:15.5px; font-weight:800; letter-spacing:-.01em; line-height:1.3; margin-top:3px}
+.risk-meta{display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px; align-items:center; font-size:11.5px; color:var(--mut)}
+.risk-meta .clause{font-family:var(--mono); font-size:10.5px}
+.trace-tag{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; color:var(--pri-tx);
+  background:var(--plum-t); padding:3px 9px; border-radius:11px}
+.trace-tag svg{width:11px; height:11px; stroke:currentColor; fill:none; stroke-width:2}
+
+.risk-bd{padding:5px 16px 6px}
+.rb{padding:12px 0; border-top:1px solid var(--line)}
+.rb:first-child{border-top:0}
+.rb-lab{font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--mut);
+  margin-bottom:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.rb-lab .src{font-weight:700; letter-spacing:.01em; text-transform:none; color:var(--mut2); font-family:var(--mono); font-size:10px}
+.rb-body{font-size:13px; color:var(--ink2); line-height:1.52}
+
+/* THE ASK, the constructive output, made the hero of the card (teal) */
+.rb.ask{border-top:0; margin:8px 0 6px; padding:13px 15px; background:var(--sec-t);
+  border-left:3px solid var(--sec); border-radius:0 9px 9px 0}
+.rb.ask .rb-lab{color:var(--sec-tx)}
+.rb.ask .rb-lab .arw{font-family:var(--sans); font-weight:900}
+.rb.ask .rb-body{color:#22403F; font-weight:600}
+.rb-prov{margin-top:9px; font-size:10.5px; color:var(--sec-tx); font-family:var(--mono); line-height:1.4}
+.rb-prov b{font-weight:800}
+
+.risk-foot{display:flex; flex-wrap:wrap; align-items:center; gap:7px 16px; padding:11px 16px;
+  border-top:1px solid var(--line2); background:var(--surface2); border-radius:0 0 var(--r) var(--r);
+  font-size:11.5px; color:var(--mut2)}
+.risk-foot .fk{font-size:9.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--mut)}
+.risk-foot .fissue{font-weight:700; color:var(--ink2)}
+.risk-foot .sep{color:var(--line2)}
+.risk-foot .closeby{color:var(--mut2)}
+.risk-foot .closeby b{color:var(--ink2); font-weight:700}
+
+/* =========================================================================
+ * TERM-CONFLICTS (none open), the honest completeness record
+ * ====================================================================== */
+.tc-intro{font-size:12.5px; color:var(--mut2); line-height:1.5; margin-bottom:4px}
+.tc-row{display:grid; grid-template-columns:1fr auto; gap:6px 14px; align-items:start; padding:12px 0; border-top:1px solid var(--line)}
+.tc-row:first-of-type{border-top:0}
+.tc-topic{font-weight:800; font-size:12.5px; color:var(--ink2)}
+.tc-docs{font-size:11px; color:var(--mut); margin-top:4px; font-family:var(--mono)}
+.tc-note{font-size:12px; color:var(--mut2); margin-top:6px; line-height:1.45; max-width:74ch}
+.tc-ok{flex:none; align-self:start; font-size:10.5px; font-weight:800; padding:3px 10px; border-radius:11px;
+  background:var(--ok-t); color:var(--ok); white-space:nowrap}
+
+.foot-note{max-width:1080px; margin:10px auto 0; padding:0 20px; font-size:11px; color:var(--mut2); line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="mock-banner">
+  <b>Mockup</b> &nbsp;·&nbsp; reframed Cross-Document panel (Open Document Risks), for review, not wired into the live dashboard.
+</div>
+
+<div class="wrap">
+  <div class="page-eyebrow">Deal · Visier People Analytics · MSA v3 (redline)</div>
+  <div class="page-title">Open Document Risks</div>
+  <div class="page-sub">Reflect-only. Each open item, why it matters to this deal, and the ask it drives.</div>
+
+  <!-- ===== FRAMING CARD ================================================== -->
+  <section class="sa-card accent-emph">
+    <div class="card-hd">
+      <span class="ch-ic"><svg viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+      <span class="ct">What this panel shows now</span>
+      <span class="cs" id="frameCount">reframed from cross-document conflicts</span>
+    </div>
+    <div class="card-bd" id="frameBody"></div>
+  </section>
+
+  <!-- ===== OPEN DOCUMENT RISKS =========================================== -->
+  <div class="sec-label">
+    <span class="sl-t">Open document risks</span>
+    <span class="sl-s" id="riskCount">ordered by severity, hard stop first</span>
+  </div>
+  <div id="riskList"></div>
+
+  <!-- ===== TERM CONFLICTS (none open) ==================================== -->
+  <section class="sa-card accent-teal">
+    <div class="card-hd">
+      <span class="ch-ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="ct">Term conflicts between documents in session</span>
+      <span class="cs" id="tcCount">none open</span>
+    </div>
+    <div class="card-bd" id="tcBody"></div>
+  </section>
+</div>
+<div class="foot-note" id="footNote"></div>
+
+<script>
+/* =========================================================================
+ * REAL DATA, inlined slices from _deal_build/_parts/data.js (verbatim).
+ * Only the slices this panel needs are inlined; nothing is fabricated.
+ * ====================================================================== */
+var D = {
+  /* documents[{id,name,type,isMissing,active,sourceType}] */
+  documents: [
+    { id:'DOC-01', name:'Visier Master Services Agreement (v3 redline)', type:'MSA', isMissing:false, active:'In negotiation', sourceType:'Uploaded contract' },
+    { id:'DOC-02', name:'SOW-01, Platform Implementation & Data Onboarding', type:'SOW', isMissing:false, active:'Draft', sourceType:'Uploaded contract' },
+    { id:'DOC-03', name:'Order Form, Subscription & Fees', type:'Order Form', isMissing:false, active:'Draft', sourceType:'Uploaded contract' },
+    { id:'DOC-04', name:'Supplier Privacy Standard (DPA)', type:'DPA', isMissing:true, active:'Referenced, not provided', sourceType:'Referenced in MSA §9.4' },
+    { id:'DOC-05', name:'Information Security Standard', type:'Exhibit', isMissing:true, active:'Referenced, not provided', sourceType:'Referenced in MSA §7.2' },
+    { id:'DOC-06', name:'Supplier redline cover email (07-15)', type:'Email', isMissing:false, active:'Active', sourceType:'M365 / Outlook' }
+  ],
+  /* documentConflicts[{id,docA,docB,topic,relation,consistent,trigger,note,issueId}] */
+  documentConflicts: [
+    { id:'DC-1', docA:'DOC-01', docB:'DOC-04', topic:'Data-protection terms', relation:'gap', consistent:false, issueId:'ISS-03', trigger:'gap',
+      note:'MSA incorporates a DPA “by reference,” but the DPA text itself is not in session, so the data-protection terms cannot be reconciled.', evidenceType:'unavailable' },
+    { id:'DC-2', docA:'DOC-01', docB:'DOC-04', topic:'Sub-processor change control', relation:'gap', consistent:false, issueId:'ISS-08', trigger:'gap',
+      note:'The sub-processor notice/objection mechanism would normally sit in the DPA; unavailable, so it cannot be verified against the MSA body.', evidenceType:'unavailable' },
+    { id:'DC-3', docA:'DOC-01', docB:'DOC-05', topic:'SLA credit schedule & security controls', relation:'gap', consistent:false, issueId:'ISS-06', trigger:'gap',
+      note:'MSA sets the 99.5% uptime target; the credit schedule and security controls sit in the missing Security Exhibit (Exhibit B).', evidenceType:'unavailable' },
+    { id:'DC-4', docA:'DOC-01', docB:'DOC-03', topic:'Renewal notice & price', relation:'conflict', consistent:true, issueId:'ISS-04', trigger:null,
+      note:'MSA and Order Form agree; both are silent on a renewal price cap (the deviation is vs. playbook, not between the two documents).', evidenceType:'contract' },
+    { id:'DC-5', docA:'DOC-02', docB:'DOC-03', topic:'Fee schedule totals', relation:'conflict', consistent:true, issueId:'ISS-12', trigger:null,
+      note:'Order Form (subscription) and SOW-01 (services) fee lines combine into the Year-1 total; no discrepancy found between the two.', evidenceType:'calculated' }
+  ],
+  /* issues[{id,title,category,priority,clause,impact,recommendedPosition,fallback,hardStop,evidenceType}]
+     Only the issues referenced by documentConflicts are inlined (the needed slice). */
+  issues: [
+    { id:'ISS-03', title:'Data-protection terms reference an unsigned DPA; no SCCs attached', category:'Data & Privacy', priority:'hard-stop', clause:'MSA §9.4 (Data Protection)',
+      impact:'Processing of global workforce personal data without an executed, reviewed DPA is a compliance exposure and likely a policy blocker.',
+      recommendedPosition:'Attach and execute a reviewed DPA with EU SCCs, a 30-day sub-processor objection right, and breach-notice within 72 hours, before MSA signature.',
+      fallback:'Execute DPA within 15 days of MSA signature with the platform paused for production data until executed.',
+      hardStop:'Signature with no DPA and no SCCs.', evidenceType:'contract' },
+    { id:'ISS-06', title:'Uptime SLA 99.5% with weak, capped service credits', category:'Service Levels', priority:'high', clause:'MSA §7.2 / Exhibit B (referenced)',
+      impact:'A quarter of degraded service yields a token credit and no exit; downtime during quarterly reporting is costly.',
+      recommendedPosition:'99.9% target; credits scaled to 50% of monthly fee; three consecutive misses trigger a termination right.',
+      fallback:'99.7% with a chronic-failure termination right retained.',
+      hardStop:'None, but chronic-failure exit is a firm ask.', evidenceType:'contract' },
+    { id:'ISS-08', title:'Sub-processors listed by reference; no change-notice or objection right', category:'Data & Privacy', priority:'medium', clause:'MSA §9.6 (Sub-processors)',
+      impact:'A new sub-processor in a high-risk jurisdiction could be added silently, undermining the data-transfer posture.',
+      recommendedPosition:'30-day advance email notice of new sub-processors with a good-faith objection-and-remediation right.',
+      fallback:'Notice via a subscribed change-feed with 15-day objection window.',
+      hardStop:'None.', evidenceType:'contract' },
+    { id:'ISS-04', title:'Auto-renewal with 90-day notice and uncapped renewal uplift', category:'Term & Renewal', priority:'high', clause:'MSA §3.2 / Order Form §4 (Term & Renewal)',
+      impact:'A missed 90-day window locks in another year at an uncapped increase; renewal leverage is lost.',
+      recommendedPosition:'Opt-in renewal, or 30-day notice with renewal uplift capped at CPI or 4%, whichever is lower.',
+      fallback:'45-day notice with a 5% renewal cap.', hardStop:'90-day window with no price cap.', evidenceType:'contract' },
+    { id:'ISS-12', title:'Total contract value anchored ~15% above internal precedent', category:'Commercial', priority:'high', clause:'Order Form §2 (Fees) + SOW-01 §7',
+      impact:'Accepting the ask overpays by an estimated $0.68M across the 3-year term versus a defensible target.',
+      recommendedPosition:'Anchor to the target scenario ($908K Y1); implementation and premium support carry the largest concessions.',
+      fallback:'Fallback scenario ($1.008M Y1) if platform discount is resisted.', hardStop:'Above the max-acceptable Y1 of $1.07M.', evidenceType:'calculated' }
+  ],
+  /* gaps[{id,input,whyItMatters,possibleSource,priority}] (the two that map to the missing exhibits used for "close by") */
+  gaps: [
+    { id:'GAP-1', priority:'critical', input:'Executed DPA text + EU SCCs (DOC-04)', whyItMatters:'Data-protection assessment is Limited and partly inferred; this is a signature gate.', possibleSource:'Supplier legal / MSA §9.4 reference' },
+    { id:'GAP-2', priority:'critical', input:'Security & Availability Exhibit B (DOC-05)', whyItMatters:'SLA credit schedule and security controls cannot be verified without it.', possibleSource:'Supplier / MSA §7.2 reference' }
+  ]
+};
+
+/* =========================================================================
+ * DERIVE, everything below is computed from D above, nothing hard-coded twice.
+ * ====================================================================== */
+var SEV_RANK  = { 'hard-stop':0, 'high':1, 'medium':2, 'low':3 };
+var SEV_LABEL = { 'hard-stop':'Hard stop', 'high':'High', 'medium':'Medium', 'low':'Low' };
+function esc(s){ return String(s==null?'':s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+function docById(id){ return D.documents.find(function(d){ return d.id===id; }); }
+function issueById(id){ return D.issues.find(function(i){ return i.id===id; }); }
+function gapForDoc(docId){ return D.gaps.find(function(g){ return g.input.indexOf(docId) !== -1; }); }
+
+/* An Open Document Risk = a documentConflict whose trigger is non-null. */
+var openRisks = D.documentConflicts
+  .filter(function(c){ return c.trigger != null; })
+  .map(function(c){
+    var issue = issueById(c.issueId);
+    // the missing document this risk traces to (the side of the pair that isMissing)
+    var missingDoc = [docById(c.docA), docById(c.docB)].filter(Boolean).find(function(d){ return d.isMissing; });
+    // the ask: recommendedPosition, falling back to hardStop (per spec)
+    var askText, askField;
+    if (issue.recommendedPosition){ askText = issue.recommendedPosition; askField = 'recommendedPosition'; }
+    else { askText = issue.hardStop; askField = 'hardStop'; }
+    return { c:c, issue:issue, missingDoc:missingDoc, gap:missingDoc ? gapForDoc(missingDoc.id) : null, askText:askText, askField:askField };
+  })
+  .sort(function(a,b){ return SEV_RANK[a.issue.priority] - SEV_RANK[b.issue.priority]; });
+
+/* the two distinct missing exhibits these risks trace to */
+var missingExhibits = [];
+openRisks.forEach(function(r){ if (r.missingDoc && missingExhibits.indexOf(r.missingDoc) === -1) missingExhibits.push(r.missingDoc); });
+
+/* true term conflicts = a 'conflict'-relation row that is NOT consistent (an actual contradiction) */
+var trueTermConflicts = D.documentConflicts.filter(function(c){ return c.relation === 'conflict' && c.consistent === false; });
+/* benign cross-document term checks on documents already in session */
+var termChecks = D.documentConflicts.filter(function(c){ return c.relation === 'conflict'; });
+
+/* =========================================================================
+ * RENDER, framing card
+ * ====================================================================== */
+document.getElementById('frameCount').textContent =
+  openRisks.length + ' open · ' + trueTermConflicts.length + ' true term conflict' + (trueTermConflicts.length===1?'':'s');
+
+var exhHtml = missingExhibits.map(function(d){
+  var drivenBy = openRisks.filter(function(r){ return r.missingDoc === d; });
+  var chips = drivenBy.map(function(r){ return r.c.id + ' → ' + r.issue.id; }).join(' &nbsp; ');
+  return '' +
+    '<div class="exh">' +
+      '<div class="exh-t">' + esc(d.name) + '</div>' +
+      '<div class="exh-m">' + esc(d.active) + '. ' + esc(d.sourceType) + '.</div>' +
+      '<div class="exh-ref"><span>' + esc(d.id) + ' · ' + esc(d.type) + '</span><span class="drives">drives ' + drivenBy.length + ' risk' + (drivenBy.length===1?'':'s') + ':</span><span>' + chips + '</span></div>' +
+    '</div>';
+}).join('');
+
+document.getElementById('frameBody').innerHTML = '' +
+  '<div class="frame-lead">Every open cross-document risk here is a document-completeness gap, not a contradiction between documents already in session.</div>' +
+  '<div class="frame-body">All ' + openRisks.length + ' open risks trace to <b>two incorporated exhibits the MSA references but that are not in this session</b>: the Supplier Privacy Standard (DPA), referenced at MSA §9.4, and the Information Security Standard (the Security &amp; Availability Exhibit), referenced at MSA §7.2. Until each is provided, the terms it carries cannot be reconciled against the MSA body. This is paper to obtain and review before signature, not a term that two in-session documents disagree on. A <b>true term conflict</b> (where a term’s value differs across two documents in session) would appear as its own row the moment one arises; right now there are ' + trueTermConflicts.length + '.</div>' +
+
+  '<div class="frame-stats">' +
+    '<div class="fstat s-risk"><div class="fs-n">' + openRisks.length + '</div><div class="fs-l">open document risks<br>(documentConflicts with a live trigger)</div></div>' +
+    '<div class="fstat s-doc"><div class="fs-n">' + missingExhibits.length + '</div><div class="fs-l">missing incorporated exhibits<br>every risk traces back to these</div></div>' +
+    '<div class="fstat s-clean"><div class="fs-n">' + trueTermConflicts.length + '</div><div class="fs-l">true term conflicts<br>' + termChecks.length + ' in-session cross-checks, both agree</div></div>' +
+  '</div>' +
+
+  '<div class="exhibits">' + exhHtml + '</div>' +
+
+  '<div class="frame-legend">' +
+    '<span>Severity = the linked finding’s priority:</span>' +
+    '<span><i class="i-hs"></i>Hard stop</span>' +
+    '<span><i class="i-hi"></i>High</span>' +
+    '<span><i class="i-md"></i>Medium</span>' +
+    '<span style="color:var(--mut)">Red is reserved for hard stops.</span>' +
+  '</div>';
+
+/* =========================================================================
+ * RENDER, one card per open document risk (the four things)
+ * ====================================================================== */
+document.getElementById('riskCount').textContent = openRisks.length + ' open, ordered by severity (hard stop first)';
+
+document.getElementById('riskList').innerHTML = openRisks.map(function(r, idx){
+  var sev = r.issue.priority;
+  var accent = sev==='hard-stop' ? 'accent-danger' : (sev==='high' ? 'accent-emph' : 'accent-warn');
+  var m = r.missingDoc;
+  var gap = r.gap;
+
+  // risk headline, a faithful label from the conflict topic + the missing document
+  var headline;
+  if (r.c.id === 'DC-1') headline = 'DPA incorporated by reference, not provided';
+  else if (r.c.id === 'DC-3') headline = 'Security &amp; Availability Exhibit not provided';
+  else if (r.c.id === 'DC-2') headline = 'Sub-processor change-control mechanism not in session';
+  else headline = esc(r.c.topic);
+
+  var closeBy = gap ? ('<span class="closeby">Close by obtaining <b>' + esc(gap.input) + '</b> from ' + esc(gap.possibleSource) + ' <span style="font-family:var(--mono)">(' + esc(gap.id) + ')</span></span>') : '';
+
+  return '' +
+  '<article class="sa-card risk ' + accent + '">' +
+
+    // ---- header: severity handle (finding) + title + traces-to ----
+    '<div class="risk-hd">' +
+      '<div class="sev-chip sev-' + sev + '">' +
+        '<span class="sc-k">' + SEV_LABEL[sev] + '</span>' +
+        '<span class="sc-t">' + esc(r.issue.id) + '</span>' +
+      '</div>' +
+      '<div class="risk-hd-main">' +
+        '<div class="risk-order">Open document risk ' + (idx+1) + ' of ' + openRisks.length + '</div>' +
+        '<div class="risk-title">' + headline + '</div>' +
+        '<div class="risk-meta">' +
+          '<span class="clause">' + esc(r.issue.clause) + '</span>' +
+          (m ? '<span class="trace-tag"><svg viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>traces to ' + esc(m.id) + ' · ' + esc(m.name) + ' (not in session)</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="risk-bd">' +
+
+      // ---- 1. THE RISK (from the documentConflict note) ----
+      '<div class="rb">' +
+        '<div class="rb-lab">The risk <span class="src">documentConflicts.' + esc(r.c.id) + '.note</span></div>' +
+        '<div class="rb-body">' + esc(r.c.note) + '</div>' +
+      '</div>' +
+
+      // ---- 2. WHY IT MATTERS (the linked issue's impact) ----
+      '<div class="rb">' +
+        '<div class="rb-lab">Why it matters to this deal <span class="src">' + esc(r.issue.id) + '.impact</span></div>' +
+        '<div class="rb-body">' + esc(r.issue.impact) + '</div>' +
+      '</div>' +
+
+      // ---- 3. THE ASK IT DRIVES (issue.recommendedPosition, fallback hardStop) ----
+      '<div class="rb ask">' +
+        '<div class="rb-lab"><span class="arw">→</span> The ask it drives</div>' +
+        '<div class="rb-body">' + esc(r.askText) + '</div>' +
+        '<div class="rb-prov">Pulled verbatim from <b>' + esc(r.issue.id) + '.' + esc(r.askField) + '</b>' + (r.askField==='hardStop' ? ' (no recommendedPosition on this finding, so the hard-stop line is used)' : '') + '</div>' +
+      '</div>' +
+
+    '</div>' +
+
+    // ---- 4. LINKED FINDING footer + how to close ----
+    '<div class="risk-foot">' +
+      '<span class="fk">Linked finding</span>' +
+      '<span class="fissue">' + esc(r.issue.id) + ' · ' + esc(r.issue.title) + '</span>' +
+      '<span class="ev ev-' + esc(r.c.evidenceType) + '">' + (r.c.evidenceType==='unavailable' ? 'Unavailable' : esc(r.c.evidenceType)) + '</span>' +
+      (closeBy ? '<span class="sep">|</span>' + closeBy : '') +
+    '</div>' +
+
+  '</article>';
+}).join('');
+
+/* =========================================================================
+ * RENDER, term conflicts (none open) honest record
+ * ====================================================================== */
+document.getElementById('tcCount').textContent = trueTermConflicts.length + ' open of ' + termChecks.length + ' checks';
+
+document.getElementById('tcBody').innerHTML = '' +
+  '<div class="tc-intro">A true term conflict is a term whose value differs across two documents already in session. None is open. The ' + termChecks.length + ' cross-document term checks below both reconcile; a real contradiction would surface here as its own risk row.</div>' +
+  termChecks.map(function(c){
+    var a = docById(c.docA), b = docById(c.docB);
+    return '' +
+    '<div class="tc-row">' +
+      '<div>' +
+        '<div class="tc-topic">' + esc(c.topic) + '</div>' +
+        '<div class="tc-docs">' + esc(c.docA) + ' ' + esc(a?a.type:'') + '  ×  ' + esc(c.docB) + ' ' + esc(b?b.type:'') + '</div>' +
+        '<div class="tc-note">' + esc(c.note) + '</div>' +
+      '</div>' +
+      '<span class="tc-ok">Both agree</span>' +
+    '</div>';
+  }).join('');
+
+/* footer provenance */
+document.getElementById('footNote').innerHTML =
+  'Mockup data mirrors the live Deal dataset (documentConflicts, documents, issues, gaps). Risks are the documentConflicts with a non-null trigger; each ask is the linked issue’s recommendedPosition (or hardStop where none exists), shown verbatim. Nothing is fabricated; fields absent in source are shown as gap-state.';
+
+/* smoke check surfaced in the title bar if anything failed to render */
+(function(){
+  var ok = document.querySelectorAll('.risk').length === openRisks.length && openRisks.length === 3;
+  if (!ok) document.title = 'RENDER ERROR — ' + document.querySelectorAll('.risk').length + ' cards';
+})();
+</script>
+</body>
+</html>

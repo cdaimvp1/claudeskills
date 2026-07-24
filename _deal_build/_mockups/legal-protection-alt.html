@@ -1,0 +1,1399 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legal &amp; Protection (v2), mockup</title>
+<style>
+/* ============================================================================
+ * Self-contained mockup, Deal dashboard design system (plum / teal / burnt-orange).
+ * No external fonts, no CDNs, no network. Opens over file://.
+ * 3-colour discipline: plum = structure/state, teal = good/action, burnt-orange =
+ * deduction/adverse. RED is reserved for hard-stop / critical only.
+ * ========================================================================== */
+:root{
+  --bg:#E2E6E1; --surface:#FFFFFF; --surface2:#F7F5F1; --nested:#EDEAE3; --well:#E4E0D8;
+  --line:#E7E2DA; --line2:#D3CDC3; --ink:#1A1A1A; --ink2:#33302B; --mut:#505A64; --mut2:#5A544C;
+  --plum:#5C2B50; --plum-t:#EDDFE9; --plum-d:#4A2340;
+  --teal-d:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --pri:var(--plum); --pri-t:var(--plum-t); --pri-tx:#5C2B50;
+  --sec:var(--teal-d); --sec-t:var(--teal-t); --sec-tx:#2F6E6B;
+  --emph-tx:#A2500F;
+  --danger:#A23A30; --danger-t:#FBE7E3; --danger-bar:#A23A30;
+  --warn:#8A5A00; --warn-t:#FBF1DA; --warn-bar:#B45309;
+  --ok:#1F7A5A; --ok-t:#DFEEE6; --ok-bar:#1F7A5A;
+  --ai:#2E5E8C; --ai-t:#E4EBF1;
+  --shadow-1:0 1px 2px rgba(28,28,34,.04),0 5px 14px -4px rgba(28,28,34,.10);
+  --shadow-2:0 2px 4px rgba(28,28,34,.06),0 12px 30px -8px rgba(28,28,34,.20);
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono','Segoe UI Mono','SFMono-Regular',Consolas,'Roboto Mono',monospace;
+  --r:11px; --r-sm:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:13.5px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; padding-bottom:44px}
+h1,h2,h3,h4,p{margin:0}
+button{font-family:inherit}
+.ic{stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; width:14px; height:14px; flex:none}
+
+/* ---- top mockup banner --------------------------------------------------- */
+.mock-banner{background:#2A2732; color:#F2EEF0; font-size:11.5px; letter-spacing:.03em;
+  padding:8px 18px; text-align:center; font-weight:600; border-bottom:2px solid var(--emph)}
+.mock-banner b{color:#F3C89E; font-weight:800; text-transform:uppercase; letter-spacing:.09em; margin-right:4px}
+
+.wrap{max-width:1260px; margin:0 auto; padding:20px 20px 0}
+.page-eyebrow{font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--mut); font-weight:700}
+.page-title{font-size:20px; font-weight:800; letter-spacing:-.01em; margin:3px 0 2px}
+.page-sub{font-size:12.5px; color:var(--mut); margin-bottom:16px}
+
+/* ---- sa-card ------------------------------------------------------------- */
+.sa-card{position:relative; background:var(--surface); border:1px solid var(--line2);
+  border-radius:var(--r); box-shadow:var(--shadow-1); margin-bottom:16px}
+.sa-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--pri); border-radius:var(--r) 0 0 var(--r)}
+.sa-card.accent-teal::before{background:var(--sec)}
+.sa-card.accent-emph::before{background:var(--emph)}
+.card-hd{display:flex; align-items:center; gap:9px; padding:12px 15px; border-bottom:1px solid var(--line2)}
+.card-hd .ch-ic{width:16px; height:16px; flex:none; color:var(--pri-tx)}
+.sa-card.accent-teal .card-hd .ch-ic{color:var(--sec-tx)}
+.sa-card.accent-emph .card-hd .ch-ic{color:var(--emph-tx)}
+.card-hd .ch-ic svg{width:16px; height:16px}
+.card-hd .ct{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink)}
+.card-hd .cs{margin-left:auto; font-family:var(--mono); font-size:11px; color:var(--mut); font-weight:600; text-align:right}
+.card-bd{padding:15px 16px}
+
+/* ---- evidence + pills ---------------------------------------------------- */
+.ev{display:inline-block; font-size:10px; font-weight:700; letter-spacing:.02em; padding:2px 7px;
+  border-radius:11px; border:1px solid var(--line2); background:var(--surface2); color:var(--mut2); white-space:nowrap; vertical-align:middle}
+.ev.ev-contract{background:var(--sec-t); color:var(--sec-tx); border-color:transparent}
+.ev.ev-internal{background:var(--plum-t); color:var(--pri-tx); border-color:transparent}
+.ev.ev-calculated{background:var(--emph-t); color:var(--emph-tx); border-color:transparent}
+.ev.ev-inference{background:var(--ai-t); color:var(--ai); border-color:transparent}
+.ev.ev-unavailable{background:var(--well); color:var(--mut2)}
+.chip-analysis{display:inline-block; font-size:10px; font-weight:800; letter-spacing:.02em; padding:2px 7px;
+  border-radius:11px; background:var(--ai-t); color:var(--ai); white-space:nowrap; vertical-align:middle}
+.chip-analysis::before{content:"◆ "; font-size:8px; vertical-align:1px}
+
+.pill{display:inline-block; font-size:10px; font-weight:800; letter-spacing:.02em; padding:2px 8px; border-radius:11px; white-space:nowrap; vertical-align:middle}
+.pill.sev-hard-stop{background:var(--danger-t); color:var(--danger)}
+.pill.sev-high{background:var(--emph-t); color:var(--emph-tx)}
+.pill.sev-medium{background:var(--warn-t); color:var(--warn)}
+.pill.sev-low{background:var(--surface2); color:var(--mut2); border:1px solid var(--line2)}
+.pill.party-supplier{background:var(--plum-t); color:var(--pri-tx)}
+.pill.party-buyer{background:var(--sec-t); color:var(--sec-tx)}
+.pill.party-mutual{background:var(--surface2); color:var(--mut2); border:1px solid var(--line2)}
+.pill.one-sided{background:var(--emph-t); color:var(--emph-tx)}
+.pill.one-sided.crit{background:var(--danger-t); color:var(--danger)}
+.pill.balanced{background:var(--ok-t); color:var(--ok)}
+
+/* severity mini-dots */
+.sevmix{display:inline-flex; align-items:center; gap:7px; font-size:10.5px; color:var(--mut2)}
+.sevmix .sd{display:inline-flex; align-items:center; gap:3px; font-weight:800}
+.sevmix .sd i{width:8px; height:8px; border-radius:50%; display:inline-block}
+.sd.d-hard-stop i{background:var(--danger)} .sd.d-hard-stop{color:var(--danger)}
+.sd.d-high i{background:var(--emph)} .sd.d-high{color:var(--emph-tx)}
+.sd.d-medium i{background:var(--warn-bar)} .sd.d-medium{color:var(--warn)}
+.sd.d-low i{background:var(--mut)} .sd.d-low{color:var(--mut2)}
+
+/* =========================================================================
+ * 1. SCORECARD PANEL, compact gauge + deduction waterfall + achievable lift
+ * ====================================================================== */
+.sc-grid{display:grid; grid-template-columns:196px 1fr; gap:26px; align-items:start}
+@media(max-width:760px){.sc-grid{grid-template-columns:1fr; gap:18px}}
+
+/* compact gauge */
+.pg{display:flex; flex-direction:column; align-items:center}
+.pg svg.gaugesvg{width:184px; height:auto}
+.pg .pg-num{font-size:42px; font-weight:800; line-height:1; margin-top:-32px; letter-spacing:-.02em}
+.pg .pg-num small{font-size:15px; font-weight:700; color:var(--mut)}
+.pg .pg-band{margin-top:7px}
+.pg-band .pill{font-size:11px; padding:3px 12px}
+.pg-scale{display:flex; flex-direction:column; gap:3px; margin-top:15px; width:100%}
+.pg-leg{display:flex; align-items:center; gap:7px; font-size:10.5px; color:var(--mut2); font-weight:600}
+.pg-leg i{width:9px; height:9px; border-radius:2px; flex:none}
+.pg-leg .rng{margin-left:auto; font-family:var(--mono); font-size:10px; color:var(--mut2)}
+.pg-leg.cur{color:var(--ink); font-weight:800}
+.pg-leg.cur .rng{color:var(--ink)}
+.howscored{display:inline-flex; align-items:center; gap:5px; margin-top:14px; font-size:10.5px;
+  font-weight:700; color:var(--sec-tx); cursor:help; border-bottom:1px dashed var(--line2); padding-bottom:1px}
+.howscored .ic{width:12px; height:12px}
+
+/* waterfall */
+.wf-head{margin-bottom:11px}
+.wf-head .wf-t{font-size:12.5px; font-weight:800; color:var(--ink)}
+.wf-head .wf-s{font-size:11.5px; color:var(--mut); margin-top:1px}
+.wf{position:relative}
+.wf-axis{position:relative; height:15px; margin-left:150px; margin-right:54px; border-bottom:1px solid var(--line2)}
+.wf-axis span{position:absolute; top:0; transform:translateX(-50%); font-size:10px; color:var(--mut2); font-family:var(--mono)}
+.wf-row{display:grid; grid-template-columns:150px 1fr 54px; align-items:center; height:31px}
+.wf-row .wf-lab{font-size:11.5px; color:var(--ink2); font-weight:600; white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; padding-right:10px; text-align:right}
+.wf-track{position:relative; height:31px}
+.wf-grid{position:absolute; inset:0; pointer-events:none}
+.wf-grid i{position:absolute; top:0; bottom:0; width:1px; background:var(--line)}
+.wf-bar{position:absolute; top:6px; height:19px; border-radius:3px}
+.wf-bar.base{background:linear-gradient(90deg,var(--plum-t),#DCC7D6); border:1px solid #C9A6BE}
+.wf-bar.current{background:var(--warn-t); border:1px solid #E4C77E}
+.wf-bar.drop{background:var(--emph); box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.wf-bar.drop.lever{outline:2px solid rgba(193,94,25,.30); outline-offset:1px}
+.wf-connect{position:absolute; top:6px; height:19px; width:1px; background:var(--line2)}
+.wf-delta{font-size:11px; font-weight:800; color:var(--emph-tx); text-align:right; font-family:var(--mono); padding-left:8px}
+.wf-row.base .wf-delta,.wf-row.current .wf-delta{color:var(--ink)}
+.wf-clickable{cursor:pointer; border-radius:5px}
+.wf-clickable:hover{background:var(--surface2)}
+.wf-clickable:hover .wf-bar.drop{filter:brightness(1.08)}
+.wf-clickable:focus-visible{outline:2px solid var(--sec); outline-offset:1px}
+.wf-ach-band{position:absolute; top:5px; height:21px; background:repeating-linear-gradient(135deg,
+  rgba(47,110,107,.16),rgba(47,110,107,.16) 5px,rgba(47,110,107,.05) 5px,rgba(47,110,107,.05) 10px);
+  border:1px dashed var(--sec); border-left:none; border-radius:0 3px 3px 0}
+.wf-ach-mark{position:absolute; top:0; bottom:0; width:2px; background:var(--sec)}
+.wf-ach-flag{position:absolute; top:-3px; transform:translateX(-50%); background:var(--sec); color:#fff;
+  font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; white-space:nowrap; font-family:var(--mono)}
+.wf-legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:13px; padding-top:11px; border-top:1px solid var(--line)}
+.wf-legend span{display:inline-flex; align-items:center; gap:6px; font-size:10.5px; color:var(--mut2); font-weight:600}
+.wf-legend i{width:13px; height:10px; border-radius:2px; flex:none}
+.i-base{background:linear-gradient(90deg,var(--plum-t),#DCC7D6); border:1px solid #C9A6BE}
+.i-drop{background:var(--emph)}
+.i-current{background:var(--warn-t); border:1px solid #E4C77E}
+.i-ach{background:repeating-linear-gradient(135deg,rgba(47,110,107,.35),rgba(47,110,107,.35) 3px,transparent 3px,transparent 6px); border:1px dashed var(--sec)}
+
+/* =========================================================================
+ * 2. TWO-COLUMN, left navigator (~33%) + right register (~67%)
+ * ====================================================================== */
+.split{display:grid; grid-template-columns:minmax(0,33fr) minmax(0,67fr); gap:16px; align-items:start}
+@media(max-width:940px){.split{grid-template-columns:1fr}}
+.left-card{margin-bottom:0}
+@media(min-width:941px){.left-card{position:sticky; top:14px; align-self:start; max-height:calc(100vh - 28px); display:flex; flex-direction:column}
+  .left-card .left-scroll{overflow:auto}}
+
+/* segmented toggle */
+.seg{display:inline-flex; background:var(--well); border:1px solid var(--line2); border-radius:9px; padding:3px; gap:3px; width:100%}
+.seg button{flex:1; border:0; background:transparent; color:var(--mut2); font-size:12px; font-weight:800;
+  letter-spacing:.02em; padding:8px 8px; border-radius:6px; cursor:pointer; transition:all .12s; display:inline-flex; align-items:center; justify-content:center; gap:6px}
+.seg button .ic{width:13px;height:13px}
+.seg button .cnt{font-family:var(--mono); font-size:10.5px; font-weight:700; opacity:.7}
+.seg button[aria-pressed="true"]{background:var(--surface); color:var(--pri-tx); box-shadow:var(--shadow-1)}
+.seg button:focus-visible{outline:2px solid var(--sec); outline-offset:2px}
+
+/* ---- PROTECTIONS accordion ---- */
+.acc{border-top:1px solid var(--line2)}
+.acc-item{border-bottom:1px solid var(--line2)}
+.acc-hd{width:100%; text-align:left; border:0; background:transparent; cursor:pointer; padding:11px 13px 10px; display:block; transition:background .12s}
+.acc-hd:hover{background:var(--surface2)}
+.acc-hd:focus-visible{outline:2px solid var(--sec); outline-offset:-2px}
+.acc-hd .ah-top{display:grid; grid-template-columns:15px 1fr auto; align-items:center; gap:9px}
+.acc-hd .chev{color:var(--mut2); transition:transform .18s ease; display:inline-flex}
+.acc-item.open .acc-hd .chev{transform:rotate(90deg); color:var(--pri-tx)}
+.acc-hd .ah-name{font-size:12.5px; font-weight:800; color:var(--ink); letter-spacing:-.005em}
+.acc-hd .ah-pts{font-family:var(--mono); font-size:12px; font-weight:800; color:var(--emph-tx)}
+.acc-hd .ah-meta{display:flex; align-items:center; gap:10px; margin:7px 0 0 24px; flex-wrap:wrap}
+.cov-chip{font-size:10px; font-weight:800; letter-spacing:.02em; padding:2px 8px; border-radius:11px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px}
+.cov-Confirm{background:var(--warn-t); color:var(--warn)}
+.cov-Gap{background:var(--danger-t); color:var(--danger)}
+.cov-Covered{background:var(--ok-t); color:var(--ok)}
+.acc-body{display:none; padding:2px 13px 11px 24px; background:var(--surface2)}
+.acc-item.open .acc-body{display:block}
+/* expanded finding rows: PLAIN rows separated only by a hairline divider (no card/bubble) */
+.acc-find{width:100%; text-align:left; border:0; background:transparent; cursor:pointer; display:grid;
+  grid-template-columns:1fr auto; align-items:center; gap:8px; padding:9px 3px; border-top:1px solid var(--line); transition:background .12s}
+.acc-find:first-child{border-top:0}
+.acc-find:hover{background:var(--surface)}
+.acc-find:focus-visible{outline:2px solid var(--sec); outline-offset:-2px}
+.acc-find.is-active{background:var(--plum-t); box-shadow:inset 3px 0 0 var(--plum)}
+.af-title{font-size:11.5px; font-weight:600; color:var(--ink2); line-height:1.35}
+.af-id{display:block; font-family:var(--mono); font-size:10px; color:var(--mut2); font-weight:700; margin-top:3px}
+.af-right{display:inline-flex; align-items:center; gap:7px; justify-self:end}
+
+/* ---- OBLIGATIONS accordion (party groups, collapsed by default) ---- */
+.ah-name .gl-bar{width:8px; height:8px; border-radius:2px; display:inline-block; margin-right:7px; vertical-align:middle}
+.ah-pts.nrm{color:var(--mut2); font-weight:800}
+.favors{display:block; min-width:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  font-size:10px; color:var(--mut2); font-weight:600; letter-spacing:.01em}
+.favors .fv-lab{color:var(--mut); font-weight:700}
+.favors b{font-weight:800}
+.favors .fv-sup{color:var(--emph-tx)}
+.favors .fv-lilly{color:var(--sec-tx)}
+.favors .fv-mut{color:var(--mut2)}
+.obl-sub{display:flex; align-items:center; gap:7px; margin-top:5px; flex-wrap:wrap}
+.obl-clause{font-size:10.5px; color:var(--mut2); font-family:var(--mono)}
+
+/* ---- must-negotiate marker (non-text dot + tooltip) ---- */
+.mneg{width:9px; height:9px; border-radius:50%; display:inline-block; flex:none; cursor:help; box-shadow:0 0 0 2px var(--surface)}
+.mneg-critical{background:var(--danger)}
+.mneg-high{background:var(--emph)}
+
+/* =========================================================================
+ * RIGHT, findings register (toolbar + list + expanding detail)
+ * ====================================================================== */
+.reg-tools{padding:12px 14px; border-bottom:1px solid var(--line2); background:var(--surface2); border-radius:0}
+.reg-search{position:relative; margin-bottom:10px}
+.reg-search .ic{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--mut2); width:15px; height:15px}
+.reg-search input{width:100%; border:1px solid var(--line2); background:var(--surface); border-radius:8px;
+  padding:9px 12px 9px 34px; font-size:12.5px; color:var(--ink); font-family:var(--sans)}
+.reg-search input:focus{outline:2px solid var(--sec); outline-offset:0; border-color:var(--sec)}
+.reg-search input::placeholder{color:var(--mut2)}
+.reg-filters{display:flex; align-items:center; gap:8px 10px; flex-wrap:wrap}
+.rf-group{display:inline-flex; align-items:center; gap:6px}
+.rf-lab{font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--mut)}
+.chip{border:1px solid var(--line2); background:var(--surface); color:var(--mut2); font-size:10.5px; font-weight:800;
+  letter-spacing:.01em; padding:4px 9px; border-radius:20px; cursor:pointer; transition:all .12s; display:inline-flex; align-items:center; gap:5px}
+.chip:hover{border-color:var(--mut2)}
+.chip:focus-visible{outline:2px solid var(--sec); outline-offset:1px}
+.chip .dotc{width:8px; height:8px; border-radius:50%; flex:none}
+.chip.c-hard-stop .dotc{background:var(--danger)} .chip.c-high .dotc{background:var(--emph)}
+.chip.c-medium .dotc{background:var(--warn-bar)} .chip.c-low .dotc{background:var(--mut)}
+.chip.c-issue .dotc{background:var(--plum)} .chip.c-obligation .dotc{background:var(--sec)}
+.chip[aria-pressed="true"]{background:var(--plum); color:#fff; border-color:var(--plum)}
+.chip[aria-pressed="true"] .dotc{outline:1.5px solid rgba(255,255,255,.7)}
+.reg-clear{margin-left:auto; border:0; background:transparent; color:var(--sec-tx); font-size:11px; font-weight:800;
+  cursor:pointer; padding:5px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px}
+.reg-clear:hover{background:var(--sec-t)}
+.reg-clear[disabled]{color:var(--mut2); opacity:.5; cursor:default; background:transparent}
+.reg-clear:focus-visible{outline:2px solid var(--sec); outline-offset:1px}
+.reg-count{font-family:var(--mono); font-size:10.5px; color:var(--mut); font-weight:600; padding:7px 14px 0}
+
+.reg-list{padding:0 0 4px}
+.reg-group-hd{display:flex; align-items:center; gap:8px; padding:11px 15px 7px}
+.reg-group-hd .rg-t{font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--mut)}
+.reg-group-hd .rg-count{font-family:var(--mono); font-size:10px; font-weight:700; color:var(--mut2); background:var(--well); padding:1px 7px; border-radius:10px}
+.reg-item{border-top:1px solid var(--line)}
+.reg-item:first-child{border-top:0}
+.reg-row{width:100%; text-align:left; border:0; background:transparent; cursor:pointer; display:grid;
+  grid-template-columns:auto 1fr auto 14px; align-items:center; gap:11px; padding:11px 15px; transition:background .12s}
+.reg-row:hover{background:var(--surface2)}
+.reg-row:focus-visible{outline:2px solid var(--sec); outline-offset:-2px}
+.reg-item.sel .reg-row{background:var(--plum-t)}
+.rr-tag{font-size:9px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; padding:3px 7px; border-radius:6px; white-space:nowrap}
+.rr-tag.tag-issue{background:var(--plum-t); color:var(--pri-tx)}
+.rr-tag.tag-obligation{background:var(--sec-t); color:var(--sec-tx)}
+.reg-item.sel .rr-tag.tag-issue{background:var(--plum); color:#fff}
+.reg-item.sel .rr-tag.tag-obligation{background:var(--sec); color:#fff}
+.rr-main{min-width:0}
+.rr-title{font-size:12.5px; font-weight:700; color:var(--ink); line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.reg-item.sel .rr-title{white-space:normal}
+.rr-sub{font-size:10.5px; color:var(--mut2); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.rr-sub .rr-id{font-family:var(--mono); font-weight:700; color:var(--mut)}
+.rr-sub .dot{opacity:.5}
+.rr-side{display:flex; align-items:center; gap:6px; justify-self:end}
+.reg-row .chev{color:var(--mut2); transition:transform .18s}
+.reg-item.sel .reg-row .chev{transform:rotate(90deg); color:var(--pri-tx)}
+.reg-detail{padding:4px 16px 18px; border-top:1px dashed var(--line2); animation:fade .16s ease}
+@keyframes fade{from{opacity:.4}to{opacity:1}}
+
+.reg-empty{display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  min-height:200px; color:var(--mut2); gap:12px; padding:28px}
+.reg-empty .ic{width:30px; height:30px; stroke:var(--line2); stroke-width:1.6}
+.reg-empty p{font-size:13px; max-width:300px}
+.reg-empty button{border:1px solid var(--sec); background:var(--sec-t); color:var(--sec-tx); font-weight:800;
+  font-size:11.5px; padding:7px 14px; border-radius:7px; cursor:pointer}
+
+/* =========================================================================
+ * FINDING DETAIL (shared): eyebrow, title, outcome cards, zones
+ * ====================================================================== */
+.fd-eyebrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:12px 0 8px}
+.fd-eyebrow .fd-id{font-family:var(--mono); font-size:11px; font-weight:800; color:var(--mut)}
+.fd-eyebrow .fd-kind{font-size:9.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:2px 8px; border-radius:11px}
+.fd-kind.k-issue{background:var(--plum-t); color:var(--pri-tx)}
+.fd-kind.k-obligation{background:var(--sec-t); color:var(--sec-tx)}
+.fd-title{font-size:16px; font-weight:800; line-height:1.32; letter-spacing:-.01em; margin-bottom:3px; color:var(--ink)}
+.fd-title.ob{font-size:14.5px}
+.fd-cat{font-size:11.5px; color:var(--mut); margin-bottom:13px}
+
+.tactic{display:flex; gap:9px; background:var(--warn-t); border:1px solid #E4C77E; border-radius:8px;
+  padding:9px 11px; margin-bottom:14px; font-size:12px}
+.tactic .ic{color:var(--warn)} .tactic b{color:var(--warn)}
+.tactic .tk-q{display:block; color:var(--mut2); font-style:italic; margin-top:3px; font-size:11.5px}
+
+/* outcome cards */
+.oc-src{font-size:10.5px; color:var(--mut2); margin:-4px 0 15px; display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.oc-src .lk{border:0; background:var(--sec-t); color:var(--sec-tx); font-weight:800; font-size:10.5px; padding:2px 8px; border-radius:11px; cursor:pointer; font-family:var(--mono)}
+.oc-src .lk:hover{background:#CFE6E3}
+.outcomes{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 6px}
+@media(max-width:560px){.outcomes{grid-template-columns:1fr}}
+.oc{border:1px solid var(--line2); border-radius:9px; padding:11px 12px 12px; background:var(--surface2); position:relative}
+.oc::before{content:""; position:absolute; left:0; top:11px; bottom:11px; width:3px; border-radius:3px}
+.oc.preferred::before{background:var(--ok-bar)} .oc.fallback::before{background:var(--warn-bar)}
+.oc.walkaway::before{background:var(--danger-bar)} .oc.walkaway-none::before{background:var(--mut2)}
+.oc .oc-lab{font-size:10px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px; padding-left:9px}
+.oc.preferred .oc-lab{color:var(--ok)} .oc.fallback .oc-lab{color:var(--warn)}
+.oc.walkaway .oc-lab{color:var(--danger)} .oc.walkaway-none .oc-lab{color:var(--mut2)}
+.oc .oc-sub{font-size:9px; font-weight:700; color:var(--mut2); letter-spacing:.02em; text-transform:none; display:block; margin-top:2px}
+.oc .oc-body{font-size:11.5px; color:var(--ink2); line-height:1.42; padding-left:9px}
+
+/* zones */
+.zone{border:1px solid var(--line2); border-left-width:3px; border-radius:8px; padding:11px 13px; margin-top:12px; background:var(--surface)}
+.zone.z-state{border-left-color:var(--plum)}
+.zone.z-problem{border-left-color:var(--emph)}
+.zone.z-play{border-left-color:var(--sec)}
+.zone-hd{display:flex; align-items:center; gap:7px; margin-bottom:9px}
+.zone-hd .ic{width:15px; height:15px}
+.zone.z-state .zone-hd{color:var(--pri-tx)} .zone.z-problem .zone-hd{color:var(--emph-tx)} .zone.z-play .zone-hd{color:var(--sec-tx)}
+.zone-hd .zt{font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase}
+.zone-bd{font-size:12.5px; color:var(--ink2); line-height:1.5}
+.zf{margin-top:10px}
+.zf:first-child{margin-top:0}
+.zf-lab{font-size:9.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--mut); margin-bottom:3px}
+.quote{border-left:3px solid var(--line2); background:var(--surface2); padding:8px 11px; margin-top:6px;
+  font-size:11.5px; color:var(--mut2); font-style:italic; border-radius:0 6px 6px 0; line-height:1.45}
+.quote.contract{border-left-color:var(--sec)}
+.quote.playbook{border-left-color:var(--plum); font-style:normal}
+.quote.playbook b{color:var(--pri-tx)}
+.quote.pushback{border-left-color:var(--emph)}
+
+/* facts table (obligation) */
+.facts{border:1px solid var(--line2); border-radius:8px; overflow:hidden; margin-top:2px}
+.fact{display:grid; grid-template-columns:132px 1fr; gap:12px; padding:9px 12px; border-top:1px solid var(--line); background:var(--surface)}
+.fact:first-child{border-top:0}
+.fact:nth-child(even){background:var(--surface2)}
+.fact-l{font-size:10px; font-weight:800; letter-spacing:.03em; text-transform:uppercase; color:var(--mut); line-height:1.4}
+.fact-v{font-size:12.5px; color:var(--ink2); line-height:1.45}
+.fact-v .gapnote{color:var(--danger); font-weight:600}
+
+/* fairness verdict */
+.verdict{display:flex; gap:11px; padding:11px 13px; border-radius:9px; border:1px solid; border-left-width:4px; margin-top:12px; align-items:flex-start}
+.verdict .ic{width:17px; height:17px; margin-top:1px; flex:none}
+.verdict.v-fair{background:var(--ok-t); border-color:var(--ok-bar)}
+.verdict.v-fair .ic,.verdict.v-fair .v-label{color:var(--ok)}
+.verdict.v-neutral{background:var(--well); border-color:var(--line2)}
+.verdict.v-neutral .ic,.verdict.v-neutral .v-label{color:var(--mut2)}
+.verdict.v-adverse{background:var(--emph-t); border-color:var(--emph)}
+.verdict.v-adverse .ic,.verdict.v-adverse .v-label{color:var(--emph-tx)}
+.verdict.v-critical{background:var(--danger-t); border-color:var(--danger)}
+.verdict.v-critical .ic,.verdict.v-critical .v-label{color:var(--danger)}
+.v-body{min-width:0}
+.v-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px}
+.v-label{font-size:12.5px; font-weight:800; letter-spacing:-.005em}
+.v-why{font-size:12px; color:var(--ink2); line-height:1.45}
+
+/* negotiate row */
+.neg{display:flex; align-items:flex-start; gap:10px; margin-top:12px; padding:10px 12px; background:var(--surface2); border:1px solid var(--line2); border-radius:8px}
+.neg-badge{font-size:10px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; padding:4px 9px; border-radius:11px; white-space:nowrap; flex:none}
+.neg-badge.yes{background:var(--emph-t); color:var(--emph-tx)}
+.neg-badge.no{background:var(--ok-t); color:var(--ok)}
+.neg-why{font-size:12px; color:var(--ink2); line-height:1.45}
+.neg-why .nq{font-size:9.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--mut); display:block; margin-bottom:2px}
+
+/* balanced panel */
+.balanced-panel{display:flex; gap:11px; align-items:flex-start; margin-top:12px; padding:12px 13px; background:var(--ok-t); border:1px solid var(--ok-bar); border-left-width:4px; border-radius:9px}
+.balanced-panel .ic{color:var(--ok); width:17px; height:17px; flex:none; margin-top:1px}
+.balanced-panel .bp-t{font-size:12.5px; font-weight:800; color:var(--ok); margin-bottom:2px}
+.balanced-panel .bp-b{font-size:12px; color:var(--ink2); line-height:1.45}
+.refine{margin-top:9px; font-size:11.5px; color:var(--mut2); line-height:1.45}
+.refine b{color:var(--ink2)}
+.xlink{border:0; background:var(--sec-t); color:var(--sec-tx); font-weight:800; font-size:11px; margin-top:8px;
+  padding:6px 11px; border-radius:7px; cursor:pointer; display:inline-flex; align-items:center; gap:6px}
+.xlink:hover{background:#CFE6E3}
+.xlink .ic{width:13px;height:13px}
+
+.play-wrap{margin-top:12px}
+.play-hd{display:flex; align-items:center; gap:7px; color:var(--sec-tx); margin-bottom:2px}
+.play-hd .zt{font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase}
+
+.dl-foot{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-top:15px; padding-top:11px;
+  border-top:1px solid var(--line2); font-size:11px; color:var(--mut2)}
+.dl-foot .fk{font-family:var(--mono)}
+.dl-foot .lk{border:0; background:var(--sec-t); color:var(--sec-tx); font-weight:800; font-size:10.5px; padding:2px 8px; border-radius:11px; cursor:pointer; font-family:var(--mono)}
+.dl-foot .lk:hover{background:#CFE6E3}
+
+.foot-note{max-width:1260px; margin:8px auto 0; padding:0 20px; font-size:11px; color:var(--mut2); line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="mock-banner"><b>Mockup</b> Legal &amp; Protection (v2), for review, not wired into the live dashboard.</div>
+
+<div class="wrap">
+  <div class="page-eyebrow">Deal · Visier People Analytics · MSA v3 (redline)</div>
+  <div class="page-title">Legal &amp; Protection</div>
+  <div class="page-sub">Reflect-only. Where the protection score was lost, and every finding behind it.</div>
+
+  <!-- ===== 1. SCORECARD ================================================== -->
+  <section class="sa-card accent-emph">
+    <div class="card-hd">
+      <span class="ch-ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg></span>
+      <span class="ct">Protection Scorecard</span>
+      <span class="cs">Supplier redline v3 · before negotiation</span>
+    </div>
+    <div class="card-bd">
+      <div class="sc-grid">
+        <div class="pg" id="gauge"></div>
+        <div>
+          <div class="wf-head">
+            <div class="wf-t">Where the score was lost</div>
+            <div class="wf-s">100 playbook-aligned baseline, less each category's deductions. Widest bar is the biggest lever. Click a bar to open its lead finding.</div>
+          </div>
+          <div class="wf" id="waterfall"></div>
+          <div class="wf-legend">
+            <span><i class="i-base"></i>Baseline 100</span>
+            <span><i class="i-drop"></i>Deduction</span>
+            <span><i class="i-current"></i>Current 58</span>
+            <span><i class="i-ach"></i>Achievable 79 (top package)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 2. TWO-COLUMN ================================================= -->
+  <div class="split">
+    <!-- LEFT navigator -->
+    <section class="sa-card left-card">
+      <div class="card-hd">
+        <span class="ch-ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+        <span class="ct">Navigator</span>
+      </div>
+      <div class="card-bd" style="padding:12px 12px 12px">
+        <div class="seg" role="tablist" aria-label="Navigator view">
+          <button id="segProt" role="tab" aria-pressed="true" onclick="setView('prot')">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>
+            Protections <span class="cnt">(8)</span></button>
+          <button id="segObl" role="tab" aria-pressed="false" onclick="setView('obl')">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            Obligations <span class="cnt">(10)</span></button>
+        </div>
+      </div>
+      <div class="left-scroll" id="leftBody"></div>
+    </section>
+
+    <!-- RIGHT register -->
+    <section class="sa-card accent-teal" id="registerCard" style="margin-bottom:0">
+      <div class="card-hd">
+        <span class="ch-ic"><svg viewBox="0 0 24 24"><path d="M8 4h9a2 2 0 012 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z"/></svg></span>
+        <span class="ct">Findings Register</span>
+        <span class="cs">issues + obligations</span>
+      </div>
+      <div class="reg-tools">
+        <div class="reg-search">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="regSearch" type="text" autocomplete="off" placeholder="Search title, clause, category, party" oninput="onSearch(this.value)" aria-label="Search findings">
+        </div>
+        <div class="reg-filters">
+          <span class="rf-group"><span class="rf-lab">Severity</span>
+            <button class="chip c-hard-stop" aria-pressed="false" onclick="toggleSev('hard-stop',this)"><span class="dotc"></span>Hard stop</button>
+            <button class="chip c-high" aria-pressed="false" onclick="toggleSev('high',this)"><span class="dotc"></span>High</button>
+            <button class="chip c-medium" aria-pressed="false" onclick="toggleSev('medium',this)"><span class="dotc"></span>Medium</button>
+            <button class="chip c-low" aria-pressed="false" onclick="toggleSev('low',this)"><span class="dotc"></span>Low</button>
+          </span>
+          <span class="rf-group"><span class="rf-lab">Type</span>
+            <button class="chip c-issue" aria-pressed="false" onclick="toggleType('issue',this)"><span class="dotc"></span>Issue</button>
+            <button class="chip c-obligation" aria-pressed="false" onclick="toggleType('obligation',this)"><span class="dotc"></span>Obligation</button>
+          </span>
+          <button class="reg-clear" id="regClear" onclick="clearFilters()" disabled>
+            <svg class="ic" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14"/></svg>
+            Clear</button>
+        </div>
+      </div>
+      <div class="reg-count" id="regCount"></div>
+      <div class="reg-list" id="regList"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+ * REAL DATA, inlined slices from _deal_build/_parts/data.js (verbatim).
+ * ====================================================================== */
+var D = {
+  protection: {
+    score: 58, band: 'Weak', evidenceType: 'inference',
+    methodology: 'Starts at 100 (a fully playbook-aligned agreement). Points are deducted per material deviation, weighted by exposure severity and the sensitivity of workforce personal data. The two signature-blocking gates (12-month liability cap; DPA-by-reference with no SCCs) drive the largest deductions. Bands: Strong 80-100 · Adequate 65-79 · Weak 45-64 · Critical below 45. Score reflects the current supplier redline (v3) BEFORE negotiation; the Negotiation packages model the post-settlement lift. Deductions sum to 42, so 100 minus 42 = 58.',
+    deductions: [
+      { category: 'Limitation of Liability', points: 9, reason: '12-month all-inclusive cap with no data-breach or confidentiality carve-out.', issueId: 'ISS-01' },
+      { category: 'Data Protection & Privacy', points: 8, reason: 'DPA incorporated by reference only; unsigned, no EU SCCs attached.', issueId: 'ISS-03' },
+      { category: 'Indemnification', points: 4, reason: 'No IP-infringement indemnity; injury indemnity gated on "gross" negligence.', issueId: 'ISS-02' },
+      { category: 'Term & Renewal', points: 4, reason: 'Auto-renewal, 90-day notice window, uncapped renewal uplift.', issueId: 'ISS-04' },
+      { category: 'Service Levels', points: 3, reason: '99.5% uptime, capped credits, credits are sole remedy.', issueId: 'ISS-06' },
+      { category: 'IP & Data Rights', points: 3, reason: 'Customer-built configurations and dashboards deemed supplier IP.', issueId: 'ISS-07' },
+      { category: 'Scope & Acceptance', points: 3, reason: 'Deemed acceptance after 10 days; no objective acceptance criteria.', issueId: 'ISS-10' },
+      { category: 'Pricing Protection', points: 3, reason: 'Uncapped post-term price uplift compounds the auto-renewal.', issueId: 'ISS-11' },
+      { category: 'Sub-processing', points: 2, reason: 'No advance sub-processor change notice or objection right.', issueId: 'ISS-08' },
+      { category: 'Exit & Termination', points: 2, reason: 'No convenience termination; prepaid fees non-refundable.', issueId: 'ISS-05' },
+      { category: 'Audit Rights', points: 1, reason: 'No for-cause audit right after a security incident.', issueId: 'ISS-09' }
+    ],
+    categories14: [
+      { name: 'Limitation of Liability', severity: 'high', coverage: 'Confirm', issueIds: ['ISS-01'] },
+      { name: 'Indemnification', severity: 'high', coverage: 'Confirm', issueIds: ['ISS-02'] },
+      { name: 'Data Protection & Privacy', severity: 'high', coverage: 'Gap', issueIds: ['ISS-03','ISS-08'] },
+      { name: 'Information Security', severity: 'high', coverage: 'Gap', issueIds: ['ISS-06'] },
+      { name: 'Service Levels & Availability', severity: 'medium', coverage: 'Confirm', issueIds: ['ISS-06'] },
+      { name: 'Term & Termination', severity: 'medium', coverage: 'Confirm', issueIds: ['ISS-04','ISS-05'] },
+      { name: 'Pricing & Renewal Economics', severity: 'medium', coverage: 'Confirm', issueIds: ['ISS-11','ISS-04'] },
+      { name: 'Intellectual Property & Data Rights', severity: 'high', coverage: 'Confirm', issueIds: ['ISS-07'] },
+      { name: 'Confidentiality', severity: 'low', coverage: 'Covered', issueIds: [] },
+      { name: 'Warranties', severity: 'medium', coverage: 'Confirm', issueIds: ['ISS-02'] },
+      { name: 'Audit & Compliance Rights', severity: 'low', coverage: 'Confirm', issueIds: ['ISS-09'] },
+      { name: 'Scope & Acceptance', severity: 'medium', coverage: 'Confirm', issueIds: ['ISS-10'] },
+      { name: 'Sub-processing & Onward Transfer', severity: 'medium', coverage: 'Gap', issueIds: ['ISS-08'] },
+      { name: 'Business Continuity / Exit', severity: 'medium', coverage: 'Confirm', issueIds: ['ISS-07','ISS-05'] }
+    ]
+  },
+  issues: [
+    { id:'ISS-01', title:'Liability cap set at 12 months of fees, all damages capped', category:'Liability', priority:'hard-stop', documentId:'DOC-01', clause:'MSA §11.2 (Limitation of Liability)',
+      supplierPosition:'Aggregate liability capped at fees paid in the 12 months preceding the claim; all categories capped, no carve-outs.',
+      sourceExcerpt:'"…the total aggregate liability of either party … shall not exceed the fees paid by Customer in the twelve (12) months preceding the event giving rise to the claim."',
+      playbookPosition:'Minimum 24 months fees for SaaS handling workforce data; data-breach, confidentiality and IP-infringement liability must be uncapped or super-capped at 3x fees.',
+      deviation:'Cap is half the floor and contains no carve-outs for the highest-exposure events.',
+      impact:'A workforce-data breach could generate exposure far exceeding a single year of fees; a 12-month all-inclusive cap leaves the buyer materially under-protected.',
+      recommendedPosition:'24-month cap; data-breach and confidentiality breaches carved out to a 3x super-cap; IP indemnity uncapped.',
+      fallback:'24-month cap with a 2x super-cap on data-breach only.',
+      hardStop:'12-month all-inclusive cap with no data-breach carve-out.',
+      supplierPushback:'"Our standard cap is 12 months; super-caps are non-standard and require executive approval."',
+      recommendedResponse:'Anchor on the workforce-data sensitivity and regulatory exposure; offer to accept a 24-month cap (not 3x) if the data-breach super-cap holds.',
+      tradeOpportunity:'Buyer can concede the mutual 24-month cap symmetry in exchange for the data-breach carve-out.',
+      tacticFlag:{ present:true, tactic:'False-standard anchoring', triggeringText:'"Our standard cap is 12 months; super-caps are non-standard and require executive approval."' },
+      evidenceType:'contract' },
+    { id:'ISS-02', title:'Mutual indemnity narrow; no IP-infringement defense of the platform', category:'Liability', priority:'high', documentId:'DOC-01', clause:'MSA §10.1-10.3 (Indemnification)',
+      supplierPosition:'Supplier indemnifies only for third-party bodily injury and tangible property damage; no IP-infringement indemnity for the platform.',
+      sourceExcerpt:'"Supplier shall indemnify Customer against third-party claims for bodily injury or damage to tangible property arising from Supplier’s gross negligence…"',
+      playbookPosition:'SaaS supplier must indemnify and defend against third-party claims that the service infringes IP, with a repair/replace/refund remedy.',
+      deviation:'IP-infringement indemnity absent entirely; injury/property indemnity gated on "gross" negligence.',
+      impact:'If a third party alleges the platform infringes their IP, the buyer bears its own defense and any settlement.',
+      recommendedPosition:'Add standard IP-infringement indemnity with defense obligation and repair/replace/refund; remove the "gross" qualifier.',
+      fallback:'IP indemnity capped at the super-cap; retain "gross" qualifier on injury only.',
+      hardStop:'No IP-infringement indemnity of any kind.',
+      supplierPushback:'"IP indemnity is covered by the general warranty."',
+      recommendedResponse:'Distinguish warranty (a promise) from indemnity (a defense obligation); the platform aggregates third-party data connectors, raising real IP exposure.',
+      tradeOpportunity:'Pair with ISS-01 super-cap, a single liability package.',
+      tacticFlag:{ present:false },
+      evidenceType:'contract' },
+    { id:'ISS-03', title:'Data-protection terms reference an unsigned DPA; no SCCs attached', category:'Data & Privacy', priority:'hard-stop', documentId:'DOC-01', clause:'MSA §9.4 (Data Protection)',
+      supplierPosition:'MSA states a DPA "will be entered into" but none is attached; no EU Standard Contractual Clauses referenced.',
+      sourceExcerpt:'"The parties will enter into a Data Processing Addendum in Supplier’s standard form, which is incorporated herein by reference."',
+      playbookPosition:'A signed DPA with EU SCCs and a sub-processor change-notice mechanism must be attached and executed at signature for any processor of employee personal data.',
+      deviation:'DPA incorporated "by reference" but not provided; no SCCs; sub-processor notice mechanism unstated.',
+      impact:'Processing of global workforce personal data without an executed, reviewed DPA is a compliance exposure and likely a policy blocker.',
+      recommendedPosition:'Attach and execute a reviewed DPA with EU SCCs, a 30-day sub-processor objection right, and breach-notice within 72 hours, before MSA signature.',
+      fallback:'Execute DPA within 15 days of MSA signature with the platform paused for production data until executed.',
+      hardStop:'Signature with no DPA and no SCCs.',
+      supplierPushback:'"Our standard DPA is sufficient and rarely modified."',
+      recommendedResponse:'Require the actual DPA text in-session for review; "standard and rarely modified" is not a substitute for reviewing the sub-processor and SCC terms.',
+      tradeOpportunity:'Low trade value, this is a compliance gate, not a lever.',
+      tacticFlag:{ present:true, tactic:'Deferred paper (incorporation by reference)', triggeringText:'"The parties will enter into a Data Processing Addendum … incorporated herein by reference."' },
+      evidenceType:'contract' },
+    { id:'ISS-04', title:'Auto-renewal with 90-day notice and uncapped renewal uplift', category:'Term & Renewal', priority:'high', documentId:'DOC-01', clause:'MSA §3.2 / Order Form §4 (Term & Renewal)',
+      supplierPosition:'Auto-renews for successive 12-month terms unless cancelled 90 days before expiry; renewal price "at then-current list."',
+      sourceExcerpt:'"…renew automatically for successive one-year periods unless either party provides written notice at least ninety (90) days prior … at Supplier’s then-current list price."',
+      playbookPosition:'Auto-renewal acceptable only with a 30-day or shorter notice window and a contractual cap on renewal price increases (CPI or 3-5%).',
+      deviation:'90-day window (3x tolerance) and no renewal-price cap expose the buyer to an unbounded uplift.',
+      impact:'A missed 90-day window locks in another year at an uncapped increase; renewal leverage is lost.',
+      recommendedPosition:'Opt-in renewal, or 30-day notice with renewal uplift capped at CPI or 4%, whichever is lower.',
+      fallback:'45-day notice with a 5% renewal cap.',
+      hardStop:'90-day window with no price cap.',
+      supplierPushback:'"90 days is needed for capacity planning; list price protects our roadmap investment."',
+      recommendedResponse:'Offer a 45-day window in exchange for the uplift cap; capacity planning does not require a pricing free hand.',
+      tradeOpportunity:'Concede notice window (45 vs 30) to win the renewal-price cap.',
+      tacticFlag:{ present:true, tactic:'Auto-renewal lock-in + long notice window', triggeringText:'"…renew automatically … unless … ninety (90) days prior … at Supplier’s then-current list price."' },
+      evidenceType:'contract' },
+    { id:'ISS-05', title:'No termination for convenience for the customer', category:'Term & Renewal', priority:'medium', documentId:'DOC-01', clause:'MSA §12.1 (Termination)',
+      supplierPosition:'Termination only for uncured material breach; no convenience right for the customer; fees non-refundable.',
+      sourceExcerpt:'"Either party may terminate for material breach uncured within thirty (30) days. Fees are non-cancellable and non-refundable."',
+      playbookPosition:'Prefer a convenience-termination right after year 1 with pro-rata refund of prepaid, unused fees.',
+      deviation:'No convenience exit; prepaid fees fully sunk on any exit.',
+      impact:'If the platform underdelivers, the buyer is locked in for the full term with no refund path.',
+      recommendedPosition:'Convenience termination after month 12 with 60-day notice and pro-rata refund of unused prepaid fees.',
+      fallback:'Convenience right only at each anniversary.',
+      hardStop:'None, this is a trade item, not a gate.',
+      supplierPushback:'"Subscriptions are committed; convenience termination undermines the discount."',
+      recommendedResponse:'Tie the convenience right to a sustained SLA miss rather than a free walk-away, if a clean convenience right is refused.',
+      tradeOpportunity:'High trade value, can be conceded to protect ISS-01/03.',
+      tacticFlag:{ present:false },
+      evidenceType:'contract' },
+    { id:'ISS-06', title:'Uptime SLA 99.5% with weak, capped service credits', category:'Service Levels', priority:'high', documentId:'DOC-01', clause:'MSA §7.2 / Exhibit B (referenced)',
+      supplierPosition:'99.5% monthly uptime; credit of 5% of monthly fee per 1% below target, capped at 15%; credits are sole remedy.',
+      sourceExcerpt:'"Supplier will use commercially reasonable efforts to achieve 99.5% availability … service credits are Customer’s sole and exclusive remedy."',
+      playbookPosition:'99.9% for a system-of-engagement analytics platform; credits meaningful (up to 100% of monthly fee); chronic-failure termination right.',
+      deviation:'99.5% target (about 3.6h/mo permitted downtime), credit cap low, and "sole remedy" blocks other recourse.',
+      impact:'A quarter of degraded service yields a token credit and no exit; downtime during quarterly reporting is costly.',
+      recommendedPosition:'99.9% target; credits scaled to 50% of monthly fee; three consecutive misses trigger a termination right.',
+      fallback:'99.7% with a chronic-failure termination right retained.',
+      hardStop:'None, but chronic-failure exit is a firm ask.',
+      supplierPushback:'"99.5% is our contractual standard; 99.9% is an enterprise-tier upgrade."',
+      recommendedResponse:'Ask whether 99.9% is genuinely a paid tier or a negotiation posture; require the actual achieved-uptime history to justify 99.5%.',
+      tradeOpportunity:'Data gap (Exhibit B), resolve before trading.',
+      tacticFlag:{ present:true, tactic:'Sole-remedy limitation', triggeringText:'"…service credits are Customer’s sole and exclusive remedy."' },
+      evidenceType:'contract' },
+    { id:'ISS-07', title:'Customer configurations and dashboards deemed supplier IP', category:'IP', priority:'high', documentId:'DOC-01', clause:'MSA §8.3 (Intellectual Property)',
+      supplierPosition:'All configurations, dashboards and derived analytics models are supplier IP; customer gets a license during the term only.',
+      sourceExcerpt:'"All configurations, templates and analytic models created within the Service shall be the exclusive property of Supplier."',
+      playbookPosition:'Customer-specific configurations and dashboards built with customer data should be customer-owned or perpetually licensed; customer data is unambiguously customer-owned.',
+      deviation:'Supplier claims ownership of buyer-built configurations and dashboards, retrievable only during the term.',
+      impact:'On exit, the buyer loses the dashboards and models it built and paid to configure; raises switching cost and lock-in.',
+      recommendedPosition:'Customer owns customer-specific configurations and dashboards; supplier retains platform IP; customer data always customer-owned with export rights.',
+      fallback:'Perpetual, royalty-free licence to configurations plus a defined export format on exit.',
+      hardStop:'Supplier ownership of customer data (not just configs).',
+      supplierPushback:'"Configurations rely on our proprietary modelling engine."',
+      recommendedResponse:'Separate the engine (theirs) from the buyer’s specific configuration and dashboard layer (buyer’s); require machine-readable export on exit either way.',
+      tradeOpportunity:'Bundle with ISS-05 continuity/exit terms.',
+      tacticFlag:{ present:true, tactic:'Broad IP capture of customer-built work', triggeringText:'"All configurations, templates and analytic models … shall be the exclusive property of Supplier."' },
+      evidenceType:'contract' },
+    { id:'ISS-08', title:'Sub-processors listed by reference; no change-notice or objection right', category:'Data & Privacy', priority:'medium', documentId:'DOC-01', clause:'MSA §9.6 (Sub-processors)',
+      supplierPosition:'Supplier may add or replace sub-processors at any time; list maintained on a webpage; no notice to customer.',
+      sourceExcerpt:'"Supplier may engage sub-processors and will maintain a current list at its website; continued use constitutes consent."',
+      playbookPosition:'Advance notice of new sub-processors (30 days or more) with a right to object; onward-transfer safeguards required.',
+      deviation:'No notice, no objection right; "continued use = consent" is not affirmative consent.',
+      impact:'A new sub-processor in a high-risk jurisdiction could be added silently, undermining the data-transfer posture.',
+      recommendedPosition:'30-day advance email notice of new sub-processors with a good-faith objection-and-remediation right.',
+      fallback:'Notice via a subscribed change-feed with 15-day objection window.',
+      hardStop:'None.',
+      supplierPushback:'"Web-list notice is standard SaaS practice."',
+      recommendedResponse:'Web-list without push notice is not sufficient for employee data; require an emailed change-feed at minimum.',
+      tradeOpportunity:'Fold into the DPA negotiation (ISS-03).',
+      tacticFlag:{ present:true, tactic:'Continued-use-as-consent', triggeringText:'"…continued use constitutes consent."' },
+      evidenceType:'contract' },
+    { id:'ISS-09', title:'Audit rights limited to a SOC 2 report once per year', category:'Audit & Compliance', priority:'low', documentId:'DOC-01', clause:'MSA §7.5 (Audit)',
+      supplierPosition:'Customer audit satisfied by an annual SOC 2 Type II report; no on-site or for-cause audit right.',
+      sourceExcerpt:'"Supplier will provide its SOC 2 Type II report annually in lieu of any audit right."',
+      playbookPosition:'SOC 2 acceptable for routine assurance, plus a for-cause audit right following a security incident.',
+      deviation:'No for-cause audit right after an incident.',
+      impact:'After a breach, the buyer cannot independently verify remediation.',
+      recommendedPosition:'Keep SOC 2 for routine assurance; add a for-cause audit (or independent assessor) right triggered by a reportable incident.',
+      fallback:'For-cause right satisfied by an agreed third-party assessor’s report.',
+      hardStop:'None.',
+      supplierPushback:'"SOC 2 is comprehensive and independently assured."',
+      recommendedResponse:'SOC 2 is periodic and general; a for-cause right is incident-specific, the two are complementary, not redundant.',
+      tradeOpportunity:'Low-cost concession item for the supplier, easy give to bank goodwill.',
+      tacticFlag:{ present:false },
+      evidenceType:'contract' },
+    { id:'ISS-10', title:'SOW acceptance is deemed after 10 days of silence', category:'Scope & Acceptance', priority:'high', documentId:'DOC-02', clause:'SOW-01 §5 (Acceptance)',
+      supplierPosition:'Each deliverable is deemed accepted if the customer does not reject in writing within 10 business days.',
+      sourceExcerpt:'"Deliverables shall be deemed accepted unless Customer provides written notice of non-conformance within ten (10) business days."',
+      playbookPosition:'Acceptance requires positive sign-off against written acceptance criteria; deemed-acceptance windows of 20 business days or more with defined criteria.',
+      deviation:'Silence = acceptance in a short window, and the SOW lists no objective acceptance criteria.',
+      impact:'A busy stakeholder could "accept" a non-conforming milestone by inaction, weakening remedies and triggering payment.',
+      recommendedPosition:'Positive sign-off against acceptance criteria defined per milestone; 20-business-day review; a cure period on rejection.',
+      fallback:'Deemed acceptance at 20 business days but only against written criteria.',
+      hardStop:'Deemed acceptance with no acceptance criteria at all.',
+      supplierPushback:'"Deemed acceptance keeps the project timeline moving."',
+      recommendedResponse:'Timelines are protected by criteria plus a cure period, not by a silence trap; offer a named reviewer with an SLA on turnaround.',
+      tradeOpportunity:'Links to SOW milestone schedule, negotiate together.',
+      tacticFlag:{ present:true, tactic:'Deemed acceptance by silence', triggeringText:'"Deliverables shall be deemed accepted unless Customer provides written notice … within ten (10) business days."' },
+      evidenceType:'contract' },
+    { id:'ISS-11', title:'Annual price uplift uncapped after the initial 3-year term', category:'Commercial', priority:'high', documentId:'DOC-03', clause:'Order Form §4.2 (Fees)',
+      supplierPosition:'Fees fixed for the 3-year initial term; thereafter "at then-current list price" with no cap.',
+      sourceExcerpt:'"Subscription fees are fixed during the Initial Term and thereafter adjust to Supplier’s then-current list price."',
+      playbookPosition:'Post-term uplift capped at CPI or a fixed 3-5%; a price-protection window beyond the initial term.',
+      deviation:'No cap on the first post-term renewal, pairs with ISS-04 auto-renewal to create real exposure.',
+      impact:'Year-4 fees could jump materially with the buyer already locked into the platform.',
+      recommendedPosition:'Cap post-term uplift at CPI or 4% for renewals 4 and 5; extend price protection two years past initial term.',
+      fallback:'5% cap for the first renewal only.',
+      hardStop:'None on its own, but jointly with ISS-04 it is high-priority.',
+      supplierPushback:'"List pricing rises with roadmap investment."',
+      recommendedResponse:'Fixed-term protection is meaningless if year 4 is unbounded; a CPI cap still lets list price rise with the market.',
+      tradeOpportunity:'Package with ISS-04 renewal terms.',
+      tacticFlag:{ present:true, tactic:'Unbounded post-term repricing', triggeringText:'"…thereafter adjust to Supplier’s then-current list price."' },
+      evidenceType:'contract' },
+    { id:'ISS-12', title:'Total contract value anchored about 15% above internal precedent', category:'Commercial', priority:'high', documentId:'DOC-03', clause:'Order Form §2 (Fees) + SOW-01 §7',
+      supplierPosition:'Year-1 all-in of $1.168M (platform $780K + implementation $220K + support $95K + connectors $45K + training $28K).',
+      sourceExcerpt:'Order Form §2 subscription and SOW-01 §7 fee schedule (see Commercials tab for the line-item breakdown).',
+      playbookPosition:'Target discount to internal precedent benchmark; implementation and support are the most negotiable lines.',
+      deviation:'Ask sits about 15% above the comparable internal analytics deal on a per-user basis (see Benchmarks).',
+      impact:'Accepting the ask overpays by an estimated $0.68M across the 3-year term versus a defensible target.',
+      recommendedPosition:'Anchor to the target scenario ($908K Y1); implementation and premium support carry the largest concessions.',
+      fallback:'Fallback scenario ($1.008M Y1) if platform discount is resisted.',
+      hardStop:'Above the max-acceptable Y1 of $1.07M.',
+      supplierPushback:'"Pricing reflects the platform’s premium analytics capability."',
+      recommendedResponse:'Separate platform value (defensible) from implementation and support loading (negotiable); benchmark the services lines against day-rate norms.',
+      tradeOpportunity:'Multi-year prepay or a case-study reference can fund a platform discount.',
+      tacticFlag:{ present:true, tactic:'High anchoring vs precedent', triggeringText:'Year-1 all-in anchored about 15% above the comparable 2024 internal analytics precedent on a per-employee basis.' },
+      evidenceType:'calculated' }
+  ],
+  obligations: [
+    { id:'OB-1', party:'supplier', text:'Maintain 99.5% monthly platform availability and issue service credits on any miss.', clause:'MSA §7.2', trigger:'Monthly, throughout the term', imbalanceFlag:true, issueId:'ISS-06', evidenceType:'contract' },
+    { id:'OB-2', party:'supplier', text:'Provide an annual SOC 2 Type II report in lieu of an audit right.', clause:'MSA §7.5', trigger:'Annually', imbalanceFlag:false, issueId:'ISS-09', evidenceType:'contract' },
+    { id:'OB-3', party:'supplier', text:'Notify the customer of any security incident affecting customer data, notice timing unstated in the MSA body.', clause:'MSA §9.x (DPA-deferred)', trigger:'On security incident', imbalanceFlag:true, issueId:'ISS-03', evidenceType:'inference' },
+    { id:'OB-4', party:'supplier', text:'Deliver each SOW milestone; deliverables deemed accepted after 10 business days of silence.', clause:'SOW-01 §5', trigger:'Per milestone (M2-M5)', imbalanceFlag:true, issueId:'ISS-10', evidenceType:'contract' },
+    { id:'OB-5', party:'supplier', text:'Maintain the sub-processor list; no advance change-notice or objection right as drafted.', clause:'MSA §9.6', trigger:'On sub-processor change', imbalanceFlag:true, issueId:'ISS-08', evidenceType:'contract' },
+    { id:'OB-6', party:'buyer', text:'Provide HRIS/payroll extract access within 5 business days of kickoff.', clause:'SOW-01 §3 (Dependencies)', trigger:'Kickoff (M1) + 5 days', imbalanceFlag:false, issueId:null, evidenceType:'contract' },
+    { id:'OB-7', party:'buyer', text:'Pay subscription fees annually in advance; fees are non-cancellable and non-refundable.', clause:'Order Form §3 / MSA §12.1', trigger:'Annually, in advance', imbalanceFlag:true, issueId:'ISS-05', evidenceType:'contract' },
+    { id:'OB-8', party:'buyer', text:'Serve written notice at least 90 days before expiry to prevent auto-renewal.', clause:'MSA §3.2', trigger:'90 days before term expiry', imbalanceFlag:true, issueId:'ISS-04', evidenceType:'contract' },
+    { id:'OB-9', party:'mutual', text:'Hold the other party’s confidential information in confidence.', clause:'MSA §6 (Confidentiality)', trigger:'Continuous (term + survival)', imbalanceFlag:false, issueId:null, evidenceType:'contract' },
+    { id:'OB-10', party:'mutual', text:'Cure a material breach within 30 days of written notice before termination.', clause:'MSA §12.1', trigger:'On breach notice', imbalanceFlag:false, issueId:'ISS-05', evidenceType:'contract' }
+  ],
+  packages: [
+    { id:'PKG-A', name:'Protection package', resultingProtectionScore:79 },
+    { id:'PKG-B', name:'Commercial package', resultingProtectionScore:65 },
+    { id:'PKG-C', name:'Service & exit package', resultingProtectionScore:69 }
+  ]
+};
+
+/* =========================================================================
+ * AUTHORED OBLIGATION REVIEW MODEL (Claude analysis).
+ * Every obligation carries a review the source data does not: a remedy-on-miss,
+ * survival/duration, reciprocity read, a colour-coded FAIRNESS VERDICT, a BETTER
+ * ALTERNATIVE, a NEGOTIATE decision, and (where negotiate = yes and a linked issue
+ * exists) three outcome cards PULLED from that issue's recommendedPosition/fallback/
+ * hardStop. Grounding for each element is noted in "ground". No quoted clause text is
+ * fabricated: remedy/survival cite contract text where it exists, else are flagged
+ * analysis or gap-state. Balanced obligations say so plainly, without padding.
+ * ====================================================================== */
+var OBA = {
+  'OB-1': {
+    remedy:'Capped service credits only: 5% of the monthly fee per 1% below target, capped at 15%, and those credits are the sole and exclusive remedy. There is no exit right for sustained failure.',
+    remedyEv:'contract',
+    survival:'Term-long, assessed monthly; no post-term availability duty.',
+    reciprocity:'One-sided supplier duty. The weakness is the remedy, not the promise.',
+    verdict:{ tone:'adverse', label:'One-sided against Lilly',
+      why:'The uptime duty exists, but the only recourse is a capped credit that is the sole remedy, so a sustained outage yields a token credit and no exit.' },
+    alternative:'A 99.9% target with credits scaled up to 50% of the monthly fee, and a termination right after three consecutive misses, so credits are no longer the only lever.',
+    negotiate:{ yes:true, why:'Both the target and the remedy sit below playbook; the sole-remedy cap is the real exposure.' },
+    cards:{ source:'linked', issueId:'ISS-06' },
+    ground:'imbalanceFlag=true + ISS-06 deviation (sole-remedy, capped credits) and impact.'
+  },
+  'OB-2': {
+    remedy:'None stated. If the report is not produced, the buyer loses its only assurance artifact; there is no contractual penalty and no for-cause audit right to fall back on.',
+    remedyEv:'analysis',
+    survival:'Annual, term-long.',
+    reciprocity:'One-sided supplier duty, but a reasonable baseline. The gap is scope, not balance.',
+    verdict:{ tone:'neutral', label:'Fair but thin',
+      why:'An annual SOC 2 is a reasonable routine assurance, but on its own it gives no for-cause audit right after a security incident.' },
+    alternative:'Keep the annual SOC 2 for routine assurance and add a for-cause audit or independent-assessor right triggered by a reportable incident.',
+    negotiate:{ yes:true, why:'Low priority and low cost, an easy add that banks goodwill.' },
+    cards:{ source:'linked', issueId:'ISS-09' },
+    ground:'imbalanceFlag=false but linked ISS-09 (low) deviation adds a for-cause gap; ISS-09 tradeOpportunity.'
+  },
+  'OB-3': {
+    remedy:'Undefined. The MSA body sets no notice deadline; the timing is deferred to the unsigned DPA (GAP-1), so a late or vague notice carries no contractual consequence.',
+    remedyEv:'gap',
+    survival:'On incident, term-long. Breach-notice duties usually survive termination, but that sits in the DPA, which is not in session (GAP-1).',
+    reciprocity:'One-sided supplier duty, and effectively unenforceable as drafted.',
+    verdict:{ tone:'critical', label:'One-sided against Lilly',
+      why:'A breach-notification duty with no stated deadline, for global workforce data, is effectively unenforceable, and it lives in an unsigned DPA. This is one of the signature-blocking gates.' },
+    alternative:'An executed DPA with a fixed 72-hour breach-notice, EU SCCs, and a 30-day sub-processor objection right, attached before signature.',
+    negotiate:{ yes:true, why:'Signature gate, not a lever. The DPA must be executed and reviewed before signing.' },
+    cards:{ source:'linked', issueId:'ISS-03' },
+    ground:'imbalanceFlag=true + ISS-03 hard-stop deviation/impact; evidenceType inference; GAP-1 for missing DPA.'
+  },
+  'OB-4': {
+    remedy:'The consequence runs against the buyer, not the supplier: 10 business days of silence deems the milestone accepted, which weakens remedies and triggers payment for work that may not conform.',
+    remedyEv:'contract',
+    survival:'Implementation phase only, per milestone M2 to M5.',
+    reciprocity:'One-sided in the supplier’s favour. Inaction by a busy reviewer becomes acceptance.',
+    verdict:{ tone:'adverse', label:'One-sided against Lilly',
+      why:'Deemed acceptance after only 10 days of silence, with no objective acceptance criteria, lets a non-conforming milestone pass by inaction.' },
+    alternative:'Positive sign-off against acceptance criteria defined per milestone, a 20-business-day review window, and a cure period on rejection.',
+    negotiate:{ yes:true, why:'The short silence-window and the missing criteria both need to move; tie it to the milestone schedule.' },
+    cards:{ source:'linked', issueId:'ISS-10' },
+    ground:'imbalanceFlag=true + ISS-10 high deviation (silence=acceptance, no criteria) and impact.'
+  },
+  'OB-5': {
+    remedy:'None. There is no notice duty to breach; the clause treats continued use as consent, so a new sub-processor can be added silently.',
+    remedyEv:'contract',
+    survival:'Ongoing, term-long.',
+    reciprocity:'One-sided. "Continued use equals consent" is not affirmative consent.',
+    verdict:{ tone:'adverse', label:'One-sided against Lilly',
+      why:'For employee personal data, a silent web-list change with no notice or objection right leaves the transfer posture exposed to a new sub-processor in a high-risk jurisdiction.' },
+    alternative:'Thirty days’ advance email notice of any new sub-processor, with a good-faith objection-and-remediation right.',
+    negotiate:{ yes:true, why:'Fold into the DPA negotiation (ISS-03); at minimum require an emailed change-feed.' },
+    cards:{ source:'linked', issueId:'ISS-08' },
+    ground:'imbalanceFlag=true + ISS-08 medium deviation (no notice/objection) and impact.'
+  },
+  'OB-6': {
+    remedy:'A buyer miss slips the implementation schedule and typically earns the supplier a matching relief or extension. It is a dependency, not a penalty.',
+    remedyEv:'analysis',
+    survival:'One-time at kickoff (M1 + 5 business days).',
+    reciprocity:'A one-sided buyer duty, but a standard and reasonable enablement dependency.',
+    verdict:{ tone:'fair', label:'Fair',
+      why:'A standard buyer enablement dependency; the platform cannot onboard workforce data without timely HRIS and payroll access.' },
+    alternative:null,
+    negotiate:{ yes:false, why:'Reasonable as drafted.' },
+    cards:null,
+    refine:'Optional tightening: start the 5-day clock on delivery of an agreed data specification, so the buyer is not on the clock before requirements are settled.',
+    ground:'imbalanceFlag=false, no linked issue. Buyer dependency; fair. Refinement authored and labelled analysis.'
+  },
+  'OB-7': {
+    remedy:'Fees are non-cancellable and non-refundable, and there is no convenience-exit, so prepaid fees are fully sunk on any early exit, even if the platform underdelivers.',
+    remedyEv:'contract',
+    survival:'Annual, in advance, across the 3-year initial term.',
+    reciprocity:'One-sided against the buyer: prepay, plus non-refundable, plus no convenience exit.',
+    verdict:{ tone:'adverse', label:'One-sided against Lilly',
+      why:'Annual prepay that is non-refundable, with no convenience-termination right, means the buyer carries all of the commitment risk.' },
+    alternative:'A convenience-termination right after month 12 with 60 days’ notice and a pro-rata refund of unused prepaid fees.',
+    negotiate:{ yes:true, why:'High trade value. This is a lever that can be conceded to protect the liability and data-protection gates (ISS-01, ISS-03).' },
+    cards:{ source:'linked', issueId:'ISS-05' },
+    ground:'imbalanceFlag=true + ISS-05 medium deviation (no convenience exit, fees sunk) and impact.'
+  },
+  'OB-8': {
+    remedy:'Miss the 90-day window and the term auto-renews for another 12 months at the supplier’s then-current list price, with no cap, so a missed date locks in a year at an unbounded uplift.',
+    remedyEv:'contract',
+    survival:'Recurs at every term boundary.',
+    reciprocity:'One-sided: a long notice burden on the buyer, plus an uncapped renewal price.',
+    verdict:{ tone:'adverse', label:'One-sided against Lilly',
+      why:'A 90-day notice window (three times playbook tolerance) combined with an uncapped renewal price turns a single missed date into a locked-in year at an unbounded increase.' },
+    alternative:'Opt-in renewal, or a 30-day notice window with the renewal uplift capped at CPI or 4%, whichever is lower.',
+    negotiate:{ yes:true, why:'One of the three signature conditions; convert auto-renewal to opt-in, or pair a short window with a price cap.' },
+    cards:{ source:'linked', issueId:'ISS-04' },
+    ground:'imbalanceFlag=true + ISS-04 high deviation (90-day window, uncapped uplift) and impact.'
+  },
+  'OB-9': {
+    remedy:'Standard breach-of-confidence remedies: injunctive relief and damages, available to the non-breaching party.',
+    remedyEv:'analysis',
+    survival:'Continuous; survives termination (term plus survival).',
+    reciprocity:'Mutual, binds both parties equally.',
+    verdict:{ tone:'fair', label:'Balanced',
+      why:'A mutual confidentiality duty binding both parties equally; market-standard.' },
+    alternative:null,
+    negotiate:{ yes:false, why:'Balanced, no action needed.' },
+    cards:null,
+    ground:'imbalanceFlag=false, party mutual, no linked issue. Genuinely balanced.'
+  },
+  'OB-10': {
+    remedy:'If the breaching party fails to cure within 30 days of written notice, the non-breaching party may terminate. The mechanism is the remedy, and it runs both ways.',
+    remedyEv:'contract',
+    survival:'Applies on any breach notice, term-long.',
+    reciprocity:'Mutual, the 30-day cure runs to both parties.',
+    verdict:{ tone:'fair', label:'Balanced',
+      why:'A mutual 30-day cure period is market-standard and binds both parties equally.' },
+    alternative:null,
+    negotiate:{ yes:false, why:'Balanced on the cure period itself. The related exit economics (non-refundable prepay, no convenience-termination) are the real concern and are handled at OB-7 and ISS-05.' },
+    cards:null,
+    crossLink:{ issueId:'ISS-05', text:'Open the linked exit issue (ISS-05)' },
+    ground:'imbalanceFlag=false, party mutual. Linked ISS-05 concerns exit economics, not the cure right, so the cure period is balanced and the exit concern is cross-linked, not duplicated.'
+  }
+};
+
+/* =========================================================================
+ * DERIVED MODEL, group the 11 fine-grained deductions into the 8 issue
+ * categories used across the register (matches d.issues[].category).
+ * ====================================================================== */
+var SEV_RANK = { 'hard-stop':0, high:1, medium:2, low:3 };
+var CAT_ORDER = ['Liability','Data & Privacy','Term & Renewal','Commercial','IP','Scope & Acceptance','Service Levels','Audit & Compliance'];
+var DED_TO_CAT = {
+  'Limitation of Liability':'Liability', 'Indemnification':'Liability',
+  'Data Protection & Privacy':'Data & Privacy', 'Sub-processing':'Data & Privacy',
+  'Term & Renewal':'Term & Renewal', 'Exit & Termination':'Term & Renewal',
+  'Pricing Protection':'Commercial',
+  'IP & Data Rights':'IP',
+  'Scope & Acceptance':'Scope & Acceptance',
+  'Service Levels':'Service Levels',
+  'Audit Rights':'Audit & Compliance'
+};
+var CAT_GAP = { 'Data & Privacy':'GAP-1', 'Service Levels':'GAP-2' };
+var GAP_NOTE = { 'GAP-1':'DPA text and EU SCCs not in session', 'GAP-2':'Security & Availability Exhibit B not in session' };
+var COV_RANK = { 'Gap':3, 'Confirm':2, 'Covered':1 };
+function issuesInCat(cat){ return D.issues.filter(function(i){ return i.category === cat; }); }
+function issueById(id){ return D.issues.find(function(i){ return i.id === id; }); }
+function oblById(id){ return D.obligations.find(function(o){ return o.id === id; }); }
+
+var CATS = CAT_ORDER.map(function(cat){
+  var deds = D.protection.deductions.filter(function(dd){ return DED_TO_CAT[dd.category] === cat; });
+  var points = deds.reduce(function(s,dd){ return s + dd.points; }, 0);
+  var primaryDed = deds.slice().sort(function(a,b){ return b.points - a.points; })[0];
+  var primaryIssueId = primaryDed ? primaryDed.issueId : (issuesInCat(cat)[0] || {}).id;
+  var iss = issuesInCat(cat).slice().sort(function(a,b){ return SEV_RANK[a.priority]-SEV_RANK[b.priority]; });
+  var idset = {}; iss.forEach(function(i){ idset[i.id] = 1; });
+  var cov = 'Covered';
+  D.protection.categories14.forEach(function(c14){
+    if (c14.issueIds.some(function(id){ return idset[id]; })){
+      if (COV_RANK[c14.coverage] > COV_RANK[cov]) cov = c14.coverage;
+    }
+  });
+  if (cov === 'Covered' && iss.length) cov = 'Confirm';
+  var mix = {}; iss.forEach(function(i){ mix[i.priority] = (mix[i.priority]||0)+1; });
+  return { cat:cat, points:points, primaryIssueId:primaryIssueId, issues:iss, coverage:cov, mix:mix, gapId:CAT_GAP[cat]||null };
+});
+function catOfIssue(id){ var i = issueById(id); return i ? i.category : null; }
+
+var BEST_PKG = D.packages.slice().sort(function(a,b){ return b.resultingProtectionScore - a.resultingProtectionScore; })[0];
+var ACHIEVABLE = BEST_PKG.resultingProtectionScore;   // 79
+var LIFT = ACHIEVABLE - D.protection.score;           // +21
+
+/* =========================================================================
+ * HELPERS
+ * ====================================================================== */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+var EV_LABEL = { contract:'Contract fact', internal:'Internal fact', public:'Public fact', calculated:'Calculated', inference:'Claude inference', assumption:'User assumption', unavailable:'Unavailable' };
+function evChip(t){ var k = EV_LABEL[t]?t:'inference'; return '<span class="ev ev-'+k+'" title="'+esc(EV_LABEL[k])+'">'+esc(EV_LABEL[k])+'</span>'; }
+var SEV_LABEL = { 'hard-stop':'Hard stop', high:'High', medium:'Medium', low:'Low' };
+function sevPill(p){ return '<span class="pill sev-'+esc(p)+'">'+esc(SEV_LABEL[p]||p)+'</span>'; }
+function partyPill(p){ var lab = p.charAt(0).toUpperCase()+p.slice(1); return '<span class="pill party-'+esc(p)+'">'+esc(lab)+'</span>'; }
+function idNum(id){ var m = String(id).match(/(\d+)/); return m ? parseInt(m[1],10) : 0; }
+function sevMixHtml(mix){
+  var order = ['hard-stop','high','medium','low'];
+  var out = order.filter(function(p){ return mix[p]; }).map(function(p){
+    return '<span class="sd d-'+p+'" title="'+esc(SEV_LABEL[p])+'"><i></i>'+mix[p]+'</span>';
+  }).join('');
+  return '<span class="sevmix">'+ (out || '<span class="sd d-low"><i></i>0</span>') +'</span>';
+}
+function shortLabel(t, n){ n = n || 74; return t.length > n ? t.slice(0,n-1).replace(/\s+\S*$/,'')+'…' : t; }
+var IC = {
+  chev:'<svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+  doc:'<svg class="ic" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+  alert:'<svg class="ic" viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+  target:'<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>',
+  scale:'<svg class="ic" viewBox="0 0 24 24"><path d="M12 3v18M6 21h12M12 6l-6 2 3 5a3 3 0 01-6 0l3-5M12 6l6 2-3 5a3 3 0 006 0l-3-5"/></svg>',
+  check:'<svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',
+  compass:'<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M16 8l-2 6-6 2 2-6z"/></svg>',
+  arrow:'<svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+};
+
+/* must-negotiate marker: red = critical/hard-stop, burnt-orange = high-impact.
+ * issue: hard-stop -> critical; high (with a real recommendedPosition) -> high.
+ * obligation: adverse/one-sided verdict + negotiate=yes -> critical if the verdict is
+ *   critical, else high. Balanced/neutral obligations get no marker. */
+function marker(kind, obj){
+  if (kind === 'issue'){
+    if (obj.priority === 'hard-stop') return { level:'critical', tip:'Critical, must be negotiated' };
+    if (obj.priority === 'high' && obj.recommendedPosition && obj.recommendedPosition.trim()) return { level:'high', tip:'High impact, negotiate' };
+    return null;
+  }
+  var a = OBA[obj.id] || {};
+  var tone = a.verdict ? a.verdict.tone : null;
+  var neg = a.negotiate && a.negotiate.yes;
+  if (tone === 'critical' && neg) return { level:'critical', tip:'Critical, must be negotiated' };
+  if (tone === 'adverse' && neg) return { level:'high', tip:'High impact, negotiate' };
+  return null;
+}
+function markerHtml(m){
+  if (!m) return '';
+  return '<span class="mneg mneg-'+m.level+'" role="img" tabindex="0" title="'+esc(m.tip)+'" aria-label="'+esc(m.tip)+'"></span>';
+}
+/* one-line fairness tally for an obligation group: adverse/critical favours Supplier,
+ * balanced/neutral is Mutual, a fair (pro-buyer) duty favours Lilly. */
+function oblFavor(o){
+  var a = OBA[o.id] || {};
+  var tone = a.verdict ? a.verdict.tone : 'neutral';
+  var label = a.verdict ? a.verdict.label : '';
+  if (tone === 'critical' || tone === 'adverse') return 'supplier';
+  if (tone === 'neutral') return 'mutual';
+  if (/balanced/i.test(label)) return 'mutual';
+  return 'lilly';
+}
+function favorsLine(list){
+  var t = { supplier:0, lilly:0, mutual:0 };
+  list.forEach(function(o){ t[oblFavor(o)]++; });
+  return '<span class="favors"><span class="fv-lab">Favors:</span> '
+    + '<b class="fv-sup">Sup '+t.supplier+'</b> · '
+    + '<b class="fv-lilly">Lilly '+t.lilly+'</b> · '
+    + '<b class="fv-mut">Mut '+t.mutual+'</b></span>';
+}
+
+/* =========================================================================
+ * 1. GAUGE (compact, semicircular) + how-scored tooltip
+ * ====================================================================== */
+function polar(cx,cy,r,deg){ var rad = deg*Math.PI/180; return { x:cx+r*Math.cos(rad), y:cy-r*Math.sin(rad) }; }
+function arcPath(cx,cy,r,s,e){ var a=polar(cx,cy,r,s), b=polar(cx,cy,r,e), large=(s-e)>180?1:0;
+  return 'M '+a.x.toFixed(2)+' '+a.y.toFixed(2)+' A '+r+' '+r+' 0 '+large+' 1 '+b.x.toFixed(2)+' '+b.y.toFixed(2); }
+var BANDS = [
+  { key:'Critical', range:'below 45', v:'var(--danger-bar)' },
+  { key:'Weak', range:'45-64', v:'var(--warn-bar)' },
+  { key:'Adequate', range:'65-79', v:'var(--sec)' },
+  { key:'Strong', range:'80-100', v:'var(--ok-bar)' }
+];
+function bandColor(b){ var h = BANDS.find(function(x){ return x.key.toLowerCase()===String(b||'').toLowerCase(); }); return h?h.v:'var(--mut2)'; }
+function renderGauge(){
+  var p = D.protection, score = Math.max(0,Math.min(100,Math.round(p.score))), color = bandColor(p.band);
+  var cx=92, cy=90, r=72, sw=18;
+  var bg = arcPath(cx,cy,r,180,0), fg = arcPath(cx,cy,r,180,180-1.8*score);
+  var achAngle = 180-1.8*ACHIEVABLE;
+  var achPt = polar(cx,cy,r,achAngle);
+  var svg = '<svg class="gaugesvg" viewBox="0 0 184 104" role="img" aria-label="Protection score '+score+' of 100, band '+esc(p.band)+'">'
+    + '<path d="'+bg+'" stroke="var(--line2)" stroke-width="'+sw+'" fill="none" stroke-linecap="round"/>'
+    + '<path d="'+fg+'" stroke="'+color+'" stroke-width="'+sw+'" fill="none" stroke-linecap="round"/>'
+    + '<circle cx="'+achPt.x.toFixed(1)+'" cy="'+achPt.y.toFixed(1)+'" r="3.4" fill="var(--surface)" stroke="var(--sec)" stroke-width="2.4"/>'
+    + '</svg>';
+  var scale = BANDS.slice().reverse().map(function(b){
+    var cur = b.key.toLowerCase()===String(p.band||'').toLowerCase();
+    return '<span class="pg-leg'+(cur?' cur':'')+'"><i style="background:'+b.v+'"></i>'+esc(b.key)+'<span class="rng">'+esc(b.range)+'</span></span>';
+  }).join('');
+  document.getElementById('gauge').innerHTML =
+    svg
+    + '<div class="pg-num" style="color:'+color+'">'+score+'<small>/100</small></div>'
+    + '<div class="pg-band"><span class="pill sev-medium">'+esc(p.band)+'</span></div>'
+    + '<div class="pg-scale">'+scale+'</div>'
+    + '<span class="howscored" tabindex="0" title="'+esc(p.methodology)+'">'
+    + '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>How scored</span>';
+}
+
+/* =========================================================================
+ * 1b. WATERFALL, 100 baseline, step down by each of the 8 categories, end 58,
+ *     with a teal achievable band from 58 to 79 (+21).
+ * ====================================================================== */
+function renderWaterfall(){
+  var rows = [];
+  rows.push({ kind:'base', lab:'Playbook baseline', from:0, to:100, delta:'100' });
+  var running = 100;
+  var biggest = Math.max.apply(null, CATS.map(function(c){ return c.points; }));
+  CATS.forEach(function(c){
+    var after = running - c.points;
+    rows.push({ kind:'drop', lab:c.cat, from:after, to:running, points:c.points,
+      delta:'−'+c.points, issueId:c.primaryIssueId, lever:(c.points===biggest) });
+    running = after;
+  });
+  rows.push({ kind:'current', lab:'Current score', from:0, to:running, delta:String(running), achievable:true });
+
+  var gridPos = [0,25,50,75,100];
+  var axis = '<div class="wf-axis">' + gridPos.map(function(v){ return '<span style="left:'+v+'%">'+v+'</span>'; }).join('') + '</div>';
+
+  var html = rows.map(function(row){
+    var grid = '<div class="wf-grid">' + gridPos.map(function(v){ return '<i style="left:'+v+'%"></i>'; }).join('') + '</div>';
+    var left = row.from, width = (row.to - row.from);
+    var barCls = 'wf-bar ' + row.kind + (row.lever ? ' lever' : '');
+    var connector = (row.kind==='drop') ? '<div class="wf-connect" style="left:'+row.to+'%"></div>' : '';
+    var bar = '<div class="'+barCls+'" style="left:'+left+'%; width:'+width+'%"'
+      + (row.kind==='drop' ? ' title="'+esc(row.lab)+': minus '+row.points+' pts, opens '+esc(row.issueId)+'"' : '') + '></div>';
+    var achOverlay = '';
+    if (row.achievable){
+      achOverlay =
+        '<div class="wf-ach-band" style="left:'+D.protection.score+'%; width:'+(ACHIEVABLE-D.protection.score)+'%"></div>'
+        + '<div class="wf-ach-mark" style="left:'+ACHIEVABLE+'%"></div>'
+        + '<div class="wf-ach-flag" style="left:'+ACHIEVABLE+'%">'+ACHIEVABLE+' · +'+LIFT+'</div>';
+    }
+    var track = '<div class="wf-track">'+grid+connector+bar+achOverlay+'</div>';
+    var rowAttrs = (row.kind==='drop')
+      ? ' class="wf-row wf-clickable" tabindex="0" role="button"'
+        + ' onclick="selectFinding(\'issue\',\''+row.issueId+'\',{ensureVisible:true,scroll:true,external:true})"'
+        + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();selectFinding(\'issue\',\''+row.issueId+'\',{ensureVisible:true,scroll:true,external:true})}"'
+      : ' class="wf-row '+row.kind+'"';
+    return '<div'+rowAttrs+'><div class="wf-lab">'+esc(row.lab)+'</div>'+track+'<div class="wf-delta">'+row.delta+'</div></div>';
+  }).join('');
+
+  document.getElementById('waterfall').innerHTML = axis + html;
+}
+
+/* =========================================================================
+ * 2. LEFT NAVIGATOR, toggle + protections accordion + obligations list
+ * ====================================================================== */
+var currentView = 'prot';
+var openAccordionCat = 'Liability';
+var openOblGroup = null;   // obligations accordion: collapsed by default (single-open)
+
+function setView(v){
+  currentView = v;
+  document.getElementById('segProt').setAttribute('aria-pressed', v==='prot');
+  document.getElementById('segObl').setAttribute('aria-pressed', v==='obl');
+  if (v === 'obl' && selectedKey && selectedKey.indexOf('obligation:') === 0){
+    var o = oblById(selectedKey.split(':')[1]); if (o) openOblGroup = o.party;
+  }
+  renderLeft();
+}
+function toggleOblGroup(key){ openOblGroup = (openOblGroup === key) ? null : key; renderLeftObligations(); }
+function renderLeft(){
+  if (currentView === 'prot') renderLeftProtections();
+  else renderLeftObligations();
+}
+function toggleAcc(cat){
+  openAccordionCat = (openAccordionCat === cat) ? null : cat;
+  renderLeftProtections();
+}
+function renderLeftProtections(){
+  var body = document.getElementById('leftBody');
+  var html = '<div class="acc">' + CATS.map(function(c){
+    var open = (c.cat === openAccordionCat);
+    var covTitle = c.gapId ? (GAP_NOTE[c.gapId]||'Evidence gap') : (c.coverage==='Confirm' ? 'Terms present, confirm in negotiation' : 'Covered');
+    var cov = '<span class="cov-chip cov-'+c.coverage+'" title="'+esc(covTitle)+'">'
+      + (c.coverage==='Gap' ? IC.alert.replace('class="ic"','class="ic" style="width:11px;height:11px"') : '')
+      + c.coverage + '</span>';
+    var finds = c.issues.map(function(iss){
+      var active = (selectedKey === 'issue:'+iss.id);
+      return '<button class="acc-find'+(active?' is-active':'')+'" role="button"'
+        + ' onclick="selectFinding(\'issue\',\''+iss.id+'\',{ensureVisible:true,scroll:true,external:true})">'
+        + '<span class="af-main"><span class="af-title">'+esc(iss.title)+'</span>'
+        + '<span class="af-id">'+esc(iss.id)+'</span></span>'
+        + '<span class="af-right">'+markerHtml(marker('issue',iss))+sevPill(iss.priority)+'</span>'
+        + '</button>';
+    }).join('');
+    return '<div class="acc-item'+(open?' open':'')+'">'
+      + '<button class="acc-hd" aria-expanded="'+open+'" onclick="toggleAcc(\''+c.cat.replace(/'/g,"\\'")+'\')">'
+      +   '<span class="ah-top"><span class="chev">'+IC.chev+'</span>'
+      +     '<span class="ah-name">'+esc(c.cat)+'</span>'
+      +     '<span class="ah-pts">−'+c.points+' pts</span></span>'
+      +   '<span class="ah-meta">'+sevMixHtml(c.mix)+cov+'</span>'
+      + '</button>'
+      + '<div class="acc-body">'+finds+'</div>'
+      + '</div>';
+  }).join('') + '</div>';
+  body.innerHTML = html;
+}
+function renderLeftObligations(){
+  var body = document.getElementById('leftBody');
+  var groups = [
+    { key:'supplier', label:'Supplier duties', bar:'var(--plum)' },
+    { key:'buyer', label:'Buyer duties', bar:'var(--sec)' },
+    { key:'mutual', label:'Mutual', bar:'var(--mut2)' }
+  ];
+  var html = '<div class="acc">' + groups.map(function(g){
+    var list = D.obligations.filter(function(o){ return o.party===g.key; })
+      .sort(function(a,b){ return (a.imbalanceFlag===b.imbalanceFlag?0:(a.imbalanceFlag?-1:1)) || idNum(a.id)-idNum(b.id); });
+    if (!list.length) return '';
+    var open = (openOblGroup === g.key);
+    var rows = list.map(function(o){
+      var active = (selectedKey === 'obligation:'+o.id);
+      var flag = o.imbalanceFlag
+        ? '<span class="pill one-sided'+(OBA[o.id] && OBA[o.id].verdict.tone==='critical'?' crit':'')+'">One-sided</span>'
+        : '<span class="pill balanced">Balanced</span>';
+      return '<button class="acc-find'+(active?' is-active':'')+'" role="button"'
+        + ' onclick="selectFinding(\'obligation\',\''+o.id+'\',{ensureVisible:true,scroll:true,external:true})">'
+        + '<span class="af-main"><span class="af-title">'+esc(shortLabel(o.text,66))+'</span>'
+        + '<span class="obl-sub">'+partyPill(o.party)+flag+'<span class="obl-clause">'+esc(o.clause)+'</span></span></span>'
+        + '<span class="af-right">'+markerHtml(marker('obligation',o))+'</span>'
+        + '</button>';
+    }).join('');
+    return '<div class="acc-item'+(open?' open':'')+'">'
+      + '<button class="acc-hd" aria-expanded="'+open+'" onclick="toggleOblGroup(\''+g.key+'\')">'
+      +   '<span class="ah-top"><span class="chev">'+IC.chev+'</span>'
+      +     '<span class="ah-name"><span class="gl-bar" style="background:'+g.bar+'"></span>'+esc(g.label)+'</span>'
+      +     '<span class="ah-pts nrm">'+list.length+'</span></span>'
+      +   '<span class="ah-meta">'+favorsLine(list)+'</span>'
+      + '</button>'
+      + '<div class="acc-body">'+rows+'</div>'
+      + '</div>';
+  }).join('') + '</div>';
+  body.innerHTML = html;
+}
+
+/* =========================================================================
+ * 3. RIGHT, findings register (list of ALL findings + search/filter/clear)
+ * ====================================================================== */
+var REG_ISSUES = D.issues.slice()
+  .sort(function(a,b){ return SEV_RANK[a.priority]-SEV_RANK[b.priority] || idNum(a.id)-idNum(b.id); })
+  .map(function(i){ return { key:'issue:'+i.id, type:'issue', id:i.id, sev:i.priority, title:i.title,
+    cat:i.category, clause:i.clause, search:(i.id+' '+i.title+' '+i.category+' '+i.clause).toLowerCase(), data:i }; });
+function oblSeverity(o){ if(!o.imbalanceFlag) return 'low'; var li = o.issueId ? issueById(o.issueId) : null; return li ? li.priority : 'medium'; }
+var REG_OBL = D.obligations.slice()
+  .sort(function(a,b){ return (a.imbalanceFlag===b.imbalanceFlag?0:(a.imbalanceFlag?-1:1)) || idNum(a.id)-idNum(b.id); })
+  .map(function(o){ return { key:'obligation:'+o.id, type:'obligation', id:o.id, sev:oblSeverity(o), title:o.text,
+    party:o.party, clause:o.clause, imbalance:o.imbalanceFlag,
+    search:(o.id+' '+o.text+' '+o.party+' '+o.clause).toLowerCase(), data:o }; });
+var ALL_ITEMS = REG_ISSUES.concat(REG_OBL);
+var TOTAL = ALL_ITEMS.length;
+
+var selectedKey = null;
+var fSearch = '', fSev = {}, fType = {};
+function anyFilter(){ return !!(fSearch || Object.keys(fSev).length || Object.keys(fType).length); }
+function passes(item){
+  if (Object.keys(fType).length && !fType[item.type]) return false;
+  if (Object.keys(fSev).length && !fSev[item.sev]) return false;
+  if (fSearch && item.search.indexOf(fSearch) < 0) return false;
+  return true;
+}
+function findItem(key){ for (var i=0;i<ALL_ITEMS.length;i++){ if (ALL_ITEMS[i].key===key) return ALL_ITEMS[i]; } return null; }
+
+function rowHtml(item){
+  var sel = (item.key === selectedKey);
+  var side, tag;
+  if (item.type === 'issue'){
+    tag = '<span class="rr-tag tag-issue">Issue</span>';
+    side = sevPill(item.sev);
+    var sub = '<span class="rr-id">'+esc(item.id)+'</span><span class="dot">·</span>'+esc(item.cat)+'<span class="dot">·</span>'+esc(item.clause);
+    var title = esc(item.title);
+  } else {
+    tag = '<span class="rr-tag tag-obligation">Obligation</span>';
+    var a = OBA[item.id];
+    side = item.imbalance
+      ? '<span class="pill one-sided'+(a && a.verdict.tone==='critical'?' crit':'')+'">One-sided</span>'
+      : '<span class="pill balanced">Balanced</span>';
+    var sub = '<span class="rr-id">'+esc(item.id)+'</span><span class="dot">·</span>'+partyPill(item.party)+'<span class="dot">·</span>'+esc(item.clause);
+    var title = esc(sel ? item.title : shortLabel(item.title, 96));
+  }
+  var mk = markerHtml(marker(item.type, item.data));
+  var head = '<button class="reg-row" onclick="selectFinding(\''+item.type+'\',\''+item.id+'\',{})" aria-expanded="'+sel+'">'
+    + tag
+    + '<span class="rr-main"><span class="rr-title">'+title+'</span><span class="rr-sub">'+sub+'</span></span>'
+    + '<span class="rr-side">'+mk+side+'</span>'
+    + '<span class="chev">'+IC.chev+'</span>'
+    + '</button>';
+  var detail = sel ? '<div class="reg-detail">'+(item.type==='issue'?tplIssue(item.data):tplObligation(item.data))+'</div>' : '';
+  return '<div class="reg-item'+(sel?' sel':'')+'">'+head+detail+'</div>';
+}
+function renderRegister(){
+  var total = 0;
+  function grp(label, items){
+    var vis = items.filter(passes);
+    if (!vis.length) return '';
+    total += vis.length;
+    return '<div class="reg-group"><div class="reg-group-hd"><span class="rg-t">'+label+'</span>'
+      + '<span class="rg-count">'+vis.length+'</span></div>'
+      + vis.map(rowHtml).join('') + '</div>';
+  }
+  var html = grp('Issues', REG_ISSUES) + grp('Obligations', REG_OBL);
+  var list = document.getElementById('regList');
+  if (!html){
+    list.innerHTML = '<div class="reg-empty">'
+      + '<svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>'
+      + '<p>No findings match the current search and filters.</p>'
+      + '<button onclick="clearFilters()">Show all findings</button></div>';
+  } else {
+    list.innerHTML = html;
+  }
+  document.getElementById('regCount').textContent = 'Showing ' + total + ' of ' + TOTAL + ' findings' + (anyFilter()?' (filtered)':'');
+  document.getElementById('regClear').disabled = !anyFilter();
+}
+
+function selectFinding(type, id, opts){
+  opts = opts || {};
+  selectedKey = type + ':' + id;
+  var item = findItem(selectedKey);
+  if (opts.ensureVisible && item && !passes(item)){ resetFilterState(); }
+  renderRegister();
+  // keep the left navigator in sync (auto-open the accordion group of the selected finding)
+  if (currentView === 'prot' && type === 'issue'){ var c = catOfIssue(id); if (c) openAccordionCat = c; }
+  if (currentView === 'obl' && type === 'obligation'){ var o = oblById(id); if (o) openOblGroup = o.party; }
+  renderLeft();
+  var el = document.querySelector('.reg-item.sel');
+  if (el){
+    if (opts.external && window.matchMedia('(max-width:940px)').matches){
+      document.getElementById('registerCard').scrollIntoView({ behavior:'smooth', block:'start' });
+    } else if (opts.scroll){
+      el.scrollIntoView({ behavior:'smooth', block: opts.external ? 'center' : 'nearest' });
+    }
+  }
+}
+
+/* ---- filter controls ---- */
+function onSearch(v){ fSearch = String(v||'').trim().toLowerCase(); renderRegister(); }
+function toggleSev(s, btn){ if (fSev[s]) delete fSev[s]; else fSev[s]=1; btn.setAttribute('aria-pressed', !!fSev[s]); renderRegister(); }
+function toggleType(t, btn){ if (fType[t]) delete fType[t]; else fType[t]=1; btn.setAttribute('aria-pressed', !!fType[t]); renderRegister(); }
+function resetFilterState(){
+  fSearch = ''; fSev = {}; fType = {};
+  document.getElementById('regSearch').value = '';
+  document.querySelectorAll('.chip').forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+}
+function clearFilters(){ resetFilterState(); renderRegister(); }
+
+/* =========================================================================
+ * 4. DETAIL TEMPLATES
+ * ====================================================================== */
+function outcomeCards(pref, fb, least){
+  var noneFloor = /^none/i.test(String(least||'').trim());
+  var lc = noneFloor ? 'walkaway-none' : 'walkaway';
+  var lLab = noneFloor ? 'No hard floor' : 'Least acceptable';
+  var lSub = noneFloor ? 'trade item, not a gate' : 'walk-away · reservation point';
+  return '<div class="outcomes">'
+    + '<div class="oc preferred"><div class="oc-lab">Preferred outcome</div><div class="oc-body">'+esc(pref)+'</div></div>'
+    + '<div class="oc fallback"><div class="oc-lab">Fallback</div><div class="oc-body">'+esc(fb)+'</div></div>'
+    + '<div class="oc '+lc+'"><div class="oc-lab">'+lLab+'<span class="oc-sub">'+lSub+'</span></div><div class="oc-body">'+esc(least)+'</div></div>'
+    + '</div>';
+}
+function zone(cls, icon, title, bodyHtml){
+  return '<div class="zone '+cls+'"><div class="zone-hd">'+icon+'<span class="zt">'+esc(title)+'</span></div>'
+    + '<div class="zone-bd">'+bodyHtml+'</div></div>';
+}
+function zf(lab, html){ return '<div class="zf"><div class="zf-lab">'+esc(lab)+'</div>'+html+'</div>'; }
+
+/* ---- ISSUE detail ---- */
+function tplIssue(i){
+  if (!i) return '<div class="reg-empty"><p>Issue not found.</p></div>';
+  var tactic = (i.tacticFlag && i.tacticFlag.present)
+    ? '<div class="tactic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l9 5v6c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7z"/><path d="M12 9v4M12 16h.01"/></svg>'
+      + '<div><b>Supplier tactic detected: '+esc(i.tacticFlag.tactic)+'.</b>'
+      + (i.tacticFlag.triggeringText ? '<span class="tk-q">'+esc(i.tacticFlag.triggeringText)+'</span>' : '')
+      + '</div></div>'
+    : '';
+  var whereBody =
+    '<div class="zone-bd">'+esc(i.supplierPosition)+'</div>'
+    + (i.sourceExcerpt ? '<div class="quote contract">'+esc(i.sourceExcerpt)+'</div>' : '');
+  var problemBody =
+    zf('Deviation', esc(i.deviation))
+    + (i.playbookPosition ? '<div class="quote playbook"><b>Playbook rule.</b> '+esc(i.playbookPosition)+'</div>' : '')
+    + zf('Business impact', esc(i.impact));
+  var playBody =
+    zf('Recommended response', esc(i.recommendedResponse))
+    + (i.supplierPushback ? '<div class="quote pushback"><b>Anticipated pushback.</b> '+esc(i.supplierPushback)+'</div>' : '')
+    + zf('Trade opportunity', esc(i.tradeOpportunity));
+  return ''
+    + '<div class="fd-eyebrow"><span class="fd-id">'+esc(i.id)+'</span>'
+    +   '<span class="fd-kind k-issue">Issue</span>'+sevPill(i.priority)+evChip(i.evidenceType)+'</div>'
+    + '<div class="fd-title">'+esc(i.title)+'</div>'
+    + '<div class="fd-cat">'+esc(i.category)+' · '+esc(i.clause)+'</div>'
+    + tactic
+    + outcomeCards(i.recommendedPosition, i.fallback, i.hardStop)
+    + '<div class="oc-src">Preferred, fallback and least-acceptable positions are the negotiation stance for this clause.</div>'
+    + zone('z-state', IC.doc, 'Where it stands', whereBody)
+    + zone('z-problem', IC.alert, 'Why it is a problem', problemBody)
+    + zone('z-play', IC.compass, 'How to play it', playBody)
+    + '<div class="dl-foot"><span class="fk">'+esc(i.clause)+'</span> · <span class="fk">'+esc(i.documentId)+'</span> · '+evChip(i.evidenceType)+'</div>';
+}
+
+/* ---- OBLIGATION detail (the substantive review) ---- */
+function remedyChip(ev){
+  if (ev === 'contract') return evChip('contract');
+  if (ev === 'gap') return '<span class="ev ev-unavailable" title="Not in session">Unavailable</span>';
+  return '<span class="chip-analysis" title="Derived by Claude, not a quoted contract term">Claude analysis</span>';
+}
+function tplObligation(o){
+  if (!o) return '<div class="reg-empty"><p>Obligation not found.</p></div>';
+  var a = OBA[o.id] || {};
+  var linked = o.issueId ? issueById(o.issueId) : null;
+  var isBalanced = !a.cards; // balanced obligations carry no outcome cards
+  var flag = o.imbalanceFlag
+    ? '<span class="pill one-sided'+(a.verdict && a.verdict.tone==='critical'?' crit':'')+'">One-sided</span>'
+    : '<span class="pill balanced">Balanced</span>';
+
+  /* ---- CONTRACT FACTS ---- */
+  var partyLabel = o.party.charAt(0).toUpperCase()+o.party.slice(1) + (o.party==='mutual' ? ' (both parties)' : '');
+  var remedyVal = esc(a.remedy) + ' ' + remedyChip(a.remedyEv)
+    + (a.remedyEv==='gap' ? ' <span class="gapnote">(gap-state)</span>' : '');
+  var facts = '<div class="facts">'
+    + fact('Owing party', esc(partyLabel))
+    + fact('Clause', '<span style="font-family:var(--mono);font-size:11.5px">'+esc(o.clause)+'</span>')
+    + fact('Trigger / frequency', esc(o.trigger))
+    + fact('Remedy if missed', remedyVal)
+    + fact('Reciprocity', esc(a.reciprocity))
+    + fact('Survival / duration', esc(a.survival) + (a.remedyEv==='gap'?'':''))
+    + '</div>';
+
+  /* ---- FAIRNESS VERDICT ---- */
+  var vIcon = a.verdict.tone==='fair' ? IC.check : (a.verdict.tone==='neutral' ? IC.scale : IC.alert);
+  var verdict = '<div class="verdict v-'+a.verdict.tone+'">'+vIcon
+    + '<div class="v-body"><div class="v-top"><span class="v-label">'+esc(a.verdict.label)+'</span>'
+    + '<span class="chip-analysis">Claude analysis</span></div>'
+    + '<div class="v-why">'+esc(a.verdict.why)+'</div></div></div>';
+
+  var out = ''
+    + '<div class="fd-eyebrow"><span class="fd-id">'+esc(o.id)+'</span>'
+    +   '<span class="fd-kind k-obligation">Obligation</span>'+partyPill(o.party)+flag+evChip(o.evidenceType)+'</div>'
+    + '<div class="fd-title ob">'+esc(o.text)+'</div>'
+    + '<div class="fd-cat">Post-sign exposure register · reflected from the contract, not monitored live</div>'
+    + zone('z-state', IC.doc, 'Contract facts', facts)
+    + verdict;
+
+  if (isBalanced){
+    /* balanced: state it plainly, do not pad. Optional refinement / cross-link only. */
+    out += '<div class="balanced-panel">'+IC.check
+      + '<div><div class="bp-t">Balanced, no action needed</div>'
+      + '<div class="bp-b">'+esc(a.negotiate.why)+'</div>'
+      + (a.refine ? '<div class="refine"><b>Note.</b> '+esc(a.refine)+' <span class="chip-analysis">Claude analysis</span></div>' : '')
+      + (a.crossLink ? '<button class="xlink" onclick="selectFinding(\'issue\',\''+a.crossLink.issueId+'\',{ensureVisible:true,scroll:true,external:true})">'+IC.arrow+esc(a.crossLink.text)+'</button>' : '')
+      + '</div></div>';
+  } else {
+    /* negotiate: better alternative + decision + the three outcome cards */
+    var playBody = zf('What a balanced, market version looks like', esc(a.alternative)+' <span class="chip-analysis">Claude analysis</span>')
+      + '<div class="neg"><span class="neg-badge '+(a.negotiate.yes?'yes':'no')+'">'+(a.negotiate.yes?'Negotiate: Yes':'Negotiate: No')+'</span>'
+      + '<div class="neg-why"><span class="nq">Why</span>'+esc(a.negotiate.why)+'</div></div>';
+    out += zone('z-play', IC.compass, 'Better alternative and how to fix it', playBody);
+
+    if (a.cards && a.cards.source === 'linked' && linked){
+      out += '<div class="play-wrap">'
+        + '<div class="oc-src">Positions carried from linked issue '
+        + '<button class="lk" onclick="selectFinding(\'issue\',\''+linked.id+'\',{ensureVisible:true,scroll:true,external:true})">'+esc(linked.id)+' →</button> '
+        + esc(shortLabel(linked.title,60))+'</div>'
+        + outcomeCards(linked.recommendedPosition, linked.fallback, linked.hardStop)
+        + '</div>';
+    } else if (a.cards && a.cards.source === 'proposed'){
+      out += '<div class="play-wrap"><div class="oc-src">Proposed stance <span class="chip-analysis">Claude analysis</span>, no linked issue in this deal.</div>'
+        + outcomeCards(a.cards.preferred, a.cards.fallback, a.cards.least) + '</div>';
+    }
+  }
+
+  out += '<div class="dl-foot"><span class="fk">'+esc(o.clause)+'</span> · '
+    + (linked ? '<button class="lk" onclick="selectFinding(\'issue\',\''+linked.id+'\',{ensureVisible:true,scroll:true,external:true})">linked '+esc(linked.id)+'</button> · ' : 'no linked issue · ')
+    + evChip(o.evidenceType)+'</div>';
+  return out;
+}
+function fact(label, valueHtml){ return '<div class="fact"><div class="fact-l">'+esc(label)+'</div><div class="fact-v">'+valueHtml+'</div></div>'; }
+
+/* =========================================================================
+ * BOOT
+ * ====================================================================== */
+renderGauge();
+renderWaterfall();
+var firstHardStop = D.issues.find(function(i){ return i.priority === 'hard-stop'; });
+selectedKey = firstHardStop ? 'issue:'+firstHardStop.id : (REG_ISSUES[0] ? REG_ISSUES[0].key : null);
+if (firstHardStop) openAccordionCat = firstHardStop.category;
+renderLeft();
+renderRegister();
+</script>
+</body>
+</html>
