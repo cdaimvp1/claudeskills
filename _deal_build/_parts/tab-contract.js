@@ -290,7 +290,9 @@ function bandColor(band) {
   const hit = PROTECTION_BANDS.find(b => b.key.toLowerCase() === String(band || '').toLowerCase());
   return hit ? hit.v : 'var(--mut2)';
 }
-function protectionGauge(protection) {
+// the gauge VISUAL only (svg + score + band + banded legend); the scorecard
+// headline lays this out on the left with methodology/rollup to its right.
+function protectionGaugeVisual(protection) {
   const score = clamp(Math.round(protection.score), 0, 100);
   const cx = 110, cy = 104, r = 82, sw = 20;
   const bg = arcPath(cx, cy, r, 180, 0);
@@ -309,28 +311,183 @@ function protectionGauge(protection) {
       '<div class="pg-score" style="color:' + color + '">' + score + '<span class="pg-max">/100</span></div>' +
       '<div class="pg-band">' + esc(protection.band) + ' protection</div>' +
     '</div>' +
-    '<div class="pg-legend">' + legend + '</div>' +
+    '<div class="pg-legend">' + legend + '</div>';
+}
+// full gauge block (visual + methodology + evidence); retained for reuse.
+function protectionGauge(protection) {
+  return protectionGaugeVisual(protection) +
     '<div class="divider"></div>' +
     '<div class="card-note" style="margin-top:0"><strong>Methodology.</strong> ' + esc(protection.methodology) + '</div>' +
     '<div style="margin-top:8px">' + evidenceChip(protection.evidenceType) + '</div>';
 }
 
-/* ---- Deduction table ---- */
-function renderDeductions(protection) {
-  const rows = protection.deductions || [];
-  const cols = [
-    { key:'category', label:'Category', render: r => '<strong>' + esc(r.category) + '</strong>' },
-    { key:'points', label:'Points', align:'num', width:'80px', render: r => '&minus;' + r.points, sortVal: r => r.points },
-    { key:'reason', label:'Reason', sort:false, render: r => r.reason },
-    { key:'issue', label:'Finding', sort:false, render: r => r.issueId ? issueJump(r.issueId) : '&mdash;' }
-  ];
-  const table = dataTable(cols, rows, { zebra:true, dense:true, id:'tbl-deductions' });
-  const totalPts = rows.reduce((s, x) => s + (x.points || 0), 0);
-  const reconciles = (100 - totalPts) === Math.round(protection.score);
-  const check = insight('Deductions total <strong>&minus;' + totalPts + '</strong> points: 100 &minus; ' + totalPts + ' = <strong>' + (100 - totalPts) +
-    '</strong>' + (reconciles ? ', matching the displayed score.' : ', does not match the displayed score (' + protection.score + '); flag for data QA.'),
+/* ============================================================================
+ * PROTECTION SCORECARD  (merges the old Protection Score gauge + Deductions +
+ * Findings-by-Category + 14-category Coverage into ONE full-width card).
+ *
+ * Category spine = the 8 CANONICAL finding categories, i.e. the distinct values of
+ * d.issues[].category. Everything is attributed by issueId (no lexical crosswalk
+ * across the differently-named deduction / 14-category taxonomies):
+ *   - Findings   = issues whose issue.category === the row category (native).
+ *   - Points off = Σ of deductions[].points whose deduction.issueId maps (issueId ->
+ *                  issue -> issue.category) into this row. Every deduction maps, so the
+ *                  points still total 42 and 100 - 42 = 58 reconciles.
+ *   - Coverage   = the WORST coverage (Gap > Confirm > Covered) among categories14[]
+ *                  whose issueIds intersect this row's issue ids; "Not assessed" if none.
+ *   - Severity   = the mix of the row's issues' priorities.
+ * A footer line preserves the coverage blind-spot value by naming the protection areas
+ * assessed as Covered with no findings (e.g. Confidentiality), which have no row here.
+ * ========================================================================== */
+const SEV_TXT = { 'hard-stop':'Hard stop', high:'High', medium:'Medium', low:'Low' };
+function sevMixHtml(findings) {
+  const parts = ['hard-stop','high','medium','low'].map(p => {
+    const n = findings.filter(f => f.priority === p).length;
+    if (!n) return '';
+    return '<span class="ps-sevtag ps-sev-' + esc(p) + '" title="' + n + ' ' + esc(SEV_TXT[p] || p) + '"><i></i>' + n + '</span>';
+  }).filter(Boolean).join('');
+  return parts || '<span class="tiny muted">&mdash;</span>';
+}
+function covPillOrNA(coverage) { return coverage ? covPill(coverage) : statusPill('missing', 'Not assessed'); }
+function trimText(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; }
+
+function scorecardRows(d) {
+  const protection = d.protection || { deductions:[], categories14:[] };
+  const deductions = protection.deductions || [];
+  const cats14 = protection.categories14 || [];
+  const issues = d.issues || [];
+  const issueById = {}; issues.forEach(i => { issueById[i.id] = i; });
+  const dedByIssue = {}; deductions.forEach(dd => { if (dd.issueId) dedByIssue[dd.issueId] = dd; });
+  const catOfIssue = id => (issueById[id] ? issueById[id].category : null);
+
+  // spine = distinct issue categories (native finding taxonomy), first-seen order
+  const cats = [];
+  issues.forEach(i => { if (i.category && cats.indexOf(i.category) === -1) cats.push(i.category); });
+
+  // worst coverage (Gap > Confirm > Covered) among 14-category rows whose issueIds intersect
+  const COV_RANK = { Gap:3, Confirm:2, Covered:1 };
+  const worstCoverage = ids => {
+    let best = null, bestRank = 0;
+    cats14.forEach(c => {
+      if ((c.issueIds || []).some(id => ids.indexOf(id) !== -1)) {
+        const rk = COV_RANK[c.coverage] || 0;
+        if (rk > bestRank) { bestRank = rk; best = c.coverage; }
+      }
+    });
+    return best;   // null -> "Not assessed"
+  };
+
+  const rows = cats.map(cat => {
+    const findings = issues.filter(i => i.category === cat)
+      .sort((a, b) => sevRank(b.priority) - sevRank(a.priority));
+    const ids = findings.map(f => f.id);
+    // points off = every scored deduction whose issue maps into THIS category
+    const points = deductions.reduce((s, dd) =>
+      s + ((dd.issueId && catOfIssue(dd.issueId) === cat) ? (dd.points || 0) : 0), 0);
+    const scored = deductions.some(dd => dd.issueId && catOfIssue(dd.issueId) === cat);
+    return { key: cat.toLowerCase(), name: cat, findings, points, scored, coverage: worstCoverage(ids) };
+  });
+  rows.sort((a, b) => (b.points - a.points) || (b.findings.length - a.findings.length) || a.name.localeCompare(b.name));
+
+  // coverage blind-spot line: 14-category areas assessed as Covered with NO finding
+  const assessedNoIssues = cats14.filter(c =>
+    c.coverage === 'Covered' && !(c.issueIds || []).some(id => !!issueById[id])).map(c => c.name);
+
+  return { rows, dedByIssue, protection, deductions, cats14, issues, assessedNoIssues };
+}
+
+function scorecardFindingTable(row, dedByIssue) {
+  if (!row.findings.length) {
+    return gapCard('No findings linked to this category',
+      (row.coverage ? 'Coverage is assessed as <strong>' + esc(row.coverage) + '</strong>; no individual findings map to this category name.'
+                     : 'No findings, and no 14-category coverage entry, carry this category name.'));
+  }
+  const body = row.findings.map(f => {
+    const ded = dedByIssue[f.id];
+    const pts = ded ? '&minus;' + ded.points : '<span class="tiny muted">&mdash;</span>';
+    const reason = ded ? esc(ded.reason) : esc(trimText(f.impact, 180));
+    const ev = evidenceChip(ded ? 'inference' : (f.evidenceType || 'inference'), { short:true });
+    const link = '<span class="ps-flink" data-gotofinding="' + esc(f.id) + '" role="button" tabindex="0" title="Open finding ' + esc(f.id) + ' in the register below">' + esc(f.title) + ' <span class="ps-flink-go">View &rarr;</span></span>';
+    return '<tr>' +
+      '<td class="num">' + pts + '</td>' +
+      '<td>' + severityPill(f.priority) + '</td>' +
+      '<td>' + covPillOrNA(row.coverage) + '</td>' +
+      '<td>' + reason + ' ' + ev + '</td>' +
+      '<td>' + link + '</td>' +
+    '</tr>';
+  }).join('');
+  return '<div class="tbl-wrap"><table class="dt dense zebra"><thead><tr>' +
+      '<th class="num" style="width:60px">Points</th>' +
+      '<th style="width:100px">Severity</th>' +
+      '<th style="width:118px">Coverage</th>' +
+      '<th>Reason</th>' +
+      '<th style="width:200px">Finding</th>' +
+    '</tr></thead><tbody>' + body + '</tbody></table></div>';
+}
+
+function renderProtectionScorecard(d) {
+  const parts = scorecardRows(d);
+  const rows = parts.rows, dedByIssue = parts.dedByIssue, protection = parts.protection,
+        deductions = parts.deductions, cats14 = parts.cats14, issues = parts.issues,
+        assessedNoIssues = parts.assessedNoIssues;
+  const score = clamp(Math.round(protection.score || 0), 0, 100);
+
+  // --- headline: gauge (left) + priority rollup & methodology (right) ---
+  const prRollup = ['hard-stop','high','medium','low'].map(p =>
+    '<span class="ps-rollup-item">' + severityPill(p) + '<b>' + issues.filter(i => i.priority === p).length + '</b></span>').join('');
+  const headline =
+    '<div class="ps-head">' +
+      '<div class="ps-head-gauge">' + protectionGaugeVisual(protection) + '</div>' +
+      '<div class="ps-head-meta">' +
+        '<div class="eyebrow" style="margin-bottom:8px">Findings by priority</div>' +
+        '<div class="ps-rollup">' + prRollup + '</div>' +
+        '<div class="divider"></div>' +
+        '<div class="card-note" style="margin-top:0"><strong>Methodology.</strong> ' + esc(protection.methodology) + ' ' + evidenceChip(protection.evidenceType, { short:true }) + '</div>' +
+      '</div>' +
+    '</div>';
+
+  // --- category accordion (one <details name="protection-scorecard"> open at a time) ---
+  const colHead =
+    '<div class="ps-acc-head"><span></span><span>Category</span><span>Findings</span>' +
+    '<span>Severity mix</span><span>Coverage</span><span style="text-align:right">Points off</span></div>';
+  const items = rows.map(row => {
+    const ptsCell = row.scored
+      ? '<span class="ps-pts">&minus;' + row.points + '</span>'
+      : '<span class="ps-pts zero">&mdash;</span>';
+    return '<details name="protection-scorecard" class="ps-cat">' +
+        '<summary class="ps-sum">' +
+          '<span class="ps-chev">' + icon('chevron') + '</span>' +
+          '<span class="ps-name" title="' + esc(row.name) + '">' + esc(row.name) + '</span>' +
+          '<span class="ps-count">' + row.findings.length + '</span>' +
+          '<span class="ps-sevmix">' + sevMixHtml(row.findings) + '</span>' +
+          '<span class="ps-cov">' + covPillOrNA(row.coverage) + '</span>' +
+          ptsCell +
+        '</summary>' +
+        '<div class="ps-cat-bd">' + scorecardFindingTable(row, dedByIssue) + '</div>' +
+      '</details>';
+  }).join('');
+  const accordion = '<div class="ps-accordion-wrap">' + colHead + items + '</div>';
+
+  // "Also assessed, no issues" line: coverage blind-spots that carry no finding row above
+  const alsoLine = assessedNoIssues.length
+    ? '<div class="card-note" style="margin-top:10px">Also assessed, no issues: <strong>' + assessedNoIssues.map(esc).join(', ') + '</strong>. ' + evidenceChip(protection.evidenceType, { short:true }) + '</div>'
+    : '';
+
+  // --- footer: score reconciliation + attribution note ---
+  const totalPts = deductions.reduce((s, x) => s + (x.points || 0), 0);
+  const reconciles = (100 - totalPts) === score;
+  const recon = insight('Reconciliation: 100 &minus; &Sigma; deductions (' + totalPts + ') = <strong>' + (100 - totalPts) + '</strong>' +
+    (reconciles ? ', matching the displayed score of <strong>' + score + '</strong>.'
+                : ', which does <strong>not</strong> match the displayed score (' + score + '); flag for data QA.'),
     reconciles ? '' : 'danger');
-  return saCard('Protection Score, Deductions', table + check, { icon:'flag', accent:'plum', sub: rows.length + ' deviations scored' });
+  const attribNote = insight('Spine = the ' + rows.length + ' finding categories. Points off map each scored deduction to its finding’s category (' +
+    deductions.length + ' deductions, &Sigma; = ' + totalPts + '); coverage is the worst of the ' + cats14.length + '-category assessments whose issues intersect this category (Gap &gt; Confirm &gt; Covered), else "Not assessed".');
+
+  return saCard('Protection Scorecard',
+    headline + '<div class="divider"></div>' +
+    '<div class="eyebrow" style="margin:2px 0 8px">Protection by finding category (' + rows.length + ') &middot; one panel opens at a time</div>' +
+    accordion + alsoLine +
+    '<div class="ps-recon">' + recon + attribNote + '</div>',
+    { icon:'shield', accent:'plum', sub: esc(protection.band) + ' &middot; ' + score + '/100' });
 }
 
 /* ---- SME routing + verified/assumed derivation (see report: no dedicated data
@@ -354,160 +511,120 @@ function verifiedInfo(evidenceType) {
     : { statusKey:'pending', label:'ASSUMED' };
 }
 
-/* ---- Findings register (was "Terms & Risk"; now folds tacticFlag + SME route) --- */
+/* ---- Findings register (was "Terms & Risk"; expanded body is grouped, not a
+ * flat insight() stack: 3 outcome cards on top, then labelled sections) --- */
+function xpGroup(label, inner) {   // label is trusted literal HTML (may carry entities)
+  return '<div class="xp-group"><div class="eyebrow xp-eyebrow">' + label + '</div>' + inner + '</div>';
+}
+function xpLine(k, v, tone) {       // k is escaped; v is trusted HTML built by the caller
+  return '<div class="xp-line' + (tone ? ' ' + tone : '') + '"><span class="xp-k">' + esc(k) + '</span><span class="xp-v">' + v + '</span></div>';
+}
 function issueExpandHtml(iss, d) {
   const doc = findDoc(iss.documentId, d);
-  const clauseBlock = collapsible(
-    'View source clause &amp; playbook position',
-    excerpt(iss.sourceExcerpt) +
-    '<div class="divider"></div>' +
-    '<div class="card-note"><strong>Playbook position:</strong> ' + esc(iss.playbookPosition) + '</div>'
-  );
-  const hardStopLine = hasRealHardStop(iss.hardStop) ? insight('<strong>Hard-stop line:</strong> ' + esc(iss.hardStop), 'danger') : '';
+  const ver = verifiedInfo(iss.evidenceType);
   const tf = iss.tacticFlag;
-  const tacticBlock = (tf && tf.present)
-    ? insight('<strong>Vendor tactic flagged:</strong> ' + esc(tf.tactic) + '. Triggering text: “' + esc(tf.triggeringText) + '” ' + evidenceChip(tf.evidenceType, { short:true }), 'warn')
+
+  // 1) three outcome cards, left-to-right: preferred | fallback | least-acceptable (the floor)
+  const isHard = hasRealHardStop(iss.hardStop);
+  const outcomes =
+    '<div class="ps-outcomes">' +
+      '<div class="oc oc-want"><div class="oc-lbl">Preferred outcome</div><div class="oc-txt">' + esc(iss.recommendedPosition) + '</div></div>' +
+      '<div class="oc oc-fallback"><div class="oc-lbl">Fallback</div><div class="oc-txt">' + esc(iss.fallback) + '</div></div>' +
+      '<div class="oc ' + (isHard ? 'oc-floor-danger' : 'oc-floor') + '"><div class="oc-lbl">Least acceptable outcome</div>' +
+        '<div class="oc-sub">walk-away / reservation point</div><div class="oc-txt">' + esc(iss.hardStop) + '</div></div>' +
+    '</div>';
+
+  // 2) grouped narrative sections
+  const problem = xpGroup('The problem',
+    xpLine('Supplier position', esc(iss.supplierPosition), '') +
+    xpLine('Deviation vs. playbook', esc(iss.deviation), 'warn') +
+    xpLine('Impact', esc(iss.impact), 'danger'));
+
+  const tacticLine = (tf && tf.present)
+    ? xpLine('Vendor tactic flagged', esc(tf.tactic) + '. Triggering text: “' + esc(tf.triggeringText) + '” ' + evidenceChip(tf.evidenceType, { short:true }), 'warn')
     : '';
+  const exchange = xpGroup('The exchange',
+    tacticLine +
+    xpLine('Supplier pushback', '“' + esc(iss.supplierPushback) + '”', '') +
+    xpLine('Recommended response', esc(iss.recommendedResponse), ''));
+
+  const trade = xpGroup('Trade opportunity', xpLine('Lever', esc(iss.tradeOpportunity), ''));
+
+  // 3) clause & routing metadata + collapsible source excerpt (evidence chips kept)
   const sourceChips = (iss.sourceIds || []).map(sid => {
     const src = (d.sources || []).find(s => s.id === sid);
     return evidenceChip(src ? src.evidenceType : 'internal', { short:true, sources:[sid] });
   }).join(' ');
-  return '<div class="kv" style="margin-bottom:8px">' +
+  const clauseExcerpt = collapsible('View source clause &amp; playbook position',
+    excerpt(iss.sourceExcerpt) +
+    '<div class="divider"></div>' +
+    '<div class="card-note" style="margin-top:0"><strong>Playbook position:</strong> ' + esc(iss.playbookPosition) + '</div>');
+  const routing = xpGroup('Clause &amp; routing',
+    '<div class="kv" style="margin-bottom:8px">' +
       '<dt>Clause</dt><dd>' + esc(iss.clause) + '</dd>' +
       '<dt>Document</dt><dd>' + (doc ? jumpLink(doc.type + ' (' + doc.id + ')', JUMP_MAP) : esc(iss.documentId)) + '</dd>' +
-      '<dt>SME route</dt><dd>' + esc(smeRoute(iss.category)) + ' <span class="tiny muted">(derived from issue category)</span></dd>' +
-      '<dt>Decision</dt><dd>' + statusPill(iss.internalDecision, decisionLabel(iss.internalDecision)) + '</dd>' +
+      '<dt>SME route</dt><dd>' + esc(smeRoute(iss.category)) + ' <span class="tiny muted">(derived from category)</span></dd>' +
+      '<dt>Verification</dt><dd>' + statusPill(ver.statusKey, ver.label) + ' <span class="tiny muted">(from evidence type)</span></dd>' +
+      '<dt>Internal decision</dt><dd>' + statusPill(iss.internalDecision, decisionLabel(iss.internalDecision)) + '</dd>' +
     '</div>' +
-    clauseBlock +
-    '<div class="divider"></div>' +
-    insight('<strong>Supplier position:</strong> ' + esc(iss.supplierPosition)) +
-    insight('<strong>Deviation vs. playbook:</strong> ' + esc(iss.deviation), 'warn') +
-    insight('<strong>Impact:</strong> ' + esc(iss.impact), 'danger') +
-    insight('<strong>Recommended position:</strong> ' + esc(iss.recommendedPosition)) +
-    insight('<strong>Fallback:</strong> ' + esc(iss.fallback)) +
-    hardStopLine + tacticBlock +
-    '<div class="divider"></div>' +
-    insight('<strong>Supplier pushback:</strong> “' + esc(iss.supplierPushback) + '”') +
-    insight('<strong>Recommended response:</strong> ' + esc(iss.recommendedResponse)) +
-    insight('<strong>Trade opportunity:</strong> ' + esc(iss.tradeOpportunity)) +
-    '<div class="btn-row" style="margin-top:8px">' + sourceChips + '</div>';
+    clauseExcerpt +
+    '<div class="btn-row" style="margin-top:8px">' + sourceChips + '</div>');
+
+  return outcomes + problem + exchange + trade + routing;
 }
 
 function issueRowHtml(iss, d) {
   const facet = (iss.priority + ' ' + iss.category).toLowerCase();
   const rowKey = iss.id;
-  const ver = verifiedInfo(iss.evidenceType);
-  const tf = iss.tacticFlag;
+  // Collapsed row is trimmed to ID · Finding · Priority · $ Impact · Evidence.
+  // Evidence-excerpt, Verified, SME route and Tactic now live in the expanded body.
   return '<tr class="expandable" data-exprow="' + rowKey + '" data-rowkey="' + rowKey + '" data-facet="' + esc(facet) + '">' +
       '<td>' + esc(iss.id) + '</td>' +
       '<td><strong>' + esc(iss.title) + '</strong><div class="tiny muted">' + esc(iss.category) + '</div></td>' +
       '<td data-sv="' + sevRank(iss.priority) + '">' + severityPill(iss.priority) + '</td>' +
-      '<td><span class="tiny muted">“' + esc(iss.sourceExcerpt) + '”</span></td>' +
-      '<td>' + esc(iss.clause) + '</td>' +
-      '<td>' + statusPill(ver.statusKey, ver.label) + '</td>' +
-      '<td>' + esc(smeRoute(iss.category)) + '</td>' +
       '<td>' + esc(iss.impact) + '</td>' +
-      '<td>' + (tf && tf.present ? '<span class="pill warn" title="' + esc(tf.tactic) + '">Flag</span>' : '<span class="tiny muted">&mdash;</span>') + '</td>' +
       '<td>' + evidenceChip(iss.evidenceType, { short:true, sources: iss.sourceIds }) + '</td>' +
     '</tr>' +
-    '<tr class="expander-row is-hidden" data-expfor="' + rowKey + '"><td colspan="10"><div class="exp-inner">' + issueExpandHtml(iss, d) + '</div></td></tr>';
+    '<tr class="expander-row is-hidden" data-expfor="' + rowKey + '"><td colspan="5"><div class="exp-inner">' + issueExpandHtml(iss, d) + '</div></td></tr>';
 }
 
 function renderFindingsRegister(d) {
   const issues = d.issues || [];
-  const CATS = ['Liability','Data & Privacy','Commercial','Term & Renewal','Service Levels','IP','Audit & Compliance','Scope & Acceptance'];
-  const catCounts = CATS.map(c => ({
-    cat: c,
-    count: issues.filter(i => i.category === c).length,
-    hasHard: issues.some(i => i.category === c && i.priority === 'hard-stop'),
-    hasHigh: issues.some(i => i.category === c && i.priority === 'high')
-  })).filter(x => x.count > 0);
-  const maxCat = Math.max.apply(null, catCounts.map(x => x.count)) || 1;
-  const barsHtml = catCounts
-    .sort((a, b) => b.count - a.count)
-    .map(x => barRow(x.cat, x.count, maxCat, String(x.count), { color: x.hasHard ? 'danger' : (x.hasHigh ? 'warn' : 'teal') }))
-    .join('');
+  const cnt = p => issues.filter(i => i.priority === p).length;
 
-  const prCounts = ['hard-stop','high','medium','low'].map(p => ({ p, count: issues.filter(i => i.priority === p).length }));
-  const prLegend = '<div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px">' +
-    prCounts.map(x => '<span style="display:inline-flex;align-items:center;gap:6px">' + severityPill(x.p) + '<strong>' + x.count + '</strong></span>').join('') +
-    '</div>';
-
-  const hardIds = issues.filter(i => i.priority === 'hard-stop');
-  const hardCats = Array.from(new Set(hardIds.map(i => i.category)));
-  const tacticCount = issues.filter(i => i.tacticFlag && i.tacticFlag.present).length;
-  const chartInsights =
-    insight('<strong>' + hardIds.length + '</strong> hard-stop item' + (hardIds.length === 1 ? '' : 's') +
-      ' (' + hardIds.map(i => i.id).join(', ') + ') sit in ' + hardCats.join(' and ') + ' &mdash; these block signature.', 'danger') +
-    insight('<strong>' + prCounts.find(x => x.p === 'high').count + '</strong> high-priority issues remain open across ' +
-      catCounts.filter(x => x.hasHigh).length + ' categories.', 'warn') +
-    insight('<strong>' + tacticCount + '</strong> of ' + issues.length + ' findings show a flagged vendor negotiation tactic (see the Tactic column).');
-
-  const chartCard = saCard('Findings by Category', barsHtml + prLegend + chartInsights,
-    { icon:'bench', sub: issues.length + ' findings tracked' });
-
-  /* ---- full filterable, expandable, sortable register ---- */
+  /* ---- full-width filterable, expandable, sortable register (chips carry counts) ---- */
   const toolbar =
     '<div class="toolbar">' +
       '<input type="search" placeholder="Search findings, clauses, categories…" data-filter-input data-filter-for="tbl-findings-register">' +
-      '<button class="chip-filter" data-filterchip="hard-stop" aria-pressed="false">Hard stop</button>' +
-      '<button class="chip-filter" data-filterchip="high" aria-pressed="false">High</button>' +
-      '<button class="chip-filter" data-filterchip="medium" aria-pressed="false">Medium</button>' +
-      '<button class="chip-filter" data-filterchip="low" aria-pressed="false">Low</button>' +
+      '<button class="chip-filter" data-filterchip="hard-stop" aria-pressed="false">Hard stop (' + cnt('hard-stop') + ')</button>' +
+      '<button class="chip-filter" data-filterchip="high" aria-pressed="false">High (' + cnt('high') + ')</button>' +
+      '<button class="chip-filter" data-filterchip="medium" aria-pressed="false">Medium (' + cnt('medium') + ')</button>' +
+      '<button class="chip-filter" data-filterchip="low" aria-pressed="false">Low (' + cnt('low') + ')</button>' +
       '<span class="spacer"></span>' +
       '<span class="filter-count">' + issues.length + ' of ' + issues.length + ' shown</span>' +
     '</div>';
+  // Height-capped scroll container; table.dt thead th is sticky, so the header holds while scrolling.
   const registerTable =
-    '<div class="tbl-wrap"><table class="dt zebra dense" id="tbl-findings-register">' +
+    '<div class="reg-scroll"><table class="dt zebra dense" id="tbl-findings-register">' +
       '<thead><tr>' +
         '<th data-sort="id">ID</th>' +
         '<th data-sort="title">Finding</th>' +
         '<th data-sort="priority">Priority</th>' +
-        '<th>Evidence excerpt</th>' +
-        '<th data-sort="clause">Cross-ref</th>' +
-        '<th data-sort="verified">Verified</th>' +
-        '<th data-sort="sme">SME route</th>' +
         '<th>$ Impact / consequence</th>' +
-        '<th>Tactic</th>' +
         '<th>Evidence</th>' +
       '</tr></thead>' +
       '<tbody>' + issues.map(iss => issueRowHtml(iss, d)).join('') + '</tbody>' +
     '</table></div>';
-  const registerCard = saCard('Findings Register, Full Detail',
+  return saCard('Findings Register, Full Detail',
     '<div data-filter-scope>' + toolbar + registerTable + '</div>',
-    { icon:'flag', accent:'plum', sub:'click a row to expand' });
-
-  return '<div class="col-4">' + chartCard + '</div><div class="col-8">' + registerCard + '</div>';
+    { icon:'flag', accent:'plum', sub: issues.length + ' findings &middot; click a row to expand' });
 }
 
-/* ---- 14-category severity x coverage (heatCell; Covered/Confirm/Gap) ---- */
-function sevNum(s) { return ({ high:3, medium:2, low:1 })[s] || 1; }
+/* ---- coverage pill (Covered/Confirm/Gap); used by the Protection Scorecard ---- */
 function covPill(coverage) {
   const map = { Covered:['aligned','Covered'], Confirm:['pending','Confirm'], Gap:['deviation','Gap'] };
   const m = map[coverage] || ['muted', coverage];
   return statusPill(m[0], m[1]);
-}
-function renderCoverageHeatmap(protection) {
-  const cats = protection.categories14 || [];
-  const rollup = { Covered:0, Confirm:0, Gap:0 };
-  cats.forEach(c => { rollup[c.coverage] = (rollup[c.coverage] || 0) + 1; });
-  const rollupHtml = '<div class="btn-row" style="margin-bottom:10px;flex-wrap:wrap">' +
-    covPill('Covered') + ' <strong>' + rollup.Covered + '</strong>&nbsp;&nbsp;' +
-    covPill('Confirm') + ' <strong>' + rollup.Confirm + '</strong>&nbsp;&nbsp;' +
-    covPill('Gap') + ' <strong>' + rollup.Gap + '</strong>' +
-    '<span class="tiny muted" style="margin-left:8px">across ' + cats.length + ' categories</span>' +
-  '</div>';
-  const cols = [
-    { key:'name', label:'Category', render: r => '<strong>' + esc(r.name) + '</strong>' },
-    { key:'severity', label:'Severity', width:'110px', sortVal: r => sevNum(r.severity),
-      render: r => heatCell(sevNum(r.severity), { scale:3, label: cap1(r.severity), title: cap1(r.severity) + ' severity exposure' }) },
-    { key:'coverage', label:'Coverage', width:'110px', render: r => covPill(r.coverage), sortVal: r => r.coverage },
-    { key:'issues', label:'Linked findings', sort:false, render: r => (r.issueIds && r.issueIds.length)
-      ? r.issueIds.map(id => issueJump(id)).join(' ') : '<span class="tiny muted">&mdash;</span>' }
-  ];
-  const table = dataTable(cols, cats, { zebra:true, dense:true, id:'tbl-coverage14' });
-  const gapNote = insight('Every <strong>Gap</strong> row above traces to the two exhibits referenced in the MSA but not provided this session (DPA, Security Exhibit). Obtaining them converts these from Gap to Confirm/Covered.', rollup.Gap ? 'warn' : '');
-  return saCard('Protection & Coverage, 14 Categories', rollupHtml + table + gapNote, { icon:'shield', sub: cats.length + ' categories' });
 }
 
 /* ---- Obligations register (post-sign exposure; dates static/reflect-only) ---- */
@@ -540,16 +657,12 @@ function renderObligations(d) {
 }
 
 function renderLegalProtection(d) {
-  const protection = d.protection || { deductions:[], categories14:[] };
-  const findingsHtml = renderFindingsRegister(d);
-  return '<div class="tab-intro"><h2>Legal &amp; Protection</h2><p class="q">Protection Score, full findings register, 14-category coverage and post-sign obligations for the MSA, SOW-01 and Order Form set. ' +
+  return '<div class="tab-intro"><h2>Legal &amp; Protection</h2><p class="q">Protection scorecard, full findings register and post-sign obligations for the MSA, SOW-01 and Order Form set. ' +
     coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
     '<div class="grid">' +
-      '<div class="col-4">' + saCard('Protection Score', protectionGauge(protection), { icon:'shield', accent:'plum' }) + '</div>' +
-      '<div class="col-8">' + renderDeductions(protection) + '</div>' +
-      findingsHtml +
-      '<div class="col-7">' + renderCoverageHeatmap(protection) + '</div>' +
-      '<div class="col-5">' + renderObligations(d) + '</div>' +
+      '<div class="col-12">' + renderProtectionScorecard(d) + '</div>' +
+      '<div class="col-12">' + renderFindingsRegister(d) + '</div>' +
+      '<div class="col-12">' + renderObligations(d) + '</div>' +
     '</div>';
 }
 
@@ -727,6 +840,70 @@ const CONTRACT_STYLE =
   '.contract-tab .pg-leg{display:inline-flex;align-items:center;gap:5px;font-size:var(--fz-floor);color:var(--mut)}' +
   '.contract-tab .pg-leg i{width:8px;height:8px;border-radius:2px;display:inline-block}' +
   '.contract-tab .pg-leg-cur{color:var(--ink);font-weight:800}' +
+  /* ---- Legal & Protection: Protection Scorecard ---- */
+  '.contract-tab .ps-head{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}' +
+  '.contract-tab .ps-head-gauge{flex:0 0 236px;max-width:250px}' +
+  '.contract-tab .ps-head-meta{flex:1 1 320px;min-width:260px}' +
+  '.contract-tab .ps-rollup{display:flex;flex-wrap:wrap;gap:8px 18px}' +
+  '.contract-tab .ps-rollup-item{display:inline-flex;align-items:center;gap:7px}' +
+  '.contract-tab .ps-rollup-item b{font:800 15px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink)}' +
+  '.contract-tab .ps-accordion-wrap{max-height:560px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)}' +
+  '.contract-tab .ps-acc-head,.contract-tab .ps-sum{display:grid;grid-template-columns:18px minmax(150px,1fr) 78px minmax(120px,1.1fr) 140px 78px;align-items:center;gap:10px}' +
+  '.contract-tab .ps-acc-head{position:sticky;top:0;z-index:2;padding:9px 13px;background:var(--panel);border-bottom:1.5px solid var(--line2)}' +
+  '.contract-tab .ps-acc-head span{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700}' +
+  '.contract-tab .ps-cat{border-bottom:1px solid var(--line)}' +
+  '.contract-tab .ps-cat:last-child{border-bottom:0}' +
+  '.contract-tab .ps-cat>summary{list-style:none;cursor:pointer;padding:10px 13px}' +
+  '.contract-tab .ps-cat>summary::-webkit-details-marker{display:none}' +
+  '.contract-tab .ps-cat>summary:hover{background:var(--nested)}' +
+  '.contract-tab .ps-cat[open]>summary{background:var(--nested)}' +
+  '.contract-tab .ps-chev{display:inline-flex;color:var(--mut);transition:transform .15s}' +
+  '.contract-tab .ps-chev svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4}' +
+  '.contract-tab .ps-cat[open] .ps-chev{transform:rotate(90deg)}' +
+  '.contract-tab .ps-name{font-weight:700;font-size:var(--fz-sm);color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+  '.contract-tab .ps-count{font-size:var(--fz-sm);color:var(--mut);font-variant-numeric:tabular-nums}' +
+  '.contract-tab .ps-sevmix{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}' +
+  '.contract-tab .ps-pts{font:800 var(--fz-sm)/1 var(--mono);text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}' +
+  '.contract-tab .ps-pts.zero{color:var(--mut);font-weight:600}' +
+  '.contract-tab .ps-cat-bd{padding:2px 13px 14px}' +
+  '.contract-tab .ps-sevtag{display:inline-flex;align-items:center;gap:5px;font:800 var(--fz-floor)/1 var(--sans);font-variant-numeric:tabular-nums}' +
+  '.contract-tab .ps-sevtag i{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}' +
+  '.contract-tab .ps-sev-hard-stop{color:var(--danger-fg)}' +
+  '.contract-tab .ps-sev-high{color:var(--warn-fg)}' +
+  '.contract-tab .ps-sev-medium{color:var(--sec-tx)}' +
+  '.contract-tab .ps-sev-low{color:var(--mut2)}' +
+  '.contract-tab .ps-flink{cursor:pointer;color:var(--sec-tx);font-weight:700}' +
+  '.contract-tab .ps-flink:hover{text-decoration:underline}' +
+  '.contract-tab .ps-flink-go{white-space:nowrap;color:var(--mut2);font-size:var(--fz-meta)}' +
+  '.contract-tab .ps-recon{margin-top:12px}' +
+  /* three outcome cards inside an expanded finding (preferred | fallback | least-acceptable) */
+  '.contract-tab .ps-outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}' +
+  '.contract-tab .oc{border:1px solid var(--line2);border-radius:var(--r-sm);padding:10px 12px;background:var(--surface2);border-top:3px solid var(--mut2)}' +
+  '.contract-tab .oc-want{border-top-color:var(--sec)}' +
+  '.contract-tab .oc-fallback{border-top-color:var(--pri)}' +
+  '.contract-tab .oc-floor{border-top-color:var(--mut2)}' +
+  '.contract-tab .oc-floor-danger{border-top-color:var(--danger-bar);background:var(--danger-bg)}' +
+  '.contract-tab .oc-lbl{font:800 var(--fz-floor)/1 var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:5px}' +
+  '.contract-tab .oc-sub{font:700 var(--fz-floor)/1.2 var(--sans);color:var(--danger-fg);margin-bottom:5px}' +
+  '.contract-tab .oc-txt{font-size:var(--fz-sm);color:var(--ink);line-height:1.45}' +
+  /* grouped narrative sections in the expanded finding */
+  '.contract-tab .xp-group{margin-top:14px}' +
+  '.contract-tab .xp-eyebrow{margin-bottom:4px}' +
+  '.contract-tab .xp-line{display:grid;grid-template-columns:150px 1fr;gap:5px 14px;padding:6px 0;font-size:var(--fz-sm);line-height:1.45}' +
+  '.contract-tab .xp-line + .xp-line{border-top:1px solid var(--line)}' +
+  '.contract-tab .xp-k{color:var(--mut);font-weight:600}' +
+  '.contract-tab .xp-v{color:var(--ink);min-width:0}' +
+  '.contract-tab .xp-line.warn .xp-k{color:var(--warn-fg)}' +
+  '.contract-tab .xp-line.danger .xp-k{color:var(--danger-fg)}' +
+  /* findings register scroll container (sticky header comes from table.dt thead th) */
+  '.contract-tab .reg-scroll{max-height:620px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-sm)}' +
+  '.contract-tab .reg-scroll table.dt thead th{position:sticky;top:0;z-index:2}' +
+  '@media(max-width:760px){' +
+    '.contract-tab .ps-outcomes{grid-template-columns:1fr}' +
+    '.contract-tab .ps-acc-head{display:none}' +
+    '.contract-tab .ps-sum{grid-template-columns:18px 1fr;gap:6px 10px}' +
+    '.contract-tab .xp-line{grid-template-columns:1fr}' +
+  '}' +
   '</style>';
 
 /* ============================================================================
