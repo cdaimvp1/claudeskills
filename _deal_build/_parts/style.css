@@ -432,6 +432,17 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
   body{background:#fff}
 }
 
+/* ---- 20. OVERVIEW ROW 1 EQUAL-HEIGHT STACK (Deal Snapshot + State of Play vs Next Steps) --
+ * .ov-stack fills the height its grid cell was stretched to (the grid row's own height comes
+ * from its tallest natural-content cell, e.g. Next Steps when it is taller than the two
+ * stacked cards combined); percentage height resolves against that once the row track is
+ * sized. .ov-slot children share that height equally (1+ slots -> 100%/2 slots -> 50% each);
+ * a card whose own content exceeds its slot's share scrolls internally (.card-bd-scroll). */
+.ov-stack{display:flex; flex-direction:column; gap:16px; height:100%}
+.ov-stack > .ov-slot{flex:1 1 auto; min-height:0; display:flex; flex-direction:column}
+.ov-stack > .ov-slot > .sa-card{flex:1 1 auto; min-height:0}
+.card-bd-scroll{overflow-y:auto; min-height:0}
+
 /* ---- persistent-strip lead cluster: who-has-the-pen chip + coverage pill ---- */
 .summary-strip .wrap{align-items:center}
 .summary-strip .ss-lead{display:flex; align-items:center; gap:10px; flex:none; padding-right:4px}

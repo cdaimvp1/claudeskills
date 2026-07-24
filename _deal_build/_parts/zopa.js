@@ -40,16 +40,21 @@ var ZOPA_CSS =
   /* collapsible line row (hairline divider, no card box) */
   '.zopa-viz .zline{border-bottom:1px solid var(--line)}' +
   '.zopa-viz .zline:last-of-type{border-bottom:none}' +
-  '.zopa-viz .zsum{list-style:none;cursor:pointer;display:block;padding:9px 2px 4px}' +
+  /* collapsed line = ONE row: fixed-width title column (~190px) beside the ZOPA bar
+   * (was title-row-above-bar-row, doubling the vertical space each line took). Every
+   * line shares the same title-column width, so every track starts at the same x --
+   * the bars line up in a column without any extra alignment logic. */
+  '.zopa-viz .zsum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:9px 2px 4px}' +
   '.zopa-viz .zsum::-webkit-details-marker{display:none}' +
   '.zopa-viz .zsum::marker{content:""}' +
-  '.zopa-viz .zsum-row{display:flex;align-items:center;gap:8px;margin-bottom:2px}' +
-  '.zopa-viz .zchev{width:7px;height:7px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
+  '.zopa-viz .zsum-row{display:flex;align-items:flex-start;gap:8px;flex:0 0 190px;width:190px;min-width:0}' +
+  '.zopa-viz .zchev{width:7px;height:7px;margin-top:5px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
   '.zopa-viz .zline[open] .zchev{transform:rotate(45deg)}' +
   '.zopa-viz .zsum:hover .zlname{color:var(--plum)}' +
-  '.zopa-viz .zlname{font-weight:700;font-size:var(--fz-sm);color:var(--ink)}' +
-  /* the ZOPA track, taller so on-bar value labels sit above + below it */
-  '.zopa-viz .ztrack{position:relative;height:82px;margin:0}' +
+  '.zopa-viz .zlname{font-weight:700;font-size:var(--fz-sm);color:var(--ink);line-height:1.3;min-width:0}' +
+  /* the ZOPA track, taller so on-bar value labels sit above + below it; now sits BESIDE
+   * the fixed-width title column (was stacked below it) so each line compacts to one row */
+  '.zopa-viz .ztrack{position:relative;height:82px;margin:0;flex:1 1 auto;min-width:0}' +
   '.zopa-viz .zaxis{position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:var(--line2);border-radius:2px}' +
   '.zopa-viz .zzopa{position:absolute;top:50%;transform:translateY(-50%);height:16px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:4px}' +
   '.zopa-viz .ztgt,.zopa-viz .zwalk{position:absolute;top:calc(50% - 11px);width:2px;height:22px;background:var(--plum)}' +
@@ -98,7 +103,10 @@ var ZOPA_CSS =
   '.zopa-viz .zlg.fb{width:0;height:14px;border-left:2px dotted var(--plum);opacity:.75}' +
   '.zopa-viz .zlg.open{width:12px;height:12px;background:var(--surface);border:2px solid var(--emph);border-radius:50%;box-sizing:border-box}' +
   '.zopa-viz .zlg.ask{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
-  '.zopa-viz .zlg.bench{width:2px;height:14px;background:var(--ink2)}';
+  '.zopa-viz .zlg.bench{width:2px;height:14px;background:var(--ink2)}' +
+  /* narrow viewports: fall back to title-above-bar (title column no longer fits beside a
+   * usable bar width) so the on-bar labels stay legible instead of being crushed together */
+  '@media(max-width:640px){.zopa-viz .zsum{flex-wrap:wrap}.zopa-viz .zsum-row{flex:0 0 100%;width:auto}.zopa-viz .ztrack{flex:1 1 100%;width:100%}}';
 
 function injectCss() {
   if (document.getElementById('zopa-css')) return;   // idempotent: safe across repeated render() calls
