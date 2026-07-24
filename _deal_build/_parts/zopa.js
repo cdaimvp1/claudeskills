@@ -263,6 +263,13 @@ function render(d) {
   return '<div class="zopa-viz">' + renderZopaGantt(d) + '</div>';
 }
 
-global.DealZopa = { render: render };
+// Total-deal / TCO band ONLY (no per-line tracks). Used by the Overview commercial
+// panel so the full line-item ZOPA lives exclusively in Economics (no duplication).
+function renderTotal(d) {
+  injectCss();
+  return '<div class="zopa-viz zopa-total-only">' + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND + '</div>';
+}
+
+global.DealZopa = { render: render, renderTotal: renderTotal };
 
 })(typeof window !== 'undefined' ? window : this);

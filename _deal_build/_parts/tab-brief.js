@@ -148,9 +148,11 @@
       '. Cost of invoking it: ' + esc(batna.costDelta) + '. Trigger: ' + esc(batna.trigger),
       'warn'
     );
-    // Real per-line + Total-deal ZOPA, shared component (identical to Economics).
-    const zopa = (typeof window !== 'undefined' && window.DealZopa) ? window.DealZopa.render(d) : '';
-    return saCard('Commercial Headline & Total-Deal ZOPA', zopa + batnaNote, { accent: 'teal', icon: 'money' });
+    // Overview shows the TOTAL-DEAL / TCO band ONLY; the per-line ZOPA lives exclusively in
+    // Economics (no duplication). A jump takes the user to the line-item detail.
+    const zopa = (typeof window !== 'undefined' && window.DealZopa) ? window.DealZopa.renderTotal(d) : '';
+    const toLines = '<div class="btn-row" style="margin-top:2px">' + jumpLink('Line-item ZOPA &amp; pricing in Economics &rarr;', 'tab:commercials/sub:deal') + '</div>';
+    return saCard('Commercial Headline & Total-Deal ZOPA', zopa + toLines + batnaNote, { accent: 'teal', icon: 'money' });
   }
 
   /* ============================= 7. EVIDENCE & GAPS BAND ============================= */
