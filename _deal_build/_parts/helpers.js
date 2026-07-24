@@ -433,6 +433,19 @@ const DealUI = {
       }
     });
 
+    // keyboard activation for NON-native controls (role="button" divs/spans in the
+    // Legal & Protection scorecard, navigator, and cross-links): Enter/Space fire the
+    // same delegated click. Native <button>/<a> handle these keys themselves, so they
+    // are excluded to avoid double-firing. Space is prevent-defaulted so it activates
+    // the control instead of scrolling the page.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      const t = e.target.closest('[role="button"]');
+      if (!t || t.tagName === 'BUTTON' || t.tagName === 'A') return;
+      e.preventDefault();
+      t.click();
+    });
+
     // assumptions: live update + recalc
     document.addEventListener('input', (e) => {
       const inp = e.target.closest('[data-assumption]');
@@ -518,7 +531,8 @@ const DealUI = {
       .map(c => c.getAttribute('data-filterchip').toLowerCase());
     let shown = 0, total = 0;
     table.querySelectorAll('tbody tr').forEach(tr => {
-      if (tr.classList.contains('expander-row')) { return; }
+      // expander bodies and group-header bands are not filterable data rows
+      if (tr.classList.contains('expander-row') || tr.hasAttribute('data-grouphd')) { return; }
       total++;
       const txt = tr.textContent.toLowerCase();
       const facet = (tr.getAttribute('data-facet') || '').toLowerCase();
@@ -534,6 +548,20 @@ const DealUI = {
     });
     const cnt = scope.querySelector('.filter-count');
     if (cnt) cnt.textContent = shown + ' of ' + total + ' shown';
+    // optional group-header bands ([data-grouphd="{facetKey}"]): recount visible rows in
+    // each group, update its count, and hide the band when its group is fully filtered out.
+    table.querySelectorAll('tr[data-grouphd]').forEach(h => {
+      const key = h.getAttribute('data-grouphd');
+      let n = 0;
+      table.querySelectorAll('tr[data-facet]').forEach(r => {
+        if (!r.classList.contains('is-hidden') && (r.getAttribute('data-facet') || '').split(' ').indexOf(key) !== -1) n++;
+      });
+      const c = h.querySelector('[data-groupcount]'); if (c) c.textContent = n;
+      h.classList.toggle('is-hidden', n === 0);
+    });
+    // optional empty-state ([data-filter-empty]): show it only when nothing matches.
+    const empty = scope.querySelector('[data-filter-empty]');
+    if (empty) empty.hidden = shown !== 0;
   },
 
   sortTable(th) {

@@ -103,8 +103,9 @@ file is produced) + adversarial scan + commit. Locate the skill dir first; verif
   (scorecard waterfall+achievable, [Protections]/[Obligations] accordions, register search/filter/clear,
   redesigned issue zones + ENRICHED obligation model [contract facts + fairness verdict + alternative +
   negotiate + 3 outcome cards], must-negotiate dot markers, Favors tally). L&P mockup APPROVED by Marc.
-- IN PROGRESS: porting the finalized L&P mockup into the LIVE Deal tab (tab-contract.js + helpers.js +
-  data.js). Task #124. On land: verify all interactions in-browser + commit. "This tab is done" after.
+- DONE: porting the finalized L&P mockup into the LIVE Deal tab (tab-contract.js + helpers.js +
+  data.js). Task #124. Verified in-browser + adversarially audited (see 2026-07-24 verification below);
+  4 mockup-parity gaps then closed. "This tab is done."
 - DECISIONS PENDING from Marc: adopt the Cross-Doc reframe live? make the Document map click-to-open the
   register row? which more skill dashboards to add to the folder? (ChatGPT analysis reviewed: keep 4-tab
   arch; the real next strategic item is a SKILL-ALIGNMENT SPEC - each skill keeps its standalone/combined
@@ -169,3 +170,26 @@ FLAGGED FOR MARC (did NOT do autonomously, by design):
 - Scorecard spine judgment call (8 issue-categories vs the messy 26-row union) - confirm or redirect.
 - The 4 generators' demo data is illustrative; spot-check each .docx/.pptx section fit vs the skill intent.
 - Untouched by design (need your call / on-hold / sensitive): #44, #80, #86, #91, #102, #108-115, #114.
+
+## 2026-07-24 (later) - #124 L&P port VERIFIED + 4 mockup-parity gaps CLOSED (with Marc)
+Verification: reopened deal-dashboard-v2.html in-browser (Playwright over 127.0.0.1:8751) + ran a 5-dimension
+adversarial conformance audit (source vs approved MOCKUP-legal-protection-alt.html vs spec vs live DOM).
+Result: interaction-wiring CONFORMANT, data-reconciliation EXACT (100-42=58, achievable 79 data-driven),
+locked-constraints CONFORMANT (0 em dashes, palette clean; 1 evidenceChip claim REFUTED on verify),
+malicious-code CLEAN. Every interaction confirmed live (deep-links both ways, segment toggle, single-open
+accordions, issue+obligation 3-outcome-card expand, filter, clear). #124 CLOSED.
+The audit confirmed 4 mockup-parity gaps; all 4 then FIXED this session (helpers.js + tab-contract.js only,
+additive/generic, node --check + build + in-browser verified each + independent malicious-code scan CLEAN):
+1. [MED a11y] Keyboard activation - added ONE delegated keydown listener: Enter/Space on non-native
+   [role=button] controls fires the same click (native button/a excluded). Verified: Enter on a focused
+   waterfall bar expands the target register row.
+2. [LOW] Register empty-state - "No findings match..." + "Show all findings" (data-lpclear) when a filter
+   yields 0 rows; generic opt-in [data-filter-empty] in _filterTable. Verified show + reset.
+3. [MED] Findings Register "Issues (N)" / "Obligations (N)" group bands with LIVE counts that hide a band
+   when its group filters to zero; generic opt-in [data-grouphd] in _filterTable. Verified 12/10 -> 2/1 -> hidden.
+4. [MED] Boot auto-expand - top hard-stop finding's register row pre-open on load + its category accordion
+   open (data-driven, not index-0). Verified ISS-01 open + Liability accordion open on load.
+FLAGGED (design judgment, easy to revert if Marc dislikes): (a) group bands are mildly redundant with the
+per-row Issue/Obligation tag; (b) boot auto-expand makes the register start taller (capped by the 620px scroll).
+Deliberately NOT changed: register-row <tr>s were left non-focusable (no new tab stops); every finding stays
+keyboard-reachable via the focusable navigator findings which deep-link + expand the row.

@@ -483,14 +483,18 @@ function lpCovChip(c) {
   return '<span class="lp-cov-chip lp-cov-' + esc(c.coverage) + '" title="' + esc(covTitle) + '">' + alertIc + esc(c.coverage) + '</span>';
 }
 function lpNavProtections(d) {
-  return lpCats(d).map((c, i) => {
+  const cats = lpCats(d);
+  // open the category that holds the top hard-stop finding on load (data-driven, not a
+  // static index) so the navigator lands on the lead risk rather than always the first row.
+  const openIdx = Math.max(0, cats.findIndex(c => (c.issues || []).some(iss => iss.priority === 'hard-stop')));
+  return cats.map((c, i) => {
     const finds = c.issues.map(iss =>
       '<div class="lp-acc-find" role="button" tabindex="0" data-gotofinding="' + esc(iss.id) + '" title="Open ' + esc(iss.id) + ' in the register">' +
         '<span class="lp-af-main"><span class="lp-af-title">' + esc(iss.title) + '</span>' +
         '<span class="lp-af-id">' + esc(iss.id) + '</span></span>' +
         '<span class="lp-af-right">' + lpMarkerHtml(lpMarkerIssue(iss)) + severityPill(iss.priority) + '</span>' +
       '</div>').join('');
-    return '<details name="lp-prot" class="lp-acc-item"' + (i === 0 ? ' open' : '') + '>' +
+    return '<details name="lp-prot" class="lp-acc-item"' + (i === openIdx ? ' open' : '') + '>' +
       '<summary class="lp-acc-hd">' +
         '<span class="lp-ah-top"><span class="lp-chev">' + LP_IC.chev + '</span>' +
           '<span class="lp-ah-name">' + esc(c.cat) + '</span>' +
@@ -582,7 +586,7 @@ function lpRegItems(d) {
     .map(o => ({ type: 'obligation', id: o.id, sev: lpOblSeverity(o, d), data: o }));
   return issues.concat(obls);
 }
-function lpRegRow(item, d) {
+function lpRegRow(item, d, open) {
   const id = item.id, isIssue = item.type === 'issue';
   const marker = lpMarkerHtml(isIssue ? lpMarkerIssue(item.data) : lpMarkerObl(item.data, d));
   const tag = isIssue ? '<span class="lp-rr-tag lp-tag-issue">Issue</span>' : '<span class="lp-rr-tag lp-tag-obligation">Obligation</span>';
@@ -602,12 +606,12 @@ function lpRegRow(item, d) {
   }
   const facet = (item.sev + ' ' + item.type).toLowerCase();
   const detail = isIssue ? lpIssueDetail(item.data, d) : lpObligationDetail(item.data, d);
-  return '<tr class="expandable lp-reg-row" data-exprow="' + esc(id) + '" data-rowkey="' + esc(id) + '" data-facet="' + esc(facet) + '">' +
+  return '<tr class="expandable lp-reg-row' + (open ? ' is-open' : '') + '" data-exprow="' + esc(id) + '" data-rowkey="' + esc(id) + '" data-facet="' + esc(facet) + '">' +
       '<td class="lp-td-tag">' + tag + '</td>' +
       '<td class="lp-td-main"><div class="lp-rr-flex">' + marker + '<span class="lp-rr-body"><span class="lp-rr-title">' + title + '</span><span class="lp-rr-sub">' + sub + '</span></span></div></td>' +
       '<td class="lp-td-side">' + side + '</td>' +
     '</tr>' +
-    '<tr class="expander-row is-hidden" data-expfor="' + esc(id) + '"><td colspan="3"><div class="exp-inner">' + detail + '</div></td></tr>';
+    '<tr class="expander-row' + (open ? '' : ' is-hidden') + '" data-expfor="' + esc(id) + '"><td colspan="3"><div class="exp-inner">' + detail + '</div></td></tr>';
 }
 function lpRegister(d) {
   const items = lpRegItems(d);
@@ -628,8 +632,23 @@ function lpRegister(d) {
       '<span class="spacer"></span>' +
       '<span class="filter-count">' + total + ' of ' + total + ' shown</span>' +
     '</div></div>';
+  // group the register under Issues / Obligations bands (each with a live count that the
+  // filter recomputes) and pre-expand the top hard-stop finding so the tab does not open
+  // fully collapsed. items are severity-sorted, so the first hard-stop is the lead finding.
+  const issues = items.filter(it => it.type === 'issue');
+  const obls = items.filter(it => it.type === 'obligation');
+  const openId = (items.find(it => it.sev === 'hard-stop') || {}).id || null;
+  const grpHd = (key, label, n) =>
+    '<tr class="lp-grp-hd" data-grouphd="' + key + '"><td colspan="3">' +
+      '<span class="lp-grp-t">' + label + '</span><span class="lp-grp-n" data-groupcount>' + n + '</span></td></tr>';
+  const bodyRows =
+    (issues.length ? grpHd('issue', 'Issues', issues.length) + issues.map(it => lpRegRow(it, d, it.id === openId)).join('') : '') +
+    (obls.length ? grpHd('obligation', 'Obligations', obls.length) + obls.map(it => lpRegRow(it, d, it.id === openId)).join('') : '');
+  const emptyState = '<div class="lp-reg-empty" data-filter-empty hidden>' + LP_IC.info +
+    '<div class="lp-re-t">No findings match the current search and filters.</div>' +
+    '<button class="lp-re-btn" type="button" data-lpclear>Show all findings</button></div>';
   const table = '<div class="lp-reg-scroll"><table class="dt dense" id="tbl-lp-register"><tbody>' +
-    items.map(it => lpRegRow(it, d)).join('') + '</tbody></table></div>';
+    bodyRows + '</tbody></table>' + emptyState + '</div>';
   return saCard('Findings Register', '<div data-filter-scope>' + toolbar + table + '</div>',
     { icon: 'flag', accent: 'teal', sub: total + ' findings &middot; issues + obligations' });
 }
@@ -1043,6 +1062,17 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-reg-scroll{max-height:620px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-sm);margin-top:10px}' +
   '.contract-tab #tbl-lp-register{width:100%}' +
   '.contract-tab #tbl-lp-register td{vertical-align:middle}' +
+  /* Issues / Obligations group bands + zero-result empty-state */
+  '.contract-tab .lp-grp-hd>td{background:var(--surface2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:5px 12px}' +
+  '.contract-tab .lp-grp-hd:first-child>td{border-top:0}' +
+  '.contract-tab .lp-grp-t{font:800 9.5px/1 var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}' +
+  '.contract-tab .lp-grp-n{margin-left:7px;font:800 9.5px/1 var(--mono);color:var(--mut2);background:var(--surface);border:1px solid var(--line2);border-radius:9px;padding:2px 7px}' +
+  '.contract-tab .lp-reg-empty{display:flex;flex-direction:column;align-items:center;gap:9px;padding:34px 20px;text-align:center;color:var(--mut2)}' +
+  '.contract-tab .lp-reg-empty[hidden]{display:none}' +
+  '.contract-tab .lp-reg-empty .lp-ic{width:22px;height:22px;color:var(--mut2)}' +
+  '.contract-tab .lp-re-t{font-size:12.5px;color:var(--mut)}' +
+  '.contract-tab .lp-re-btn{border:1px solid var(--line2);background:var(--surface);color:var(--sec-tx);font:800 11px/1 var(--sans);cursor:pointer;padding:7px 13px;border-radius:20px}' +
+  '.contract-tab .lp-re-btn:hover{background:var(--sec-t)}' +
   '.contract-tab .lp-reg-row.is-open>td{background:var(--plum-t)}' +
   '.contract-tab .lp-td-tag{width:1%;white-space:nowrap}' +
   '.contract-tab .lp-rr-tag{display:inline-block;font:800 9px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;padding:3px 7px;border-radius:6px;white-space:nowrap}' +
