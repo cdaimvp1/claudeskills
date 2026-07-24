@@ -671,9 +671,9 @@ const dashboardData = {
       { id: 'AC-4', deliverable: 'D5', criteria: 'Training delivered; no competency or attendance threshold stated.', defined: false, evidenceType: 'inference' }
     ],
     dependencies: [
-      { id: 'DEP-1', text: 'Buyer provides HRIS/payroll extract access by M1+5 days.', owner: 'Buyer', risk: 'high', evidenceType: 'contract' },
-      { id: 'DEP-2', text: 'Buyer confirms data-classification for employee PII.',      owner: 'Buyer', risk: 'medium', evidenceType: 'inference' },
-      { id: 'DEP-3', text: 'Supplier provisions production tenant before M2.',           owner: 'Supplier', risk: 'low', evidenceType: 'contract' }
+      { id: 'DEP-1', text: 'Buyer provides HRIS/payroll extract access by M1+5 days.', owner: 'Buyer', risk: 'high', milestone: 'M2', evidenceType: 'contract' },
+      { id: 'DEP-2', text: 'Buyer confirms data-classification for employee PII.',      owner: 'Buyer', risk: 'medium', milestone: 'M2', evidenceType: 'inference' },
+      { id: 'DEP-3', text: 'Supplier provisions production tenant before M2.',           owner: 'Supplier', risk: 'low', milestone: 'M2', evidenceType: 'contract' }
     ],
     // RACI matrix, activities x roles; value: R|A|C|I|'' ; flag ambiguity where >1 A or none
     raci: {

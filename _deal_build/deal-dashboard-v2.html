@@ -2561,9 +2561,9 @@ const dashboardData = {
       { id: 'AC-4', deliverable: 'D5', criteria: 'Training delivered; no competency or attendance threshold stated.', defined: false, evidenceType: 'inference' }
     ],
     dependencies: [
-      { id: 'DEP-1', text: 'Buyer provides HRIS/payroll extract access by M1+5 days.', owner: 'Buyer', risk: 'high', evidenceType: 'contract' },
-      { id: 'DEP-2', text: 'Buyer confirms data-classification for employee PII.',      owner: 'Buyer', risk: 'medium', evidenceType: 'inference' },
-      { id: 'DEP-3', text: 'Supplier provisions production tenant before M2.',           owner: 'Supplier', risk: 'low', evidenceType: 'contract' }
+      { id: 'DEP-1', text: 'Buyer provides HRIS/payroll extract access by M1+5 days.', owner: 'Buyer', risk: 'high', milestone: 'M2', evidenceType: 'contract' },
+      { id: 'DEP-2', text: 'Buyer confirms data-classification for employee PII.',      owner: 'Buyer', risk: 'medium', milestone: 'M2', evidenceType: 'inference' },
+      { id: 'DEP-3', text: 'Supplier provisions production tenant before M2.',           owner: 'Supplier', risk: 'low', milestone: 'M2', evidenceType: 'contract' }
     ],
     // RACI matrix, activities x roles; value: R|A|C|I|'' ; flag ambiguity where >1 A or none
     raci: {
@@ -4387,25 +4387,58 @@ function renderReconciliation(d) {
     { icon:'target', accent:'teal', sub: nScope + ' scope items &middot; ' + nShift + ' shifts &middot; click a row' });
 }
 
-/* ---- intent 1 (timeline verification) + payment structure ---- */
+/* ---- intent 1 (timeline): a services/SOW-trait panel (trait-gated in renderScopePerfFull).
+ * Interactive milestone timeline: dates ON the swim lanes, click a milestone to see its
+ * deliverables, acceptance gates and the dependencies that gate it (delegated data-scpick
+ * master-detail). Deal-level verification + payment callouts sit below. ---- */
+function scShortDate(s) {
+  const dt = new Date(s);
+  if (isNaN(dt)) return String(s);
+  return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getUTCMonth()] + ' ' + dt.getUTCDate();
+}
+function scTimelineBars(d) {
+  const ms = d.scope.milestones || [];
+  const t0 = +new Date(ms[0].date), t1 = +new Date(ms[ms.length - 1].end), span = (t1 - t0) || 1;
+  const pos = v => clamp(((+new Date(v) - t0) / span) * 100, 0, 100);
+  return ms.map((m, i) => {
+    const a = pos(m.date), b = pos(m.end), w = Math.max(b - a, 7);
+    return '<div class="sc-tl-row' + (i === 0 ? ' sc-sel' : '') + '" role="button" tabindex="0" data-scpick="' + esc(m.id) + '" title="Show milestone detail">' +
+      '<div class="sc-tl-lab">' + esc(m.name) + '</div>' +
+      '<div class="sc-tl-track">' +
+        '<span class="sc-tl-d sc-tl-d1" style="left:' + a.toFixed(1) + '%">' + esc(scShortDate(m.date)) + '</span>' +
+        '<span class="sc-tl-d sc-tl-d2" style="left:' + b.toFixed(1) + '%">' + esc(scShortDate(m.end)) + '</span>' +
+        '<div class="sc-tl-bar' + (i === 0 ? ' pri' : '') + '" style="left:' + a.toFixed(1) + '%;width:' + w.toFixed(1) + '%"><span class="sc-tl-mid">' + esc(m.id) + '</span></div>' +
+      '</div></div>';
+  }).join('');
+}
+function scMilestoneDetail(d, m) {
+  const sc = d.scope || {};
+  const delivs = (sc.deliverables || []).filter(x => x.milestone === m.id);
+  const deps = (sc.dependencies || []).filter(x => x.milestone === m.id);
+  const accFor = id => (sc.acceptance || []).filter(a => a.deliverable === id);
+  const dRows = delivs.length ? delivs.map(dl => {
+    const acc = accFor(dl.id).map(a => '<div class="sc-mac">' + (a.defined ? statusPill('aligned', 'Defined') : statusPill('deviation', 'Not defined')) + '<span class="tiny">' + esc(a.criteria) + '</span></div>').join('');
+    return '<div class="sc-mdel"><div class="sc-mdel-hd"><span class="sc-tag">' + esc(dl.id) + '</span><strong>' + esc(dl.name) + '</strong><span class="tiny muted">owner ' + esc(dl.owner) + '</span></div>' +
+      (acc || '<div class="tiny muted">No acceptance criteria stated.</div>') + '</div>';
+  }).join('') : '<div class="tiny muted">No deliverables mapped to this milestone.</div>';
+  const depRows = deps.length ? deps.map(dep => '<div class="sc-mdep">' + severityPill(dep.risk) + '<span class="tiny">' + esc(dep.text) + ' &middot; owner ' + esc(dep.owner) + '</span></div>').join('') : '<div class="tiny muted">No gating dependencies recorded.</div>';
+  return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(m.id) + '</span><span class="sc-tag">' + esc(scShortDate(m.date)) + ' &rarr; ' + esc(scShortDate(m.end)) + '</span></div>' +
+    '<div class="sc-dl-title">' + esc(m.name) + '</div>' +
+    '<div class="sc-msec-h">Deliverables + acceptance</div>' + dRows +
+    '<div class="sc-msec-h" style="margin-top:13px">Dependencies to close this milestone</div>' + depRows;
+}
 function renderDeliveryTimeline(d) {
   const sc = d.scope || {};
   const ms = sc.milestones || [];
-  const ganttRows = ms.map((m, i) => ({ label: m.name + ' · ' + m.date, start: m.date, end: m.end, tone: i === 0 ? 'pri' : '', badge: m.id }));
-  const ganttHtml = ms.length
-    ? gantt(ganttRows, { start: ms[0].date, end: ms[ms.length - 1].end })
-    : gapCard('Milestone schedule', 'No dated milestones in this session, so the timeline cannot be verified. ' + evidenceChip('unavailable'));
+  if (!ms.length) return saCard('Delivery Timeline', gapCard('Milestone schedule', 'No delivery schedule in this session. ' + evidenceChip('unavailable')), { icon:'clock' });
+  const bars = scTimelineBars(d);
+  const detail = ms.map((m, i) => '<div class="sc-detail-panel" data-scpanel="' + esc(m.id) + '"' + (i === 0 ? '' : ' hidden') + '>' + scMilestoneDetail(d, m) + '</div>').join('');
   const tv = sc.timelineVerification;
   const verify = tv ? insight('<strong>Timeline check (proposed vs contract):</strong> ' + esc(tv.note) + ' ' + evidenceChip(tv.evidenceType, { short:true }), 'warn') : '';
   const pay = sc.paymentStructure ? insight('<strong>Payment structure:</strong> ' + esc(sc.paymentStructure.note) + ' ' + evidenceChip(sc.paymentStructure.evidenceType, { short:true }), sc.paymentStructure.milestoneTied ? '' : 'warn') : '';
-  const crit = insight('<strong>Critical chain:</strong> data onboarding (M2) gates every later milestone; Lilly&rsquo;s HRIS/payroll access is due within 5 days of kickoff (see Shifts to Lilly), and the supplier must provision the production tenant before M2.', 'warn');
-  const legend = '<dl class="kv" style="margin-top:12px">' + (sc.deliverables || []).map(dl => {
-    const m = ms.find(x => x.id === dl.milestone);
-    return '<dt>' + esc(dl.id) + '</dt><dd><strong>' + esc(dl.name) + '</strong> &mdash; ' +
-      (m ? esc(m.name) + ' (' + esc(dl.milestone) + ')' : esc(dl.milestone)) + ' &middot; owner ' + esc(dl.owner) + ' ' + evidenceChip(dl.evidenceType, { short:true }) + '</dd>';
-  }).join('') + '</dl>';
-  return saCard('Delivery Timeline', ganttHtml + verify + pay + crit + legend,
-    { icon:'clock', sub: ms.length + ' milestones &middot; scope containerised per milestone' });
+  const body = '<div class="sc-tl" data-scmaster><div class="sc-tl-bars">' + bars + '</div>' +
+    '<div class="sc-md-detail sc-tl-detail">' + detail + '</div></div>' + verify + pay;
+  return saCard('Delivery Timeline', body, { icon:'clock', sub: ms.length + ' milestones &middot; click a milestone' });
 }
 
 /* ---- intent 3: RACI + shifts-to-Lilly register ---- */
@@ -4459,10 +4492,13 @@ function renderPerformance(d) {
 // FAT/SAT) over the same backbone, driven off d.meta.contractSet + category traits.
 function renderScopePerfFull(d) {
   // shifts fold INTO the reconciliation ledger (Mockup C); readiness is a header strip (renderScopePerf);
-  // RACI is full-width. Timeline is a services/SOW-trait panel.
+  // RACI is full-width. The Delivery Timeline is TRAIT-GATED: it renders only when a delivery schedule
+  // exists (services / SOW). A goods PO or a pure software-license deal has no milestones, so the tab
+  // composes WITHOUT the timeline panel (a goods/capital composition would slot its own panel here).
+  const hasSchedule = ((d.scope || {}).milestones || []).length > 0;
   return '<div class="grid">' +
       '<div class="col-12">' + renderReconciliation(d) + '</div>' +
-      '<div class="col-12">' + renderDeliveryTimeline(d) + '</div>' +
+      (hasSchedule ? '<div class="col-12">' + renderDeliveryTimeline(d) + '</div>' : '') +
       '<div class="col-12">' + renderRaciPanel(d) + '</div>' +
       '<div class="col-12">' + renderPerformance(d) + '</div>' +
     '</div>';
@@ -4802,6 +4838,29 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-rv.sc-rec{color:var(--plum);font-weight:700}' +
   '.contract-tab .sc-tag{font:700 10px/1 var(--mono);color:var(--mut);background:var(--nested);border:1px solid var(--line2);border-radius:5px;padding:2px 6px}' +
   '@media(max-width:760px){.contract-tab .sc-md{grid-template-columns:1fr}.contract-tab .sc-md-list{max-height:none}}' +
+  /* interactive delivery timeline (dates on lanes + click-a-milestone detail) */
+  '.contract-tab .sc-tl{border:1px solid var(--line);border-radius:9px;overflow:hidden}' +
+  '.contract-tab .sc-tl-bars{padding:14px 16px 12px}' +
+  '.contract-tab .sc-tl-row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;padding:6px 4px;border-radius:6px;cursor:pointer}' +
+  '.contract-tab .sc-tl-row:hover{background:var(--surface2)}' +
+  '.contract-tab .sc-tl-row.sc-sel{background:var(--plum-t)}' +
+  '.contract-tab .sc-tl-row:focus-visible{outline:2px solid var(--sec);outline-offset:-2px}' +
+  '.contract-tab .sc-tl-lab{font-weight:700;font-size:12px;color:var(--ink)}' +
+  '.contract-tab .sc-tl-track{position:relative;height:32px}' +
+  '.contract-tab .sc-tl-bar{position:absolute;top:13px;height:16px;border-radius:4px;background:var(--sec);display:flex;align-items:center;justify-content:center;min-width:22px}' +
+  '.contract-tab .sc-tl-bar.pri{background:var(--plum)}' +
+  '.contract-tab .sc-tl-mid{font:800 9px/1 var(--sans);color:#fff;letter-spacing:.03em}' +
+  '.contract-tab .sc-tl-d{position:absolute;top:0;font:700 9px/1 var(--mono);color:var(--mut);white-space:nowrap}' +
+  '.contract-tab .sc-tl-d1{transform:translateX(0)}' +
+  '.contract-tab .sc-tl-d2{transform:translateX(-100%)}' +
+  '.contract-tab .sc-tl-detail{border-top:1px solid var(--line);min-height:0}' +
+  '.contract-tab .sc-msec-h{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}' +
+  '.contract-tab .sc-mdel{border:1px solid var(--line2);border-radius:7px;padding:9px 11px;margin-bottom:8px;background:var(--surface)}' +
+  '.contract-tab .sc-mdel-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}' +
+  '.contract-tab .sc-mac{display:flex;align-items:flex-start;gap:7px;margin-top:5px;color:var(--ink2)}' +
+  '.contract-tab .sc-mdep{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-top:1px solid var(--line);color:var(--ink2)}' +
+  '.contract-tab .sc-mdep:first-child{border-top:0}' +
+  '@media(max-width:640px){.contract-tab .sc-tl-row{grid-template-columns:1fr}}' +
   '</style>';
 
 /* ============================================================================
