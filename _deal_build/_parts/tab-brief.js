@@ -4,9 +4,13 @@
  * from the canonical model, never re-authored. Same issue/scenario/gap OBJECTS
  * the other tabs read; never re-typed (anti-drift by reference).
  *
- * 7 panels, 4 rows (top to bottom):
- *   Row 1: Deal snapshot / State-of-play digest / Next-actions timeline
- *          (three equal columns; key facts, who has the pen, planning sequence)
+ * Pen band (full width, who has the pen) + 5 panels, 4 rows (top to bottom):
+ *   Pen band: single-line who-has-the-pen context (party, basis, confidence).
+ *             Moved off the persistent strip (shell.js) to kill horizontal scroll.
+ *   Row 1: Deal snapshot / State of Play & Next Steps
+ *          (two equal columns; key facts, then last material event + the
+ *           sequenced next-steps timeline, merged from the old separate
+ *           State-of-play digest + Next-actions timeline cards)
  *   Row 2: Recommendation / Top-5 issues
  *          (stance + 3 signature conditions + limitations; hard-stop first, off the issues[] spine)
  *   Row 3: Commercial headline + full ZOPA
@@ -29,6 +33,28 @@
     'renewal': 'Renewal'
   };
 
+  /* ============================= 0. PEN BAND ============================= */
+  // Full-width, single-line who-has-the-pen context. Replaces the pen chip that used
+  // to lead the persistent strip (shell.js); no coverage badge here, that was dropped.
+  function buildPenBand(d) {
+    const pen = d.deal.whoHasPen;
+    if (!pen) return '';
+    const conf = String(pen.confidence || '').toLowerCase();
+    const confColor = conf === 'high' ? 'var(--sec-tx)' : conf === 'low' ? 'var(--danger-fg)' : 'var(--emph-tx)';
+    const confBorder = conf === 'high' ? 'var(--sec)' : conf === 'low' ? 'var(--danger-bar)' : 'var(--emph)';
+    return `
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:9px;background:var(--pri-t);
+        border:1px solid var(--line2);border-left:3px solid var(--pri);border-radius:var(--r-sm);
+        padding:9px 14px;margin-bottom:16px;font-size:var(--fz-sm)">
+        <span style="font:800 var(--fz-floor)/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--pri-tx);flex:none">Pen</span>
+        <b style="font-weight:800;color:var(--ink);flex:none;white-space:nowrap">${esc(pen.party || '—')}</b>
+        ${pen.basis ? `<span style="color:var(--ink2);flex:1 1 320px;min-width:0">${esc(pen.basis)}</span>` : ''}
+        ${pen.confidence ? `<span style="font:700 var(--fz-floor)/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;
+          flex:none;color:${confColor};border:1px solid ${confBorder};border-radius:20px;padding:2px 8px">${esc(pen.confidence)}</span>` : ''}
+      </div>
+    `;
+  }
+
   /* ============================= 1. VERDICT BLOCK ============================= */
   function buildVerdict(d) {
     const rec = d.deal.recommendation;
@@ -47,8 +73,6 @@
           ${iss ? severityPill(iss.priority) : ''}
           <span style="font-weight:600">${esc(c.text)}</span>
         </div>
-        ${evidenceChip(iss ? iss.evidenceType : 'inference', { short: true, sources: iss ? iss.sourceIds : [] })}
-        ${jumpLink('View in register →', 'tab:contract/sub:legal')}
       </dd>`;
     }).join('');
 
@@ -85,31 +109,41 @@
         <dt>Analysis date</dt><dd class="mono">${esc(snap.analysisDate)}</dd>
         <dt>Evidence</dt><dd>${coverageBadge(snap.evidenceCoverage)}</dd>
       </dl>
-      <div class="card-note">${esc(d.meta.disclaimer)}</div>
     `;
     return saCard('Deal Snapshot', html, { accent: 'teal', icon: 'doc', sub: esc(snap.projectId) });
   }
 
-  /* ============================= 3. STATE-OF-PLAY DIGEST ============================= */
-  function buildStateOfPlay(d) {
+  /* ============================= 3. STATE OF PLAY & NEXT STEPS (merged) =============================
+   * Merges the old State-of-play digest + Immediate Next Actions cards. "Who has the
+   * pen" is dropped here, it now lives in the pen band above row 1. sop.nextExpectedMove
+   * duplicates the substance of sequence step 1 (both describe leading with the
+   * protection/signature-blocking terms), so it is folded into a single lead line
+   * rather than repeated as its own timeline entry. */
+  function buildStateOfPlayAndNextSteps(d) {
     const sop = d.deal.stateOfPlay;
-    const pen = d.deal.whoHasPen;
+    const items = d.negotiation.sequence.map(s => {
+      const pkg = d.negotiation.packages.find(p => p.id === s.packageId);
+      const tone = pkg ? (pkg.priority === 1 ? 'pri' : pkg.priority === 3 ? 'emph' : '') : '';
+      const meta = (pkg ? `<span class="tiny muted">${esc(pkg.name)}</span> ` : '') + evidenceChip(s.evidenceType, { short: true });
+      return { date: 'Step ' + s.step, name: s.text, meta, tone };
+    });
     const html = `
       <dl class="kv" style="grid-template-columns:1fr">
-        <dt>Who has the pen</dt>
-        <dd>${esc(sop.whoHasPen)} <span class="tiny muted">(${esc(pen.confidence)} confidence, as of ${esc(pen.asOf)})</span></dd>
         <dt>Last material event</dt>
         <dd>${esc(sop.lastMaterialEvent)}</dd>
         <dt>Next expected move</dt>
         <dd>${esc(sop.nextExpectedMove)}</dd>
       </dl>
-      <div class="card-note">${evidenceChip(sop.evidenceType, { short: true })} Best-effort read of process position; not a monitored, live-tracked signal.</div>
+      ${timeline(items)}
+      ${insight('A planning sequence for the meeting, not a task list: packages are sequenced so protection terms are agreed before commercials are discussed.')}
       <div class="btn-row">${jumpLink('Full communications thread →', 'tab:negotiation')}</div>
     `;
-    return saCard('State of Play', html, { accent: 'emph', icon: 'meeting' });
+    return saCard('State of Play & Next Steps', html, { accent: 'emph', icon: 'clock' });
   }
 
   /* ============================= 4. TOP-5 ISSUES ============================= */
+  // Compact list on Overview, no row-expand: severity + title + category/clause only.
+  // Full recommended/fallback/hard-stop/excerpt detail lives on Terms & Review → Legal & Protection.
   function buildTopIssues(d) {
     const sorted = d.issues.slice().sort((a, b) => (rankPriority[b.priority] || 0) - (rankPriority[a.priority] || 0));
     const top5 = sorted.slice(0, 5);
@@ -117,23 +151,10 @@
       { key: 'priority', label: '', width: '96px', sortVal: r => rankPriority[r.priority] || 0, render: r => severityPill(r.priority) },
       { key: 'title', label: 'Issue', render: r => `<strong>${esc(r.title)}</strong><div class="tiny muted">${esc(r.category)} · ${esc(r.clause)}</div>` }
     ];
-    const table = dataTable(cols, top5, {
-      id: 'ov-top-issues', zebra: true,
-      expand: r => `
-        <div class="kv" style="margin-bottom:10px">
-          <dt>Recommended</dt><dd>${esc(r.recommendedPosition)}</dd>
-          <dt>Fallback</dt><dd>${esc(r.fallback)}</dd>
-          <dt>Hard stop</dt><dd style="color:var(--danger-fg);font-weight:600">${esc(r.hardStop)}</dd>
-        </div>
-        ${excerpt(r.sourceExcerpt)}
-        <div class="btn-row">
-          ${jumpLink('Full issue register →', 'tab:contract/sub:legal')}
-          ${jumpLink('Negotiation position →', 'tab:negotiation/sub:positions')}
-        </div>
-      `
-    });
+    const table = dataTable(cols, top5, { id: 'ov-top-issues', zebra: true });
     const html = table + insight('These 5 span both hard-stops plus the highest-value high-priority items; the full ' +
-      d.issues.length + '-issue register is in Terms &amp; Review → Terms &amp; Risk.');
+      d.issues.length + '-issue register is in Terms &amp; Review → Legal &amp; Protection.') +
+      `<div class="btn-row">${jumpLink('Full issue register →', 'tab:contract/sub:legal')}</div>`;
     return saCard('Top 5 Issues', html, { icon: 'flag', sub: top5.length + ' of ' + d.issues.length });
   }
 
@@ -150,20 +171,7 @@
     return saCard('Commercial Headline & Total-Deal ZOPA', zopa + batnaNote, { accent: 'teal', icon: 'money' });
   }
 
-  /* ============================= 6. NEXT-ACTIONS TIMELINE ============================= */
-  function buildNextActions(d) {
-    const items = d.negotiation.sequence.map(s => {
-      const pkg = d.negotiation.packages.find(p => p.id === s.packageId);
-      const tone = pkg ? (pkg.priority === 1 ? 'pri' : pkg.priority === 3 ? 'emph' : '') : '';
-      const meta = (pkg ? `<span class="tiny muted">${esc(pkg.name)}</span> ` : '') + evidenceChip(s.evidenceType, { short: true });
-      return { date: 'Step ' + s.step, name: s.text, meta, tone };
-    });
-    const html = timeline(items) +
-      insight('A planning sequence for the meeting, not a task list: packages are sequenced so protection terms are agreed before commercials are discussed.');
-    return saCard('Immediate Next Actions', html, { accent: 'emph', icon: 'clock' });
-  }
-
-  /* ============================= 7. EVIDENCE & GAPS BAND ============================= */
+  /* ============================= 6. EVIDENCE & GAPS BAND ============================= */
   // Compact source x analysis-area coverage STRIP (one rollup row, not the full matrix).
   function buildCoverageStrip(d) {
     const areas = d.analysisAreas;
@@ -219,14 +227,13 @@
 
       <div class="tab-intro">
         <h2>Overview</h2>
-        <div class="q">What is being negotiated, what blocks signature, what to ask for, and what is still missing; read in about two minutes.</div>
-        <div class="tiny muted" style="margin-top:7px">Session snapshot generated ${esc(d.meta.generatedAt.replace('T', ' '))} · ${coverageBadge(d.deal.evidenceCoverage)} overall evidence coverage</div>
       </div>
 
+      ${buildPenBand(d)}
+
       <div class="grid">
-        <div class="col-4">${buildSnapshot(d)}</div>
-        <div class="col-4">${buildStateOfPlay(d)}</div>
-        <div class="col-4">${buildNextActions(d)}</div>
+        <div class="col-6">${buildSnapshot(d)}</div>
+        <div class="col-6">${buildStateOfPlayAndNextSteps(d)}</div>
       </div>
 
       <div class="grid" style="margin-top:16px">

@@ -1770,8 +1770,10 @@ else DealUI.init();
  *    email is a CONSTRUCTED enterprise negotiation scenario, NOT a real record, and is
  *    labelled 'contract' (as-if drafted paper), 'calculated', 'inference' or 'assumption'.
  *    No specific real Visier financial is asserted as fact.
- *  - Referenced-but-missing documents (DPA, Security Exhibit) are evidenceType
- *    'unavailable' and feed gaps[]; never zero-filled into a fake panel.
+ *  - Referenced-but-missing components (the Supplier Privacy Standard / DPA, fed to
+ *    gaps[] as GAP-1; the Information Security Standard, as GAP-2) plus standard-but-
+ *    unconfirmed MSA-level components (EU SCCs, AI Addendum) are evidenceType
+ *    'unavailable' and never zero-filled into a fake panel.
  * ========================================================================== */
 const dashboardData = {
 
@@ -1865,38 +1867,55 @@ const dashboardData = {
   //                   found in the MSA v3 redline text captured this session, so every
   //                   ranked basis below is evidenceType 'inference' (our defensible read
   //                   of standard MSA + Order Form + SOW structure), never 'contract'.
-  //   isMissing     : true for the two referenced-but-not-provided components (DPA,
-  //                   Security Exhibit) so the register can render them as gap rows.
+  //   isMissing     : true for the four MSA-level components not verified this session
+  //                   (Supplier Privacy Standard / DPA, Information Security Standard,
+  //                   EU SCCs, AI Addendum) so the register + map render them as gap rows.
+  //   tier          : 'master' (the MSA) | 'msa-component' (exhibits/addenda incorporated
+  //                   AT the MSA level: Supplier Privacy Standard, Information Security
+  //                   Standard, EU SCCs, AI Addendum) | 'subordinate' (SOW, Order Form,
+  //                   which operate UNDER the MSA) | 'correspondence' (the email). Drives the
+  //                   left-to-right umbrella layout of the Document Relationship Map.
+  //   supplierName  : 'Visier Inc.' on every contract instrument; null on the internal email.
   documents: [
-    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, evidenceType: 'contract', limitations: [],
+    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, tier: 'master', supplierName: 'Visier Inc.', evidenceType: 'contract', limitations: [],
       executedDate: null, expirationDate: null, active: 'In negotiation', controlling: true, isMissing: false,
       relevance: 'direct', relevanceNote: 'Master agreement; governs interpretation and sets precedence for the Order Form and SOW beneath it.',
       precedenceRank: 1,
       precedenceBasis: { text: 'Ranked as the controlling master instrument; the v3 redline body does not contain an express order-of-precedence clause among the MSA / Order Form / SOW, so this hierarchy is our read, not a quoted contract term.', evidenceType: 'inference' } },
-    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, evidenceType: 'contract', limitations: [],
+    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, tier: 'subordinate', supplierName: 'Visier Inc.', evidenceType: 'contract', limitations: [],
       executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
       relevance: 'direct', relevanceNote: 'Defines the implementation scope and deliverables authorized under the Order Form; no redline round documented for this instrument (unlike the MSA).',
       precedenceRank: 3,
       precedenceBasis: { text: 'Ranked below the Order Form as the subordinate scope/services document it details; no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
-    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, evidenceType: 'contract', limitations: [],
+    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, tier: 'subordinate', supplierName: 'Visier Inc.', evidenceType: 'contract', limitations: [],
       executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
       relevance: 'direct', relevanceNote: 'Commercial ordering document; binds the specific subscription, term and fees under the MSA and references SOW-01 for scope.',
       precedenceRank: 2,
       precedenceBasis: { text: 'Ranked immediately below the MSA as the work-authorizing instrument that triggers the specific commercial commitment (an Order Form functions as a type of SOW); no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
-    { id: 'DOC-04', name: 'Data Processing Addendum (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'],
+    { id: 'DOC-04', name: 'Supplier Privacy Standard (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'],
       executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
-      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so data-protection terms are never silently assumed.',
+      relevance: 'direct', relevanceNote: 'The Lilly Supplier Privacy Standard (the DPA) is incorporated at the MSA level for the processing of employee personal data; not supplied this session, so it is shown as an incorporated-component gap row and its terms are never silently assumed.',
       precedenceRank: null,
-      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
-    { id: 'DOC-05', name: 'Security & Availability Exhibit (Exhibit B)', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'],
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-05', name: 'Information Security Standard', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'],
       executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
-      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so SLA-credit and security-control terms are never silently assumed.',
+      relevance: 'direct', relevanceNote: 'The Information Security Standard (the security & availability exhibit) is incorporated at the MSA level; not supplied this session, so it is shown as an incorporated-component gap row and its SLA-credit and security-control terms are never silently assumed.',
       precedenceRank: null,
-      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
-    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, evidenceType: 'internal', limitations: [],
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, tier: 'correspondence', supplierName: null, evidenceType: 'internal', limitations: [],
       executedDate: null, expirationDate: null, active: 'Active', controlling: false, isMissing: false,
       relevance: 'direct', relevanceNote: 'Correspondence evidencing receipt/date of the MSA v3 redline; supports the negotiation timeline, not a governing instrument, so it carries no precedence rank.',
-      precedenceRank: null, precedenceBasis: null }
+      precedenceRank: null, precedenceBasis: null },
+    { id: 'DOC-07', name: 'EU Standard Contractual Clauses (EU SCCs)', type: 'SCCs', status: 'Standard MSA-level component, not confirmed in session', date: null, sourceType: 'Standard Lilly MSA-level component (presence not confirmed in session)', role: 'data', relatedTo: ['DOC-01','DOC-04'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Standard Lilly MSA-level component; its presence in this contract set was not confirmed this session, so no terms are assessed.'],
+      executedDate: null, expirationDate: null, active: 'Not confirmed in session', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'EU Standard Contractual Clauses are a standard Lilly MSA-level component incorporated at the MSA for cross-border transfers of employee personal data; presence in this set was not confirmed this session, so the map shows the umbrella slot without asserting any reviewed terms.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once confirmed and reviewed; rank cannot be confirmed while its presence in this set is unconfirmed.', evidenceType: 'unavailable' } },
+    { id: 'DOC-08', name: 'AI Addendum', type: 'Addendum', status: 'Standard MSA-level component, not confirmed in session', date: null, sourceType: 'Standard Lilly MSA-level component (presence not confirmed in session)', role: 'reference', relatedTo: ['DOC-01'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Standard Lilly MSA-level component; its presence in this contract set was not confirmed this session, so no terms are assessed.'],
+      executedDate: null, expirationDate: null, active: 'Not confirmed in session', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'An AI Addendum is a standard Lilly MSA-level component governing supplier use of AI (relevant because the platform includes a generative-AI assistant); presence in this set was not confirmed this session, so the map shows the umbrella slot without asserting any reviewed terms.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once confirmed and reviewed; rank cannot be confirmed while its presence in this set is unconfirmed.', evidenceType: 'unavailable' } }
   ],
 
   /* ---- 2b. documentRelevanceMeta (honest gap-state for the "indirect / comparable"
@@ -2557,22 +2576,28 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
 <script>
 /* =============================================================================
  * zopa.js, shared ZOPA (Zone of Possible Agreement) visualization for the Deal
- * artifact. A horizontal track per commercial line showing the ZOPA zone
- * (target -> walk-away) as a teal band, with positioned marks for target,
- * walk-away, fallback, Theo's opening (burnt-orange) and the supplier ask
- * (plum; red only when it sits above walk-away), plus the matched market
- * benchmark as an ink POINT tick, followed by the total-deal ZOPA / TCO band
- * and a bottom legend. We hold POINT benchmarks, not a market lo/hi band, so
- * a single market tick is drawn and NEVER a fabricated range; lines with no
- * comp say so.
+ * artifact. Each commercial line is a COLLAPSIBLE row (native <details>): the
+ * collapsed state shows only the line title + one horizontal ZOPA bar (the
+ * track), with the key dollar values labelled directly ON the bar (supplier
+ * ask, target, walk-away, plus opening / fallback / market where held), value
+ * labels staggered above and below the track so close figures never collide.
+ * Expanding the row reveals the Price / Opening / Market / Read detail rows,
+ * where every material value still carries an evidenceChip. The total-deal
+ * ZOPA / TCO band renders in the SAME bar style but stays always-visible (not
+ * collapsed) at the bottom, followed by one shared legend.
  *
- * Extracted verbatim from _parts/tab-commercials.js (2026-07-23) so any tab
- * that needs the ZOPA renders byte-identical output. Public entry:
+ * Palette (locked): ZOPA zone = teal; target/walk/fallback = plum family;
+ * Theo opening = burnt-orange; supplier ask = plum, red ONLY when it sits above
+ * walk-away; market benchmark = neutral-ink POINT tick. We hold POINT
+ * benchmarks, never a market lo/hi band, so a single market tick is drawn and
+ * NEVER a fabricated range; lines with no comp say so in the expanded detail.
+ *
+ * Extracted from _parts/tab-commercials.js (2026-07-23); redesigned to the
+ * collapse-by-default / values-on-the-bar spec (2026-07-23). Public entry:
  *   window.DealZopa.render(d)  ->  HTML string, wrapped in <div class="zopa-viz">
  *
- * Currently called from the Economics tab (tab-commercials.js, 3A "ZOPA by
- * Line Item · Pricing & Benchmarks"); the Overview tab's "Total-deal ZOPA"
- * section can call this same entry point to render the identical viz.
+ * Called from the Economics tab (tab-commercials.js, 3A "ZOPA by Line Item")
+ * and the Overview / Brief tab (tab-brief.js) via the same entry point.
  *
  * Depends on GLOBALS exported by helpers.js: esc, evidenceChip, jumpLink,
  * gapCard, M, assumVal, clampp, benchForLine. Load order MUST be
@@ -2584,21 +2609,23 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = dashboar
 'use strict';
 
 /* ---------- 0. scoped CSS, injected once into <head> ----------------------
- * Ported 1:1 from tab-commercials.js's scoped <style> block, rescoped from
- * `.commercials-tab .X` to `.zopa-viz .X` so it applies wherever the ZOPA is
- * mounted (tab-agnostic). Palette-remapped from platform pv-11 (ZOPA zone =
- * teal, our target/walk/fallback = plum family, opening = burnt-orange,
- * ask = plum or red only when above walk-away, benchmark = neutral ink
- * point). Guarded + idempotent: safe to call render() from multiple tabs. */
+ * Scoped to `.zopa-viz .X` so it applies wherever the ZOPA is mounted
+ * (tab-agnostic). De-bubbled: each line is a hairline-separated row, not a
+ * boxed card. Guarded + idempotent: safe to call render() from multiple tabs. */
 var ZOPA_CSS =
-  '.zopa-viz .zline{margin:0 0 16px}' +
-  '.zopa-viz .zline:last-of-type{margin-bottom:8px}' +
-  '.zopa-viz .zlhd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:7px}' +
+  /* collapsible line row (hairline divider, no card box) */
+  '.zopa-viz .zline{border-bottom:1px solid var(--line)}' +
+  '.zopa-viz .zline:last-of-type{border-bottom:none}' +
+  '.zopa-viz .zsum{list-style:none;cursor:pointer;display:block;padding:9px 2px 4px}' +
+  '.zopa-viz .zsum::-webkit-details-marker{display:none}' +
+  '.zopa-viz .zsum::marker{content:""}' +
+  '.zopa-viz .zsum-row{display:flex;align-items:center;gap:8px;margin-bottom:2px}' +
+  '.zopa-viz .zchev{width:7px;height:7px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
+  '.zopa-viz .zline[open] .zchev{transform:rotate(45deg)}' +
+  '.zopa-viz .zsum:hover .zlname{color:var(--plum)}' +
   '.zopa-viz .zlname{font-weight:700;font-size:var(--fz-sm);color:var(--ink)}' +
-  '.zopa-viz .zlask{font-size:var(--fz-floor);font-weight:700}' +
-  '.zopa-viz .zlask.over{color:var(--danger)}' +
-  '.zopa-viz .zlask.ok{color:var(--teal-d)}' +
-  '.zopa-viz .ztrack{position:relative;height:30px;margin:2px 0}' +
+  /* the ZOPA track, taller so on-bar value labels sit above + below it */
+  '.zopa-viz .ztrack{position:relative;height:82px;margin:0}' +
   '.zopa-viz .zaxis{position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:var(--line2);border-radius:2px}' +
   '.zopa-viz .zzopa{position:absolute;top:50%;transform:translateY(-50%);height:16px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:4px}' +
   '.zopa-viz .ztgt,.zopa-viz .zwalk{position:absolute;top:calc(50% - 11px);width:2px;height:22px;background:var(--plum)}' +
@@ -2608,29 +2635,39 @@ var ZOPA_CSS =
   '.zopa-viz .zask{position:absolute;top:calc(50% - 14px);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}' +
   '.zopa-viz .zask.over{border-top-color:var(--danger)}' +
   '.zopa-viz .zbench{position:absolute;top:calc(50% - 12px);width:2px;height:24px;background:var(--ink2)}' +
-  '.zopa-viz .zlleg{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:6px}' +
-  '.zopa-viz .zlleg .zztgt{color:var(--teal-d);font-weight:700}' +
+  /* on-bar value labels, staggered up/down to avoid overlap when values are close */
+  '.zopa-viz .zlab{position:absolute;display:flex;flex-direction:column;align-items:center;line-height:1.12;white-space:nowrap;text-align:center;transform:translateX(-50%);pointer-events:none}' +
+  '.zopa-viz .zlab.zlab-l{align-items:flex-start;text-align:left;transform:translateX(0)}' +
+  '.zopa-viz .zlab.zlab-r{align-items:flex-end;text-align:right;transform:translateX(-100%)}' +
+  '.zopa-viz .zlab.up{bottom:calc(50% + 17px)}' +
+  '.zopa-viz .zlab.dn{top:calc(50% + 17px)}' +
+  '.zopa-viz .zltag{font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;font-weight:700;color:var(--mut2)}' +
+  '.zopa-viz .zlval{font-size:var(--fz-floor);font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}' +
+  '.zopa-viz .zlab.open .zltag{color:var(--emph)}' +
+  '.zopa-viz .zlab.tgt .zltag{color:var(--teal-d)}' +
+  '.zopa-viz .zlab.walk .zltag{color:var(--plum)}' +
+  '.zopa-viz .zlab.fb .zltag{color:var(--plum)}' +
+  '.zopa-viz .zlab.ask .zltag{color:var(--plum)}' +
+  '.zopa-viz .zlab.bench .zltag{color:var(--ink2)}' +
+  '.zopa-viz .zlab.ask.over .zltag,.zopa-viz .zlab.ask.over .zlval{color:var(--danger)}' +
+  /* expanded per-line detail */
+  '.zopa-viz .zline-detail{padding:0 2px 12px}' +
   '.zopa-viz .znobench{color:var(--mut2);font-style:italic}' +
-  '.zopa-viz .zdetail{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line2);display:grid;gap:5px}' +
+  '.zopa-viz .zdetail{margin-top:2px;padding-top:9px;border-top:1px dashed var(--line2);display:grid;gap:5px}' +
   '.zopa-viz .zdrow{display:flex;gap:10px;font-size:var(--fz-sm);line-height:1.45}' +
   '.zopa-viz .zdk{flex:0 0 118px;color:var(--mut2);font-weight:700}' +
   '.zopa-viz .zdv{color:var(--ink2);flex:1;min-width:0}' +
   '.zopa-viz .zdv b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}' +
-  '.zopa-viz .ztotal{margin-top:14px;padding-top:14px;border-top:2px solid var(--plum)}' +
-  '.zopa-viz .zthd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}' +
+  /* total-deal ZOPA / TCO aggregate (always visible, same bar style) */
+  '.zopa-viz .ztotal{margin-top:16px;padding-top:14px;border-top:2px solid var(--plum)}' +
+  '.zopa-viz .zthd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px}' +
   '.zopa-viz .ztname{font-weight:800;font-size:var(--fz);color:var(--plum)}' +
   '.zopa-viz .ztsub{font-size:var(--fz-floor);color:var(--mut2)}' +
-  '.zopa-viz .ztband{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}' +
-  '.zopa-viz .ztchip{font-size:var(--fz-sm);font-weight:700;border-radius:30px;padding:5px 12px;white-space:nowrap;font-variant-numeric:tabular-nums}' +
-  '.zopa-viz .ztchip.open{background:var(--surface);border:1.5px solid var(--emph);color:var(--emph)}' +
-  '.zopa-viz .ztchip.tgt{background:var(--teal-t);color:var(--teal-d)}' +
-  '.zopa-viz .ztchip.walk{background:var(--plum-t);color:var(--plum)}' +
-  '.zopa-viz .ztchip.ok{background:var(--teal-t);color:var(--teal-d)}' +
-  '.zopa-viz .ztchip.over{background:var(--danger-t);color:var(--danger)}' +
-  '.zopa-viz .ztarrow{font-size:var(--fz-floor);color:var(--mut2)}' +
+  /* one shared bottom legend */
   '.zopa-viz .zopalegend{display:flex;gap:16px;flex-wrap:wrap;font-size:var(--fz-floor);color:var(--mut2);margin-top:14px;padding-top:11px;border-top:1px solid var(--line)}' +
   '.zopa-viz .zopalegend span{display:inline-flex;align-items:center}' +
   '.zopa-viz .zopalegend i{display:inline-block;margin-right:6px;vertical-align:middle}' +
+  '.zopa-viz .zhint{margin-left:auto;font-style:italic}' +
   '.zopa-viz .zlg.zopa{width:16px;height:10px;background:var(--teal-t);border:1px solid var(--teal-d);border-radius:2px}' +
   '.zopa-viz .zlg.tgt{width:2px;height:14px;background:var(--plum)}' +
   '.zopa-viz .zlg.walk{width:2px;height:14px;background:var(--plum);opacity:.5}' +
@@ -2670,7 +2707,54 @@ function zopaBenchForLine(d, l) {
   return { value: value, note: note, benchId: b.id, comparability: b.comparability, raw: b.comparisonValue, explanation: b.explanation, evidenceType: b.evidenceType };
 }
 
-/* ---------- 2. per-line ZOPA track ------------------------------------------ */
+/* ---------- 2. shared ZOPA bar (marks + on-bar value labels) ---------------
+ * ONE builder used by BOTH the per-line track and the total-deal / TCO band so
+ * they read byte-identical. cfg = { open, target, fallback, walk, ask, over,
+ * bench }. fallback / bench may be null (no mark, no label drawn). Value labels
+ * are sorted left-to-right and alternated up/down so the two closest figures
+ * always land on opposite lanes; near an edge a label left/right-aligns so it
+ * never overflows the track. */
+function zopaBar(cfg) {
+  const open = cfg.open, target = cfg.target, walk = cfg.walk, ask = cfg.ask;
+  const fallback = cfg.fallback, bench = cfg.bench, over = cfg.over;
+  const vals = [open, target, walk, ask];
+  if (fallback != null) vals.push(fallback);
+  if (bench != null) vals.push(bench);
+  let min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+  const pad = (max - min) * 0.10 || 1; min -= pad; max += pad;
+  const span = (max - min) || 1;
+  const pos = v => clampp((v - min) / span * 100, 0, 100);
+
+  const marks = '<div class="zaxis"></div>' +
+    '<div class="zzopa" style="left:' + pos(target).toFixed(1) + '%;width:' + Math.max(pos(walk) - pos(target), 0).toFixed(1) + '%" title="ZOPA ' + M(target) + ' to ' + M(walk) + '"></div>' +
+    '<div class="ztgt" style="left:' + pos(target).toFixed(1) + '%" title="Target ' + M(target) + '"></div>' +
+    '<div class="zwalk" style="left:' + pos(walk).toFixed(1) + '%" title="Walk-away ' + M(walk) + '"></div>' +
+    (fallback != null ? '<div class="zfb" style="left:' + pos(fallback).toFixed(1) + '%" title="Fallback ' + M(fallback) + '"></div>' : '') +
+    '<div class="zopen" style="left:' + pos(open).toFixed(1) + '%" title="Theo opening ' + M(open) + '"></div>' +
+    '<div class="zask ' + (over ? 'over' : 'ok') + '" style="left:calc(' + pos(ask).toFixed(1) + '% - 5px)" title="Supplier ask ' + M(ask) + '"></div>' +
+    (bench != null ? '<div class="zbench" style="left:' + pos(bench).toFixed(1) + '%" title="Market ' + M(bench) + '"></div>' : '');
+
+  const pts = [
+    { v: open,     cls: 'open', tag: 'Open' },
+    { v: target,   cls: 'tgt',  tag: 'Target' },
+    { v: fallback, cls: 'fb',   tag: 'Fallback' },
+    { v: walk,     cls: 'walk', tag: 'Walk' },
+    { v: ask,      cls: 'ask' + (over ? ' over' : ''), tag: 'Ask' },
+    { v: bench,    cls: 'bench', tag: 'Market' }
+  ].filter(p => p.v != null).sort((a, b) => a.v - b.v);
+
+  const labels = pts.map((p, i) => {
+    const pp = pos(p.v);
+    const lane = (i % 2 === 0) ? 'up' : 'dn';
+    const align = pp <= 10 ? ' zlab-l' : (pp >= 90 ? ' zlab-r' : '');
+    return '<span class="zlab ' + p.cls + ' ' + lane + align + '" style="left:' + pp.toFixed(1) + '%">' +
+      '<span class="zltag">' + esc(p.tag) + '</span><span class="zlval">' + M(p.v) + '</span></span>';
+  }).join('');
+
+  return '<div class="ztrack">' + marks + labels + '</div>';
+}
+
+/* ---------- 3. per-line ZOPA row (collapsible) ------------------------------ */
 function zopaLineHTML(d, l) {
   const ask = l.supplierAmount, target = l.target, walk = l.maximumAcceptable, fallback = l.fallback;
   // Theo opening: anchor aggressively but credibly BELOW target so there is room to settle
@@ -2678,53 +2762,29 @@ function zopaLineHTML(d, l) {
   const open = Math.round(Math.max(target * 0.85, 2 * target - walk));
   const over = ask > walk;                  // supplier ask above our walk-away -> the ONLY red trigger
   const bench = zopaBenchForLine(d, l);
-  // Scale = the negotiation span (opening -> ask), plus the benchmark point when present.
-  // No fabricated market band: only the marks we actually hold are placed on the track.
-  const vals = [open, target, walk, ask, fallback];
-  if (bench) vals.push(bench.value);
-  let min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
-  const pad = (max - min) * 0.08 || 1; min -= pad; max += pad;
-  const span = (max - min) || 1;
-  const pos = v => clampp((v - min) / span * 100, 0, 100);
   const gap = Math.round((1 - open / target) * 100);
-  const track = '<div class="ztrack">' +
-    '<div class="zaxis"></div>' +
-    '<div class="zzopa" style="left:' + pos(target).toFixed(1) + '%;width:' + Math.max(pos(walk) - pos(target), 0).toFixed(1) + '%" title="ZOPA ' + M(target) + ' to ' + M(walk) + '"></div>' +
-    '<div class="ztgt" style="left:' + pos(target).toFixed(1) + '%" title="Target ' + M(target) + '"></div>' +
-    '<div class="zwalk" style="left:' + pos(walk).toFixed(1) + '%" title="Walk-away ' + M(walk) + '"></div>' +
-    (fallback != null ? '<div class="zfb" style="left:' + pos(fallback).toFixed(1) + '%" title="Fallback ' + M(fallback) + '"></div>' : '') +
-    '<div class="zopen" style="left:' + pos(open).toFixed(1) + '%" title="Theo opening ' + M(open) + '"></div>' +
-    '<div class="zask ' + (over ? 'over' : 'ok') + '" style="left:calc(' + pos(ask).toFixed(1) + '% - 5px)" title="Supplier ask ' + M(ask) + '"></div>' +
-    (bench ? '<div class="zbench" style="left:' + pos(bench.value).toFixed(1) + '%" title="Market ' + M(bench.value) + ' (' + esc(bench.comparability) + ' comparability)"></div>' : '') +
-  '</div>';
-  const leg = '<div class="zlleg">' +
-    '<span class="zztgt">ZOPA ' + M(target) + ' to ' + M(walk) + '</span>' +
-    '<span>opening ' + M(open) + '</span>' +
-    '<span>fallback ' + M(fallback) + '</span>' +
-    (bench ? '<span>market ' + M(bench.value) + ' (' + esc(bench.comparability) + ')</span>'
-           : '<span class="znobench">no market benchmark in session</span>') +
-  '</div>';
+  const track = zopaBar({ open: open, target: target, fallback: fallback, walk: walk, ask: ask, over: over, bench: bench ? bench.value : null });
   const mktRow = bench
     ? '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><b>' + M(bench.value) + '</b> - ' + esc(bench.note) + '. ' + esc(bench.raw) + ' · ' + esc(bench.comparability) + ' comparability ' + evidenceChip(bench.evidenceType, { sources: [bench.benchId] }) + '</span></div>'
     : '<div class="zdrow"><span class="zdk">Market</span><span class="zdv"><span class="znobench">No market benchmark for this line in session</span> - no external comparison was available, so no market mark is drawn (no lo/hi band fabricated). ' + evidenceChip('unavailable') + '</span></div>';
-  const detail = '<div class="zdetail">' +
+  const detail = '<div class="zline-detail"><div class="zdetail">' +
     '<div class="zdrow"><span class="zdk">Price</span><span class="zdv">supplier ask <b>' + M(ask) + '</b> vs target ' + M(target) + ' · fallback ' + M(fallback) + ' · walk-away ' + M(walk) + ' ' + evidenceChip(l.evidenceType, { sources: l.sourceIds }) + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Theo opening</span><span class="zdv">open at <b>' + M(open) + '</b>, about ' + gap + '% below target, leaving room to settle at ' + M(target) + ' ' + evidenceChip('inference') + '</span></div>' +
     mktRow +
     '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + (over
         ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
         : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
-  '</div>';
-  return '<div class="zline"><div class="zlhd"><span class="zlname">' + esc(l.item) + '</span>' +
-    '<span class="zlask ' + (over ? 'over' : 'ok') + '">supplier ask ' + M(ask) + (over ? ' · above walk-away' : ' · within range') + '</span></div>' +
-    track + leg + detail + '</div>';
+  '</div></div>';
+  return '<details class="zline"><summary class="zsum">' +
+    '<div class="zsum-row"><span class="zchev" aria-hidden="true"></span><span class="zlname">' + esc(l.item) + '</span></div>' +
+    track + '</summary>' + detail + '</details>';
 }
 
-/* ---------- 3. total-deal ZOPA / TCO band -----------------------------------
+/* ---------- 4. total-deal ZOPA / TCO band (always visible) ------------------
  * Whole-deal ask/target/walk totals from the 3-yr scenarios (SC-ask /
  * SC-target / SC-max), fallback from SC-fallback; opening derived the same
  * way as the per-line opening. No deal-level market benchmark exists in
- * session -> honest gap-state. */
+ * session -> honest gap-state in the detail (no market tick on the bar). */
 function zopaTotalHTML(d) {
   const sc = id => ((d.scenarios || []).find(s => s.id === id) || {});
   const askS = sc('SC-ask'), tgtS = sc('SC-target'), fbS = sc('SC-fallback'), maxS = sc('SC-max');
@@ -2735,23 +2795,17 @@ function zopaTotalHTML(d) {
   const emp = assumVal(d, 'ASM-1', 18000), years = assumVal(d, 'ASM-2', 3);
   const read = 'Supplier ask ' + M(askTot) + ' sits ' + (over ? 'above' : 'within') + ' the ' + M(walkTot) +
     ' walk-away; the ' + M(tgtTot) + ' target anchors the deal (about ' + M(apart) + ' below ask). The platform subscription is the biggest lever.';
-  const band = '<div class="ztband">' +
-    '<span class="ztchip open">Theo opening ' + M(openTot) + '</span>' +
-    '<span class="ztchip tgt">Target ' + M(tgtTot) + '</span>' +
-    '<span class="ztarrow">to</span>' +
-    '<span class="ztchip walk">Walk-away ' + M(walkTot) + '</span>' +
-    '<span class="ztchip ' + (over ? 'over' : 'ok') + '">Supplier ask ' + M(askTot) + '</span>' +
-  '</div>';
-  const detail = '<div class="zdetail">' +
+  const track = zopaBar({ open: openTot, target: tgtTot, fallback: fbTot || null, walk: walkTot, ask: askTot, over: over, bench: null });
+  const detail = '<div class="zline-detail"><div class="zdetail">' +
     '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>' +
     '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>' +
-  '</div>';
+  '</div></div>';
   return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCO</span>' +
     '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
-    band + detail + '</div>';
+    track + detail + '</div>';
 }
 
 const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
@@ -2762,6 +2816,7 @@ const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
   '<span><i class="zlg open"></i>Theo opening</span>' +
   '<span><i class="zlg ask"></i>supplier ask (red = above walk-away)</span>' +
   '<span><i class="zlg bench"></i>market benchmark (point)</span>' +
+  '<span class="zhint">Click a line for detail</span>' +
 '</div>';
 
 function renderZopaGantt(d) {
@@ -2770,7 +2825,7 @@ function renderZopaGantt(d) {
   return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
 }
 
-/* ---------- 4. public entry ------------------------------------------------- */
+/* ---------- 5. public entry ------------------------------------------------- */
 function render(d) {
   injectCss();
   return '<div class="zopa-viz">' + renderZopaGantt(d) + '</div>';
@@ -2788,9 +2843,13 @@ global.DealZopa = { render: render };
  * from the canonical model, never re-authored. Same issue/scenario/gap OBJECTS
  * the other tabs read; never re-typed (anti-drift by reference).
  *
- * 7 panels, 4 rows (top to bottom):
- *   Row 1: Deal snapshot / State-of-play digest / Next-actions timeline
- *          (three equal columns; key facts, who has the pen, planning sequence)
+ * Pen band (full width, who has the pen) + 5 panels, 4 rows (top to bottom):
+ *   Pen band: single-line who-has-the-pen context (party, basis, confidence).
+ *             Moved off the persistent strip (shell.js) to kill horizontal scroll.
+ *   Row 1: Deal snapshot / State of Play & Next Steps
+ *          (two equal columns; key facts, then last material event + the
+ *           sequenced next-steps timeline, merged from the old separate
+ *           State-of-play digest + Next-actions timeline cards)
  *   Row 2: Recommendation / Top-5 issues
  *          (stance + 3 signature conditions + limitations; hard-stop first, off the issues[] spine)
  *   Row 3: Commercial headline + full ZOPA
@@ -2813,6 +2872,28 @@ global.DealZopa = { render: render };
     'renewal': 'Renewal'
   };
 
+  /* ============================= 0. PEN BAND ============================= */
+  // Full-width, single-line who-has-the-pen context. Replaces the pen chip that used
+  // to lead the persistent strip (shell.js); no coverage badge here, that was dropped.
+  function buildPenBand(d) {
+    const pen = d.deal.whoHasPen;
+    if (!pen) return '';
+    const conf = String(pen.confidence || '').toLowerCase();
+    const confColor = conf === 'high' ? 'var(--sec-tx)' : conf === 'low' ? 'var(--danger-fg)' : 'var(--emph-tx)';
+    const confBorder = conf === 'high' ? 'var(--sec)' : conf === 'low' ? 'var(--danger-bar)' : 'var(--emph)';
+    return `
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:9px;background:var(--pri-t);
+        border:1px solid var(--line2);border-left:3px solid var(--pri);border-radius:var(--r-sm);
+        padding:9px 14px;margin-bottom:16px;font-size:var(--fz-sm)">
+        <span style="font:800 var(--fz-floor)/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--pri-tx);flex:none">Pen</span>
+        <b style="font-weight:800;color:var(--ink);flex:none;white-space:nowrap">${esc(pen.party || '—')}</b>
+        ${pen.basis ? `<span style="color:var(--ink2);flex:1 1 320px;min-width:0">${esc(pen.basis)}</span>` : ''}
+        ${pen.confidence ? `<span style="font:700 var(--fz-floor)/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;
+          flex:none;color:${confColor};border:1px solid ${confBorder};border-radius:20px;padding:2px 8px">${esc(pen.confidence)}</span>` : ''}
+      </div>
+    `;
+  }
+
   /* ============================= 1. VERDICT BLOCK ============================= */
   function buildVerdict(d) {
     const rec = d.deal.recommendation;
@@ -2831,8 +2912,6 @@ global.DealZopa = { render: render };
           ${iss ? severityPill(iss.priority) : ''}
           <span style="font-weight:600">${esc(c.text)}</span>
         </div>
-        ${evidenceChip(iss ? iss.evidenceType : 'inference', { short: true, sources: iss ? iss.sourceIds : [] })}
-        ${jumpLink('View in register →', 'tab:contract/sub:legal')}
       </dd>`;
     }).join('');
 
@@ -2869,31 +2948,41 @@ global.DealZopa = { render: render };
         <dt>Analysis date</dt><dd class="mono">${esc(snap.analysisDate)}</dd>
         <dt>Evidence</dt><dd>${coverageBadge(snap.evidenceCoverage)}</dd>
       </dl>
-      <div class="card-note">${esc(d.meta.disclaimer)}</div>
     `;
     return saCard('Deal Snapshot', html, { accent: 'teal', icon: 'doc', sub: esc(snap.projectId) });
   }
 
-  /* ============================= 3. STATE-OF-PLAY DIGEST ============================= */
-  function buildStateOfPlay(d) {
+  /* ============================= 3. STATE OF PLAY & NEXT STEPS (merged) =============================
+   * Merges the old State-of-play digest + Immediate Next Actions cards. "Who has the
+   * pen" is dropped here, it now lives in the pen band above row 1. sop.nextExpectedMove
+   * duplicates the substance of sequence step 1 (both describe leading with the
+   * protection/signature-blocking terms), so it is folded into a single lead line
+   * rather than repeated as its own timeline entry. */
+  function buildStateOfPlayAndNextSteps(d) {
     const sop = d.deal.stateOfPlay;
-    const pen = d.deal.whoHasPen;
+    const items = d.negotiation.sequence.map(s => {
+      const pkg = d.negotiation.packages.find(p => p.id === s.packageId);
+      const tone = pkg ? (pkg.priority === 1 ? 'pri' : pkg.priority === 3 ? 'emph' : '') : '';
+      const meta = (pkg ? `<span class="tiny muted">${esc(pkg.name)}</span> ` : '') + evidenceChip(s.evidenceType, { short: true });
+      return { date: 'Step ' + s.step, name: s.text, meta, tone };
+    });
     const html = `
       <dl class="kv" style="grid-template-columns:1fr">
-        <dt>Who has the pen</dt>
-        <dd>${esc(sop.whoHasPen)} <span class="tiny muted">(${esc(pen.confidence)} confidence, as of ${esc(pen.asOf)})</span></dd>
         <dt>Last material event</dt>
         <dd>${esc(sop.lastMaterialEvent)}</dd>
         <dt>Next expected move</dt>
         <dd>${esc(sop.nextExpectedMove)}</dd>
       </dl>
-      <div class="card-note">${evidenceChip(sop.evidenceType, { short: true })} Best-effort read of process position; not a monitored, live-tracked signal.</div>
+      ${timeline(items)}
+      ${insight('A planning sequence for the meeting, not a task list: packages are sequenced so protection terms are agreed before commercials are discussed.')}
       <div class="btn-row">${jumpLink('Full communications thread →', 'tab:negotiation')}</div>
     `;
-    return saCard('State of Play', html, { accent: 'emph', icon: 'meeting' });
+    return saCard('State of Play & Next Steps', html, { accent: 'emph', icon: 'clock' });
   }
 
   /* ============================= 4. TOP-5 ISSUES ============================= */
+  // Compact list on Overview, no row-expand: severity + title + category/clause only.
+  // Full recommended/fallback/hard-stop/excerpt detail lives on Terms & Review → Legal & Protection.
   function buildTopIssues(d) {
     const sorted = d.issues.slice().sort((a, b) => (rankPriority[b.priority] || 0) - (rankPriority[a.priority] || 0));
     const top5 = sorted.slice(0, 5);
@@ -2901,23 +2990,10 @@ global.DealZopa = { render: render };
       { key: 'priority', label: '', width: '96px', sortVal: r => rankPriority[r.priority] || 0, render: r => severityPill(r.priority) },
       { key: 'title', label: 'Issue', render: r => `<strong>${esc(r.title)}</strong><div class="tiny muted">${esc(r.category)} · ${esc(r.clause)}</div>` }
     ];
-    const table = dataTable(cols, top5, {
-      id: 'ov-top-issues', zebra: true,
-      expand: r => `
-        <div class="kv" style="margin-bottom:10px">
-          <dt>Recommended</dt><dd>${esc(r.recommendedPosition)}</dd>
-          <dt>Fallback</dt><dd>${esc(r.fallback)}</dd>
-          <dt>Hard stop</dt><dd style="color:var(--danger-fg);font-weight:600">${esc(r.hardStop)}</dd>
-        </div>
-        ${excerpt(r.sourceExcerpt)}
-        <div class="btn-row">
-          ${jumpLink('Full issue register →', 'tab:contract/sub:legal')}
-          ${jumpLink('Negotiation position →', 'tab:negotiation/sub:positions')}
-        </div>
-      `
-    });
+    const table = dataTable(cols, top5, { id: 'ov-top-issues', zebra: true });
     const html = table + insight('These 5 span both hard-stops plus the highest-value high-priority items; the full ' +
-      d.issues.length + '-issue register is in Terms &amp; Review → Terms &amp; Risk.');
+      d.issues.length + '-issue register is in Terms &amp; Review → Legal &amp; Protection.') +
+      `<div class="btn-row">${jumpLink('Full issue register →', 'tab:contract/sub:legal')}</div>`;
     return saCard('Top 5 Issues', html, { icon: 'flag', sub: top5.length + ' of ' + d.issues.length });
   }
 
@@ -2934,20 +3010,7 @@ global.DealZopa = { render: render };
     return saCard('Commercial Headline & Total-Deal ZOPA', zopa + batnaNote, { accent: 'teal', icon: 'money' });
   }
 
-  /* ============================= 6. NEXT-ACTIONS TIMELINE ============================= */
-  function buildNextActions(d) {
-    const items = d.negotiation.sequence.map(s => {
-      const pkg = d.negotiation.packages.find(p => p.id === s.packageId);
-      const tone = pkg ? (pkg.priority === 1 ? 'pri' : pkg.priority === 3 ? 'emph' : '') : '';
-      const meta = (pkg ? `<span class="tiny muted">${esc(pkg.name)}</span> ` : '') + evidenceChip(s.evidenceType, { short: true });
-      return { date: 'Step ' + s.step, name: s.text, meta, tone };
-    });
-    const html = timeline(items) +
-      insight('A planning sequence for the meeting, not a task list: packages are sequenced so protection terms are agreed before commercials are discussed.');
-    return saCard('Immediate Next Actions', html, { accent: 'emph', icon: 'clock' });
-  }
-
-  /* ============================= 7. EVIDENCE & GAPS BAND ============================= */
+  /* ============================= 6. EVIDENCE & GAPS BAND ============================= */
   // Compact source x analysis-area coverage STRIP (one rollup row, not the full matrix).
   function buildCoverageStrip(d) {
     const areas = d.analysisAreas;
@@ -3003,14 +3066,13 @@ global.DealZopa = { render: render };
 
       <div class="tab-intro">
         <h2>Overview</h2>
-        <div class="q">What is being negotiated, what blocks signature, what to ask for, and what is still missing; read in about two minutes.</div>
-        <div class="tiny muted" style="margin-top:7px">Session snapshot generated ${esc(d.meta.generatedAt.replace('T', ' '))} · ${coverageBadge(d.deal.evidenceCoverage)} overall evidence coverage</div>
       </div>
 
+      ${buildPenBand(d)}
+
       <div class="grid">
-        <div class="col-4">${buildSnapshot(d)}</div>
-        <div class="col-4">${buildStateOfPlay(d)}</div>
-        <div class="col-4">${buildNextActions(d)}</div>
+        <div class="col-6">${buildSnapshot(d)}</div>
+        <div class="col-6">${buildStateOfPlayAndNextSteps(d)}</div>
       </div>
 
       <div class="grid" style="margin-top:16px">
@@ -3089,34 +3151,61 @@ function issueJump(id, priority) {
 /* ============================================================================
  * SUBTAB 2A, Documents & Conflicts
  * ========================================================================== */
-function docNode(doc, isRoot) {
+// A compact map box: shows EXACTLY document type, supplier name, document name,
+// active status, and the executed-expiration dates (rendering "Draft" when no
+// executedDate exists, i.e. every instrument in this pre-signature set). variant
+// is 'master' | 'component' | 'sub'; it only styles the box, never adds fields.
+function docNode(doc, variant) {
   const missing = doc.isMissing || doc.evidenceType === 'unavailable';
-  const cls = 'ddm-child' + (missing ? ' ddm-missing' : '') + (isRoot ? ' ddm-rootbox' : '');
+  const cls = 'ddm-box ddm-box-' + variant + (missing ? ' ddm-box-missing' : '');
   const skey = missing ? 'deviation' : (doc.active === 'Active' ? 'aligned' : 'pending');
+  const dates = doc.executedDate
+    ? esc(doc.executedDate) + ' &ndash; ' + (doc.expirationDate ? esc(doc.expirationDate) : 'open-ended')
+    : 'Draft';
   return '<div class="' + cls + '">' +
+    '<div class="ddm-type">' + esc(doc.type) + '</div>' +
+    '<div class="ddm-supplier">' + esc(doc.supplierName || '') + '</div>' +
     '<div class="ddm-name">' + esc(doc.name) + '</div>' +
-    '<div class="ddm-meta">' + esc(doc.type) + (doc.precedenceRank ? ' &middot; precedence ' + doc.precedenceRank : '') + '</div>' +
-    '<div class="ddm-bottom">' + statusPill(skey, doc.active) +
-      (doc.controlling ? ' <span class="tiny" style="color:var(--pri-tx);font-weight:700">Controlling</span>' : '') + '</div>' +
+    '<div class="ddm-foot">' + statusPill(skey, doc.active) +
+      '<span class="ddm-dates">' + dates + '</span></div>' +
   '</div>';
 }
 
 function renderDocMap(d) {
   const docs = d.documents || [];
-  const root = docs.find(x => x.controlling) || docs.find(x => x.role === 'governing') || docs[0];
-  const inHierarchy = docs.filter(x => x !== root && x.role !== 'correspondence');
+  const master = docs.find(x => x.tier === 'master') || docs.find(x => x.controlling) || docs.find(x => x.role === 'governing') || docs[0];
+  const components = docs.filter(x => x.tier === 'msa-component');
+  const subordinates = docs.filter(x => x.tier === 'subordinate');
   const missingDocs = docs.filter(x => x.isMissing);
   const relMeta = d.documentRelevanceMeta || {};
 
-  /* ---- 1. Condensed relationship map (hierarchy only, no narrative blurbs) ---- */
-  const treeHtml =
-    '<div class="ddm-tree">' +
-      '<div class="ddm-root">' + docNode(root, true) + '</div>' +
-      '<div class="ddm-branch"></div>' +
-      '<div class="ddm-children">' + inHierarchy.map(c => docNode(c, false)).join('') + '</div>' +
+  /* ---- 1. Document Relationship Map, left-to-right umbrella. The MSA (master) sits
+   * on the LEFT and ENCLOSES its incorporated components (Supplier Privacy Standard /
+   * DPA, Information Security Standard, EU SCCs, AI Addendum) inside one bordered
+   * umbrella, so they read as part of the MSA, not peers of the SOW / Order Form. The
+   * subordinate instruments (SOW, Order Form) sit to the RIGHT, operating under it. The
+   * correspondence email is excluded (not a governing instrument; it stays in the
+   * register). Each box shows only type, supplier, name, active status and the
+   * executed-expiration dates (Draft while pre-signature). ---- */
+  const umbrellaHtml =
+    '<div class="ddm">' +
+      '<div class="ddm-umbrella">' +
+        '<div class="ddm-umbrella-cap">Master agreement, with components incorporated at the MSA level</div>' +
+        docNode(master, 'master') +
+        '<div class="ddm-inc">' +
+          '<div class="ddm-inc-label">Incorporated at the MSA level (' + components.length + ')</div>' +
+          '<div class="ddm-inc-list">' + components.map(c => docNode(c, 'component')).join('') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ddm-flow"><span class="ddm-flow-label">operate under &rarr;</span><span class="ddm-flow-line"></span></div>' +
+      '<div class="ddm-under">' +
+        '<div class="ddm-under-label">Operating under the MSA (' + subordinates.length + ')</div>' +
+        subordinates.map(s => docNode(s, 'sub')).join('') +
+      '</div>' +
     '</div>';
-  const docMapCard = saCard('Document Relationship Map', treeHtml,
-    { icon:'doc', sub: esc(root.type) + ' governs ' + inHierarchy.filter(c => !c.isMissing).length + ' documents &middot; ' + missingDocs.length + ' referenced, not provided' });
+  const draftNote = insight('No executed copy of any instrument surfaced in this session; every document is pre-signature, so the executed&ndash;expiration field reads <strong>Draft</strong> and no execution or expiration date is asserted. ' + evidenceChip('inference', { short:true }));
+  const docMapCard = saCard('Document Relationship Map', umbrellaHtml + draftNote,
+    { icon:'doc', sub: esc(master.type) + ' umbrella over ' + subordinates.length + ' operating documents &middot; ' + components.length + ' components incorporated at MSA level &middot; ' + missingDocs.length + ' not provided this session' });
 
   /* ---- 2. Document Family Register: ordered by precedence; carries executed /
    * expiration / active + controlling and ONE Governing Terms & Precedence column;
@@ -3714,21 +3803,28 @@ function renderScopePerf(d) {
  * ========================================================================== */
 const CONTRACT_STYLE =
   '<style>' +
-  '.contract-tab .ddm-tree{padding:10px 6px 16px}' +
-  '.contract-tab .ddm-root{display:flex;justify-content:center}' +
-  '.contract-tab .ddm-branch{width:2px;height:20px;background:var(--line2);margin:0 auto}' +
-  '.contract-tab .ddm-children{position:relative;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:16px}' +
-  '.contract-tab .ddm-children::before{content:"";position:absolute;top:0;left:12%;right:12%;height:2px;background:var(--line2)}' +
-  '.contract-tab .ddm-child{position:relative;flex:1 1 128px;max-width:168px;background:var(--surface);border:1px solid var(--line2);' +
-    'border-radius:var(--r-sm);padding:10px 12px;box-shadow:var(--shadow-1)}' +
-  '.contract-tab .ddm-child::before{content:"";position:absolute;top:-16px;left:50%;width:2px;height:16px;background:var(--line2)}' +
-  '.contract-tab .ddm-child.ddm-missing{background:var(--panel);border-style:dashed}' +
-  '.contract-tab .ddm-rootbox{max-width:260px;border-color:var(--pri);border-width:1.5px}' +
-  '.contract-tab .ddm-role{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:700}' +
-  '.contract-tab .ddm-name{font-weight:700;font-size:var(--fz-sm);margin:3px 0 2px;color:var(--ink)}' +
-  '.contract-tab .ddm-meta{font-size:var(--fz-meta);color:var(--mut)}' +
-  '.contract-tab .ddm-status{font-size:var(--fz-meta);color:var(--mut2);margin:2px 0 6px;font-style:italic}' +
-  '.contract-tab .ddm-bottom{display:flex;gap:6px;flex-wrap:wrap;align-items:center}' +
+  /* Document Relationship Map, left-to-right umbrella (MSA encloses its incorporated
+   * components; subordinate instruments operate under it to the right). Locked palette:
+   * plum (--pri) frames the umbrella; neutrals carry everything else. */
+  '.contract-tab .ddm{display:flex;align-items:stretch;flex-wrap:wrap;gap:0;padding:12px 4px 6px}' +
+  '.contract-tab .ddm-umbrella{flex:1 1 360px;min-width:280px;border:1.5px solid var(--pri);border-radius:var(--r-sm);background:var(--panel);padding:12px 12px 14px}' +
+  '.contract-tab .ddm-umbrella-cap{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.06em;color:var(--pri-tx);font-weight:800;margin-bottom:9px}' +
+  '.contract-tab .ddm-inc{margin-top:11px;padding-top:11px;border-top:1px dashed var(--line2)}' +
+  '.contract-tab .ddm-inc-label{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;margin-bottom:8px}' +
+  '.contract-tab .ddm-inc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:8px}' +
+  '.contract-tab .ddm-flow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 6px;min-width:78px}' +
+  '.contract-tab .ddm-flow-label{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;white-space:nowrap;text-align:center}' +
+  '.contract-tab .ddm-flow-line{width:100%;height:2px;background:var(--line2)}' +
+  '.contract-tab .ddm-under{flex:0 1 232px;min-width:190px;display:flex;flex-direction:column;justify-content:center;gap:8px}' +
+  '.contract-tab .ddm-under-label{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700}' +
+  '.contract-tab .ddm-box{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;box-shadow:var(--shadow-1)}' +
+  '.contract-tab .ddm-box-master{border-color:var(--pri);border-width:1.5px}' +
+  '.contract-tab .ddm-box-missing{border-style:dashed;opacity:.94}' +
+  '.contract-tab .ddm-type{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:700}' +
+  '.contract-tab .ddm-supplier{font-size:var(--fz-meta);color:var(--mut2)}' +
+  '.contract-tab .ddm-name{font-weight:700;font-size:var(--fz-sm);margin:2px 0 7px;color:var(--ink);line-height:1.28}' +
+  '.contract-tab .ddm-foot{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between}' +
+  '.contract-tab .ddm-dates{font-size:var(--fz-meta);color:var(--mut);font-variant-numeric:tabular-nums}' +
   '.contract-tab .pg-wrap{position:relative;display:flex;flex-direction:column;align-items:center;padding:4px 0 0}' +
   '.contract-tab .pg-svg{width:100%;max-width:240px;height:auto}' +
   '.contract-tab .pg-score{margin-top:-14px;font:800 32px/1 var(--sans);color:var(--ink)}' +
@@ -5022,7 +5118,10 @@ if (typeof global !== 'undefined') {
         ' &middot; session snapshot, advisory only, not a system of record</div>' +
     '</div>';
 
-  /* ---- persistent strip: who-has-the-pen chip + coverage pill + <=5 counts ---- */
+  /* ---- persistent strip: <=5 counts only. The who-has-the-pen chip + coverage
+   * badge used to lead the strip (ss-lead) but that overflowed into a horizontal
+   * scrollbar; that context now renders as a pen band atop Overview (tab-brief.js).
+   * penChip() is kept for reuse elsewhere; it is simply no longer called here. ---- */
   function penChip(p) {
     if (!p) return '';
     var conf = String(p.confidence || '').toLowerCase();
@@ -5033,11 +5132,6 @@ if (typeof global !== 'undefined') {
       (p.confidence ? '<span class="pen-conf">' + esc(p.confidence) + '</span>' : '') +
     '</span>';
   }
-  var stripLead =
-    '<div class="ss-lead">' +
-      penChip(deal.whoHasPen) +
-      (global.coverageBadge ? global.coverageBadge(deal.evidenceCoverage) : '') +
-    '</div>';
   function stripCounts() {
     return (deal.summaryStrip || []).slice(0, 5).map(function (s) {
       return '<button class="ss-item tone-' + esc(s.tone) + '" data-jump="' + esc(s.jump) + '">' +
@@ -5061,7 +5155,7 @@ if (typeof global !== 'undefined') {
   var skeleton =
     '<main class="sa-main">' + titleHTML +
       '<div class="sticky-head">' +
-        '<div class="summary-strip"><div class="wrap">' + stripLead +
+        '<div class="summary-strip"><div class="wrap">' +
           '<div class="ss-counts" id="ss"></div></div></div>' +
         tabbar +
       '</div>' +

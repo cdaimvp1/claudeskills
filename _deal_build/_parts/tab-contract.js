@@ -49,34 +49,61 @@ function issueJump(id, priority) {
 /* ============================================================================
  * SUBTAB 2A, Documents & Conflicts
  * ========================================================================== */
-function docNode(doc, isRoot) {
+// A compact map box: shows EXACTLY document type, supplier name, document name,
+// active status, and the executed-expiration dates (rendering "Draft" when no
+// executedDate exists, i.e. every instrument in this pre-signature set). variant
+// is 'master' | 'component' | 'sub'; it only styles the box, never adds fields.
+function docNode(doc, variant) {
   const missing = doc.isMissing || doc.evidenceType === 'unavailable';
-  const cls = 'ddm-child' + (missing ? ' ddm-missing' : '') + (isRoot ? ' ddm-rootbox' : '');
+  const cls = 'ddm-box ddm-box-' + variant + (missing ? ' ddm-box-missing' : '');
   const skey = missing ? 'deviation' : (doc.active === 'Active' ? 'aligned' : 'pending');
+  const dates = doc.executedDate
+    ? esc(doc.executedDate) + ' &ndash; ' + (doc.expirationDate ? esc(doc.expirationDate) : 'open-ended')
+    : 'Draft';
   return '<div class="' + cls + '">' +
+    '<div class="ddm-type">' + esc(doc.type) + '</div>' +
+    '<div class="ddm-supplier">' + esc(doc.supplierName || '') + '</div>' +
     '<div class="ddm-name">' + esc(doc.name) + '</div>' +
-    '<div class="ddm-meta">' + esc(doc.type) + (doc.precedenceRank ? ' &middot; precedence ' + doc.precedenceRank : '') + '</div>' +
-    '<div class="ddm-bottom">' + statusPill(skey, doc.active) +
-      (doc.controlling ? ' <span class="tiny" style="color:var(--pri-tx);font-weight:700">Controlling</span>' : '') + '</div>' +
+    '<div class="ddm-foot">' + statusPill(skey, doc.active) +
+      '<span class="ddm-dates">' + dates + '</span></div>' +
   '</div>';
 }
 
 function renderDocMap(d) {
   const docs = d.documents || [];
-  const root = docs.find(x => x.controlling) || docs.find(x => x.role === 'governing') || docs[0];
-  const inHierarchy = docs.filter(x => x !== root && x.role !== 'correspondence');
+  const master = docs.find(x => x.tier === 'master') || docs.find(x => x.controlling) || docs.find(x => x.role === 'governing') || docs[0];
+  const components = docs.filter(x => x.tier === 'msa-component');
+  const subordinates = docs.filter(x => x.tier === 'subordinate');
   const missingDocs = docs.filter(x => x.isMissing);
   const relMeta = d.documentRelevanceMeta || {};
 
-  /* ---- 1. Condensed relationship map (hierarchy only, no narrative blurbs) ---- */
-  const treeHtml =
-    '<div class="ddm-tree">' +
-      '<div class="ddm-root">' + docNode(root, true) + '</div>' +
-      '<div class="ddm-branch"></div>' +
-      '<div class="ddm-children">' + inHierarchy.map(c => docNode(c, false)).join('') + '</div>' +
+  /* ---- 1. Document Relationship Map, left-to-right umbrella. The MSA (master) sits
+   * on the LEFT and ENCLOSES its incorporated components (Supplier Privacy Standard /
+   * DPA, Information Security Standard, EU SCCs, AI Addendum) inside one bordered
+   * umbrella, so they read as part of the MSA, not peers of the SOW / Order Form. The
+   * subordinate instruments (SOW, Order Form) sit to the RIGHT, operating under it. The
+   * correspondence email is excluded (not a governing instrument; it stays in the
+   * register). Each box shows only type, supplier, name, active status and the
+   * executed-expiration dates (Draft while pre-signature). ---- */
+  const umbrellaHtml =
+    '<div class="ddm">' +
+      '<div class="ddm-umbrella">' +
+        '<div class="ddm-umbrella-cap">Master agreement, with components incorporated at the MSA level</div>' +
+        docNode(master, 'master') +
+        '<div class="ddm-inc">' +
+          '<div class="ddm-inc-label">Incorporated at the MSA level (' + components.length + ')</div>' +
+          '<div class="ddm-inc-list">' + components.map(c => docNode(c, 'component')).join('') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ddm-flow"><span class="ddm-flow-label">operate under &rarr;</span><span class="ddm-flow-line"></span></div>' +
+      '<div class="ddm-under">' +
+        '<div class="ddm-under-label">Operating under the MSA (' + subordinates.length + ')</div>' +
+        subordinates.map(s => docNode(s, 'sub')).join('') +
+      '</div>' +
     '</div>';
-  const docMapCard = saCard('Document Relationship Map', treeHtml,
-    { icon:'doc', sub: esc(root.type) + ' governs ' + inHierarchy.filter(c => !c.isMissing).length + ' documents &middot; ' + missingDocs.length + ' referenced, not provided' });
+  const draftNote = insight('No executed copy of any instrument surfaced in this session; every document is pre-signature, so the executed&ndash;expiration field reads <strong>Draft</strong> and no execution or expiration date is asserted. ' + evidenceChip('inference', { short:true }));
+  const docMapCard = saCard('Document Relationship Map', umbrellaHtml + draftNote,
+    { icon:'doc', sub: esc(master.type) + ' umbrella over ' + subordinates.length + ' operating documents &middot; ' + components.length + ' components incorporated at MSA level &middot; ' + missingDocs.length + ' not provided this session' });
 
   /* ---- 2. Document Family Register: ordered by precedence; carries executed /
    * expiration / active + controlling and ONE Governing Terms & Precedence column;
@@ -674,21 +701,28 @@ function renderScopePerf(d) {
  * ========================================================================== */
 const CONTRACT_STYLE =
   '<style>' +
-  '.contract-tab .ddm-tree{padding:10px 6px 16px}' +
-  '.contract-tab .ddm-root{display:flex;justify-content:center}' +
-  '.contract-tab .ddm-branch{width:2px;height:20px;background:var(--line2);margin:0 auto}' +
-  '.contract-tab .ddm-children{position:relative;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:16px}' +
-  '.contract-tab .ddm-children::before{content:"";position:absolute;top:0;left:12%;right:12%;height:2px;background:var(--line2)}' +
-  '.contract-tab .ddm-child{position:relative;flex:1 1 128px;max-width:168px;background:var(--surface);border:1px solid var(--line2);' +
-    'border-radius:var(--r-sm);padding:10px 12px;box-shadow:var(--shadow-1)}' +
-  '.contract-tab .ddm-child::before{content:"";position:absolute;top:-16px;left:50%;width:2px;height:16px;background:var(--line2)}' +
-  '.contract-tab .ddm-child.ddm-missing{background:var(--panel);border-style:dashed}' +
-  '.contract-tab .ddm-rootbox{max-width:260px;border-color:var(--pri);border-width:1.5px}' +
-  '.contract-tab .ddm-role{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:700}' +
-  '.contract-tab .ddm-name{font-weight:700;font-size:var(--fz-sm);margin:3px 0 2px;color:var(--ink)}' +
-  '.contract-tab .ddm-meta{font-size:var(--fz-meta);color:var(--mut)}' +
-  '.contract-tab .ddm-status{font-size:var(--fz-meta);color:var(--mut2);margin:2px 0 6px;font-style:italic}' +
-  '.contract-tab .ddm-bottom{display:flex;gap:6px;flex-wrap:wrap;align-items:center}' +
+  /* Document Relationship Map, left-to-right umbrella (MSA encloses its incorporated
+   * components; subordinate instruments operate under it to the right). Locked palette:
+   * plum (--pri) frames the umbrella; neutrals carry everything else. */
+  '.contract-tab .ddm{display:flex;align-items:stretch;flex-wrap:wrap;gap:0;padding:12px 4px 6px}' +
+  '.contract-tab .ddm-umbrella{flex:1 1 360px;min-width:280px;border:1.5px solid var(--pri);border-radius:var(--r-sm);background:var(--panel);padding:12px 12px 14px}' +
+  '.contract-tab .ddm-umbrella-cap{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.06em;color:var(--pri-tx);font-weight:800;margin-bottom:9px}' +
+  '.contract-tab .ddm-inc{margin-top:11px;padding-top:11px;border-top:1px dashed var(--line2)}' +
+  '.contract-tab .ddm-inc-label{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;margin-bottom:8px}' +
+  '.contract-tab .ddm-inc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:8px}' +
+  '.contract-tab .ddm-flow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 6px;min-width:78px}' +
+  '.contract-tab .ddm-flow-label{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;white-space:nowrap;text-align:center}' +
+  '.contract-tab .ddm-flow-line{width:100%;height:2px;background:var(--line2)}' +
+  '.contract-tab .ddm-under{flex:0 1 232px;min-width:190px;display:flex;flex-direction:column;justify-content:center;gap:8px}' +
+  '.contract-tab .ddm-under-label{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700}' +
+  '.contract-tab .ddm-box{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;box-shadow:var(--shadow-1)}' +
+  '.contract-tab .ddm-box-master{border-color:var(--pri);border-width:1.5px}' +
+  '.contract-tab .ddm-box-missing{border-style:dashed;opacity:.94}' +
+  '.contract-tab .ddm-type{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:700}' +
+  '.contract-tab .ddm-supplier{font-size:var(--fz-meta);color:var(--mut2)}' +
+  '.contract-tab .ddm-name{font-weight:700;font-size:var(--fz-sm);margin:2px 0 7px;color:var(--ink);line-height:1.28}' +
+  '.contract-tab .ddm-foot{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between}' +
+  '.contract-tab .ddm-dates{font-size:var(--fz-meta);color:var(--mut);font-variant-numeric:tabular-nums}' +
   '.contract-tab .pg-wrap{position:relative;display:flex;flex-direction:column;align-items:center;padding:4px 0 0}' +
   '.contract-tab .pg-svg{width:100%;max-width:240px;height:auto}' +
   '.contract-tab .pg-score{margin-top:-14px;font:800 32px/1 var(--sans);color:var(--ink)}' +

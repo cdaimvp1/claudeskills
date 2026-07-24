@@ -27,8 +27,10 @@
  *    email is a CONSTRUCTED enterprise negotiation scenario, NOT a real record, and is
  *    labelled 'contract' (as-if drafted paper), 'calculated', 'inference' or 'assumption'.
  *    No specific real Visier financial is asserted as fact.
- *  - Referenced-but-missing documents (DPA, Security Exhibit) are evidenceType
- *    'unavailable' and feed gaps[]; never zero-filled into a fake panel.
+ *  - Referenced-but-missing components (the Supplier Privacy Standard / DPA, fed to
+ *    gaps[] as GAP-1; the Information Security Standard, as GAP-2) plus standard-but-
+ *    unconfirmed MSA-level components (EU SCCs, AI Addendum) are evidenceType
+ *    'unavailable' and never zero-filled into a fake panel.
  * ========================================================================== */
 const dashboardData = {
 
@@ -122,38 +124,55 @@ const dashboardData = {
   //                   found in the MSA v3 redline text captured this session, so every
   //                   ranked basis below is evidenceType 'inference' (our defensible read
   //                   of standard MSA + Order Form + SOW structure), never 'contract'.
-  //   isMissing     : true for the two referenced-but-not-provided components (DPA,
-  //                   Security Exhibit) so the register can render them as gap rows.
+  //   isMissing     : true for the four MSA-level components not verified this session
+  //                   (Supplier Privacy Standard / DPA, Information Security Standard,
+  //                   EU SCCs, AI Addendum) so the register + map render them as gap rows.
+  //   tier          : 'master' (the MSA) | 'msa-component' (exhibits/addenda incorporated
+  //                   AT the MSA level: Supplier Privacy Standard, Information Security
+  //                   Standard, EU SCCs, AI Addendum) | 'subordinate' (SOW, Order Form,
+  //                   which operate UNDER the MSA) | 'correspondence' (the email). Drives the
+  //                   left-to-right umbrella layout of the Document Relationship Map.
+  //   supplierName  : 'Visier Inc.' on every contract instrument; null on the internal email.
   documents: [
-    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, evidenceType: 'contract', limitations: [],
+    { id: 'DOC-01', name: 'Visier Master Services Agreement (v3 redline)', type: 'MSA', status: 'Draft, supplier paper, 2nd redline', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'governing', relatedTo: ['DOC-02','DOC-03'], pages: 34, tier: 'master', supplierName: 'Visier Inc.', evidenceType: 'contract', limitations: [],
       executedDate: null, expirationDate: null, active: 'In negotiation', controlling: true, isMissing: false,
       relevance: 'direct', relevanceNote: 'Master agreement; governs interpretation and sets precedence for the Order Form and SOW beneath it.',
       precedenceRank: 1,
       precedenceBasis: { text: 'Ranked as the controlling master instrument; the v3 redline body does not contain an express order-of-precedence clause among the MSA / Order Form / SOW, so this hierarchy is our read, not a quoted contract term.', evidenceType: 'inference' } },
-    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, evidenceType: 'contract', limitations: [],
+    { id: 'DOC-02', name: 'SOW-01, Platform Implementation & Data Onboarding', type: 'SOW', status: 'Draft, under review', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'scope', relatedTo: ['DOC-01','DOC-03'], pages: 11, tier: 'subordinate', supplierName: 'Visier Inc.', evidenceType: 'contract', limitations: [],
       executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
       relevance: 'direct', relevanceNote: 'Defines the implementation scope and deliverables authorized under the Order Form; no redline round documented for this instrument (unlike the MSA).',
       precedenceRank: 3,
       precedenceBasis: { text: 'Ranked below the Order Form as the subordinate scope/services document it details; no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
-    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, evidenceType: 'contract', limitations: [],
+    { id: 'DOC-03', name: 'Order Form, Subscription & Fees', type: 'Order Form', status: 'Draft', date: '2026-07-15', sourceType: 'Uploaded contract', role: 'ordering', relatedTo: ['DOC-01','DOC-02'], pages: 3, tier: 'subordinate', supplierName: 'Visier Inc.', evidenceType: 'contract', limitations: [],
       executedDate: null, expirationDate: null, active: 'Draft', controlling: false, isMissing: false,
       relevance: 'direct', relevanceNote: 'Commercial ordering document; binds the specific subscription, term and fees under the MSA and references SOW-01 for scope.',
       precedenceRank: 2,
       precedenceBasis: { text: 'Ranked immediately below the MSA as the work-authorizing instrument that triggers the specific commercial commitment (an Order Form functions as a type of SOW); no express precedence clause was found in session, this order is our read.', evidenceType: 'inference' } },
-    { id: 'DOC-04', name: 'Data Processing Addendum (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'],
+    { id: 'DOC-04', name: 'Supplier Privacy Standard (DPA)', type: 'DPA', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §9.4', role: 'data', relatedTo: ['DOC-01'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Not in session, data-protection assessment is Limited and partly inferred from the MSA body.'],
       executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
-      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so data-protection terms are never silently assumed.',
+      relevance: 'direct', relevanceNote: 'The Lilly Supplier Privacy Standard (the DPA) is incorporated at the MSA level for the processing of employee personal data; not supplied this session, so it is shown as an incorporated-component gap row and its terms are never silently assumed.',
       precedenceRank: null,
-      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
-    { id: 'DOC-05', name: 'Security & Availability Exhibit (Exhibit B)', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'],
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-05', name: 'Information Security Standard', type: 'Exhibit', status: 'Referenced, not provided', date: null, sourceType: 'Referenced in MSA §7.2', role: 'security', relatedTo: ['DOC-01'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Not in session, SLA credit schedule and security controls could not be verified.'],
       executedDate: null, expirationDate: null, active: 'Referenced, not provided', controlling: false, isMissing: true,
-      relevance: 'direct', relevanceNote: 'Incorporated by reference in the MSA but not supplied this session; shown as a first-class gap row so SLA-credit and security-control terms are never silently assumed.',
+      relevance: 'direct', relevanceNote: 'The Information Security Standard (the security & availability exhibit) is incorporated at the MSA level; not supplied this session, so it is shown as an incorporated-component gap row and its SLA-credit and security-control terms are never silently assumed.',
       precedenceRank: null,
-      precedenceBasis: { text: 'Would sit in the direct precedence chain once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
-    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, evidenceType: 'internal', limitations: [],
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once executed and reviewed; rank cannot be confirmed while the document itself is unavailable.', evidenceType: 'unavailable' } },
+    { id: 'DOC-06', name: 'Supplier redline cover email (07-15)', type: 'Email', status: 'Received', date: '2026-07-15', sourceType: 'M365 / Outlook', role: 'correspondence', relatedTo: ['DOC-01'], pages: null, tier: 'correspondence', supplierName: null, evidenceType: 'internal', limitations: [],
       executedDate: null, expirationDate: null, active: 'Active', controlling: false, isMissing: false,
       relevance: 'direct', relevanceNote: 'Correspondence evidencing receipt/date of the MSA v3 redline; supports the negotiation timeline, not a governing instrument, so it carries no precedence rank.',
-      precedenceRank: null, precedenceBasis: null }
+      precedenceRank: null, precedenceBasis: null },
+    { id: 'DOC-07', name: 'EU Standard Contractual Clauses (EU SCCs)', type: 'SCCs', status: 'Standard MSA-level component, not confirmed in session', date: null, sourceType: 'Standard Lilly MSA-level component (presence not confirmed in session)', role: 'data', relatedTo: ['DOC-01','DOC-04'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Standard Lilly MSA-level component; its presence in this contract set was not confirmed this session, so no terms are assessed.'],
+      executedDate: null, expirationDate: null, active: 'Not confirmed in session', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'EU Standard Contractual Clauses are a standard Lilly MSA-level component incorporated at the MSA for cross-border transfers of employee personal data; presence in this set was not confirmed this session, so the map shows the umbrella slot without asserting any reviewed terms.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once confirmed and reviewed; rank cannot be confirmed while its presence in this set is unconfirmed.', evidenceType: 'unavailable' } },
+    { id: 'DOC-08', name: 'AI Addendum', type: 'Addendum', status: 'Standard MSA-level component, not confirmed in session', date: null, sourceType: 'Standard Lilly MSA-level component (presence not confirmed in session)', role: 'reference', relatedTo: ['DOC-01'], pages: null, tier: 'msa-component', supplierName: 'Visier Inc.', evidenceType: 'unavailable', limitations: ['Standard Lilly MSA-level component; its presence in this contract set was not confirmed this session, so no terms are assessed.'],
+      executedDate: null, expirationDate: null, active: 'Not confirmed in session', controlling: false, isMissing: true,
+      relevance: 'direct', relevanceNote: 'An AI Addendum is a standard Lilly MSA-level component governing supplier use of AI (relevant because the platform includes a generative-AI assistant); presence in this set was not confirmed this session, so the map shows the umbrella slot without asserting any reviewed terms.',
+      precedenceRank: null,
+      precedenceBasis: { text: 'Attaches at the MSA level as an incorporated component once confirmed and reviewed; rank cannot be confirmed while its presence in this set is unconfirmed.', evidenceType: 'unavailable' } }
   ],
 
   /* ---- 2b. documentRelevanceMeta (honest gap-state for the "indirect / comparable"

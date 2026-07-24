@@ -43,7 +43,10 @@
         ' &middot; session snapshot, advisory only, not a system of record</div>' +
     '</div>';
 
-  /* ---- persistent strip: who-has-the-pen chip + coverage pill + <=5 counts ---- */
+  /* ---- persistent strip: <=5 counts only. The who-has-the-pen chip + coverage
+   * badge used to lead the strip (ss-lead) but that overflowed into a horizontal
+   * scrollbar; that context now renders as a pen band atop Overview (tab-brief.js).
+   * penChip() is kept for reuse elsewhere; it is simply no longer called here. ---- */
   function penChip(p) {
     if (!p) return '';
     var conf = String(p.confidence || '').toLowerCase();
@@ -54,11 +57,6 @@
       (p.confidence ? '<span class="pen-conf">' + esc(p.confidence) + '</span>' : '') +
     '</span>';
   }
-  var stripLead =
-    '<div class="ss-lead">' +
-      penChip(deal.whoHasPen) +
-      (global.coverageBadge ? global.coverageBadge(deal.evidenceCoverage) : '') +
-    '</div>';
   function stripCounts() {
     return (deal.summaryStrip || []).slice(0, 5).map(function (s) {
       return '<button class="ss-item tone-' + esc(s.tone) + '" data-jump="' + esc(s.jump) + '">' +
@@ -82,7 +80,7 @@
   var skeleton =
     '<main class="sa-main">' + titleHTML +
       '<div class="sticky-head">' +
-        '<div class="summary-strip"><div class="wrap">' + stripLead +
+        '<div class="summary-strip"><div class="wrap">' +
           '<div class="ss-counts" id="ss"></div></div></div>' +
         tabbar +
       '</div>' +
