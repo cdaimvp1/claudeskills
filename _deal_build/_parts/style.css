@@ -430,3 +430,19 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
   .sa-card{break-inside:avoid; box-shadow:none}
   body{background:#fff}
 }
+
+/* ---- persistent-strip lead cluster: who-has-the-pen chip + coverage pill ---- */
+.summary-strip .wrap{align-items:center}
+.summary-strip .ss-lead{display:flex; align-items:center; gap:10px; flex:none; padding-right:4px}
+.summary-strip .ss-counts{display:flex; gap:10px; flex:1 1 auto; min-width:0}
+.pen-chip{display:inline-flex; align-items:center; gap:7px; background:var(--pri-t); border:1px solid var(--line2);
+  border-radius:30px; padding:5px 11px; font-size:var(--fz-meta); color:var(--ink); max-width:380px}
+.pen-chip .pen-k{font:800 var(--fz-floor)/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--pri-tx); flex:none}
+.pen-chip b{font-weight:800; white-space:nowrap; flex:none}
+.pen-chip .pen-basis{color:var(--mut); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px}
+.pen-chip .pen-conf{font:700 var(--fz-floor)/1 var(--sans); letter-spacing:.03em; text-transform:uppercase; flex:none;
+  background:var(--surface); border:1px solid var(--line2); border-radius:20px; padding:2px 7px; color:var(--mut2)}
+.pen-chip.pen-high .pen-conf{color:var(--sec-tx); border-color:var(--sec)}
+.pen-chip.pen-moderate .pen-conf{color:var(--emph-tx); border-color:var(--emph)}
+.pen-chip.pen-low .pen-conf{color:var(--danger-fg); border-color:var(--danger-bar)}
+@media (max-width:760px){ .pen-chip .pen-basis{display:none} }

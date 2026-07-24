@@ -1,367 +1,493 @@
 /* =============================================================================
- * tab-commercials.js — "Commercials" primary tab builder for the Deal artifact.
+ * tab-commercials.js, "ECONOMICS" primary tab builder for the Deal artifact.
+ *   (display name ECONOMICS; id / jump namespace stays `commercials`)
  *
  * Exposes:  window.renderTab_commercials(d)  ->  HTML string for the whole tab
- *           (subtab bar + 3 subtab panels), plus window.DealTabs.commercials
- *           as an alias (builder convention in helpers.js).
+ *           (subtab bar + 3 subtab panels), plus window.DealTabs.commercials.
  *
- * Subtabs: Proposal (line items + cash flow + terms + concerns) ·
- *          Scenarios (ask/target/fallback/max + editable assumptions + recalc
- *          + tornado sensitivity) · Benchmarks (only real comparisons).
+ * Question the tab answers: "What is it worth, what should I pay?"
  *
- * Reads ONLY from dashboardData (param d). No fact is hard-coded here that
- * already lives in data.js — commercialLines / scenarios / benchmarks /
- * assumptions / issues are looked up by id and rendered, never restated.
+ * Subtabs (3):
+ *   3A  Deal Table & ZOPA   (data-subpanel="commercials/deal")
+ *   3B  Pro-forma           (data-subpanel="commercials/proforma")
+ *   3C  Scenarios & Sens.   (data-subpanel="commercials/scenarios")
  *
- * LIVE RECALC DESIGN (see helpers.js comment on DealUI.onRecalc):
- *   Moving an assumption slider must not fabricate new precision — it re-runs
- *   a transparent, locally-defined model and shows the delta from the
- *   generation-time snapshot. At the assumptions' ORIGINAL values the model
- *   reproduces the original scenario figures exactly (ratio = 1); away from
- *   the original values it scales proportionally. Sortable-table headers are
- *   bound once at DealUI.init() and are NOT delegated, so recalculation never
- *   replaces a <table> — it patches only the value spans + their data-sv
- *   sort-cache in place.
+ * Reads ONLY from dashboardData (param d). Every rendered number already lives in
+ * data.js (commercialLines / scenarios / benchmarks / assumptions / proforma /
+ * issues) and is looked up by id, never restated. The pro-forma numbers are
+ * PRECOMPUTED; this file renders them; it does NOT port the pv-12 engine.
+ *
+ * THE ONLY LIVE MATH ON THIS TAB is npv(cashflows, rate): moving the WACC slider
+ * (assumptions ASM-5) re-discounts proforma.cashflowByYear at the slider rate and
+ * repaints the NPV read + the NPV-vs-rate curve marker. Everything else (scenario
+ * ladder, sensitivity tornado, savings waterfall, deal table) is static, drawn
+ * straight from the internally-coherent data object. See DEAL-DESIGN-DECISION.md
+ * PART 1 "Tab 3, ECONOMICS" and PART 2 §2-3 ("reuse pv-12" = render precomputed).
  * ========================================================================== */
 (function (global) {
 'use strict';
 
-/* ---------- 0. small local utils (not exported — helpers.js owns the API) - */
-function assumVal(d, id, fallback, overrides) {
-  if (overrides && Object.prototype.hasOwnProperty.call(overrides, id)) return overrides[id];
-  const a = (d.assumptions || []).find(x => x.id === id);
-  return a ? a.value : fallback;
-}
+/* ---------- 0. local utils (helpers.js owns the exported API) ------------- */
+function clampp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+function sumF(arr, f) { return (arr || []).reduce((s, x) => s + (f(x) || 0), 0); }
 function findLine(d, id) { return (d.commercialLines || []).find(l => l.id === id) || {}; }
 function findIssue(d, id) { return (d.issues || []).find(i => i.id === id); }
+function assumVal(d, id, fb) { const a = (d.assumptions || []).find(x => x.id === id); return a ? a.value : fb; }
+// compact money with a clean minus sign (helpers' money() renders "$-350K")
+function M(n) { if (n == null || isNaN(n)) return '—'; return (n < 0 ? '−' : '') + money(Math.abs(n), { compact: true }); }
+function setText(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
+
+// THE only live calculation on this tab. Discounts each year at period i+1, the
+// convention the data is built on (verified: nets at 6% -> npvCurve rate 6; cost
+// outflows PV at 6% -> tcoSummary.netTerm). cashflows = array of per-year numbers.
+function npv(cashflows, ratePct) {
+  const r = (ratePct || 0) / 100;
+  return (cashflows || []).reduce((s, v, i) => s + v / Math.pow(1 + r, i + 1), 0);
+}
+
 function negPill(level) {
   const lvl = String(level || '').toLowerCase();
-  return '<span class="pill ' + (lvl === 'high' ? 'info' : 'muted') + '">' + esc(level) + '</span>';
+  return '<span class="pill ' + (lvl === 'high' ? 'info' : lvl === 'medium' ? 'muted' : 'muted') + '">' + esc(level || '—') + '</span>';
 }
 function compPill(level) {
   const lvl = String(level || '').toLowerCase();
   return '<span class="pill ' + (lvl === 'moderate' ? 'info' : 'muted') + '">Comparability: ' + esc(level) + '</span>';
 }
-
-/* ---------- 1. the pricing model (drives waterfall / table / tornado) ----- */
-// Year-by-year cash for one scenario under given (or current) assumption
-// overrides. Only the platform line (CL-1) is headcount/discount-sensitive,
-// matching ASM-1.usedIn / ASM-4.usedIn in data.js; everything else uses the
-// scenario's own values{} as drafted.
-function yearlyCashFlow(d, scenario, overrides) {
-  const empRatio = assumVal(d, 'ASM-1', 18000, overrides) / 18000;
-  const term = Math.max(1, Math.round(assumVal(d, 'ASM-2', 3, overrides)));
-  const uplift = assumVal(d, 'ASM-3', 4, overrides) / 100;
-  const discount = assumVal(d, 'ASM-4', 18, overrides) / 100;
-  const askCL1 = findLine(d, 'CL-1').supplierAmount || 0;
-  let cl1 = scenario.values['CL-1'] || 0;
-  if (scenario.id === 'SC-target') cl1 = askCL1 * (1 - discount);
-  cl1 = cl1 * empRatio;
-  const cl3 = scenario.values['CL-3'] || 0;
-  const oneTime = (scenario.values['CL-2'] || 0) + (scenario.values['CL-4'] || 0) + (scenario.values['CL-5'] || 0);
-  const annual = cl1 + cl3;
-  const years = [];
-  for (let k = 0; k < term; k++) years.push(annual * Math.pow(1 + uplift, k) + (k === 0 ? oneTime : 0));
-  return years;
+function confPill(c) {
+  const k = String(c || '').toLowerCase();
+  return '<span class="pill ' + (k === 'high' ? 'ok' : k === 'low' ? 'warn' : 'info') + '">' + esc(c || '—') + '</span>';
 }
-function scenarioModel(d, scenario, overrides) {
-  const years = yearlyCashFlow(d, scenario, overrides);
-  return { y1: years[0] || 0, total: years.reduce((a, b) => a + b, 0) };
-}
-function npv(years, ratePct) {
-  const r = (ratePct || 0) / 100;
-  return years.reduce((sum, v, idx) => sum + v / Math.pow(1 + r, idx), 0);
-}
-// baseline captured once, at first render (i.e. the generation-time values),
-// so a moved-then-reset slider reproduces the original figures exactly.
-let _baseline = null;
-function baseline(d) {
-  if (_baseline) return _baseline;
-  _baseline = {};
-  (d.scenarios || []).forEach(s => { _baseline[s.id] = scenarioModel(d, s); });
-  return _baseline;
-}
-// scenarios re-scaled: at unmoved assumptions this returns the ORIGINAL
-// s.y1Total / s.total exactly; away from baseline it scales by the model's
-// ratio. Never invents a number unrelated to the generation-time snapshot.
-function liveScenarios(d) {
-  const base = baseline(d);
-  return (d.scenarios || []).map(s => {
-    const m = scenarioModel(d, s);
-    const b = base[s.id] || { y1: 1, total: 1 };
-    return Object.assign({}, s, {
-      liveY1: s.y1Total * (m.y1 / (b.y1 || 1)),
-      liveTotal: s.total * (m.total / (b.total || 1))
-    });
-  });
-}
-function liveAsk(d) {
-  const empRatio = assumVal(d, 'ASM-1', 18000) / 18000;
-  const l = findLine(d, 'CL-1');
-  return (l.supplierAmount || 0) * empRatio;
-}
-function liveTarget(d, line) {
-  if (line.id !== 'CL-1') return line.target;
-  const askCL1 = findLine(d, 'CL-1').supplierAmount || 0;
-  const discount = assumVal(d, 'ASM-4', 18) / 100;
-  const empRatio = assumVal(d, 'ASM-1', 18000) / 18000;
-  return askCL1 * (1 - discount) * empRatio;
+function matPill(m) {
+  const k = String(m || '').toLowerCase();
+  return '<span class="pill ' + (k === 'high' ? 'warn' : k === 'low' ? 'muted' : 'info') + '">' + esc(m || '—') + '</span>';
 }
 
-/* ---------- 2. PROPOSAL — render fns (each re-invoked on recalc) ---------- */
-function renderLineChart(d) {
-  const lines = d.commercialLines || [];
-  const recurring = lines.filter(l => l.frequency === 'annual');
-  const oneTime = lines.filter(l => l.frequency === 'one-time');
-  const group = (title, rows) => {
-    const max = Math.max.apply(null, rows.map(l => Math.max(l.id === 'CL-1' ? liveAsk(d) : l.supplierAmount, liveTarget(d, l))).concat([1]));
-    return '<div class="eyebrow" style="margin:10px 0 4px">' + esc(title) + '</div>' +
-      rows.map(l => {
-        const ask = l.id === 'CL-1' ? liveAsk(d) : l.supplierAmount;
-        const tgt = liveTarget(d, l);
-        return barRow(esc(l.item) + ' — ask', ask, max, money(ask, { compact: true }), { color: 'pri', title: l.item + ' as drafted' }) +
-          barRow(esc(l.item) + ' — target', tgt, max, money(tgt, { compact: true }), { color: 'teal', title: l.item + ' target position' });
-      }).join('<div style="height:6px"></div>');
-  };
-  return group('Recurring (annual)', recurring) + group('One-time (services)', oneTime);
+/* ---------- 1. 3A, DEAL TABLE & ZOPA ------------------------------------- */
+// In-row bar: domain [target .. ask] (ask is always the max of the four for
+// every line). Teal band = ZOPA (target -> max-acceptable); plum mark = supplier
+// ask (sits above the zone); dotted tick = fallback.
+function zopaBar(l) {
+  const lo = l.target, hi = l.supplierAmount, span = (hi - lo) || 1;
+  const pos = v => clampp((v - lo) / span * 100, 0, 100);
+  const maxPct = pos(l.maximumAcceptable), fbPct = pos(l.fallback);
+  return '<div class="zbar" title="ZOPA ' + M(lo) + '–' + M(l.maximumAcceptable) +
+    '; fallback ' + M(l.fallback) + '; supplier ask ' + M(hi) + '">' +
+    '<span class="z-band" style="left:0;width:' + maxPct.toFixed(1) + '%"></span>' +
+    '<span class="z-fb" style="left:' + fbPct.toFixed(1) + '%"></span>' +
+    '<span class="z-mark z-ask"></span></div>';
 }
-function renderLineItemsTable(d) {
+// benchmark -> line mapping (BENCH-int is the platform $/emp figure = CL-1;
+// BENCH-svc is the implementation day-rate = CL-2). No line link in the data.
+function benchForLine(d, id) {
+  const map = { 'CL-1': 'BENCH-int', 'CL-2': 'BENCH-svc' };
+  const bid = map[id];
+  return bid ? (d.benchmarks || []).find(b => b.id === bid) : null;
+}
+function benchChip(d, id) {
+  const b = benchForLine(d, id);
+  return b ? '<span class="jump" data-jump="el:' + esc(b.id) + '" title="' + esc(b.item) + '">' + esc(b.comparability) + '</span>'
+           : '<span class="tiny muted">—</span>';
+}
+function renderDealTable(d) {
   const cols = [
     { key: 'item', label: 'Line item', render: r => '<strong>' + esc(r.item) + '</strong><div class="tiny muted">' + esc(r.unit) + ' · ' + esc(r.frequency) + '</div>' },
-    { key: 'ask', label: 'Ask (Y1)', align: 'num', sortVal: r => (r.id === 'CL-1' ? liveAsk(d) : r.supplierAmount),
-      render: r => '<span id="li-ask-' + esc(r.id) + '">' + money(r.id === 'CL-1' ? liveAsk(d) : r.supplierAmount, { compact: true }) + '</span>' },
-    { key: 'target', label: 'Target', align: 'num', sortVal: r => liveTarget(d, r),
-      render: r => '<span id="li-target-' + esc(r.id) + '">' + money(liveTarget(d, r), { compact: true }) + '</span>' },
-    { key: 'fallback', label: 'Fallback', align: 'num', sortVal: r => r.fallback, render: r => money(r.fallback, { compact: true }) },
-    { key: 'maximumAcceptable', label: 'Max acceptable', align: 'num', sortVal: r => r.maximumAcceptable, render: r => money(r.maximumAcceptable, { compact: true }) },
-    { key: 'negotiability', label: 'Negotiability', render: r => negPill(r.negotiability) },
-    { key: 'evidenceType', label: 'Evidence', render: r => evidenceChip(r.evidenceType, { sources: r.sourceIds, short: true }) }
+    { key: 'ask', label: 'Ask (Y1)', align: 'num', sortVal: r => r.supplierAmount, render: r => M(r.supplierAmount) },
+    { key: 'target', label: 'Target', align: 'num', sortVal: r => r.target, render: r => M(r.target) },
+    { key: 'fallback', label: 'Fallback', align: 'num', sortVal: r => r.fallback, render: r => M(r.fallback) },
+    { key: 'max', label: 'Max', align: 'num', sortVal: r => r.maximumAcceptable, render: r => M(r.maximumAcceptable) },
+    { key: 'zopa', label: 'Ask vs target · ZOPA', sort: false, render: r => zopaBar(r) },
+    { key: 'bench', label: 'Bench', sort: false, render: r => benchChip(d, r.id) },
+    { key: 'negotiability', label: 'Neg.', render: r => negPill(r.negotiability) }
   ];
   return dataTable(cols, d.commercialLines || [], {
-    id: 'cml-lineitems-tbl', zebra: true, dense: true,
-    expand: r => '<div class="kv"><dt>Quantity</dt><dd>' + esc(r.quantity) + ' ' + esc(r.unit) + '</dd>' +
-      '<dt>Sources</dt><dd>' + evidenceChip(r.evidenceType, { sources: r.sourceIds }) + '</dd></div>'
+    id: 'cml-deal-table', zebra: true, dense: true,
+    expand: r => '<div class="kv">' +
+      '<dt>Quantity</dt><dd>' + esc(r.quantity) + ' ' + esc(r.unit) + '</dd>' +
+      '<dt>ZOPA (target ↔ max)</dt><dd class="mono">' + M(r.target) + ' ↔ ' + M(r.maximumAcceptable) + '</dd>' +
+      '<dt>Ask premium over max</dt><dd class="mono">' + M(r.supplierAmount - r.maximumAcceptable) + '</dd>' +
+      '<dt>Evidence</dt><dd>' + evidenceChip(r.evidenceType, { sources: r.sourceIds }) +
+        ' <span class="tiny muted">ask is a contract figure; target / fallback / max are calculated positions</span></dd></div>'
   });
 }
-function renderCashFlow(d) {
-  const ask = (d.scenarios || []).find(s => s.id === 'SC-ask') || {};
-  const years = yearlyCashFlow(d, ask);
-  const max = Math.max.apply(null, years.concat([1]));
-  return years.map((v, i) => barRow('Year ' + (i + 1), v, max, money(v, { compact: true }), { color: 'pri', title: 'Modeled Year ' + (i + 1) + ' cash, supplier-ask basis' })).join('');
+const ZOPA_LEGEND =
+  '<div class="legend" style="margin-top:10px">' +
+    '<span><i style="background:var(--teal-t);border:1px solid var(--teal-d)"></i>ZOPA (target → max-acceptable)</span>' +
+    '<span><i style="background:var(--plum)"></i>Supplier ask</span>' +
+    '<span><i style="width:2px;border-left:2px dotted var(--mut2);background:transparent"></i>Fallback</span>' +
+  '</div>';
+function renderDealTotals(d) {
+  const lines = d.commercialLines || [];
+  const askY1 = sumF(lines, l => l.supplierAmount), tgtY1 = sumF(lines, l => l.target), maxY1 = sumF(lines, l => l.maximumAcceptable);
+  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {}).total;
+  const askT = sc('SC-ask'), tgtT = sc('SC-target'), maxT = sc('SC-max');
+  const col = (lbl, val) => '<div class="dt-col"><div class="k-lbl">' + lbl + '</div><div class="dt-vals">' + val + '</div></div>';
+  return '<div class="deal-totals">' +
+    col('Year-1 all-in', 'Ask <b>' + M(askY1) + '</b> · Target <b>' + M(tgtY1) + '</b> · Max <b>' + M(maxY1) + '</b>') +
+    col('3-yr TCV (initial term)', 'Ask <b>' + M(askT) + '</b> · Target <b>' + M(tgtT) + '</b> · Max <b>' + M(maxT) + '</b>') +
+    col('Total-deal ZOPA (3-yr)', '<b>' + M(tgtT) + ' ↔ ' + M(maxT) + '</b> ' + evidenceChip('calculated', { short: true })) +
+  '</div>' +
+  insight('The supplier ask (' + M(askT) + ' over the term) sits <strong>above</strong> the walk-away max (' + M(maxT) +
+    '); any settlement inside ' + M(tgtT) + '–' + M(maxT) + ' is within the zone, with <strong>' + M(tgtT) +
+    '</strong> the defensible target. Year-1 line totals reconcile to the scenario Year-1 figures.');
+}
+function renderDiscountArchitecture(d) {
+  const lines = d.commercialLines || [];
+  const disc = l => (l.supplierAmount - l.target);
+  const platform = lines.filter(l => l.id === 'CL-1'), services = lines.filter(l => l.id !== 'CL-1');
+  const platDisc = sumF(platform, disc), svcDisc = sumF(services, disc);
+  const platAsk = sumF(platform, l => l.supplierAmount), svcAsk = sumF(services, l => l.supplierAmount);
+  const platPct = platAsk ? Math.round(platDisc / platAsk * 100) : 0;
+  const svcPct = svcAsk ? Math.round(svcDisc / svcAsk * 100) : 0;
+  const maxD = Math.max(platDisc, svcDisc, 1);
+  const perLine = lines.map(l => {
+    const dd = disc(l), p = l.supplierAmount ? Math.round(dd / l.supplierAmount * 100) : 0;
+    return '<div class="disc-line"><span>' + esc(l.item) + '</span><span class="mono">' + M(dd) + ' · ' + p + '%</span></div>';
+  }).join('');
+  return saCard('Discount Architecture',
+    barRow('Platform (defensible)', platDisc, maxD, M(platDisc) + ' · ~' + platPct + '%', { color: 'pri', title: 'Platform line discount to internal precedent' }) +
+    barRow('Services & support (loaded)', svcDisc, maxD, M(svcDisc) + ' · ~' + svcPct + '%', { color: 'emph', title: 'Implementation, support, connectors, training' }) +
+    '<div style="margin-top:10px">' + perLine + '</div>' +
+    insight('Platform value is benchmark-defensible (~' + platPct + '% to the 2024 internal precedent); implementation, support and connectors are day-rate / loaded lines carrying the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
+    { accent: 'plum', icon: 'money', sub: evidenceChip('calculated', { short: true }) });
+}
+function renderRenewalBand(d) {
+  const iss = ['ISS-04', 'ISS-11'].map(id => findIssue(d, id)).filter(Boolean);
+  const rows = iss.map(i =>
+    '<div class="rn-item"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+      severityPill(i.priority) + '<strong style="flex:1 1 200px;min-width:0">' + esc(i.title) + '</strong>' +
+      evidenceChip(i.evidenceType, { sources: i.sourceIds, short: true }) + '</div>' +
+    '<dl class="kv" style="margin-top:6px">' +
+      '<dt>As drafted</dt><dd>' + esc(i.supplierPosition) + '</dd>' +
+      '<dt>Protection ask</dt><dd>' + esc(i.recommendedPosition) + ' ' + jumpLink('Terms →', 'tab:contract/sub:legal') + '</dd>' +
+    '</dl></div>').join('<div class="divider"></div>');
+  return saCard('Renewal & Price Protection', rows +
+    insight('Auto-renewal (ISS-04) and the uncapped post-term uplift (ISS-11) compound: a missed 90-day window locks another year at an unbounded increase. A rate lock / CPI cap is the single highest-value commercial protection after the platform discount.', 'warn'),
+    { accent: 'emph', icon: 'clock' });
+}
+function renderBenchmarks(d) {
+  const bs = d.benchmarks || [];
+  if (!bs.length) {
+    return gapCard('No comparable benchmark in this session', 'No internal precedent or credible external comparison was available at generation time; no fabricated market percentiles are shown. ' + jumpLink('Gaps →', 'tab:brief'));
+  }
+  const cards = bs.map(b => '<div class="col-4">' + saCard(b.item,
+    '<div class="bm-val mono">' + esc(b.comparisonValue) + '</div>' +
+    '<div style="margin-top:9px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">' + compPill(b.comparability) + evidenceChip(b.evidenceType, { sources: [b.sourceId] }) + '</div>' +
+    collapsible('Methodology & caveat', '<p style="margin:0">' + esc(b.explanation) + '</p>'),
+    { accent: 'teal', icon: 'bench', id: b.id }) + '</div>').join('');
+  return '<div class="grid">' + cards + '</div>' +
+    '<div style="margin-top:12px">' + insight('Benchmark coverage rests on one internal precedent plus a weak-comparability public figure; real comps only. A prior Visier quote or a competing bid (' + jumpLink('GAP-4', 'tab:brief') + ') would firm the platform-pricing target; until then it stays RESEARCH-PENDING.', 'warn') + '</div>';
 }
 
-/* ---------- 3. SCENARIOS — render fns (each re-invoked on recalc) -------- */
-function renderWaterfall(d) {
-  const scs = liveScenarios(d);
-  const order = [
-    ['SC-ask', 'total'], ['SC-max', 'down'], ['SC-fallback', 'down'], ['SC-target', 'final']
+/* ---------- 2. 3B, PRO-FORMA (precomputed; WACC slider = the live math) --- */
+function renderTcoKpis(d) {
+  const pf = d.proforma || {}, t = pf.tcoSummary || {}, be = pf.breakEven || {};
+  const wacc = assumVal(d, 'ASM-5', 6);
+  const livePv = npv((pf.plByYear || []).map(y => y.cost), wacc);
+  const kpi = (lbl, val, note) => '<div class="kpi"><div class="k-lbl">' + lbl + '</div><div class="k-val">' + val + '</div>' + (note ? '<div class="tiny muted">' + note + '</div>' : '') + '</div>';
+  return '<div class="kpi-row">' +
+    kpi('Year-1 TCO', M(t.y1), 'target scenario') +
+    kpi('3-yr TCV', M(t.term), 'target · initial term') +
+    kpi('PV of 3-yr cost @ WACC', '<span id="cml-pvcost-live">' + M(livePv) + '</span>', 'discounted at ' + wacc + '%') +
+    kpi('Payback', (pf.paybackMonths != null ? pf.paybackMonths : '—') + ' mo', 'undiscounted, vs value case') +
+    kpi('NPV break-even', (be.rate != null ? be.rate : '—') + '%', 'rate where value case = 0') +
+  '</div>' +
+  insight('Cost figures are the negotiated target scenario and reconcile to the 3-year TCV. The value case (P&L revenue) is a modelled business-case assumption, clearly labelled, not a booked figure.');
+}
+function renderPL(d) {
+  const rows = (d.proforma || {}).plByYear || [];
+  const cols = [
+    { key: 'year', label: 'Year' },
+    { key: 'revenue', label: 'Value case', align: 'num', render: r => M(r.revenue) },
+    { key: 'cost', label: 'Cost', align: 'num', render: r => M(r.cost) },
+    { key: 'net', label: 'Net', align: 'num', render: r => '<span class="' + (r.net < 0 ? 'st-deviation' : 'st-aligned') + '">' + M(r.net) + '</span>' }
   ];
-  const steps = order.map(([id, kind]) => {
-    const s = scs.find(x => x.id === id) || { name: id, liveTotal: 0 };
-    return { label: s.name, value: s.liveTotal, kind, display: money(s.liveTotal, { compact: true }) };
+  return dataTable(cols, rows, { id: 'cml-pl', dense: true });
+}
+function renderCashflow(d) {
+  const rows = (d.proforma || {}).cashflowByYear || [];
+  const cols = [
+    { key: 'year', label: 'Year' },
+    { key: 'in', label: 'Value in', align: 'num', render: r => M(r.in) },
+    { key: 'out', label: 'Cash out', align: 'num', render: r => M(r.out) },
+    { key: 'net', label: 'Net', align: 'num', render: r => '<span class="' + (r.net < 0 ? 'st-deviation' : 'st-aligned') + '">' + M(r.net) + '</span>' },
+    { key: 'cum', label: 'Cumulative', align: 'num', render: r => '<span class="' + (r.cum < 0 ? 'st-deviation' : 'st-aligned') + '">' + M(r.cum) + '</span>' }
+  ];
+  return dataTable(cols, rows, { id: 'cml-cf', dense: true });
+}
+function renderWaccControl(d) {
+  const a = (d.assumptions || []).find(x => x.id === 'ASM-5');
+  const band = ((d.proforma || {}).wacc || {}).band || {};
+  const wacc = a ? a.value : 6;
+  const liveNpv = npv(((d.proforma || {}).cashflowByYear || []).map(y => y.net), wacc);
+  const inBand = wacc >= band.target && wacc <= band.ceiling;
+  const bandTxt = inBand ? 'Within governance band' : 'Outside governance band (' + band.target + '–' + band.ceiling + '%)';
+  return (a ? assumptionSlider(a) : gapCard('No WACC assumption', 'ASM-5 discount rate not present in this session.')) +
+    '<dl class="kv" style="margin-top:10px">' +
+      '<dt>Governance band</dt><dd>' + band.target + '%–' + band.ceiling + '% (finance-set) ' +
+        '<span class="pill ' + (inBand ? 'ok' : 'warn') + '" id="cml-wacc-band-status">' + bandTxt + '</span></dd>' +
+      '<dt>NPV of value case @ WACC</dt><dd class="mono"><span id="cml-npv-live">' + M(liveNpv) + '</span> ' + evidenceChip('calculated', { short: true }) + '</dd>' +
+    '</dl>' +
+    '<div class="btn-row"><button class="btn" data-reset-assumptions>' + icon('reset') + 'Reset to governed rate</button></div>' +
+    insight('Moving the WACC re-discounts the modelled net cash flows live; it is the only live calculation on this tab. Outside the ' + band.target + '–' + band.ceiling + '% finance band the NPV read is indicative only; confirm the governed rate with finance.');
+}
+// SVG NPV-vs-rate curve. Re-rendered on WACC change to move the live marker.
+function renderNpvCurve(d, wacc) {
+  const pf = d.proforma || {};
+  const curve = (pf.npvCurve || []).slice().sort((a, b) => a.rate - b.rate);
+  if (!curve.length) return gapCard('No NPV curve', 'NPV-vs-rate data not available in this session.');
+  const be = pf.breakEven || {}, band = (pf.wacc || {}).band || {};
+  const xMax = Math.max.apply(null, curve.map(p => p.rate).concat([be.rate || 0, 12]));
+  const yMax = Math.max.apply(null, curve.map(p => p.npv).concat([1]));
+  const W = 340, H = 172, padL = 46, padR = 14, padT = 14, padB = 30, pw = W - padL - padR, ph = H - padT - padB;
+  const X = r => padL + (r / xMax) * pw, Y = v => padT + (1 - v / yMax) * ph;
+  const line = curve.map(p => X(p.rate).toFixed(1) + ',' + Y(p.npv).toFixed(1)).join(' ');
+  const area = X(curve[0].rate).toFixed(1) + ',' + Y(0).toFixed(1) + ' ' + line + ' ' + X(curve[curve.length - 1].rate).toFixed(1) + ',' + Y(0).toFixed(1);
+  const wx = X(clampp(wacc, 0, xMax));
+  const wnpv = npv((pf.cashflowByYear || []).map(y => y.net), wacc);
+  const wy = Y(clampp(wnpv, 0, yMax));
+  const bandRect = (band.target != null && band.ceiling != null)
+    ? '<rect x="' + X(band.target).toFixed(1) + '" y="' + padT + '" width="' + (X(band.ceiling) - X(band.target)).toFixed(1) + '" height="' + ph + '" fill="var(--emph-t)" opacity="0.5"></rect>' : '';
+  const beMark = (be.rate != null)
+    ? '<line x1="' + X(be.rate).toFixed(1) + '" y1="' + padT + '" x2="' + X(be.rate).toFixed(1) + '" y2="' + (padT + ph) + '" stroke="var(--danger-bar)" stroke-width="1.5" stroke-dasharray="2 2"></line>' +
+      '<text x="' + X(be.rate).toFixed(1) + '" y="' + (padT - 3) + '" text-anchor="end" font-size="9" fill="var(--danger)">break-even ' + be.rate + '%</text>' : '';
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" class="npv-svg" role="img" aria-label="NPV of the value case versus discount rate">' +
+    '<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + ph) + '" stroke="var(--line2)"></line>' +
+    '<line x1="' + padL + '" y1="' + (padT + ph) + '" x2="' + (padL + pw) + '" y2="' + (padT + ph) + '" stroke="var(--line2)"></line>' +
+    '<text x="' + (padL - 5) + '" y="' + (Y(yMax) + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--mut)">' + M(yMax) + '</text>' +
+    '<text x="' + (padL - 5) + '" y="' + Y(0).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--mut)">$0</text>' +
+    bandRect +
+    '<polygon points="' + area + '" fill="var(--teal-t)" opacity="0.55"></polygon>' +
+    '<polyline points="' + line + '" fill="none" stroke="var(--teal-d)" stroke-width="2"></polyline>' +
+    beMark +
+    '<line x1="' + wx.toFixed(1) + '" y1="' + padT + '" x2="' + wx.toFixed(1) + '" y2="' + (padT + ph) + '" stroke="var(--emph)" stroke-width="1.5" stroke-dasharray="3 2"></line>' +
+    '<circle cx="' + wx.toFixed(1) + '" cy="' + wy.toFixed(1) + '" r="3.5" fill="var(--emph)" stroke="var(--surface)" stroke-width="1.5"></circle>' +
+    '<text x="' + clampp(wx, padL + 2, padL + pw - 78).toFixed(1) + '" y="' + (padT + 10) + '" font-size="9" fill="var(--emph-tx)" font-weight="700">WACC ' + wacc + '% · ' + M(wnpv) + '</text>' +
+    '<text x="' + padL + '" y="' + (H - 8) + '" text-anchor="start" font-size="9" fill="var(--mut)">0%</text>' +
+    '<text x="' + (padL + pw).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="end" font-size="9" fill="var(--mut)">' + xMax + '%</text>' +
+    '<text x="' + (padL + pw / 2).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="9" fill="var(--mut)">discount rate →</text>' +
+  '</svg>';
+}
+function renderSavingsWaterfall(d) {
+  const sw = (d.proforma || {}).savingsWaterfall || [];
+  if (!sw.length) return saCard('Savings Waterfall vs Supplier Ask', gapCard('No savings waterfall', 'Baseline-to-target reconciliation not available.'), { accent: 'teal', icon: 'trade' });
+  const steps = sw.map(s => {
+    if (s.kind === 'baseline') return { label: s.label, value: s.delta, kind: 'total', display: M(s.delta) };
+    if (s.kind === 'net') return { label: s.label, value: s.delta, kind: 'final', display: M(s.delta) };
+    return { label: s.label, value: Math.abs(s.delta), kind: 'down', display: (s.delta < 0 ? '−' : '+') + M(Math.abs(s.delta)) };
   });
-  return waterfall(steps, {});
+  const ask = sw.find(s => s.kind === 'baseline') || { delta: 0 }, net = sw.find(s => s.kind === 'net') || { delta: 0 };
+  const saved = ask.delta - net.delta, pctOff = ask.delta ? Math.round(saved / ask.delta * 100) : 0;
+  return saCard('Savings Waterfall vs Supplier Ask',
+    waterfall(steps, {}) +
+    insight('The two anchor bars are the supplier ask (' + M(ask.delta) + ') and the negotiated target (' + M(net.delta) + '); the bars between are the negotiated reductions, sized by magnitude. Total removed: <strong>' + M(saved) + '</strong> (' + pctOff + '% off the ask) across the 3-year term.'),
+    { accent: 'teal', icon: 'trade', sub: evidenceChip('calculated', { short: true }) });
 }
-function renderTornado(d) {
-  const target = (d.scenarios || []).find(s => s.id === 'SC-target');
-  if (!target) return '';
-  const rows = (d.assumptions || []).map(a => {
-    const lo = scenarioModel(d, target, { [a.id]: a.min }).total;
-    const hi = scenarioModel(d, target, { [a.id]: a.max }).total;
-    return { a, lo: Math.min(lo, hi), hi: Math.max(lo, hi), swing: Math.abs(hi - lo) };
-  }).sort((x, y) => y.swing - x.swing);
-  const max = Math.max.apply(null, rows.map(r => r.swing).concat([1]));
-  return rows.map(r => barRow(
-    esc(r.a.label), r.swing, max, money(r.swing, { compact: true }),
-    { color: 'emph', title: 'Range if set to min/max: ' + money(r.lo, { compact: true }) + ' – ' + money(r.hi, { compact: true }) + ' · materiality: ' + r.a.materiality }
-  )).join('');
+function renderTeardown(d) {
+  const rows = (d.proforma || {}).teardown || [];
+  const cols = [
+    { key: 'line', label: 'Cost line', render: r => '<strong>' + esc(r.line) + '</strong>' },
+    { key: 'driver', label: 'Driver', render: r => '<span class="tiny">' + esc(r.driver) + '</span>' },
+    { key: 'amount', label: 'Amount (Y1)', align: 'num', render: r => M(r.amount) },
+    { key: 'ev', label: 'Ev.', render: r => evidenceChip(r.evidenceType, { short: true }) }
+  ];
+  const total = sumF(rows, r => r.amount);
+  return dataTable(cols, rows, { id: 'cml-teardown', dense: true }) +
+    insight('Year-1 target cost decomposition; sums to <strong>' + M(total) + '</strong> (the Year-1 target all-in). Hidden-cost multipliers are deliberately not fabricated.');
 }
-function patchScenarioTable(d) {
-  liveScenarios(d).forEach(s => {
-    const y1 = document.getElementById('sc-y1-' + s.id);
-    if (y1) { y1.textContent = money(s.liveY1, { compact: true }); const td = y1.closest('td'); if (td) td.setAttribute('data-sv', String(s.liveY1)); }
-    const tot = document.getElementById('sc-tot-' + s.id);
-    if (tot) { tot.textContent = money(s.liveTotal, { compact: true }); const td = tot.closest('td'); if (td) td.setAttribute('data-sv', String(s.liveTotal)); }
-  });
-}
-function patchLineTable(d) {
-  (d.commercialLines || []).forEach(l => {
-    const ask = document.getElementById('li-ask-' + l.id);
-    if (ask) { const v = l.id === 'CL-1' ? liveAsk(d) : l.supplierAmount; ask.textContent = money(v, { compact: true }); const td = ask.closest('td'); if (td) td.setAttribute('data-sv', String(v)); }
-    const tgt = document.getElementById('li-target-' + l.id);
-    if (tgt) { const v = liveTarget(d, l); tgt.textContent = money(v, { compact: true }); const td = tgt.closest('td'); if (td) td.setAttribute('data-sv', String(v)); }
-  });
-}
-function patchMisc(d) {
-  const scs = liveScenarios(d);
-  const ask = scs.find(s => s.id === 'SC-ask'), tgt = scs.find(s => s.id === 'SC-target');
-  const gap = document.getElementById('cml-tcv-gap');
-  if (gap && ask && tgt) gap.textContent = money(tgt.liveTotal - ask.liveTotal, { compact: true }) + ' vs. ask';
-  const term = document.getElementById('cml-term-mirror');
-  if (term) term.textContent = assumVal(d, 'ASM-2', 3) + ' yrs';
-  const up = document.getElementById('cml-uplift-mirror');
-  if (up) up.textContent = assumVal(d, 'ASM-3', 4) + '%';
-  const npvEl = document.getElementById('cml-npv-target');
-  if (npvEl && tgt) {
-    const years = yearlyCashFlow(d, (d.scenarios || []).find(s => s.id === 'SC-target'));
-    npvEl.textContent = money(npv(years, assumVal(d, 'ASM-5', 6)), { compact: true });
-  }
+function renderAssumptionsRegister(d) {
+  const cols = [
+    { key: 'label', label: 'Assumption', render: r => '<strong>' + esc(r.label) + '</strong><div class="tiny muted">used in: ' + esc((r.usedIn || []).join(', ')) + '</div>' },
+    { key: 'value', label: 'Value', align: 'num', render: r => '<span class="mono">' + esc(r.unit === '%' ? r.value + '%' : r.value.toLocaleString('en-US') + (r.unit ? ' ' + r.unit : '')) + '</span>' },
+    { key: 'materiality', label: 'Materiality', render: r => matPill(r.materiality) },
+    { key: 'confidence', label: 'Confidence', render: r => confPill(r.confidence) },
+    { key: 'evidenceType', label: 'Evidence', render: r => evidenceChip(r.evidenceType || r.classification, { short: true }) }
+  ];
+  return dataTable(cols, d.assumptions || [], {
+    id: 'cml-asm-register', dense: true, zebra: true,
+    expand: r => {
+      const log = (r.researchLog || []).map(l => '<div class="rl-item"><span class="mono tiny">' + esc(l.date) + '</span> ' + esc(l.note) + ' ' + (l.sourceId ? evidenceChip('internal', { sources: [l.sourceId], short: true }) : '') + '</div>').join('') || '<span class="tiny muted">No research log.</span>';
+      return '<div class="kv">' +
+        '<dt>Range</dt><dd class="mono">' + esc(r.min) + '–' + esc(r.max) + ' ' + esc(r.unit || '') + ' (step ' + esc(r.step) + ')</dd>' +
+        '<dt>Research log</dt><dd style="flex-direction:column;align-items:flex-start;gap:4px">' + log + '</dd></div>';
+    }
+  }) +
+  insight('Register is read-only here; only the WACC (ASM-5) is interactive, via the discount control above. Editing it re-discounts the NPV live.');
 }
 
-/* ---------- 4. BENCHMARKS — numeric extraction from grounded strings ----- */
-// Only the 3 real comparisons in d.benchmarks are used; numbers are parsed
-// from the model's own comparisonValue / issue text, never invented.
-function benchNumbers(bench, d) {
-  if (bench.id === 'BENCH-int') {
-    const nums = (bench.comparisonValue.match(/[\d.]+/g) || []).map(Number);
-    return { ours: nums[0], compare: nums[1], oursLabel: 'This ask', compareLabel: 'Internal precedent', fmt: v => '$' + v };
-  }
-  if (bench.id === 'BENCH-svc') {
-    const oursM = bench.comparisonValue.match(/\$([\d,]+)\/day/);
-    const rangeM = bench.comparisonValue.match(/\$([\d,]+)[–-]([\d,]+)/);
-    const ours = oursM ? parseFloat(oursM[1].replace(/,/g, '')) : null;
-    const lo = rangeM ? parseFloat(rangeM[1].replace(/,/g, '')) : null;
-    const hi = rangeM ? parseFloat(rangeM[2].replace(/,/g, '')) : null;
-    const compare = (lo != null && hi != null) ? (lo + hi) / 2 : null;
-    return { ours, compare, oursLabel: 'This SOW ($/day)', compareLabel: 'Internal norm (' + (lo != null ? '$' + lo.toLocaleString() + '–$' + hi.toLocaleString() : 'range') + ')', fmt: v => '$' + Math.round(v).toLocaleString() };
-  }
-  if (bench.id === 'BENCH-pub') {
-    const iss = findIssue(d, 'ISS-04');
-    const oursM = iss && iss.supplierPosition ? iss.supplierPosition.match(/(\d+)\s*days/i) : null;
-    const ours = oursM ? parseFloat(oursM[1]) : null;
-    const nums = (bench.comparisonValue.match(/\d+/g) || []).map(Number);
-    const compare = nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length) : null;
-    return { ours, compare, oursLabel: 'Our draft (notice days)', compareLabel: 'Market typical (' + bench.comparisonValue + ')', fmt: v => Math.round(v) + 'd' };
-  }
-  return { ours: null, compare: null, fmt: v => String(v) };
+/* ---------- 3. 3C, SCENARIOS & SENSITIVITY (all precomputed / static) ---- */
+function renderScenarioWaterfall(d) {
+  const scs = d.scenarios || [];
+  const order = [['SC-ask', 'total'], ['SC-max', 'down'], ['SC-fallback', 'down'], ['SC-target', 'final']];
+  const steps = order.map(o => {
+    const s = scs.find(x => x.id === o[0]) || { name: o[0], total: 0 };
+    return { label: s.name, value: s.total, kind: o[1], display: M(s.total) };
+  });
+  return waterfall(steps, {}) +
+    insight('Each bar is the full 3-year TCV if Lilly holds that position, precomputed from the scenario set. Target is the negotiated goal; max-acceptable is the walk-away (budget ceiling unconfirmed: ' + jumpLink('GAP-3', 'tab:brief') + ').');
 }
-function renderBenchmarkCard(bench, d) {
-  const n = benchNumbers(bench, d);
-  const max = Math.max(n.ours || 0, n.compare || 0, 1) * 1.15;
-  const chart = (n.ours != null && n.compare != null)
-    ? barRow(n.oursLabel, n.ours, max, n.fmt(n.ours), { color: 'pri' }) + barRow(n.compareLabel, n.compare, max, n.fmt(n.compare), { color: 'teal' })
-    : gapCard('Not directly comparable', 'This benchmark is context only — no like-for-like figure to bar-chart.');
-  return saCard(bench.item, chart +
-    '<div style="margin-top:9px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">' +
-      compPill(bench.comparability) + evidenceChip(bench.evidenceType, { sources: [bench.sourceId] }) +
-    '</div>' +
-    collapsible('Methodology & caveat', '<p style="margin:0">' + esc(bench.explanation) + '</p>'),
-    { accent: 'teal', icon: 'bench' }
-  );
+function renderScenarioTable(d) {
+  const cols = [
+    { key: 'name', label: 'Scenario', render: r => '<strong>' + esc(r.name) + '</strong><div class="tiny muted">' + esc(r.basis) + '</div>' },
+    { key: 'y1Total', label: 'Year-1', align: 'num', sortVal: r => r.y1Total, render: r => M(r.y1Total) },
+    { key: 'total', label: '3-yr TCV', align: 'num', sortVal: r => r.total, render: r => M(r.total) },
+    { key: 'evidenceType', label: 'Ev.', render: r => evidenceChip(r.evidenceType, { short: true }) }
+  ];
+  return dataTable(cols, d.scenarios || [], { id: 'cml-scenario-tbl', zebra: true, dense: true, expand: r => insight(r.interpretation) });
+}
+// Precomputed static tornado from proforma.sensitivity (NOT a live recompute).
+function renderTornado(d) {
+  const rows = ((d.proforma || {}).sensitivity || []).slice();
+  if (!rows.length) return gapCard('No sensitivity data', 'Precomputed sensitivity not available in this session.');
+  rows.forEach(r => { r._swing = Math.abs((r.high || 0) - (r.low || 0)); });
+  rows.sort((a, b) => b._swing - a._swing);
+  const dMin = Math.min.apply(null, rows.map(r => r.low));
+  const dMax = Math.max.apply(null, rows.map(r => r.high));
+  const span = (dMax - dMin) || 1;
+  const base = rows[0].base;
+  const basePct = (base - dMin) / span * 100;
+  const body = rows.map(r => {
+    const loPct = (r.low - dMin) / span * 100, hiPct = (r.high - dMin) / span * 100;
+    return '<div class="tor-row"><div class="tor-lbl">' + esc(r.driver) + '<div class="tiny muted mono">' + M(r.low) + ' – ' + M(r.high) + '</div></div>' +
+      '<div class="tor-track"><span class="tor-base" style="left:' + basePct.toFixed(1) + '%"></span>' +
+      '<span class="tor-bar tor-lo" style="left:' + loPct.toFixed(1) + '%;width:' + (basePct - loPct).toFixed(1) + '%"></span>' +
+      '<span class="tor-bar tor-hi" style="left:' + basePct.toFixed(1) + '%;width:' + (hiPct - basePct).toFixed(1) + '%"></span></div></div>';
+  }).join('');
+  return '<div class="tornado">' + body + '</div>' +
+    '<div class="tiny muted" style="margin-top:8px">Centre line = target 3-yr TCV (' + M(base) + '). Teal = lower cost, orange = higher cost. Precomputed static ranges, not a live recompute.</div>';
+}
+function renderVaR(d) {
+  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {}).total;
+  const sens = re => ((d.proforma || {}).sensitivity || []).find(s => new RegExp(re, 'i').test(s.driver)) || {};
+  const disc = sens('discount'), emp = sens('employee');
+  const rows = [
+    { risk: 'Settle at max-acceptable, not target', exposure: M((sc('SC-max') || 0) - (sc('SC-target') || 0)), linked: 'SC-max · ISS-12', ev: 'assumption' },
+    { risk: 'Platform discount not fully achieved', exposure: disc.high != null ? M(disc.high - disc.base) : '—', linked: 'ASM-4 · ISS-12', ev: 'calculated' },
+    { risk: 'Employee count above the 18,000 plan', exposure: emp.high != null ? M(emp.high - emp.base) : '—', linked: 'ASM-1', ev: 'assumption' },
+    { risk: 'Uncapped post-term uplift + auto-renewal (Y4+)', exposure: 'Unbounded (no cap)', linked: 'ISS-04 · ISS-11', ev: 'inference' },
+    { risk: 'FY27 budget ceiling unconfirmed', exposure: 'Walk-away unvalidated', linked: 'GAP-3', ev: 'unavailable' }
+  ];
+  const cols = [
+    { key: 'risk', label: 'Risk driver', render: r => '<strong>' + esc(r.risk) + '</strong>' },
+    { key: 'exposure', label: 'Term exposure', align: 'num', render: r => '<span class="mono">' + esc(r.exposure) + '</span>' },
+    { key: 'linked', label: 'Linked', render: r => '<span class="tiny mono">' + esc(r.linked) + '</span>' },
+    { key: 'ev', label: 'Ev.', render: r => evidenceChip(r.ev, { short: true }) }
+  ];
+  return dataTable(cols, rows, { id: 'cml-var', dense: true }) +
+    insight('Exposures are independent reads, not additive. The largest controllable risk is settling above target; the largest uncontrolled risk is the uncapped post-term uplift.', 'warn');
+}
+
+/* ---------- 4. live recompute (WACC slider -> NPV) ------------------------ */
+function recompute(d) {
+  const pf = d.proforma || {}, wacc = assumVal(d, 'ASM-5', 6);
+  setText('cml-npv-live', M(npv((pf.cashflowByYear || []).map(y => y.net), wacc)));
+  setText('cml-pvcost-live', M(npv((pf.plByYear || []).map(y => y.cost), wacc)));
+  const band = (pf.wacc || {}).band || {};
+  const bs = document.getElementById('cml-wacc-band-status');
+  if (bs && band.target != null) {
+    const inB = wacc >= band.target && wacc <= band.ceiling;
+    bs.className = 'pill ' + (inB ? 'ok' : 'warn');
+    bs.textContent = inB ? 'Within governance band' : 'Outside governance band (' + band.target + '–' + band.ceiling + '%)';
+  }
+  const cv = document.getElementById('cml-npv-curve');
+  if (cv) cv.innerHTML = renderNpvCurve(d, wacc);
 }
 
 /* ---------- 5. TAB ASSEMBLY ----------------------------------------------- */
 function renderTab_commercials(d) {
-  baseline(d); // lock in generation-time figures before any interaction
+  const wacc0 = assumVal(d, 'ASM-5', 6);
+  const pl = (d.proforma || {}).plByYear || [], cf = (d.proforma || {}).cashflowByYear || [];
+  const tsvRows = ['Year\tValue case\tCost\tNet\tCash in\tCash out\tCumulative'];
+  pl.forEach((p, i) => { const c = cf[i] || {}; tsvRows.push([p.year, p.revenue, p.cost, p.net, c.in, c.out, c.cum].join('\t')); });
+  const tsv = tsvRows.join('\n');
 
-  const scs = liveScenarios(d);
-  const concernIssues = (d.issues || []).filter(i => i.category === 'Commercial' || i.id === 'ISS-04');
-
-  /* ---- PROPOSAL subtab ---- */
-  const proposal =
-    '<div class="tab-intro"><h2>Proposal</h2><p class="q">What Visier is proposing, normalized against Lilly’s internal ' +
-    'negotiating positions — a sample session-snapshot read of DOC-01/02/03.</p></div>' +
+  /* ---- 3A: Deal Table & ZOPA ---- */
+  const deal =
+    '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">One normalized view of every commercial line, supplier ask against Lilly’s target, fallback and walk-away, with the per-line zone of possible agreement. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
-      '<div class="col-7">' + saCard('Ask vs. Target — By Line Item', '<div id="cml-linechart">' + renderLineChart(d) + '</div>' +
-        insight('Ask reflects the Order Form / SOW figure (contract fact); target, fallback and maximum-acceptable are calculated negotiation positions, not contract terms.'),
-        { accent: 'plum', icon: 'money', sub: coverageBadge('Strong') }) + '</div>' +
-      '<div class="col-5">' + saCard('Normalized Line Items', '<div id="cml-lineitems-table">' + renderLineItemsTable(d) + '</div>',
-        { icon: 'doc', sub: '5 lines · ' + esc((d.commercialLines || []).length) + ' rows' }) + '</div>' +
-      '<div class="col-6">' + saCard('Cash Flow by Contract Year', '<div id="cml-cashflow">' + renderCashFlow(d) + '</div>' +
-        insight('Supplier-ask basis; one-time services land in Year 1 only, recurring lines carry the post-term uplift assumption from Year 2 onward.'),
-        { accent: 'teal', icon: 'scenarios' }) + '</div>' +
-      '<div class="col-6">' + saCard('Commercial Terms', (function () {
-        const term = findIssue(d, 'ISS-04'); const uplift = findIssue(d, 'ISS-11');
-        const initTerm = (d.assumptions || []).find(a => a.id === 'ASM-2') || { value: 3, evidenceType: 'contract' };
-        const upliftA = (d.assumptions || []).find(a => a.id === 'ASM-3') || { value: 4, evidenceType: 'assumption' };
-        return '<dl class="kv">' +
-          '<dt>Initial term</dt><dd><span id="cml-term-mirror">' + esc(initTerm.value) + ' yrs</span> ' + evidenceChip(initTerm.evidenceType, { short: true }) + '</dd>' +
-          '<dt>Auto-renewal</dt><dd>' + (term ? severityPill(term.priority) : '') + ' ' + (term ? esc(term.title) : 'n/a') + ' ' + jumpLink('view →', 'tab:contract/sub:terms') + '</dd>' +
-          '<dt>Post-term uplift (model input)</dt><dd><span id="cml-uplift-mirror">' + esc(upliftA.value) + '%</span> ' + evidenceChip(upliftA.evidenceType, { short: true }) + ' <span class="tiny muted">local assumption, used for Y2+ modeling only</span></dd>' +
-          '<dt>Post-term price cap</dt><dd>' + (uplift ? severityPill(uplift.priority) : '') + ' ' + (uplift ? esc(uplift.title) : 'n/a') + ' ' + jumpLink('view →', 'tab:contract/sub:terms') + '</dd>' +
-          '<dt>Payment / invoicing schedule</dt><dd>' + evidenceChip('unavailable') + ' <span class="tiny muted">not specified in this session</span></dd>' +
-        '</dl>';
-      })(), { icon: 'scale' }) + '</div>' +
-      '<div class="col-12">' + saCard('Commercial Concerns Feeding This Analysis', concernIssues.map(i =>
-        '<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 0">' +
-          severityPill(i.priority) + '<strong style="flex:1 1 260px; min-width:0">' + esc(i.title) + '</strong>' +
-          '<span class="tiny muted" style="flex:2 1 320px">' + esc(i.deviation) + '</span>' +
-          evidenceChip(i.evidenceType, { sources: i.sourceIds, short: true }) +
-          jumpLink('Register →', 'tab:contract/sub:terms') +
-        '</div>'
-      ).join('<div class="divider"></div>'), { accent: 'emph', icon: 'flag' }) + '</div>' +
+      '<div class="col-12">' + saCard('Deal Table, Normalized Line Items', renderDealTable(d) + ZOPA_LEGEND + renderDealTotals(d), { accent: 'plum', icon: 'money', sub: (d.commercialLines || []).length + ' lines' }) + '</div>' +
+      '<div class="col-7">' + renderDiscountArchitecture(d) + '</div>' +
+      '<div class="col-5">' + renderRenewalBand(d) + '</div>' +
+    '</div>' +
+    '<div style="margin-top:16px"><div class="eyebrow" style="margin-bottom:8px">Benchmarks, real comparisons only</div>' + renderBenchmarks(d) + '</div>';
+
+  /* ---- 3B: Pro-forma ---- */
+  const proforma =
+    '<div class="tab-intro"><h2>Pro-forma</h2><p class="q">The target-scenario cost model over the initial term, discounted at Lilly’s WACC, what the deal is worth once financed. ' + evidenceChip('calculated', { short: true }) + '</p></div>' +
+    '<div class="grid">' +
+      '<div class="col-12">' + saCard('Total Cost of Ownership', renderTcoKpis(d) + '<div class="btn-row">' + copyBtn('Copy pro-forma (TSV)', null, tsv) + '<button class="btn" data-print>' + icon('print') + 'Print</button></div>', { accent: 'plum', icon: 'scale' }) + '</div>' +
+      '<div class="col-6">' + saCard('P&amp;L by Contract Year', renderPL(d), { accent: 'teal', icon: 'scenarios', sub: 'value case = assumption' }) + '</div>' +
+      '<div class="col-6">' + saCard('Cash Flow by Contract Year', renderCashflow(d), { accent: 'teal', icon: 'money' }) + '</div>' +
+      '<div class="col-6">' + saCard('Discount Control, WACC', renderWaccControl(d), { accent: 'emph', icon: 'assume', sub: 'live NPV' }) + '</div>' +
+      '<div class="col-6">' + saCard('NPV vs Discount Rate', '<div id="cml-npv-curve">' + renderNpvCurve(d, wacc0) + '</div>' + insight('The value-case NPV stays firmly positive across the plausible discount range; it only reaches zero near a ~' + (((d.proforma || {}).breakEven || {}).rate) + '% rate, far above the 5–7% governed WACC, a robust case.'), { accent: 'teal', icon: 'scenarios' }) + '</div>' +
+      '<div class="col-7">' + renderSavingsWaterfall(d) + '</div>' +
+      '<div class="col-5">' + saCard('Cost Teardown (Year-1 target)', renderTeardown(d), { icon: 'doc' }) + '</div>' +
+      '<div class="col-12">' + saCard('Assumptions Register', renderAssumptionsRegister(d), { accent: 'emph', icon: 'assume', sub: (d.assumptions || []).length + ' inputs' }) + '</div>' +
     '</div>';
 
-  /* ---- SCENARIOS subtab ---- */
-  const scenarioTable = dataTable(
-    [
-      { key: 'name', label: 'Scenario', render: r => '<strong>' + esc(r.name) + '</strong><div class="tiny muted">' + esc(r.basis) + '</div>' },
-      { key: 'liveY1', label: 'Year-1', align: 'num', sortVal: r => r.liveY1, render: r => '<span id="sc-y1-' + esc(r.id) + '">' + money(r.liveY1, { compact: true }) + '</span>' },
-      { key: 'liveTotal', label: 'TCV (initial term)', align: 'num', sortVal: r => r.liveTotal, render: r => '<span id="sc-tot-' + esc(r.id) + '">' + money(r.liveTotal, { compact: true }) + '</span>' },
-      { key: 'evidenceType', label: 'Evidence', render: r => evidenceChip(r.evidenceType, { short: true }) }
-    ],
-    scs,
-    { id: 'cml-scenario-tbl', zebra: true, expand: r => insight(r.interpretation) }
-  );
-  const assumptionsHtml = (d.assumptions || []).map(a => assumptionSlider(a)).join('');
+  /* ---- 3C: Scenarios & Sensitivity ---- */
   const scenarios =
-    '<div class="tab-intro"><h2>Scenarios</h2><p class="q">If Lilly holds firm at each position, what is the total contract value over the ' +
-    'initial term — and which assumption moves that number most? <span class="tiny muted">Sliders are local to this snapshot; reset restores the generated figures exactly.</span></p></div>' +
+    '<div class="tab-intro"><h2>Scenarios &amp; Sensitivity</h2><p class="q">The four negotiating positions as full 3-year TCVs, and which drivers move the number most. ' + coverageBadge('Moderate') + '</p></div>' +
     '<div class="grid">' +
-      '<div class="col-7">' + saCard('Ask → Negotiated Value Ladder', '<div id="cml-waterfall">' + renderWaterfall(d) + '</div>' +
-        '<div class="kv" style="margin-top:10px">' +
-          '<dt>Target vs. ask (initial term)</dt><dd><span id="cml-tcv-gap" class="mono">' + money((scs.find(s => s.id === 'SC-target') || {}).liveTotal - (scs.find(s => s.id === 'SC-ask') || {}).liveTotal, { compact: true }) + ' vs. ask</span></dd>' +
-          '<dt>NPV of target (at prepay discount rate)</dt><dd><span id="cml-npv-target" class="mono">' + money(npv(yearlyCashFlow(d, (d.scenarios || []).find(s => s.id === 'SC-target')), assumVal(d, 'ASM-5', 6)), { compact: true }) + '</span> ' + evidenceChip('calculated', { short: true }) + '</dd>' +
-        '</div>',
-        { accent: 'plum', icon: 'scenarios', sub: coverageBadge('Moderate') }) + '</div>' +
-      '<div class="col-5">' + saCard('Scenario Comparison', scenarioTable, { icon: 'target' }) + '</div>' +
-      '<div class="col-6">' + saCard('Assumptions (editable, local)', assumptionsHtml +
-        '<div class="btn-row"><button class="btn" data-reset-assumptions>' + icon('reset') + 'Reset to generated values</button></div>',
-        { icon: 'assume', accent: 'emph' }) + '</div>' +
-      '<div class="col-6">' + saCard('Sensitivity — Swing on the Target TCV', '<div id="cml-tornado">' + renderTornado(d) + '</div>' +
-        insight('Each bar is the target scenario’s total swing when that assumption moves across its full min–max range, others held at current value; sorted by size.'),
-        { icon: 'scale' }) + '</div>' +
+      '<div class="col-7">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d), { accent: 'plum', icon: 'scenarios' }) + '</div>' +
+      '<div class="col-5">' + saCard('Scenario Comparison', renderScenarioTable(d), { icon: 'target' }) + '</div>' +
+      '<div class="col-7">' + saCard('Sensitivity, Swing on 3-yr TCV', renderTornado(d), { accent: 'emph', icon: 'scale' }) + '</div>' +
+      '<div class="col-5">' + saCard('Value at Risk', renderVaR(d), { accent: 'danger', icon: 'flag' }) + '</div>' +
     '</div>';
 
-  /* ---- BENCHMARKS subtab ---- */
-  const benches = d.benchmarks || [];
-  const benchmarks = benches.length
-    ? '<div class="tab-intro"><h2>Benchmarks</h2><p class="q">Only comparisons backed by a real source are shown here — no fabricated ' +
-      'market percentiles or should-cost precision.</p></div>' +
-      '<div class="grid">' + benches.map(b => '<div class="col-4">' + renderBenchmarkCard(b, d) + '</div>').join('') + '</div>' +
-      '<div style="margin-top:14px">' + insight('Benchmark coverage rests on a single internal precedent plus one weak-comparability public figure; a prior Visier quote or competing bid (' + jumpLink('GAP-4', 'tab:sources') + ') would firm the platform-pricing target.', 'warn') + '</div>'
-    : '<div class="tab-intro"><h2>Benchmarks</h2></div>' + gapCard('No comparable benchmark in this session', 'No internal precedent or credible external comparison was available at generation time.');
+  /* ---- scoped styles (only what the base system does not provide) ---- */
+  const scopedStyle = '<style>' +
+    '.commercials-tab .subtab-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:-2px;margin-right:2px}' +
+    '.commercials-tab .zbar{position:relative;height:22px;min-width:130px;background:var(--well);border:1px solid var(--line);border-radius:5px;overflow:hidden}' +
+    '.commercials-tab .zbar .z-band{position:absolute;top:0;bottom:0;background:var(--teal-t);border-right:2px solid var(--teal-d)}' +
+    '.commercials-tab .zbar .z-mark{position:absolute;top:0;bottom:0;width:2px}' +
+    '.commercials-tab .zbar .z-ask{background:var(--plum);right:0}' +
+    '.commercials-tab .zbar .z-fb{position:absolute;top:3px;bottom:3px;border-left:2px dotted var(--mut2)}' +
+    '.commercials-tab .deal-totals{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line2)}' +
+    '.commercials-tab .deal-totals .dt-col{flex:1 1 180px;min-width:160px}' +
+    '.commercials-tab .deal-totals .k-lbl{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;margin-bottom:3px}' +
+    '.commercials-tab .deal-totals .dt-vals{font-size:var(--fz-sm);color:var(--ink2)}' +
+    '.commercials-tab .deal-totals .dt-vals b{font-variant-numeric:tabular-nums;color:var(--ink)}' +
+    '.commercials-tab .kpi-row{display:flex;gap:12px;flex-wrap:wrap}' +
+    '.commercials-tab .kpi{flex:1 1 140px;min-width:130px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px}' +
+    '.commercials-tab .kpi .k-lbl{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700}' +
+    '.commercials-tab .kpi .k-val{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:3px;color:var(--ink)}' +
+    '.commercials-tab .disc-line{display:flex;justify-content:space-between;gap:10px;font-size:var(--fz-sm);padding:5px 0;border-top:1px solid var(--line)}' +
+    '.commercials-tab .disc-line:first-child{border-top:0}' +
+    '.commercials-tab .rn-item .kv{margin-top:6px}' +
+    '.commercials-tab .bm-val{font-size:var(--fz);font-weight:700;color:var(--ink)}' +
+    '.commercials-tab .rl-item{font-size:var(--fz-sm);line-height:1.45}' +
+    '.commercials-tab .npv-svg{width:100%;height:auto;display:block;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm)}' +
+    '.commercials-tab .tornado{display:grid;gap:9px}' +
+    '.commercials-tab .tor-row{display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center}' +
+    '.commercials-tab .tor-lbl{font-size:var(--fz-sm);font-weight:600;color:var(--ink2)}' +
+    '.commercials-tab .tor-track{position:relative;height:22px;background:var(--well);border:1px solid var(--line);border-radius:5px}' +
+    '.commercials-tab .tor-base{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink2);z-index:2}' +
+    '.commercials-tab .tor-bar{position:absolute;top:3px;bottom:3px}' +
+    '.commercials-tab .tor-lo{background:var(--teal-d);border-radius:3px 0 0 3px}' +
+    '.commercials-tab .tor-hi{background:var(--emph);border-radius:0 3px 3px 0}' +
+    '@media (max-width:640px){.commercials-tab .tor-row{grid-template-columns:120px 1fr}}' +
+  '</style>';
 
-  /* ---- assemble ---- */
-  const html =
+  return scopedStyle + '<div class="commercials-tab">' +
     '<div class="subtabbar" data-subtab-group="commercials"><div class="wrap">' +
-      '<button class="subtab-btn" data-subtab="proposal" aria-selected="true">Proposal</button>' +
-      '<button class="subtab-btn" data-subtab="scenarios">Scenarios</button>' +
-      '<button class="subtab-btn" data-subtab="benchmarks">Benchmarks</button>' +
+      '<button class="subtab-btn" data-subtab="deal" aria-selected="true">' + icon('money') + ' Deal Table &amp; ZOPA</button>' +
+      '<button class="subtab-btn" data-subtab="proforma">' + icon('scale') + ' Pro-forma</button>' +
+      '<button class="subtab-btn" data-subtab="scenarios">' + icon('scenarios') + ' Scenarios &amp; Sensitivity</button>' +
     '</div></div>' +
     '<div class="tab-body"><div class="wrap">' +
-      '<div data-subpanel="commercials/proposal" class="is-active">' + proposal + '</div>' +
+      '<div data-subpanel="commercials/deal" class="is-active">' + deal + '</div>' +
+      '<div data-subpanel="commercials/proforma">' + proforma + '</div>' +
       '<div data-subpanel="commercials/scenarios">' + scenarios + '</div>' +
-      '<div data-subpanel="commercials/benchmarks">' + benchmarks + '</div>' +
-    '</div></div>';
-
-  return html;
+    '</div></div>' +
+  '</div>';
 }
 
-/* ---------- 6. wire recalculation once at module load -------------------- */
+/* ---------- 6. wire the WACC recalc once at module load ------------------- */
 if (typeof global.DealUI !== 'undefined' && typeof global.DealUI.onRecalc === 'function') {
-  global.DealUI.onRecalc(function (d) {
-    const wf = document.getElementById('cml-waterfall'); if (wf) wf.innerHTML = renderWaterfall(d);
-    const tornado = document.getElementById('cml-tornado'); if (tornado) tornado.innerHTML = renderTornado(d);
-    const lc = document.getElementById('cml-linechart'); if (lc) lc.innerHTML = renderLineChart(d);
-    const cf = document.getElementById('cml-cashflow'); if (cf) cf.innerHTML = renderCashFlow(d);
-    patchScenarioTable(d);
-    patchLineTable(d);
-    patchMisc(d);
-  });
+  global.DealUI.onRecalc(recompute);
 }
 
-/* ---------- 7. exports ----------------------------------------------------*/
+/* ---------- 7. exports ---------------------------------------------------- */
 global.renderTab_commercials = renderTab_commercials;
 global.DealTabs = global.DealTabs || {};
 global.DealTabs.commercials = renderTab_commercials;

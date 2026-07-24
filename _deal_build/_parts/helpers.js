@@ -1,5 +1,5 @@
 /* =============================================================================
- * helpers.js — shared render + interaction helpers for the Deal artifact.
+ * helpers.js, shared render + interaction helpers for the Deal artifact.
  * The 5 tab builders (Brief / Contract / Commercials / Negotiation / Sources)
  * MUST use these verbatim so the artifact reads as one system.
  *
@@ -17,7 +17,7 @@
  *        <div class="subtabbar" data-subtab-group="contract"><div class="wrap">
  *           <button class="subtab-btn" data-subtab="map">…</button> …</div></div>
  *        <div data-subpanel="contract/map">…</div>  (id = "group/key")
- * 4. Interaction is DELEGATED and wired on load by DealUI.init() — builders only
+ * 4. Interaction is DELEGATED and wired on load by DealUI.init(), builders only
  *    emit the right data-attributes (documented per helper below). No inline
  *    onclick. Allowed controls ONLY: show-evidence, expand/collapse, filter,
  *    sort, change-assumption+recalc+reset, copy, print, jump. Nothing else.
@@ -93,7 +93,7 @@ function evidenceChip(type, opts) {
   const o = opts || {}; const m = EV_META[type] || EV_META.inference;
   const txt = o.short ? m.label.split(' ')[0] : m.label;
   const src = (o.sources && o.sources.length)
-    ? ' data-jump="tab:sources/sub:sources" title="' + esc(m.label) + ' · ' + esc(o.sources.join(', ')) + '"'
+    ? ' data-jump="tab:brief" title="' + esc(m.label) + ' · ' + esc(o.sources.join(', ')) + '"'
     : ' title="' + esc(m.label) + '"';
   return '<span class="ev ' + m.cls + '"' + src + '>' + esc(txt) + '</span>';
 }
@@ -131,7 +131,7 @@ function saCard(title, inner, opts) {
     '<header class="card-hd">' + ic + '<span class="ct">' + esc(title) + '</span>' + sub + '</header>' +
     '<div class="card-bd' + bc + '">' + (inner || '') + '</div></section>';
 }
-// insight(text, tone) — a SHORT supporting narrative line (never a wall). tone: ''|'warn'|'danger'
+// insight(text, tone), a SHORT supporting narrative line (never a wall). tone: ''|'warn'|'danger'
 function insight(text, tone) {
   return '<div class="insight ' + (tone || '') + '"><span class="ib"></span><span>' + text + '</span></div>';
 }
@@ -257,7 +257,7 @@ function gantt(rows, opts) {
 }
 
 /* ---------- 8. ASSUMPTION SLIDER (LOCAL) ---------------------------------- */
-// assumptionSlider(a) — a is a dashboardData.assumptions[] entry.
+// assumptionSlider(a), a is a dashboardData.assumptions[] entry.
 // Emits a range input wired to DealUI; editing updates a.value and runs recalc callbacks.
 function assumptionSlider(a) {
   const disp = a.unit === '%' ? a.value + '%' : (a.value.toLocaleString('en-US') + (a.unit ? ' ' + a.unit : ''));
@@ -287,7 +287,7 @@ function copyBtn(label, targetSel, rawText) {
 }
 
 /* =========================================================================
- *  INTERACTION LAYER — DealUI  (wired once on load via DealUI.init())
+ *  INTERACTION LAYER, DealUI  (wired once on load via DealUI.init())
  * ========================================================================= */
 const recalcFns = [];
 const assumptionOriginals = {};
@@ -298,6 +298,7 @@ const DealUI = {
 
   // ---- tab + subtab routing ----
   showTab(key) {
+    if (!document.querySelector('[data-tabpanel="' + key + '"]')) return;  // guard: never blank the page on a stale jump
     document.querySelectorAll('[data-tab]').forEach(b =>
       b.setAttribute('aria-selected', b.getAttribute('data-tab') === key ? 'true' : 'false'));
     document.querySelectorAll('[data-tabpanel]').forEach(p =>
@@ -334,6 +335,7 @@ const DealUI = {
   },
 
   init() {
+    if (this._inited) return; this._inited = true;   // idempotent: the shell owns mount+init timing
     // snapshot originals for reset
     (global.dashboardData.assumptions || []).forEach(a => { assumptionOriginals[a.id] = a.value; });
 
