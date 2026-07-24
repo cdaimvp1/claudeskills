@@ -378,7 +378,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -389,6 +389,27 @@ const DealUI = {
       }
       if (t.hasAttribute('data-jump')) { this.jump(t.getAttribute('data-jump')); return; }
       if (t.hasAttribute('data-gotofinding')) { this.gotoFinding(t.getAttribute('data-gotofinding')); return; }
+      // Legal & Protection navigator: segmented toggle between the Protections and
+      // Obligations accordion groups. Scoped to the nearest .lp-nav so it never
+      // touches other tabs; drives the seg-button aria-selected + group [hidden].
+      if (t.hasAttribute('data-lpview')) {
+        const view = t.getAttribute('data-lpview');
+        const nav = t.closest('.lp-nav') || document;
+        nav.querySelectorAll('[data-lpview]').forEach(b =>
+          b.setAttribute('aria-selected', b.getAttribute('data-lpview') === view ? 'true' : 'false'));
+        nav.querySelectorAll('[data-lpgroup]').forEach(g => { g.hidden = (g.getAttribute('data-lpgroup') !== view); });
+        return;
+      }
+      // Legal & Protection register: clear the search box + un-press every chip in
+      // this filter scope, then re-run the (now empty) filter so all rows show.
+      if (t.hasAttribute('data-lpclear')) {
+        const scope = t.closest('[data-filter-scope]') || document;
+        const box = scope.querySelector('[data-filter-input]');
+        if (box) box.value = '';
+        scope.querySelectorAll('[data-filterchip][aria-pressed="true"]').forEach(c => c.setAttribute('aria-pressed', 'false'));
+        this.applyChipFilters(scope);
+        return;
+      }
       if (t.hasAttribute('data-print')) { window.print(); return; }
       if (t.hasAttribute('data-theme-toggle')) {
         const cur = document.documentElement.getAttribute('data-theme');

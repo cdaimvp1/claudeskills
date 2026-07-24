@@ -454,6 +454,144 @@ const dashboardData = {
     { id: 'OB-10', party: 'mutual', text: 'Cure a material breach within 30 days of written notice before termination.', clause: 'MSA §12.1', trigger: 'On breach notice', dueBasis: 'static', imbalanceFlag: false, issueId: 'ISS-05', evidenceType: 'contract' }
   ],
 
+  /* ---- 3c-ii. obligationAnalysis (Claude analysis layer over obligations[]) ----
+   * Keyed by obligation id. Carries the authored review the raw obligation does not:
+   * a remedy-if-missed (+ its evidence type), reciprocity read, survival/duration, a
+   * colour-coded fairness verdict + one-line why, a better alternative, a negotiate
+   * decision + why, and the three outcome positions. Outcome positions REFERENCE the
+   * linked issue (recommendedPosition / fallback / hardStop) via outcome.source='linked'
+   * + issueId, so no negotiation stance is restated here; where no linked issue exists a
+   * labelled outcome.source='proposed' stance would carry preferred/fallback/leastAcceptable.
+   * remedyEvidence: 'contract' = quoted contract fact · 'inference' = Claude-reasoned (no
+   * quoted clause) · 'unavailable' = evidence gap (e.g. OB-3, deferred to the unsigned DPA).
+   * verdict/alternative/negotiate and inference-remedies are Claude analysis (evidenceType
+   * inference). balanced:true = fair/mutual, no negotiation action (OB-6/OB-9/OB-10). All
+   * text values are reviewed + approved (source: legal-protection mockup, authored verbatim). */
+  obligationAnalysis: {
+    'OB-1': {
+      remedyIfMissed: 'Capped service credits only: 5% of the monthly fee per 1% below target, capped at 15%, and those credits are the sole and exclusive remedy. There is no exit right for sustained failure.',
+      remedyEvidence: 'contract',
+      reciprocity: 'One-sided supplier duty. The weakness is the remedy, not the promise.',
+      survival: 'Term-long, assessed monthly; no post-term availability duty.',
+      fairnessVerdict: 'adverse', verdictLabel: 'One-sided against Lilly',
+      verdictWhy: 'The uptime duty exists, but the only recourse is a capped credit that is the sole remedy, so a sustained outage yields a token credit and no exit.',
+      betterAlternative: 'A 99.9% target with credits scaled up to 50% of the monthly fee, and a termination right after three consecutive misses, so credits are no longer the only lever.',
+      negotiate: true, negotiateWhy: 'Both the target and the remedy sit below playbook; the sole-remedy cap is the real exposure.',
+      outcome: { source: 'linked', issueId: 'ISS-06' }, balanced: false,
+      ground: 'imbalanceFlag=true + ISS-06 deviation (sole-remedy, capped credits) and impact.'
+    },
+    'OB-2': {
+      remedyIfMissed: 'None stated. If the report is not produced, the buyer loses its only assurance artifact; there is no contractual penalty and no for-cause audit right to fall back on.',
+      remedyEvidence: 'inference',
+      reciprocity: 'One-sided supplier duty, but a reasonable baseline. The gap is scope, not balance.',
+      survival: 'Annual, term-long.',
+      fairnessVerdict: 'neutral', verdictLabel: 'Fair but thin',
+      verdictWhy: 'An annual SOC 2 is a reasonable routine assurance, but on its own it gives no for-cause audit right after a security incident.',
+      betterAlternative: 'Keep the annual SOC 2 for routine assurance and add a for-cause audit or independent-assessor right triggered by a reportable incident.',
+      negotiate: true, negotiateWhy: 'Low priority and low cost, an easy add that banks goodwill.',
+      outcome: { source: 'linked', issueId: 'ISS-09' }, balanced: false,
+      ground: 'imbalanceFlag=false but linked ISS-09 (low) deviation adds a for-cause gap; ISS-09 tradeOpportunity.'
+    },
+    'OB-3': {
+      remedyIfMissed: 'Undefined. The MSA body sets no notice deadline; the timing is deferred to the unsigned DPA (GAP-1), so a late or vague notice carries no contractual consequence.',
+      remedyEvidence: 'unavailable',
+      reciprocity: 'One-sided supplier duty, and effectively unenforceable as drafted.',
+      survival: 'On incident, term-long. Breach-notice duties usually survive termination, but that sits in the DPA, which is not in session (GAP-1).',
+      fairnessVerdict: 'critical', verdictLabel: 'One-sided against Lilly',
+      verdictWhy: 'A breach-notification duty with no stated deadline, for global workforce data, is effectively unenforceable, and it lives in an unsigned DPA. This is one of the signature-blocking gates.',
+      betterAlternative: 'An executed DPA with a fixed 72-hour breach-notice, EU SCCs, and a 30-day sub-processor objection right, attached before signature.',
+      negotiate: true, negotiateWhy: 'Signature gate, not a lever. The DPA must be executed and reviewed before signing.',
+      outcome: { source: 'linked', issueId: 'ISS-03' }, balanced: false,
+      ground: 'imbalanceFlag=true + ISS-03 hard-stop deviation/impact; evidenceType inference; GAP-1 for missing DPA.'
+    },
+    'OB-4': {
+      remedyIfMissed: 'The consequence runs against the buyer, not the supplier: 10 business days of silence deems the milestone accepted, which weakens remedies and triggers payment for work that may not conform.',
+      remedyEvidence: 'contract',
+      reciprocity: 'One-sided in the supplier’s favour. Inaction by a busy reviewer becomes acceptance.',
+      survival: 'Implementation phase only, per milestone M2 to M5.',
+      fairnessVerdict: 'adverse', verdictLabel: 'One-sided against Lilly',
+      verdictWhy: 'Deemed acceptance after only 10 days of silence, with no objective acceptance criteria, lets a non-conforming milestone pass by inaction.',
+      betterAlternative: 'Positive sign-off against acceptance criteria defined per milestone, a 20-business-day review window, and a cure period on rejection.',
+      negotiate: true, negotiateWhy: 'The short silence-window and the missing criteria both need to move; tie it to the milestone schedule.',
+      outcome: { source: 'linked', issueId: 'ISS-10' }, balanced: false,
+      ground: 'imbalanceFlag=true + ISS-10 high deviation (silence=acceptance, no criteria) and impact.'
+    },
+    'OB-5': {
+      remedyIfMissed: 'None. There is no notice duty to breach; the clause treats continued use as consent, so a new sub-processor can be added silently.',
+      remedyEvidence: 'contract',
+      reciprocity: 'One-sided. "Continued use equals consent" is not affirmative consent.',
+      survival: 'Ongoing, term-long.',
+      fairnessVerdict: 'adverse', verdictLabel: 'One-sided against Lilly',
+      verdictWhy: 'For employee personal data, a silent web-list change with no notice or objection right leaves the transfer posture exposed to a new sub-processor in a high-risk jurisdiction.',
+      betterAlternative: 'Thirty days’ advance email notice of any new sub-processor, with a good-faith objection-and-remediation right.',
+      negotiate: true, negotiateWhy: 'Fold into the DPA negotiation (ISS-03); at minimum require an emailed change-feed.',
+      outcome: { source: 'linked', issueId: 'ISS-08' }, balanced: false,
+      ground: 'imbalanceFlag=true + ISS-08 medium deviation (no notice/objection) and impact.'
+    },
+    'OB-6': {
+      remedyIfMissed: 'A buyer miss slips the implementation schedule and typically earns the supplier a matching relief or extension. It is a dependency, not a penalty.',
+      remedyEvidence: 'inference',
+      reciprocity: 'A one-sided buyer duty, but a standard and reasonable enablement dependency.',
+      survival: 'One-time at kickoff (M1 + 5 business days).',
+      fairnessVerdict: 'fair', verdictLabel: 'Fair',
+      verdictWhy: 'A standard buyer enablement dependency; the platform cannot onboard workforce data without timely HRIS and payroll access.',
+      betterAlternative: null,
+      negotiate: false, negotiateWhy: 'Reasonable as drafted.',
+      outcome: null, balanced: true,
+      refine: 'Optional tightening: start the 5-day clock on delivery of an agreed data specification, so the buyer is not on the clock before requirements are settled.',
+      ground: 'imbalanceFlag=false, no linked issue. Buyer dependency; fair. Refinement authored and labelled analysis.'
+    },
+    'OB-7': {
+      remedyIfMissed: 'Fees are non-cancellable and non-refundable, and there is no convenience-exit, so prepaid fees are fully sunk on any early exit, even if the platform underdelivers.',
+      remedyEvidence: 'contract',
+      reciprocity: 'One-sided against the buyer: prepay, plus non-refundable, plus no convenience exit.',
+      survival: 'Annual, in advance, across the 3-year initial term.',
+      fairnessVerdict: 'adverse', verdictLabel: 'One-sided against Lilly',
+      verdictWhy: 'Annual prepay that is non-refundable, with no convenience-termination right, means the buyer carries all of the commitment risk.',
+      betterAlternative: 'A convenience-termination right after month 12 with 60 days’ notice and a pro-rata refund of unused prepaid fees.',
+      negotiate: true, negotiateWhy: 'High trade value. This is a lever that can be conceded to protect the liability and data-protection gates (ISS-01, ISS-03).',
+      outcome: { source: 'linked', issueId: 'ISS-05' }, balanced: false,
+      ground: 'imbalanceFlag=true + ISS-05 medium deviation (no convenience exit, fees sunk) and impact.'
+    },
+    'OB-8': {
+      remedyIfMissed: 'Miss the 90-day window and the term auto-renews for another 12 months at the supplier’s then-current list price, with no cap, so a missed date locks in a year at an unbounded uplift.',
+      remedyEvidence: 'contract',
+      reciprocity: 'One-sided: a long notice burden on the buyer, plus an uncapped renewal price.',
+      survival: 'Recurs at every term boundary.',
+      fairnessVerdict: 'adverse', verdictLabel: 'One-sided against Lilly',
+      verdictWhy: 'A 90-day notice window (three times playbook tolerance) combined with an uncapped renewal price turns a single missed date into a locked-in year at an unbounded increase.',
+      betterAlternative: 'Opt-in renewal, or a 30-day notice window with the renewal uplift capped at CPI or 4%, whichever is lower.',
+      negotiate: true, negotiateWhy: 'One of the three signature conditions; convert auto-renewal to opt-in, or pair a short window with a price cap.',
+      outcome: { source: 'linked', issueId: 'ISS-04' }, balanced: false,
+      ground: 'imbalanceFlag=true + ISS-04 high deviation (90-day window, uncapped uplift) and impact.'
+    },
+    'OB-9': {
+      remedyIfMissed: 'Standard breach-of-confidence remedies: injunctive relief and damages, available to the non-breaching party.',
+      remedyEvidence: 'inference',
+      reciprocity: 'Mutual, binds both parties equally.',
+      survival: 'Continuous; survives termination (term plus survival).',
+      fairnessVerdict: 'fair', verdictLabel: 'Balanced',
+      verdictWhy: 'A mutual confidentiality duty binding both parties equally; market-standard.',
+      betterAlternative: null,
+      negotiate: false, negotiateWhy: 'Balanced, no action needed.',
+      outcome: null, balanced: true,
+      ground: 'imbalanceFlag=false, party mutual, no linked issue. Genuinely balanced.'
+    },
+    'OB-10': {
+      remedyIfMissed: 'If the breaching party fails to cure within 30 days of written notice, the non-breaching party may terminate. The mechanism is the remedy, and it runs both ways.',
+      remedyEvidence: 'contract',
+      reciprocity: 'Mutual, the 30-day cure runs to both parties.',
+      survival: 'Applies on any breach notice, term-long.',
+      fairnessVerdict: 'fair', verdictLabel: 'Balanced',
+      verdictWhy: 'A mutual 30-day cure period is market-standard and binds both parties equally.',
+      betterAlternative: null,
+      negotiate: false, negotiateWhy: 'Balanced on the cure period itself. The related exit economics (non-refundable prepay, no convenience-termination) are the real concern and are handled at OB-7 and ISS-05.',
+      outcome: null, balanced: true,
+      crossLink: { issueId: 'ISS-05', text: 'Open the linked exit issue (ISS-05)' },
+      ground: 'imbalanceFlag=false, party mutual. Linked ISS-05 concerns exit economics, not the cure right, so the cure period is balanced and the exit concern is cross-linked, not duplicated.'
+    }
+  },
+
   /* ---- 3d. protection (auditable score, the S2 defensible version) ---------
    * score starts at 100 (fully playbook-aligned) and deducts per material deviation.
    * Bands: Strong 80–100 · Adequate 65–79 · Weak 45–64 · Critical <45. */
