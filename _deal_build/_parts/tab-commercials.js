@@ -16,11 +16,11 @@
  * issues) and is looked up by id, never restated. The pro-forma numbers are
  * PRECOMPUTED; this file renders them; it does NOT port the pv-12 engine.
  *
- * THE ONLY LIVE MATH ON THIS TAB is npv(cashflows, rate): moving the WACC slider
- * (assumptions ASM-5) re-discounts proforma.cashflowByYear at the slider rate and
- * repaints the NPV read + the NPV-vs-rate curve marker. Everything else (scenario
- * ladder, sensitivity tornado, savings waterfall, deal table) is static, drawn
- * straight from the internally-coherent data object. See DEAL-DESIGN-DECISION.md
+ * LIVE MATH ON THIS TAB: (1) the WACC slider (ASM-5) re-discounts proforma.cashflowByYear
+ * + the pro-forma table's discounted columns and repaints the NPV read/curve; (2) the ZOPA
+ * sensitivity sliders (ASM-1 employee count, ASM-4 platform discount) recompute the platform
+ * line live (see zopa.js). Everything else (negotiated-value ladder, deal table) is static,
+ * drawn straight from the internally-coherent data object. See DEAL-DESIGN-DECISION.md
  * PART 1 "Tab 3, ECONOMICS" and PART 2 §2-3 ("reuse pv-12" = render precomputed).
  * ========================================================================== */
 (function (global) {
@@ -171,38 +171,53 @@ function renderShouldCost(d) {
 /* ---------- 2. 3B, PRO-FORMA (precomputed; WACC slider = the live math) --- */
 function renderTcoKpis(d) {
   const pf = d.proforma || {}, t = pf.tcoSummary || {}, be = pf.breakEven || {};
-  const wacc = assumVal(d, 'ASM-5', 6);
+  const wacc = assumVal(d, 'ASM-5', 6), years = assumVal(d, 'ASM-2', 3);
   const livePv = npv((pf.plByYear || []).map(y => y.cost), wacc);
   const kpi = (lbl, val, note) => '<div class="kpi"><div class="k-lbl">' + lbl + '</div><div class="k-val">' + val + '</div>' + (note ? '<div class="tiny muted">' + note + '</div>' : '') + '</div>';
   return '<div class="kpi-row">' +
-    kpi('Year-1 TCO', M(t.y1), 'target scenario') +
-    kpi('3-yr TCV', M(t.term), 'target · initial term') +
-    kpi('PV of 3-yr cost @ WACC', '<span id="cml-pvcost-live">' + M(livePv) + '</span>', 'discounted at ' + wacc + '%') +
+    kpi('Year-1 cost', M(t.y1), 'target scenario') +
+    kpi(years + '-yr TCV', M(t.term), 'target · initial term') +
+    kpi('PV of cost @ WACC', '<span id="cml-pvcost-live">' + M(livePv) + '</span>', 'discounted at ' + wacc + '%') +
     kpi('Payback', (pf.paybackMonths != null ? pf.paybackMonths : '—') + ' mo', 'undiscounted, vs value case') +
     kpi('NPV break-even', (be.rate != null ? be.rate : '—') + '%', 'rate where value case = 0') +
   '</div>' +
-  insight('Cost figures are the negotiated target scenario and reconcile to the 3-year TCV. The value case (P&L revenue) is a modelled business-case assumption, clearly labelled, not a booked figure.');
+  insight('Internal analysis, not contract terms. Cost figures are the negotiated target scenario and reconcile to the ' + years + '-year TCV. The value case is a modelled business-case benefit (an assumption, clearly labelled), not a booked figure.');
 }
-function renderPL(d) {
-  const rows = (d.proforma || {}).plByYear || [];
-  const cols = [
-    { key: 'year', label: 'Year' },
-    { key: 'revenue', label: 'Value case', align: 'num', render: r => M(r.revenue) },
-    { key: 'cost', label: 'Cost', align: 'num', render: r => M(r.cost) },
-    { key: 'net', label: 'Net', align: 'num', render: r => '<span class="' + (r.net < 0 ? 'st-deviation' : 'st-aligned') + '">' + M(r.net) + '</span>' }
-  ];
-  return dataTable(cols, rows, { id: 'cml-pl', dense: true });
-}
-function renderCashflow(d) {
-  const rows = (d.proforma || {}).cashflowByYear || [];
-  const cols = [
-    { key: 'year', label: 'Year' },
-    { key: 'in', label: 'Value in', align: 'num', render: r => M(r.in) },
-    { key: 'out', label: 'Cash out', align: 'num', render: r => M(r.out) },
-    { key: 'net', label: 'Net', align: 'num', render: r => '<span class="' + (r.net < 0 ? 'st-deviation' : 'st-aligned') + '">' + M(r.net) + '</span>' },
-    { key: 'cum', label: 'Cumulative', align: 'num', render: r => '<span class="' + (r.cum < 0 ? 'st-deviation' : 'st-aligned') + '">' + M(r.cum) + '</span>' }
-  ];
-  return dataTable(cols, rows, { id: 'cml-cf', dense: true });
+// The detailed multi-year pro-forma: cost, value case, net, cumulative, and the WACC-discounted
+// columns (Summary hides the discounting; Detailed shows it). The discounted cells carry ids so
+// recompute() re-discounts them live off the WACC control without re-rendering (toggle state kept).
+function renderProforma(d, wacc) {
+  const pf = d.proforma || {}, pl = pf.plByYear || [];
+  if (!pl.length) return gapCard('No pro-forma model', 'No multi-year cost / value model in this session. ' + evidenceChip('unavailable'));
+  const years = assumVal(d, 'ASM-2', 3), r = (wacc || 0) / 100;
+  const sgn = v => v < 0 ? 'st-deviation' : 'st-aligned';
+  let cum = 0, dcum = 0;
+  const body = pl.map((p, i) => {
+    cum += p.net;
+    const df = 1 / Math.pow(1 + r, i + 1), dn = p.net * df; dcum += dn;
+    return '<tr>' +
+      '<td>' + esc(p.year) + '</td>' +
+      '<td class="pf-n">' + M(p.cost) + '</td>' +
+      '<td class="pf-n">' + M(p.revenue) + '</td>' +
+      '<td class="pf-n"><span class="' + sgn(p.net) + '">' + M(p.net) + '</span></td>' +
+      '<td class="pf-n"><span class="' + sgn(cum) + '">' + M(cum) + '</span></td>' +
+      '<td class="pf-n pf-detail" id="pf-df-' + i + '">' + df.toFixed(3) + '</td>' +
+      '<td class="pf-n pf-detail"><span id="pf-dn-' + i + '" class="' + sgn(dn) + '">' + M(dn) + '</span></td>' +
+      '<td class="pf-n pf-detail"><span id="pf-dc-' + i + '" class="' + sgn(dcum) + '">' + M(dcum) + '</span></td>' +
+    '</tr>';
+  }).join('');
+  const totCost = sumF(pl, x => x.cost), totVal = sumF(pl, x => x.revenue), totNet = sumF(pl, x => x.net);
+  const head = '<tr><th>Year</th><th class="pf-n">Cost</th><th class="pf-n">Value case</th><th class="pf-n">Net</th><th class="pf-n">Cumulative</th>' +
+    '<th class="pf-n pf-detail">DF @WACC</th><th class="pf-n pf-detail">Disc. net</th><th class="pf-n pf-detail">Disc. cum.</th></tr>';
+  const foot = '<tr class="pf-tot"><td>Total</td><td class="pf-n">' + M(totCost) + '</td><td class="pf-n">' + M(totVal) + '</td><td class="pf-n">' + M(totNet) + '</td><td class="pf-n"></td>' +
+    '<td class="pf-n pf-detail"></td><td class="pf-n pf-detail"></td><td class="pf-n pf-detail">NPV <span id="pf-npv">' + M(dcum) + '</span></td></tr>';
+  return '<div class="pf-wrap" data-pf-mode="summary">' +
+    '<div class="pf-toolbar"><div class="pf-toggle" role="group" aria-label="Model detail level">' +
+      '<button class="pf-tab is-on" data-pf-view="summary">Summary</button>' +
+      '<button class="pf-tab" data-pf-view="detailed">Detailed</button>' +
+    '</div><span class="pf-note">Detailed adds the WACC discounting; the value case is a modelled assumption.</span></div>' +
+    '<div class="pf-scroll"><table class="pf-table"><thead>' + head + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + '</tfoot></table></div>' +
+    insight('Cost outflows are the negotiated target scenario (reconcile to the ' + years + '-year TCV). Net is the value case minus cost; the discounted columns and NPV recompute live from the WACC control. ' + evidenceChip('calculated', { short: true }));
 }
 function renderWaccControl(d) {
   const a = (d.assumptions || []).find(x => x.id === 'ASM-5');
@@ -217,8 +232,8 @@ function renderWaccControl(d) {
         '<span class="pill ' + (inBand ? 'ok' : 'warn') + '" id="cml-wacc-band-status">' + bandTxt + '</span></dd>' +
       '<dt>NPV of value case @ WACC</dt><dd class="mono"><span id="cml-npv-live">' + M(liveNpv) + '</span> ' + evidenceChip('calculated', { short: true }) + '</dd>' +
     '</dl>' +
-    '<div class="btn-row"><button class="btn" data-reset-assumptions>' + icon('reset') + 'Reset to governed rate</button></div>' +
-    insight('Moving the WACC re-discounts the modelled net cash flows live; it is the only live calculation on this tab. Outside the ' + band.target + '–' + band.ceiling + '% finance band the NPV read is indicative only; confirm the governed rate with finance.');
+    '<div class="btn-row"><button class="btn-icon" data-reset-assumptions title="Reset to the governed rate" aria-label="Reset to the governed rate">' + icon('reset') + '</button><span class="tiny muted">reset to the governed rate</span></div>' +
+    insight('Moving the WACC re-discounts the modelled net flows live, including the pro-forma table above. Outside the ' + band.target + '–' + band.ceiling + '% finance band the NPV read is indicative only; confirm the governed rate with finance.');
 }
 // SVG NPV-vs-rate curve. Re-rendered on WACC change to move the live marker.
 function renderNpvCurve(d, wacc) {
@@ -257,33 +272,9 @@ function renderNpvCurve(d, wacc) {
     '<text x="' + (padL + pw / 2).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="9" fill="var(--mut)">discount rate →</text>' +
   '</svg>';
 }
-function renderSavingsWaterfall(d) {
-  const sw = (d.proforma || {}).savingsWaterfall || [];
-  if (!sw.length) return saCard('Savings Waterfall vs Supplier Ask', gapCard('No savings waterfall', 'Baseline-to-target reconciliation not available.'), { accent: 'teal', icon: 'trade' });
-  const steps = sw.map(s => {
-    if (s.kind === 'baseline') return { label: s.label, value: s.delta, kind: 'total', display: M(s.delta) };
-    if (s.kind === 'net') return { label: s.label, value: s.delta, kind: 'final', display: M(s.delta) };
-    return { label: s.label, value: Math.abs(s.delta), kind: 'down', display: (s.delta < 0 ? '−' : '+') + M(Math.abs(s.delta)) };
-  });
-  const ask = sw.find(s => s.kind === 'baseline') || { delta: 0 }, net = sw.find(s => s.kind === 'net') || { delta: 0 };
-  const saved = ask.delta - net.delta, pctOff = ask.delta ? Math.round(saved / ask.delta * 100) : 0;
-  return saCard('Savings Waterfall vs Supplier Ask',
-    waterfall(steps, {}) +
-    insight('The two anchor bars are the supplier ask (' + M(ask.delta) + ') and the negotiated target (' + M(net.delta) + '); the bars between are the negotiated reductions, sized by magnitude. Total removed: <strong>' + M(saved) + '</strong> (' + pctOff + '% off the ask) across the 3-year term.'),
-    { accent: 'teal', icon: 'trade', sub: evidenceChip('calculated', { short: true }) });
-}
-function renderTeardown(d) {
-  const rows = (d.proforma || {}).teardown || [];
-  const cols = [
-    { key: 'line', label: 'Cost line', render: r => '<strong>' + esc(r.line) + '</strong>' },
-    { key: 'driver', label: 'Driver', render: r => '<span class="tiny">' + esc(r.driver) + '</span>' },
-    { key: 'amount', label: 'Amount (Y1)', align: 'num', render: r => M(r.amount) },
-    { key: 'ev', label: 'Ev.', render: r => evidenceChip(r.evidenceType, { short: true }) }
-  ];
-  const total = sumF(rows, r => r.amount);
-  return dataTable(cols, rows, { id: 'cml-teardown', dense: true }) +
-    insight('Year-1 target cost decomposition; sums to <strong>' + M(total) + '</strong> (the Year-1 target all-in). Hidden-cost multipliers are deliberately not fabricated.');
-}
+/* renderSavingsWaterfall retired: it duplicated the Negotiated Value Ladder (renderScenarioWaterfall),
+ * which now lives on the Deal tab. renderTeardown (Year-1 cost decomposition) was cut as low-signal;
+ * the per-line cost build lives in Should-Cost + the ZOPA line detail. */
 function renderAssumptionsRegister(d) {
   const cols = [
     { key: 'label', label: 'Assumption', render: r => '<strong>' + esc(r.label) + '</strong><div class="tiny muted">used in: ' + esc((r.usedIn || []).join(', ')) + '</div>' },
@@ -334,15 +325,23 @@ function recompute(d) {
   }
   const cv = document.getElementById('cml-npv-curve');
   if (cv) cv.innerHTML = renderNpvCurve(d, wacc);
+  // pro-forma discounted columns (WACC-live): update the cells in place, keeping the toggle state
+  const pl = pf.plByYear || [];
+  if (document.getElementById('pf-npv') && pl.length) {
+    const r = wacc / 100; let dcum = 0;
+    pl.forEach((p, i) => {
+      const df = 1 / Math.pow(1 + r, i + 1), dn = p.net * df; dcum += dn;
+      setText('pf-df-' + i, df.toFixed(3));
+      setText('pf-dn-' + i, M(dn));
+      setText('pf-dc-' + i, M(dcum));
+    });
+    setText('pf-npv', M(dcum));
+  }
 }
 
 /* ---------- 5. TAB ASSEMBLY ----------------------------------------------- */
 function renderTab_commercials(d) {
-  const wacc0 = assumVal(d, 'ASM-5', 6);
-  const pl = (d.proforma || {}).plByYear || [], cf = (d.proforma || {}).cashflowByYear || [];
-  const tsvRows = ['Year\tValue case\tCost\tNet\tCash in\tCash out\tCumulative'];
-  pl.forEach((p, i) => { const c = cf[i] || {}; tsvRows.push([p.year, p.revenue, p.cost, p.net, c.in, c.out, c.cum].join('\t')); });
-  const tsv = tsvRows.join('\n');
+  const wacc0 = assumVal(d, 'ASM-5', 6), years = assumVal(d, 'ASM-2', 3);
 
   /* ---- 3A: Deal Table & ZOPA (reordered: room + renewal on top, then should-cost, the
        negotiated-value ladder, and the ZOPA last with sensitivity drivers + benchmark ticks) ---- */
@@ -360,17 +359,14 @@ function renderTab_commercials(d) {
         { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · leverage · benchmark ticks · live drivers' }) + '</div>' +
     '</div>';
 
-  /* ---- 3B: Pro-forma ---- */
-  const proforma =
-    '<div class="tab-intro"><h2>Pro-forma</h2><p class="q">The target-scenario cost model over the initial term, discounted at Lilly’s WACC, what the deal is worth once financed. ' + evidenceChip('calculated', { short: true }) + '</p></div>' +
+  /* ---- 3B: Financial Model (was Pro-forma) ---- */
+  const financial =
+    '<div class="tab-intro"><h2>Financial Model</h2><p class="q">Internal analysis, not contract terms: the target-scenario cost model over the ' + years + '-year initial term against a modelled value case, discounted at Lilly’s WACC. ' + evidenceChip('calculated', { short: true }) + '</p></div>' +
     '<div class="grid">' +
-      '<div class="col-12">' + saCard('Total Cost of Ownership', renderTcoKpis(d) + '<div class="btn-row">' + copyBtn('Copy pro-forma (TSV)', null, tsv) + '<button class="btn" data-print>' + icon('print') + 'Print</button></div>', { accent: 'plum', icon: 'scale' }) + '</div>' +
-      '<div class="col-6">' + saCard('P&L by Contract Year', renderPL(d), { accent: 'teal', icon: 'scenarios', sub: 'value case = assumption' }) + '</div>' +
-      '<div class="col-6">' + saCard('Cash Flow by Contract Year', renderCashflow(d), { accent: 'teal', icon: 'money' }) + '</div>' +
-      '<div class="col-6">' + saCard('Discount Control, WACC', renderWaccControl(d), { accent: 'emph', icon: 'assume', sub: 'live NPV' }) + '</div>' +
+      '<div class="col-12">' + saCard('Top-Line Summary', renderTcoKpis(d), { accent: 'plum', icon: 'scale', sub: years + '-yr TCV · target scenario' }) + '</div>' +
+      '<div class="col-12">' + saCard('Pro-forma · ' + years + '-Year Model', renderProforma(d, wacc0), { accent: 'teal', icon: 'scenarios', sub: 'cost · value case · net · discounted' }) + '</div>' +
+      '<div class="col-6">' + saCard('Discount Control · WACC', renderWaccControl(d), { accent: 'emph', icon: 'assume', sub: 'live' }) + '</div>' +
       '<div class="col-6">' + saCard('NPV vs Discount Rate', '<div id="cml-npv-curve">' + renderNpvCurve(d, wacc0) + '</div>' + insight('The value-case NPV stays firmly positive across the plausible discount range; it only reaches zero near a ~' + (((d.proforma || {}).breakEven || {}).rate) + '% rate, far above the 5–7% governed WACC, a robust case.'), { accent: 'teal', icon: 'scenarios' }) + '</div>' +
-      '<div class="col-7">' + renderSavingsWaterfall(d) + '</div>' +
-      '<div class="col-5">' + saCard('Cost Teardown (Year-1 target)', renderTeardown(d), { icon: 'doc' }) + '</div>' +
       '<div class="col-12">' + saCard('Assumptions Register', renderAssumptionsRegister(d), { accent: 'emph', icon: 'assume', sub: (d.assumptions || []).length + ' inputs' }) + '</div>' +
     '</div>';
 
@@ -414,16 +410,34 @@ function renderTab_commercials(d) {
     '.commercials-tab .scst-lg b{color:var(--ink2)}' +
     '.commercials-tab .rl-item{font-size:var(--fz-sm);line-height:1.45}' +
     '.commercials-tab .npv-svg{width:100%;height:auto;display:block;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm)}' +
+    /* Financial Model: detailed pro-forma table + Summary/Detailed toggle */
+    '.commercials-tab .pf-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}' +
+    '.commercials-tab .pf-toggle{display:inline-flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden}' +
+    '.commercials-tab .pf-tab{appearance:none;border:0;background:var(--surface);color:var(--mut);font:700 11px/1 var(--sans);padding:7px 13px;cursor:pointer}' +
+    '.commercials-tab .pf-tab+.pf-tab{border-left:1px solid var(--line2)}' +
+    '.commercials-tab .pf-tab.is-on{background:var(--plum);color:#fff}' +
+    '.commercials-tab .pf-note{font-size:11px;color:var(--mut2)}' +
+    '.commercials-tab .pf-scroll{overflow-x:auto}' +
+    '.commercials-tab .pf-table{width:100%;border-collapse:collapse;font-size:var(--fz-sm)}' +
+    '.commercials-tab .pf-table th,.commercials-tab .pf-table td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}' +
+    '.commercials-tab .pf-table th{font:700 10px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);background:var(--surface2)}' +
+    '.commercials-tab .pf-table td.pf-n,.commercials-tab .pf-table th.pf-n{text-align:right;font-variant-numeric:tabular-nums}' +
+    '.commercials-tab .pf-table tfoot .pf-tot td{font-weight:800;border-top:2px solid var(--line2);border-bottom:0;color:var(--ink)}' +
+    '.commercials-tab .pf-wrap[data-pf-mode="summary"] .pf-detail{display:none}' +
+    /* icon-only button (WACC reset) */
+    '.commercials-tab .btn-icon{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid var(--line2);border-radius:7px;background:var(--surface);color:var(--mut);cursor:pointer}' +
+    '.commercials-tab .btn-icon:hover{color:var(--plum);border-color:var(--plum)}' +
+    '.commercials-tab .btn-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}' +
   '</style>';
 
   return scopedStyle + '<div class="commercials-tab">' +
     '<div class="subtabbar" data-subtab-group="commercials"><div class="wrap">' +
       '<button class="subtab-btn" data-subtab="deal" aria-selected="true">' + icon('money') + ' Deal Table &amp; ZOPA</button>' +
-      '<button class="subtab-btn" data-subtab="proforma">' + icon('scale') + ' Pro-forma</button>' +
+      '<button class="subtab-btn" data-subtab="proforma">' + icon('scale') + ' Financial Model</button>' +
     '</div></div>' +
     '<div class="tab-body"><div class="wrap">' +
       '<div data-subpanel="commercials/deal" class="is-active">' + deal + '</div>' +
-      '<div data-subpanel="commercials/proforma">' + proforma + '</div>' +
+      '<div data-subpanel="commercials/proforma">' + financial + '</div>' +
     '</div></div>' +
   '</div>';
 }

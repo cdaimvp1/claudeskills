@@ -391,7 +391,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -430,6 +430,16 @@ const DealUI = {
         const m = t.closest('[data-scmaster]') || document;
         m.querySelectorAll('[data-scpick]').forEach(r => r.classList.toggle('sc-sel', r === t));
         m.querySelectorAll('[data-scpanel]').forEach(p => { p.hidden = p.getAttribute('data-scpanel') !== id; });
+        return;
+      }
+      // Financial Model pro-forma: Summary <-> Detailed column toggle, scoped to the nearest table.
+      if (t.hasAttribute('data-pf-view')) {
+        const view = t.getAttribute('data-pf-view');
+        const wrap = t.closest('[data-pf-mode]');
+        if (wrap) {
+          wrap.setAttribute('data-pf-mode', view);
+          wrap.querySelectorAll('[data-pf-view]').forEach(b => b.classList.toggle('is-on', b.getAttribute('data-pf-view') === view));
+        }
         return;
       }
       if (t.hasAttribute('data-print')) { window.print(); return; }

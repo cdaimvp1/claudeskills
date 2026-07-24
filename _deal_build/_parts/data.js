@@ -839,30 +839,8 @@ const dashboardData = {
     ],
     breakEven: { rate: 35, months: 28 },   // NPV of net value crosses zero at a ~35% discount rate (far above the 6% WACC, robust); undiscounted payback ~28 months
     paybackMonths: 28,
-    savingsWaterfall: [
-      { label: 'Supplier ask (3-yr TCV)', delta: 3051000, kind: 'baseline' },
-      { label: 'Platform subscription discount', delta: -420000, kind: 'concession' },
-      { label: 'Premium support reduction', delta: -105000, kind: 'concession' },
-      { label: 'Implementation fee reduction', delta: -60000, kind: 'concession' },
-      { label: 'Connectors + training reductions', delta: -25000, kind: 'concession' },
-      { label: 'Renewal / in-term uplift cap', delta: -69000, kind: 'concession' },
-      { label: 'Target (3-yr TCV)', delta: 2372000, kind: 'net' }
-    ],
-    teardown: [
-      { line: 'Platform subscription', driver: '18,000 employees × ~$36/emp/yr (target)', amount: 640000, evidenceType: 'calculated' },
-      { line: 'Implementation services', driver: 'SOW-01 fixed fee, ~80 person-days at target day-rate', amount: 160000, evidenceType: 'calculated' },
-      { line: 'Premium support', driver: 'Enterprise support tier (target)', amount: 60000, evidenceType: 'calculated' },
-      { line: 'Data connectors (2)', driver: '2 additional source connectors, one-time', amount: 30000, evidenceType: 'calculated' },
-      { line: 'Training', driver: '2 sessions, up to 25 users, one-time', amount: 18000, evidenceType: 'calculated' }
-    ],
-    // precomputed tornado, each driver swings the 3-yr GROSS TCO (base $2.372M)
-    sensitivity: [
-      { driver: 'Employee count (±33%)',        low: 1732000, base: 2372000, high: 3012000 },
-      { driver: 'Platform discount (10–25%)',    low: 2207000, base: 2372000, high: 2558000 },
-      { driver: 'In-term uplift (0–6%)',         low: 2308000, base: 2372000, high: 2437000 },
-      { driver: 'Implementation effort (±25%)',  low: 2332000, base: 2372000, high: 2412000 },
-      { driver: 'Premium support scope (±25%)',  low: 2327000, base: 2372000, high: 2417000 }
-    ]
+    // savingsWaterfall / teardown / sensitivity retired: the negotiated-value ladder (from
+    // scenarios) lives on the Deal tab, and sensitivity is now the live ZOPA driver sliders.
   },
 
   /* ---- 8. negotiation (positions reference issue ids, never re-state them) - */
