@@ -328,6 +328,27 @@ Generate the deliverables below. Run the Pre-Delivery Self-Test (Deliverables se
    ```
    This is the durable artifact. Write it to Project Knowledge when a Project is present (S2). It is what process-navigator's New-Supplier Governance Rows widget checks for as evidence of "Sole-Source Justification Captured" (see Cross-Skill Handoffs).
 
+## Outputs: PPTX deck or Word doc
+
+`sole_source_generator.py` (vendored in this skill's own directory, alongside `numeric_kernel.py`) mechanically renders Deliverable #1 above from a single validated sole-source register (the request, the seven scored Challenge dimensions, mitigations, `alternatives_register.csv`-shaped rows, price validation, the research log, and SME routing) into EITHER of two output formats, both driven by the identical data model, never freehand-authored:
+
+- **`sole_source_challenge_report.docx`** (Word memo, python-docx): the full narrative memo, Sections 01 Request Summary, 02 The Challenge, 03 Evidence and Price Validation, 04 Verdict and Recommendation, 05 Next Steps and SME Routing, 06 Research Methodology, and an Appendix (raw scorecard), exactly Deliverable #1's fixed skeleton.
+- **`sole_source_challenge_report.pptx`** (PowerPoint deck, python-pptx): the same content as a 13-slide deck, one idea per slide with a title plus concise bullets or a table (title slide, one slide per DOCX subsection, branching at Section 04 on the verdict into a Mitigations slide, a Leading Dimensions and Watch Items slide, or a Ranked Alternatives Worth Pursuing slide, per whether the verdict is DEFENSIBLE WITH MITIGATIONS, DEFENSIBLE, or WEAK).
+
+Invocations (run from this skill's own directory):
+```
+python sole_source_generator.py --input register.json --output sole_source_challenge_report.docx --format docx
+python sole_source_generator.py --input register.json --output sole_source_challenge_report.pptx --format pptx
+python sole_source_generator.py --demo          # or --self-test; builds all 3 illustrative demo
+                                                  # registers (a DEFENSIBLE WITH MITIGATIONS case
+                                                  # matching this file's own Phase 4 worked example,
+                                                  # 3.475; a WEAK case; and a Hard-Rule-2-capped case)
+                                                  # in both formats, reopens each with
+                                                  # python-docx / python-pptx, and asserts (reports N/N)
+```
+
+The Defensibility Score (via `weighted_score()`, G11), the verdict band and the Hard Rule 2 ASSERTED-majority cap, the ranked alternatives ordering, `recommended_next_action`, and the closing Next Steps are all COMPUTED by the generator, never hand-typed into either format. Mitigations, the alternatives register, price-validation figures, the research log, and SME routing are consumed as already-decided input (this skill's own Phase 2-4 judgment), never re-derived. A hard-coded invariant gate (weights sum to 1.00, weighted contributions reconcile to the score, the score is in range, the verdict matches its band and cap, the price position matches the figures, mitigations are present when the verdict requires them, alternatives is never empty, the ranked-alternatives table is genuinely sorted, and a debarment/sanctions/GxP-adjacent reference is always SME-routed) must pass before either file is saved. See the module docstring in `sole_source_generator.py` for the full input JSON schema and the judgment calls it flags.
+
 **Pre-Delivery Self-Test (G6, run before presenting):**
 - [ ] All seven dimensions scored, each with a VERIFIED/ASSERTED/INFERRED label and named evidence or an explicit gap.
 - [ ] The Defensibility Score is the kernel's `weighted_score()` return value, shown with the full calc table; weighted_contribution values sum to it.
