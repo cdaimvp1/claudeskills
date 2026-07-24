@@ -391,7 +391,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -421,6 +421,15 @@ const DealUI = {
         if (box) box.value = '';
         scope.querySelectorAll('[data-filterchip][aria-pressed="true"]').forEach(c => c.setAttribute('aria-pressed', 'false'));
         this.applyChipFilters(scope);
+        return;
+      }
+      // Scope reconciliation master-detail: clicking a list row (data-scpick="id") selects it and
+      // reveals the matching detail panel (data-scpanel="id") within the nearest [data-scmaster].
+      if (t.hasAttribute('data-scpick')) {
+        const id = t.getAttribute('data-scpick');
+        const m = t.closest('[data-scmaster]') || document;
+        m.querySelectorAll('[data-scpick]').forEach(r => r.classList.toggle('sc-sel', r === t));
+        m.querySelectorAll('[data-scpanel]').forEach(p => { p.hidden = p.getAttribute('data-scpanel') !== id; });
         return;
       }
       if (t.hasAttribute('data-print')) { window.print(); return; }

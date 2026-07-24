@@ -792,13 +792,7 @@ function raciCell(val) {
 /* ---- scope chips (locked palette: teal/plum/burnt-orange, red only for a true conflict) ---- */
 const SCOPE_STATUS_LABEL = { 'in-contract':'In contract', partial:'Partial', ambiguous:'Ambiguous', missing:'Missing', contradicted:'Contradicted' };
 function scopeStatusChip(s) { return '<span class="sc-st sc-st-' + esc(s) + '">' + esc(SCOPE_STATUS_LABEL[s] || s) + '</span>'; }
-function shiftTypeChip(t) { return '<span class="sc-shift-type">' + esc(t) + '</span>'; }
 function stanceChip(s) { return '<span class="sc-stance sc-stance-' + esc(s) + '">' + esc(s === 'push-back' ? 'Push back' : 'Accept') + '</span>'; }
-function normMark(present) {
-  if (present === true) return '<span class="sc-st sc-st-in-contract">Present</span>';
-  if (present === 'partial') return '<span class="sc-st sc-st-partial">Partial</span>';
-  return '<span class="sc-st sc-st-missing">Missing</span>';
-}
 
 /* ---- intent rollup: the scope-readiness verdict (complete / sound / fairly allocated) ---- */
 function scopeReadiness(d) {
@@ -818,41 +812,64 @@ function scopeReadiness(d) {
   const vlabel = vk === 'deviation' ? 'Fix before signature' : (vk === 'partial' ? 'Proceed with conditions' : 'Scope-ready');
   return { missing, contradicted, ambiguous, partial, inC, undefinedAcc, ambiguousRaci, slaGaps, pushBacks, completeK, soundK, fairK, vk, vlabel, total: is.length };
 }
-function scopeReadinessBanner(d) {
-  const r = scopeReadiness(d);
-  const dim = (name, k, detail) => '<div class="sc-rd-dim">' +
-    '<div class="sc-rd-dn">' + esc(name) + statusPill(k, k === 'aligned' ? 'OK' : (k === 'partial' ? 'Watch' : 'Gaps')) + '</div>' +
-    '<div class="sc-rd-dt">' + detail + '</div></div>';
-  const body = '<div class="sc-readiness">' +
-    dim('Complete', r.completeK, r.inC + ' of ' + r.total + ' intended items in contract &middot; ' + r.missing + ' missing &middot; ' + r.contradicted + ' contradicted') +
-    dim('Sound as drafted', r.soundK, r.undefinedAcc + ' undefined acceptance &middot; ' + r.ambiguousRaci + ' unclear accountability &middot; ' + r.slaGaps + ' SLA gaps') +
-    dim('Fairly allocated', r.fairK, r.pushBacks + ' scope points shift onto Lilly &middot; push back') +
-    '</div>';
-  return saCard('Scope Readiness', body,
-    { icon:'shield', accent: r.vk === 'deviation' ? 'danger' : (r.vk === 'partial' ? 'emph' : 'teal'),
-      sub: '<span class="sc-verdict sc-verdict-' + r.vk + '">' + esc(r.vlabel) + '</span>' });
-}
 
-/* ---- intent 1: intended-scope-vs-contract reconciliation (the centerpiece) ---- */
-function renderReconciliation(d) {
+/* ---- intent 1 + 3: reconciliation master-detail (Mockup C). One list unifies requested /
+ * assumed / category-norm scope items AND the shifts-to-Lilly (all "expected vs what the paper
+ * says"); clicking a row reveals its detail. Performance stays its own panel. Interaction is the
+ * delegated DealUI data-scpick handler (helpers.js), no inline JS. ---- */
+const SC_ORIGIN_LABEL = { requested:'Requested', assumed:'Assumed', norm:'Norm', shift:'Shift' };
+function scReconItems(d) {
   const sc = d.scope || {};
-  const cols = [
-    { key:'text', label:'Intended scope', render: r => '<strong>' + esc(r.text) + '</strong><div class="tiny muted">' + esc(r.source) + '</div>' },
-    { key:'status', label:'Status', width:'132px', sortVal: r => r.status, render: r => scopeStatusChip(r.status) },
-    { key:'contractRef', label:'In contract', width:'150px', sort:false, render: r => r.contractRef ? esc(r.contractRef) : '<span class="tiny muted">&mdash;</span>' },
-    { key:'confidence', label:'Conf.', width:'70px', sort:false, render: r => '<span class="tiny">' + esc(r.confidence) + '</span>' }
-  ];
-  const table = dataTable(cols, sc.intendedScope || [], { zebra:true, dense:true, id:'tbl-reconcile',
-    rowClass: r => r.status === 'contradicted' ? 'rowtint-danger' : (r.status === 'missing' ? 'rowtint-warn' : ''),
-    expand: r => '<div class="kv"><dt>Detail</dt><dd>' + esc(r.note) + ' ' + evidenceChip(r.evidenceType, { short:true }) + '</dd></div>' });
-  const assumed = (sc.assumedScope || []).map(a => '<li>' + esc(a.text) + ' <span class="tiny muted">' + esc(a.note) + '</span> ' + evidenceChip(a.evidenceType, { short:true }) + '</li>').join('');
-  const norms = (sc.categoryNorms || []).map(n => '<li>' + normMark(n.present) + ' ' + esc(n.text) + ' <span class="tiny muted">' + esc(n.note) + '</span></li>').join('');
-  const extra = '<div class="sc-recon-extra">' +
-    '<div class="sc-re-col"><div class="eyebrow">Assumed / unwritten (' + (sc.assumedScope || []).length + ')</div><ul class="sc-re-list">' + assumed + '</ul></div>' +
-    '<div class="sc-re-col"><div class="eyebrow">Category norms &middot; Total Recall</div><ul class="sc-re-list">' + norms + '</ul></div>' +
+  const scope = (sc.intendedScope || []).map(x => ({ kind:'scope', id:x.id, origin:x.origin || 'requested', x:x }));
+  const shifts = (sc.shifts || []).map(s => ({ kind:'shift', id:s.id, origin:'shift', x:s }));
+  return scope.concat(shifts);
+}
+function scReconKV(k, v, cls) { return '<div class="sc-rr"><div class="sc-rk">' + esc(k) + '</div><div class="sc-rv ' + (cls || '') + '">' + v + '</div></div>'; }
+function scReconRow(it, first) {
+  const x = it.x;
+  const chip = it.kind === 'shift' ? stanceChip(x.stance) : scopeStatusChip(x.status);
+  const sub = it.kind === 'shift' ? x.trigger : (x.contractRef || '');
+  return '<div class="sc-row' + (first ? ' sc-sel' : '') + '" role="button" tabindex="0" data-scpick="' + esc(x.id) + '" title="Show detail">' +
+    '<span class="sc-src sc-src-' + esc(it.origin) + '">' + esc(SC_ORIGIN_LABEL[it.origin] || it.origin) + '</span>' +
+    '<span class="sc-rtxt">' + esc(x.text) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span>' +
+    chip + '</div>';
+}
+function scScopeDetail(x) {
+  return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(x.id) + '</span>' + scopeStatusChip(x.status) + '<span class="sc-shift-type">' + esc(x.source) + '</span></div>' +
+    '<div class="sc-dl-title">' + esc(x.text) + '</div>' +
+    '<div class="sc-recon">' +
+      scReconKV('Intended', esc(x.intended || '—')) +
+      scReconKV('In contract', esc(x.contract || '—') + (x.contractRef ? ' <span class="sc-tag">' + esc(x.contractRef) + '</span>' : '')) +
+      scReconKV('Delta', esc(x.delta || '—'), 'sc-delta') +
+      scReconKV('Recommend', esc(x.rec || '—'), 'sc-rec') +
+      scReconKV('Confidence', esc(x.confidence || '—') + ' ' + evidenceChip(x.evidenceType, { short:true })) +
+    '</div>';
+}
+function scShiftDetail(s) {
+  return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(s.id) + '</span>' + stanceChip(s.stance) + '<span class="sc-shift-type">' + esc(s.shiftType) + '</span></div>' +
+    '<div class="sc-dl-title">' + esc(s.text) + '</div>' +
+    '<div class="sc-recon">' +
+      scReconKV('Shifts', '<b>' + esc(s.shiftType) + '</b> onto Lilly') +
+      scReconKV('Source', esc(s.source)) +
+      scReconKV('Trigger', esc(s.trigger)) +
+      scReconKV('Stance', s.stance === 'push-back' ? 'Push back' : 'Accept') +
+      scReconKV('Recommend', esc(s.note || '—'), 'sc-rec') +
+      scReconKV('Evidence', evidenceChip(s.evidenceType, { short:true })) +
+    '</div>';
+}
+function renderReconciliation(d) {
+  const items = scReconItems(d);
+  const list = items.map((it, i) => scReconRow(it, i === 0)).join('');
+  const panels = items.map((it, i) =>
+    '<div class="sc-detail-panel" data-scpanel="' + esc(it.id) + '"' + (i === 0 ? '' : ' hidden') + '>' +
+      (it.kind === 'shift' ? scShiftDetail(it.x) : scScopeDetail(it.x)) + '</div>').join('');
+  const body = '<div class="sc-md" data-scmaster>' +
+    '<div class="sc-md-list">' + list + '</div>' +
+    '<div class="sc-md-detail">' + panels + '</div>' +
   '</div>';
-  return saCard('Intended-Scope Reconciliation', table + extra,
-    { icon:'target', accent:'teal', sub: 'is what we asked for actually in the paper?' });
+  const nScope = (d.scope.intendedScope || []).length, nShift = (d.scope.shifts || []).length;
+  return saCard('Intended-Scope Reconciliation', body,
+    { icon:'target', accent:'teal', sub: nScope + ' scope items &middot; ' + nShift + ' shifts &middot; click a row' });
 }
 
 /* ---- intent 1 (timeline verification) + payment structure ---- */
@@ -891,20 +908,6 @@ function renderRaciPanel(d) {
     amb + ' of ' + rows.length + ' activities have unclear accountability (two Accountable, or none) &mdash; expand for detail.</div>';
   return saCard('Responsibility (RACI)', table + legend, { icon:'raci', sub: amb + ' unclear' });
 }
-function renderShifts(d) {
-  const sc = d.scope || {};
-  const cols = [
-    { key:'text', label:'Scope point that shifts to Lilly', render: r => '<strong>' + esc(r.text) + '</strong><div class="tiny muted">' + esc(r.source) + '</div>' },
-    { key:'shiftType', label:'Shifts', width:'92px', sortVal: r => r.shiftType, render: r => shiftTypeChip(r.shiftType) },
-    { key:'trigger', label:'Trigger', width:'132px', sort:false, render: r => '<span class="tiny">' + esc(r.trigger) + '</span>' },
-    { key:'stance', label:'Stance', width:'104px', sortVal: r => r.stance === 'push-back' ? 1 : 0, render: r => stanceChip(r.stance) }
-  ];
-  const table = dataTable(cols, sc.shifts || [], { zebra:true, dense:true, id:'tbl-shifts',
-    rowClass: r => r.stance === 'push-back' ? 'rowtint-warn' : '',
-    expand: r => '<div class="kv"><dt>Why it matters / how to handle</dt><dd>' + esc(r.note) + ' ' + evidenceChip(r.evidenceType, { short:true }) + '</dd></div>' });
-  const pb = (sc.shifts || []).filter(s => s.stance === 'push-back').length;
-  return saCard('Shifts to Lilly', table, { icon:'flag', accent:'emph', sub: pb + ' to push back' });
-}
 
 /* ---- intent 2: performance (SLA/KPI + acceptance gates + change control, merged) ---- */
 function renderPerformance(d) {
@@ -940,12 +943,12 @@ function renderPerformance(d) {
 // services/SOW composition. Goods/capital would compose a parallel set (spec conformance, Incoterms,
 // FAT/SAT) over the same backbone, driven off d.meta.contractSet + category traits.
 function renderScopePerfFull(d) {
+  // shifts fold INTO the reconciliation ledger (Mockup C); readiness is a header strip (renderScopePerf);
+  // RACI is full-width. Timeline is a services/SOW-trait panel.
   return '<div class="grid">' +
-      '<div class="col-12">' + scopeReadinessBanner(d) + '</div>' +
       '<div class="col-12">' + renderReconciliation(d) + '</div>' +
       '<div class="col-12">' + renderDeliveryTimeline(d) + '</div>' +
-      '<div class="col-5">' + renderRaciPanel(d) + '</div>' +
-      '<div class="col-7">' + renderShifts(d) + '</div>' +
+      '<div class="col-12">' + renderRaciPanel(d) + '</div>' +
       '<div class="col-12">' + renderPerformance(d) + '</div>' +
     '</div>';
 }
@@ -958,8 +961,13 @@ function renderScopePerf(d) {
     return '<div class="tab-intro"><h2>Scope &amp; Performance</h2><p class="q">No Statement of Work in scope. ' + coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
       '<div class="grid"><div class="col-12">' + note + '</div></div>';
   }
-  return '<div class="tab-intro"><h2>Scope &amp; Performance</h2><p class="q">SOW-01 objective, delivery schedule, acceptance standards, responsibility split and service levels. ' +
-    coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
+  // readiness verdict as a compact header strip (replaces the old banner panel)
+  const r = scopeReadiness(d);
+  const strip = '<div class="sc-strip"><span class="sc-verdict sc-verdict-' + r.vk + '">' + esc(r.vlabel) + '</span>' +
+    '<span class="sc-strip-d">' + r.missing + ' missing &middot; ' + r.contradicted + ' contradicted &middot; ' +
+    r.undefinedAcc + ' undefined acceptance &middot; ' + r.pushBacks + ' shifts to push back</span></div>';
+  return '<div class="tab-intro"><h2>Scope &amp; Performance</h2><p class="q">Is the scope complete, sound, and fairly allocated? ' +
+    coverageBadge(d.deal.evidenceCoverage) + '</p>' + strip + '</div>' +
     renderScopePerfFull(d);
 }
 
@@ -1250,10 +1258,35 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-stance{display:inline-block;font:800 9.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:6px}' +
   '.contract-tab .sc-stance-push-back{background:color-mix(in srgb,var(--emph) 12%,transparent);color:var(--emph)}' +
   '.contract-tab .sc-stance-accept{background:var(--sec-t);color:var(--sec-tx)}' +
-  '.contract-tab .sc-recon-extra{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}' +
-  '.contract-tab .sc-re-list{margin:6px 0 0;padding-left:16px;line-height:1.7;font-size:12px;color:var(--ink2)}' +
-  '.contract-tab .sc-re-list li{margin-bottom:5px}' +
-  '@media(max-width:760px){.contract-tab .sc-recon-extra{grid-template-columns:1fr}}' +
+  /* readiness header strip + reconciliation master-detail (Mockup C) */
+  '.contract-tab .sc-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}' +
+  '.contract-tab .sc-strip-d{font-size:11.5px;color:var(--mut)}' +
+  '.contract-tab .sc-md{display:grid;grid-template-columns:minmax(300px,1fr) 1.3fr;border:1px solid var(--line);border-radius:9px;overflow:hidden}' +
+  '.contract-tab .sc-md-list{border-right:1px solid var(--line);max-height:470px;overflow-y:auto}' +
+  '.contract-tab .sc-row{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}' +
+  '.contract-tab .sc-row:last-child{border-bottom:0}' +
+  '.contract-tab .sc-row:hover{background:var(--surface2)}' +
+  '.contract-tab .sc-row.sc-sel{background:var(--plum-t)}' +
+  '.contract-tab .sc-row:focus-visible{outline:2px solid var(--sec);outline-offset:-2px}' +
+  '.contract-tab .sc-src{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);background:var(--nested);border:1px solid var(--line2);border-radius:4px;padding:3px 5px;white-space:nowrap}' +
+  '.contract-tab .sc-src-shift{background:color-mix(in srgb,var(--emph) 12%,transparent);color:var(--emph);border-color:color-mix(in srgb,var(--emph) 30%,transparent)}' +
+  '.contract-tab .sc-src-norm{background:var(--plum-t);color:var(--pri-tx);border-color:#d9bcd2}' +
+  '.contract-tab .sc-rtxt{font-weight:600;font-size:12px;color:var(--ink);min-width:0}' +
+  '.contract-tab .sc-rtxt small{display:block;color:var(--mut2);font-weight:500;font-size:10.5px;margin-top:1px}' +
+  '.contract-tab .sc-md-detail{background:var(--surface2);padding:16px 18px;min-height:300px}' +
+  '.contract-tab .sc-detail-panel[hidden]{display:none}' +
+  '.contract-tab .sc-dl-eyebrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}' +
+  '.contract-tab .sc-dl-id{font:800 11px/1 var(--mono);color:var(--mut)}' +
+  '.contract-tab .sc-dl-title{font-size:15px;font-weight:800;line-height:1.3;margin:2px 0 12px;color:var(--ink)}' +
+  '.contract-tab .sc-recon{border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:var(--surface)}' +
+  '.contract-tab .sc-rr{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid var(--line)}' +
+  '.contract-tab .sc-rr:last-child{border-bottom:0}' +
+  '.contract-tab .sc-rk{background:var(--nested);font:800 9.5px/1.3 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);padding:9px 10px}' +
+  '.contract-tab .sc-rv{padding:9px 11px;font-size:12px;color:var(--ink2);line-height:1.45}' +
+  '.contract-tab .sc-rv.sc-delta{color:var(--emph);font-weight:700}' +
+  '.contract-tab .sc-rv.sc-rec{color:var(--plum);font-weight:700}' +
+  '.contract-tab .sc-tag{font:700 10px/1 var(--mono);color:var(--mut);background:var(--nested);border:1px solid var(--line2);border-radius:5px;padding:2px 6px}' +
+  '@media(max-width:760px){.contract-tab .sc-md{grid-template-columns:1fr}.contract-tab .sc-md-list{max-height:none}}' +
   '</style>';
 
 /* ============================================================================
