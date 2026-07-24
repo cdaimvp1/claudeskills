@@ -1032,9 +1032,23 @@ function renderPerformance(d) {
       '<dt>Playbook</dt><dd>' + esc(r.playbook) + '</dd>' +
       '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.recommend) + (r.issueId ? ' ' + issueJump(r.issueId) : '') + '</dd>' +
       '</dl>' + (r.why ? '<div class="sc-perf-why">' + esc(r.why) + '</div>' : '') + '</div>' });
-  const body = '<div class="eyebrow" style="margin:2px 0 7px">Service levels &amp; KPIs</div>' + slaTable +
-    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Deliverable acceptance gates</div>' + accTable + accNote +
-    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Change control</div>' + chgTable;
+  // commitments-health summary strip: how many in each section fall short, at a glance
+  const sl = sc.serviceLevels || [], cc = sc.changeControl || [];
+  const nSla = sl.filter(x => x.status !== 'aligned').length;
+  const nAcc = (sc.acceptance || []).filter(x => !x.defined).length;
+  const nChg = cc.filter(x => x.status !== 'aligned').length;
+  const stat = (n, total, label) => '<div class="perf-stat"><span class="perf-n ' + (n ? 'bad' : 'ok') + '">' + n + '</span>' +
+    '<span class="perf-lbl">of ' + total + ' ' + label + '</span></div>';
+  const health = '<div class="perf-health">' +
+    stat(nSla, sl.length, 'SLAs below playbook') +
+    stat(nAcc, (sc.acceptance || []).length, 'acceptance gates undefined') +
+    stat(nChg, cc.length, 'change-control terms to fix') + '</div>';
+  const eb = (label, n, suffix) => '<div class="eyebrow perf-eb" style="margin:2px 0 7px">' + label +
+    (n ? ' <span class="perf-chip">' + n + ' ' + suffix + '</span>' : ' <span class="perf-chip ok">clear</span>') + '</div>';
+  const body = health +
+    eb('Service levels &amp; KPIs', nSla, 'below') + slaTable +
+    '<div class="divider"></div>' + eb('Deliverable acceptance gates', nAcc, 'undefined') + accTable + accNote +
+    '<div class="divider"></div>' + eb('Change control', nChg, 'to fix') + chgTable;
   return saCard('Performance: SLAs, Acceptance & Change Control', body, { icon:'shield', accent:'emph', sub:'click any row for the recommendation' });
 }
 
@@ -1063,11 +1077,13 @@ function renderSowAssumptions(d) {
     rowClass: r => onLilly(r) ? 'rowtint-warn' : '',
     expand: r => '<div class="kv">' +
       '<dt>Presumes</dt><dd>' + esc(r.presumes) + '</dd>' +
+      '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.rec || '—') + '</dd>' +
+      '<dt>Raise with</dt><dd><b>' + esc(r.raiseWith || '—') + '</b></dd>' +
       '<dt>Linked</dt><dd>' + saLinkedHtml(r.linked) + '</dd></div>' });
   const nLilly = sa.filter(onLilly).length;
-  return saCard('SOW Assumptions (supplier-stated)',
-    table + insight('These are the premises the SOW is built on, not consequences. <strong>' + nLilly + '</strong> of ' + sa.length +
-      ' put the burden on Lilly if they prove untrue. Verify each before relying on the delivery plan; every row cites the clause it comes from. ' + evidenceChip('contract', { short:true }), nLilly ? 'warn' : ''),
+  return saCard('Contract Assumptions (supplier-stated)',
+    table + insight('The premises the contract (SOW and MSA) is built on, not consequences. <strong>' + nLilly + '</strong> of ' + sa.length +
+      ' put the burden on Lilly if they prove untrue, the classic risk in a fixed-price services deal: the supplier assumes conditions that, if wrong, become Lilly’s cost or delay. Verify each; every row cites the clause and expands to a recommendation. ' + evidenceChip('contract', { short:true }), nLilly ? 'warn' : ''),
     { icon:'assume', accent:'plum', sub: nLilly + ' shift the burden to Lilly' });
 }
 
@@ -1471,6 +1487,14 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-mmeta i{display:block;font:700 9px/1.5 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);font-style:normal}' +
   '.contract-tab .sc-perf-rec{font-weight:600;color:var(--ink)}' +
   '.contract-tab .sc-perf-why{margin-top:6px;font-size:12px;line-height:1.5;color:var(--mut2);font-style:italic}' +
+  /* Performance commitments-health strip + per-section count chips */
+  '.contract-tab .perf-health{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}' +
+  '.contract-tab .perf-stat{flex:1 1 150px;min-width:140px;display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--surface);border:1px solid var(--line2);border-radius:8px}' +
+  '.contract-tab .perf-n{font:800 21px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--emph);min-width:20px;text-align:center}' +
+  '.contract-tab .perf-n.ok{color:var(--sec)}' +
+  '.contract-tab .perf-lbl{font-size:11px;line-height:1.35;color:var(--mut2)}' +
+  '.contract-tab .perf-chip{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;color:var(--emph-tx);background:var(--emph-t);vertical-align:1px}' +
+  '.contract-tab .perf-chip.ok{color:var(--sec-tx);background:var(--sec-t)}' +
   '.contract-tab .sc-lk-ref{font:700 10px/1 var(--mono);color:var(--mut2);background:var(--nested);padding:2px 5px;border-radius:4px}' +
   '.contract-tab .sc-tl-detail{border-top:1px solid var(--line);min-height:0}' +
   '.contract-tab .sc-msec-h{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}' +

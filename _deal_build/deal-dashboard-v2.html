@@ -2651,11 +2651,11 @@ const dashboardData = {
      * clause, `burden` who carries it if the premise is wrong, and `linked` the shift/finding it
      * drives. Trait-gated: renders only for engagements with a SOW in scope. */
     sowAssumptions: [
-      { id: 'SA-1', assumption: 'Customer will provide data in a clean, conformed format.', ref: 'SOW-01 assumptions', presumes: 'Lilly’s HR extracts are analysis-ready at handover.', burden: 'Lilly', risk: 'If the extracts need remediation, that effort (and any M2 slip) is Lilly’s; the proposal implied supplier-assisted cleansing.', linked: ['SH-2', 'IS-7'], evidenceType: 'contract' },
-      { id: 'SA-2', assumption: 'SSO / RBAC configuration is a “Joint” responsibility.', ref: 'SOW-01 D4', presumes: 'Lilly supplies unspecified SSO / RBAC configuration effort.', burden: 'Lilly', risk: 'No task split or Lilly-side estimate; the un-scoped config effort surfaces at M4.', linked: ['SH-5', 'IS-3'], evidenceType: 'contract' },
-      { id: 'SA-3', assumption: 'Deliverables are deemed accepted after 10 business days of silence.', ref: 'SOW-01 §5', presumes: 'Lilly actively reviews and rejects within 10 days, or accepts by default.', burden: 'Lilly', risk: 'Silence = acceptance shifts the QA burden onto Lilly against a short clock; D3 and D5 carry no objective standard.', linked: ['SH-3', 'ISS-10'], evidenceType: 'contract' },
-      { id: 'SA-4', assumption: 'Historical data older than three years is out of scope.', ref: 'SOW-01 §4', presumes: 'Three years of history is sufficient for Lilly’s analytics.', burden: 'Lilly', risk: 'Lilly asked for five years (IS-4); the extra two years become a post-signature change order at the uncapped day-rate.', linked: ['IS-4', 'SH-4'], evidenceType: 'contract' },
-      { id: 'SA-5', assumption: 'Service levels apply from the go-live date.', ref: 'MSA §7.2', presumes: 'No availability / support commitment is needed during onboarding.', burden: 'Lilly', risk: 'The whole implementation window is un-SLA’d; an outage during onboarding has no remedy.', linked: ['AS-1'], evidenceType: 'contract' }
+      { id: 'SA-1', assumption: 'Customer will provide data in a clean, conformed format.', ref: 'SOW-01 assumptions', presumes: 'Lilly’s HR extracts are analysis-ready at handover.', burden: 'Lilly', risk: 'If the extracts need remediation, that effort (and any M2 slip) is Lilly’s; the proposal implied supplier-assisted cleansing.', rec: 'Negotiate a supplier-assisted cleansing allowance, or budget the internal remediation effort explicitly.', raiseWith: 'Supplier PM + Buyer data team', linked: ['SH-2', 'IS-7'], evidenceType: 'contract' },
+      { id: 'SA-2', assumption: 'SSO / RBAC configuration is a “Joint” responsibility.', ref: 'SOW-01 D4', presumes: 'Lilly supplies unspecified SSO / RBAC configuration effort.', burden: 'Lilly', risk: 'No task split or Lilly-side estimate; the un-scoped config effort surfaces at M4.', rec: 'Split the SSO / RBAC tasks and estimate the Lilly-side effort before M4.', raiseWith: 'Supplier PM + Buyer IT', linked: ['SH-5', 'IS-3'], evidenceType: 'contract' },
+      { id: 'SA-3', assumption: 'Deliverables are deemed accepted after 10 business days of silence.', ref: 'SOW-01 §5', presumes: 'Lilly actively reviews and rejects within 10 days, or accepts by default.', burden: 'Lilly', risk: 'Silence = acceptance shifts the QA burden onto Lilly against a short clock; D3 and D5 carry no objective standard.', rec: 'Require explicit written acceptance (not silence), or extend the review window, and add objective criteria for D3 / D5.', raiseWith: 'Supplier PM + Legal', linked: ['SH-3', 'ISS-10'], evidenceType: 'contract' },
+      { id: 'SA-4', assumption: 'Historical data older than three years is out of scope.', ref: 'SOW-01 §4', presumes: 'Three years of history is sufficient for Lilly’s analytics.', burden: 'Lilly', risk: 'Lilly asked for five years (IS-4); the extra two years become a post-signature change order at the uncapped day-rate.', rec: 'Restore the 5-year history, or accept 3 years with a fixed-price option to add the 2 years later.', raiseWith: 'Supplier PM + Category lead', linked: ['IS-4', 'SH-4'], evidenceType: 'contract' },
+      { id: 'SA-5', assumption: 'Service levels apply from the go-live date.', ref: 'MSA §7.2', presumes: 'No availability / support commitment is needed during onboarding.', burden: 'Lilly', risk: 'The whole implementation window is un-SLA’d; an outage during onboarding has no remedy.', rec: 'Add an implementation-phase availability / support commitment before go-live.', raiseWith: 'Supplier PM', linked: ['AS-1'], evidenceType: 'contract' }
     ]
   },
 
@@ -4676,9 +4676,23 @@ function renderPerformance(d) {
       '<dt>Playbook</dt><dd>' + esc(r.playbook) + '</dd>' +
       '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.recommend) + (r.issueId ? ' ' + issueJump(r.issueId) : '') + '</dd>' +
       '</dl>' + (r.why ? '<div class="sc-perf-why">' + esc(r.why) + '</div>' : '') + '</div>' });
-  const body = '<div class="eyebrow" style="margin:2px 0 7px">Service levels &amp; KPIs</div>' + slaTable +
-    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Deliverable acceptance gates</div>' + accTable + accNote +
-    '<div class="divider"></div><div class="eyebrow" style="margin:2px 0 7px">Change control</div>' + chgTable;
+  // commitments-health summary strip: how many in each section fall short, at a glance
+  const sl = sc.serviceLevels || [], cc = sc.changeControl || [];
+  const nSla = sl.filter(x => x.status !== 'aligned').length;
+  const nAcc = (sc.acceptance || []).filter(x => !x.defined).length;
+  const nChg = cc.filter(x => x.status !== 'aligned').length;
+  const stat = (n, total, label) => '<div class="perf-stat"><span class="perf-n ' + (n ? 'bad' : 'ok') + '">' + n + '</span>' +
+    '<span class="perf-lbl">of ' + total + ' ' + label + '</span></div>';
+  const health = '<div class="perf-health">' +
+    stat(nSla, sl.length, 'SLAs below playbook') +
+    stat(nAcc, (sc.acceptance || []).length, 'acceptance gates undefined') +
+    stat(nChg, cc.length, 'change-control terms to fix') + '</div>';
+  const eb = (label, n, suffix) => '<div class="eyebrow perf-eb" style="margin:2px 0 7px">' + label +
+    (n ? ' <span class="perf-chip">' + n + ' ' + suffix + '</span>' : ' <span class="perf-chip ok">clear</span>') + '</div>';
+  const body = health +
+    eb('Service levels &amp; KPIs', nSla, 'below') + slaTable +
+    '<div class="divider"></div>' + eb('Deliverable acceptance gates', nAcc, 'undefined') + accTable + accNote +
+    '<div class="divider"></div>' + eb('Change control', nChg, 'to fix') + chgTable;
   return saCard('Performance: SLAs, Acceptance & Change Control', body, { icon:'shield', accent:'emph', sub:'click any row for the recommendation' });
 }
 
@@ -4707,11 +4721,13 @@ function renderSowAssumptions(d) {
     rowClass: r => onLilly(r) ? 'rowtint-warn' : '',
     expand: r => '<div class="kv">' +
       '<dt>Presumes</dt><dd>' + esc(r.presumes) + '</dd>' +
+      '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.rec || '—') + '</dd>' +
+      '<dt>Raise with</dt><dd><b>' + esc(r.raiseWith || '—') + '</b></dd>' +
       '<dt>Linked</dt><dd>' + saLinkedHtml(r.linked) + '</dd></div>' });
   const nLilly = sa.filter(onLilly).length;
-  return saCard('SOW Assumptions (supplier-stated)',
-    table + insight('These are the premises the SOW is built on, not consequences. <strong>' + nLilly + '</strong> of ' + sa.length +
-      ' put the burden on Lilly if they prove untrue. Verify each before relying on the delivery plan; every row cites the clause it comes from. ' + evidenceChip('contract', { short:true }), nLilly ? 'warn' : ''),
+  return saCard('Contract Assumptions (supplier-stated)',
+    table + insight('The premises the contract (SOW and MSA) is built on, not consequences. <strong>' + nLilly + '</strong> of ' + sa.length +
+      ' put the burden on Lilly if they prove untrue, the classic risk in a fixed-price services deal: the supplier assumes conditions that, if wrong, become Lilly’s cost or delay. Verify each; every row cites the clause and expands to a recommendation. ' + evidenceChip('contract', { short:true }), nLilly ? 'warn' : ''),
     { icon:'assume', accent:'plum', sub: nLilly + ' shift the burden to Lilly' });
 }
 
@@ -5115,6 +5131,14 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-mmeta i{display:block;font:700 9px/1.5 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);font-style:normal}' +
   '.contract-tab .sc-perf-rec{font-weight:600;color:var(--ink)}' +
   '.contract-tab .sc-perf-why{margin-top:6px;font-size:12px;line-height:1.5;color:var(--mut2);font-style:italic}' +
+  /* Performance commitments-health strip + per-section count chips */
+  '.contract-tab .perf-health{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}' +
+  '.contract-tab .perf-stat{flex:1 1 150px;min-width:140px;display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--surface);border:1px solid var(--line2);border-radius:8px}' +
+  '.contract-tab .perf-n{font:800 21px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--emph);min-width:20px;text-align:center}' +
+  '.contract-tab .perf-n.ok{color:var(--sec)}' +
+  '.contract-tab .perf-lbl{font-size:11px;line-height:1.35;color:var(--mut2)}' +
+  '.contract-tab .perf-chip{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;color:var(--emph-tx);background:var(--emph-t);vertical-align:1px}' +
+  '.contract-tab .perf-chip.ok{color:var(--sec-tx);background:var(--sec-t)}' +
   '.contract-tab .sc-lk-ref{font:700 10px/1 var(--mono);color:var(--mut2);background:var(--nested);padding:2px 5px;border-radius:4px}' +
   '.contract-tab .sc-tl-detail{border-top:1px solid var(--line);min-height:0}' +
   '.contract-tab .sc-msec-h{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}' +
@@ -5270,19 +5294,22 @@ function renderDiscountArchitecture(d) {
   const platAsk = sumF(platform, l => l.supplierAmount), svcAsk = sumF(services, l => l.supplierAmount);
   const platPct = platAsk ? Math.round(platDisc / platAsk * 100) : 0;
   const svcPct = svcAsk ? Math.round(svcDisc / svcAsk * 100) : 0;
-  const maxD = Math.max(platDisc, svcDisc, 1);
-  const perLine = lines.map(l => {
-    const dd = disc(l), p = l.supplierAmount ? Math.round(dd / l.supplierAmount * 100) : 0;
-    return '<div class="disc-line"><span>' + esc(l.item) + '</span><span class="mono">' + M(dd) + ' · ' + p + '%</span></div>';
-  }).join('');
+  // one compact per-line table (sorted by room), each line tagged defensible / loaded, with a
+  // mini-bar sized to its share of the room. Replaces the redundant two-bar summary + list.
+  const maxD = Math.max.apply(null, lines.map(disc).concat([1]));
+  const rows = lines.slice().sort((a, b) => disc(b) - disc(a));
+  const cols = [
+    { key: 'item', label: 'Line', render: r => '<strong>' + esc(r.item) + '</strong> ' +
+        (r.id === 'CL-1' ? '<span class="room-tag def">defensible</span>' : '<span class="room-tag load">loaded</span>') },
+    { key: 'room', label: 'Room', align: 'num', sortVal: r => disc(r), render: r => M(disc(r)) },
+    { key: 'pct', label: '% of ask', align: 'num', sortVal: r => r.supplierAmount ? disc(r) / r.supplierAmount : 0,
+      render: r => (r.supplierAmount ? Math.round(disc(r) / r.supplierAmount * 100) : 0) + '%' },
+    { key: 'bar', label: 'Share of the room', sort: false, render: r => miniBar(disc(r), maxD, { color: r.id === 'CL-1' ? 'pri' : 'emph' }) }
+  ];
   return saCard('Where the Room Is',
-    '<div class="disc-summary">' +
-      barRow('Platform (defensible)', platDisc, maxD, M(platDisc) + ' · ~' + platPct + '%', { color: 'pri', title: 'Platform line discount to internal precedent' }) +
-      barRow('Services & support (loaded)', svcDisc, maxD, M(svcDisc) + ' · ~' + svcPct + '%', { color: 'emph', title: 'Implementation, support, connectors, training' }) +
-    '</div>' +
-    '<div style="margin-top:10px">' + perLine + '</div>' +
-    insight('Where to push: the platform is benchmark-defensible (~' + platPct + '% to the 2024 internal precedent), so the room is in the loaded lines &mdash; implementation, support and connectors carry the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
-    { accent: 'plum', icon: 'money', sub: 'the negotiable levers by line ' + evidenceChip('calculated', { short: true }) });
+    dataTable(cols, rows, { id: 'cml-room', dense: true, zebra: true }) +
+    insight('The platform line is benchmark-defensible (~' + platPct + '% room to the 2024 internal precedent), so the real room is in the loaded lines: implementation, support and connectors carry the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
+    { accent: 'plum', icon: 'money', sub: 'negotiable room by line ' + evidenceChip('calculated', { short: true }) });
 }
 function renderRenewalBand(d) {
   const iss = ['ISS-04', 'ISS-11'].map(id => findIssue(d, id)).filter(Boolean);
@@ -5501,20 +5528,20 @@ function recompute(d) {
 function renderTab_commercials(d) {
   const wacc0 = assumVal(d, 'ASM-5', 6), years = assumVal(d, 'ASM-2', 3);
 
-  /* ---- 3A: Deal Table & ZOPA (reordered: room + renewal on top, then should-cost, the
-       negotiated-value ladder, and the ZOPA last with sensitivity drivers + benchmark ticks) ---- */
+  /* ---- 3A: Deal Table & ZOPA (order: room + renewal on top, then the interactive ZOPA
+       (sensitivity drivers + benchmark ticks), then should-cost and the negotiated-value ladder) ---- */
   const deal =
     '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Where the negotiable room is, the supplier ask against Lilly’s target, fallback and walk-away, per-line leverage, and how the number moves with the deal’s drivers. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-6">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-6">' + renderRenewalBand(d) + '</div>' +
-      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
-      '<div class="col-12">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d),
-        { accent: 'plum', icon: 'scenarios', sub: 'supplier ask down to target, step by step' }) + '</div>' +
       '<div class="col-12">' + saCard('ZOPA by Line Item · Sensitivity & Benchmarks',
         window.DealZopa.sensitivity(d) + '<div id="cml-zopa-live">' + window.DealZopa.render(d) + '</div>' + renderDealTotals(d) +
         collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
         { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · leverage · benchmark ticks · live drivers' }) + '</div>' +
+      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
+      '<div class="col-12">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d),
+        { accent: 'plum', icon: 'scenarios', sub: 'supplier ask down to target, step by step' }) + '</div>' +
     '</div>';
 
   /* ---- 3B: Financial Model (was Pro-forma) ---- */
@@ -5547,11 +5574,11 @@ function renderTab_commercials(d) {
     '.commercials-tab .kpi{flex:1 1 140px;min-width:130px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px}' +
     '.commercials-tab .kpi .k-lbl{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700}' +
     '.commercials-tab .kpi .k-val{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:3px;color:var(--ink)}' +
-    '.commercials-tab .disc-line{display:flex;justify-content:space-between;gap:10px;font-size:var(--fz-sm);padding:5px 0;border-top:1px solid var(--line)}' +
-    '.commercials-tab .disc-line:first-child{border-top:0}' +
-    /* the two summary bars: wider label + value columns (thinner bar) so each row is one line */
-    '.commercials-tab .disc-summary .bar-row{grid-template-columns:172px 1fr 96px}' +
-    '.commercials-tab .disc-summary .bl,.commercials-tab .disc-summary .bv{white-space:nowrap}' +
+    /* Where-the-Room per-line table: defensible / loaded tags + a share-of-room mini-bar */
+    '.commercials-tab .room-tag{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;white-space:nowrap}' +
+    '.commercials-tab .room-tag.def{color:var(--sec-tx);background:var(--sec-t)}' +
+    '.commercials-tab .room-tag.load{color:var(--emph-tx);background:var(--emph-t)}' +
+    '.commercials-tab #cml-room .minibar{min-width:70px}' +
     /* icon-only reset tucked to the right of a slider heading */
     '.commercials-tab .asm-reset{width:22px;height:22px;flex:0 0 auto;align-self:center;margin-left:4px}' +
     '.commercials-tab .asm-reset svg{width:13px;height:13px}' +

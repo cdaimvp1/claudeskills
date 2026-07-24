@@ -114,19 +114,22 @@ function renderDiscountArchitecture(d) {
   const platAsk = sumF(platform, l => l.supplierAmount), svcAsk = sumF(services, l => l.supplierAmount);
   const platPct = platAsk ? Math.round(platDisc / platAsk * 100) : 0;
   const svcPct = svcAsk ? Math.round(svcDisc / svcAsk * 100) : 0;
-  const maxD = Math.max(platDisc, svcDisc, 1);
-  const perLine = lines.map(l => {
-    const dd = disc(l), p = l.supplierAmount ? Math.round(dd / l.supplierAmount * 100) : 0;
-    return '<div class="disc-line"><span>' + esc(l.item) + '</span><span class="mono">' + M(dd) + ' · ' + p + '%</span></div>';
-  }).join('');
+  // one compact per-line table (sorted by room), each line tagged defensible / loaded, with a
+  // mini-bar sized to its share of the room. Replaces the redundant two-bar summary + list.
+  const maxD = Math.max.apply(null, lines.map(disc).concat([1]));
+  const rows = lines.slice().sort((a, b) => disc(b) - disc(a));
+  const cols = [
+    { key: 'item', label: 'Line', render: r => '<strong>' + esc(r.item) + '</strong> ' +
+        (r.id === 'CL-1' ? '<span class="room-tag def">defensible</span>' : '<span class="room-tag load">loaded</span>') },
+    { key: 'room', label: 'Room', align: 'num', sortVal: r => disc(r), render: r => M(disc(r)) },
+    { key: 'pct', label: '% of ask', align: 'num', sortVal: r => r.supplierAmount ? disc(r) / r.supplierAmount : 0,
+      render: r => (r.supplierAmount ? Math.round(disc(r) / r.supplierAmount * 100) : 0) + '%' },
+    { key: 'bar', label: 'Share of the room', sort: false, render: r => miniBar(disc(r), maxD, { color: r.id === 'CL-1' ? 'pri' : 'emph' }) }
+  ];
   return saCard('Where the Room Is',
-    '<div class="disc-summary">' +
-      barRow('Platform (defensible)', platDisc, maxD, M(platDisc) + ' · ~' + platPct + '%', { color: 'pri', title: 'Platform line discount to internal precedent' }) +
-      barRow('Services & support (loaded)', svcDisc, maxD, M(svcDisc) + ' · ~' + svcPct + '%', { color: 'emph', title: 'Implementation, support, connectors, training' }) +
-    '</div>' +
-    '<div style="margin-top:10px">' + perLine + '</div>' +
-    insight('Where to push: the platform is benchmark-defensible (~' + platPct + '% to the 2024 internal precedent), so the room is in the loaded lines &mdash; implementation, support and connectors carry the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
-    { accent: 'plum', icon: 'money', sub: 'the negotiable levers by line ' + evidenceChip('calculated', { short: true }) });
+    dataTable(cols, rows, { id: 'cml-room', dense: true, zebra: true }) +
+    insight('The platform line is benchmark-defensible (~' + platPct + '% room to the 2024 internal precedent), so the real room is in the loaded lines: implementation, support and connectors carry the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
+    { accent: 'plum', icon: 'money', sub: 'negotiable room by line ' + evidenceChip('calculated', { short: true }) });
 }
 function renderRenewalBand(d) {
   const iss = ['ISS-04', 'ISS-11'].map(id => findIssue(d, id)).filter(Boolean);
@@ -345,20 +348,20 @@ function recompute(d) {
 function renderTab_commercials(d) {
   const wacc0 = assumVal(d, 'ASM-5', 6), years = assumVal(d, 'ASM-2', 3);
 
-  /* ---- 3A: Deal Table & ZOPA (reordered: room + renewal on top, then should-cost, the
-       negotiated-value ladder, and the ZOPA last with sensitivity drivers + benchmark ticks) ---- */
+  /* ---- 3A: Deal Table & ZOPA (order: room + renewal on top, then the interactive ZOPA
+       (sensitivity drivers + benchmark ticks), then should-cost and the negotiated-value ladder) ---- */
   const deal =
     '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Where the negotiable room is, the supplier ask against Lilly’s target, fallback and walk-away, per-line leverage, and how the number moves with the deal’s drivers. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-6">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-6">' + renderRenewalBand(d) + '</div>' +
-      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
-      '<div class="col-12">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d),
-        { accent: 'plum', icon: 'scenarios', sub: 'supplier ask down to target, step by step' }) + '</div>' +
       '<div class="col-12">' + saCard('ZOPA by Line Item · Sensitivity & Benchmarks',
         window.DealZopa.sensitivity(d) + '<div id="cml-zopa-live">' + window.DealZopa.render(d) + '</div>' + renderDealTotals(d) +
         collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
         { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · leverage · benchmark ticks · live drivers' }) + '</div>' +
+      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
+      '<div class="col-12">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d),
+        { accent: 'plum', icon: 'scenarios', sub: 'supplier ask down to target, step by step' }) + '</div>' +
     '</div>';
 
   /* ---- 3B: Financial Model (was Pro-forma) ---- */
@@ -391,11 +394,11 @@ function renderTab_commercials(d) {
     '.commercials-tab .kpi{flex:1 1 140px;min-width:130px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px}' +
     '.commercials-tab .kpi .k-lbl{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700}' +
     '.commercials-tab .kpi .k-val{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:3px;color:var(--ink)}' +
-    '.commercials-tab .disc-line{display:flex;justify-content:space-between;gap:10px;font-size:var(--fz-sm);padding:5px 0;border-top:1px solid var(--line)}' +
-    '.commercials-tab .disc-line:first-child{border-top:0}' +
-    /* the two summary bars: wider label + value columns (thinner bar) so each row is one line */
-    '.commercials-tab .disc-summary .bar-row{grid-template-columns:172px 1fr 96px}' +
-    '.commercials-tab .disc-summary .bl,.commercials-tab .disc-summary .bv{white-space:nowrap}' +
+    /* Where-the-Room per-line table: defensible / loaded tags + a share-of-room mini-bar */
+    '.commercials-tab .room-tag{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;white-space:nowrap}' +
+    '.commercials-tab .room-tag.def{color:var(--sec-tx);background:var(--sec-t)}' +
+    '.commercials-tab .room-tag.load{color:var(--emph-tx);background:var(--emph-t)}' +
+    '.commercials-tab #cml-room .minibar{min-width:70px}' +
     /* icon-only reset tucked to the right of a slider heading */
     '.commercials-tab .asm-reset{width:22px;height:22px;flex:0 0 auto;align-self:center;margin-left:4px}' +
     '.commercials-tab .asm-reset svg{width:13px;height:13px}' +
