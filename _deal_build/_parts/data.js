@@ -806,41 +806,24 @@ const dashboardData = {
     { id: 'BENCH-pub', item: 'SaaS auto-renewal notice', comparisonValue: '30–45 days typical', sourceId: 'WEB-01', comparability: 'Weak', explanation: 'General market practice for enterprise SaaS; not a Visier-specific or verified figure. Context only.', evidenceType: 'public' }
   ],
 
-  /* ---- 7b. proforma (PORT of the pv-12 P&L/cash-flow engine + pro-forma lens) -
-   * Modelled at the TARGET scenario. Cash OUT reconciles to SC-target.total ($2.372M).
-   * revenue = a modelled workforce-analytics business-case value (efficiency + avoided
-   * incumbent effort), an ASSUMPTION, clearly labelled; it is NOT a real figure and is
-   * the only benefit input. WACC = ASM-5 (6%). Everything here is calculated/assumption. */
+  /* ---- 7b. proforma, inputs for the LIVE financial-model engine (tab-commercials.js pfModel).
+   * The engine computes the multi-year cost model from the commercial lines (at target) and the
+   * term (ASM-2), in-term uplift (ASM-3) and WACC (ASM-5) drivers, so the model reshapes live.
+   * This object supplies only the modelled value-case stream + the WACC governance band. The
+   * precomputed pl/cashflow/npv-curve tables were removed when the engine replaced them (the
+   * engine is the single source of truth). Everything here is calculated / assumption. */
   proforma: {
     evidenceType: 'calculated',
-    basis: 'Target-scenario cost outflows (reconcile to SC-target 3-yr TCV $2.372M) against a modelled business-case value stream (assumption). Discounted at the 6% WACC (ASM-5). Recurring is held flat in-term with a small modelled uplift; one-time implementation, connectors and training fall in Year 1.',
-    plByYear: [
-      { year: 'Y1 (FY27)', revenue: 558000,  cost: 908000, net: -350000 },
-      { year: 'Y2 (FY28)', revenue: 962000,  cost: 732000, net: 230000 },
-      { year: 'Y3 (FY29)', revenue: 1062000, cost: 732000, net: 330000 }
+    basis: 'Modelled net = a business-case value stream (assumption) less the target-scenario cost outflows. Cost is computed live from the commercial lines (recurring compounds at the ASM-3 in-term uplift; one-time implementation, connectors and training fall in Year 1) over the ASM-2 term, discounted at the ASM-5 WACC. The negotiation-target TCV ($2.372M, before modelled uplift) lives in the scenarios; the modelled cost sits slightly above it by the uplift.',
+    // value-case decomposition (modelled assumption): the business-case benefit broken into its
+    // components. byYear = Y1..Y3 ramp; the live model holds the last year flat for a longer
+    // term. Per-year sums are 558 / 962 / 1062 (the modelled value case).
+    valueComponents: [
+      { label: 'Analyst effort avoided', byYear: [300000, 520000, 580000], evidenceType: 'assumption' },
+      { label: 'Faster workforce insight (decision value)', byYear: [180000, 320000, 360000], evidenceType: 'assumption' },
+      { label: 'Incumbent reporting retired', byYear: [78000, 122000, 122000], evidenceType: 'assumption' }
     ],
-    cashflowByYear: [
-      { year: 'Y1 (FY27)', in: 558000,  out: 908000, net: -350000, cum: -350000 },
-      { year: 'Y2 (FY28)', in: 962000,  out: 732000, net: 230000,  cum: -120000 },
-      { year: 'Y3 (FY29)', in: 1062000, out: 732000, net: 330000,  cum: 210000 }
-    ],
-    tcoSummary: { y1: 908000, term: 2372000, netTerm: 2123000 },   // netTerm = PV of the 3-yr cost outflows at the 6% WACC
-    wacc: { value: 6, band: { target: 5, ceiling: 7 } },           // = ASM-5; governance band around the finance rate
-    npvCurve: [
-      { rate: 0,  npv: 210000 },
-      { rate: 4,  npv: 169000 },
-      { rate: 6,  npv: 152000 },
-      { rate: 8,  npv: 135000 },
-      { rate: 12, npv: 106000 },
-      { rate: 16, npv: 81000 },
-      { rate: 20, npv: 59000 },
-      { rate: 28, npv: 24000 },
-      { rate: 35, npv: 1000 }
-    ],
-    breakEven: { rate: 35, months: 28 },   // NPV of net value crosses zero at a ~35% discount rate (far above the 6% WACC, robust); undiscounted payback ~28 months
-    paybackMonths: 28,
-    // savingsWaterfall / teardown / sensitivity retired: the negotiated-value ladder (from
-    // scenarios) lives on the Deal tab, and sensitivity is now the live ZOPA driver sliders.
+    wacc: { value: 6, band: { target: 5, ceiling: 7 } }   // = ASM-5; governance band around the finance rate
   },
 
   /* ---- 8. negotiation (positions reference issue ids, never re-state them) - */
