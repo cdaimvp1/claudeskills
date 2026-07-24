@@ -220,17 +220,6 @@ function renderSourceInventory(d) {
       '<dt>Detail</dt><dd>' + esc(r.detail) + '</dd><dt>Evidence</dt><dd>' + evidenceChip(r.evidenceType) + '</dd></div>'
   });
 }
-function renderGapsMatrix(d) {
-  const points = (d.gaps || []).map(g => ({
-    x: g.ease, y: g.decisionImpact, label: g.id.replace('GAP-', ''),
-    color: g.priority === 'critical' ? 'danger' : g.priority === 'important' ? 'emph' : 'teal',
-    title: g.input + ' (' + g.priority + ') impact ' + g.decisionImpact + '/5, ease ' + g.ease + '/5'
-  }));
-  return matrixPlot(points, {
-    xLabel: 'Ease to obtain →', yLabel: 'Decision impact →', xMax: 5, yMax: 5,
-    quadrants: ['Hard, high stakes', 'Quick win: get first', 'Low priority', 'Easy, low value']
-  });
-}
 function renderAllGapsTable(d) {
   const rank = { critical:3, important:2, helpful:1 };
   const gaps = (d.gaps || []).slice().sort((a, b) => {
@@ -248,20 +237,23 @@ function renderAllGapsTable(d) {
   return dataTable(cols, gaps, { id:'tc-all-gaps', zebra:true, dense:true });
 }
 function renderSourcesEvidence(d) {
-  const invCard = saCard('Source Inventory',
-    renderSourceInventory(d) + insight('All ' + (d.sources || []).length + ' sources behind this analysis, with the count of analysis areas each one covers. Expand a row for its coverage detail.'),
-    { icon:'sources', accent:'teal', sub: (d.sources || []).length + ' sources' });
-  const matrixCard = saCard('Missing Inputs, Impact vs. Ease', renderGapsMatrix(d),
-    { icon:'gap', sub: (d.gaps || []).length + ' gaps' });
-  const gapsCard = saCard('All Missing Inputs',
-    renderAllGapsTable(d) + insight('The full gap register (Overview shows only the top 5). Quick wins, high decision impact and easy to obtain, are worth closing before the next draft.'),
-    { icon:'flag', accent:'emph', sub: (d.gaps || []).length + ' tracked' });
-  return '<div class="tab-intro"><h2>Sources &amp; Evidence</h2><p class="q">The full evidence ledger behind this deal: every source, and every missing input with how much it would move the decision. ' +
+  // reframed: the tab leads with the ACTIONABLE gap register (what we don't know that could change
+  // the decision, ranked by impact + gettability). The impact/ease matrix was cut (its info is
+  // already columns in the table); the source inventory is demoted to a collapsible provenance appendix.
+  const gaps = d.gaps || [];
+  const crit = gaps.filter(g => g.priority === 'critical').length;
+  const imp = gaps.filter(g => g.priority === 'important').length;
+  const lead = insight('The inputs we do <strong>not</strong> have that would most change this decision, ranked by decision impact and how gettable they are. The ' + crit + ' critical ones are signature-gating; close the high-impact, easy-to-get gaps before the next draft.', crit ? 'warn' : '');
+  const gapsCard = saCard('Missing Inputs to Resolve', lead + renderAllGapsTable(d),
+    { icon:'flag', accent:'emph', sub: gaps.length + ' open &middot; ' + crit + ' critical &middot; ' + imp + ' important' });
+  const invCard = saCard('Evidence Provenance',
+    collapsible('<span>Source inventory &mdash; ' + (d.sources || []).length + ' sources behind this analysis</span>', renderSourceInventory(d), { open: false }),
+    { icon:'sources', accent:'teal', sub: 'appendix' });
+  return '<div class="tab-intro"><h2>Sources &amp; Evidence</h2><p class="q">What don&rsquo;t we know that could change the decision, and can we get it? ' +
     coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
     '<div class="grid">' +
+      '<div class="col-12">' + gapsCard + '</div>' +
       '<div class="col-12">' + invCard + '</div>' +
-      '<div class="col-5">' + matrixCard + '</div>' +
-      '<div class="col-7">' + gapsCard + '</div>' +
     '</div>';
 }
 

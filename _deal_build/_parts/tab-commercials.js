@@ -124,12 +124,12 @@ function renderDiscountArchitecture(d) {
     const dd = disc(l), p = l.supplierAmount ? Math.round(dd / l.supplierAmount * 100) : 0;
     return '<div class="disc-line"><span>' + esc(l.item) + '</span><span class="mono">' + M(dd) + ' · ' + p + '%</span></div>';
   }).join('');
-  return saCard('Discount Architecture',
+  return saCard('Where the Room Is',
     barRow('Platform (defensible)', platDisc, maxD, M(platDisc) + ' · ~' + platPct + '%', { color: 'pri', title: 'Platform line discount to internal precedent' }) +
     barRow('Services & support (loaded)', svcDisc, maxD, M(svcDisc) + ' · ~' + svcPct + '%', { color: 'emph', title: 'Implementation, support, connectors, training' }) +
     '<div style="margin-top:10px">' + perLine + '</div>' +
-    insight('Platform value is benchmark-defensible (~' + platPct + '% to the 2024 internal precedent); implementation, support and connectors are day-rate / loaded lines carrying the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
-    { accent: 'plum', icon: 'money', sub: evidenceChip('calculated', { short: true }) });
+    insight('Where to push: the platform is benchmark-defensible (~' + platPct + '% to the 2024 internal precedent), so the room is in the loaded lines &mdash; implementation, support and connectors carry the largest percentage concessions (~' + svcPct + '%). Separate the two in the room. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')),
+    { accent: 'plum', icon: 'money', sub: 'the negotiable levers by line ' + evidenceChip('calculated', { short: true }) });
 }
 function renderRenewalBand(d) {
   const iss = ['ISS-04', 'ISS-11'].map(id => findIssue(d, id)).filter(Boolean);
@@ -150,13 +150,40 @@ function renderBenchmarks(d) {
   if (!bs.length) {
     return gapCard('No comparable benchmark in this session', 'No internal precedent or credible external comparison was available at generation time; no fabricated market percentiles are shown. ' + jumpLink('Gaps →', 'tab:brief'));
   }
-  const cards = bs.map(b => '<div class="col-4">' + saCard(b.item,
-    '<div class="bm-val mono">' + esc(b.comparisonValue) + '</div>' +
-    '<div style="margin-top:9px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">' + compPill(b.comparability) + evidenceChip(b.evidenceType, { sources: [b.sourceId] }) + '</div>' +
-    collapsible('Methodology & caveat', '<p style="margin:0">' + esc(b.explanation) + '</p>'),
-    { accent: 'teal', icon: 'bench', id: b.id }) + '</div>').join('');
-  return '<div class="grid">' + cards + '</div>' +
-    '<div style="margin-top:12px">' + insight('Benchmark coverage rests on one internal precedent plus a weak-comparability public figure; real comps only. A prior Visier quote or a competing bid (' + jumpLink('GAP-4', 'tab:brief') + ') would firm the platform-pricing target; until then it stays RESEARCH-PENDING.', 'warn') + '</div>';
+  // uniform compact strip (was ragged col-4 cards): each comparison is one cell of equal size,
+  // sitting right under the ZOPA because it is the EVIDENCE that makes the target defensible.
+  const cells = bs.map(b => '<div class="bm-cell" id="' + esc(b.id) + '">' +
+    '<div class="bm-cell-t">' + esc(b.item) + '</div>' +
+    '<div class="bm-cell-v mono">' + esc(b.comparisonValue) + '</div>' +
+    '<div class="bm-cell-f">' + compPill(b.comparability) + evidenceChip(b.evidenceType, { sources: [b.sourceId], short: true }) + '</div>' +
+    '<div class="bm-cell-m" title="' + esc(b.explanation) + '">' + esc(b.explanation) + '</div>' +
+  '</div>').join('');
+  return saCard('Benchmarks', '<div class="bm-strip">' + cells + '</div>' +
+    insight('Real comparisons only &mdash; one internal precedent plus a weak-comparability public figure. A prior Visier quote or a competing bid (' + jumpLink('GAP-4', 'tab:brief') + ') would firm the platform-pricing target; until then it stays research-pending.', 'warn'),
+    { accent: 'teal', icon: 'bench', sub: bs.length + ' comparisons &middot; support the target' });
+}
+/* ---- should-cost: bottoms-up cost build per driver, vs the ask, sizing the headroom ---- */
+function renderShouldCost(d) {
+  const scd = d.shouldCost;
+  if (!scd || !(scd.drivers || []).length) return saCard('Should-Cost, Bottoms-Up', gapCard('No should-cost model', 'No bottoms-up cost build in this session. ' + evidenceChip('unavailable')), { icon: 'scale' });
+  const usd = n => '$' + Number(n).toLocaleString('en-US');
+  const segCols = ['var(--teal-d)', 'color-mix(in srgb,var(--sec) 48%,white)', 'var(--plum)', 'var(--mut2)', 'var(--emph)'];
+  const drivers = scd.drivers.map(dr => {
+    const scPct = clampp((dr.shouldCost / dr.ask) * 100, 0, 100);
+    const segs = dr.buildup.map((b, i) => '<div class="scst-seg" style="width:' + (b.v / dr.ask * 100).toFixed(1) + '%;background:' + segCols[i % segCols.length] + '" title="' + esc(b.k) + ': ' + usd(b.v) + '"></div>').join('');
+    const legend = dr.buildup.map((b, i) => '<span class="scst-lg"><i style="background:' + segCols[i % segCols.length] + '"></i>' + esc(b.k) + ' <b>' + usd(b.v) + '</b></span>').join('');
+    return '<div class="scst-driver">' +
+      '<div class="scst-hd"><strong>' + esc(dr.item) + '</strong> <span class="tiny muted">' + esc(dr.unit) + '</span>' +
+        '<span class="scst-head-lbl">should-cost <b>' + usd(dr.shouldCost) + '</b> vs ask <b>' + usd(dr.ask) + '</b> &middot; headroom <b class="scst-hr">' + usd(dr.headroom) + '</b></span></div>' +
+      '<div class="scst-track">' + segs +
+        '<div class="scst-gap" style="left:' + scPct.toFixed(1) + '%" title="Headroom to the ask"></div>' +
+        '<div class="scst-ask" title="Ask ' + usd(dr.ask) + '"></div></div>' +
+      '<div class="scst-lgs">' + legend + '</div>' +
+      insight(esc(dr.note), 'warn') +
+    '</div>';
+  }).join('');
+  return saCard('Should-Cost, Bottoms-Up', drivers + insight('<strong>Read:</strong> ' + esc(scd.note) + ' ' + evidenceChip(scd.evidenceType, { short: true })),
+    { accent: 'teal', icon: 'scale', sub: scd.drivers.length + ' cost drivers &middot; headroom to target' });
 }
 
 /* ---------- 2. 3B, PRO-FORMA (precomputed; WACC slider = the live math) --- */
@@ -383,14 +410,17 @@ function renderTab_commercials(d) {
 
   /* ---- 3A: Deal Table & ZOPA ---- */
   const deal =
-    '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">One normalized view of every commercial line, supplier ask against Lilly’s target, fallback and walk-away, with the per-line zone of possible agreement. ' + coverageBadge('Strong') + '</p></div>' +
+    '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Every commercial line: the supplier ask against Lilly’s target, fallback and walk-away, the per-line zone of possible agreement, and how defensible the price is. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
-      '<div class="col-12">' + saCard('Deal Table, Normalized Line Items', renderDealTable(d) + renderDealTotals(d), { accent: 'plum', icon: 'money', sub: (d.commercialLines || []).length + ' lines' }) + '</div>' +
-      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing & Benchmarks', window.DealZopa.render(d), { accent: 'plum', icon: 'target', sub: 'target → walk-away · Theo opening · supplier ask · benchmark' }) + '</div>' +
-      '<div class="col-7">' + renderDiscountArchitecture(d) + '</div>' +
-      '<div class="col-5">' + renderRenewalBand(d) + '</div>' +
-    '</div>' +
-    '<div style="margin-top:16px"><div class="eyebrow" style="margin-bottom:8px">Benchmarks, real comparisons only</div>' + renderBenchmarks(d) + '</div>';
+      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing & Benchmarks',
+        window.DealZopa.render(d) + renderDealTotals(d) +
+        collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
+        { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · target → walk-away · supplier ask' }) + '</div>' +
+      '<div class="col-12">' + renderBenchmarks(d) + '</div>' +
+      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
+      '<div class="col-6">' + renderDiscountArchitecture(d) + '</div>' +
+      '<div class="col-6">' + renderRenewalBand(d) + '</div>' +
+    '</div>';
 
   /* ---- 3B: Pro-forma ---- */
   const proforma =
@@ -434,7 +464,27 @@ function renderTab_commercials(d) {
     '.commercials-tab .disc-line{display:flex;justify-content:space-between;gap:10px;font-size:var(--fz-sm);padding:5px 0;border-top:1px solid var(--line)}' +
     '.commercials-tab .disc-line:first-child{border-top:0}' +
     '.commercials-tab .rn-item .kv{margin-top:6px}' +
-    '.commercials-tab .bm-val{font-size:var(--fz);font-weight:700;color:var(--ink)}' +
+    /* benchmarks as a uniform strip */
+    '.commercials-tab .bm-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}' +
+    '.commercials-tab .bm-cell{border:1px solid var(--line2);border-radius:8px;padding:11px 13px;background:var(--surface2)}' +
+    '.commercials-tab .bm-cell-t{font:800 10px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);margin-bottom:5px}' +
+    '.commercials-tab .bm-cell-v{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35}' +
+    '.commercials-tab .bm-cell-f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:7px 0}' +
+    '.commercials-tab .bm-cell-m{font-size:10px;color:var(--mut2);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}' +
+    /* should-cost bottoms-up bars */
+    '.commercials-tab .scst-driver{margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--line)}' +
+    '.commercials-tab .scst-driver:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}' +
+    '.commercials-tab .scst-hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px}' +
+    '.commercials-tab .scst-head-lbl{margin-left:auto;font-size:11px;color:var(--ink2)}' +
+    '.commercials-tab .scst-hr{color:var(--emph)}' +
+    '.commercials-tab .scst-track{position:relative;height:22px;border-radius:5px;overflow:hidden;background:var(--nested);display:flex}' +
+    '.commercials-tab .scst-seg{height:100%}' +
+    '.commercials-tab .scst-gap{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(45deg,var(--line2),var(--line2) 3px,transparent 3px,transparent 7px)}' +
+    '.commercials-tab .scst-ask{position:absolute;top:-3px;bottom:-3px;right:0;width:2px;background:var(--ink2)}' +
+    '.commercials-tab .scst-lgs{display:flex;flex-wrap:wrap;gap:10px;margin-top:9px;margin-bottom:6px}' +
+    '.commercials-tab .scst-lg{font-size:10.5px;color:var(--mut2);display:inline-flex;align-items:center;gap:4px}' +
+    '.commercials-tab .scst-lg i{width:9px;height:9px;border-radius:2px;display:inline-block}' +
+    '.commercials-tab .scst-lg b{color:var(--ink2)}' +
     '.commercials-tab .rl-item{font-size:var(--fz-sm);line-height:1.45}' +
     '.commercials-tab .npv-svg{width:100%;height:auto;display:block;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm)}' +
     '.commercials-tab .tornado{display:grid;gap:9px}' +

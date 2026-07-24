@@ -768,6 +768,23 @@ const dashboardData = {
     { id: 'SC-max',  name: 'Max acceptable',    basis: 'Working ceiling (unapproved)', values: { 'CL-1':720000, 'CL-2':200000, 'CL-3':85000, 'CL-4':40000, 'CL-5':25000 }, y1Total: 1070000, total: 2797000, interpretation: 'Walk-away line. Above this, escalate rather than sign. Budget ceiling not yet confirmed (see gaps).', evidenceType: 'assumption' }
   ],
 
+  /* ---- should-cost: bottoms-up estimate of what the two main cost drivers SHOULD cost the
+   * supplier to deliver, vs the ask, to size the negotiable headroom. Illustrative build
+   * (a real engagement refines it with a should-cost workbook); each driver's buildup sums to
+   * its shouldCost. ------------------------------------------------------------------------- */
+  shouldCost: {
+    note: 'The ask sits above a defensible bottoms-up cost on both drivers, so there is real headroom to the target; the platform is the thinner margin, services the fatter one.',
+    evidenceType: 'assumption',
+    drivers: [
+      { id: 'SC-plat', item: 'Platform subscription', unit: 'per employee / yr', ask: 43, shouldCost: 39, headroom: 4,
+        buildup: [ { k: 'Hosting & infrastructure', v: 6 }, { k: 'Support & customer success', v: 8 }, { k: 'R&D / product allocation', v: 11 }, { k: 'SG&A', v: 5 }, { k: 'Target margin (~23%)', v: 9 } ],
+        note: 'Bottoms-up about $39/emp/yr; the $43 ask carries ~$4/emp/yr of headroom, consistent with the ~$37 2024 internal precedent.' },
+      { id: 'SC-impl', item: 'Implementation services', unit: 'per day', ask: 2000, shouldCost: 1650, headroom: 350,
+        buildup: [ { k: 'Loaded consultant cost', v: 1100 }, { k: 'Utilization / bench', v: 200 }, { k: 'Overhead', v: 150 }, { k: 'Target margin (~12%)', v: 200 } ],
+        note: 'About $1,650/day bottoms-up, inside the $1,500-1,750 market norm; the ~$2,000/day ask carries ~$350/day of headroom.' }
+    ]
+  },
+
   /* ---- 7. benchmarks (ONLY internal precedent + one public norm are real) --- */
   benchmarks: [
     { id: 'BENCH-int', item: 'Platform $/employee/yr', comparisonValue: '$43/emp/yr (this ask) vs ~$37/emp/yr (2024 precedent, scale-adjusted)', sourceId: 'FIN-01', comparability: 'Moderate', explanation: 'Internal precedent: a 2024 workforce-analytics platform at ~14,000 employees, normalised to a per-employee rate. The ask sits ~16% above precedent; the target ($36/emp/yr) lands at precedent. Scale and scope differ; directional, not exact.', evidenceType: 'internal' },
