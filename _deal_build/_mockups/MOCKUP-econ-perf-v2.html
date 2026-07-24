@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups — Performance panel + Benchmark merge</title>
+<style>
+  :root{
+    --plum:#5C2B50; --teal:#2F6E6B; --tealD:#245a57; --emph:#C15E19; --danger:#b41e16;
+    --ink:#22252a; --ink2:#41464e; --mut:#6b7280; --mut2:#8a919c;
+    --line:#e7e9ec; --line2:#d8dbe0; --surface:#fff; --surface2:#f6f7f8; --nested:#eef0f2; --bg:#edefed;
+    --sec-t:#dcebe9; --plum-t:#efe6ed; --ok:#1f7a53; --warn:#a4610f;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.4}
+  .wrap{max-width:1200px;margin:0 auto;padding:20px 24px 90px}
+  h1{font-size:19px;font-weight:800;margin:0 0 4px}
+  .lede{color:var(--mut);font-size:12px;margin:0 0 18px}
+  h2.sec{font-size:14px;font-weight:800;margin:26px 0 4px;padding-top:14px;border-top:2px solid var(--line2)}
+  .sub{color:var(--mut);font-size:12px;margin:0 0 10px}
+  .sw{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+  .sw button{font:800 11.5px/1 var(--sans);border:1px solid var(--line2);background:var(--surface);color:var(--ink2);padding:8px 12px;border-radius:7px;cursor:pointer}
+  .sw button.on{background:var(--plum);color:#fff;border-color:var(--plum)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:11px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,30,.05)}
+  .card-hd{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--line);border-top:3px solid var(--emph)}
+  .card-hd .ct{font-weight:800;font-size:12.5px;text-transform:uppercase;letter-spacing:.02em}
+  .card-hd .cs{margin-left:auto;font-size:11px;color:var(--mut2);font-family:var(--mono)}
+  .card-bd{padding:14px 15px}
+  .hint{font-size:11px;color:var(--mut2);font-style:italic;margin-top:11px;padding-top:9px;border-top:1px dashed var(--line2)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;font:800 9px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:7px 9px;border-bottom:1px solid var(--line2)}
+  td{padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+  td strong{color:var(--ink)}
+  .sec-h{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:14px 0 6px}
+  .sec-h:first-child{margin-top:0}
+  .st{display:inline-flex;align-items:center;gap:4px;font:800 9px/1 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 7px;border-radius:5px;white-space:nowrap}
+  .st-ok{background:var(--sec-t);color:#215f5b} .st-warn{background:#f7e3d4;color:var(--emph)} .st-dev{background:#f6ddd9;color:var(--danger)}
+  .st i{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+  .link{color:var(--teal);font-weight:700;text-decoration:none}
+  /* master-detail */
+  .md{display:grid;grid-template-columns:minmax(240px,1fr) 1.2fr;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .md-list{border-right:1px solid var(--line);max-height:340px;overflow:auto}
+  .md-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer}
+  .md-row:hover{background:var(--surface2)} .md-row.sel{background:var(--plum-t)}
+  .md-row .t{font-weight:600;font-size:11.5px} .md-row .t small{display:block;color:var(--mut2);font-weight:500;font-size:10px}
+  .md-d{padding:15px 16px;background:var(--surface2)}
+  .kv{display:grid;grid-template-columns:110px 1fr;border:1px solid var(--line2);border-radius:7px;overflow:hidden;background:var(--surface);margin-top:8px}
+  .kv .k{background:var(--nested);font:800 9px/1.3 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut);padding:8px 9px;border-bottom:1px solid var(--line)}
+  .kv .v{padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--line);color:var(--ink2)}
+  .kv .k:last-of-type,.kv .v:last-of-type{border-bottom:0}
+  .rec{color:var(--plum);font-weight:700}
+  /* gaps-first cards */
+  .verd{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:10px 13px;margin-bottom:12px}
+  .verd b{font-size:14px;color:var(--emph)}
+  .gcard{border:1px solid var(--line2);border-left:3px solid var(--emph);border-radius:7px;padding:10px 12px;margin-bottom:9px;background:var(--surface)}
+  .gcard.dev{border-left-color:var(--danger)}
+  .gcard .gh{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:3px}
+  .gcard .gh strong{font-size:12.5px}
+  .gcard .gd{font-size:11px;color:var(--ink2)}
+  .agg{background:var(--sec-t);border-radius:7px;padding:9px 12px;font-size:11.5px;color:#215f5b;margin-top:6px}
+  /* zopa mini + benchmark */
+  .zl{margin:14px 0}
+  .zl-t{font-weight:700;font-size:12px;margin-bottom:4px;display:flex;justify-content:space-between}
+  .ztrack{position:relative;height:40px;margin:8px 0}
+  .zaxis{position:absolute;top:50%;left:0;right:0;height:2px;background:var(--line2);transform:translateY(-50%)}
+  .zzone{position:absolute;top:50%;height:14px;transform:translateY(-50%);background:var(--sec-t);border:1px solid var(--tealD);border-radius:3px}
+  .zt{position:absolute;top:calc(50% - 10px);width:2px;height:20px;background:var(--plum)}
+  .zask{position:absolute;top:calc(50% - 12px);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}
+  .zb{position:absolute;top:calc(50% - 13px);width:2px;height:26px;background:var(--emph)}
+  .zlab{position:absolute;font:700 8.5px/1.1 var(--mono);white-space:nowrap;transform:translateX(-50%);text-align:center}
+  .zlab b{display:block;font-family:var(--sans);font-size:9px;letter-spacing:.02em;text-transform:uppercase;color:var(--mut2);font-weight:800}
+  .zlab.bench{color:var(--emph)} .zlab.bench b{color:var(--emph)}
+  .zexp{border:1px dashed var(--line2);border-radius:6px;padding:8px 10px;margin-top:6px;font-size:11px;color:var(--ink2);background:var(--surface2)}
+  .zexp .br{display:flex;gap:8px;padding:2px 0}
+  .zexp .bk{flex:0 0 96px;color:var(--mut2);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.03em}
+  .zexp .bk.bench{color:var(--emph)}
+  /* should-cost mini */
+  .sct{position:relative;height:22px;border-radius:5px;overflow:hidden;background:var(--nested);display:flex;margin:6px 0}
+  .sct .seg{height:100%}
+  .sct .gap{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(45deg,var(--line2),var(--line2) 3px,transparent 3px,transparent 7px)}
+  .sct .bench{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--emph)}
+  .sct .ask{position:absolute;top:-3px;bottom:-3px;right:0;width:2px;background:var(--ink2)}
+  .benchtag{display:inline-block;font:800 8.5px/1 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--emph);background:#f7e3d4;border-radius:4px;padding:2px 5px;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mockups — Performance panel &amp; Benchmark merge</h1>
+  <p class="lede">Two topics. Toggle the options in each. Real Visier data, layout study only (not final styling).</p>
+
+  <h2 class="sec">1 · Performance panel — 3 alternatives</h2>
+  <p class="sub">Today it's three stacked tables (SLAs / acceptance gates / change control). Alternatives that make it more decision-led:</p>
+  <div class="sw" id="sw-perf"></div>
+  <div id="perf"></div>
+
+  <h2 class="sec">2 · Benchmarks — merge into ZOPA + Should-Cost</h2>
+  <p class="sub">Your idea: drop the separate Benchmarks panel and mark each benchmark on its own line item / cost driver.</p>
+  <div class="sw" id="sw-bench"></div>
+  <div id="bench"></div>
+</div>
+
+<script>
+/* ---------- data ---------- */
+var SLA=[
+  {m:'Platform uptime',c:'99.5% / month',p:'99.9%',s:'dev',rem:'5% credit / 1% miss, capped 15%',fx:'ISS-06'},
+  {m:'Support response (P1)',c:'4 business hours',p:'1 hour, 24×7',s:'warn',rem:'None stated',fx:null},
+  {m:'Data refresh latency',c:'Next-day (T+1)',p:'T+1 acceptable',s:'ok',rem:'—',fx:null}
+];
+var ACC=[
+  {d:'D1',c:'All 4 sources ingest with <2% record-reject over 2 cycles',ok:true},
+  {d:'D2',c:'Validation pack reconciles headcount to HRIS within ±0.5%',ok:true},
+  {d:'D3',c:'Dashboards render agreed metrics; no objective criteria for "agreed"',ok:false},
+  {d:'D5',c:'Training delivered; no competency or attendance threshold',ok:false}
+];
+var CHG=[
+  {t:'Changes require a signed Change Order; supplier estimates effort at standard day-rate',s:'ok'},
+  {t:'No cap on change-order day-rate; ties to ISS-11 uncapped pricing',s:'warn'}
+];
+function st(s){return '<span class="st st-'+(s==='ok'?'ok':s==='warn'?'warn':'dev')+'"><i></i>'+(s==='ok'?'Aligned':s==='warn'?'Partial':'Deviation')+'</span>';}
+
+/* ---------- PERFORMANCE A: commitments scorecard ---------- */
+function perfA(){
+  var rows='';
+  rows+='<tr><td colspan="5" class="sec-h" style="padding-top:2px">Service levels</td></tr>';
+  SLA.forEach(function(x){rows+='<tr><td><strong>'+x.m+'</strong></td><td>'+x.c+'</td><td>'+x.p+'</td><td>'+st(x.s)+'</td><td>'+(x.fx?'<a class="link">'+x.fx+' →</a>':'—')+'</td></tr>';});
+  rows+='<tr><td colspan="5" class="sec-h">Deliverable acceptance gates</td></tr>';
+  ACC.forEach(function(x){rows+='<tr><td><strong>'+x.d+'</strong> acceptance</td><td>'+x.c+'</td><td>Objective pass/fail</td><td>'+st(x.ok?'ok':'dev')+'</td><td>'+(x.ok?'—':'<a class="link">ISS-10 →</a>')+'</td></tr>';});
+  rows+='<tr><td colspan="5" class="sec-h">Change control</td></tr>';
+  CHG.forEach(function(x){rows+='<tr><td><strong>Change process</strong></td><td colspan="2">'+x.t+'</td><td>'+st(x.s)+'</td><td>—</td></tr>';});
+  document.getElementById('perf').innerHTML='<div class="card"><div class="card-hd"><span class="ct">Performance commitments</span><span class="cs">9 commitments · 4 below standard</span></div><div class="card-bd">'+
+    '<table><thead><tr><th>Commitment</th><th>Contract</th><th>Playbook / standard</th><th>Status</th><th>Finding</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<div class="hint">A. One unified scorecard — every commitment (SLA, acceptance gate, change term) as a row with contract vs standard vs status. Scannable "did we commit, is it adequate."</div></div></div>';
+}
+/* ---------- PERFORMANCE B: master-detail ---------- */
+function perfB(){
+  var items=SLA.map(function(x){return {t:x.m,sub:'Service level',s:x.s,c:x.c,p:x.p,rem:x.rem,fx:x.fx};})
+    .concat(ACC.map(function(x){return {t:x.d+' acceptance',sub:'Acceptance gate',s:x.ok?'ok':'dev',c:x.c,p:'Objective pass/fail',rem:x.ok?'Defined':'Not defined',fx:x.ok?null:'ISS-10'};}))
+    .concat(CHG.map(function(x,i){return {t:'Change term '+(i+1),sub:'Change control',s:x.s,c:x.t,p:'Capped, defined',rem:'—',fx:i?'ISS-11':null};}));
+  var list=items.map(function(x,i){return '<div class="md-row'+(i===0?' sel':'')+'" data-i="'+i+'"><span class="t">'+x.t+'<small>'+x.sub+'</small></span>'+st(x.s)+'</div>';}).join('');
+  function det(x){return '<div style="font-weight:800;font-size:14px;margin-bottom:2px">'+x.t+'</div><div style="color:var(--mut2);font-size:11px">'+x.sub+'</div>'+
+    '<div class="kv"><div class="k">Contract</div><div class="v">'+x.c+'</div><div class="k">Playbook</div><div class="v">'+x.p+'</div><div class="k">Remedy</div><div class="v">'+x.rem+'</div><div class="k">Status</div><div class="v">'+st(x.s)+'</div>'+
+    '<div class="k">Recommend</div><div class="v rec">'+(x.s==='ok'?'Confirm as drafted':'Tighten to the playbook standard'+(x.fx?' (see '+x.fx+')':''))+'</div></div>';}
+  document.getElementById('perf').innerHTML='<div class="card"><div class="card-hd"><span class="ct">Performance commitments</span><span class="cs">click a commitment</span></div><div class="card-bd">'+
+    '<div class="md"><div class="md-list" id="pb-list">'+list+'</div><div class="md-d" id="pb-det"></div></div>'+
+    '<div class="hint">B. Master-detail (matches the reconciliation panel): a list of commitments, click for contract vs playbook vs remedy vs recommendation. Consistent interaction across the tab.</div></div></div>';
+  var det0=document.getElementById('pb-det'); det0.innerHTML=det(items[0]);
+  document.querySelectorAll('#pb-list .md-row').forEach(function(r){r.onclick=function(){document.querySelectorAll('#pb-list .md-row').forEach(function(x){x.classList.remove('sel');});r.classList.add('sel');det0.innerHTML=det(items[+r.dataset.i]);};});
+}
+/* ---------- PERFORMANCE C: gaps-first ---------- */
+function perfC(){
+  var devs=[
+    {t:'Platform uptime 99.5% vs 99.9% playbook',d:'Weak, capped service credits (15% cap). ISS-06.',dev:true},
+    {t:'Support P1 response 4h vs 1h/24×7',d:'No remedy stated for missed response.',dev:false},
+    {t:'D3 dashboard acceptance undefined',d:'No objective criteria for "agreed metrics" — acceptance-by-silence risk. ISS-10.',dev:true},
+    {t:'D5 training acceptance undefined',d:'No competency/attendance threshold.',dev:false},
+    {t:'Change-order day-rate uncapped',d:'Open-ended cost exposure on scope creep. ISS-11.',dev:false}
+  ];
+  var cards=devs.map(function(x){return '<div class="gcard'+(x.dev?' dev':'')+'"><div class="gh"><strong>'+x.t+'</strong>'+st(x.dev?'dev':'warn')+'</div><div class="gd">'+x.d+'</div></div>';}).join('');
+  document.getElementById('perf').innerHTML='<div class="card"><div class="card-hd"><span class="ct">Performance — what needs fixing</span><span class="cs">5 of 9 below standard</span></div><div class="card-bd">'+
+    '<div class="verd">Performance adequacy: <b>Below playbook on 5 of 9 commitments</b> — fix before signature.</div>'+cards+
+    '<div class="agg">✓ Aligned (4): data-refresh latency (T+1), D1 data-ingest acceptance, D2 validation acceptance, change-order process. <a class="link">Show all</a></div>'+
+    '<div class="hint">C. Gaps-first: lead with the commitments that fall short (the actionable ones), summarize the aligned ones in one line. Decision-led, least scrolling.</div></div></div>';
+}
+
+/* ---------- BENCHMARK 1: ticks on ZOPA + should-cost ---------- */
+function zbar(cfg){ // positions as % of [min,max]
+  var vals=[cfg.target,cfg.walk,cfg.ask,cfg.bench].filter(function(v){return v!=null;});
+  var min=Math.min.apply(null,vals),max=Math.max.apply(null,vals); var pad=(max-min)*0.14||1; min-=pad;max+=pad; var span=max-min;
+  var p=function(v){return ((v-min)/span*100);};
+  return '<div class="ztrack"><div class="zaxis"></div>'+
+    '<div class="zzone" style="left:'+p(cfg.target).toFixed(1)+'%;width:'+(p(cfg.walk)-p(cfg.target)).toFixed(1)+'%"></div>'+
+    '<div class="zt" style="left:'+p(cfg.target).toFixed(1)+'%"></div>'+
+    '<div class="zask" style="left:calc('+p(cfg.ask).toFixed(1)+'% - 5px)"></div>'+
+    (cfg.bench!=null?'<div class="zb" style="left:'+p(cfg.bench).toFixed(1)+'%"></div><span class="zlab bench" style="left:'+p(cfg.bench).toFixed(1)+'%;top:calc(50% + 15px)"><b>benchmark</b>'+cfg.benchLab+'</span>':'')+
+    '<span class="zlab" style="left:'+p(cfg.target).toFixed(1)+'%;top:calc(50% - 34px)"><b>target</b>'+cfg.targetLab+'</span>'+
+    '<span class="zlab" style="left:'+p(cfg.ask).toFixed(1)+'%;top:calc(50% - 34px)"><b>ask</b>'+cfg.askLab+'</span>'+
+  '</div>';
+}
+function bench1(){
+  document.getElementById('bench').innerHTML=
+    '<div class="card"><div class="card-hd" style="border-top-color:var(--plum)"><span class="ct">ZOPA by line item</span><span class="cs">benchmark tick per line</span></div><div class="card-bd">'+
+      '<div class="zl"><div class="zl-t"><span>Platform subscription (18,000 employees)</span><span class="benchtag">bench ~$37/emp</span></div>'+
+        zbar({target:640000,walk:720000,ask:780000,bench:666000,targetLab:'$640K',askLab:'$780K',benchLab:'$666K'})+
+      '</div>'+
+      '<div class="zl"><div class="zl-t"><span>Implementation services (SOW-01)</span><span class="benchtag">bench $1.5–1.75K/day</span></div>'+
+        zbar({target:160000,walk:200000,ask:220000,bench:179000,targetLab:'$160K',askLab:'$220K',benchLab:'$179K'})+
+      '</div>'+
+      '<div class="hint">The market benchmark is drawn as a tick right on each line\'s ZOPA bar (the ZOPA already supports a market mark). No separate Benchmarks panel.</div>'+
+    '</div></div>'+
+    '<div class="card" style="margin-top:14px"><div class="card-hd"><span class="ct">Should-Cost, bottoms-up</span><span class="cs">benchmark as a reference line</span></div><div class="card-bd">'+
+      '<div style="font-weight:700;font-size:12px;margin-bottom:2px">Platform subscription <span style="color:var(--mut2);font-weight:500">per employee/yr</span></div>'+
+      '<div class="sct"><div class="seg" style="width:14%;background:var(--tealD)"></div><div class="seg" style="width:19%;background:#8fb8b3"></div><div class="seg" style="width:26%;background:var(--plum)"></div><div class="seg" style="width:12%;background:var(--mut2)"></div><div class="seg" style="width:20%;background:var(--emph)"></div><div class="gap" style="left:91%"></div><div class="bench" style="left:86%" title="benchmark ~$37"></div><div class="ask"></div></div>'+
+      '<div style="font-size:11px;color:var(--ink2)">should-cost <b>$39</b> · <span style="color:var(--emph)">benchmark $37</span> · ask <b>$43</b> — the benchmark sits just under our bottoms-up cost, confirming the target is defensible.</div>'+
+      '<div class="hint">On should-cost, the benchmark becomes a vertical reference line on the cost bar — you instantly see should-cost vs benchmark vs ask on one scale.</div>'+
+    '</div></div>';
+}
+/* ---------- BENCHMARK 2: benchmark row in the line expand + slim provenance ---------- */
+function bench2(){
+  document.getElementById('bench').innerHTML=
+    '<div class="card"><div class="card-hd" style="border-top-color:var(--plum)"><span class="ct">ZOPA by line item — Platform (expanded)</span><span class="cs">benchmark inside the line detail</span></div><div class="card-bd">'+
+      '<div class="zl"><div class="zl-t"><span>Platform subscription (18,000 employees)</span></div>'+
+        zbar({target:640000,walk:720000,ask:780000,bench:null,targetLab:'$640K',askLab:'$780K'})+
+        '<div class="zexp">'+
+          '<div class="br"><span class="bk">Price</span><span>ask <b>$780K</b> vs target $640K · walk-away $720K</span></div>'+
+          '<div class="br"><span class="bk bench">Benchmark</span><span><b>~$37/emp/yr</b> (2024 internal precedent, scale-adjusted) · Moderate comparability · <a class="link">methodology</a></span></div>'+
+          '<div class="br"><span class="bk">Read</span><span>The ask is ~17% over the precedent-based target; hold to $640K.</span></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="hint">Benchmarks live inside each line\'s expand (a "Benchmark" row), where the methodology/caveat also fits. A slim provenance strip (below) keeps the full list one click away.</div>'+
+      '<div style="margin-top:10px;border:1px solid var(--line2);border-radius:7px;padding:9px 11px;background:var(--surface2);font-size:11px;color:var(--ink2)">▸ <b>Benchmark provenance</b> (3 comparisons) — platform $/emp precedent · implementation day-rate norm · SaaS auto-renewal notice. <span style="color:var(--mut2)">collapsed appendix</span></div>'+
+    '</div></div>';
+}
+
+/* ---------- switchers ---------- */
+function mkSw(id, opts, host){
+  var el=document.getElementById(id);
+  opts.forEach(function(o,i){var b=document.createElement('button');b.textContent=o.lab;if(i===0)b.className='on';b.onclick=function(){el.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});b.className='on';o.fn();};el.appendChild(b);});
+  opts[0].fn();
+}
+mkSw('sw-perf',[{lab:'A · Scorecard',fn:perfA},{lab:'B · Master-detail',fn:perfB},{lab:'C · Gaps-first',fn:perfC}]);
+mkSw('sw-bench',[{lab:'1 · Ticks on ZOPA + should-cost',fn:bench1},{lab:'2 · Row in the line expand',fn:bench2}]);
+</script>
+</body>
+</html>

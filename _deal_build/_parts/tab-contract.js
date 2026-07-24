@@ -814,28 +814,64 @@ function scReconRow(it, first) {
     '<span class="sc-rtxt">' + esc(x.text) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span>' +
     chip + '</div>';
 }
+// linked-finding chips: ISS -> deep-link to Legal & Protection, GAP -> Sources & Evidence, and
+// IS/SH/CN/AS -> select that row within THIS reconciliation panel (delegated data-scpick).
+function scLinkedHtml(arr) {
+  if (!arr || !arr.length) return '<span class="sc-fmut">none</span>';
+  return arr.map(function (id) {
+    if (/^ISS/.test(id)) return jumpLink(id + ' →', JUMP_LEGAL);
+    if (/^GAP/.test(id)) return jumpLink(id + ' →', JUMP_GAPS);
+    return '<span class="sc-lk" role="button" tabindex="0" data-scpick="' + esc(id) + '">' + esc(id) + ' →</span>';
+  }).join(' · ');
+}
+function scSide(cls, label, val, tag, quote, quoteNone) {
+  return '<div class="sc-side ' + cls + '"><div class="sc-sl">' + esc(label) + '</div>' +
+    '<div class="sc-sv">' + esc(val) + (tag ? ' <span class="sc-tag">' + esc(tag) + '</span>' : '') + '</div>' +
+    (quote ? '<div class="sc-quote' + (quoteNone ? ' sc-quote-none' : '') + '">' + esc(quote) + '</div>' : '') + '</div>';
+}
+function scFoot(items) {
+  return '<div class="sc-foot">' + items.map(function (it) {
+    return '<span><span class="sc-fk">' + esc(it.k) + '</span>' + it.v + '</span>';
+  }).join('') + '</div>';
+}
 function scScopeDetail(x) {
-  return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(x.id) + '</span>' + scopeStatusChip(x.status) + '<span class="sc-shift-type">' + esc(x.source) + '</span></div>' +
+  return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(x.id) + '</span>' + scopeStatusChip(x.status) +
+      '<span class="sc-src sc-src-' + esc(x.origin) + '">' + esc((SC_ORIGIN_LABEL[x.origin] || x.origin) + ' · ' + x.source) + '</span></div>' +
     '<div class="sc-dl-title">' + esc(x.text) + '</div>' +
+    '<div class="sc-two">' +
+      scSide('sc-side-int', 'What Lilly intended', x.intended || '—', null, x.iq || '', false) +
+      scSide('sc-side-con', 'What the contract says', x.contract || '—', x.contractRef, x.cq || '', x.cqNone) +
+    '</div>' +
     '<div class="sc-recon">' +
-      scReconKV('Intended', esc(x.intended || '—')) +
-      scReconKV('In contract', esc(x.contract || '—') + (x.contractRef ? ' <span class="sc-tag">' + esc(x.contractRef) + '</span>' : '')) +
       scReconKV('Delta', esc(x.delta || '—'), 'sc-delta') +
+      scReconKV('Impact if unresolved', esc(x.impact || '—')) +
       scReconKV('Recommend', esc(x.rec || '—'), 'sc-rec') +
-      scReconKV('Confidence', esc(x.confidence || '—') + ' ' + evidenceChip(x.evidenceType, { short:true })) +
-    '</div>';
+    '</div>' +
+    scFoot([
+      { k: 'Owner', v: '<b>' + esc(x.owner || '—') + '</b>' },
+      { k: 'Raise with', v: '<b>' + esc(x.raiseWith || '—') + '</b>' },
+      { k: 'Linked', v: scLinkedHtml(x.linked) },
+      { k: 'Confidence', v: '<b>' + esc(x.confidence || '—') + '</b> ' + evidenceChip(x.evidenceType, { short: true }) }
+    ]);
 }
 function scShiftDetail(s) {
-  return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(s.id) + '</span>' + stanceChip(s.stance) + '<span class="sc-shift-type">' + esc(s.shiftType) + '</span></div>' +
+  return '<div class="sc-dl-eyebrow"><span class="sc-dl-id">' + esc(s.id) + '</span>' + stanceChip(s.stance) +
+      '<span class="sc-src sc-src-shift">Shift · ' + esc(s.shiftType) + '</span></div>' +
     '<div class="sc-dl-title">' + esc(s.text) + '</div>' +
     '<div class="sc-recon">' +
       scReconKV('Shifts', '<b>' + esc(s.shiftType) + '</b> onto Lilly') +
       scReconKV('Source', esc(s.source)) +
       scReconKV('Trigger', esc(s.trigger)) +
-      scReconKV('Stance', s.stance === 'push-back' ? 'Push back' : 'Accept') +
-      scReconKV('Recommend', esc(s.note || '—'), 'sc-rec') +
-      scReconKV('Evidence', evidenceChip(s.evidenceType, { short:true })) +
-    '</div>';
+      scReconKV('Impact', esc(s.impact || '—')) +
+      scReconKV('Recommend', esc(s.rec || '—'), 'sc-rec') +
+    '</div>' +
+    scFoot([
+      { k: 'Stance', v: '<b>' + (s.stance === 'push-back' ? 'Push back' : 'Accept') + '</b>' },
+      { k: 'Owner', v: '<b>' + esc(s.owner || '—') + '</b>' },
+      { k: 'Raise with', v: '<b>' + esc(s.raiseWith || '—') + '</b>' },
+      { k: 'Linked', v: scLinkedHtml(s.linked) },
+      { k: 'Evidence', v: evidenceChip(s.evidenceType, { short: true }) }
+    ]);
 }
 function renderReconciliation(d) {
   const items = scReconItems(d);
@@ -1306,6 +1342,21 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-rv.sc-rec{color:var(--plum);font-weight:700}' +
   '.contract-tab .sc-tag{font:700 10px/1 var(--mono);color:var(--mut);background:var(--nested);border:1px solid var(--line2);border-radius:5px;padding:2px 6px}' +
   '@media(max-width:760px){.contract-tab .sc-md{grid-template-columns:1fr}.contract-tab .sc-md-list{max-height:none}}' +
+  /* richer reconciliation detail pane: intended|contract side-by-side + excerpts + foot */
+  '.contract-tab .sc-two{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:12px}' +
+  '.contract-tab .sc-side{border:1px solid var(--line2);border-radius:8px;padding:10px 12px;background:var(--surface)}' +
+  '.contract-tab .sc-side-int{border-left:3px solid var(--sec)}' +
+  '.contract-tab .sc-side-con{border-left:3px solid var(--plum)}' +
+  '.contract-tab .sc-sl{font:800 8.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:5px}' +
+  '.contract-tab .sc-sv{font-size:12px;color:var(--ink);font-weight:600;line-height:1.4}' +
+  '.contract-tab .sc-quote{font-size:10.5px;color:var(--mut2);font-style:italic;line-height:1.45;margin-top:6px;padding-left:8px;border-left:2px solid var(--line2)}' +
+  '.contract-tab .sc-quote-none{color:var(--danger);font-style:normal}' +
+  '.contract-tab .sc-foot{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--ink2);border-top:1px solid var(--line);padding-top:11px;margin-top:11px}' +
+  '.contract-tab .sc-foot b{color:var(--ink)}' +
+  '.contract-tab .sc-fk{color:var(--mut2);font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.04em;margin-right:5px}' +
+  '.contract-tab .sc-lk{color:var(--sec-tx);font-weight:700;cursor:pointer}' +
+  '.contract-tab .sc-fmut{color:var(--mut2)}' +
+  '@media(max-width:720px){.contract-tab .sc-two{grid-template-columns:1fr}}' +
   /* interactive delivery timeline (dates on lanes + click-a-milestone detail) */
   '.contract-tab .sc-tl{border:1px solid var(--line);border-radius:9px;overflow:hidden}' +
   '.contract-tab .sc-tl-bars{padding:14px 16px 12px}' +

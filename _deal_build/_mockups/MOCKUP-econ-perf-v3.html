@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups v3 — Performance detail + benchmark ticks on the real ZOPA</title>
+<style>
+  :root{
+    --plum:#5C2B50; --pri-tx:#5C2B50; --teal:#2F6E6B; --tealD:#245a57; --emph:#C15E19; --danger:#b41e16;
+    --ink:#22252a; --ink2:#41464e; --mut:#6b7280; --mut2:#8a919c;
+    --line:#e7e9ec; --line2:#d8dbe0; --surface:#fff; --surface2:#f6f7f8; --nested:#eef0f2; --bg:#edefed;
+    --sec-t:#dcebe9; --plum-t:#efe6ed;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.4}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 24px 90px}
+  h1{font-size:19px;font-weight:800;margin:0 0 4px}
+  .lede{color:var(--mut);font-size:12px;margin:0 0 16px}
+  h2.sec{font-size:14px;font-weight:800;margin:26px 0 4px;padding-top:14px;border-top:2px solid var(--line2)}
+  .sub{color:var(--mut);font-size:12px;margin:0 0 12px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:11px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,30,.05)}
+  .card-hd{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--line);border-top:3px solid var(--emph)}
+  .card-hd.teal{border-top-color:var(--teal)} .card-hd.plum{border-top-color:var(--plum)}
+  .card-hd .ct{font-weight:800;font-size:12.5px;text-transform:uppercase;letter-spacing:.02em}
+  .card-hd .cs{margin-left:auto;font-size:11px;color:var(--mut2);font-family:var(--mono)}
+  .card-bd{padding:14px 15px}
+  .eyebrow{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:16px 0 7px}
+  .eyebrow:first-child{margin-top:2px}
+  .divider{height:1px;background:var(--line);margin:15px 0}
+  .hint{font-size:11px;color:var(--mut2);font-style:italic;margin-top:12px;padding-top:9px;border-top:1px dashed var(--line2)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;font:800 9px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:7px 9px;border-bottom:1px solid var(--line2)}
+  td{padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink2)}
+  td strong{color:var(--ink)}
+  tr.exp-row{cursor:pointer} tr.exp-row:hover{background:var(--surface2)}
+  tr.exp-row .chev{display:inline-block;width:6px;height:6px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .12s;margin-right:7px}
+  tr.exp-row.open .chev{transform:rotate(45deg)}
+  tr.detail>td{background:var(--surface2);padding:0}
+  tr.detail.hidden{display:none}
+  .kv{display:grid;grid-template-columns:120px 1fr;margin:10px 12px}
+  .kv .k{font:800 9px/1.3 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut);padding:6px 0}
+  .kv .v{padding:6px 0;font-size:12px;color:var(--ink2)}
+  .kv .v.rec{color:var(--plum);font-weight:700}
+  .st{display:inline-flex;align-items:center;gap:4px;font:800 9px/1 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 7px;border-radius:5px;white-space:nowrap}
+  .st-ok{background:var(--sec-t);color:#215f5b} .st-warn{background:#f7e3d4;color:var(--emph)} .st-dev{background:#f6ddd9;color:var(--danger)}
+  .st i{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+  .link{color:var(--teal);font-weight:700}
+  .note{font-size:11px;color:var(--ink2);margin:2px 0 10px 12px;padding-left:9px;border-left:2px solid var(--emph)}
+
+  /* ---- faithful ZOPA (copied from the live zopa.js styling; UNCHANGED except the benchmark tick is
+     made prominent + labelled) ---- */
+  .zline{border-bottom:1px solid var(--line)}
+  .zline:last-child{border-bottom:0}
+  .zsum{display:flex;align-items:center;gap:14px;padding:11px 2px 6px}
+  .zsum-row{display:flex;align-items:flex-start;gap:8px;flex:0 0 210px;width:210px}
+  .zlname{font-weight:700;font-size:12px;color:var(--ink);line-height:1.3}
+  .ztrack{position:relative;height:82px;flex:1 1 auto;min-width:0}
+  .zaxis{position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:var(--line2);border-radius:2px}
+  .zzopa{position:absolute;top:50%;transform:translateY(-50%);height:16px;background:var(--sec-t);border:1px solid var(--tealD);border-radius:4px}
+  .ztgt,.zwalk{position:absolute;top:calc(50% - 11px);width:2px;height:22px;background:var(--plum)}
+  .zwalk{opacity:.5}
+  .zfb{position:absolute;top:calc(50% - 7px);height:14px;border-left:2px dotted var(--plum);opacity:.75}
+  .zopen{position:absolute;top:calc(50% - 6px);width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--surface);border:2px solid var(--emph);box-sizing:border-box}
+  .zask{position:absolute;top:calc(50% - 14px);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}
+  .zask.over{border-top-color:var(--danger)}
+  /* the ONE change: benchmark tick from a thin neutral mark -> a clear burnt-orange tick */
+  .zbench{position:absolute;top:calc(50% - 15px);width:3px;height:30px;background:var(--emph);border-radius:2px}
+  .zlab{position:absolute;display:flex;flex-direction:column;align-items:center;line-height:1.12;white-space:nowrap;text-align:center;transform:translateX(-50%)}
+  .zlab.up{bottom:calc(50% + 18px)} .zlab.dn{top:calc(50% + 18px)}
+  .zltag{font-size:9px;letter-spacing:.03em;text-transform:uppercase;font-weight:800;color:var(--mut2)}
+  .zlval{font-size:11px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .zlab.bench .zltag,.zlab.bench .zlval{color:var(--emph)}
+  .zlab.tgt .zltag{color:var(--tealD)} .zlab.walk .zltag,.zlab.open .zltag{color:var(--plum)}
+  .zlab.open .zltag{color:var(--emph)}
+  .zlegend{display:flex;gap:16px;flex-wrap:wrap;font-size:10px;color:var(--mut2);margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+  .zlegend i{display:inline-block;margin-right:5px;vertical-align:middle}
+  .lg-bench{width:3px;height:13px;background:var(--emph);border-radius:2px}
+  .lg-tgt{width:2px;height:13px;background:var(--plum)}
+  .lg-ask{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid var(--plum)}
+  .zexp{border:1px dashed var(--line2);border-radius:6px;padding:9px 11px;margin:2px 0 8px 224px;font-size:11px;color:var(--ink2);background:var(--surface2)}
+  .zexp .br{display:flex;gap:8px;padding:2px 0}
+  .zexp .bk{flex:0 0 92px;color:var(--mut2);font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:.03em}
+  .zexp .bk.bench{color:var(--emph)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mockups v3 — corrected</h1>
+  <p class="lede">Two things, done the way you asked: (1) the Performance panel kept as-is but each commitment expandable to the missing depth; (2) the real ZOPA left untouched, with a clear benchmark tick added per line.</p>
+
+  <h2 class="sec">1 · Performance panel — same layout, add the depth</h2>
+  <p class="sub">Nothing about the panel changes except every commitment now <strong>expands</strong> to Contract · Playbook · Remedy · Status · Recommend (+ why). Click a row.</p>
+  <div id="perf"></div>
+
+  <h2 class="sec">2 · Benchmark tick on each ZOPA line — ZOPA unchanged</h2>
+  <p class="sub">The live ZOPA, exactly as-is; the only change is the market benchmark tick is now a clear burnt-orange mark + label on each line that has one. The separate Benchmarks panel goes away; the methodology moves into the line's expand.</p>
+  <div id="bench"></div>
+</div>
+
+<script>
+/* ---------- Performance data (with the deep detail per commitment) ---------- */
+var SLA=[
+  {m:'Platform uptime',c:'99.5% / month',p:'99.9%',rem:'5% credit per 1% miss, capped 15%',s:'dev',fx:'ISS-06',rec:'Tighten to 99.9% and remove the 15% credit cap.',why:'Below playbook; the cap means chronic misses cost the supplier almost nothing.'},
+  {m:'Support response (P1)',c:'4 business hours',p:'1 hour, 24×7',rem:'None stated',s:'warn',fx:null,rec:'Add a 1-hour 24×7 P1 target with a credit for misses.',why:'No remedy = no teeth if support is slow on a critical issue.'},
+  {m:'Data refresh latency',c:'Next-day (T+1)',p:'T+1 acceptable',rem:'—',s:'ok',fx:null,rec:'Accept as drafted.',why:'Meets the playbook standard.'}
+];
+var ACC=[
+  {m:'D1 · Data-source integration',c:'All 4 sources ingest with <2% record-reject over 2 cycles',p:'Objective pass/fail',rem:'Re-run cycle on fail',s:'ok',fx:null,rec:'Accept — objective and measurable.',why:'Clear, testable standard.'},
+  {m:'D2 · Content model + validation',c:'Validation reconciles headcount to HRIS within ±0.5%',p:'Objective pass/fail',rem:'Re-validate on fail',s:'ok',fx:null,rec:'Accept.',why:'Objective tolerance stated.'},
+  {m:'D3 · Dashboard set',c:'“Dashboards render agreed metrics” — no objective criteria for “agreed”',p:'Objective pass/fail',rem:'None',s:'dev',fx:'ISS-10',rec:'Define the metric list + an explicit sign-off (not silence).',why:'Acceptance-by-silence: the burden shifts to Lilly on a 10-day clock.'},
+  {m:'D5 · Training',c:'“Training delivered” — no competency or attendance threshold',p:'Objective pass/fail',rem:'None',s:'dev',fx:'ISS-10',rec:'Add an attendance/competency bar to “delivered”.',why:'No measurable completion standard.'}
+];
+var CHG=[
+  {m:'Change process',c:'Changes require a signed Change Order; supplier estimates at standard day-rate',p:'Signed CO required',rem:'n/a',s:'ok',fx:null,rec:'Accept the process.',why:'Standard, controlled.'},
+  {m:'Change-order pricing',c:'No cap on the change-order day-rate',p:'Capped day-rate',rem:'n/a',s:'warn',fx:'ISS-11',rec:'Cap the change-order day-rate (or reuse the platform discount).',why:'Open-ended cost exposure on any scope creep.'}
+];
+function st(s){return '<span class="st st-'+(s==='ok'?'ok':s==='warn'?'warn':'dev')+'"><i></i>'+(s==='ok'?'Aligned':s==='warn'?'Partial':'Deviation')+'</span>';}
+function detailKV(x){
+  return '<div class="kv">'+
+    '<div class="k">Contract</div><div class="v">'+x.c+'</div>'+
+    '<div class="k">Playbook</div><div class="v">'+x.p+'</div>'+
+    '<div class="k">Remedy</div><div class="v">'+x.rem+'</div>'+
+    '<div class="k">Status</div><div class="v">'+st(x.s)+'</div>'+
+    '<div class="k">Recommend</div><div class="v rec">'+x.rec+(x.fx?' <span class="link">('+x.fx+' →)</span>':'')+'</div>'+
+  '</div><div class="note">'+x.why+'</div>';
+}
+function tbl(rows,cols){
+  var head='<tr><th style="width:24px"></th>'+cols.map(function(c){return '<th>'+c.h+'</th>';}).join('')+'</tr>';
+  var body=rows.map(function(x,i){
+    var tds=cols.map(function(c){return '<td>'+c.f(x)+'</td>';}).join('');
+    return '<tr class="exp-row" data-t="'+i+'"><td><span class="chev"></span></td>'+tds+'</tr>'+
+      '<tr class="detail hidden" data-d="'+i+'"><td colspan="'+(cols.length+1)+'">'+detailKV(x)+'</td></tr>';
+  }).join('');
+  return '<table><thead>'+head+'</thead><tbody>'+body+'</tbody></table>';
+}
+function renderPerf(){
+  var slaCols=[{h:'Metric',f:function(x){return '<strong>'+x.m+'</strong>';}},{h:'Contract',f:function(x){return x.c;}},{h:'Playbook',f:function(x){return x.p;}},{h:'Status',f:function(x){return st(x.s);}}];
+  var accCols=[{h:'Deliverable',f:function(x){return '<strong>'+x.m+'</strong>';}},{h:'Objective?',f:function(x){return x.s==='dev'?'<span style="color:var(--danger);font-weight:700">Not defined</span>':'Defined';}},{h:'Status',f:function(x){return st(x.s);}}];
+  var chgCols=[{h:'Change control',f:function(x){return '<strong>'+x.m+'</strong>';}},{h:'Terms',f:function(x){return x.c;}},{h:'Status',f:function(x){return st(x.s);}}];
+  document.getElementById('perf').innerHTML='<div class="card"><div class="card-hd"><span class="ct">Performance: SLAs, Acceptance &amp; Change Control</span><span class="cs">click any row for the detail</span></div><div class="card-bd">'+
+    '<div class="eyebrow">Service levels &amp; KPIs</div>'+tbl(SLA,slaCols)+
+    '<div class="divider"></div><div class="eyebrow">Deliverable acceptance gates</div>'+tbl(ACC,accCols)+
+    '<div class="divider"></div><div class="eyebrow">Change control</div>'+tbl(CHG,chgCols)+
+    '<div class="hint">Same three-section panel you have now — the only change is each commitment expands to the depth that was missing (Contract · Playbook · Remedy · Status · Recommend · why).</div></div></div>';
+  document.querySelectorAll('#perf .exp-row').forEach(function(r){r.onclick=function(){
+    r.classList.toggle('open');
+    var d=r.parentNode.querySelector('.detail[data-d="'+r.dataset.t+'"]'); if(d) d.classList.toggle('hidden');
+  };});
+}
+
+/* ---------- faithful ZOPA + benchmark tick ---------- */
+function M(n){ if(n>=1e6) return '$'+(n/1e6).toFixed(2).replace(/\.?0+$/,'')+'M'; if(n>=1e3) return '$'+Math.round(n/1e3)+'K'; return '$'+n; }
+function zline(cfg){
+  var vals=[cfg.open,cfg.target,cfg.walk,cfg.ask]; if(cfg.fb!=null)vals.push(cfg.fb); if(cfg.bench!=null)vals.push(cfg.bench);
+  var min=Math.min.apply(null,vals),max=Math.max.apply(null,vals); var pad=(max-min)*0.1||1; min-=pad;max+=pad; var span=max-min;
+  var p=function(v){return Math.max(0,Math.min(100,(v-min)/span*100));};
+  var over=cfg.ask>cfg.walk;
+  var marks='<div class="zaxis"></div>'+
+    '<div class="zzopa" style="left:'+p(cfg.target).toFixed(1)+'%;width:'+Math.max(p(cfg.walk)-p(cfg.target),0).toFixed(1)+'%"></div>'+
+    '<div class="ztgt" style="left:'+p(cfg.target).toFixed(1)+'%"></div>'+
+    '<div class="zwalk" style="left:'+p(cfg.walk).toFixed(1)+'%"></div>'+
+    (cfg.fb!=null?'<div class="zfb" style="left:'+p(cfg.fb).toFixed(1)+'%"></div>':'')+
+    '<div class="zopen" style="left:'+p(cfg.open).toFixed(1)+'%"></div>'+
+    '<div class="zask '+(over?'over':'')+'" style="left:calc('+p(cfg.ask).toFixed(1)+'% - 5px)"></div>'+
+    (cfg.bench!=null?'<div class="zbench" style="left:'+p(cfg.bench).toFixed(1)+'%" title="market benchmark"></div>':'');
+  var pts=[{v:cfg.open,cls:'open',tag:'Open'},{v:cfg.target,cls:'tgt',tag:'Target'},{v:cfg.walk,cls:'walk',tag:'Walk'},{v:cfg.ask,cls:'ask',tag:'Ask'}];
+  if(cfg.bench!=null)pts.push({v:cfg.bench,cls:'bench',tag:'Benchmark'});
+  pts.sort(function(a,b){return a.v-b.v;});
+  var labels=pts.map(function(pp,i){var lane=(i%2===0)?'up':'dn';return '<span class="zlab '+pp.cls+' '+lane+'" style="left:'+p(pp.v).toFixed(1)+'%"><span class="zltag">'+pp.tag+'</span><span class="zlval">'+M(pp.v)+'</span></span>';}).join('');
+  var exp=cfg.bench!=null?'<div class="zexp"><div class="br"><span class="bk bench">Benchmark</span><span><b>'+M(cfg.bench)+'</b> — '+cfg.benchNote+' · <span class="link">methodology</span></span></div><div class="br"><span class="bk">Read</span><span>'+cfg.read+'</span></div></div>':'';
+  return '<div class="zline"><div class="zsum"><div class="zsum-row"><span class="zlname">'+cfg.name+'</span></div><div class="ztrack">'+marks+labels+'</div></div>'+exp+'</div>';
+}
+function renderBench(){
+  var lines=[
+    zline({name:'Platform subscription (18,000 employees)',open:560000,target:640000,fb:690000,walk:720000,ask:780000,bench:666000,benchNote:'~$37/emp/yr 2024 internal precedent, scale-adjusted · Moderate comparability',read:'Ask ~$60K above the target; the benchmark sits just under target, so $640K is defensible.'}),
+    zline({name:'Implementation services (SOW-01)',open:136000,target:160000,fb:185000,walk:200000,ask:220000,bench:179000,benchNote:'$1,500–1,750/day market norm midpoint vs the ~$2,000/day ask · Moderate comparability',read:'Ask is above the norm; hold toward the $160K target.'}),
+    zline({name:'Premium support tier',open:78000,target:90000,fb:98000,walk:105000,ask:112000,bench:null})
+  ].join('');
+  document.getElementById('bench').innerHTML='<div class="card"><div class="card-hd plum"><span class="ct">ZOPA by Line Item · Pricing</span><span class="cs">benchmark tick per line</span></div><div class="card-bd">'+
+    lines+
+    '<div class="zlegend"><span><i class="lg-tgt"></i>target / walk-away</span><span><i class="lg-ask"></i>supplier ask</span><span><i class="lg-bench"></i>market benchmark</span><span style="margin-left:auto;font-style:italic">lines with a real comp show a benchmark tick; others don\'t (no fabricated comp)</span></div>'+
+    '<div class="hint">This is your existing ZOPA, unchanged — the only difference is the benchmark mark is now a clear burnt-orange tick + label on each line that has one (Platform, Implementation). The 3rd line has no real comp, so no tick. The separate Benchmarks panel is removed; methodology sits in each line\'s expand.</div></div></div>';
+}
+
+renderPerf(); renderBench();
+</script>
+</body>
+</html>

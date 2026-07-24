@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup — Reconciliation detail pane (richer)</title>
+<style>
+  :root{
+    --plum:#5C2B50; --pri-tx:#5C2B50; --teal:#2F6E6B; --tealD:#245a57; --emph:#C15E19; --danger:#b41e16;
+    --ink:#22252a; --ink2:#41464e; --mut:#6b7280; --mut2:#8a919c;
+    --line:#e7e9ec; --line2:#d8dbe0; --surface:#fff; --surface2:#f6f7f8; --nested:#eef0f2; --bg:#edefed;
+    --sec-t:#dcebe9; --plum-t:#efe6ed;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.4}
+  .wrap{max-width:1240px;margin:0 auto;padding:20px 22px 90px}
+  h1{font-size:18px;font-weight:800;margin:0 0 3px}
+  .lede{color:var(--mut);font-size:12px;margin:0 0 14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,30,.05)}
+  .card-hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);border-top:3px solid var(--teal)}
+  .card-hd .ct{font-weight:800;font-size:12.5px;text-transform:uppercase;letter-spacing:.02em}
+  .card-hd .cs{margin-left:auto;font-size:11px;color:var(--mut2);font-family:var(--mono)}
+  .card-bd{padding:14px 16px}
+  /* master-detail (left unchanged from the live panel) */
+  .md{display:grid;grid-template-columns:minmax(320px,1fr) 1.35fr;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .md-list{border-right:1px solid var(--line);max-height:560px;overflow-y:auto}
+  .row{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+  .row:hover{background:var(--surface2)} .row.sel{background:var(--plum-t)}
+  .src{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);background:var(--nested);border:1px solid var(--line2);border-radius:4px;padding:3px 5px;white-space:nowrap}
+  .src.shift{background:#f7e3d4;color:var(--emph);border-color:#e6b892} .src.norm{background:var(--plum-t);color:var(--plum);border-color:#d9bcd2}
+  .rtxt{font-weight:600;font-size:12px;color:var(--ink);min-width:0} .rtxt small{display:block;color:var(--mut2);font-weight:500;font-size:10.5px}
+  .st{display:inline-flex;align-items:center;font:800 9px/1 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:4px 8px;border-radius:6px;border:1px solid transparent;white-space:nowrap}
+  .st-in{background:var(--sec-t);color:#215f5b;border-color:#9fc9c4}
+  .st-partial{background:var(--plum-t);color:var(--plum);border-color:#d9bcd2}
+  .st-ambiguous{background:#efe0eb;color:var(--plum);border-color:#d0a9c6}
+  .st-missing{background:#f7e3d4;color:var(--emph);border-color:#e6b892}
+  .st-contradicted{background:#f6ddd9;color:var(--danger);border-color:#e3a9a2}
+  .st-push{background:#f7e3d4;color:var(--emph)} .st-accept{background:var(--sec-t);color:#215f5b}
+  /* ---- the richer detail pane ---- */
+  .det{padding:16px 18px;background:var(--surface2);min-height:520px}
+  .eyebrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+  .did{font:800 11px/1 var(--mono);color:var(--mut)}
+  .dtitle{font-size:15.5px;font-weight:800;line-height:1.3;margin:3px 0 13px;color:var(--ink)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:12px}
+  @media(max-width:720px){.two{grid-template-columns:1fr}}
+  .side{border:1px solid var(--line2);border-radius:8px;padding:10px 12px;background:var(--surface)}
+  .side.intended{border-left:3px solid var(--teal)} .side.contract{border-left:3px solid var(--plum)}
+  .side .sl{font:800 8.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:5px}
+  .side .sv{font-size:12px;color:var(--ink);font-weight:600;line-height:1.4}
+  .side .tag{font:700 9.5px/1 var(--mono);color:var(--mut);background:var(--nested);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;margin-left:5px}
+  .quote{font-size:10.5px;color:var(--mut2);font-style:italic;line-height:1.45;margin-top:6px;padding-left:8px;border-left:2px solid var(--line2)}
+  .quote.none{color:var(--danger);font-style:normal}
+  .band{display:grid;grid-template-columns:96px 1fr;border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:var(--surface);margin-bottom:10px}
+  .band .bk{background:var(--nested);font:800 9px/1.3 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut);padding:9px 10px;border-bottom:1px solid var(--line)}
+  .band .bv{padding:9px 11px;font-size:12px;color:var(--ink2);line-height:1.45;border-bottom:1px solid var(--line)}
+  .band .bk:last-of-type,.band .bv:last-of-type{border-bottom:0}
+  .band .bv.delta{color:var(--emph);font-weight:700} .band .bv.rec{color:var(--plum);font-weight:700}
+  .foot{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--ink2);border-top:1px solid var(--line);padding-top:11px}
+  .foot b{color:var(--ink)} .foot .lk{color:var(--teal);font-weight:700}
+  .foot .k{color:var(--mut2);font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.04em;margin-right:4px}
+  .evchip{font:700 9px/1 var(--sans);color:var(--mut2);background:var(--nested);border-radius:4px;padding:2px 5px;margin-left:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Reconciliation — richer detail pane</h1>
+  <p class="lede">Left list is exactly your live panel (unchanged). The right detail is rebuilt: intended vs contract side-by-side <em>with the actual source excerpts</em>, plus impact-if-unresolved, owner / who to raise it with, and linked findings. Click any row.</p>
+  <div class="card">
+    <div class="card-hd"><span class="ct">Intended-Scope Reconciliation</span><span class="cs">13 scope items · 6 shifts · click a row</span></div>
+    <div class="card-bd"><div class="md"><div class="md-list" id="list"></div><div class="det" id="det"></div></div></div>
+  </div>
+</div>
+<script>
+var D=[
+ {id:'IS-1',origin:'requested',src:'RFP §3.1',status:'in-contract',ref:'SOW-01 D1',conf:'High',ev:'contract',text:'Onboard 4 core HR data sources (HRIS, payroll, recruiting, learning).',
+  intended:'4 sources: HRIS, payroll, recruiting, learning',
+  iq:'"The solution shall onboard the following four HR data sources: HRIS, payroll, recruiting, and learning." — RFP §3.1',
+  contract:'D1 delivers all 4 sources', cq:'"Deliverable D1 — Data-source integration (4 sources)." — SOW-01 §2',
+  delta:'None — fully covered', impact:'None (aligned).', rec:'Confirm the 4 sources at kickoff.',
+  owner:'Buyer PMO', raise:'Supplier PM', linked:[]},
+ {id:'IS-2',origin:'requested',src:'Proposal §2',status:'in-contract',ref:'SOW-01 D3',conf:'High',ev:'contract',text:'Executive + manager dashboard set.',
+  intended:'Exec + manager dashboards', iq:'"...an executive and manager dashboard set." — Proposal §2',
+  contract:'D3, capped at 12 dashboards', cq:'"Deliverable D3 — Dashboard set (up to 12)." — SOW-01 §2',
+  delta:'Cap at 12 dashboards', impact:'If Lilly needs >12, additional dashboards are a change order.', rec:'Confirm 12 is enough for the initial rollout.',
+  owner:'Buyer analytics lead', raise:'Supplier PM', linked:[]},
+ {id:'IS-3',origin:'requested',src:'RFP §5',status:'in-contract',ref:'SOW-01 D4',conf:'High',ev:'contract',text:'SSO / role-based access integration.',
+  intended:'SSO + RBAC configured', iq:'"Single sign-on and role-based access control." — RFP §5',
+  contract:'D4, owner marked Joint', cq:'"Deliverable D4 — SSO / RBAC configuration (owner: Joint)." — SOW-01 §2',
+  delta:'Joint owner, no task split', impact:'"Joint" with no RACI split means Lilly-side config effort is unscoped (see SH-5).', rec:'Pin down which SSO/RBAC tasks are Lilly-owned before M4.',
+  owner:'Buyer IT', raise:'Supplier PM', linked:['SH-5']},
+ {id:'IS-4',origin:'requested',src:'RFP §3.4',status:'contradicted',ref:'SOW-01 out-of-scope',conf:'High',ev:'contract',text:'Historical data migration, 5 years.',
+  intended:'5 years of historical data', iq:'"Migrate five (5) years of historical workforce data." — RFP §3.4',
+  contract:'SOW excludes history older than 3 years', cq:'"Historical data older than three (3) years is out of scope." — SOW-01 §4 (Out of scope)',
+  delta:'2 years dropped — direct conflict', impact:'2 yrs of trend / attrition history unavailable at go-live; adding it post-signature is a change order at the uncapped day-rate (ISS-11).',
+  rec:'Restore to 5yr, or accept 3yr with a documented waiver plus a fixed-price option to add the 2 years later.',
+  owner:'Category lead', raise:'Supplier PM + Legal', linked:['ISS-11']},
+ {id:'IS-5',origin:'requested',src:'Proposal §8 · RFP §9',status:'missing',ref:null,conf:'High',ev:'inference',text:'Exit / transition assistance at end of term.',
+  intended:'Exit assistance at end of term', iq:'"Supplier shall provide reasonable transition assistance on exit." — RFP §9; acknowledged in Proposal §8',
+  contract:'No exit-assistance clause in the SOW or MSA', cq:'No corresponding clause found in the reviewed documents.', cqNone:true,
+  delta:'Entirely absent', impact:'At term end Lilly has no contractual right to data return, config export or transition support — high switching-cost lock-in.',
+  rec:'Add an exit-assistance clause (data return + config export + a reasonable transition-services period) before signature.',
+  owner:'Legal', raise:'Supplier legal', linked:['CN-2']},
+ {id:'IS-6',origin:'requested',src:'Proposal §4',status:'ambiguous',ref:'standard content pack (?)',conf:'Moderate',ev:'inference',text:'Predictive attrition / flight-risk modeling.',
+  intended:'Attrition / flight-risk modeling', iq:'"...including predictive attrition and flight-risk insights." — Proposal §4',
+  contract:'SOW excludes bespoke predictive models', cq:'"Bespoke predictive models beyond the standard content pack are out of scope." — SOW-01 §4',
+  delta:'Unclear whether the standard pack covers attrition', impact:'If attrition isn\'t in the standard pack, a headline requested capability is silently out of scope — surfaces only after go-live.',
+  rec:'Get written confirmation the standard content pack includes attrition, or price the model in now.',
+  owner:'Buyer analytics lead', raise:'Supplier PM', linked:[]},
+ {id:'IS-7',origin:'requested',src:'Email 2026-07-08',status:'missing',ref:null,conf:'Moderate',ev:'internal',text:'Supplier-assisted data-quality remediation during onboarding.',
+  intended:'Supplier-assisted data cleansing', iq:'"Can your team help remediate data-quality issues during onboarding?" — email to Supplier, 2026-07-08',
+  contract:'SOW assumes Lilly provides clean, conformed data', cq:'"Customer will provide data in a clean, conformed format." — SOW-01 assumptions',
+  delta:'Remediation burden lands on Lilly', impact:'If the extracts aren\'t clean, remediation effort is Lilly\'s and can slip M2 (see SH-2).',
+  rec:'Negotiate a supplier-assisted cleansing allowance, or budget the internal effort explicitly.',
+  owner:'Buyer PMO', raise:'Supplier PM', linked:['SH-2']},
+ {id:'IS-8',origin:'requested',src:'RFP §6',status:'partial',ref:'SOW-01 D5',conf:'High',ev:'contract',text:'Admin + analyst training.',
+  intended:'Admin + analyst training', iq:'"Provide administrator and analyst training." — RFP §6',
+  contract:'D5, but no competency / attendance threshold', cq:'"Deliverable D5 — Admin + analyst training (2 sessions)." — SOW-01 §2 (acceptance AC-4 undefined)',
+  delta:'No acceptance standard', impact:'"Training delivered" is unmeasurable — the supplier can claim completion regardless of outcome (acceptance-by-silence).',
+  rec:'Add an attendance + competency bar to the D5 acceptance criterion (AC-4).',
+  owner:'Buyer PMO', raise:'Supplier PM', linked:['ISS-10']},
+ {id:'AS-1',origin:'assumed',src:'Assumed',status:'missing',ref:null,conf:'Inferred',ev:'inference',text:'Production support / SLAs during the pre-go-live implementation phase.',
+  intended:'Availability + support during onboarding', iq:'Implicit — assumed by Lilly, not stated in any source.',
+  contract:'The SLA register applies post-go-live only', cq:'"Service levels apply from the go-live date." — MSA §7.2',
+  delta:'No pre-go-live coverage', impact:'An outage during onboarding has no remedy; the whole implementation window is un-SLA\'d.',
+  rec:'Add an implementation-phase availability / support commitment.', owner:'Buyer PMO', raise:'Supplier PM', linked:[]},
+ {id:'CN-1',origin:'norm',src:'Category norm',status:'missing',ref:null,conf:'Category norm',ev:'inference',text:'A signed DPA + EU SCCs for employee personal data.',
+  intended:'DPA + SCCs (category-standard for workforce data)', iq:'Category norm — standard for HR-data SaaS; expected even though not requested explicitly.',
+  contract:'Referenced but not provided', cq:'"Data processing per the Supplier Privacy Standard (DPA)." — MSA §9.4 (document not in session)',
+  delta:'Absent', impact:'No enforceable data-protection terms for 18,000 employees\' PII — a compliance + signature gate.',
+  rec:'Obtain the signed DPA + EU SCCs before signature.', owner:'Privacy / Legal', raise:'Supplier legal', linked:['ISS-03','GAP-1']}
+];
+var SHIFTS=[
+ {id:'SH-1',shift:true,origin:'shift',src:'Shift',stance:'push-back',type:'dependency',text:'Lilly provides HRIS/payroll access within 5 days of kickoff.',trigger:'Kickoff (M1)',
+  impact:'A tight 5-day window; late access slips the whole critical chain (M2 onward).', rec:'Widen the window, or add a supplier-side replan if access is delayed.', owner:'Buyer HRIS', raise:'Supplier PM', linked:[], ev:'contract', srcDetail:'SOW dependency (DEP-1)'},
+ {id:'SH-2',shift:true,origin:'shift',src:'Shift',stance:'push-back',type:'effort',text:'Supplier assumes Lilly supplies clean, conformed data; remediation is Lilly’s.',trigger:'Data onboarding (M2)',
+  impact:'The unwritten cost — if data isn\'t clean the effort lands on Lilly; the proposal implied supplier-assisted cleansing (IS-7).', rec:'Negotiate a supplier-assisted cleansing allowance.', owner:'Buyer PMO', raise:'Supplier PM', linked:['IS-7'], ev:'inference', srcDetail:'Supplier assumption (proposal)'}
+];
+var ALL=D.concat(SHIFTS);
+var ORIGIN={requested:'Requested',assumed:'Assumed',norm:'Norm',shift:'Shift'};
+function stChip(s){var m={'in-contract':['in','In contract'],partial:['partial','Partial'],ambiguous:['ambiguous','Ambiguous'],missing:['missing','Missing'],contradicted:['contradicted','Contradicted']}[s];return '<span class="st st-'+m[0]+'">'+m[1]+'</span>';}
+function stanceChip(s){return '<span class="st st-'+(s==='push-back'?'push':'accept')+'">'+(s==='push-back'?'Push back':'Accept')+'</span>';}
+function ev(t){return '<span class="evchip">'+t+'</span>';}
+function linkedHtml(a){return a&&a.length?a.map(function(x){return '<span class="lk">'+x+' →</span>';}).join(' · '):'none';}
+
+function renderList(){
+  document.getElementById('list').innerHTML=ALL.map(function(x,i){
+    var chip=x.shift?stanceChip(x.stance):stChip(x.status);
+    var sub=x.shift?x.trigger:(x.ref||'');
+    var sc=x.origin==='shift'?'src shift':x.origin==='norm'?'src norm':'src';
+    return '<div class="row'+(i===0?' sel':'')+'" data-i="'+i+'"><span class="'+sc+'">'+ORIGIN[x.origin]+'</span>'+
+      '<span class="rtxt">'+x.text+(sub?'<small>'+sub+'</small>':'')+'</span>'+chip+'</div>';
+  }).join('');
+  document.querySelectorAll('#list .row').forEach(function(r){r.onclick=function(){
+    document.querySelectorAll('#list .row').forEach(function(x){x.classList.remove('sel');});r.classList.add('sel');
+    renderDetail(ALL[+r.dataset.i]);
+  };});
+}
+function renderScope(x){
+  return '<div class="eyebrow"><span class="did">'+x.id+'</span>'+stChip(x.status)+'<span class="src">'+ORIGIN[x.origin]+' · '+x.src+'</span></div>'+
+    '<div class="dtitle">'+x.text+'</div>'+
+    '<div class="two">'+
+      '<div class="side intended"><div class="sl">What Lilly intended</div><div class="sv">'+x.intended+'</div><div class="quote">'+x.iq+'</div></div>'+
+      '<div class="side contract"><div class="sl">What the contract says</div><div class="sv">'+x.contract+(x.ref?'<span class="tag">'+x.ref+'</span>':'')+'</div><div class="quote'+(x.cqNone?' none':'')+'">'+x.cq+'</div></div>'+
+    '</div>'+
+    '<div class="band"><div class="bk">Delta</div><div class="bv delta">'+x.delta+'</div>'+
+      '<div class="bk">Impact if unresolved</div><div class="bv">'+x.impact+'</div>'+
+      '<div class="bk">Recommend</div><div class="bv rec">'+x.rec+'</div></div>'+
+    '<div class="foot"><span><span class="k">Owner</span><b>'+x.owner+'</b></span><span><span class="k">Raise with</span><b>'+x.raise+'</b></span>'+
+      '<span><span class="k">Linked</span>'+linkedHtml(x.linked)+'</span><span><span class="k">Confidence</span><b>'+x.conf+'</b>'+ev(x.ev)+'</span></div>';
+}
+function renderShift(x){
+  return '<div class="eyebrow"><span class="did">'+x.id+'</span>'+stanceChip(x.stance)+'<span class="src shift">Shift · '+x.type+'</span></div>'+
+    '<div class="dtitle">'+x.text+'</div>'+
+    '<div class="band"><div class="bk">Shifts</div><div class="bv"><b>'+x.type+'</b> onto Lilly</div>'+
+      '<div class="bk">Source</div><div class="bv">'+x.srcDetail+'</div>'+
+      '<div class="bk">Trigger</div><div class="bv">'+x.trigger+'</div>'+
+      '<div class="bk">Impact</div><div class="bv">'+x.impact+'</div>'+
+      '<div class="bk">Recommend</div><div class="bv rec">'+x.rec+'</div></div>'+
+    '<div class="foot"><span><span class="k">Stance</span><b>'+(x.stance==='push-back'?'Push back':'Accept')+'</b></span><span><span class="k">Owner</span><b>'+x.owner+'</b></span>'+
+      '<span><span class="k">Raise with</span><b>'+x.raise+'</b></span><span><span class="k">Linked</span>'+linkedHtml(x.linked)+'</span><span><span class="k">Evidence</span>'+ev(x.ev)+'</span></div>';
+}
+function renderDetail(x){document.getElementById('det').innerHTML=x.shift?renderShift(x):renderScope(x);}
+renderList(); renderDetail(ALL[0]);
+</script>
+</body>
+</html>
