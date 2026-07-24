@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scope Reconciliation — merge mockups A/B/C/D</title>
+<style>
+  :root{
+    --plum:#5C2B50; --teal:#2F6E6B; --emph:#C15E19; --danger:#b41e16;
+    --ink:#22252a; --ink2:#41464e; --mut:#6b7280; --mut2:#8a919c;
+    --line:#e7e9ec; --line2:#d8dbe0; --surface:#ffffff; --surface2:#f6f7f8; --nested:#eef0f2; --bg:#edefed;
+    --sec-t:#dcebe9; --plum-t:#efe6ed;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.4}
+  .wrap{max-width:1320px;margin:0 auto;padding:22px 26px 80px}
+  h1{font-size:20px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+  .lede{color:var(--mut);font-size:12.5px;margin:0 0 16px}
+  /* switcher */
+  .switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .switch button{font:800 12px/1 var(--sans);border:1px solid var(--line2);background:var(--surface);color:var(--ink2);padding:9px 14px;border-radius:8px;cursor:pointer}
+  .switch button.on{background:var(--plum);color:#fff;border-color:var(--plum)}
+  .desc{font-size:12px;color:var(--mut);margin:8px 0 16px;min-height:18px}
+  /* card */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(20,20,30,.05);margin-bottom:16px;overflow:hidden}
+  .card-hd{display:flex;align-items:center;gap:9px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .card-hd .ct{font-weight:800;font-size:13px;letter-spacing:.01em;text-transform:uppercase}
+  .card-hd .cs{margin-left:auto;font-size:11px;color:var(--mut2);font-family:var(--mono)}
+  .card-hd.emph{border-top:3px solid var(--emph)} .card-hd.teal{border-top:3px solid var(--teal)} .card-hd.plum{border-top:3px solid var(--plum)}
+  .card-bd{padding:14px 16px}
+  /* segmented */
+  .seg{display:inline-flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;margin-bottom:12px}
+  .seg button{font:800 11.5px/1 var(--sans);border:0;background:var(--surface);color:var(--mut);padding:8px 14px;cursor:pointer;border-right:1px solid var(--line2)}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--plum);color:#fff}
+  .seg .cnt{opacity:.8;margin-left:5px;font-variant-numeric:tabular-nums}
+  /* master-detail */
+  .md{display:grid;grid-template-columns:minmax(320px,1.05fr) 1.35fr;gap:0;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .md-list{border-right:1px solid var(--line);max-height:460px;overflow-y:auto}
+  .md-row{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+  .md-row:hover{background:var(--surface2)}
+  .md-row.sel{background:var(--plum-t)}
+  .md-row .src{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);background:var(--nested);border:1px solid var(--line2);border-radius:4px;padding:3px 5px;white-space:nowrap}
+  .md-row .txt{font-weight:600;font-size:12px;color:var(--ink);min-width:0}
+  .md-row .txt small{display:block;color:var(--mut2);font-weight:500;font-size:10.5px}
+  .md-detail{padding:16px 18px;background:var(--surface2);min-height:300px}
+  .md-empty{color:var(--mut2);font-style:italic;padding:30px 4px}
+  .dl-eyebrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+  .dl-id{font:800 11px/1 var(--mono);color:var(--mut)}
+  .dl-title{font-size:15px;font-weight:800;line-height:1.3;margin:2px 0 12px}
+  .recon{display:grid;grid-template-columns:1fr;gap:0;border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:var(--surface);margin-bottom:12px}
+  .recon .rr{display:grid;grid-template-columns:118px 1fr;border-bottom:1px solid var(--line)}
+  .recon .rr:last-child{border-bottom:0}
+  .recon .rk{background:var(--nested);font:800 9.5px/1.3 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);padding:9px 10px}
+  .recon .rv{padding:9px 11px;font-size:12px;color:var(--ink2);line-height:1.45}
+  .recon .rv.delta{color:var(--emph);font-weight:700}
+  .recon .rv.rec{color:var(--plum);font-weight:700}
+  /* chips */
+  .st{display:inline-flex;align-items:center;font:800 9px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 7px;border-radius:6px;border:1px solid transparent;white-space:nowrap}
+  .st-in-contract{background:var(--sec-t);color:#215f5b;border-color:#9fc9c4}
+  .st-partial{background:var(--plum-t);color:var(--plum);border-color:#d9bcd2}
+  .st-ambiguous{background:#efe0eb;color:var(--plum);border-color:#d0a9c6}
+  .st-missing{background:#f7e3d4;color:var(--emph);border-color:#e6b892}
+  .st-contradicted{background:#f6ddd9;color:var(--danger);border-color:#e3a9a2}
+  .stype{display:inline-block;font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;padding:3px 6px;border-radius:5px;background:var(--nested);color:var(--mut2);border:1px solid var(--line2)}
+  .stance{display:inline-block;font:800 9px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:3px 7px;border-radius:6px}
+  .stance-push-back{background:#f7e3d4;color:var(--emph)} .stance-accept{background:var(--sec-t);color:#215f5b}
+  .sev{width:14px;height:14px;flex:none;vertical-align:middle}
+  .chip-ev{display:inline-block;font:700 9px/1 var(--sans);color:var(--mut2);background:var(--nested);border-radius:4px;padding:2px 5px;margin-left:4px}
+  /* tables */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;font:800 9.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:8px 10px;border-bottom:1px solid var(--line2)}
+  td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+  tr:last-child td{border-bottom:0}
+  td strong{color:var(--ink)}
+  td small{display:block;color:var(--mut2);font-size:10.5px}
+  .sec-hd{font:800 10px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:0 0 6px;padding-top:2px}
+  .divider{height:1px;background:var(--line);margin:16px 0}
+  .band{display:grid;grid-template-columns:1fr;gap:0}
+  .tag{font:700 10px/1 var(--mono);color:var(--mut);background:var(--nested);border:1px solid var(--line2);border-radius:5px;padding:2px 6px}
+  .note{font-size:11.5px;color:var(--ink2);line-height:1.5;margin-top:6px}
+  .hint{font-size:11px;color:var(--mut2);font-style:italic;margin:10px 2px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Scope &amp; Performance — merge mockups</h1>
+  <p class="lede">Real scope data from the Visier deal. Toggle A/B/C/D. In A and C, click a list row to drive the detail pane. This is a layout study, not final styling.</p>
+  <div class="switch" id="switch"></div>
+  <div class="desc" id="desc"></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+/* ---------- data (real Visier scope, with enriched reconciliation detail) ---------- */
+var SEVICON = {
+  'hard-stop':'<svg class="sev" viewBox="0 0 24 24" fill="currentColor"><path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"/></svg>'
+};
+var STATUS_LABEL = {'in-contract':'In contract',partial:'Partial',ambiguous:'Ambiguous',missing:'Missing',contradicted:'Contradicted'};
+function stChip(s){return '<span class="st st-'+s+'">'+STATUS_LABEL[s]+'</span>';}
+function stanceChip(s){return '<span class="stance stance-'+s+'">'+(s==='push-back'?'Push back':'Accept')+'</span>';}
+function ev(t){return '<span class="chip-ev">'+t+'</span>';}
+
+var SCOPE = [
+  {id:'IS-1',src:'RFP §3.1',item:'Onboard 4 core HR data sources',status:'in-contract',ref:'SOW-01 D1',conf:'High',intended:'4 sources: HRIS, payroll, recruiting, learning',contract:'D1 delivers all 4 sources',delta:'None',rec:'Confirm at kickoff',evi:'contract'},
+  {id:'IS-2',src:'Proposal §2',item:'Executive + manager dashboard set',status:'in-contract',ref:'SOW-01 D3',conf:'High',intended:'Exec + manager dashboards',contract:'D3, capped at 12 dashboards',delta:'Cap at 12',rec:'Confirm 12 is enough',evi:'contract'},
+  {id:'IS-3',src:'RFP §5',item:'SSO / role-based access integration',status:'in-contract',ref:'SOW-01 D4',conf:'High',intended:'SSO + RBAC configured',contract:'D4, owner marked Joint',delta:'Joint owner, no task split',rec:'Pin down the Lilly-side tasks',evi:'contract'},
+  {id:'IS-4',src:'RFP §3.4',item:'Historical data migration, 5 years',status:'contradicted',ref:'SOW-01 out-of-scope',conf:'High',intended:'5 years of history',contract:'SOW excludes history older than 3 years',delta:'2 years dropped',rec:'Restore to 5yr, or accept 3yr with a documented waiver',evi:'contract'},
+  {id:'IS-5',src:'Proposal §8 · RFP §9',item:'Exit / transition assistance at end of term',status:'missing',ref:'—',conf:'High',intended:'Exit assistance at end of term',contract:'No exit-assistance clause in SOW or MSA',delta:'Entirely absent',rec:'Add an exit-assistance clause before signature',evi:'inference'},
+  {id:'IS-6',src:'Proposal §4',item:'Predictive attrition / flight-risk modeling',status:'ambiguous',ref:'standard pack?',conf:'Moderate',intended:'Attrition / flight-risk modeling',contract:'SOW excludes bespoke predictive models',delta:'Unclear if the standard pack covers it',rec:'Confirm the standard content pack scope',evi:'inference'},
+  {id:'IS-7',src:'Email 2026-07-08',item:'Supplier-assisted data-quality remediation',status:'missing',ref:'—',conf:'Moderate',intended:'Supplier-assisted data cleansing',contract:'SOW assumes Lilly provides clean data',delta:'Remediation burden lands on Lilly',rec:'Negotiate supplier remediation, or accept the effort (see SH-2)',evi:'internal'},
+  {id:'IS-8',src:'RFP §6',item:'Admin + analyst training',status:'partial',ref:'SOW-01 D5',conf:'High',intended:'Admin + analyst training',contract:'D5, no competency/attendance threshold',delta:'No acceptance standard',rec:'Define completion criteria (ties to AC-4)',evi:'contract'}
+];
+var ASSUMED = [
+  {id:'AS-1',src:'Assumed',item:'Production support / SLAs pre-go-live',status:'missing',ref:'—',conf:'Inferred',intended:'Availability during onboarding',contract:'SLA register covers post-go-live only',delta:'No pre-go-live coverage',rec:'Add pre-go-live support terms',evi:'inference'},
+  {id:'AS-2',src:'Assumed',item:'Knowledge transfer beyond 2 training sessions',status:'missing',ref:'—',conf:'Inferred',intended:'KT to Lilly analytics team for self-sufficiency',contract:'Not a stated deliverable',delta:'Assumed, unwritten',rec:'Scope KT explicitly, or accept the self-sufficiency risk',evi:'inference'}
+];
+var NORMS = [
+  {id:'CN-1',src:'Norm',item:'Signed DPA + EU SCCs (employee data)',status:'missing',ref:'—',conf:'Category norm',intended:'DPA + SCCs (category-standard)',contract:'Referenced but not provided',delta:'Absent',rec:'Obtain signed DPA (GAP-1, ISS-03)',evi:'inference'},
+  {id:'CN-2',src:'Norm',item:'Exit / transition-assistance clause',status:'missing',ref:'—',conf:'Category norm',intended:'Standard in comparable SaaS exits',contract:'Absent',delta:'Absent (matches IS-5)',rec:'Add exit-assistance clause',evi:'inference'},
+  {id:'CN-3',src:'Norm',item:'Defined data return + deletion on termination',status:'partial',ref:'—',conf:'Category norm',intended:'Return + deletion window',contract:'Return implied, deletion window unspecified',delta:'Deletion window missing',rec:'Specify the deletion window',evi:'inference'}
+];
+var SHIFTS = [
+  {id:'SH-1',src:'Shift',item:'Lilly provides HRIS/payroll access within 5 days of kickoff',type:'dependency',trigger:'Kickoff (M1)',stance:'push-back',rec:'Widen the window or add a supplier-side replan',evi:'contract'},
+  {id:'SH-2',src:'Shift',item:'Supplier assumes Lilly supplies clean data; remediation is Lilly’s',type:'effort',trigger:'Data onboarding (M2)',stance:'push-back',rec:'Negotiate supplier-assisted cleansing (see IS-7)',evi:'inference'},
+  {id:'SH-3',src:'Shift',item:'Deliverables deemed accepted after 10 days of silence',type:'risk',trigger:'Each deliverable',stance:'push-back',rec:'Require explicit sign-off or extend the window',evi:'contract'},
+  {id:'SH-4',src:'Shift',item:'Change orders billed at an uncapped day-rate',type:'cost',trigger:'Any change order',stance:'push-back',rec:'Cap the change-order day-rate',evi:'inference'},
+  {id:'SH-5',src:'Shift',item:'SSO / RBAC is “Joint” with no Lilly-side effort estimate',type:'effort',trigger:'Dashboards + access (M4)',stance:'push-back',rec:'Split tasks and estimate the Lilly-side effort',evi:'contract'},
+  {id:'SH-6',src:'Shift',item:'Lilly confirms data-classification for employee PII',type:'dependency',trigger:'Before M2',stance:'accept',rec:'Reasonable; assign an owner and a date',evi:'inference'}
+];
+var SLA = [
+  {metric:'Platform uptime',target:'99.5% / month',playbook:'99.9%',status:'deviation'},
+  {metric:'Support response (P1)',target:'4 business hours',playbook:'1 hour, 24×7',status:'partial'},
+  {metric:'Data refresh latency',target:'Next-day (T+1)',playbook:'T+1 acceptable',status:'aligned'}
+];
+var ACCEPT = [
+  {d:'D1',c:'All 4 sources ingest with <2% record-reject rate over 2 cycles.',defined:true},
+  {d:'D2',c:'Validation pack reconciles headcount to HRIS within ±0.5%.',defined:true},
+  {d:'D3',c:'Dashboards render agreed metrics; no objective criteria for “agreed”.',defined:false},
+  {d:'D5',c:'Training delivered; no competency or attendance threshold.',defined:false}
+];
+var CHANGE = ['Changes require a signed Change Order; supplier estimates effort at standard day-rate.','No cap on change-order day-rate; ties to ISS-11 uncapped pricing.'];
+
+/* ---------- detail renderers ---------- */
+function reconRow(k,v,cls){return '<div class="rr"><div class="rk">'+k+'</div><div class="rv '+(cls||'')+'">'+v+'</div></div>';}
+function scopeDetail(x){
+  return '<div class="dl-eyebrow"><span class="dl-id">'+x.id+'</span>'+stChip(x.status)+'<span class="stype">'+x.src+'</span></div>'+
+    '<div class="dl-title">'+x.item+'</div>'+
+    '<div class="recon">'+
+      reconRow('Intended', x.intended)+
+      reconRow('In contract', x.contract+' <span class="tag">'+x.ref+'</span>')+
+      reconRow('Delta', x.delta,'delta')+
+      reconRow('Recommend', x.rec,'rec')+
+      reconRow('Confidence', x.conf+' '+ev(x.evi))+
+    '</div>';
+}
+function shiftDetail(x){
+  return '<div class="dl-eyebrow"><span class="dl-id">'+x.id+'</span>'+stanceChip(x.stance)+'<span class="stype">'+x.type+'</span></div>'+
+    '<div class="dl-title">'+x.item+'</div>'+
+    '<div class="recon">'+
+      reconRow('Shifts', '<b>'+x.type+'</b> onto Lilly')+
+      reconRow('Trigger', x.trigger)+
+      reconRow('Stance', x.stance==='push-back'?'Push back':'Accept')+
+      reconRow('Recommend', x.rec,'rec')+
+      reconRow('Evidence', ev(x.evi))+
+    '</div>';
+}
+function perfDetail(x){
+  return '<div class="dl-eyebrow"><span class="dl-id">SLA</span></div>'+
+    '<div class="dl-title">'+x.metric+'</div>'+
+    '<div class="recon">'+reconRow('Contract',x.target)+reconRow('Playbook',x.playbook)+reconRow('Status',x.status)+'</div>';
+}
+
+/* ---------- master-detail builder ---------- */
+function mdList(rows, showSrc, renderDetail, detailId, listId){
+  var html='<div class="md-list" id="'+listId+'">';
+  rows.forEach(function(r,i){
+    var icon = r.status ? stChip(r.status) : stanceChip(r.stance);
+    html+='<div class="md-row'+(i===0?' sel':'')+'" data-i="'+i+'">'+
+      (showSrc?'<span class="src">'+r.src+'</span>':'<span></span>')+
+      '<span class="txt">'+r.item+(r.trigger?'<small>'+r.trigger+'</small>':(r.ref&&r.ref!=='—'?'<small>'+r.ref+'</small>':''))+'</span>'+
+      icon+'</div>';
+  });
+  html+='</div>';
+  return html;
+}
+function wireMD(listId, detailId, rows, renderDetail){
+  var list=document.getElementById(listId), det=document.getElementById(detailId);
+  det.innerHTML=renderDetail(rows[0]);
+  list.querySelectorAll('.md-row').forEach(function(row){
+    row.addEventListener('click',function(){
+      list.querySelectorAll('.md-row').forEach(function(r){r.classList.remove('sel');});
+      row.classList.add('sel');
+      det.innerHTML=renderDetail(rows[+row.dataset.i]);
+    });
+  });
+}
+
+/* ---------- compact tables ---------- */
+function scopeTable(rows){
+  var h='<table><thead><tr><th>Intended scope</th><th>Source</th><th>Status</th><th>In contract</th></tr></thead><tbody>';
+  rows.forEach(function(r){h+='<tr><td><strong>'+r.item+'</strong></td><td><span class="stype">'+r.src+'</span></td><td>'+stChip(r.status)+'</td><td>'+(r.ref&&r.ref!=='—'?r.ref:'<span style="color:var(--mut2)">—</span>')+'</td></tr>';});
+  return h+'</tbody></table>';
+}
+function shiftTable(rows){
+  var h='<table><thead><tr><th>Scope point that shifts to Lilly</th><th>Shifts</th><th>Trigger</th><th>Stance</th></tr></thead><tbody>';
+  rows.forEach(function(r){h+='<tr><td><strong>'+r.item+'</strong></td><td><span class="stype">'+r.type+'</span></td><td>'+r.trigger+'</td><td>'+stanceChip(r.stance)+'</td></tr>';});
+  return h+'</tbody></table>';
+}
+function perfBlock(){
+  var h='<div class="sec-hd">Service levels &amp; KPIs</div><table><thead><tr><th>Metric</th><th>Contract</th><th>Playbook</th><th>Status</th></tr></thead><tbody>';
+  SLA.forEach(function(s){h+='<tr><td><strong>'+s.metric+'</strong></td><td>'+s.target+'</td><td>'+s.playbook+'</td><td>'+s.status+'</td></tr>';});
+  h+='</tbody></table><div class="divider"></div><div class="sec-hd">Deliverable acceptance gates</div><table><thead><tr><th>Deliverable</th><th>Acceptance criteria</th><th>Objective?</th></tr></thead><tbody>';
+  ACCEPT.forEach(function(a){h+='<tr><td>'+a.d+'</td><td>'+a.c+'</td><td>'+(a.defined?'Defined':'<span style="color:var(--emph);font-weight:700">Not defined</span>')+'</td></tr>';});
+  h+='</tbody></table><div class="divider"></div><div class="sec-hd">Change control</div>';
+  CHANGE.forEach(function(c){h+='<div class="note">• '+c+'</div>';});
+  return h;
+}
+function cardHd(title,sub,accent){return '<div class="card-hd '+(accent||'')+'"><span class="ct">'+title+'</span>'+(sub?'<span class="cs">'+sub+'</span>':'')+'</div>';}
+
+/* ---------- the 4 mockups ---------- */
+function mockA(){
+  var segs=[{k:'scope',lab:'Scope',rows:SCOPE.concat(ASSUMED,NORMS),det:scopeDetail,src:true},
+            {k:'shifts',lab:'Shifts',rows:SHIFTS,det:shiftDetail,src:false},
+            {k:'perf',lab:'Performance',rows:SLA.map(function(s){return {item:s.metric,status:'',stance:'accept',metric:s.metric,target:s.target,playbook:s.playbook};}),det:perfDetail,src:false}];
+  var counts={scope:SCOPE.length+ASSUMED.length+NORMS.length,shifts:SHIFTS.length,perf:SLA.length};
+  var segHtml='<div class="seg">'+segs.map(function(s){return '<button data-seg="'+s.k+'"'+(s.k==='scope'?' class="on"':'')+'>'+s.lab+'<span class="cnt">'+counts[s.k]+'</span></button>';}).join('')+'</div>';
+  var html='<div class="card">'+cardHd('Scope Reconciliation','one panel · segmented','teal')+'<div class="card-bd">'+segHtml+
+    '<div class="md"><div id="A-list-wrap"></div><div class="md-detail" id="A-detail"></div></div>'+
+    '<div class="hint">Segment swaps what the list holds; the detail pane adapts its fields. Everything (scope · shifts · performance) lives in ONE panel.</div></div></div>';
+  document.getElementById('stage').innerHTML=html;
+  function loadSeg(k){
+    var s=segs.filter(function(x){return x.k===k;})[0];
+    document.getElementById('A-list-wrap').innerHTML=mdList(s.rows,s.src,s.det,'A-detail','A-list');
+    wireMD('A-list','A-detail',s.rows,s.det);
+  }
+  loadSeg('scope');
+  document.querySelectorAll('.seg [data-seg]').forEach(function(b){b.addEventListener('click',function(){
+    document.querySelectorAll('.seg [data-seg]').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); loadSeg(b.dataset.seg);
+  });});
+}
+function mockB(){
+  var html='<div class="card">'+cardHd('Scope Reconciliation','one panel · three stacked bands','teal')+'<div class="card-bd">'+
+    '<div class="sec-hd">Intended scope ('+ (SCOPE.length+ASSUMED.length+NORMS.length) +')</div>'+scopeTable(SCOPE.concat(ASSUMED,NORMS))+
+    '<div class="divider"></div><div class="sec-hd">Shifts to Lilly ('+SHIFTS.length+')</div>'+shiftTable(SHIFTS)+
+    '<div class="divider"></div><div class="sec-hd">Performance ('+ (SLA.length+ACCEPT.length) +')</div>'+perfBlock()+
+    '<div class="hint">No detail pane — three labeled bands, tables only. Simplest, but it is essentially today\'s panels re-boxed under one header.</div></div></div>';
+  document.getElementById('stage').innerHTML=html;
+}
+function mockC(){
+  var rows=SCOPE.concat(ASSUMED,NORMS,SHIFTS.map(function(s){return {id:s.id,src:'Shift',item:s.item,status:null,stance:s.stance,type:s.type,trigger:s.trigger,rec:s.rec,evi:s.evi,_shift:true};}));
+  function detail(x){return x._shift?shiftDetail(x):scopeDetail(x);}
+  var html='<div class="card">'+cardHd('Scope Reconciliation','master-detail · requested / assumed / norm / shift as one list','teal')+'<div class="card-bd">'+
+    '<div class="md"><div id="C-list-wrap"></div><div class="md-detail" id="C-detail"></div></div>'+
+    '<div class="hint">Requested, assumed, category-norm AND shifts are all rows — one Source column, one detail pane. Performance stays its own panel (below).</div></div></div>'+
+    '<div class="card">'+cardHd('Performance: SLAs · Acceptance · Change Control','own panel','emph')+'<div class="card-bd">'+perfBlock()+'</div></div>';
+  document.getElementById('stage').innerHTML=html;
+  document.getElementById('C-list-wrap').innerHTML=mdList(rows,true,detail,'C-detail','C-list');
+  wireMD('C-list','C-detail',rows,detail);
+}
+function mockD(){
+  var html='<div class="card">'+cardHd('Scope Reconciliation & Responsibility','two stacked bands','teal')+'<div class="card-bd">'+
+    '<div class="sec-hd">Intended vs contract ('+ (SCOPE.length+ASSUMED.length+NORMS.length) +')</div>'+scopeTable(SCOPE.concat(ASSUMED,NORMS))+
+    '<div class="divider"></div><div class="sec-hd">Shifts to Lilly ('+SHIFTS.length+')</div>'+shiftTable(SHIFTS)+
+    '<div class="hint">Reconciliation + shifts stacked in one panel; Performance separate. Like C but flat tables, no detail pane.</div></div></div>'+
+    '<div class="card">'+cardHd('Performance: SLAs · Acceptance · Change Control','own panel','emph')+'<div class="card-bd">'+perfBlock()+'</div></div>';
+  document.getElementById('stage').innerHTML=html;
+}
+
+/* ---------- switcher ---------- */
+var MOCKS=[
+  {k:'A',lab:'Mockup A',desc:'Group 1 · Performance + Shifts merged INTO Reconciliation — unified master-detail with a Scope / Shifts / Performance segment.',fn:mockA},
+  {k:'B',lab:'Mockup B',desc:'Group 1 · Performance + Shifts merged INTO Reconciliation — one panel, three stacked bands, no detail pane.',fn:mockB},
+  {k:'C',lab:'Mockup C',desc:'Group 2 · Shifts folded into Reconciliation as a Source type (master-detail); Performance stays its own panel. (my recommendation)',fn:mockC},
+  {k:'D',lab:'Mockup D',desc:'Group 2 · Reconciliation + Shifts stacked in one panel; Performance separate. Flat tables.',fn:mockD}
+];
+var sw=document.getElementById('switch');
+MOCKS.forEach(function(m,i){var b=document.createElement('button');b.textContent=m.lab;if(i===0)b.className='on';b.onclick=function(){sw.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});b.className='on';document.getElementById('desc').textContent=m.desc;m.fn();};sw.appendChild(b);});
+document.getElementById('desc').textContent=MOCKS[0].desc;
+MOCKS[0].fn();
+</script>
+</body>
+</html>

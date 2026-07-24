@@ -201,7 +201,7 @@
     // Overview shows the TOTAL-DEAL / TCV band ONLY; the per-line ZOPA lives exclusively in
     // Economics (no duplication). A jump takes the user to the line-item detail.
     const zopa = (typeof window !== 'undefined' && window.DealZopa) ? window.DealZopa.renderTotal(d) : '';
-    const toLines = '<div class="btn-row" style="margin-top:2px">' + jumpLink('Line-item ZOPA &amp; pricing in Economics &rarr;', 'tab:commercials/sub:deal') + '</div>';
+    const toLines = '<div class="btn-row" style="margin-top:2px">' + jumpLink('Line-item ZOPA & pricing in Economics →', 'tab:commercials/sub:deal') + '</div>';
     return saCard('Commercial Headline & Total-Deal ZOPA', commercialHeadline(d) + zopa + toLines + batnaNote, { accent: 'teal', icon: 'money' });
   }
 

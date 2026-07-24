@@ -129,7 +129,7 @@ function renderDocMap(d) {
         '<dt>Related to</dt><dd>' + (related || '&mdash;') + '</dd>' +
         basis +
       '</div>' + lim +
-        (r.isMissing ? '<div class="btn-row">' + jumpLink('View gap detail &rarr;', JUMP_GAPS) + '</div>' : '');
+        (r.isMissing ? '<div class="btn-row">' + jumpLink('View gap detail →', JUMP_GAPS) + '</div>' : '');
     }
   });
   const regNote = '';   // bottom precedence/relevance notes removed (repetitive; detail lives in each row's expand)

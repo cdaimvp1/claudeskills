@@ -386,7 +386,7 @@ function renderTab_commercials(d) {
     '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">One normalized view of every commercial line, supplier ask against Lilly’s target, fallback and walk-away, with the per-line zone of possible agreement. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + saCard('Deal Table, Normalized Line Items', renderDealTable(d) + renderDealTotals(d), { accent: 'plum', icon: 'money', sub: (d.commercialLines || []).length + ' lines' }) + '</div>' +
-      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing &amp; Benchmarks', window.DealZopa.render(d), { accent: 'plum', icon: 'target', sub: 'target → walk-away · Theo opening · supplier ask · benchmark' }) + '</div>' +
+      '<div class="col-12">' + saCard('ZOPA by Line Item · Pricing & Benchmarks', window.DealZopa.render(d), { accent: 'plum', icon: 'target', sub: 'target → walk-away · Theo opening · supplier ask · benchmark' }) + '</div>' +
       '<div class="col-7">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-5">' + renderRenewalBand(d) + '</div>' +
     '</div>' +
@@ -397,7 +397,7 @@ function renderTab_commercials(d) {
     '<div class="tab-intro"><h2>Pro-forma</h2><p class="q">The target-scenario cost model over the initial term, discounted at Lilly’s WACC, what the deal is worth once financed. ' + evidenceChip('calculated', { short: true }) + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + saCard('Total Cost of Ownership', renderTcoKpis(d) + '<div class="btn-row">' + copyBtn('Copy pro-forma (TSV)', null, tsv) + '<button class="btn" data-print>' + icon('print') + 'Print</button></div>', { accent: 'plum', icon: 'scale' }) + '</div>' +
-      '<div class="col-6">' + saCard('P&amp;L by Contract Year', renderPL(d), { accent: 'teal', icon: 'scenarios', sub: 'value case = assumption' }) + '</div>' +
+      '<div class="col-6">' + saCard('P&L by Contract Year', renderPL(d), { accent: 'teal', icon: 'scenarios', sub: 'value case = assumption' }) + '</div>' +
       '<div class="col-6">' + saCard('Cash Flow by Contract Year', renderCashflow(d), { accent: 'teal', icon: 'money' }) + '</div>' +
       '<div class="col-6">' + saCard('Discount Control, WACC', renderWaccControl(d), { accent: 'emph', icon: 'assume', sub: 'live NPV' }) + '</div>' +
       '<div class="col-6">' + saCard('NPV vs Discount Rate', '<div id="cml-npv-curve">' + renderNpvCurve(d, wacc0) + '</div>' + insight('The value-case NPV stays firmly positive across the plausible discount range; it only reaches zero near a ~' + (((d.proforma || {}).breakEven || {}).rate) + '% rate, far above the 5–7% governed WACC, a robust case.'), { accent: 'teal', icon: 'scenarios' }) + '</div>' +
