@@ -344,6 +344,26 @@ const DealUI = {
     if (subM && tabM) this.showSubtab(tabM[1], subM[1]);
   },
 
+  gotoFinding(id) {
+    // Deep-link from the Protection Scorecard / Cross-Doc panel to the EXACT finding
+    // row in the Findings Register (Legal & Protection subtab): switch there, expand
+    // that row, scroll it into view + flash. Used by [data-gotofinding="ISS-xx"].
+    this.jump('tab:contract/sub:legal');
+    const open = () => {
+      const row = document.querySelector('[data-exprow="' + id + '"]');
+      if (!row) return;
+      row.classList.remove('is-hidden');                 // in case a filter hid it
+      if (!row.classList.contains('is-open')) {
+        row.classList.add('is-open');
+        const exp = document.querySelector('[data-expfor="' + id + '"]');
+        if (exp) exp.classList.remove('is-hidden');
+      }
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.classList.add('flash'); setTimeout(() => row.classList.remove('flash'), 1400);
+    };
+    setTimeout(open, 60);
+  },
+
   toast(msg) {
     let t = document.querySelector('.copied-toast');
     if (!t) { t = document.createElement('div'); t.className = 'copied-toast'; document.body.appendChild(t); }
@@ -358,7 +378,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -368,6 +388,7 @@ const DealUI = {
         return;
       }
       if (t.hasAttribute('data-jump')) { this.jump(t.getAttribute('data-jump')); return; }
+      if (t.hasAttribute('data-gotofinding')) { this.gotoFinding(t.getAttribute('data-gotofinding')); return; }
       if (t.hasAttribute('data-print')) { window.print(); return; }
       if (t.hasAttribute('data-theme-toggle')) {
         const cur = document.documentElement.getAttribute('data-theme');

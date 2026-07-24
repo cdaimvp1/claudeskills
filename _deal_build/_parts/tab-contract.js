@@ -132,11 +132,7 @@ function renderDocMap(d) {
         (r.isMissing ? '<div class="btn-row">' + jumpLink('View gap detail &rarr;', JUMP_GAPS) + '</div>' : '');
     }
   });
-  const regNote =
-    insight('Rows are ordered by governing precedence. Precedence is our read of a standard MSA + Order Form + SOW structure; no express order-of-precedence clause appeared in the MSA v3 redline this session. ' + evidenceChip('inference', { short:true })) +
-    (relMeta.indirectPresent === false
-      ? insight('<strong>Direct relevance only.</strong> ' + esc(relMeta.indirectNote) + ' ' + evidenceChip(relMeta.evidenceType || 'unavailable', { short:true }))
-      : '');
+  const regNote = '';   // bottom precedence/relevance notes removed (repetitive; detail lives in each row's expand)
   const regCard = saCard('Document Family Register', regTable + regNote,
     { icon:'sources', accent:'teal', sub: docs.length + ' documents, by precedence' });
 
@@ -194,18 +190,17 @@ function renderConflicts(d) {
     { key:'topic', label:'Term / clause', render: r => '<strong>' + esc(r.topic) + '</strong>' },
     { key:'docs', label:'Documents', sort:false, render: r => docTypeOf(r.docA, d) + ' &harr; ' + docTypeOf(r.docB, d) },
     { key:'note', label:'What is unresolved', sort:false, render: r => '<span class="tiny">' + esc(r.note) + '</span>' },
-    { key:'issue', label:'Linked finding', sort:false, render: r => r.issueId ? issueJump(r.issueId, (d.issues.find(i => i.id === r.issueId) || {}).priority) : '&mdash;' }
+    { key:'issue', label:'Linked finding', sort:false, render: r => {
+        if (!r.issueId) return '&mdash;';
+        const pr = (d.issues.find(i => i.id === r.issueId) || {}).priority;
+        // the colored severity chip IS the link (no ISS-id text); click jumps to the exact finding
+        return '<span data-gotofinding="' + esc(r.issueId) + '" style="cursor:pointer" title="Open finding ' + esc(r.issueId) + ' in the register below">' + severityPill(pr) + '</span>';
+      } }
   ];
   const table = shown.length
     ? dataTable(cols, shown, { zebra:true, dense:true, id:'tbl-crossdoc' })
     : gapCard('No active conflicts, risks, or gaps', 'Every cross-document check in session is consistent; nothing to raise.');
-  const gapCount = shown.filter(c => c.trigger === 'gap').length;
-  const insights =
-    insight('<strong>' + shown.length + '</strong> of ' + all.length + ' cross-document checks need resolving' +
-      (shown.length && gapCount === shown.length ? '; all ' + shown.length + ' are <strong>gaps from the two missing exhibits</strong> (DPA, Security Exhibit), not contradictions between documents in session' : '') +
-      '. The ' + excluded + ' fully-consistent checks are not shown. ' + evidenceChip('unavailable', { short:true }), shown.length ? 'warn' : '') +
-    insight('No term-modification history to trace yet: this is a new MSA with no amendments or change orders, and the one version step in session (MSA v2 to v3) held the liability cap unchanged. A row will appear here once a term actually changes across versions.');
-  return saCard('Cross-Document Conflicts & Gaps', table + insights, { icon:'scale', sub: shown.length + ' to resolve' });
+  return saCard('Cross-Document Conflicts & Gaps', table, { icon:'scale', sub: shown.length + ' to resolve' });   // bottom summary/trace notes removed (repetitive)
 }
 
 /* ============================================================================

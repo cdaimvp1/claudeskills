@@ -186,13 +186,14 @@ a:hover{text-decoration:underline}
   font:700 var(--fz)/1 var(--sans); letter-spacing:.01em; padding:14px 16px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:7px}
 .tab-btn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2}
 .tab-btn:hover{color:var(--ink)}
-.tab-btn[aria-selected="true"]{color:var(--pri-tx); border-bottom-color:var(--emph)}
-.subtabbar{background:var(--panel); border-bottom:1px solid var(--line)}
-.subtabbar .wrap{display:flex; gap:6px; padding-top:9px; padding-bottom:9px; overflow-x:auto}
-.subtab-btn{appearance:none; background:var(--surface); border:1px solid var(--line2); border-radius:30px; color:var(--mut);
-  font:700 var(--fz-sm)/1 var(--sans); padding:7px 14px; cursor:pointer; white-space:nowrap}
-.subtab-btn:hover{color:var(--ink); border-color:var(--mut2)}
-.subtab-btn[aria-selected="true"]{background:var(--pri); color:var(--pri-fg); border-color:var(--pri)}
+.tab-btn[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
+/* Subtab bar = same underline design as the main tab bar (not pills); active = black text + black underline. */
+.subtabbar{background:var(--surface); border-bottom:1px solid var(--line2)}
+.subtabbar .wrap{display:flex; gap:2px; overflow-x:auto}
+.subtab-btn{appearance:none; background:transparent; border:0; border-bottom:2.5px solid transparent; color:var(--mut);
+  font:700 var(--fz-sm)/1 var(--sans); letter-spacing:.01em; padding:12px 15px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:7px}
+.subtab-btn:hover{color:var(--ink)}
+.subtab-btn[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
 
 /* tab/subtab panels */
 [data-tabpanel]{display:none}
