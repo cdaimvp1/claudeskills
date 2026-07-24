@@ -106,6 +106,17 @@ file is produced) + adversarial scan + commit. Locate the skill dir first; verif
 - DONE: porting the finalized L&P mockup into the LIVE Deal tab (tab-contract.js + helpers.js +
   data.js). Task #124. Verified in-browser + adversarially audited (see 2026-07-24 verification below);
   4 mockup-parity gaps then closed. "This tab is done."
+- DONE (2026-07-24, with Marc): OVERVIEW batch (16a26fc) - (1) Snapshot|StateOfPlay side-by-side +
+  Next Steps full-width as 3 enriched step-cards (give->get, protection/TCO deltas, round target,
+  issues) killing the ~400px whitespace; (2) fixed the broken row-2 equalizer via ResizeObserver so
+  Recommendation + Top-5 lock to equal height (scroll on overflow) + collapsed Analysis Limitations;
+  (3) deal-ADAPTIVE commercial-headline KPI strip (TCV / Cost avoidance [CA/CI by deal, not flat
+  "Savings"] / Walk-away / Biggest lever) + renamed ZOPA band TCO->TCV. SEVERITY pills recolor +
+  icons site-wide (3f2d506): hard-stop=stop-sign burnt-orange, high=arrow-up plum, medium=line teal,
+  low=arrow-down light-teal (word kept as label+aria); red stays reserved for genuine danger; L&P
+  nav severity-mix dots aligned. Both verified in-browser + independent malicious-code scan CLEAN.
+  OPEN follow-ups Marc may want: severity pills icon-ONLY (drop the word); slim Overview ZOPA by
+  moving Opening/Benchmark read-lines to Economics (shared zopaTotalHTML - needs an Overview flag).
 - DECISIONS PENDING from Marc: adopt the Cross-Doc reframe live? make the Document map click-to-open the
   register row? which more skill dashboards to add to the folder? (ChatGPT analysis reviewed: keep 4-tab
   arch; the real next strategic item is a SKILL-ALIGNMENT SPEC - each skill keeps its standalone/combined
