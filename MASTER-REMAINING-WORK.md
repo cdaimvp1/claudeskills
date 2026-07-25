@@ -91,7 +91,20 @@ If the session restarted/compacted, this is where things stand.
   fabricated defaults; every-tab-always-renders) + never-regress the 3 modes (DEVELOP/MANAGE/PREPARE).
   Build phases 1-4 (spec -> reference JSX -> workflow/interpretive content -> verify/package) AWAIT Marc's
   approval of the plan + 3 open decisions (the 11->7 mapping; Execution as 7th vs 8th tab; confirm MCM here).
-  NO category-strategy files edited yet.
+  Marc APPROVED all 3 (7-tab as proposed; Execution replaces Trend; convert to MCM). NOTE: build now follows
+  the deterministic-dashboard architecture below, not a reference JSX.
+- **DASHBOARD ARCHITECTURE PIVOT (LOCKED 2026-07-25) - see `_redesign_proposals/DASHBOARD-ARCHITECTURE-DECISION.md`.**
+  Marc: there should be ONE locked dashboard per hub, carried in the skill, model authors ONLY the data object
+  (the Landscape pattern). The per-skill "reference JSX" (a per-run reinterpretation) is RETIRED - it was
+  scaffolding from before the deterministic build existed. This came out of the RFx-mockup feedback (it
+  deviated from the platform RFx tab + the locked shell). **Deal hub DONE:** deal-room now carries the
+  `_deal_build` engine under `dashboard/` and builds the locked dashboard deterministically (verified 2.9MB w/
+  platform chrome); reference JSX retired. **NEXT:** RFx dashboard built once (platform RFx tab + shared shell
+  + Marc's keep-list + a new Business Case tab, minus Desktop-incompatible bits: no multi-user score submit, no
+  send-to-Deal button) then rfx-hub carries it; Category Strategy dashboard finished from the #4 workflow draft
+  on the shared shell; plus a NEW business-case-deck skill (gap: exec-summary-package is ATC/ATS approval, not
+  a winner business-case deck; decision-deck retired). Shared shell = the platform chrome (`theo-brand.js` +
+  `theo-color.css` via `_platform_build/build_dashboard.py`), already used by Deal + Landscape.
 - **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
   orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
   (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new
