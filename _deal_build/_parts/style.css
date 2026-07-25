@@ -216,12 +216,12 @@ a:hover{text-decoration:underline}
 .ev{display:inline-flex; align-items:center; gap:4px; font:700 var(--fz-floor)/1 var(--sans); letter-spacing:.03em;
   padding:3px 7px 3px 6px; border-radius:20px; border:1px solid transparent; white-space:nowrap; vertical-align:middle}
 .ev::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor; flex:none}
-.ev-contract{background:var(--sec-t); color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 30%,transparent)}
-.ev-internal{background:var(--pri-t); color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 25%,transparent)}
-.ev-public{background:var(--info-bg); color:var(--info-fg); border-color:color-mix(in srgb,var(--sec) 22%,transparent)}
-.ev-calculated{background:var(--emph-t); color:var(--emph-tx); border-color:color-mix(in srgb,var(--emph) 30%,transparent)}
-.ev-inference{background:var(--warn-bg); color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 30%,transparent)}
-.ev-assumption{background:var(--pri-t); color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 40%,transparent); border-style:dashed}
+.ev-contract{background:transparent; color:var(--sec-tx); border-color:color-mix(in srgb,var(--sec) 42%,transparent)}
+.ev-internal{background:transparent; color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 42%,transparent)}
+.ev-public{background:transparent; color:var(--info-fg); border-color:color-mix(in srgb,var(--info-fg) 42%,transparent)}
+.ev-calculated{background:transparent; color:var(--emph-tx); border-color:color-mix(in srgb,var(--emph) 45%,transparent)}
+.ev-inference{background:transparent; color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 45%,transparent)}
+.ev-assumption{background:transparent; color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 45%,transparent); border-style:dashed}
 .ev-unavailable{background:var(--well); color:var(--mut); border-color:var(--line2)}
 .ev-unavailable::before{background:var(--mut)}
 
@@ -366,7 +366,7 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 .asm-ctrl input[type=range]{width:100%; accent-color:var(--pri); height:4px}
 .asm-ctrl .asm-badge{font-size:var(--fz-floor); color:var(--mut)}
 .local-flag{display:inline-flex; align-items:center; gap:4px; font:700 var(--fz-floor)/1 var(--sans); color:var(--emph-tx);
-  background:var(--emph-t); border-radius:5px; padding:3px 6px; text-transform:uppercase; letter-spacing:.05em}
+  background:transparent; border:1px solid color-mix(in srgb,var(--emph) 45%,transparent); border-radius:5px; padding:3px 6px; text-transform:uppercase; letter-spacing:.05em}
 .btn{appearance:none; font:700 var(--fz-sm)/1 var(--sans); padding:8px 13px; border-radius:8px; cursor:pointer;
   border:1px solid var(--line2); background:var(--surface); color:var(--ink); display:inline-flex; align-items:center; gap:6px}
 .btn svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2}

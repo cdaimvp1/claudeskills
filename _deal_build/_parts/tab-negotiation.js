@@ -515,7 +515,7 @@ function renderTab_negotiation(d) {
     '.neg-tab .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}' +
     /* tactic flag chip on the spine */
     '.neg-tab .tac-chip{display:inline-flex;align-items:center;gap:4px;font:700 var(--fz-floor)/1 var(--sans);color:var(--warn-fg);' +
-    'background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn-bar) 30%,transparent);border-radius:20px;padding:3px 8px}' +
+    'background:transparent;border:1px solid color-mix(in srgb,var(--warn-bar) 45%,transparent);border-radius:20px;padding:3px 8px}' +
     '.neg-tab .tac-chip svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}' +
     /* posture difficulty */
     '.neg-tab .diff-read{display:flex;align-items:center;gap:10px;flex-wrap:wrap}' +

@@ -502,7 +502,7 @@ function renderTab_commercials(d) {
     /* Where-the-Room per-line table: defensible / loaded tags + a share-of-room mini-bar */
     '.commercials-tab .room-tag{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;white-space:nowrap}' +
     '.commercials-tab .room-tag.def{color:var(--sec-tx);background:var(--sec-t)}' +
-    '.commercials-tab .room-tag.load{color:var(--emph-tx);background:var(--emph-t)}' +
+    '.commercials-tab .room-tag.load{color:var(--emph-tx);background:transparent;border:1px solid color-mix(in srgb,var(--emph) 45%,transparent)}' +
     '.commercials-tab #cml-room .minibar{min-width:70px}' +
     /* icon-only reset tucked to the right of a slider heading */
     '.commercials-tab .asm-reset{width:22px;height:22px;flex:0 0 auto;align-self:center;margin-left:4px}' +

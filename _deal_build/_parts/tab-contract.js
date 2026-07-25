@@ -1183,7 +1183,7 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-wf-grid i{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}' +
   '.contract-tab .lp-wf-bar{position:absolute;top:6px;height:19px;border-radius:3px}' +
   '.contract-tab .lp-wf-bar.base{background:linear-gradient(90deg,var(--plum-t),var(--heat-2));border:1px solid var(--heat-2)}' +
-  '.contract-tab .lp-wf-bar.current{background:var(--warn-t);border:1px solid color-mix(in srgb,var(--warn-bar) 45%,transparent)}' +
+  '.contract-tab .lp-wf-bar.current{background:transparent;border:1.5px solid var(--warn-bar)}' +
   '.contract-tab .lp-wf-bar.drop{background:var(--emph);box-shadow:0 1px 0 rgba(0,0,0,.08)}' +
   '.contract-tab .lp-wf-bar.drop.lever{outline:2px solid color-mix(in srgb,var(--emph) 40%,transparent);outline-offset:1px}' +
   '.contract-tab .lp-wf-connect{position:absolute;top:6px;height:19px;width:1px;background:var(--line2)}' +
@@ -1201,7 +1201,7 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-wf-legend i{width:13px;height:10px;border-radius:2px;flex:none}' +
   '.contract-tab .lp-i-base{background:linear-gradient(90deg,var(--plum-t),var(--heat-2));border:1px solid var(--heat-2)}' +
   '.contract-tab .lp-i-drop{background:var(--emph)}' +
-  '.contract-tab .lp-i-current{background:var(--warn-t);border:1px solid color-mix(in srgb,var(--warn-bar) 45%,transparent)}' +
+  '.contract-tab .lp-i-current{background:transparent;border:1.5px solid var(--warn-bar)}' +
   '.contract-tab .lp-i-ach{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--sec) 35%,transparent),color-mix(in srgb,var(--sec) 35%,transparent) 3px,transparent 3px,transparent 6px);border:1px dashed var(--sec)}' +
   /* 2. navigator: segmented toggle + accordions */
   '.contract-tab .lp-nav{display:flex;flex-direction:column}' +
@@ -1225,10 +1225,10 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-ah-pts{font:800 12px/1 var(--mono);color:var(--emph-tx)}' +
   '.contract-tab .lp-ah-pts.nrm{color:var(--mut2)}' +
   '.contract-tab .lp-ah-meta{display:flex;align-items:center;gap:10px;margin:7px 0 0 24px;flex-wrap:wrap}' +
-  '.contract-tab .lp-cov-chip{font:800 10px/1 var(--sans);letter-spacing:.02em;padding:3px 8px;border-radius:11px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}' +
-  '.contract-tab .lp-cov-Confirm{background:var(--warn-t);color:var(--warn)}' +
-  '.contract-tab .lp-cov-Gap{background:var(--danger-t);color:var(--danger)}' +
-  '.contract-tab .lp-cov-Covered{background:var(--ok-t);color:var(--ok)}' +
+  '.contract-tab .lp-cov-chip{font:800 10px/1 var(--sans);letter-spacing:.02em;padding:3px 8px;border-radius:11px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid transparent}' +
+  '.contract-tab .lp-cov-Confirm{color:var(--warn-fg);border-color:color-mix(in srgb,var(--warn-bar) 45%,transparent)}' +
+  '.contract-tab .lp-cov-Gap{color:var(--danger-fg);border-color:color-mix(in srgb,var(--danger-bar) 45%,transparent)}' +
+  '.contract-tab .lp-cov-Covered{color:var(--ok-fg);border-color:color-mix(in srgb,var(--ok-bar) 45%,transparent)}' +
   '.contract-tab .lp-acc-body{padding:2px 13px 11px 24px;background:var(--surface2)}' +
   '.contract-tab .lp-acc-find{width:100%;text-align:left;cursor:pointer;display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:9px 3px;border-top:1px solid var(--line);transition:background .12s}' +
   '.contract-tab .lp-acc-find:first-child{border-top:0}' +
@@ -1258,8 +1258,8 @@ const CONTRACT_STYLE =
   '.contract-tab .pill.lp-party-supplier{background:var(--plum-t);color:var(--pri-tx)}' +
   '.contract-tab .pill.lp-party-buyer{background:var(--sec-t);color:var(--sec-tx)}' +
   '.contract-tab .pill.lp-party-mutual{background:var(--nested);color:var(--mut2);border-color:var(--line2)}' +
-  '.contract-tab .pill.lp-one-sided{background:var(--emph-t);color:var(--emph-tx)}' +
-  '.contract-tab .pill.lp-one-sided.crit{background:var(--danger-t);color:var(--danger)}' +
+  '.contract-tab .pill.lp-one-sided{background:transparent;color:var(--emph-tx);border-color:color-mix(in srgb,var(--emph) 45%,transparent)}' +
+  '.contract-tab .pill.lp-one-sided.crit{background:transparent;color:var(--danger-fg);border-color:color-mix(in srgb,var(--danger-bar) 45%,transparent)}' +
   '.contract-tab .pill.lp-balanced{background:var(--ok-t);color:var(--ok)}' +
   /* 3. register */
   '.contract-tab .lp-reg-tools .toolbar{margin-bottom:0}' +
@@ -1309,7 +1309,7 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-fd-title{font-size:16px;font-weight:800;line-height:1.32;letter-spacing:-.01em;margin-bottom:3px;color:var(--ink)}' +
   '.contract-tab .lp-fd-title.ob{font-size:14.5px}' +
   '.contract-tab .lp-fd-cat{font-size:11.5px;color:var(--mut);margin-bottom:13px}' +
-  '.contract-tab .lp-tactic{display:flex;gap:9px;background:var(--warn-t);border:1px solid color-mix(in srgb,var(--warn-bar) 45%,transparent);border-radius:8px;padding:9px 11px;margin-bottom:14px;font-size:12px}' +
+  '.contract-tab .lp-tactic{display:flex;gap:9px;background:var(--surface2);border:1px solid var(--line2);border-left:3px solid var(--warn-bar);border-radius:8px;padding:9px 11px;margin-bottom:14px;font-size:12px}' +
   '.contract-tab .lp-tactic .lp-ic{color:var(--warn);flex:none}' +
   '.contract-tab .lp-tactic b{color:var(--warn)}' +
   '.contract-tab .lp-tk-q{display:block;color:var(--mut2);font-style:italic;margin-top:3px;font-size:11.5px}' +
@@ -1362,9 +1362,9 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-verdict.v-fair .lp-ic,.contract-tab .lp-verdict.v-fair .lp-v-label{color:var(--ok)}' +
   '.contract-tab .lp-verdict.v-neutral{background:var(--nested);border-color:var(--line2)}' +
   '.contract-tab .lp-verdict.v-neutral .lp-ic,.contract-tab .lp-verdict.v-neutral .lp-v-label{color:var(--mut2)}' +
-  '.contract-tab .lp-verdict.v-adverse{background:var(--emph-t);border-color:var(--emph)}' +
+  '.contract-tab .lp-verdict.v-adverse{background:var(--surface2);border-color:color-mix(in srgb,var(--emph) 40%,transparent);border-left-color:var(--emph)}' +
   '.contract-tab .lp-verdict.v-adverse .lp-ic,.contract-tab .lp-verdict.v-adverse .lp-v-label{color:var(--emph-tx)}' +
-  '.contract-tab .lp-verdict.v-critical{background:var(--danger-t);border-color:var(--danger)}' +
+  '.contract-tab .lp-verdict.v-critical{background:var(--surface2);border-color:color-mix(in srgb,var(--danger) 40%,transparent);border-left-color:var(--danger)}' +
   '.contract-tab .lp-verdict.v-critical .lp-ic,.contract-tab .lp-verdict.v-critical .lp-v-label{color:var(--danger)}' +
   '.contract-tab .lp-v-body{min-width:0}' +
   '.contract-tab .lp-v-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}' +
@@ -1372,7 +1372,7 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-v-why{font-size:12px;color:var(--ink2);line-height:1.45}' +
   '.contract-tab .lp-neg{display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding:10px 12px;background:var(--surface2);border:1px solid var(--line2);border-radius:8px}' +
   '.contract-tab .lp-neg-badge{font:800 10px/1.3 var(--sans);letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:11px;white-space:nowrap;flex:none}' +
-  '.contract-tab .lp-neg-badge.yes{background:var(--emph-t);color:var(--emph-tx)}' +
+  '.contract-tab .lp-neg-badge.yes{background:transparent;color:var(--emph-tx);border:1px solid color-mix(in srgb,var(--emph) 45%,transparent)}' +
   '.contract-tab .lp-neg-badge.no{background:var(--ok-t);color:var(--ok)}' +
   '.contract-tab .lp-neg-why{font-size:12px;color:var(--ink2);line-height:1.45}' +
   '.contract-tab .lp-nq{display:block;font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:2px}' +
@@ -1397,8 +1397,8 @@ const CONTRACT_STYLE =
   /* ---- Scope & Performance: readiness verdict, reconciliation ledger, shifts register ---- */
   '.contract-tab .sc-verdict{font:800 10px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 9px;border-radius:20px}' +
   '.contract-tab .sc-verdict-aligned{background:var(--sec-t);color:var(--sec-tx)}' +
-  '.contract-tab .sc-verdict-partial{background:color-mix(in srgb,var(--emph) 14%,transparent);color:var(--emph)}' +
-  '.contract-tab .sc-verdict-deviation{background:var(--danger-bg);color:var(--danger-fg)}' +
+  '.contract-tab .sc-verdict-partial{background:transparent;color:var(--emph);border:1px solid color-mix(in srgb,var(--emph) 45%,transparent)}' +
+  '.contract-tab .sc-verdict-deviation{background:transparent;color:var(--danger-fg);border:1px solid color-mix(in srgb,var(--danger-bar) 45%,transparent)}' +
   '.contract-tab .sc-readiness{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}' +
   '.contract-tab .sc-rd-dim{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--surface2)}' +
   '.contract-tab .sc-rd-dn{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;font-size:13px;color:var(--ink);margin-bottom:6px}' +
@@ -1408,11 +1408,11 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-st-in-contract{background:var(--sec-t);color:var(--sec-tx);border-color:color-mix(in srgb,var(--sec) 28%,transparent)}' +
   '.contract-tab .sc-st-partial{background:var(--plum-t);color:var(--pri-tx);border-color:color-mix(in srgb,var(--plum) 22%,transparent)}' +
   '.contract-tab .sc-st-ambiguous{background:color-mix(in srgb,var(--plum) 14%,transparent);color:var(--plum);border-color:color-mix(in srgb,var(--plum) 34%,transparent)}' +
-  '.contract-tab .sc-st-missing{background:color-mix(in srgb,var(--emph) 12%,transparent);color:var(--emph);border-color:color-mix(in srgb,var(--emph) 38%,transparent)}' +
-  '.contract-tab .sc-st-contradicted{background:var(--danger-bg);color:var(--danger-fg);border-color:color-mix(in srgb,var(--danger-bar) 35%,transparent)}' +
+  '.contract-tab .sc-st-missing{background:transparent;color:var(--emph);border-color:color-mix(in srgb,var(--emph) 45%,transparent)}' +
+  '.contract-tab .sc-st-contradicted{background:transparent;color:var(--danger-fg);border-color:color-mix(in srgb,var(--danger-bar) 45%,transparent)}' +
   '.contract-tab .sc-shift-type{display:inline-block;font:800 9px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:var(--nested);color:var(--mut2);border:1px solid var(--line2)}' +
   '.contract-tab .sc-stance{display:inline-block;font:800 9.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:6px}' +
-  '.contract-tab .sc-stance-push-back{background:color-mix(in srgb,var(--emph) 12%,transparent);color:var(--emph)}' +
+  '.contract-tab .sc-stance-push-back{background:transparent;color:var(--emph);border:1px solid color-mix(in srgb,var(--emph) 45%,transparent)}' +
   '.contract-tab .sc-stance-accept{background:var(--sec-t);color:var(--sec-tx)}' +
   /* readiness header strip + reconciliation master-detail (Mockup C) */
   '.contract-tab .sc-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}' +
@@ -1425,7 +1425,7 @@ const CONTRACT_STYLE =
   '.contract-tab .sc-row.sc-sel{background:var(--plum-t)}' +
   '.contract-tab .sc-row:focus-visible{outline:2px solid var(--sec);outline-offset:-2px}' +
   '.contract-tab .sc-src{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);background:var(--nested);border:1px solid var(--line2);border-radius:4px;padding:3px 5px;white-space:nowrap}' +
-  '.contract-tab .sc-src-shift{background:color-mix(in srgb,var(--emph) 12%,transparent);color:var(--emph);border-color:color-mix(in srgb,var(--emph) 30%,transparent)}' +
+  '.contract-tab .sc-src-shift{background:transparent;color:var(--emph);border:1px solid color-mix(in srgb,var(--emph) 45%,transparent)}' +
   '.contract-tab .sc-src-norm{background:var(--plum-t);color:var(--pri-tx);border-color:#d9bcd2}' +
   '.contract-tab .sc-rtxt{font-weight:600;font-size:12px;color:var(--ink);min-width:0}' +
   '.contract-tab .sc-rtxt small{display:block;color:var(--mut2);font-weight:500;font-size:10.5px;margin-top:1px}' +
@@ -1492,7 +1492,7 @@ const CONTRACT_STYLE =
   '.contract-tab .perf-n{font:800 21px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--emph);min-width:20px;text-align:center}' +
   '.contract-tab .perf-n.ok{color:var(--sec)}' +
   '.contract-tab .perf-lbl{font-size:11px;line-height:1.35;color:var(--mut2)}' +
-  '.contract-tab .perf-chip{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;color:var(--emph-tx);background:var(--emph-t);vertical-align:1px}' +
+  '.contract-tab .perf-chip{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;color:var(--emph-tx);background:transparent;border:1px solid color-mix(in srgb,var(--emph) 45%,transparent);vertical-align:1px}' +
   '.contract-tab .perf-chip.ok{color:var(--sec-tx);background:var(--sec-t)}' +
   '.contract-tab .sc-lk-ref{font:700 10px/1 var(--mono);color:var(--mut2);background:var(--nested);padding:2px 5px;border-radius:4px}' +
   '.contract-tab .sc-tl-detail{border-top:1px solid var(--line);min-height:0}' +
