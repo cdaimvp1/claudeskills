@@ -4,6 +4,29 @@ Consolidated 2026-07-24 (evening) from ALL trackers/build-plans + a skills-updat
 
 **Tags:** `[do-now]` autonomously doable · `[Marc]` needs your decision · `[hold]` on-hold/sensitive · `[release]` packaging/release step · `[blocked]` needs Lilly network · `[verify]` status contradiction to resolve. Source tracker in parens.
 
+## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-25)
+If the session restarted/compacted, this is where things stand.
+- **Deal dashboard** (`_deal_build/`, tracker `DEAL-DASHBOARD-TRACKER.md`): all 3 Negotiation tabs ported
+  (Trade Plan/Communications/Positions), full MCM colour, no dark mode, pale-fill sweep done. Commits
+  through 6be83e9. **NOT locked** yet: #12 Communications live filters + #13 Next-Session-Brief decision
+  remain (Marc's lock gate = only lock when every pending Deal change is done).
+- **Marc APPROVED the 6 skill recommendations** (review `.txt` on Desktop): (5) claim-gate/abstention suite-wide,
+  (2) update the no-green-rule foundation to permit teal [needs a brand-colors.md check first], (1) new
+  `deal-workspace` hub skill + fix "Deal Room" name collision, (3) RFx→Deal handoff canonical, (6) shared
+  comms-evidence methodology starting with deal-room + the 2 negotiation-prep skills, (4) Category Strategy
+  rebuild (phased). Recommended order: finish the dashboard first, then #5 → #2 → #1 → #3/#6 → #4.
+- **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
+  orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
+  (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new
+  `rfx-hub`; Deep Dive → home TBD.
+- **RFx DASHBOARD REDESIGN — spec DONE**, `_redesign_proposals/RFx-REDESIGN-SPEC.md` (supersedes RFx.md).
+  Rename RFP→**RFx** (serves RFI/RFQ/RFP, any commodity). Platform `RfxTab.tsx` = base, 6-section model
+  folded in. **3 decisions resolved** (spec §G, Marc to confirm): new thin `rfx-hub`; scoring ownership
+  split (evaluation-engine=official, response-analysis=proposed) + one shared kernel; keep the 4-subtab
+  spine. NEXT: mockup the reconciled structure for Marc, then build per §F (8 phases).
+- **Deferred (needs Marc / bigger)**: Landscape MCM colour pass (#15, hardcoded hexes in pv-07* engine),
+  the skill-side builds (all needs-Marc decisions above). Blocked: help-desk network harvest (Lilly network).
+
 ## 0. Governing constraints (apply to everything below)
 - **Skill updates NEVER regress** — additive/branch only; a skill can serve its original purpose AND feed dashboard(s); the ONLY allowed regression is a Claude-Desktop-compat forced change, and only after explain + Marc sign-off (memory `feedback_skill_update_never_regress_branch`).
 - **MCM palette** — plum/teal backbone, burnt-orange emphasis; settled=teal, attention=burnt-orange, critical=deep-rust `#9A3B1F`, info=muted-blue `#2E5E8C`; NO stoplight green/red/yellow; NO dark mode; outline pills; NO pale-orange/amber fills (see DEAL-DASHBOARD-TRACKER LOCKED constraints).
