@@ -394,7 +394,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view],[data-pf-setdepth]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-cofilter],[data-coexpand],[data-pf-view],[data-pf-setdepth]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -433,6 +433,37 @@ const DealUI = {
         const m = t.closest('[data-scmaster]') || document;
         m.querySelectorAll('[data-scpick]').forEach(r => r.classList.toggle('sc-sel', r === t));
         m.querySelectorAll('[data-scpanel]').forEach(p => { p.hidden = p.getAttribute('data-scpanel') !== id; });
+        return;
+      }
+      // Communications alignment-map filters (status summary cards + category chips):
+      // pure attribute toggle over the scoped .co-item list, no re-render. Reflect-only.
+      if (t.hasAttribute('data-cofilter')) {
+        const spec = t.getAttribute('data-cofilter'); const ci = spec.indexOf(':');
+        const kind = spec.slice(0, ci), val = spec.slice(ci + 1);
+        const scope = t.closest('[data-coscope]'); if (!scope) return;
+        const attr = kind === 'status' ? 'data-fstatus' : 'data-fcat';
+        const cur = scope.getAttribute(attr) || '';
+        const next = (kind === 'cat' && val === '') ? '' : (cur === val ? '' : val);
+        scope.setAttribute(attr, next);
+        scope.querySelectorAll('[data-cofilter]').forEach(b => {
+          const bs = b.getAttribute('data-cofilter'); const bi = bs.indexOf(':');
+          if (bs.slice(0, bi) === kind) b.setAttribute('aria-pressed', bs.slice(bi + 1) === next ? 'true' : 'false');
+        });
+        const fs = scope.getAttribute('data-fstatus') || '', fc = scope.getAttribute('data-fcat') || '';
+        let shown = 0;
+        scope.querySelectorAll('.co-item').forEach(it => {
+          const ok = (!fs || it.getAttribute('data-status') === fs) && (!fc || it.getAttribute('data-cat') === fc);
+          it.hidden = !ok; if (ok) shown++;
+        });
+        const c = scope.querySelector('[data-cocount]'); if (c) c.textContent = shown;
+        return;
+      }
+      if (t.hasAttribute('data-coexpand')) {
+        const scope = t.closest('[data-coscope]'); if (!scope) return;
+        const items = Array.prototype.slice.call(scope.querySelectorAll('.co-item')).filter(x => !x.hidden);
+        const anyClosed = items.some(x => !x.open);
+        items.forEach(x => { x.open = anyClosed; });
+        t.textContent = anyClosed ? 'Collapse all' : 'Expand all';
         return;
       }
       // Financial Model statement toggle (Pro-forma / P&L / Cash Flow), scoped to the nearest table.

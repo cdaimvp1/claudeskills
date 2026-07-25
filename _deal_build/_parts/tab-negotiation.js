@@ -374,6 +374,7 @@ function renderTab_negotiation(d) {
     function itemRow(iss) {
       const id = iss.id;
       const status = readOf(id).status || 'unraised';
+      const cat = catOf(id) || '';
       const evs = evForIssue(id);
       const usEvs = evs.filter((e) => e.direction !== 'in');
       const themEvs = evs.filter((e) => e.direction === 'in');
@@ -395,7 +396,7 @@ function renderTab_negotiation(d) {
           '<div class="co-gap-v">' + esc(iss.supplierPosition || '—') + '</div></div></div>';
 
       if (!full) {
-        return '<details class="co-item">' + head + '<div class="co-body">' + gap +
+        return '<details class="co-item" data-status="' + esc(status) + '" data-cat="' + esc(cat) + '">' + head + '<div class="co-body">' + gap +
           '<div class="co-open co-o-unraised"><b>Next move:</b> <span>Not yet raised with Visier; the position is set in the redline but there are no communications on it yet. Put it on the table.</span></div>' +
           '</div></details>';
       }
@@ -426,7 +427,7 @@ function renderTab_negotiation(d) {
       const openLbl = status === 'awaiting' ? 'Waiting on them' : status === 'discussion' ? 'In play' : 'Next move';
       const open = '<div class="co-open co-o-' + esc(status) + '"><b>' + openLbl + ':</b> <span>' + esc(openTxt) + '</span></div>';
 
-      return '<details class="co-item">' + head + '<div class="co-body">' + gap + evidence + exch + open + '</div></details>';
+      return '<details class="co-item" data-status="' + esc(status) + '" data-cat="' + esc(cat) + '">' + head + '<div class="co-body">' + gap + evidence + exch + open + '</div></details>';
     }
 
     const order = { awaiting: 0, discussion: 1, unraised: 2, agreed: 3 };
@@ -437,18 +438,27 @@ function renderTab_negotiation(d) {
     const counts = { awaiting: 0, discussion: 0, unraised: 0, agreed: 0 };
     d.issues.forEach((i) => { const s = readOf(i.id).status || 'unraised'; if (counts[s] != null) counts[s]++; });
 
+    const cats = (tp.categories || []).map((c) => c.name);
     const summary = '<div class="co-summary">' +
       ['awaiting', 'discussion', 'unraised', 'agreed'].map((k) =>
-        '<div class="co-st-card co-' + k + '"><span class="co-st-n">' + counts[k] + '</span>' +
+        '<div class="co-st-card co-' + k + '" role="button" tabindex="0" data-cofilter="status:' + k + '" aria-pressed="false">' +
+        '<span class="co-st-n">' + counts[k] + '</span>' +
         '<span class="co-st-l">' + STT[k] + '</span></div>').join('') + '</div>';
+    const catFilter = cats.length
+      ? '<div class="co-catfilter"><button class="co-cf" data-cofilter="cat:" aria-pressed="true">All</button>' +
+        cats.map((c) => '<button class="co-cf" data-cofilter="cat:' + esc(c) + '" aria-pressed="false">' + esc(c) + '</button>').join('') + '</div>'
+      : '';
+    const listctl = '<div class="co-listctl"><span class="co-lc-count"><b data-cocount>' + items.length + '</b> contested items</span>' +
+      '<button class="co-lc-btn" data-coexpand>Expand all</button></div>';
     const evNote = events.length
       ? insight('Every contested term below shows both sides and the exact messages and quotes that got them there, cited to the M365 thread. ' + coverageBadge(d.deal.evidenceCoverage))
       : insight('No in-session email/Teams thread was available; positions below are mapped from the redline only.', 'warn');
     const list = '<div class="co-list">' + items.map(itemRow).join('') + '</div>';
+    const body = '<div data-coscope data-fstatus="" data-fcat="">' + summary + catFilter + evNote + listctl + list + '</div>';
 
     return '<div class="grid"><div class="col-12">' +
-      saCard('Alignment map · contested terms', summary + evNote + list,
-        { accent: 'plum', icon: 'sources', sub: items.length + ' contested items · click a row' }) +
+      saCard('Alignment map · contested terms', body,
+        { accent: 'plum', icon: 'sources', sub: items.length + ' contested items · filter or click a row' }) +
       '</div></div>';
   }
 
@@ -668,6 +678,14 @@ function renderTab_negotiation(d) {
     '.neg-tab .co-open.co-o-awaiting{border-left-color:var(--warn-bar)}' +
     '.neg-tab .co-open.co-o-discussion{border-left-color:var(--sec)}' +
     '.neg-tab .co-open.co-o-unraised{border-left-color:var(--line2)}' +
+    '.neg-tab .co-st-card{cursor:pointer}' +
+    '.neg-tab .co-st-card[aria-pressed="true"]{border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri)}' +
+    '.neg-tab .co-catfilter{display:flex;gap:7px;flex-wrap:wrap;margin:11px 0 2px}' +
+    '.neg-tab .co-cf{font:700 11px/1 var(--sans);padding:5px 11px;border-radius:20px;border:1px solid var(--line2);background:transparent;color:var(--mut);cursor:pointer}' +
+    '.neg-tab .co-cf[aria-pressed="true"]{border-color:var(--pri);color:var(--pri-tx)}' +
+    '.neg-tab .co-listctl{display:flex;align-items:center;gap:10px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}' +
+    '.neg-tab .co-lc-count{font-size:11px;color:var(--mut2)}.neg-tab .co-lc-count b{color:var(--ink);font-variant-numeric:tabular-nums}' +
+    '.neg-tab .co-lc-btn{margin-left:auto;font:700 11px/1 var(--sans);color:var(--pri-tx);background:none;border:0;cursor:pointer}' +
     '@media(max-width:720px){.neg-tab .co-gap{grid-template-columns:1fr}.neg-tab .co-ev-cols{grid-template-columns:1fr}}' +
     /* ===== 4A Positions (per-term workbench) ===== */
     '.neg-tab .ps-posture{display:grid;grid-template-columns:1.15fr 1fr;gap:15px;margin-bottom:16px}' +
