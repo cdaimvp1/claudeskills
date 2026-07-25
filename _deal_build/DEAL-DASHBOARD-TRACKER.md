@@ -263,7 +263,31 @@ All verified in-browser; commits below. See the UPDATED LOCKED palette constrain
   next-move (recommendedResponse). Colour-reconciled (outline pills, pale-teal us / white+rust them, plum category
   chips, no pale-orange fills). buildDerivedBrief REMOVED → see task #13.
 
-### REMAINING (tasks #11–#16 created this session; also in the harness task list):
+### 2026-07-24 (overnight continuation) — Positions port + pale-fill sweep + review
+- PALE-FILL SWEEP DONE (49310b4): converted every remaining pale-orange/amber/rust fill to
+  outline / neutral-bg+left-bar across Legal & Protection (.lp-tactic, .lp-verdict, .lp-cov-*,
+  .lp-one-sided, .lp-neg-badge, .lp-wf-bar.current), Scope (.sc-verdict/st/stance/src-shift),
+  Economics (.room-tag.load), Negotiation (.tac-chip) AND the shared evidence chips (.ev-* +
+  .local-flag, 84 on one page). Verified 0 pale-orange/amber/rust fills across all 4 tabs.
+- NEGOTIATION → POSITIONS PORTED (9030cac): rebuilt buildPositions to the locked per-term
+  workbench (posture: signature gates Now→Need + protection trajectory 58→97 + difficulty +
+  distribution; master-detail via the reused data-scpick handler — position ladder / why /
+  exchange / trade / dependencies / history). New neg.tradePlan.signatureGates. Colour-reconciled;
+  stance toggle dropped (reflect-only), live severity filter deferred (#12-adjacent). Verified.
+- ALL 3 Negotiation tabs now ported (Trade Plan a57f563, Communications a57f563, Positions 9030cac).
+- OVERNIGHT REVIEW written to Marc's desktop (Theo-Overnight-Review-and-Platform-Assessment.txt):
+  response to his 3 ChatGPT reviews (RFx lifecycle boundary / Communications shared-engines /
+  Category Strategy rebuild) + a full Theo-platform→skills assessment. Master remaining-work list
+  at repo root (MASTER-REMAINING-WORK.md).
+- LOCK HELD (#17): per Marc's gate ("only once every pending Deal change is done"), NOT locking
+  while #12 (Communications live filters — needs a delegated DealUI handler; deferred as a
+  supervised interaction) and #13 (Next-Session Brief re-home/drop decision) remain open. The Deal
+  dashboard is otherwise complete + polished (3 tabs ported, full MCM colour, no pale fills, no dark
+  mode). Landscape colour pass (#15) also deferred: bigger than the token file (hardcoded stoplight
+  hexes in the pv-07* render engine, shared across tabs) — safer supervised. Skill updates: all
+  needs-Marc (D0 hub-skill-home, D2 no-green-rule foundation) — flagged, not touched.
+
+### REMAINING (tasks #11–#19; also in the harness task list + MASTER-REMAINING-WORK.md):
 - #11 Port/verify Negotiation → Positions vs its locked mockup (buildPositions likely still old design).
 - #12 Wire Communications filters (status/category/search) + Expand-all — needs a DealUI delegated handler
   (the app's _filterTable is table-only); the comms summary strip is counts-only for now.
