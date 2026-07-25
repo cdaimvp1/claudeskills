@@ -106,8 +106,17 @@ var ZOPA_CSS =
   '.zopa-viz .zdk{flex:0 0 118px;color:var(--mut2);font-weight:700}' +
   '.zopa-viz .zdv{color:var(--ink2);flex:1;min-width:0}' +
   '.zopa-viz .zdv b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}' +
-  /* total-deal ZOPA / TCO aggregate (always visible, same bar style) */
+  /* per-line ZOPA collapsed section (total-deal band sits above it, always visible) */
+  '.zopa-viz .zlines{border-top:1px solid var(--line);margin-top:10px}' +
+  '.zopa-viz .zlines>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 2px;font:800 10.5px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--plum)}' +
+  '.zopa-viz .zlines>summary::-webkit-details-marker{display:none}' +
+  '.zopa-viz .zlines>summary::marker{content:""}' +
+  '.zopa-viz .zlines>summary:hover{color:var(--sec)}' +
+  '.zopa-viz .zchev2{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
+  '.zopa-viz .zlines[open]>summary .zchev2{transform:rotate(45deg)}' +
+  /* total-deal ZOPA / TCV aggregate (always visible; now the TOP element of the deal card) */
   '.zopa-viz .ztotal{margin-top:16px;padding-top:14px;border-top:2px solid var(--plum)}' +
+  '.zopa-viz .ztotal:first-child{margin-top:0;padding-top:2px;border-top:none}' +
   '.zopa-viz .zthd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px}' +
   '.zopa-viz .ztname{font-weight:800;font-size:var(--fz);color:var(--plum)}' +
   '.zopa-viz .ztsub{font-size:var(--fz-floor);color:var(--mut2)}' +
@@ -265,21 +274,40 @@ function zopaLineHTML(d, l) {
         ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
         : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
   '</div></div>';
-  return '<details class="zline"><summary class="zsum">' +
+  return '<details class="zline" data-zkey="' + esc(l.id) + '"><summary class="zsum">' +
     '<div class="zsum-row"><span class="zchev" aria-hidden="true"></span>' +
       '<span class="zsum-txt"><span class="zlname">' + esc(l.item) + '</span>' + zopaLeverageBadge(lev) + '</span></div>' +
     track + '</summary>' + detail + '</details>';
 }
 
-/* ---------- 4. total-deal ZOPA / TCO band (always visible) ------------------
- * Whole-deal ask/target/walk totals from the 3-yr scenarios (SC-ask /
- * SC-target / SC-max), fallback from SC-fallback; opening derived the same
- * way as the per-line opening. No deal-level market benchmark exists in
- * session -> honest gap-state in the detail (no market tick on the bar). */
-function zopaTotalHTML(d, opts) {
+/* ---------- 4. total-deal ZOPA / TCV band ----------------------------------
+ * LIVE whole-deal ask/target/walk/fallback totals via zopaDealTotals: each is the
+ * canonical scenario total PLUS the delta from the live platform line (CL-1), scaled
+ * over the term. The delta is 0 at plan, so the band reconciles EXACTLY to the
+ * scenarios; off-plan it moves with the sensitivity drivers. No deal-level market
+ * benchmark exists in session -> honest gap-state (no market tick on the bar). */
+function zopaDealTotals(d) {
   const sc = id => ((d.scenarios || []).find(s => s.id === id) || {});
   const askS = sc('SC-ask'), tgtS = sc('SC-target'), fbS = sc('SC-fallback'), maxS = sc('SC-max');
-  const askTot = askS.total || 0, tgtTot = tgtS.total || 0, walkTot = maxS.total || 0, fbTot = fbS.total || 0;
+  const cl1 = (d.commercialLines || []).find(l => l.id === 'CL-1');
+  const years = assumVal(d, 'ASM-2', 3), uplift = assumVal(d, 'ASM-3', 4) / 100;
+  let mult = 0; for (let i = 0; i < years; i++) mult += Math.pow(1 + uplift, i);   // CL-1 recurring term multiplier
+  let dAsk = 0, dTgt = 0, dMax = 0, dFb = 0;
+  if (cl1) {
+    const lv = zopaLiveLine(d, cl1);
+    dAsk = lv.ask - (cl1.supplierAmount || 0); dTgt = lv.target - (cl1.target || 0);
+    dMax = lv.walk - (cl1.maximumAcceptable || 0); dFb = lv.fallback - (cl1.fallback || 0);
+  }
+  return {
+    askY1: (askS.y1Total || 0) + dAsk, tgtY1: (tgtS.y1Total || 0) + dTgt, maxY1: (maxS.y1Total || 0) + dMax,
+    askT: (askS.total || 0) + mult * dAsk, tgtT: (tgtS.total || 0) + mult * dTgt,
+    maxT: (maxS.total || 0) + mult * dMax, fbT: (fbS.total || 0) + mult * dFb,
+    maxEv: maxS.evidenceType || 'assumption', offPlan: !!(dAsk || dTgt || dMax || dFb)
+  };
+}
+function zopaTotalHTML(d, opts) {
+  const t = zopaDealTotals(d);
+  const askTot = Math.round(t.askT), tgtTot = Math.round(t.tgtT), walkTot = Math.round(t.maxT), fbTot = Math.round(t.fbT);
   const openTot = Math.round(Math.max(tgtTot * 0.85, 2 * tgtTot - walkTot));
   const over = askTot > walkTot, apart = Math.abs(askTot - tgtTot);
   const gap = Math.round((1 - openTot / tgtTot) * 100);
@@ -288,18 +316,31 @@ function zopaTotalHTML(d, opts) {
     ' walk-away; the ' + M(tgtTot) + ' target anchors the deal (about ' + M(apart) + ' below ask). The platform subscription is the biggest lever.';
   const track = zopaBar({ open: openTot, target: tgtTot, fallback: fbTot || null, walk: walkTot, ask: askTot, over: over, bench: null });
   // Overview passes { slim:true }: the headline KPI cards already carry ask/target/walk, so the
-  // panel keeps only the synthesized READ line (the analysis) and pushes Opening + Market-benchmark
-  // down to Economics, where the full read-out lives. Economics renders every row.
+  // panel keeps only the synthesized READ line (the analysis). Economics renders every row.
   const rowAsk = '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>';
   const rowOpen = '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>';
-  const rowWalk = '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>';
-  const rowBench = '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>';
+  const rowWalk = '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (' + years + '-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(t.maxEv) + '</span></div>';
+  const rowBench = '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>';
   const rowRead = '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>';
   const rows = (opts && opts.slim) ? [rowRead] : [rowAsk, rowOpen, rowWalk, rowBench, rowRead];
   const detail = '<div class="zline-detail"><div class="zdetail">' + rows.join('') + '</div></div>';
   return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCV</span>' +
     '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
     track + detail + '</div>';
+}
+// live Year-1 / term totals strip (the same delta-based totals as the band)
+function zopaDealTotalsStrip(d) {
+  const t = zopaDealTotals(d), years = assumVal(d, 'ASM-2', 3);
+  const col = (lbl, val) => '<div class="dt-col"><div class="k-lbl">' + lbl + '</div><div class="dt-vals">' + val + '</div></div>';
+  const over = t.askT > t.maxT;
+  return '<div class="deal-totals">' +
+    col('Year-1 all-in', 'Ask <b>' + M(t.askY1) + '</b> · Target <b>' + M(t.tgtY1) + '</b> · Max <b>' + M(t.maxY1) + '</b>') +
+    col(years + '-yr TCV (initial term)', 'Ask <b>' + M(t.askT) + '</b> · Target <b>' + M(t.tgtT) + '</b> · Max <b>' + M(t.maxT) + '</b>') +
+    col('Total-deal ZOPA', '<b>' + M(t.tgtT) + ' ↔ ' + M(t.maxT) + '</b> ' + evidenceChip('calculated', { short: true })) +
+  '</div>' +
+  insight('The supplier ask (' + M(t.askT) + ' over the term) sits <strong>' + (over ? 'above' : 'within') + '</strong> the walk-away max (' + M(t.maxT) +
+    '); any settlement inside ' + M(t.tgtT) + '–' + M(t.maxT) + ' is within the zone, with <strong>' + M(t.tgtT) + '</strong> the defensible target.' +
+    (t.offPlan ? ' Live at the current sensitivity drivers.' : ' At plan; totals reconcile to the scenario figures.'));
 }
 
 const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
@@ -313,10 +354,17 @@ const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
   '<span class="zhint">Click a line for detail</span>' +
 '</div>';
 
+// Deal-tab composition: the total-deal ZOPA + live totals strip are ALWAYS visible; the per-line
+// ZOPAs live in a collapsed section (each row still expands to its own detail). Progressive
+// disclosure: total -> per-line -> per-line detail. The legend stays visible below.
 function renderZopaGantt(d) {
   const lines = d.commercialLines || [];
   if (!lines.length) return gapCard('No commercial lines in session', 'No line items to build a ZOPA from.');
-  return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
+  const perLine = lines.map(l => zopaLineHTML(d, l)).join('');
+  const linesSection = '<details class="zlines" data-zkey="lines"><summary>' +
+    '<span class="zchev2" aria-hidden="true"></span>Per-line ZOPA · ' + lines.length + ' lines · leverage · benchmark ticks · click to expand</summary>' +
+    '<div class="zlines-body">' + perLine + '</div></details>';
+  return zopaTotalHTML(d) + zopaDealTotalsStrip(d) + linesSection + ZOPA_BOTTOM_LEGEND;
 }
 
 /* ---------- 4b. sensitivity strip (Economics deal tab) ----------------------
@@ -351,16 +399,21 @@ function zopaSensitivity(d) {
     '<div id="zopa-sens-live" class="zopa-sens-live">' + zopaSensReadout(d) + '</div>' +
   '</div></div>';
 }
-// repaint live bars + readout ONLY when a ZOPA driver (ASM-1 / ASM-4) actually moved, so an
-// unrelated recalc (e.g. the pro-forma WACC slider) never re-renders and collapses expanded rows.
+// repaint the live ZOPA ONLY when a model driver that feeds it actually moved (employee count,
+// platform discount, term, in-term uplift), so an unrelated recalc (e.g. the WACC slider) never
+// re-renders it. Open/closed state of every <details data-zkey> is preserved across the repaint.
 var _zopaDriverSig = null;
 function renderSensitiveZopa() {
   const d = global.dashboardData; if (!d) return;
-  const sig = assumVal(d, 'ASM-1', 0) + '|' + assumVal(d, 'ASM-4', 0);
+  const sig = [assumVal(d, 'ASM-1', 0), assumVal(d, 'ASM-4', 0), assumVal(d, 'ASM-2', 0), assumVal(d, 'ASM-3', 0)].join('|');
   if (sig === _zopaDriverSig) return;
   _zopaDriverSig = sig;
   const bars = document.getElementById('cml-zopa-live');
-  if (bars) bars.innerHTML = render(d);
+  if (bars) {
+    const open = [].slice.call(bars.querySelectorAll('details[data-zkey][open]')).map(x => x.getAttribute('data-zkey'));
+    bars.innerHTML = render(d);
+    open.forEach(k => { const el = bars.querySelector('details[data-zkey="' + k + '"]'); if (el) el.open = true; });
+  }
   const out = document.getElementById('zopa-sens-live');
   if (out) out.innerHTML = zopaSensReadout(d);
 }

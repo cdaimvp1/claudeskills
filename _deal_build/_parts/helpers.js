@@ -391,7 +391,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view],[data-pf-setdepth]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -432,13 +432,23 @@ const DealUI = {
         m.querySelectorAll('[data-scpanel]').forEach(p => { p.hidden = p.getAttribute('data-scpanel') !== id; });
         return;
       }
-      // Financial Model pro-forma: Summary <-> Detailed column toggle, scoped to the nearest table.
+      // Financial Model statement toggle (Pro-forma / P&L / Cash Flow), scoped to the nearest table.
       if (t.hasAttribute('data-pf-view')) {
         const view = t.getAttribute('data-pf-view');
         const wrap = t.closest('[data-pf-mode]');
         if (wrap) {
           wrap.setAttribute('data-pf-mode', view);
           wrap.querySelectorAll('[data-pf-view]').forEach(b => b.classList.toggle('is-on', b.getAttribute('data-pf-view') === view));
+        }
+        return;
+      }
+      // Financial Model detail toggle (Summary <-> Full): action = data-pf-setdepth, state = data-pf-depth on the wrap.
+      if (t.hasAttribute('data-pf-setdepth')) {
+        const depth = t.getAttribute('data-pf-setdepth');
+        const wrap = t.closest('[data-pf-depth]');
+        if (wrap) {
+          wrap.setAttribute('data-pf-depth', depth);
+          wrap.querySelectorAll('[data-pf-setdepth]').forEach(b => b.classList.toggle('is-on', b.getAttribute('data-pf-setdepth') === depth));
         }
         return;
       }

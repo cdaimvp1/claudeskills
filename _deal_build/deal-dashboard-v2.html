@@ -1636,7 +1636,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view],[data-pf-setdepth]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -1677,13 +1677,23 @@ const DealUI = {
         m.querySelectorAll('[data-scpanel]').forEach(p => { p.hidden = p.getAttribute('data-scpanel') !== id; });
         return;
       }
-      // Financial Model pro-forma: Summary <-> Detailed column toggle, scoped to the nearest table.
+      // Financial Model statement toggle (Pro-forma / P&L / Cash Flow), scoped to the nearest table.
       if (t.hasAttribute('data-pf-view')) {
         const view = t.getAttribute('data-pf-view');
         const wrap = t.closest('[data-pf-mode]');
         if (wrap) {
           wrap.setAttribute('data-pf-mode', view);
           wrap.querySelectorAll('[data-pf-view]').forEach(b => b.classList.toggle('is-on', b.getAttribute('data-pf-view') === view));
+        }
+        return;
+      }
+      // Financial Model detail toggle (Summary <-> Full): action = data-pf-setdepth, state = data-pf-depth on the wrap.
+      if (t.hasAttribute('data-pf-setdepth')) {
+        const depth = t.getAttribute('data-pf-setdepth');
+        const wrap = t.closest('[data-pf-depth]');
+        if (wrap) {
+          wrap.setAttribute('data-pf-depth', depth);
+          wrap.querySelectorAll('[data-pf-setdepth]').forEach(b => b.classList.toggle('is-on', b.getAttribute('data-pf-setdepth') === depth));
         }
         return;
       }
@@ -3017,8 +3027,17 @@ var ZOPA_CSS =
   '.zopa-viz .zdk{flex:0 0 118px;color:var(--mut2);font-weight:700}' +
   '.zopa-viz .zdv{color:var(--ink2);flex:1;min-width:0}' +
   '.zopa-viz .zdv b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}' +
-  /* total-deal ZOPA / TCO aggregate (always visible, same bar style) */
+  /* per-line ZOPA collapsed section (total-deal band sits above it, always visible) */
+  '.zopa-viz .zlines{border-top:1px solid var(--line);margin-top:10px}' +
+  '.zopa-viz .zlines>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 2px;font:800 10.5px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--plum)}' +
+  '.zopa-viz .zlines>summary::-webkit-details-marker{display:none}' +
+  '.zopa-viz .zlines>summary::marker{content:""}' +
+  '.zopa-viz .zlines>summary:hover{color:var(--sec)}' +
+  '.zopa-viz .zchev2{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
+  '.zopa-viz .zlines[open]>summary .zchev2{transform:rotate(45deg)}' +
+  /* total-deal ZOPA / TCV aggregate (always visible; now the TOP element of the deal card) */
   '.zopa-viz .ztotal{margin-top:16px;padding-top:14px;border-top:2px solid var(--plum)}' +
+  '.zopa-viz .ztotal:first-child{margin-top:0;padding-top:2px;border-top:none}' +
   '.zopa-viz .zthd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px}' +
   '.zopa-viz .ztname{font-weight:800;font-size:var(--fz);color:var(--plum)}' +
   '.zopa-viz .ztsub{font-size:var(--fz-floor);color:var(--mut2)}' +
@@ -3176,21 +3195,40 @@ function zopaLineHTML(d, l) {
         ? 'Ask sits <b>' + M(ask - walk) + '</b> above the ' + M(walk) + ' walk-away; hold to the ' + M(target) + ' target. ' + jumpLink('ISS-12 →', 'tab:contract/sub:legal')
         : 'Ask is within the ' + M(target) + ' to ' + M(walk) + ' zone; settle toward the ' + M(target) + ' target.') + '</span></div>' +
   '</div></div>';
-  return '<details class="zline"><summary class="zsum">' +
+  return '<details class="zline" data-zkey="' + esc(l.id) + '"><summary class="zsum">' +
     '<div class="zsum-row"><span class="zchev" aria-hidden="true"></span>' +
       '<span class="zsum-txt"><span class="zlname">' + esc(l.item) + '</span>' + zopaLeverageBadge(lev) + '</span></div>' +
     track + '</summary>' + detail + '</details>';
 }
 
-/* ---------- 4. total-deal ZOPA / TCO band (always visible) ------------------
- * Whole-deal ask/target/walk totals from the 3-yr scenarios (SC-ask /
- * SC-target / SC-max), fallback from SC-fallback; opening derived the same
- * way as the per-line opening. No deal-level market benchmark exists in
- * session -> honest gap-state in the detail (no market tick on the bar). */
-function zopaTotalHTML(d, opts) {
+/* ---------- 4. total-deal ZOPA / TCV band ----------------------------------
+ * LIVE whole-deal ask/target/walk/fallback totals via zopaDealTotals: each is the
+ * canonical scenario total PLUS the delta from the live platform line (CL-1), scaled
+ * over the term. The delta is 0 at plan, so the band reconciles EXACTLY to the
+ * scenarios; off-plan it moves with the sensitivity drivers. No deal-level market
+ * benchmark exists in session -> honest gap-state (no market tick on the bar). */
+function zopaDealTotals(d) {
   const sc = id => ((d.scenarios || []).find(s => s.id === id) || {});
   const askS = sc('SC-ask'), tgtS = sc('SC-target'), fbS = sc('SC-fallback'), maxS = sc('SC-max');
-  const askTot = askS.total || 0, tgtTot = tgtS.total || 0, walkTot = maxS.total || 0, fbTot = fbS.total || 0;
+  const cl1 = (d.commercialLines || []).find(l => l.id === 'CL-1');
+  const years = assumVal(d, 'ASM-2', 3), uplift = assumVal(d, 'ASM-3', 4) / 100;
+  let mult = 0; for (let i = 0; i < years; i++) mult += Math.pow(1 + uplift, i);   // CL-1 recurring term multiplier
+  let dAsk = 0, dTgt = 0, dMax = 0, dFb = 0;
+  if (cl1) {
+    const lv = zopaLiveLine(d, cl1);
+    dAsk = lv.ask - (cl1.supplierAmount || 0); dTgt = lv.target - (cl1.target || 0);
+    dMax = lv.walk - (cl1.maximumAcceptable || 0); dFb = lv.fallback - (cl1.fallback || 0);
+  }
+  return {
+    askY1: (askS.y1Total || 0) + dAsk, tgtY1: (tgtS.y1Total || 0) + dTgt, maxY1: (maxS.y1Total || 0) + dMax,
+    askT: (askS.total || 0) + mult * dAsk, tgtT: (tgtS.total || 0) + mult * dTgt,
+    maxT: (maxS.total || 0) + mult * dMax, fbT: (fbS.total || 0) + mult * dFb,
+    maxEv: maxS.evidenceType || 'assumption', offPlan: !!(dAsk || dTgt || dMax || dFb)
+  };
+}
+function zopaTotalHTML(d, opts) {
+  const t = zopaDealTotals(d);
+  const askTot = Math.round(t.askT), tgtTot = Math.round(t.tgtT), walkTot = Math.round(t.maxT), fbTot = Math.round(t.fbT);
   const openTot = Math.round(Math.max(tgtTot * 0.85, 2 * tgtTot - walkTot));
   const over = askTot > walkTot, apart = Math.abs(askTot - tgtTot);
   const gap = Math.round((1 - openTot / tgtTot) * 100);
@@ -3199,18 +3237,31 @@ function zopaTotalHTML(d, opts) {
     ' walk-away; the ' + M(tgtTot) + ' target anchors the deal (about ' + M(apart) + ' below ask). The platform subscription is the biggest lever.';
   const track = zopaBar({ open: openTot, target: tgtTot, fallback: fbTot || null, walk: walkTot, ask: askTot, over: over, bench: null });
   // Overview passes { slim:true }: the headline KPI cards already carry ask/target/walk, so the
-  // panel keeps only the synthesized READ line (the analysis) and pushes Opening + Market-benchmark
-  // down to Economics, where the full read-out lives. Economics renders every row.
+  // panel keeps only the synthesized READ line (the analysis). Economics renders every row.
   const rowAsk = '<div class="zdrow"><span class="zdk">Ask vs target</span><span class="zdv">supplier ask <b>' + M(askTot) + '</b> vs target ' + M(tgtTot) + ' (' + M(apart) + ' apart over the ' + years + '-yr term) ' + evidenceChip('calculated') + '</span></div>';
   const rowOpen = '<div class="zdrow"><span class="zdk">Opening</span><span class="zdv">aggregate opening <b>' + M(openTot) + '</b>, about ' + gap + '% below target, the room to negotiate up to ' + M(tgtTot) + ' ' + evidenceChip('inference') + '</span></div>';
-  const rowWalk = '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (3-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(maxS.evidenceType || 'assumption') + '</span></div>';
-  const rowBench = '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents above (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>';
+  const rowWalk = '<div class="zdrow"><span class="zdk">Walk-away</span><span class="zdv"><b>' + M(walkTot) + '</b> max-acceptable (' + years + '-yr) · fallback ' + M(fbTot) + '. Budget ceiling unconfirmed ' + jumpLink('GAP-3 →', 'tab:brief') + ' ' + evidenceChip(t.maxEv) + '</span></div>';
+  const rowBench = '<div class="zdrow"><span class="zdk">Market benchmark</span><span class="zdv"><span class="znobench">No deal-level market benchmark in session</span> - the only comps are the two per-line precedents (platform $/employee, implementation day-rate); no whole-deal TCV comparison is fabricated. ' + evidenceChip('unavailable') + '</span></div>';
   const rowRead = '<div class="zdrow"><span class="zdk">Read</span><span class="zdv">' + read + '</span></div>';
   const rows = (opts && opts.slim) ? [rowRead] : [rowAsk, rowOpen, rowWalk, rowBench, rowRead];
   const detail = '<div class="zline-detail"><div class="zdetail">' + rows.join('') + '</div></div>';
   return '<div class="ztotal"><div class="zthd"><span class="ztname">Total-deal ZOPA · TCV</span>' +
     '<span class="ztsub">' + emp.toLocaleString('en-US') + ' employees · ' + years + '-yr term · target to walk-away for the whole deal</span></div>' +
     track + detail + '</div>';
+}
+// live Year-1 / term totals strip (the same delta-based totals as the band)
+function zopaDealTotalsStrip(d) {
+  const t = zopaDealTotals(d), years = assumVal(d, 'ASM-2', 3);
+  const col = (lbl, val) => '<div class="dt-col"><div class="k-lbl">' + lbl + '</div><div class="dt-vals">' + val + '</div></div>';
+  const over = t.askT > t.maxT;
+  return '<div class="deal-totals">' +
+    col('Year-1 all-in', 'Ask <b>' + M(t.askY1) + '</b> · Target <b>' + M(t.tgtY1) + '</b> · Max <b>' + M(t.maxY1) + '</b>') +
+    col(years + '-yr TCV (initial term)', 'Ask <b>' + M(t.askT) + '</b> · Target <b>' + M(t.tgtT) + '</b> · Max <b>' + M(t.maxT) + '</b>') +
+    col('Total-deal ZOPA', '<b>' + M(t.tgtT) + ' ↔ ' + M(t.maxT) + '</b> ' + evidenceChip('calculated', { short: true })) +
+  '</div>' +
+  insight('The supplier ask (' + M(t.askT) + ' over the term) sits <strong>' + (over ? 'above' : 'within') + '</strong> the walk-away max (' + M(t.maxT) +
+    '); any settlement inside ' + M(t.tgtT) + '–' + M(t.maxT) + ' is within the zone, with <strong>' + M(t.tgtT) + '</strong> the defensible target.' +
+    (t.offPlan ? ' Live at the current sensitivity drivers.' : ' At plan; totals reconcile to the scenario figures.'));
 }
 
 const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
@@ -3224,10 +3275,17 @@ const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
   '<span class="zhint">Click a line for detail</span>' +
 '</div>';
 
+// Deal-tab composition: the total-deal ZOPA + live totals strip are ALWAYS visible; the per-line
+// ZOPAs live in a collapsed section (each row still expands to its own detail). Progressive
+// disclosure: total -> per-line -> per-line detail. The legend stays visible below.
 function renderZopaGantt(d) {
   const lines = d.commercialLines || [];
   if (!lines.length) return gapCard('No commercial lines in session', 'No line items to build a ZOPA from.');
-  return lines.map(l => zopaLineHTML(d, l)).join('') + zopaTotalHTML(d) + ZOPA_BOTTOM_LEGEND;
+  const perLine = lines.map(l => zopaLineHTML(d, l)).join('');
+  const linesSection = '<details class="zlines" data-zkey="lines"><summary>' +
+    '<span class="zchev2" aria-hidden="true"></span>Per-line ZOPA · ' + lines.length + ' lines · leverage · benchmark ticks · click to expand</summary>' +
+    '<div class="zlines-body">' + perLine + '</div></details>';
+  return zopaTotalHTML(d) + zopaDealTotalsStrip(d) + linesSection + ZOPA_BOTTOM_LEGEND;
 }
 
 /* ---------- 4b. sensitivity strip (Economics deal tab) ----------------------
@@ -3262,16 +3320,21 @@ function zopaSensitivity(d) {
     '<div id="zopa-sens-live" class="zopa-sens-live">' + zopaSensReadout(d) + '</div>' +
   '</div></div>';
 }
-// repaint live bars + readout ONLY when a ZOPA driver (ASM-1 / ASM-4) actually moved, so an
-// unrelated recalc (e.g. the pro-forma WACC slider) never re-renders and collapses expanded rows.
+// repaint the live ZOPA ONLY when a model driver that feeds it actually moved (employee count,
+// platform discount, term, in-term uplift), so an unrelated recalc (e.g. the WACC slider) never
+// re-renders it. Open/closed state of every <details data-zkey> is preserved across the repaint.
 var _zopaDriverSig = null;
 function renderSensitiveZopa() {
   const d = global.dashboardData; if (!d) return;
-  const sig = assumVal(d, 'ASM-1', 0) + '|' + assumVal(d, 'ASM-4', 0);
+  const sig = [assumVal(d, 'ASM-1', 0), assumVal(d, 'ASM-4', 0), assumVal(d, 'ASM-2', 0), assumVal(d, 'ASM-3', 0)].join('|');
   if (sig === _zopaDriverSig) return;
   _zopaDriverSig = sig;
   const bars = document.getElementById('cml-zopa-live');
-  if (bars) bars.innerHTML = render(d);
+  if (bars) {
+    const open = [].slice.call(bars.querySelectorAll('details[data-zkey][open]')).map(x => x.getAttribute('data-zkey'));
+    bars.innerHTML = render(d);
+    open.forEach(k => { const el = bars.querySelector('details[data-zkey="' + k + '"]'); if (el) el.open = true; });
+  }
   const out = document.getElementById('zopa-sens-live');
   if (out) out.innerHTML = zopaSensReadout(d);
 }
@@ -5255,21 +5318,8 @@ function renderDealTable(d) {
  * zopaLineHTML / zopaTotalHTML / ZOPA_BOTTOM_LEGEND / renderZopaGantt and
  * the .zopa-viz CSS (moved from this file's scoped <style> block below,
  * 2026-07-23 extraction). --- */
-function renderDealTotals(d) {
-  const lines = d.commercialLines || [];
-  const askY1 = sumF(lines, l => l.supplierAmount), tgtY1 = sumF(lines, l => l.target), maxY1 = sumF(lines, l => l.maximumAcceptable);
-  const sc = id => ((d.scenarios || []).find(s => s.id === id) || {}).total;
-  const askT = sc('SC-ask'), tgtT = sc('SC-target'), maxT = sc('SC-max');
-  const col = (lbl, val) => '<div class="dt-col"><div class="k-lbl">' + lbl + '</div><div class="dt-vals">' + val + '</div></div>';
-  return '<div class="deal-totals">' +
-    col('Year-1 all-in', 'Ask <b>' + M(askY1) + '</b> · Target <b>' + M(tgtY1) + '</b> · Max <b>' + M(maxY1) + '</b>') +
-    col('3-yr TCV (initial term)', 'Ask <b>' + M(askT) + '</b> · Target <b>' + M(tgtT) + '</b> · Max <b>' + M(maxT) + '</b>') +
-    col('Total-deal ZOPA (3-yr)', '<b>' + M(tgtT) + ' ↔ ' + M(maxT) + '</b> ' + evidenceChip('calculated', { short: true })) +
-  '</div>' +
-  insight('The supplier ask (' + M(askT) + ' over the term) sits <strong>above</strong> the walk-away max (' + M(maxT) +
-    '); any settlement inside ' + M(tgtT) + '–' + M(maxT) + ' is within the zone, with <strong>' + M(tgtT) +
-    '</strong> the defensible target. Year-1 line totals reconcile to the scenario Year-1 figures.');
-}
+/* renderDealTotals moved into zopa.js as zopaDealTotalsStrip (it must live inside the repainted
+ * ZOPA container so the Year-1 / term totals update live with the delta-based total-deal band). */
 function renderDiscountArchitecture(d) {
   const lines = d.commercialLines || [];
   const disc = l => (l.supplierAmount - l.target);
@@ -5417,34 +5467,36 @@ function pfTable(m, rows) {
   };
   const head = '<tr><th class="pf-rl"></th>' + m.yearLabels.map(y => '<th class="pf-n">' + esc(y) + '</th>').join('') + '<th class="pf-n pf-tot-col">Total</th></tr>';
   const body = rows.map(r => {
-    if (r.section) return '<tr class="pf-section"><td class="pf-rl" colspan="' + (m.years + 2) + '">' + esc(r.section) + '</td></tr>';
+    if (r.section) return '<tr class="pf-section pf-lineitem"><td class="pf-rl" colspan="' + (m.years + 2) + '">' + esc(r.section) + '</td></tr>';
+    const cls = ((r.cls || '') + (r.lineitem ? ' pf-lineitem' : '')).trim();
     const cells = r.values.map(v => '<td class="pf-n">' + cell(v, r) + '</td>').join('');
     const tot = r.dec ? '' : (r.pct ? (r.total == null ? '' : r.total + '%') : cell(r.total, r));
-    return '<tr class="' + (r.cls || '') + '"><td class="pf-rl">' + esc(r.label) + '</td>' + cells + '<td class="pf-n pf-tot-col">' + tot + '</td></tr>';
+    return '<tr class="' + cls + '"><td class="pf-rl">' + esc(r.label) + '</td>' + cells + '<td class="pf-n pf-tot-col">' + tot + '</td></tr>';
   }).join('');
   return '<div class="pf-scroll"><table class="pf-table pf-transposed"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
 }
+// rows tagged lineitem:true (and section headers) are hidden in Summary depth, leaving the roll-ups.
 function pfViewProforma(m) {
   const rows = [{ section: 'Cost outflows (target scenario)' }];
-  m.costLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total }));
+  m.costLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total, lineitem: true }));
   rows.push({ label: 'Total cost', values: m.costByYear, total: m.costTotal, cls: 'pf-subtot' });
   rows.push({ section: 'Value case (modelled assumption)' });
-  m.valueLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total }));
+  m.valueLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total, lineitem: true }));
   rows.push({ label: 'Total value case', values: m.valueByYear, total: m.valueTotal, cls: 'pf-subtot' });
   rows.push({ label: 'Net', values: m.netByYear, total: m.netTotal, cls: 'pf-net', signed: true });
   rows.push({ label: 'Cumulative net', values: m.cumByYear, total: m.cumByYear[m.years - 1], cls: 'pf-cum', signed: true });
   rows.push({ section: 'Discounted @ WACC ' + Math.round(m.wacc * 100) + '%' });
-  rows.push({ label: 'Discount factor', values: m.dfByYear, dec: true });
-  rows.push({ label: 'Discounted net', values: m.dnByYear, signed: true });
+  rows.push({ label: 'Discount factor', values: m.dfByYear, dec: true, lineitem: true });
+  rows.push({ label: 'Discounted net', values: m.dnByYear, signed: true, lineitem: true });
   rows.push({ label: 'NPV (cumulative PV)', values: m.dcByYear, total: m.npv, cls: 'pf-npvrow', signed: true });
   return rows;
 }
 function pfViewPL(m) {
   const rows = [{ section: 'Revenue (value case, modelled)' }];
-  m.valueLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total }));
+  m.valueLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total, lineitem: true }));
   rows.push({ label: 'Total revenue', values: m.valueByYear, total: m.valueTotal, cls: 'pf-subtot' });
   rows.push({ section: 'Operating cost' });
-  m.costLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total }));
+  m.costLines.forEach(l => rows.push({ label: l.label, values: l.byYear, total: l.total, lineitem: true }));
   rows.push({ label: 'Total cost', values: m.costByYear, total: m.costTotal, cls: 'pf-subtot' });
   rows.push({ label: 'Net result', values: m.netByYear, total: m.netTotal, cls: 'pf-net', signed: true });
   const margin = m.netByYear.map((n, i) => m.valueByYear[i] ? Math.round(n / m.valueByYear[i] * 100) : 0);
@@ -5459,26 +5511,29 @@ function pfViewCashflow(m) {
   return [
     { label: 'Cash in (value realized)', values: m.valueByYear, total: m.valueTotal },
     { section: 'Cash out' },
-    { label: 'One-time (implementation, connectors, training)', values: otY, total: sum(otY) },
-    { label: 'Recurring (subscription, support)', values: reY, total: sum(reY) },
+    { label: 'One-time (implementation, connectors, training)', values: otY, total: sum(otY), lineitem: true },
+    { label: 'Recurring (subscription, support)', values: reY, total: sum(reY), lineitem: true },
     { label: 'Total cash out', values: m.costByYear, total: m.costTotal, cls: 'pf-subtot' },
     { label: 'Net cash flow', values: m.netByYear, total: m.netTotal, cls: 'pf-net', signed: true },
     { label: 'Cumulative cash', values: m.cumByYear, total: m.cumByYear[m.years - 1], cls: 'pf-cum', signed: true }
   ];
 }
 // the model card body: a Pro-forma / P&L / Cash Flow view toggle over the transposed engine output
-function renderFinancial(d, view) {
+function renderFinancial(d, view, depth) {
   const m = pfModel(d);
   if (!m.costLines.length) return gapCard('No commercial lines', 'No cost lines to build a model from. ' + evidenceChip('unavailable'));
-  const v = view || 'proforma';
-  const btn = (id, label) => '<button class="pf-tab' + (v === id ? ' is-on' : '') + '" data-pf-view="' + id + '">' + label + '</button>';
-  const toolbar = '<div class="pf-toolbar"><div class="pf-toggle" role="group" aria-label="Statement view">' +
-    btn('proforma', 'Pro-forma') + btn('pl', 'P&amp;L') + btn('cashflow', 'Cash Flow') + '</div>' +
+  const v = view || 'proforma', dp = depth || 'summary';
+  const vbtn = (id, label) => '<button class="pf-tab' + (v === id ? ' is-on' : '') + '" data-pf-view="' + id + '">' + label + '</button>';
+  const dbtn = (id, label) => '<button class="pf-tab' + (dp === id ? ' is-on' : '') + '" data-pf-setdepth="' + id + '">' + label + '</button>';
+  const toolbar = '<div class="pf-toolbar"><div class="pf-toggles">' +
+    '<div class="pf-toggle" role="group" aria-label="Statement view">' + vbtn('proforma', 'Pro-forma') + vbtn('pl', 'P&amp;L') + vbtn('cashflow', 'Cash Flow') + '</div>' +
+    '<div class="pf-toggle" role="group" aria-label="Detail level">' + dbtn('summary', 'Summary') + dbtn('full', 'Full') + '</div>' +
+    '</div>' +
     '<span class="pf-note">Modelled over ' + m.years + ' year' + (m.years === 1 ? '' : 's') + ' at ' + Math.round(m.uplift * 100) + '% in-term uplift; value case is a modelled assumption.</span></div>';
   const views = '<div class="pf-view pf-view-proforma">' + pfTable(m, pfViewProforma(m)) + '</div>' +
     '<div class="pf-view pf-view-pl">' + pfTable(m, pfViewPL(m)) + '</div>' +
     '<div class="pf-view pf-view-cashflow">' + pfTable(m, pfViewCashflow(m)) + '</div>';
-  return '<div class="pf-vwrap" data-pf-mode="' + v + '">' + toolbar + views + '</div>';
+  return '<div class="pf-vwrap" data-pf-mode="' + v + '" data-pf-depth="' + dp + '">' + toolbar + views + '</div>';
 }
 // term + in-term-uplift sliders (uplift shown only when the offer has recurring lines: trait-driven)
 function renderFinancialDrivers(d) {
@@ -5612,7 +5667,9 @@ function recompute(d) {
   const fin = document.getElementById('cml-financial');
   if (fin) {
     const vwEl = fin.querySelector('[data-pf-mode]');
-    fin.innerHTML = renderFinancial(d, vwEl ? vwEl.getAttribute('data-pf-mode') : 'proforma');
+    const view = vwEl ? vwEl.getAttribute('data-pf-mode') : 'proforma';
+    const depth = vwEl ? vwEl.getAttribute('data-pf-depth') : 'summary';
+    fin.innerHTML = renderFinancial(d, view, depth);
   }
   const tl = document.getElementById('cml-topline');
   if (tl) tl.innerHTML = renderTopline(d);
@@ -5629,8 +5686,8 @@ function renderTab_commercials(d) {
     '<div class="grid">' +
       '<div class="col-6">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-6">' + renderRenewalBand(d) + '</div>' +
-      '<div class="col-12">' + saCard('ZOPA by Line Item · Sensitivity & Benchmarks',
-        window.DealZopa.sensitivity(d) + '<div id="cml-zopa-live">' + window.DealZopa.render(d) + '</div>' + renderDealTotals(d) +
+      '<div class="col-12">' + saCard('Total-Deal ZOPA · Sensitivity & Benchmarks',
+        window.DealZopa.sensitivity(d) + '<div id="cml-zopa-live">' + window.DealZopa.render(d) + '</div>' +
         collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
         { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · leverage · benchmark ticks · live drivers' }) + '</div>' +
       '<div class="col-12">' + renderShouldCost(d) + '</div>' +
@@ -5643,7 +5700,7 @@ function renderTab_commercials(d) {
     '<div class="tab-intro"><h2>Financial Model</h2><p class="q">Internal analysis, not contract terms: a live cost + value model over the initial term, discounted at Lilly’s WACC. Move the drivers to reshape the deal. ' + evidenceChip('calculated', { short: true }) + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + saCard('Top-Line Summary', '<div id="cml-topline">' + renderTopline(d) + '</div>', { accent: 'plum', icon: 'scale', sub: 'target scenario · modelled value' }) + '</div>' +
-      '<div class="col-12">' + saCard('Pro-forma Model', renderFinancialDrivers(d) + '<div id="cml-financial">' + renderFinancial(d, 'proforma') + '</div>', { accent: 'teal', icon: 'scenarios', sub: 'pro-forma · P&amp;L · cash flow · live' }) + '</div>' +
+      '<div class="col-12">' + saCard('Financial Modeling', renderFinancialDrivers(d) + '<div id="cml-financial">' + renderFinancial(d, 'proforma', 'summary') + '</div>', { accent: 'teal', icon: 'scenarios', sub: 'pro-forma · P&amp;L · cash flow · live' }) + '</div>' +
       '<div class="col-6">' + saCard('Discount Control · WACC', renderWaccControl(d), { accent: 'emph', icon: 'assume', sub: 'live' }) + '</div>' +
       '<div class="col-6">' + saCard('NPV vs Discount Rate', '<div id="cml-npv-curve">' + renderNpvCurve(d, wacc0) + '</div>' + insight('The value-case NPV stays positive across the plausible discount range and falls to zero only well above the 5–7% governed WACC, a robust case. The curve reshapes as you move the model drivers.'), { accent: 'teal', icon: 'scenarios' }) + '</div>' +
       '<div class="col-12">' + saCard('Assumptions Register', renderAssumptionsRegister(d), { accent: 'emph', icon: 'assume', sub: (d.assumptions || []).length + ' inputs' }) + '</div>' +
@@ -5697,6 +5754,8 @@ function renderTab_commercials(d) {
     '.commercials-tab .npv-svg{width:100%;height:auto;display:block;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm)}' +
     /* Financial Model: transposed pro-forma / P&L / cash-flow table + a view toggle */
     '.commercials-tab .pf-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}' +
+    '.commercials-tab .pf-toggles{display:flex;gap:10px;flex-wrap:wrap}' +
+    '.commercials-tab .pf-vwrap[data-pf-depth="summary"] .pf-lineitem{display:none}' +
     '.commercials-tab .pf-toggle{display:inline-flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden}' +
     '.commercials-tab .pf-tab{appearance:none;border:0;background:var(--surface);color:var(--mut);font:700 11px/1 var(--sans);padding:7px 13px;cursor:pointer}' +
     '.commercials-tab .pf-tab+.pf-tab{border-left:1px solid var(--line2)}' +
