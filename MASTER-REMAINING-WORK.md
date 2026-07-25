@@ -55,9 +55,15 @@ If the session restarted/compacted, this is where things stand.
   persisted state), do NOT create `deal-workspace`. The "Deal Room" name collision is already documented in
   deal-room's own description: commercial-negotiation-prep's STATIC dashboard is also titled "Deal Room";
   fix = rename that static dashboard so "Deal Room" means only the live skill. NEEDS Marc's confirmation.
-- **Dashboard builds UNBLOCKED (#2 done).** #20 RFx mockup and #15 Landscape MCM can now build against the
-  documented Dashboard Palette (MCM plum/teal/burnt-orange, non-stoplight, no dark mode) that matches the
-  locked Deal dashboard. NEXT after #1: build #20 (RFx dashboard mockup for review).
+- **#20 RFx dashboard mockup DONE 2026-07-25 (for review).** `_redesign_proposals/RFx-MOCKUP.html` (1,180
+  lines, self-contained). Built to spec section A: 4 subtabs (Executive Readout / Scoring / Analysis /
+  Recommendation) + handoff action, promoted panels (Bid-Leveling Gate, Evaluation Readiness, dual-ranking
+  + gateConflict, participation glyphs shape+label, claim-gate [CONFIRM] x13). MCM palette. VERIFIED:
+  renders clean (only a favicon 404, no JS errors), a11y snapshot confirms structure, 0 banned hexes, 0 em
+  dashes, self-contained, malicious-scan clean, no fabrication (Ashford pricing shows "Not submitted"). One
+  honest limitation: the bid-leveling denominator selector has real numbers only for "per named user/year";
+  other denominators show [CONFIRM] rather than fabricated recompute. AWAITING Marc's review before building
+  the real rfx-hub skill. NEXT: #15 Landscape MCM pass.
 - **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
   orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
   (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new

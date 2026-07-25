@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RFx Dashboard - Structural Review Mockup</title>
+<style>
+  :root{
+    --plum:#5C2B50;
+    --teal:#2F6E6B;
+    --burnt:#C15E19;
+    --rust:#9A3B1F;
+    --info:#2E5E8C;
+    --mut:#8A969E;
+    --ink:#212121;
+    --card:#F4F1ED;
+    --border:#E3DDD3;
+    --white:#FFFFFF;
+    --plum-tint: rgba(92,43,80,.07);
+    --plum-tint2: rgba(92,43,80,.14);
+    --teal-tint: rgba(47,110,107,.08);
+    --teal-tint2: rgba(47,110,107,.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: Arial, Helvetica, sans-serif;
+    color:var(--ink);
+    background:#FBFAF8;
+    overflow-x:hidden;
+    font-size:13px;
+    line-height:1.5;
+  }
+  h1,h2,h3,.serif,.num,.bignum{ font-family: Georgia, "Times New Roman", serif; }
+  a{color:var(--info);}
+
+  /* ---------- Header ---------- */
+  .app-header{
+    background:var(--ink);
+    padding:14px 24px 12px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .app-header .left{ display:flex; align-items:center; gap:14px; }
+  .app-header .bar{ width:5px; height:42px; background:var(--plum); border-radius:2px; }
+  .app-header .eyebrow{ font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:#C9C2CE; }
+  .app-header .title{ font-size:19px; font-weight:700; color:#fff; margin-top:2px; }
+  .app-header .right{ font-size:11px; color:var(--mut); text-align:right; line-height:1.6; }
+
+  /* ---------- Top-level tab nav ---------- */
+  .tabnav{
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:0 24px; display:flex; overflow-x:auto;
+  }
+  .tabnav button{
+    padding:12px 18px; font-size:12px; font-weight:600; color:var(--mut);
+    background:transparent; border:none; border-bottom:3px solid transparent;
+    cursor:pointer; white-space:nowrap;
+  }
+  .tabnav button.active{ color:var(--ink); font-weight:700; border-bottom-color:var(--ink); }
+
+  /* ---------- Segmented control (Analysis Individual/Cross-Supplier) ---------- */
+  .subnav{ display:flex; gap:0; border:1px solid var(--border); border-radius:8px; overflow:hidden; width:max-content; margin-bottom:14px;}
+  .subnav button{
+    padding:8px 18px; font-size:12px; font-weight:600; color:var(--mut);
+    background:#fff; border:none; cursor:pointer; border-right:1px solid var(--border);
+  }
+  .subnav button:last-child{ border-right:none; }
+  .subnav button.active{ color:var(--ink); font-weight:700; background:var(--card); border-bottom:2px solid var(--ink); }
+
+  /* ---------- Body ---------- */
+  .body-wrap{ padding:20px 24px 48px; max-width:1360px; margin:0 auto; }
+  .tabpanel{ display:none; }
+  .tabpanel.active{ display:block; }
+
+  /* ---------- Card ---------- */
+  .card{
+    background:#fff; border:1px solid var(--border); border-radius:8px;
+    padding:16px 18px; margin-bottom:16px;
+  }
+  .card-title{
+    font-size:13px; font-weight:700; color:var(--ink); margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .card-title .tick{ width:3px; height:14px; background:var(--plum); border-radius:2px; flex:none; }
+  .card-title .note{ margin-left:auto; font-size:10.5px; font-weight:600; color:var(--mut); font-family:Arial; }
+
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .grid-4{ display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; }
+  .grid-5{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  @media (max-width: 900px){ .grid-2,.grid-3,.grid-4,.grid-5{ grid-template-columns:1fr 1fr; } }
+
+  /* ---------- KPI ---------- */
+  .kpi{
+    background:#fff; border:1px solid var(--border); border-left:4px solid var(--plum);
+    border-radius:8px; padding:12px 14px;
+  }
+  .kpi .lbl{ font-size:9.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--mut); }
+  .kpi .val{ font-size:21px; font-weight:700; color:var(--ink); margin-top:4px; }
+  .kpi .sub{ font-size:10.5px; color:var(--mut); margin-top:2px; }
+
+  /* ---------- Table ---------- */
+  .twrap{ overflow-x:auto; max-width:100%; border:1px solid var(--border); border-radius:8px; }
+  table.dt{ width:100%; border-collapse:collapse; font-size:12px; min-width:640px; }
+  table.dt th{
+    background:var(--card); color:var(--ink); font-weight:700; font-size:10.5px;
+    text-transform:uppercase; letter-spacing:.03em; text-align:left; padding:9px 10px;
+    border-bottom:1px solid var(--border); white-space:nowrap;
+  }
+  table.dt td{ padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  table.dt tr:last-child td{ border-bottom:none; }
+  table.dt tr.total-row td{ background:var(--plum-tint); font-weight:700; border-top:2px solid var(--plum); }
+  table.dt tr.gate-row td{ background:var(--card); font-style:italic; color:var(--ink); font-size:11px; }
+  table.dt td.center, table.dt th.center{ text-align:center; }
+  table.dt td.right, table.dt th.right{ text-align:right; }
+
+  /* ---------- Pills (outline only, never saturated fill) ---------- */
+  .pill{
+    display:inline-flex; align-items:center; gap:4px; border-radius:20px; padding:2px 9px;
+    font-size:10px; font-weight:700; letter-spacing:.03em; white-space:nowrap; background:#fff;
+    border:1.5px solid var(--mut); color:var(--mut);
+  }
+  .pill-ok{ border-color:var(--teal); color:var(--teal); }
+  .pill-warn{ border-color:var(--burnt); color:var(--burnt); }
+  .pill-danger{ border-color:var(--rust); color:var(--rust); }
+  .pill-info{ border-color:var(--info); color:var(--info); }
+  .pill-plum{ border-color:var(--plum); color:var(--plum); }
+
+  /* ---------- Evidence + Confirm ---------- */
+  .evidence{
+    display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700;
+    border:1px solid var(--info); color:var(--info); border-radius:5px; padding:1px 7px; background:#fff;
+    white-space:nowrap;
+  }
+  .evidence:before{ content:"cite"; font-size:8.5px; letter-spacing:.04em; text-transform:uppercase; opacity:.75; }
+  .confirm{
+    display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700;
+    border:1px dashed var(--burnt); color:var(--burnt); border-radius:5px; padding:2px 8px; background:#fff;
+  }
+
+  /* ---------- Glyph row (shape + label, never color-only) ---------- */
+  .glyph-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .glyph{
+    display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:3px 9px 3px 7px;
+    border:1px solid var(--border); border-radius:16px; background:#fff; color:var(--ink);
+  }
+  .glyph .shape{ font-size:12px; font-weight:700; width:14px; text-align:center; }
+  .glyph.g-done .shape{ color:var(--teal); }
+  .glyph.g-half .shape{ color:var(--info); }
+  .glyph.g-flag .shape{ color:var(--rust); }
+  .glyph.g-dash .shape{ color:var(--mut); }
+
+  /* ---------- Mini bar ---------- */
+  .minibar{ width:74px; height:7px; background:var(--card); border-radius:5px; overflow:hidden; display:inline-block; vertical-align:middle; border:1px solid var(--border); }
+  .minibar-fill{ height:100%; background:var(--plum); }
+  .minibar-wrap{ display:flex; align-items:center; gap:6px; }
+  .minibar-num{ font-size:11px; font-weight:700; }
+
+  /* ---------- Heat cell (sequential single-hue teal, never stoplight) ---------- */
+  .heat-cell{ text-align:center; font-weight:700; font-size:12px; border-radius:4px; padding:8px 4px; color:var(--ink); border:1px solid var(--border); position:relative; }
+  .heat-cell.leader{ border:2.5px solid var(--plum); }
+  .heat-leadertag{ display:block; font-size:8.5px; font-weight:700; color:var(--plum); letter-spacing:.03em; margin-top:2px; }
+
+  /* ---------- Status text for req matrix ---------- */
+  .status-met{ color:var(--teal); font-weight:700; }
+  .status-partial{ color:var(--burnt); font-weight:700; }
+  .status-gap{ color:var(--rust); font-weight:700; }
+  .moscow{ font-size:9.5px; font-weight:700; border-radius:4px; padding:1px 5px; border:1px solid; }
+  .moscow.must{ color:var(--rust); border-color:var(--rust); }
+  .moscow.should{ color:var(--info); border-color:var(--info); }
+  .moscow.could{ color:var(--mut); border-color:var(--mut); }
+
+  /* ---------- Chips (supplier selector) ---------- */
+  .chiprow{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .chip{
+    padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:#fff;
+    font-size:12px; font-weight:600; color:var(--ink); cursor:pointer;
+  }
+  .chip.active{ border-color:var(--plum); background:var(--plum-tint); color:var(--plum); font-weight:700; }
+
+  /* ---------- Collapsible ---------- */
+  .collapse-header{
+    display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 4px;
+    font-weight:700; font-size:12.5px; color:var(--ink); user-select:none;
+  }
+  .collapse-header .chev{ transition:transform .15s; font-size:11px; color:var(--mut); }
+  .collapse-header.open .chev{ transform:rotate(90deg); }
+  .collapse-body{ display:none; }
+  .collapse-body.open{ display:block; }
+
+  /* ---------- Rubric bands ---------- */
+  .rubric-list{ display:grid; grid-template-columns:1fr 1fr; gap:6px 20px; }
+  .rubric-item{ display:flex; gap:8px; font-size:11.5px; align-items:baseline; }
+  .rubric-item .band-n{ font-weight:700; font-family:Georgia,serif; width:16px; }
+
+  /* ---------- Misc ---------- */
+  .muted{ color:var(--mut); }
+  .small{ font-size:11px; }
+  .band{ background:var(--plum-tint); border-radius:6px; padding:10px 14px; margin-bottom:12px; }
+  .band-teal{ background:var(--teal-tint); }
+  hr.rule{ border:none; border-top:1px solid var(--border); margin:14px 0; }
+  .flex-between{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  .lede{ font-size:12.5px; line-height:1.7; }
+  .btn-primary{
+    background:var(--plum); color:#fff; border:none; border-radius:6px; padding:11px 22px;
+    font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .btn-secondary{
+    background:#fff; color:var(--ink); border:1.5px solid var(--border); border-radius:6px; padding:10px 18px;
+    font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .jump-nav{ display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; margin-bottom:14px; }
+  .jump-nav a{ color:var(--ink); font-weight:600; text-decoration:none; border-bottom:2px solid var(--border); padding-bottom:2px; }
+  .jump-nav a:hover{ border-bottom-color:var(--plum); }
+
+  .footer{
+    background:var(--ink); padding:12px 24px; display:flex; justify-content:space-between;
+    font-size:10px; color:var(--mut);
+  }
+  .split{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="left">
+    <div class="bar"></div>
+    <div>
+      <div class="eyebrow">RFx Dashboard - Structural Review Mockup</div>
+      <div class="title">Lab Informatics Platform (LIMS/ELN) Replacement - RFP-2026-114</div>
+    </div>
+  </div>
+  <div class="right">Illustrative data - representative only<br>Reflect-only advisory, not system of record</div>
+</div>
+
+<div class="tabnav" id="tabnav">
+  <button class="active" onclick="showTab('exec')" data-tab="exec">1. Executive Readout</button>
+  <button onclick="showTab('scoring')" data-tab="scoring">2. Scoring</button>
+  <button onclick="showTab('analysis')" data-tab="analysis">3. Analysis</button>
+  <button onclick="showTab('reco')" data-tab="reco">4. Recommendation</button>
+</div>
+
+<div class="body-wrap">
+
+<!-- =========================================================
+     TAB 1: EXECUTIVE READOUT
+========================================================= -->
+<div class="tabpanel active" id="tab-exec">
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Event Strip<span class="note">RFx: RFP (RFI / RFQ / RFP instrument selector)</span></div>
+    <div class="flex-between" style="margin-bottom:10px;">
+      <div>
+        <span class="pill pill-plum">RFP</span>
+        <span class="pill">Phase 5 of 8: Evaluation &amp; Scoring</span>
+        <span class="pill pill-warn">At-risk (deadline)</span>
+      </div>
+      <div class="small muted">Last refresh: 07/24/2026 08:10 ET</div>
+    </div>
+    <div class="grid-4" style="margin-bottom:6px;">
+      <div class="small"><b>Next milestone</b><br>Group Decision workshop - Aug 4, 2026 (10 days out)</div>
+      <div class="small"><b>Award basis</b><br>Best Value - weighted criteria + mandatory gate requirements</div>
+      <div class="small"><b>Panel roster</b><br>7 evaluators: Quality, IT, Lab Ops, Security, Procurement</div>
+      <div class="small"><b>Links</b><br><a href="#">Response documents</a> &middot; <a href="#">Supplier Landscape (Lab Informatics)</a></div>
+    </div>
+    <div class="small muted">Deadline pill states: On-track / At-risk / Breached / Stale (derived from dates + refresh, no live dependency). Current: <b style="color:var(--burnt);">At-risk</b> - 2 of 4 suppliers have open gating clarifications past first response window.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Participation<span class="note">shape + label per stage, never color alone</span></div>
+    <table class="dt" style="min-width:760px;">
+      <tr><th>Supplier</th><th>Agreed</th><th>CDA</th><th>MSA</th><th>Response</th><th>Demo-set</th><th>Demo-done</th></tr>
+      <tr>
+        <td><b>Meridian LIMS</b></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Agreed</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>CDA signed</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>MSA on file</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Received</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Scheduled</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Complete</span></td>
+      </tr>
+      <tr>
+        <td><b>Vantage Sciences</b></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Agreed</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>CDA signed</span></td>
+        <td><span class="glyph g-half"><span class="shape">&#9680;</span>MSA: in redline</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Received</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Scheduled</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Complete</span></td>
+      </tr>
+      <tr>
+        <td><b>NorthPeak Informatics</b></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Agreed</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>CDA signed</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>MSA on file</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Received</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Scheduled</span></td>
+        <td><span class="glyph g-half"><span class="shape">&#9680;</span>Rescheduled</span></td>
+      </tr>
+      <tr>
+        <td><b>Ashford Labs Software</b></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Agreed</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>CDA signed</span></td>
+        <td><span class="glyph g-flag"><span class="shape">&#9873;</span>MSA: none on file</span></td>
+        <td><span class="glyph g-half"><span class="shape">&#9680;</span>Partial - BAFO pending</span></td>
+        <td><span class="glyph g-done"><span class="shape">&#10003;</span>Scheduled</span></td>
+        <td><span class="glyph g-dash"><span class="shape">&#9711;</span>Not yet</span></td>
+      </tr>
+    </table>
+    <div class="small muted" style="margin-top:8px;">Glyph key: &#10003; done &nbsp; &#9680; in progress &nbsp; &#9873; blocked / attention &nbsp; &#9711; not started. Shape and label both carry meaning; color is supplementary only.</div>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:16px;">
+    <div class="kpi">
+      <div class="lbl">3-yr TCO</div>
+      <div class="val num">$1.67M</div>
+      <div class="sub">Meridian (gate-pass leader). Vantage $1.99M (compensatory leader, gate-fail)</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">CCI (Composite Coverage Index)</div>
+      <div class="val num">77%</div>
+      <div class="sub">Portfolio-average requirement coverage, all suppliers x categories</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Scorecards submitted</div>
+      <div class="val num">13 of 15</div>
+      <div class="sub">2 evaluators outstanding (Security, Lab Ops backup)</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Q&amp;A open</div>
+      <div class="val num">4 open</div>
+      <div class="sub">Oldest pending 11 days (Vantage SEC-1 remediation)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Completeness &amp; Risk Roll-up</div>
+    <div class="twrap">
+    <table class="dt">
+      <tr><th>Supplier</th><th class="center">Conforming</th><th class="center">Completeness %</th><th class="center">Red-flags</th><th class="center">Gating items</th><th>Award tier</th></tr>
+      <tr>
+        <td><b>Meridian LIMS</b></td>
+        <td class="center"><span class="pill pill-ok">Y</span></td>
+        <td class="center">96%</td>
+        <td class="center">0</td>
+        <td class="center">0</td>
+        <td><span class="pill pill-ok">Tier 1 - Recommended</span></td>
+      </tr>
+      <tr>
+        <td><b>Vantage Sciences</b></td>
+        <td class="center"><span class="pill pill-danger">N</span></td>
+        <td class="center">94%</td>
+        <td class="center">1</td>
+        <td class="center">1</td>
+        <td><span class="pill pill-warn">Tier 2 - Conditional (gate fail)</span></td>
+      </tr>
+      <tr>
+        <td><b>NorthPeak Informatics</b></td>
+        <td class="center"><span class="pill pill-ok">Y</span></td>
+        <td class="center">90%</td>
+        <td class="center">0</td>
+        <td class="center">0</td>
+        <td><span class="pill pill-ok">Tier 1 - Strong Alternate</span></td>
+      </tr>
+      <tr>
+        <td><b>Ashford Labs Software</b></td>
+        <td class="center"><span class="pill pill-warn">Pending</span></td>
+        <td class="center">78%</td>
+        <td class="center">1</td>
+        <td class="center">1</td>
+        <td><span class="pill pill-danger">Tier 3 - Incomplete Submission</span></td>
+      </tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Supplier Score Grid<span class="note">score triad: AI first-pass / Panel / Pre-RFx scan</span></div>
+    <div class="twrap">
+    <table class="dt">
+      <tr><th>Supplier</th><th class="center">AI first-pass</th><th class="center">Panel (official)</th><th class="center">Pre-RFx scan</th><th>Coverage %</th><th>Award tier</th></tr>
+      <tr>
+        <td><b>Meridian LIMS</b></td>
+        <td class="center num">4.00</td>
+        <td class="center num" style="font-weight:700;">4.06</td>
+        <td class="center num">3.90</td>
+        <td><div class="minibar-wrap"><span class="minibar"><span class="minibar-fill" style="width:81%;"></span></span><span class="minibar-num">81%</span></div></td>
+        <td><span class="pill pill-ok">Tier 1</span></td>
+      </tr>
+      <tr>
+        <td><b>Vantage Sciences</b></td>
+        <td class="center num">4.20</td>
+        <td class="center num" style="font-weight:700;">4.18</td>
+        <td class="center num">3.70</td>
+        <td><div class="minibar-wrap"><span class="minibar"><span class="minibar-fill" style="width:83%;"></span></span><span class="minibar-num">83%</span></div></td>
+        <td><span class="pill pill-warn">Tier 2</span></td>
+      </tr>
+      <tr>
+        <td><b>NorthPeak Informatics</b></td>
+        <td class="center num">3.95</td>
+        <td class="center num" style="font-weight:700;">4.00</td>
+        <td class="center num">4.00</td>
+        <td><div class="minibar-wrap"><span class="minibar"><span class="minibar-fill" style="width:81%;"></span></span><span class="minibar-num">81%</span></div></td>
+        <td><span class="pill pill-ok">Tier 1</span></td>
+      </tr>
+      <tr>
+        <td><b>Ashford Labs Software</b></td>
+        <td class="center num">3.30</td>
+        <td class="center num" style="font-weight:700;">3.19</td>
+        <td class="center num">3.40</td>
+        <td><div class="minibar-wrap"><span class="minibar"><span class="minibar-fill" style="width:64%;"></span></span><span class="minibar-num">64%</span></div></td>
+        <td><span class="pill pill-danger">Tier 3</span></td>
+      </tr>
+    </table>
+    </div>
+    <div class="small muted" style="margin-top:8px;">Row click selects the supplier and opens Analysis &gt; Individual for that supplier in the full build. Triad relabeled commodity-neutral (no IT/Landscape branding).</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Evaluation Lede<span class="note">claim-gated: cites or abstains</span></div>
+    <div class="lede">
+      Panel scoring across 5 weighted categories places <b>Vantage Sciences</b> highest on compensatory weighted total (4.18 of 5), but Vantage carries an unresolved Must-Have gate fail on SEC-1 (data residency: primary hosting proposed outside the required region). Excluding suppliers with an open Must-Have fail, <b>Meridian LIMS</b> leads on weighted total (4.06 of 5) with <b>NorthPeak Informatics</b> close behind (4.00 of 5).
+      <span class="evidence">Scoring Matrix + Security SME log</span>
+      <br><br>
+      <span class="confirm">CONFIRM: Group Decision panel to formally acknowledge the gate-pass leader before award (see Evaluation Readiness, Recommendation tab)</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- =========================================================
+     TAB 2: SCORING
+========================================================= -->
+<div class="tabpanel" id="tab-scoring">
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Scoring Matrix<span class="note">criteria x weight x supplier, panel-average to 1dp</span></div>
+    <div class="twrap">
+    <table class="dt">
+      <tr><th>Category</th><th class="center">Weight</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th><th class="center">Leader</th></tr>
+      <tr>
+        <td>Functional Fit</td><td class="center">30%</td>
+        <td class="center num">4.2</td><td class="center num">4.5</td><td class="center num">3.6</td><td class="center num">3.0</td>
+        <td class="center">&#9733; Vantage</td>
+      </tr>
+      <tr>
+        <td>Data &amp; Integration</td><td class="center">20%</td>
+        <td class="center num">3.8</td><td class="center num">4.2</td><td class="center num">3.9</td><td class="center num">3.2</td>
+        <td class="center">&#9733; Vantage</td>
+      </tr>
+      <tr>
+        <td>Security &amp; Compliance</td><td class="center">20%</td>
+        <td class="center num">4.5</td><td class="center num">3.8<span class="pill pill-danger" style="margin-left:4px;">Gate fail</span></td><td class="center num">4.3</td><td class="center num">3.8</td>
+        <td class="center">&#9733; Meridian</td>
+      </tr>
+      <tr>
+        <td>Implementation &amp; Support</td><td class="center">15%</td>
+        <td class="center num">4.0</td><td class="center num">3.8</td><td class="center num">4.3</td><td class="center num">3.5</td>
+        <td class="center">&#9733; NorthPeak</td>
+      </tr>
+      <tr>
+        <td>Commercial</td><td class="center">15%</td>
+        <td class="center num">3.8</td><td class="center num">4.4</td><td class="center num">4.2</td><td class="center num">2.4<span class="pill pill-danger" style="margin-left:4px;">Gate fail</span></td>
+        <td class="center">&#9733; Vantage</td>
+      </tr>
+      <tr class="total-row">
+        <td>Weighted Total</td><td class="center">100%</td>
+        <td class="center num">4.06</td><td class="center num">4.18</td><td class="center num">4.00</td><td class="center num">3.19</td>
+        <td class="center">&#9733; Vantage (compensatory)</td>
+      </tr>
+      <tr class="gate-row">
+        <td colspan="7">Must-Have gate footer: Vantage FAILS SEC-1 (data residency, scored 0). Ashford FAILS COM-1 (final pricing not submitted, scored 0). Meridian and NorthPeak: all 6 must-haves PASS.</td>
+      </tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Dual-Ranking Surface<span class="note">compensatory vs. gate-pass, side by side</span></div>
+    <div class="grid-2">
+      <div class="band">
+        <div class="small muted" style="font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;">Compensatory leader (raw weighted total)</div>
+        <div class="bignum" style="font-size:22px; font-weight:700;">Vantage Sciences</div>
+        <div class="num" style="font-size:15px; color:var(--plum);">4.18 / 5</div>
+        <div class="small muted" style="margin-top:4px;">Ranked 1st by weighted total alone, before applying Must-Have gates.</div>
+      </div>
+      <div class="band band-teal">
+        <div class="small muted" style="font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;">Gate-pass leader (Must-Have filter applied)</div>
+        <div class="bignum" style="font-size:22px; font-weight:700;">Meridian LIMS</div>
+        <div class="num" style="font-size:15px; color:var(--teal);">4.06 / 5</div>
+        <div class="small muted" style="margin-top:4px;">Highest weighted total among suppliers with zero Must-Have failures.</div>
+      </div>
+    </div>
+    <div class="card" style="background:#fff; border-color:var(--rust); margin-top:12px; margin-bottom:0;">
+      <div class="small" style="color:var(--rust); font-weight:700;">GATE CONFLICT</div>
+      <div class="small" style="margin-top:4px;">Vantage Sciences leads on compensatory weighted total (4.18) but carries a Must-Have zero on <b>SEC-1 (Data residency: in-region hosting)</b>. This makes Meridian LIMS (4.06) the gate-pass leader. Ashford Labs Software also carries an independent Must-Have zero on COM-1 (final pricing not submitted) and is not a contender in either ranking. <span class="evidence">Must-Have gate footer</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Criterion Cards<span class="note">sub-requirements, within-category weight, must-have flags</span></div>
+
+    <div class="band" style="margin-bottom:14px;">
+      <div class="flex-between"><b>Functional Fit</b><span class="pill pill-plum">Category weight 30%</span></div>
+      <table class="dt" style="margin-top:8px; min-width:0;"><tr><th>Requirement</th><th class="center">In-cat wt</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th><th>Field-high</th></tr>
+      <tr><td><span class="moscow must">MUST</span> FF-1 Sample lifecycle management</td><td class="center">30%</td><td class="center num">5.0</td><td class="center num">5.0</td><td class="center num">4.0</td><td class="center num">3.0</td><td>Meridian / Vantage (tie)</td></tr>
+      <tr><td><span class="moscow should">SHOULD</span> FF-2 Instrument / ELN bridge integration</td><td class="center">25%</td><td class="center num">4.0</td><td class="center num">5.0</td><td class="center num">3.5</td><td class="center num">3.0</td><td>Vantage</td></tr>
+      <tr><td><span class="moscow should">SHOULD</span> FF-3 Configurable workflow engine</td><td class="center">25%</td><td class="center num">4.0</td><td class="center num">5.0</td><td class="center num">3.5</td><td class="center num">3.0</td><td>Vantage</td></tr>
+      <tr><td><span class="moscow could">COULD</span> FF-4 Mobile / tablet data capture <span class="pill pill-warn">DRAFT weight</span></td><td class="center">20%*</td><td class="center num">3.5</td><td class="center num">2.5</td><td class="center num">3.0</td><td class="center num">3.0</td><td>Meridian</td></tr>
+      </table>
+      <div class="small muted" style="margin-top:6px;">* FF-4 in-category weight is unconfirmed. DRAFT - confirm with evaluation team before Group Decision.</div>
+    </div>
+
+    <div class="band" style="margin-bottom:14px;">
+      <div class="flex-between"><b>Data &amp; Integration</b><span class="pill pill-plum">Category weight 20%</span></div>
+      <table class="dt" style="margin-top:8px; min-width:0;"><tr><th>Requirement</th><th class="center">In-cat wt</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th><th>Field-high</th></tr>
+      <tr><td><span class="moscow must">MUST</span> DI-1 ERP / QMS system integration</td><td class="center">40%</td><td class="center num">4.0</td><td class="center num">4.5</td><td class="center num">4.0</td><td class="center num">3.0</td><td>Vantage</td></tr>
+      <tr><td><span class="moscow should">SHOULD</span> DI-2 Instrument data integration (drivers)</td><td class="center">35%</td><td class="center num">3.5</td><td class="center num">4.0</td><td class="center num">4.0</td><td class="center num">3.5</td><td>Vantage / NorthPeak (tie)</td></tr>
+      <tr><td><span class="moscow could">COULD</span> DI-3 API / webhook extensibility</td><td class="center">25%</td><td class="center num">4.0</td><td class="center num">4.0</td><td class="center num">3.5</td><td class="center num">3.0</td><td>Meridian / Vantage (tie)</td></tr>
+      </table>
+    </div>
+
+    <div class="band" style="margin-bottom:14px;">
+      <div class="flex-between"><b>Security &amp; Compliance</b><span class="pill pill-plum">Category weight 20%</span></div>
+      <table class="dt" style="margin-top:8px; min-width:0;"><tr><th>Requirement</th><th class="center">In-cat wt</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th><th>Field-high</th></tr>
+      <tr><td><span class="moscow must">MUST</span> SEC-1 Data residency (in-region hosting)</td><td class="center">25%</td><td class="center num">5.0</td><td class="center num" style="color:var(--rust); font-weight:700;">0.0 FAIL</td><td class="center num">5.0</td><td class="center num">4.0</td><td>Meridian / NorthPeak (tie)</td></tr>
+      <tr><td><span class="moscow must">MUST</span> SEC-2 SOC 2 Type II certification</td><td class="center">25%</td><td class="center num">5.0</td><td class="center num">5.0</td><td class="center num">4.0</td><td class="center num">3.0</td><td>Meridian / Vantage (tie)</td></tr>
+      <tr><td><span class="moscow should">SHOULD</span> SEC-3 Encryption at rest and in transit</td><td class="center">25%</td><td class="center num">4.0</td><td class="center num">5.0</td><td class="center num">4.0</td><td class="center num">4.0</td><td>Vantage</td></tr>
+      <tr><td><span class="moscow should">SHOULD</span> SEC-4 RBAC + audit logging</td><td class="center">25%</td><td class="center num">4.0</td><td class="center num">5.0</td><td class="center num">4.0</td><td class="center num">4.0</td><td>Vantage</td></tr>
+      </table>
+    </div>
+
+    <div class="band" style="margin-bottom:14px;">
+      <div class="flex-between"><b>Implementation &amp; Support</b><span class="pill pill-plum">Category weight 15%</span></div>
+      <table class="dt" style="margin-top:8px; min-width:0;"><tr><th>Requirement</th><th class="center">In-cat wt</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th><th>Field-high</th></tr>
+      <tr><td><span class="moscow should">SHOULD</span> IMP-1 Implementation methodology &amp; timeline</td><td class="center">40%</td><td class="center num">4.0</td><td class="center num">3.5</td><td class="center num">4.5</td><td class="center num">3.5</td><td>NorthPeak</td></tr>
+      <tr><td><span class="moscow must">MUST</span> IMP-2 Data migration from legacy LIMS</td><td class="center">35%</td><td class="center num">4.0</td><td class="center num">4.0</td><td class="center num">4.0</td><td class="center num">3.0</td><td>3-way tie</td></tr>
+      <tr><td><span class="moscow should">SHOULD</span> IMP-3 Ongoing support SLA</td><td class="center">25%</td><td class="center num">4.0</td><td class="center num">4.0</td><td class="center num">4.5</td><td class="center num">4.0</td><td>NorthPeak</td></tr>
+      </table>
+    </div>
+
+    <div class="band">
+      <div class="flex-between"><b>Commercial</b><span class="pill pill-plum">Category weight 15%</span></div>
+      <table class="dt" style="margin-top:8px; min-width:0;"><tr><th>Requirement</th><th class="center">In-cat wt</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th><th>Field-high</th></tr>
+      <tr><td><span class="moscow must">MUST</span> COM-1 Final unit pricing submitted</td><td class="center">40%</td><td class="center num">5.0</td><td class="center num">5.0</td><td class="center num">4.5</td><td class="center num" style="color:var(--rust); font-weight:700;">0.0 FAIL</td><td>Meridian / Vantage (tie)</td></tr>
+      <tr><td><span class="moscow should">SHOULD</span> COM-2 Multi-year price protection / escalator cap</td><td class="center">30%</td><td class="center num">3.0</td><td class="center num">4.0</td><td class="center num">4.0</td><td class="center num">4.0</td><td>3-way tie</td></tr>
+      <tr><td><span class="moscow could">COULD</span> COM-3 Contract flexibility (termination / exit terms)</td><td class="center">30%</td><td class="center num">3.0</td><td class="center num">4.0</td><td class="center num">4.0</td><td class="center num">4.0</td><td>3-way tie</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapse-header" onclick="toggleCollapse(this,'registerBody')">
+      <span class="chev">&#9656;</span> Requirements Register (17 requirements, full detail) - click to expand/collapse
+    </div>
+    <div class="collapse-body" id="registerBody">
+      <div class="twrap" style="margin-top:8px;">
+      <table class="dt">
+        <tr><th>ID</th><th>Requirement</th><th class="center">MoSCoW</th><th>Acceptance criterion</th><th>Traces to objective</th><th class="center">In-cat wt</th><th class="center">Cat wt</th><th class="center">Confidence</th></tr>
+        <tr><td>FF-1</td><td>Sample lifecycle management</td><td class="center"><span class="moscow must">MUST</span></td><td>Chain-of-custody from login through disposal with an electronic record</td><td>Data Integrity &amp; Traceability</td><td class="center">30%</td><td class="center">30%</td><td class="center">High</td></tr>
+        <tr><td>FF-2</td><td>Instrument / ELN bridge integration</td><td class="center"><span class="moscow should">SHOULD</span></td><td>Bidirectional exchange with existing ELN, no manual re-entry</td><td>Operational Efficiency</td><td class="center">25%</td><td class="center">30%</td><td class="center">High</td></tr>
+        <tr><td>FF-3</td><td>Configurable workflow engine</td><td class="center"><span class="moscow should">SHOULD</span></td><td>Non-technical admin can modify workflow steps without vendor services</td><td>Total Cost of Ownership</td><td class="center">25%</td><td class="center">30%</td><td class="center">Medium</td></tr>
+        <tr><td>FF-4</td><td>Mobile / tablet data capture</td><td class="center"><span class="moscow could">COULD</span></td><td>Native tablet app, offline-capable, at-bench entry</td><td>User Adoption</td><td class="center">20% <span class="pill pill-warn">DRAFT</span></td><td class="center">30%</td><td class="center">Medium</td></tr>
+        <tr><td>DI-1</td><td>ERP / QMS system integration</td><td class="center"><span class="moscow must">MUST</span></td><td>Real-time or near-real-time interface, no custom middleware</td><td>Systems Consolidation</td><td class="center">40%</td><td class="center">20%</td><td class="center">High</td></tr>
+        <tr><td>DI-2</td><td>Instrument data integration (drivers)</td><td class="center"><span class="moscow should">SHOULD</span></td><td>Certified driver library covers &ge;90% of in-scope instrument fleet</td><td>Automation</td><td class="center">35%</td><td class="center">20%</td><td class="center">Medium</td></tr>
+        <tr><td>DI-3</td><td>API / webhook extensibility</td><td class="center"><span class="moscow could">COULD</span></td><td>Documented REST API and webhook support</td><td>Future-Proofing</td><td class="center">25%</td><td class="center">20%</td><td class="center">Medium</td></tr>
+        <tr><td>SEC-1</td><td>Data residency (in-region hosting)</td><td class="center"><span class="moscow must">MUST</span></td><td>Production and DR instances both hosted in-region</td><td>Regulatory Compliance</td><td class="center">25%</td><td class="center">20%</td><td class="center">High</td></tr>
+        <tr><td>SEC-2</td><td>SOC 2 Type II certification</td><td class="center"><span class="moscow must">MUST</span></td><td>Current SOC 2 Type II covering the proposed hosting environment</td><td>Regulatory Compliance</td><td class="center">25%</td><td class="center">20%</td><td class="center">High</td></tr>
+        <tr><td>SEC-3</td><td>Encryption at rest and in transit</td><td class="center"><span class="moscow should">SHOULD</span></td><td>AES-256 at rest, TLS 1.2+ in transit, documented key management</td><td>Data Protection</td><td class="center">25%</td><td class="center">20%</td><td class="center">High</td></tr>
+        <tr><td>SEC-4</td><td>RBAC + audit logging</td><td class="center"><span class="moscow should">SHOULD</span></td><td>Granular RBAC, immutable exportable audit log</td><td>Data Protection</td><td class="center">25%</td><td class="center">20%</td><td class="center">Medium</td></tr>
+        <tr><td>IMP-1</td><td>Implementation methodology &amp; timeline</td><td class="center"><span class="moscow should">SHOULD</span></td><td>Phased methodology, named milestones, go-live criteria</td><td>Deployment Risk</td><td class="center">40%</td><td class="center">15%</td><td class="center">Medium</td></tr>
+        <tr><td>IMP-2</td><td>Data migration from legacy LIMS</td><td class="center"><span class="moscow must">MUST</span></td><td>Validated migration with reconciliation report for 100% of active records</td><td>Data Integrity &amp; Traceability</td><td class="center">35%</td><td class="center">15%</td><td class="center">Medium</td></tr>
+        <tr><td>IMP-3</td><td>Ongoing support SLA</td><td class="center"><span class="moscow should">SHOULD</span></td><td>24x7 Sev-1 response within 1 hour, named technical contact</td><td>Operational Continuity</td><td class="center">25%</td><td class="center">15%</td><td class="center">Medium</td></tr>
+        <tr><td>COM-1</td><td>Final unit pricing submitted</td><td class="center"><span class="moscow must">MUST</span></td><td>Complete signed pricing schedule at the proposed denominator unit</td><td>Commercial Certainty</td><td class="center">40%</td><td class="center">15%</td><td class="center">High</td></tr>
+        <tr><td>COM-2</td><td>Multi-year price protection / escalator cap</td><td class="center"><span class="moscow should">SHOULD</span></td><td>Escalator capped at or below 3% annually for initial term</td><td>Total Cost of Ownership</td><td class="center">30%</td><td class="center">15%</td><td class="center">Medium</td></tr>
+        <tr><td>COM-3</td><td>Contract flexibility (termination / exit terms)</td><td class="center"><span class="moscow could">COULD</span></td><td>Termination for convenience with a bounded exit-assistance period</td><td>Risk Mitigation</td><td class="center">30%</td><td class="center">15%</td><td class="center">Low</td></tr>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="tick"></span>Rubric Bands<span class="note">named 0-5, never a bare number</span></div>
+      <div class="rubric-list">
+        <div class="rubric-item"><span class="band-n">5</span><span>Exceptional - exceeds requirement, no residual risk</span></div>
+        <div class="rubric-item"><span class="band-n">4</span><span>Fully Meets - meets requirement, minor residual risk</span></div>
+        <div class="rubric-item"><span class="band-n">3</span><span>Largely Meets - meets with a workaround</span></div>
+        <div class="rubric-item"><span class="band-n">2</span><span>Partially Meets - significant gap</span></div>
+        <div class="rubric-item"><span class="band-n">1</span><span>Minimally Meets - major gap</span></div>
+        <div class="rubric-item"><span class="band-n">0</span><span>Does Not Meet / Fails Must-Have</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tick"></span>Weight Sanity Gate</div>
+      <div class="small">Category weights: <span class="pill pill-ok">100% confirmed</span> (30 + 20 + 20 + 15 + 15).</div>
+      <div class="small" style="margin-top:8px;">Sub-requirement weights: <span class="pill pill-warn">1 unconfirmed</span></div>
+      <div class="small" style="margin-top:6px;">FF-4 (Mobile / tablet capture) in-category weight is <b>DRAFT - confirm with evaluation team</b> before Group Decision. Never silently normalized.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- =========================================================
+     TAB 3: ANALYSIS
+========================================================= -->
+<div class="tabpanel" id="tab-analysis">
+
+  <div class="subnav">
+    <button class="active" id="seg-btn-individual" onclick="showSegment('individual')">Individual (Supplier Deep Dive)</button>
+    <button id="seg-btn-cross" onclick="showSegment('cross')">Cross-Supplier</button>
+  </div>
+
+  <!-- ===== INDIVIDUAL ===== -->
+  <div id="seg-individual">
+    <div class="chiprow">
+      <div class="chip active" data-sup="meridian" onclick="showSupplier('meridian')">Meridian LIMS</div>
+      <div class="chip" data-sup="vantage" onclick="showSupplier('vantage')">Vantage Sciences</div>
+      <div class="chip" data-sup="northpeak" onclick="showSupplier('northpeak')">NorthPeak Informatics</div>
+      <div class="chip" data-sup="ashford" onclick="showSupplier('ashford')">Ashford Labs Software</div>
+    </div>
+
+    <div class="card band" style="border:1px solid var(--border);">
+      <div class="card-title" style="margin-bottom:6px;"><span class="tick"></span>Internal Buyer Context<span class="note">does not affect coverage scores</span></div>
+      <div class="grid-4" id="buyerContext"><!-- filled by supplier profile --></div>
+    </div>
+
+    <div class="jump-nav">
+      <a href="#s-summary">Response summary</a>
+      <a href="#s-fit">Requirements fit</a>
+      <a href="#s-sgr">Strengths / Gaps / Red-flags</a>
+      <a href="#s-comm">Commercial &amp; operational</a>
+      <a href="#s-clar">Clarifications (DRAFT)</a>
+    </div>
+
+    <!-- MERIDIAN -->
+    <div class="supplier-profile" data-sup="meridian">
+      <div class="card" id="s-summary">
+        <div class="card-title"><span class="tick"></span>Response Summary &amp; Profile</div>
+        <div class="small">312-page response, submitted on time. Proposes a cloud-hosted, in-region multi-tenant SaaS deployment, 300 named users, phased 9-month rollout across 2 sites. Incumbent ELN vendor for this site since 2022.</div>
+      </div>
+      <div class="card" id="s-fit">
+        <div class="card-title"><span class="tick"></span>Requirements Fit<span class="note">per-requirement citation</span></div>
+        <div class="twrap"><table class="dt"><tr><th>Req</th><th class="center">Status</th><th class="center">Confidence</th><th>Citation</th></tr>
+        <tr><td>FF-1 Sample lifecycle management</td><td class="center"><span class="status-met">Met</span></td><td class="center">High</td><td><span class="evidence">Response, Sec 3.2, p.44</span></td></tr>
+        <tr><td>SEC-1 Data residency (in-region hosting)</td><td class="center"><span class="status-met">Met</span></td><td class="center">High</td><td><span class="evidence">Response, Sec 6.1, p.118</span></td></tr>
+        <tr><td>IMP-2 Data migration from legacy LIMS</td><td class="center"><span class="status-partial">Partial</span></td><td class="center">Medium</td><td><span class="evidence">Response, Sec 8.4, p.166</span></td></tr>
+        </table></div>
+      </div>
+      <div class="grid-2">
+        <div class="card" id="s-sgr">
+          <div class="card-title"><span class="tick"></span>Strengths / Gaps / Red-flags</div>
+          <div class="small"><b>Strengths:</b> strong sample-lifecycle depth; in-region hosting confirmed; existing ELN integration lowers interface risk.</div>
+          <div class="small" style="margin-top:6px;"><b>Gaps:</b> mobile capture is iOS-only (Should-have); Android roadmap unconfirmed.</div>
+          <div class="small" style="margin-top:6px;"><b>Red-flags:</b> none logged.</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tick"></span>Inconsistencies</div>
+          <div class="small">Response Sec 3.2 states "24/7 support" while the Sec 9.1 SLA table lists business-hours-only for Tier 3 tickets. <span class="confirm">CONFIRM: which section governs</span></div>
+        </div>
+      </div>
+      <div class="card" id="s-comm">
+        <div class="card-title"><span class="tick"></span>Commercial &amp; Operational</div>
+        <div class="small">3-yr normalized: $1,852 / named user / yr <span class="pill">IN_LINE (&plusmn;5%)</span>. Implementation team based onshore. Named CSM assigned at kickoff.</div>
+      </div>
+      <div class="card" id="s-clar">
+        <div class="card-title"><span class="tick"></span>Clarifications <span class="note">DRAFT</span></div>
+        <div class="small">Q: Confirm Android tablet support timeline. <span class="confirm">CONFIRM: reply pending, routed to Meridian 07/22</span></div>
+      </div>
+    </div>
+
+    <!-- VANTAGE -->
+    <div class="supplier-profile" data-sup="vantage" style="display:none;">
+      <div class="card" id="s-summary">
+        <div class="card-title"><span class="tick"></span>Response Summary &amp; Profile</div>
+        <div class="small">284-page response. Proposes a hybrid-cloud deployment (EU-primary, US disaster-recovery), 300 named users, 6-month rollout. New supplier relationship; no prior MSA.</div>
+      </div>
+      <div class="card" id="s-fit">
+        <div class="card-title"><span class="tick"></span>Requirements Fit<span class="note">per-requirement citation</span></div>
+        <div class="twrap"><table class="dt"><tr><th>Req</th><th class="center">Status</th><th class="center">Confidence</th><th>Citation</th></tr>
+        <tr><td>FF-1 Sample lifecycle management</td><td class="center"><span class="status-met">Met</span></td><td class="center">High</td><td><span class="evidence">Response, Sec 2.1, p.31</span></td></tr>
+        <tr><td>SEC-1 Data residency (in-region hosting) <span class="pill pill-danger">Must-Have</span></td><td class="center"><span class="status-gap">Gap</span></td><td class="center">High</td><td><span class="evidence">Response, Sec 5.3, p.97</span></td></tr>
+        <tr><td>DI-2 Instrument data integration</td><td class="center"><span class="status-met">Met</span></td><td class="center">High</td><td><span class="evidence">Response, Sec 4.2, p.61</span></td></tr>
+        </table></div>
+      </div>
+      <div class="grid-2">
+        <div class="card" id="s-sgr">
+          <div class="card-title"><span class="tick"></span>Strengths / Gaps / Red-flags</div>
+          <div class="small"><b>Strengths:</b> fastest proposed timeline; strongest functional-fit score in the panel.</div>
+          <div class="small" style="margin-top:6px;"><b>Gaps:</b> escalator/exit terms scored lower than field.</div>
+          <div class="small" style="margin-top:6px; color:var(--rust); font-weight:700;">Red-flag: primary hosting region (EU-West) does not meet the in-region data-residency Must-Have (SEC-1). Addendum 2 asked for a US-hosted commitment; reply outstanding.</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tick"></span>Inconsistencies</div>
+          <div class="small">Sales deck (Appendix C) advertises "full US hosting" while Sec 5.3 technical architecture names EU-West as primary. <span class="confirm">CONFIRM: which is authoritative</span></div>
+        </div>
+      </div>
+      <div class="card" id="s-comm">
+        <div class="card-title"><span class="tick"></span>Commercial &amp; Operational</div>
+        <div class="small">3-yr normalized: $2,207 / named user / yr <span class="pill pill-warn">ABOVE benchmark (+16%)</span>.</div>
+      </div>
+      <div class="card" id="s-clar">
+        <div class="card-title"><span class="tick"></span>Clarifications <span class="note">DRAFT, GATING</span></div>
+        <div class="small"><span class="pill pill-danger">GATING</span> Q: Can Vantage commit to US-region-only hosting for this contract, in writing, with an SLA? <span class="confirm">CONFIRM: reply due before Group Decision - blocks gate resolution</span></div>
+      </div>
+    </div>
+
+    <!-- NORTHPEAK -->
+    <div class="supplier-profile" data-sup="northpeak" style="display:none;">
+      <div class="card" id="s-summary">
+        <div class="card-title"><span class="tick"></span>Response Summary &amp; Profile</div>
+        <div class="small">198-page response. On-prem or private-cloud deployment, 300 named users, 8-month rollout.</div>
+      </div>
+      <div class="card" id="s-fit">
+        <div class="card-title"><span class="tick"></span>Requirements Fit<span class="note">per-requirement citation</span></div>
+        <div class="twrap"><table class="dt"><tr><th>Req</th><th class="center">Status</th><th class="center">Confidence</th><th>Citation</th></tr>
+        <tr><td>FF-1 Sample lifecycle management</td><td class="center"><span class="status-partial">Partial</span></td><td class="center">Medium</td><td><span class="evidence">Response, Sec 3.1, p.28</span></td></tr>
+        <tr><td>SEC-1 Data residency (in-region hosting)</td><td class="center"><span class="status-met">Met</span></td><td class="center">High</td><td><span class="evidence">Response, Sec 7.2, p.101</span></td></tr>
+        <tr><td>IMP-1 Implementation methodology</td><td class="center"><span class="status-met">Met</span></td><td class="center">Medium</td><td><span class="evidence">Response, Sec 8.1, p.140</span></td></tr>
+        </table></div>
+      </div>
+      <div class="grid-2">
+        <div class="card" id="s-sgr">
+          <div class="card-title"><span class="tick"></span>Strengths / Gaps / Red-flags</div>
+          <div class="small"><b>Strengths:</b> highest implementation &amp; support score; strong security posture; competitive pricing.</div>
+          <div class="small" style="margin-top:6px;"><b>Gaps:</b> functional configurability scored lower than Meridian/Vantage; smaller partner ecosystem for instrument drivers.</div>
+          <div class="small" style="margin-top:6px;"><b>Red-flags:</b> none logged.</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tick"></span>Inconsistencies</div>
+          <div class="small">None logged.</div>
+        </div>
+      </div>
+      <div class="card" id="s-comm">
+        <div class="card-title"><span class="tick"></span>Commercial &amp; Operational</div>
+        <div class="small">3-yr normalized: $1,728 / named user / yr <span class="pill pill-ok">BELOW benchmark (-9%)</span>.</div>
+      </div>
+      <div class="card" id="s-clar">
+        <div class="card-title"><span class="tick"></span>Clarifications <span class="note">DRAFT</span></div>
+        <div class="small">Q: Confirm instrument-driver library breadth for legacy titrators. <span class="pill pill-ok">Reply received 07/18, pending panel review</span></div>
+      </div>
+    </div>
+
+    <!-- ASHFORD -->
+    <div class="supplier-profile" data-sup="ashford" style="display:none;">
+      <div class="card" id="s-summary">
+        <div class="card-title"><span class="tick"></span>Response Summary &amp; Profile</div>
+        <div class="small">142-page response. Cloud-hosted, 300 named users; final pricing schedule not yet submitted, pending BAFO.</div>
+      </div>
+      <div class="card" id="s-fit">
+        <div class="card-title"><span class="tick"></span>Requirements Fit<span class="note">per-requirement citation</span></div>
+        <div class="twrap"><table class="dt"><tr><th>Req</th><th class="center">Status</th><th class="center">Confidence</th><th>Citation</th></tr>
+        <tr><td>FF-1 Sample lifecycle management</td><td class="center"><span class="status-partial">Partial</span></td><td class="center">Medium</td><td><span class="evidence">Response, Sec 2.4, p.19</span></td></tr>
+        <tr><td>SEC-1 Data residency (in-region hosting)</td><td class="center"><span class="status-met">Met</span></td><td class="center">Medium</td><td><span class="evidence">Response, Sec 5.1, p.52</span></td></tr>
+        <tr><td>COM-1 Final unit pricing submitted <span class="pill pill-danger">Must-Have</span></td><td class="center"><span class="status-gap">Gap - Not submitted</span></td><td class="center">n/a</td><td><span class="confirm">CONFIRM: BAFO due 07/29</span></td></tr>
+        </table></div>
+      </div>
+      <div class="grid-2">
+        <div class="card" id="s-sgr">
+          <div class="card-title"><span class="tick"></span>Strengths / Gaps / Red-flags</div>
+          <div class="small"><b>Strengths:</b> simplest deployment model; competitive non-price scores where submitted.</div>
+          <div class="small" style="margin-top:6px; color:var(--rust); font-weight:700;">Red-flag: final pricing not submitted; Bid-Leveling Gate cannot clear until received.</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tick"></span>Inconsistencies</div>
+          <div class="small">None logged (insufficient submitted content to assess).</div>
+        </div>
+      </div>
+      <div class="card" id="s-comm">
+        <div class="card-title"><span class="tick"></span>Commercial &amp; Operational</div>
+        <div class="small">Normalized unit price: <span class="confirm">Not submitted (NO_REFERENCE)</span></div>
+      </div>
+      <div class="card" id="s-clar">
+        <div class="card-title"><span class="tick"></span>Clarifications <span class="note">DRAFT, GATING</span></div>
+        <div class="small"><span class="pill pill-danger">GATING</span> Q: Please submit final BAFO pricing schedule. <span class="confirm">CONFIRM: due 07/29, currently open</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CROSS-SUPPLIER ===== -->
+  <div id="seg-cross" style="display:none;">
+
+    <div class="card">
+      <div class="card-title"><span class="tick"></span>Coverage Heatmap<span class="note">category x supplier %, ring = category leader</span></div>
+      <div class="twrap">
+      <table class="dt">
+        <tr><th>Category</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th></tr>
+        <tr>
+          <td>Functional Fit</td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.29);">84%</div></td>
+          <td><div class="heat-cell leader" style="background:rgba(47,110,107,.32);">90%<span class="heat-leadertag">LEADER</span></div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.25);">72%</div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.20);">60%</div></td>
+        </tr>
+        <tr>
+          <td>Data &amp; Integration</td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.26);">76%</div></td>
+          <td><div class="heat-cell leader" style="background:rgba(47,110,107,.29);">84%<span class="heat-leadertag">LEADER</span></div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.27);">78%</div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.22);">64%</div></td>
+        </tr>
+        <tr>
+          <td>Security &amp; Compliance</td>
+          <td><div class="heat-cell leader" style="background:rgba(47,110,107,.31);">90%<span class="heat-leadertag">LEADER</span></div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.26);">76%</div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.30);">86%</div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.26);">76%</div></td>
+        </tr>
+        <tr>
+          <td>Implementation &amp; Support</td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.28);">80%</div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.26);">76%</div></td>
+          <td><div class="heat-cell leader" style="background:rgba(47,110,107,.30);">86%<span class="heat-leadertag">LEADER</span></div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.24);">70%</div></td>
+        </tr>
+        <tr>
+          <td>Commercial</td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.26);">76%</div></td>
+          <td><div class="heat-cell leader" style="background:rgba(47,110,107,.31);">88%<span class="heat-leadertag">LEADER</span></div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.29);">84%</div></td>
+          <td><div class="heat-cell" style="background:rgba(47,110,107,.17);">48%</div></td>
+        </tr>
+      </table>
+      </div>
+      <div class="small muted" style="margin-top:8px;">Single-hue sequential shading (teal) encodes magnitude only; the numeric % is always shown as text alongside. No stoplight red/amber/green.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="tick"></span>Requirements Matrix<span class="note">drill-down, representative subset</span></div>
+      <div class="twrap">
+      <table class="dt">
+        <tr><th>Requirement</th><th class="center">MoSCoW</th><th class="center">Meridian</th><th class="center">Vantage</th><th class="center">NorthPeak</th><th class="center">Ashford</th></tr>
+        <tr><td>FF-1 Sample lifecycle mgmt</td><td class="center"><span class="moscow must">MUST</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-partial">Partial</span></td></tr>
+        <tr><td>FF-4 Mobile / tablet capture</td><td class="center"><span class="moscow could">COULD</span></td><td class="center"><span class="status-partial">Partial</span></td><td class="center"><span class="status-partial">Partial</span></td><td class="center"><span class="status-partial">Partial</span></td><td class="center"><span class="status-partial">Partial</span></td></tr>
+        <tr><td>DI-1 ERP / QMS integration</td><td class="center"><span class="moscow must">MUST</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-partial">Partial</span></td></tr>
+        <tr><td>DI-2 Instrument data integration</td><td class="center"><span class="moscow should">SHOULD</span></td><td class="center"><span class="status-partial">Partial</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-partial">Partial</span></td></tr>
+        <tr><td>SEC-1 Data residency (in-region)</td><td class="center"><span class="moscow must">MUST</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-gap">Gap - Must-Have FAIL</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td></tr>
+        <tr><td>SEC-2 SOC 2 Type II</td><td class="center"><span class="moscow must">MUST</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-partial">Partial</span></td></tr>
+        <tr><td>IMP-2 Data migration</td><td class="center"><span class="moscow must">MUST</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-partial">Partial</span></td></tr>
+        <tr><td>COM-1 Final unit pricing</td><td class="center"><span class="moscow must">MUST</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-met">Met</span></td><td class="center"><span class="status-gap">Gap - Must-Have FAIL</span></td></tr>
+      </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="tick"></span>Commercial &amp; Bid Leveling</div>
+
+      <div class="small" style="font-weight:700; margin-bottom:6px;">Bid-Leveling Gate</div>
+      <div class="glyph-row" style="margin-bottom:12px;">
+        <span class="glyph g-done"><span class="shape">&#10003;</span>Meridian: Complete</span>
+        <span class="glyph g-done"><span class="shape">&#10003;</span>Vantage: Complete</span>
+        <span class="glyph g-done"><span class="shape">&#10003;</span>NorthPeak: Complete</span>
+        <span class="glyph g-flag"><span class="shape">&#9873;</span>Ashford: Pending (BAFO due 07/29)</span>
+      </div>
+      <div class="band" style="border-left:4px solid var(--rust);">
+        <span class="pill pill-danger">Gate: BLOCKED</span> Ranking is not yet fully trusted for apples-to-apples comparison until all 4 bids clear leveling. 3 of 4 complete.
+      </div>
+
+      <hr class="rule">
+      <div class="small" style="font-weight:700; margin-bottom:6px;">Raw Pricing (as submitted)</div>
+      <div class="twrap">
+      <table class="dt">
+        <tr><th>Supplier</th><th class="right">License (yr 1)</th><th class="right">Implementation (one-time)</th><th class="right">Support (% of license)</th></tr>
+        <tr><td>Meridian LIMS</td><td class="right num">$420,000</td><td class="right num">$180,000</td><td class="right num">18%</td></tr>
+        <tr><td>Vantage Sciences</td><td class="right num">$510,000</td><td class="right num">$150,000</td><td class="right num">20%</td></tr>
+        <tr><td>NorthPeak Informatics</td><td class="right num">$380,000</td><td class="right num">$210,000</td><td class="right num">18%</td></tr>
+        <tr><td>Ashford Labs Software</td><td class="right" colspan="3"><span class="confirm">Not submitted - BAFO due 07/29</span></td></tr>
+      </table>
+      </div>
+
+      <hr class="rule">
+      <div class="flex-between" style="margin-bottom:6px;">
+        <div class="small" style="font-weight:700;">Normalized All-In Unit Comparison</div>
+        <div class="small">Denominator:
+          <select id="denomSelect" onchange="denomChange(this.value)" style="font-size:11px; padding:2px 4px;">
+            <option value="user">per named user / year</option>
+            <option value="seat">per seat / year</option>
+            <option value="site">per site / year</option>
+          </select>
+        </div>
+      </div>
+      <div id="denomNote" class="small muted" style="margin-bottom:8px;">Showing: per named user / year (300 named users). Denominator and component labels are commodity-parameterized; swap to per-seat, per-site, per-unit, per-hour for other categories.</div>
+      <div class="twrap">
+      <table class="dt">
+        <tr><th>Supplier</th><th class="right">All-in / yr</th><th class="right">Per user / yr</th><th>Reconciliation</th><th class="center">Read</th></tr>
+        <tr>
+          <td>Meridian LIMS</td><td class="right num">$555,600</td><td class="right num">$1,852</td>
+          <td class="small">($420,000 license + $75,600 support) + ($180,000 impl &divide; 3 yr = $60,000) = $555,600 &divide; 300 users</td>
+          <td class="center"><span class="pill pill-ok">IN_LINE (-2.5%)</span></td>
+        </tr>
+        <tr>
+          <td>Vantage Sciences</td><td class="right num">$662,000</td><td class="right num">$2,207</td>
+          <td class="small">($510,000 license + $102,000 support) + ($150,000 impl &divide; 3 yr = $50,000) = $662,000 &divide; 300 users</td>
+          <td class="center"><span class="pill pill-warn">ABOVE (+16.2%)</span></td>
+        </tr>
+        <tr>
+          <td>NorthPeak Informatics</td><td class="right num">$518,400</td><td class="right num">$1,728</td>
+          <td class="small">($380,000 license + $68,400 support) + ($210,000 impl &divide; 3 yr = $70,000) = $518,400 &divide; 300 users</td>
+          <td class="center"><span class="pill pill-ok">BELOW (-9.1%)</span></td>
+        </tr>
+        <tr>
+          <td>Ashford Labs Software</td><td class="right" colspan="3"><span class="confirm">Not submitted - cannot normalize</span></td>
+          <td class="center"><span class="pill">NO_REFERENCE</span></td>
+        </tr>
+      </table>
+      </div>
+      <div class="small muted" style="margin-top:6px;">Reference benchmark: $1,900 / named user / yr (pre-RFx market scan). BELOW / IN_LINE (&plusmn;5%) / ABOVE / NO_REFERENCE.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="tick"></span>Risk Roll-up</div>
+      <div class="twrap">
+      <table class="dt">
+        <tr><th>Supplier</th><th class="center">Completeness</th><th class="center">Fully Meets</th><th class="center">Conforming</th><th class="center">Red-flags</th><th class="center">Gating</th><th class="center">Clarifications open</th></tr>
+        <tr><td>Meridian LIMS</td><td class="center">96%</td><td class="center">9 of 17</td><td class="center"><span class="pill pill-ok">Y</span></td><td class="center">0</td><td class="center">0</td><td class="center">1</td></tr>
+        <tr><td>Vantage Sciences</td><td class="center">94%</td><td class="center">11 of 17</td><td class="center"><span class="pill pill-danger">N</span></td><td class="center">1</td><td class="center">1</td><td class="center">1</td></tr>
+        <tr><td>NorthPeak Informatics</td><td class="center">90%</td><td class="center">8 of 17</td><td class="center"><span class="pill pill-ok">Y</span></td><td class="center">0</td><td class="center">0</td><td class="center">0</td></tr>
+        <tr><td>Ashford Labs Software</td><td class="center">78%</td><td class="center">4 of 17</td><td class="center"><span class="pill pill-warn">Pending</span></td><td class="center">1</td><td class="center">1</td><td class="center">1</td></tr>
+      </table>
+      </div>
+      <div class="small muted" style="margin-top:8px;">Gate-vs-total callout: 2 of 4 suppliers (Vantage, Ashford) carry an independent Must-Have zero despite non-trivial weighted totals - the reason dual-ranking exists.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="tick"></span>Q&amp;A &amp; Addenda</div>
+      <div class="small" style="font-weight:700; margin-bottom:6px;">Question distribution by category (anonymized, deduped by question-key)</div>
+      <div class="grid-5" style="margin-bottom:12px;">
+        <div class="kpi"><div class="lbl">Functional Fit</div><div class="val num" style="font-size:17px;">8</div></div>
+        <div class="kpi"><div class="lbl">Security</div><div class="val num" style="font-size:17px;">6</div></div>
+        <div class="kpi"><div class="lbl">Data &amp; Integ.</div><div class="val num" style="font-size:17px;">5</div></div>
+        <div class="kpi"><div class="lbl">Commercial</div><div class="val num" style="font-size:17px;">4</div></div>
+        <div class="kpi"><div class="lbl">Impl. &amp; Support</div><div class="val num" style="font-size:17px;">3</div></div>
+      </div>
+      <div class="twrap" style="margin-bottom:12px;">
+      <table class="dt">
+        <tr><th>Category</th><th>Open question</th><th class="center">Age</th><th>Routed to</th></tr>
+        <tr><td>Security</td><td>Vantage SEC-1 hosting remediation <span class="pill pill-danger">GATING</span></td><td class="center">11 days</td><td>Security SME</td></tr>
+        <tr><td>Commercial</td><td>Ashford BAFO pricing submission <span class="pill pill-danger">GATING</span></td><td class="center">6 days</td><td>Category Manager</td></tr>
+        <tr><td>Functional Fit</td><td>Meridian Android tablet roadmap</td><td class="center">3 days</td><td>Category Manager</td></tr>
+        <tr><td>Data &amp; Integration</td><td>NorthPeak instrument-driver library scope</td><td class="center">1 day</td><td>Technical SME</td></tr>
+      </table>
+      </div>
+      <div class="small" style="font-weight:700; margin-bottom:6px;">Addenda (formal, post-issuance)</div>
+      <div class="twrap">
+      <table class="dt">
+        <tr><th>Addendum</th><th class="center">Issued</th><th>Change</th><th>Traceability</th></tr>
+        <tr><td>Addendum 1</td><td class="center">06/30/2026</td><td>Extended demo scheduling window by 5 business days</td><td>Applies to all suppliers; shifted Demo-set milestone</td></tr>
+        <tr><td>Addendum 2</td><td class="center">07/10/2026</td><td>Clarified in-region hosting definition for SEC-1 (production and DR must both be in-region)</td><td>Directly triggered discovery of Vantage's SEC-1 gap during evaluation</td></tr>
+      </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =========================================================
+     TAB 4: RECOMMENDATION
+========================================================= -->
+<div class="tabpanel" id="tab-reco">
+
+  <div class="card" style="border-left:4px solid var(--plum);">
+    <div class="card-title"><span class="tick"></span>Final Recommendation<span class="note">claim-gated</span></div>
+    <div class="lede">
+      <b>Advisory recommendation: Meridian LIMS</b> <span class="pill pill-ok">Tier 1 - gate-pass leader</span> weighted total 4.06 of 5.
+      <br><br>
+      The gate-pass leader is used as the basis for the advisory award because Vantage Sciences, the compensatory leader by raw weighted total (4.18), carries an open Must-Have gate fail (SEC-1, data residency) that has not been remediated in writing.
+      <span class="evidence">Scoring Matrix + Must-Have gate footer + Addendum 2</span>
+      <br><br>
+      <span class="confirm">CONFIRM: Group Decision panel sign-off scheduled 08/04/2026. Evaluation Readiness shows 4 of 5 items not yet cleared - see panel below before treating this as final.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Decision Tracker</div>
+    <div class="grid-4">
+      <div class="band band-teal"><b>1. AI Advisory</b><br><span class="pill pill-ok">Complete</span><div class="small muted" style="margin-top:6px;">07/12/2026</div></div>
+      <div class="band band-teal"><b>2. Panel Scoring</b><br><span class="pill pill-ok">Complete</span><div class="small muted" style="margin-top:6px;">07/19/2026</div></div>
+      <div class="band"><b>3. Group Decision</b><br><span class="pill pill-warn">Scheduled</span><div class="small muted" style="margin-top:6px;">08/04/2026</div></div>
+      <div class="band" style="background:#fff; border:1px solid var(--border);"><b>4. Award</b><br><span class="pill">Not started</span><div class="small muted" style="margin-top:6px;">Pending Group Decision</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>The Case, Per Supplier</div>
+    <div class="grid-4">
+      <div class="band">
+        <b>Meridian LIMS</b>
+        <div class="small" style="margin-top:6px;"><b>For:</b> gate-pass leader; strong sample-lifecycle + security fit; existing ELN integration lowers risk.</div>
+        <div class="small" style="margin-top:6px;"><b>Against:</b> weakest commercial-terms sub-score (COM-2) among finalists; mobile capture still maturing (FF-4).</div>
+      </div>
+      <div class="band">
+        <b>Vantage Sciences</b>
+        <div class="small" style="margin-top:6px;"><b>For:</b> highest compensatory weighted total; fastest timeline; strong functional fit.</div>
+        <div class="small" style="margin-top:6px;"><b>Against:</b> open Must-Have gate fail (SEC-1), unremediated; highest normalized unit price (ABOVE benchmark).</div>
+      </div>
+      <div class="band">
+        <b>NorthPeak Informatics</b>
+        <div class="small" style="margin-top:6px;"><b>For:</b> gate-pass runner-up; strongest implementation &amp; support score; BELOW-benchmark pricing.</div>
+        <div class="small" style="margin-top:6px;"><b>Against:</b> lowest functional-fit score among finalists; smaller instrument-driver library.</div>
+      </div>
+      <div class="band">
+        <b>Ashford Labs Software</b>
+        <div class="small" style="margin-top:6px;"><b>For:</b> simplest deployment model; competitive non-price scores where submitted.</div>
+        <div class="small" style="margin-top:6px;"><b>Against:</b> Must-Have gate fail (COM-1, pricing not submitted); lowest completeness (78%); Tier 3.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Sensitivity / Robustness Verdict<span class="note">weight perturbation &plusmn;5pp</span></div>
+    <div class="small">Tested: each category weight shifted &plusmn;5pp against an adjacent category, holding must-have gates fixed.</div>
+    <div class="band" style="margin-top:10px;">
+      <b>Verdict: Robust among gate-pass suppliers; fragile-to-Functional-Fit-weight for the (non-gate-passing) compensatory ranking.</b>
+      <div class="small" style="margin-top:6px;">Meridian remains the gate-pass leader over NorthPeak under every tested &plusmn;5pp single-category perturbation. If Functional Fit weight rises to 35% (Security -5pp to 15%), Vantage's compensatory lead widens further while its gate fail remains unresolved - this does not change the gate-pass order.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Evaluation Readiness<span class="note">gates the handoff</span></div>
+    <div class="twrap">
+    <table class="dt">
+      <tr><th>Item</th><th class="center">Status</th><th>Evidence / action</th></tr>
+      <tr><td>Bid-leveling complete?</td><td class="center"><span class="pill pill-danger">Blocked</span></td><td class="small"><span class="confirm">CONFIRM: Ashford final BAFO pricing not yet submitted (due 07/29)</span></td></tr>
+      <tr><td>Weights confirmed (no DRAFT)?</td><td class="center"><span class="pill pill-danger">Blocked</span></td><td class="small"><span class="confirm">CONFIRM: FF-4 in-category weight still DRAFT</span></td></tr>
+      <tr><td>Gate-conflict resolved or acknowledged?</td><td class="center"><span class="pill pill-warn">Confirm needed</span></td><td class="small"><span class="confirm">CONFIRM: Vantage SEC-1 remediation reply outstanding (11 days); panel has not formally acknowledged gate-pass designation</span></td></tr>
+      <tr><td>Mandatory reviews cleared?</td><td class="center"><span class="pill pill-ok">Cleared</span></td><td class="small"><span class="evidence">Quality 07/14, Security 07/15, Legal 07/20</span></td></tr>
+      <tr><td>Open gating clarifications closed?</td><td class="center"><span class="pill pill-danger">Blocked</span></td><td class="small"><span class="confirm">CONFIRM: 2 open (Vantage SEC-1, Ashford COM-1 BAFO)</span></td></tr>
+    </table>
+    </div>
+    <div class="band" style="border-left:4px solid var(--rust); margin-top:12px;">
+      <b style="color:var(--rust);">NOT READY</b> - 4 of 5 items require action before this handoff should be treated as final. Handoff below carries <b>draft: true</b> and lists these as open issues.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Award-Scenario Modeler<span class="note">optional, advisory-only</span></div>
+    <div class="small muted" style="margin-bottom:10px;">Single-vs-split allocation between the two gate-pass finalists. Not a decision - illustrative recompute only.</div>
+    <div class="flex-between" style="margin-bottom:8px;">
+      <span class="small">100% Meridian</span>
+      <input type="range" id="scenarioSlider" min="0" max="100" value="100" step="10" oninput="updateScenario(this.value)" style="flex:1; margin:0 12px;">
+      <span class="small">100% NorthPeak</span>
+    </div>
+    <div class="grid-3">
+      <div class="kpi"><div class="lbl">Allocation</div><div class="val num" id="scenAlloc" style="font-size:15px;">Meridian 100% / NorthPeak 0%</div></div>
+      <div class="kpi"><div class="lbl">Blended weighted score</div><div class="val num" id="scenScore">4.06</div></div>
+      <div class="kpi"><div class="lbl">Blended 3-yr TCO</div><div class="val num" id="scenTco">$1.67M</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tick"></span>Provenance / Carry-Forward Block<span class="note">feeds the Deal handoff object</span></div>
+    <div class="twrap">
+    <table class="dt">
+      <tr><td style="width:220px;"><b>Selected supplier</b></td><td>Meridian LIMS - Tier 1, gate-pass leader (draft, pending readiness clearance)</td></tr>
+      <tr><td><b>Requirement model</b></td><td>17 requirements, 5 categories, 6 must-have. Weights locked at scoring; 1 sub-requirement weight still DRAFT (FF-4).</td></tr>
+      <tr><td><b>Normalized TCO</b></td><td>$1,852 / named user / yr; $555,600 / yr all-in; 3-yr $1,666,800. <span class="pill pill-warn">Indicative - firm in negotiation</span></td></tr>
+      <tr><td><b>Award conditions</b></td><td>Gate-pass confirmed for Meridian. Quality review cleared 07/14. Security review cleared 07/15. Legal review cleared 07/20.</td></tr>
+      <tr><td><b>Open issues</b></td><td>Vantage gate-conflict acknowledgment outstanding (informational, not blocking Meridian). FF-4 weight still DRAFT.</td></tr>
+      <tr><td><b>Commitments</b></td><td>3-yr price-protection cap of 3% annual escalator (supplier-stated, to be finalized in negotiation). Named CSM at kickoff.</td></tr>
+      <tr><td><b>Risks</b></td><td>None red-flagged for Meridian. Vantage/Ashford gate fails are out of scope for this handoff.</td></tr>
+      <tr><td><b>Evidence</b></td><td>Scoring Matrix export &middot; Security SME sign-off log &middot; Legal review log &middot; Response Sec 6.1 p.118</td></tr>
+      <tr><td><b>Conformance status</b></td><td><span class="pill pill-ok">Conforming</span></td></tr>
+      <tr><td><b>Provenance note</b></td><td>Financial-viability grade and exit terms to be re-validated during negotiation. This handoff is advisory only.</td></tr>
+      <tr><td><b>Draft</b></td><td><span class="pill pill-warn">true</span> - nothing locked; Deal owns everything after handoff.</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center; padding:26px;">
+    <button class="btn-primary" onclick="sendHandoff()" id="handoffBtn">Send winner to Deal dashboard</button>
+    <div class="small muted" style="margin-top:10px;">Emits the RFx &rarr; Deal handoff object (draft: true). Lifecycle ends at selection; Deal owns negotiation, ZOPA locking, and contract onward.</div>
+    <div id="handoffConfirm" class="band band-teal" style="display:none; margin-top:14px; text-align:left;">
+      <b>Handoff object prepared (draft).</b> Selected: Meridian LIMS, Tier 1, gate-pass leader. 2 open issues carried forward for Deal's awareness. Nothing sent externally in this mockup - structural review only.
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /body-wrap -->
+
+<div class="footer">
+  <div>RFx Dashboard - structural review mockup, illustrative data only</div>
+  <div>Reflect-only advisory | Not a system of record | 2026</div>
+</div>
+
+<script>
+  function showTab(name){
+    document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('#tabnav button').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-tab') === name);
+    });
+  }
+
+  function showSegment(name){
+    document.getElementById('seg-individual').style.display = (name === 'individual') ? 'block' : 'none';
+    document.getElementById('seg-cross').style.display = (name === 'cross') ? 'block' : 'none';
+    document.getElementById('seg-btn-individual').classList.toggle('active', name === 'individual');
+    document.getElementById('seg-btn-cross').classList.toggle('active', name === 'cross');
+  }
+
+  var buyerContexts = {
+    meridian: [
+      ['Relationship', 'Existing - incumbent ELN vendor since 2022'],
+      ['Spend', '$1.2M active spend across 2 sites'],
+      ['Risk status', 'Low - clean review history'],
+      ['Security signal', 'Clear - no open findings (last review Q2 2026)']
+    ],
+    vantage: [
+      ['Relationship', 'New supplier - no prior contract'],
+      ['Spend', '$0 active spend (net-new)'],
+      ['Risk status', 'Medium - onboarding in progress, MSA in redline'],
+      ['Security signal', 'Under review - hosting-region question open']
+    ],
+    northpeak: [
+      ['Relationship', 'Existing - adjacent site license since 2023'],
+      ['Spend', '$310K active spend, 1 site'],
+      ['Risk status', 'Low - clean review history'],
+      ['Security signal', 'Clear - no open findings (last review Q1 2026)']
+    ],
+    ashford: [
+      ['Relationship', 'New supplier - no prior contract'],
+      ['Spend', '$0 active spend (net-new)'],
+      ['Risk status', 'Medium - MSA not yet on file'],
+      ['Security signal', 'Clear, pending final commercial submission']
+    ]
+  };
+
+  function renderBuyerContext(sup){
+    var rows = buyerContexts[sup];
+    var html = '';
+    for (var i = 0; i < rows.length; i++){
+      html += '<div class="small"><b>' + rows[i][0] + '</b><br>' + rows[i][1] + '</div>';
+    }
+    document.getElementById('buyerContext').innerHTML = html;
+  }
+
+  function showSupplier(sup){
+    document.querySelectorAll('.supplier-profile').forEach(function(el){
+      el.style.display = (el.getAttribute('data-sup') === sup) ? 'block' : 'none';
+    });
+    document.querySelectorAll('.chip').forEach(function(c){
+      c.classList.toggle('active', c.getAttribute('data-sup') === sup);
+    });
+    renderBuyerContext(sup);
+  }
+
+  function toggleCollapse(headerEl, bodyId){
+    headerEl.classList.toggle('open');
+    document.getElementById(bodyId).classList.toggle('open');
+  }
+
+  function denomChange(val){
+    var note = document.getElementById('denomNote');
+    if (val === 'user'){
+      note.textContent = 'Showing: per named user / year (300 named users). Denominator and component labels are commodity-parameterized; swap to per-seat, per-site, per-unit, per-hour for other categories.';
+    } else {
+      note.textContent = 'CONFIRM: recompute for this denominator is not populated in this illustrative mock - denominator selection is fixed at build time from the commodity profile. Per named user / year is the only figure shown here.';
+    }
+  }
+
+  function updateScenario(val){
+    var pct = parseInt(val, 10);
+    var meridianScore = 4.06, northpeakScore = 4.00;
+    var meridianTco = 1666800, northpeakTco = 1555200;
+    var blendedScore = (meridianScore * pct + northpeakScore * (100 - pct)) / 100;
+    var blendedTco = (meridianTco * pct + northpeakTco * (100 - pct)) / 100;
+    document.getElementById('scenAlloc').textContent = 'Meridian ' + pct + '% / NorthPeak ' + (100 - pct) + '%';
+    document.getElementById('scenScore').textContent = blendedScore.toFixed(2);
+    document.getElementById('scenTco').textContent = '$' + (blendedTco / 1000000).toFixed(2) + 'M';
+  }
+
+  function sendHandoff(){
+    document.getElementById('handoffConfirm').style.display = 'block';
+    var btn = document.getElementById('handoffBtn');
+    btn.textContent = 'Handoff prepared (draft) - see below';
+  }
+</script>
+
+</body>
+</html>
