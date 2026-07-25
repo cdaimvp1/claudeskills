@@ -13,12 +13,13 @@
 
   // ---- Theme (shared light/dark across all shell pages) ----------------------
   // Apply the saved preference right away so the chrome mounts in the right theme.
-  try { var __th = localStorage.getItem('theo-theme');
-    if (__th === 'dark' || __th === 'light') document.documentElement.setAttribute('data-theme', __th);
-  } catch (e) {}
-  window.theoTheme = function () { try { return localStorage.getItem('theo-theme') || 'light'; } catch (e) { return 'light'; } };
-  window.theoSetTheme = function (t) { t = (t === 'dark') ? 'dark' : 'light';
-    try { document.documentElement.setAttribute('data-theme', t); localStorage.setItem('theo-theme', t); } catch (e) {}
+  // Dark mode REMOVED (no-dark-mode decision, MCM two-palette model): force light always.
+  // data-theme is never set to 'dark', so every former dark-theme CSS override is unreachable.
+  // theoSetTheme is kept as a no-op-to-light so any existing caller or toggle cannot activate dark.
+  try { document.documentElement.setAttribute('data-theme', 'light'); localStorage.setItem('theo-theme', 'light'); } catch (e) {}
+  window.theoTheme = function () { return 'light'; };
+  window.theoSetTheme = function (t) {
+    try { document.documentElement.setAttribute('data-theme', 'light'); localStorage.setItem('theo-theme', 'light'); } catch (e) {}
     try { if (window.theoReflectTheme) window.theoReflectTheme(); } catch (e) {}
   };
 

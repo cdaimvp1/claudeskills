@@ -63,7 +63,19 @@ If the session restarted/compacted, this is where things stand.
   dashes, self-contained, malicious-scan clean, no fabrication (Ashford pricing shows "Not submitted"). One
   honest limitation: the bid-leveling denominator selector has real numbers only for "per named user/year";
   other denominators show [CONFIRM] rather than fabricated recompute. AWAITING Marc's review before building
-  the real rfx-hub skill. NEXT: #15 Landscape MCM pass.
+  the real rfx-hub skill.
+- **#15 Landscape MCM pass - CORE DONE 2026-07-25 (verified in browser, light mode).** In
+  `supplier-landscape-1c344a/dashboard/assets`: theo-color.css status tones remapped to MCM non-stoplight
+  (ok = teal #2F6E6B not green, warn = burnt-orange #C15E19, danger = deep rust #9A3B1F, info = muted blue
+  #2E5E8C; owner-rule comment updated from "green IS allowed" to non-stoplight); the html[data-theme="dark"]
+  token block DELETED; app-shell.js forced to light-only (theoSetTheme is a no-op-to-light, stored 'dark'
+  overridden on load) so dark mode is unreachable (no toggle UI exists). Verified: renders light, tabs
+  grey/black, no stoplight green, 0 JS errors (favicon 404 only). COLOR-ONLY; entity/hue library + neutral
+  ladder untouched. **RESIDUALS needing Marc's scope call (NOT done, flagged):** (a) the recommendation
+  leader row still uses a pale-orange EMPHASIS tint fill (--emph-t), which conflicts with "no pale burnt-
+  orange fills" but is the locked design's leader-highlight treatment (converting it to an outline/frame is
+  a render-engine change to a LOCKED template); (b) dead dark-mode CSS remains (unreachable) in pv.css +
+  theo-brand.js. Both deferred pending Marc's confirmation that #15 should go to full Deal-parity fill->outline.
 - **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
   orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
   (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new
