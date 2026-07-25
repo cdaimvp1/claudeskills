@@ -882,6 +882,13 @@ const dashboardData = {
         'ISS-05': { gap: 'moderate', move: 'likely', status: 'unraised' },
         'ISS-09': { gap: 'close', move: 'likely', status: 'unraised' }
       },
+      // signature gates (Positions posture): the terms that must clear before signing.
+      // now = where the supplier is holding; need = what clears the gate (short forms).
+      signatureGates: [
+        { id: 'ISS-01', label: 'Liability cap', now: 'Supplier holding a 12-month all-in cap, no carve-outs', need: '24-month cap + a data-breach super-cap' },
+        { id: 'ISS-03', label: 'Data protection / DPA', now: 'DPA "by reference," not provided; no EU SCCs', need: 'Executed DPA + SCCs, reviewed in-session' },
+        { id: 'ISS-04', label: 'Renewal & price', now: '90-day auto-renewal at uncapped "list" pricing', need: '45-day notice or shorter + a renewal-price cap' }
+      ],
       evidenceType: 'inference'
     },
     // give-get matrix: what we give vs what we get; value low/med/high to each side

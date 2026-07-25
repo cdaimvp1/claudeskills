@@ -84,163 +84,117 @@ function renderTab_negotiation(d) {
       esc(ref + ', jump to Sources') + '">' + esc(ref) + '</span>';
   }
 
-  /* ============================== 4A, POSITIONS =========================== */
+  /* ============================== 4A, POSITIONS =========================== *
+   * Per-term workbench (locked MOCKUP-negotiation-positions.html): an orienting
+   * posture header (signature gates Now->Need + protection trajectory 58->97 +
+   * difficulty + severity distribution) over a master-detail of the 12 terms.
+   * Selection reuses the tested delegated data-scpick handler (helpers.js) - all
+   * detail panels render up front, only the selected shows; NO new JS, reflect-only.
+   * Every value is looked up from d.issues / d.negotiation / d.protection / d.comms;
+   * the stance toggle + live severity filter from the mockup are intentionally left
+   * out (reflect-only / not-a-live-dashboard). Content is not re-typed. */
   function buildPositions() {
-    // --- posture header: 4-tier distribution + a derived difficulty read ------
+    const tp = neg.tradePlan || {};
+    const prot = d.protection || {};
+    const gates = tp.signatureGates || [];
+    const pkgs = neg.packages || [];
+
+    // posture 1: signature gates (Now -> Need)
+    const gateHtml = gates.map((g) => {
+      const iss = issueById(g.id);
+      return '<div class="ps-gate"><div class="ps-gate-top">' + severityPill(iss ? iss.priority : 'high') +
+        '<span class="ps-gate-t">' + esc(g.label) + '</span>' +
+        '<span class="ps-gate-id">' + esc(g.id) + (iss ? ' · ' + esc(iss.clause) : '') + '</span></div>' +
+        '<div class="ps-gate-status"><span class="ps-g-now"><b>Now</b>' + esc(g.now) + '</span>' +
+        '<span class="ps-g-need"><b>Need</b>' + esc(g.need) + '</span></div></div>';
+    }).join('');
+    const gatesCard = '<div class="ps-pcard"><div class="ps-pc-h">Signature gates &middot; must clear before signing</div>' +
+      '<div class="ps-gates">' + gateHtml + '</div></div>';
+
+    // posture 2: protection trajectory + package chips + difficulty + distribution
+    const protNow = prot.score != null ? prot.score : null;
+    const protTgt = tp.scoreboard ? tp.scoreboard.protTarget : null;
+    const pkgChips = pkgs.map((p) => {
+      const dp = p.deltas ? p.deltas.protection : null;
+      return '<span class="ps-pk-chip">' + esc(p.name.replace(' package', '')) + ' <b>+' + (dp != null ? dp : '?') + '</b></span>';
+    }).join('');
     const counts = { 'hard-stop': 0, high: 0, medium: 0, low: 0 };
     d.issues.forEach((i) => { if (counts[i.priority] != null) counts[i.priority]++; });
-    const totalIssues = d.issues.length;
-    const distColor = { 'hard-stop': 'danger', high: 'warn', medium: 'teal', low: 'pri' };
-    const distRows = ['hard-stop', 'high', 'medium', 'low'].map((p) =>
-      barRow(SEV_LABEL_LOCAL[p], counts[p], totalIssues, String(counts[p]), { color: distColor[p] })).join('');
-
-    // difficulty: deterministic weight of the distribution, colored by protection band.
     const diffScore = counts['hard-stop'] * 3 + counts.high;
     const diffLabel = diffScore >= 8 ? 'High' : diffScore >= 4 ? 'Moderate' : 'Low';
-    const diffCls = diffScore >= 8 ? 'danger' : diffScore >= 4 ? 'warn' : 'ok';
-    const prot = d.protection || {};
-    const bandLine = prot.score != null
-      ? 'Protection score <b>' + esc(prot.score) + '</b> (' + esc(prot.band || '') + ') on the current redline, before negotiation. ' +
-        jumpLink('See the deduction table', 'tab:contract/sub:legal')
-      : '';
+    const dist = ['hard-stop', 'high', 'medium', 'low'].map((k) =>
+      '<span class="ps-dist-i">' + sevIcon(k) + '<b>' + counts[k] + '</b> ' + (k === 'hard-stop' ? 'hard stop' : k === 'medium' ? 'med' : k) + '</span>').join('');
+    const trajPct = protNow != null ? Math.max(0, Math.min(100, protNow)) : 0;
+    const trajCard = '<div class="ps-pcard"><div class="ps-pc-h">Protection score &middot; where we can get to</div>' +
+      '<div class="ps-traj-top"><span class="ps-traj-now">' + (protNow != null ? protNow : '&mdash;') + '</span>' +
+      '<span class="ps-traj-lbl">' + esc(prot.band || 'Weak') + ', on the<br>current redline</span>' +
+      '<span class="ps-traj-arr">&rarr;</span><span class="ps-traj-goal">' + (protTgt != null ? protTgt : '&mdash;') + '</span>' +
+      '<span class="ps-traj-lbl">Strong, if the<br>packages land</span></div>' +
+      '<div class="ps-traj-bar"><div class="ps-traj-fill" style="width:' + trajPct + '%"></div></div>' +
+      '<div class="ps-traj-marks"><span>0</span><span>now ' + (protNow != null ? protNow : '&mdash;') + '</span>' +
+      '<span>target ' + (protTgt != null ? protTgt : '&mdash;') + '</span><span>100</span></div>' +
+      (pkgChips ? '<div class="ps-pk-legend">' + pkgChips + '</div>' : '') +
+      '<div class="ps-diff-row"><span class="pill warn ps-diff-pill">Difficulty: ' + diffLabel + '</span>' +
+      '<span class="ps-dist">' + dist + '</span></div></div>';
 
-    const postureInner =
-      '<div class="grid">' +
-        '<div class="col-6">' +
-          '<div class="eyebrow" style="margin-bottom:6px">Issue distribution &middot; ' + totalIssues + ' terms in play ' +
-            evidenceChip('calculated', { short: true }) + '</div>' + distRows +
-        '</div>' +
-        '<div class="col-6">' +
-          '<div class="eyebrow" style="margin-bottom:6px">Negotiation difficulty</div>' +
-          '<div class="diff-read"><span class="pill ' + diffCls + ' diff-pill">' + esc(diffLabel) + '</span>' +
-            '<span class="tiny muted">' + counts['hard-stop'] + ' hard stop(s) + ' + counts.high +
-            ' high-priority terms drive the read ' + evidenceChip('inference', { short: true }) + '</span></div>' +
-          (bandLine ? '<div class="card-note" style="margin-top:10px">' + bandLine + '</div>' : '') +
-          '<div class="card-note">' + esc((d.deal.recommendation && d.deal.recommendation.headline) || '') + '</div>' +
-        '</div>' +
-      '</div>';
-    const postureCard = saCard('Posture', postureInner, { accent: 'plum', icon: 'target',
-      sub: coverageBadge(d.deal.evidenceCoverage), id: 'negPostureCard' });
+    const posture = '<div class="ps-posture">' + gatesCard + trajCard + '</div>';
 
-    // --- ONE unified position register over d.issues (legal + commercial + scope) --
-    const rows = d.issues.slice().sort((a, b) =>
-      (PR_RANK[a.priority] - PR_RANK[b.priority]) || a.id.localeCompare(b.id));
+    // master-detail (delegated data-scpick; all panels rendered, selected shown)
+    const PR = { 'hard-stop': 0, high: 1, medium: 2, low: 3 };
+    const rows = d.issues.slice().sort((a, b) => (PR[a.priority] - PR[b.priority]) || a.id.localeCompare(b.id));
+    const pkgOf = (id) => pkgs.find((p) => (p.issueIds || []).indexOf(id) !== -1);
 
-    const cols = [
-      { key: 'title', label: 'Issue', width: '20%', render: (r) =>
-          '<div style="font-weight:700"><span class="row-chevron">' + icon('chevron') + '</span>' + esc(r.title) + '</div>' +
-          '<div class="tiny muted" style="padding-left:19px">' + esc(r.category) + ' &middot; ' + esc(r.id) + '</div>' +
-          (r.tacticFlag && r.tacticFlag.present ? '<div style="padding-left:19px;margin-top:4px">' + tacticChip(r) + '</div>' : ''),
-        sortVal: (r) => r.title.toLowerCase() },
-      { key: 'priority', label: 'Priority', width: '8%', render: (r) => severityPill(r.priority),
-        sortVal: (r) => PR_RANK[r.priority] },
-      { key: 'basis', label: 'Playbook basis', width: '14%', render: (r) =>
-          '<div class="tiny">' + esc(r.clause) + '</div><div style="margin-top:3px">' +
-          evidenceChip(r.evidenceType, { short: true, sources: r.sourceIds }) + '</div>',
-        sort: false },
-      { key: 'supplierPosition', label: 'Supplier position', width: '19%', render: (r) =>
-          '<span class="clamp2">' + esc(r.supplierPosition) + '</span>', sort: false },
-      { key: 'recommendedPosition', label: 'Our position (target)', width: '18%',
-        render: (r) => wordingPair(r.recommendedPosition), sort: false },
-      { key: 'fallback', label: 'Fallback', width: '13%',
-        render: (r) => wordingPair(r.fallback), sort: false },
-      { key: 'hardStop', label: 'Hard stop', width: '8%', render: hardStopCell, sort: false }
-    ];
-
-    const expand = (r) => {
-      const doc = docById(r.documentId);
-      const tacticBlock = (r.tacticFlag && r.tacticFlag.present)
-        ? '<div class="insight warn" style="margin-top:8px"><span class="ib"></span><span><b>Tactic flag, ' +
-            esc(r.tacticFlag.tactic) + ':</b> ' + esc(r.tacticFlag.triggeringText) + ' ' +
-            evidenceChip(r.tacticFlag.evidenceType || 'inference', { short: true }) + '</span></div>'
-        : '';
-      return '<div class="grid">' +
-        '<div class="col-7">' +
-          '<div class="eyebrow" style="margin-bottom:5px">Source excerpt &middot; ' + esc(doc ? doc.name : r.documentId) + '</div>' +
-          excerpt(r.sourceExcerpt) +
-          '<div class="eyebrow" style="margin:10px 0 4px">Arguments</div>' +
-          '<div class="insight"><span class="ib"></span><span><b>Playbook position:</b> ' + esc(r.playbookPosition) + '</span></div>' +
-          '<div class="insight warn"><span class="ib"></span><span><b>Deviation:</b> ' + esc(r.deviation) + '</span></div>' +
-          '<div class="insight danger"><span class="ib"></span><span><b>Impact:</b> ' + esc(r.impact) + '</span></div>' +
-        '</div>' +
-        '<div class="col-5">' +
-          '<div class="eyebrow" style="margin-bottom:5px">Negotiation play</div>' +
-          '<div class="tiny" style="margin-bottom:6px"><b>Predicted pushback:</b> ' + esc(r.supplierPushback) + '</div>' +
-          '<div class="tiny" style="margin-bottom:6px"><b>Rebuttal:</b> ' + esc(r.recommendedResponse) + '</div>' +
-          '<div class="tiny" style="margin-bottom:8px"><b>Trade against:</b> ' + esc(r.tradeOpportunity) + '</div>' +
-          tacticBlock +
-          '<div style="margin-top:8px">' + statusPill(r.internalDecision, r.internalDecision === 'pending' ? 'Decision pending' : r.internalDecision) +
-          ' ' + evidenceChip(r.evidenceType, { sources: r.sourceIds }) + '</div>' +
-        '</div></div>';
-    };
-
-    // rowClass reopens the class attr to inject a real data-facet (chip-filter
-    // convention); the built-in ".expandable" token lands harmlessly inside the
-    // facet value, so we render our own chevron and drive expand via data-exprow.
-    const table = dataTable(cols, rows, {
-      id: 'negPositionsTable', zebra: true, sortable: true, expand,
-      rowClass: (r) => 'pos-row" data-facet="' + esc(r.priority)
-    });
-
-    const chips = ['hard-stop', 'high', 'medium', 'low'].map((p) =>
-      '<button class="chip-filter" data-filterchip="' + p + '" aria-pressed="false">' +
-      esc(SEV_LABEL_LOCAL[p]) + '</button>').join('');
-
-    // data-filter-scope must wrap BOTH the toolbar and the table (applyFilter looks
-    // for table.dt inside the scope). The wording radios sit in the same scope so
-    // their :checked sibling selectors reach the .word-scope wrapping the table.
-    const toolbar =
-      '<div data-filter-scope>' +
-        '<div class="toolbar">' +
-          '<input type="search" placeholder="Filter by keyword, clause, category…" data-filter-input data-filter-for="negPositionsTable">' +
-          chips +
-          '<span class="spacer"></span><span class="filter-count">' + rows.length + ' of ' + rows.length + ' shown</span>' +
-        '</div>' +
-        '<input type="radio" id="wm-collab-pos" name="wm-pos" value="collab" class="sr-only" checked>' +
-        '<input type="radio" id="wm-direct-pos" name="wm-pos" value="direct" class="sr-only">' +
-        '<div class="word-toggle-row">' +
-          '<span class="eyebrow">Wording</span>' +
-          '<label for="wm-collab-pos" class="chip-filter word-lbl">Collaborative</label>' +
-          '<label for="wm-direct-pos" class="chip-filter word-lbl">Direct</label>' +
-          '<span class="tiny muted">Same asks, two registers, substance is identical.</span>' +
-        '</div>' +
-        '<div class="word-scope">' + table + '</div>' +
-      '</div>';
-
-    const registerBody =
-      insight('One register for legal, commercial and scope terms, the same ' + rows.length +
-        ' issues that drive Terms & Review, framed as positions. Each is playbook-cited; expand a row for source, arguments, pushback and rebuttal.') +
-      toolbar;
-    const registerCard = saCard('Position register', registerBody, { accent: 'plum', icon: 'scale', id: 'negPositionsCard' });
-
-    // --- term-interdependency mini-map: which positions move together ---------
-    const clusters = (neg.packages || []).map((p) => {
-      const chipsHtml = p.issueIds.map((id) => issueTag(id)).join('<span class="idep-x">×</span>');
-      return '<div class="idep-row"><span class="idep-name">' + esc(p.name) + '</span>' +
-        '<span class="idep-chips">' + chipsHtml + '</span></div>';
+    const listHtml = rows.map((iss, i) => {
+      const pkg = pkgOf(iss.id);
+      return '<div class="ps-row' + (i === 0 ? ' sc-sel' : '') + '" role="button" tabindex="0" data-scpick="' + esc(iss.id) + '" title="Show detail">' +
+        severityPill(iss.priority) +
+        '<span class="ps-r-txt"><span class="ps-r-t">' + esc(iss.title) + '</span>' +
+        '<span class="ps-r-c">' + esc(iss.id) + ' &middot; ' + esc(iss.category) + '</span></span>' +
+        '<span class="ps-r-pkg">' + (pkg ? esc(pkg.name.replace(' package', '')) : '&mdash;') + '</span></div>';
     }).join('');
-    const crossLinks = (neg.giveGets || []).filter((g) => new Set(g.issueIds).size >= 2);
-    const crossHtml = crossLinks.length
-      ? '<div class="eyebrow" style="margin:12px 0 4px">Cross-links (from trade-offs)</div>' +
-        crossLinks.map((g) =>
-          '<div class="idep-row"><span class="idep-name tiny">' + esc(g.get) + '</span>' +
-          '<span class="idep-chips">' + g.issueIds.map((id) => issueTag(id)).join('<span class="idep-x">×</span>') + '</span></div>').join('')
-      : '';
-    const idepCard = (neg.packages && neg.packages.length)
-      ? saCard('Term interdependency map',
-          insight('Positions inside a bracket move together, concede or hold them as a set, not one at a time. Cross-links are single trades that touch two terms.') +
-          '<div class="eyebrow" style="margin:8px 0 4px">Bundles (move as one)</div>' + clusters + crossHtml,
-          { accent: 'teal', icon: 'trade', sub: evidenceChip('inference', { short: true }) })
-      : gapCard('No interdependency map', 'No bundled packages are defined for this deal yet.');
 
-    return '<div class="grid">' +
-      '<div class="col-12">' + postureCard + '</div>' +
-      '<div class="col-12">' + registerCard + '</div>' +
-      '<div class="col-12">' + idepCard + '</div>' +
-      '</div>';
+    function detailPanel(iss, i) {
+      const rung = (cls, k, v) => '<div class="ps-rung ' + cls + '"><div class="ps-rk">' + k + '</div>' +
+        '<div class="ps-rv">' + esc(v || '—') + '</div></div>';
+      const movesWith = new Set();
+      pkgs.forEach((p) => { if ((p.issueIds || []).indexOf(iss.id) !== -1) (p.issueIds || []).forEach((x) => { if (x !== iss.id) movesWith.add(x); }); });
+      const deps = [];
+      const pkg = pkgOf(iss.id);
+      if (pkg) deps.push('<span class="ps-dep"><span class="ps-dk">bundle</span><b>' + esc(pkg.name) + '</b></span>');
+      Array.from(movesWith).forEach((x) => { const xi = issueById(x); deps.push('<span class="ps-dep"><span class="ps-dk">moves with</span><b>' + esc(x) + '</b> ' + esc(xi ? xi.category : '') + '</span>'); });
+      const evs = (comms.events || []).filter((e) => e.issueId === iss.id).slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+      const hist = evs.length
+        ? '<div class="ps-hist">' + evs.map((e) => '<div class="ps-hev"><div class="ps-h-d">' + esc(e.date) + '</div>' +
+            '<div class="ps-h-t"><span class="ps-h-who">' + esc(e.party || '') + '</span> ' + esc(e.text) + '</div></div>').join('') + '</div>'
+        : '<div class="ps-ladder-note">No recorded movement on this term yet.</div>';
+      const tacticHtml = (iss.tacticFlag && iss.tacticFlag.present)
+        ? '<span class="ps-tactic">' + icon('flag') + ' tactic: ' + esc(iss.tacticFlag.tactic) + '</span>' : '';
+      return '<div class="ps-detail" data-scpanel="' + esc(iss.id) + '"' + (i === 0 ? '' : ' hidden') + '>' +
+        '<div class="ps-d-eyebrow"><span class="ps-d-id">' + esc(iss.id) + '</span>' + severityPill(iss.priority) +
+        '<span class="ps-d-clause">' + esc(iss.category) + ' &middot; ' + esc(iss.clause) + '</span></div>' +
+        '<div class="ps-d-title">' + esc(iss.title) + '</div>' +
+        '<div class="ps-sec-h">Position ladder &middot; as-drafted &rarr; walk-away</div>' +
+        '<div class="ps-ladder">' + rung('sup', 'As drafted', iss.supplierPosition) + rung('tgt', 'Target', iss.recommendedPosition) +
+        rung('fb', 'Fallback', iss.fallback) + rung('walk', 'Walk-away', iss.hardStop) + '</div>' +
+        '<div class="ps-ladder-note">Open at Target; drop only one rung at a time, and only for a matching give.</div>' +
+        '<div class="ps-sec-h">Why it matters</div>' +
+        '<dl class="ps-kv"><dt>Playbook</dt><dd>' + esc(iss.playbookPosition || '—') + '</dd><dt>Impact</dt><dd>' + esc(iss.impact || '—') + '</dd></dl>' +
+        '<div class="ps-sec-h">The exchange</div>' +
+        '<div class="ps-exch"><div class="ps-e ps-push"><div class="ps-e-k">Expected pushback</div><div class="ps-e-v">' + esc(iss.supplierPushback || '—') + '</div>' + tacticHtml + '</div>' +
+        '<div class="ps-e ps-rebut"><div class="ps-e-k">Our rebuttal</div><div class="ps-e-v">' + esc(iss.recommendedResponse || '—') + '</div></div></div>' +
+        (iss.tradeOpportunity ? '<div class="ps-trade"><b>Trade:</b> ' + esc(iss.tradeOpportunity) + '</div>' : '') +
+        '<div class="ps-sec-h">Dependencies</div><div class="ps-deps">' + (deps.length ? deps.join('') : '<span class="ps-ladder-note">Standalone term.</span>') + '</div>' +
+        '<div class="ps-sec-h">History &middot; this term across the redlines</div>' + hist + '</div>';
+    }
+    const md = '<div class="ps-md" data-scmaster><div class="ps-list">' + listHtml + '</div>' +
+      '<div class="ps-detailwrap">' + rows.map(detailPanel).join('') + '</div></div>';
+
+    return '<div class="grid"><div class="col-12">' +
+      saCard('Positions · per-term workbench', posture + md,
+        { accent: 'plum', icon: 'target', sub: rows.length + ' terms &middot; click one' }) +
+      '</div></div>';
   }
 
-  /* ============================== 4B, TRADE PLAN ========================== */
   /* ===== 4B, TRADE PLAN (item-driven, per locked mockup) ===================
    * For every ask where we and the supplier are not aligned: what we want, what
    * we would trade to get it, and our floor, with how far apart we are and how
@@ -715,6 +669,85 @@ function renderTab_negotiation(d) {
     '.neg-tab .co-open.co-o-discussion{border-left-color:var(--sec)}' +
     '.neg-tab .co-open.co-o-unraised{border-left-color:var(--line2)}' +
     '@media(max-width:720px){.neg-tab .co-gap{grid-template-columns:1fr}.neg-tab .co-ev-cols{grid-template-columns:1fr}}' +
+    /* ===== 4A Positions (per-term workbench) ===== */
+    '.neg-tab .ps-posture{display:grid;grid-template-columns:1.15fr 1fr;gap:15px;margin-bottom:16px}' +
+    '.neg-tab .ps-pcard{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:14px}' +
+    '.neg-tab .ps-pc-h{font:800 10px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:12px}' +
+    '.neg-tab .ps-gates{display:flex;flex-direction:column;gap:9px}' +
+    '.neg-tab .ps-gate{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--line2);border-radius:9px;background:var(--surface2)}' +
+    '.neg-tab .ps-gate-top{display:flex;align-items:center;gap:9px}' +
+    '.neg-tab .ps-gate-t{font-weight:700;font-size:12.5px;color:var(--ink)}' +
+    '.neg-tab .ps-gate-id{margin-left:auto;font:700 9px/1 var(--mono);color:var(--mut2)}' +
+    '.neg-tab .ps-gate-status{display:flex;flex-direction:column;gap:3px}' +
+    '.neg-tab .ps-g-now,.neg-tab .ps-g-need{font-size:11px;line-height:1.35}' +
+    '.neg-tab .ps-g-now{color:var(--danger-fg)}.neg-tab .ps-g-need{color:var(--sec-tx)}' +
+    '.neg-tab .ps-g-now b,.neg-tab .ps-g-need b{font:800 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;margin-right:5px}' +
+    '.neg-tab .ps-traj-top{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap}' +
+    '.neg-tab .ps-traj-now{font:800 30px/1 var(--sans);color:var(--danger-fg)}' +
+    '.neg-tab .ps-traj-goal{font:800 30px/1 var(--sans);color:var(--sec-tx)}' +
+    '.neg-tab .ps-traj-arr{color:var(--mut2);font-size:16px;margin:0 3px}' +
+    '.neg-tab .ps-traj-lbl{font-size:11px;color:var(--mut2);line-height:1.2}' +
+    '.neg-tab .ps-traj-bar{position:relative;height:12px;border-radius:6px;background:var(--nested);overflow:hidden;margin:4px 0 3px}' +
+    '.neg-tab .ps-traj-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,var(--danger),var(--emph) 55%,var(--sec))}' +
+    '.neg-tab .ps-traj-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--mut2);margin-top:3px}' +
+    '.neg-tab .ps-pk-legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}' +
+    '.neg-tab .ps-pk-chip{font-size:10.5px;color:var(--ink2);border:1px solid var(--line2);border-radius:6px;padding:3px 8px}' +
+    '.neg-tab .ps-pk-chip b{color:var(--sec-tx)}' +
+    '.neg-tab .ps-diff-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line);flex-wrap:wrap}' +
+    '.neg-tab .ps-diff-pill{font-size:var(--fz-sm)}' +
+    '.neg-tab .ps-dist{display:flex;gap:12px;font-size:11px;color:var(--mut2);flex-wrap:wrap}' +
+    '.neg-tab .ps-dist-i{display:inline-flex;align-items:center;gap:4px}' +
+    '.neg-tab .ps-dist-i .sev-ic{width:12px;height:12px}' +
+    '.neg-tab .ps-dist-i b{color:var(--ink);font-variant-numeric:tabular-nums}' +
+    '.neg-tab .ps-md{display:grid;grid-template-columns:300px 1fr;background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden}' +
+    '.neg-tab .ps-list{border-right:1px solid var(--line);max-height:660px;overflow:auto}' +
+    '.neg-tab .ps-row{display:flex;gap:9px;align-items:flex-start;padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer}' +
+    '.neg-tab .ps-row:hover{background:var(--surface2)}' +
+    '.neg-tab .ps-row.sc-sel{background:var(--pri-t)}' +
+    '.neg-tab .ps-r-txt{min-width:0;flex:1}' +
+    '.neg-tab .ps-r-t{font-weight:700;font-size:12px;color:var(--ink);line-height:1.3}' +
+    '.neg-tab .ps-r-c{display:block;font-size:10.5px;color:var(--mut2);margin-top:2px}' +
+    '.neg-tab .ps-r-pkg{margin-left:auto;font:700 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);flex:none}' +
+    '.neg-tab .ps-detailwrap{max-height:660px;overflow:auto}' +
+    '.neg-tab .ps-detail{padding:18px 20px}' +
+    '.neg-tab .ps-d-eyebrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}' +
+    '.neg-tab .ps-d-id{font:800 11px/1 var(--mono);color:var(--mut)}' +
+    '.neg-tab .ps-d-clause{font-size:11px;color:var(--mut2)}' +
+    '.neg-tab .ps-d-title{font-size:17px;font-weight:800;line-height:1.3;margin:3px 0 16px;color:var(--ink)}' +
+    '.neg-tab .ps-sec-h{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:18px 0 9px}' +
+    '.neg-tab .ps-ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}' +
+    '.neg-tab .ps-rung{border:1px solid var(--line2);border-radius:9px;padding:10px 11px;background:var(--surface2)}' +
+    '.neg-tab .ps-rk{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}' +
+    '.neg-tab .ps-rv{font-size:11.5px;color:var(--ink2);line-height:1.4}' +
+    '.neg-tab .ps-rung.sup{background:var(--surface);border-left:3px solid var(--danger-bar)}.neg-tab .ps-rung.sup .ps-rk{color:var(--danger-fg)}' +
+    '.neg-tab .ps-rung.tgt{background:var(--sec-t)}.neg-tab .ps-rung.tgt .ps-rk{color:var(--sec-tx)}' +
+    '.neg-tab .ps-rung.fb{background:var(--pri-t)}.neg-tab .ps-rung.fb .ps-rk{color:var(--pri-tx)}' +
+    '.neg-tab .ps-rung.walk{background:var(--pri-t);border-color:color-mix(in srgb,var(--pri) 40%,transparent)}.neg-tab .ps-rung.walk .ps-rk{color:var(--pri-tx)}' +
+    '.neg-tab .ps-ladder-note{font-size:10.5px;color:var(--mut2);font-style:italic;margin-top:7px}' +
+    '.neg-tab .ps-kv{display:grid;grid-template-columns:110px 1fr;gap:5px 12px;font-size:12.5px;margin:0}' +
+    '.neg-tab .ps-kv dt{color:var(--mut2);font-weight:700}' +
+    '.neg-tab .ps-kv dd{margin:0;color:var(--ink2);line-height:1.5}' +
+    '.neg-tab .ps-exch{display:grid;grid-template-columns:1fr 1fr;gap:10px}' +
+    '.neg-tab .ps-e{border:1px solid var(--line2);border-radius:9px;padding:11px 12px}' +
+    '.neg-tab .ps-e-k{font:800 9px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}' +
+    '.neg-tab .ps-e.ps-push{background:var(--surface);border-left:3px solid var(--danger-bar)}.neg-tab .ps-e.ps-push .ps-e-k{color:var(--danger-fg)}' +
+    '.neg-tab .ps-e.ps-rebut{background:var(--sec-t)}.neg-tab .ps-e.ps-rebut .ps-e-k{color:var(--sec-tx)}' +
+    '.neg-tab .ps-e-v{font-size:12px;line-height:1.5;color:var(--ink2)}' +
+    '.neg-tab .ps-tactic{display:inline-flex;align-items:center;gap:5px;margin-top:7px;font:700 10.5px/1 var(--sans);color:var(--emph);background:transparent;border:1px solid color-mix(in srgb,var(--emph) 45%,transparent);border-radius:5px;padding:3px 7px}' +
+    '.neg-tab .ps-tactic svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}' +
+    '.neg-tab .ps-trade{margin-top:10px;font-size:12px;color:var(--ink2);background:var(--nested);border-radius:8px;padding:9px 11px}' +
+    '.neg-tab .ps-trade b{color:var(--pri-tx)}' +
+    '.neg-tab .ps-deps{display:flex;flex-wrap:wrap;gap:8px}' +
+    '.neg-tab .ps-dep{font-size:11px;padding:5px 9px;border-radius:6px;border:1px solid var(--line2);background:var(--surface2)}' +
+    '.neg-tab .ps-dep .ps-dk{font:700 8.5px/1 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);margin-right:5px}' +
+    '.neg-tab .ps-dep b{color:var(--pri-tx)}' +
+    '.neg-tab .ps-hist{display:flex;flex-direction:column;border-left:2px solid var(--line2);margin-left:5px;padding-left:14px}' +
+    '.neg-tab .ps-hev{position:relative;padding:7px 0}' +
+    '.neg-tab .ps-hev::before{content:"";position:absolute;left:-20px;top:11px;width:8px;height:8px;border-radius:50%;background:var(--pri);border:2px solid var(--surface)}' +
+    '.neg-tab .ps-h-d{font:700 10px/1 var(--mono);color:var(--mut2)}' +
+    '.neg-tab .ps-h-t{font-size:12px;color:var(--ink2);margin-top:2px;line-height:1.4}' +
+    '.neg-tab .ps-h-who{font-weight:700;color:var(--pri-tx)}' +
+    '@media(max-width:820px){.neg-tab .ps-posture{grid-template-columns:1fr}.neg-tab .ps-md{grid-template-columns:1fr}.neg-tab .ps-ladder{grid-template-columns:1fr 1fr}.neg-tab .ps-exch{grid-template-columns:1fr}}' +
     '</style>';
 
   // Consistent with every other subtabbed tab (Terms & Review, Economics): the subtab bar sits
@@ -722,7 +755,7 @@ function renderTab_negotiation(d) {
   // (there is no separate tab-level "Negotiation" heading).
   const cov = coverageBadge(d.deal.evidenceCoverage);
   const intro = (h2, q) => '<div class="tab-intro"><h2>' + h2 + '</h2><p class="q">' + q + ' ' + cov + '</p></div>';
-  const posIntro = intro('Positions', 'The 12 legal, commercial and scope terms framed as negotiating positions, each playbook-cited with the supplier stance, our ask, pushback and rebuttal, plus how they bundle and trade together.');
+  const posIntro = intro('Positions', 'One term at a time: its full arc (as-drafted → target → fallback → walk-away), why it matters, the exchange, its dependencies and its history, under an orienting posture header of the signature gates and where the protection score can get to.');
   const tradeIntro = intro('Trade Plan', 'For each ask where we and the supplier are not aligned: what we want, what we would trade to get it, and our floor, with how far apart we are and how likely they move, plus the currency we can spend and the walk-away.');
   const commsIntro = intro('Communications', 'Where every contested redline, ask and gap stands between us and the supplier, mapped to the specific messages and quotes on each side. The evidence layer, organised by what you are actually negotiating.');
   return scopedStyle + '<div class="neg-tab">' +
