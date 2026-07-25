@@ -18,10 +18,10 @@
  *      Never carry status meaning; never reuse a semantic tone as an entity.
  *
  * OWNER RULES:
- *   - Green IS allowed. Success / done = green (--ok-*). Just never cluster a
- *     lot of green and red together, it reads like Christmas; keep them apart.
- *   - Lilly Red (--red) stays scarce: reserved for the header and DANGER only.
- *     Never decorative, never a categorical/entity colour.
+ *   - NO stoplight status. settled=teal (--ok-*), attention=burnt orange
+ *     (--warn-*), critical=deep rust (--danger-*). No green/red/yellow tones.
+ *   - Lilly Red (--red) is BRAND only (header): scarce, never a status/entity tone.
+ *     Colour rides on text/pills/bars/dots, never pale full-area fills.
  *   - CONTRAST FLOOR (both modes): text stays readable. Muted text is a MID
  *     stop (--mut / --mut2), never a light gray on a light surface, exactly as
  *     dark text is never used on a dark surface. Hairline tokens (--line*) are
@@ -44,14 +44,14 @@
   --mut:#505A64;       /* muted text (AA-safe) */
   --mut2:#564F48;      /* secondary muted */
 
-  /* brand - header + danger only */
+  /* brand - header only (Lilly red is brand, not a status tone) */
   --red:#E1251B; --red-d:#B41E16;
 
-  /* 2. semantic tones: -bg tint, -fg text/icon, -bar accent */
-  --warn-bg:#FBF1DA;  --warn-fg:#8A5A00;  --warn-bar:#B45309;  /* needs your action */
-  --info-bg:#E8EEF6;  --info-fg:#0F3A85;  --info-bar:#0F3A85;  /* notable / recommendation */
-  --danger-bg:#FBE7E3;--danger-fg:#B41E16;--danger-bar:#E1251B;/* hard gate / blocker / late */
-  --ok-bg:#E4F1E6;    --ok-fg:#2E7D46;                          /* cleared / done - green */
+  /* 2. semantic tones (MCM, NO stoplight): -bg tint, -fg text/icon, -bar accent */
+  --warn-bg:#F7E7D7;  --warn-fg:#C15E19;  --warn-bar:#C15E19;  /* needs attention (burnt orange) */
+  --info-bg:#E4EBF1;  --info-fg:#2E5E8C;  --info-bar:#2E5E8C;  /* notable / recommendation (muted blue) */
+  --danger-bg:#F6E1D5;--danger-fg:#9A3B1F;--danger-bar:#9A3B1F;/* hard gate / blocker (deep rust) */
+  --ok-bg:#DCEBE9;    --ok-fg:#2F6E6B;    --ok-bar:#2F6E6B;    /* settled / cleared (teal) */
 
   /* 3. categorical entity colours (differentiation only) */
   --ent-1:#0F3A85;  /* navy */

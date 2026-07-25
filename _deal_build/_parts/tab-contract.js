@@ -118,7 +118,7 @@ function renderDocMap(d) {
   ];
   const regTable = dataTable(regCols, ordered, {
     zebra:true, dense:true, id:'tbl-doc-register',
-    rowClass: r => r.isMissing ? 'rowtint-warn' : '',
+    rowClass: r => r.isMissing ? 'dt-flag-warn' : '',
     expand: r => {
       const related = (r.relatedTo || []).map(id => { const rd = findDoc(id, d); return rd ? rd.type + ' (' + rd.id + ')' : id; }).join(', ');
       const lim = (r.limitations || []).length ? insight(esc(r.limitations.join(' ')), 'warn') : '';
@@ -448,8 +448,8 @@ function lpScorecard(d) {
  * ====================================================================== */
 function lpSevMix(mix) {
   const order = ['hard-stop', 'high', 'medium', 'low'];
-  const out = order.filter(p => mix[p]).map(p => '<span class="lp-sd d-' + p + '" title="' + esc(LP_SEV_LABEL[p]) + '"><i></i>' + mix[p] + '</span>').join('');
-  return '<span class="lp-sevmix">' + (out || '<span class="lp-sd d-low"><i></i>0</span>') + '</span>';
+  const out = order.filter(p => mix[p]).map(p => '<span class="lp-sd d-' + p + '" title="' + esc(LP_SEV_LABEL[p]) + '">' + sevIcon(p) + mix[p] + '</span>').join('');
+  return '<span class="lp-sevmix">' + (out || '<span class="lp-sd d-low">' + sevIcon('low') + '0</span>') + '</span>';
 }
 function lpCovChip(c) {
   const covTitle = c.gapId ? (LP_GAP_NOTE[c.gapId] || 'Evidence gap') : (c.coverage === 'Confirm' ? 'Terms present, confirm in negotiation' : 'Covered');
@@ -983,7 +983,7 @@ function renderRaciPanel(d) {
     .concat(raci.roles.map((role, i) => ({ key:'role' + i, label: role, sort:false, render: r => raciCell(r.vals[i]) })));
   const rows = raci.rows || [];
   const table = dataTable(cols, rows, { zebra:false, dense:true, id:'tbl-raci', sortable:false,
-    rowClass: r => r.ambiguous ? 'rowtint-warn' : '',
+    rowClass: r => r.ambiguous ? 'dt-flag-warn' : '',
     expand: r => r.note ? insight(esc(r.note), 'warn') + ' ' + evidenceChip(r.evidenceType, { short:true }) : null });
   const amb = rows.filter(r => r.ambiguous).length;
   const legend = '<div class="tiny muted" style="margin-top:8px">R Responsible &middot; A Accountable &middot; C Consulted &middot; I Informed. ' +
@@ -1008,7 +1008,7 @@ function renderPerformance(d) {
     { key:'issue', label:'Finding', sort:false, render: r => r.issueId ? issueJump(r.issueId) : '&mdash;' }
   ];
   const slaTable = dataTable(slaCols, sc.serviceLevels || [], { zebra:true, dense:true, id:'tbl-sla',
-    rowClass: r => r.status === 'deviation' ? 'rowtint-danger' : (r.status === 'partial' ? 'rowtint-warn' : ''),
+    rowClass: r => r.status === 'deviation' ? 'dt-flag-danger' : (r.status === 'partial' ? 'dt-flag-warn' : ''),
     expand: recKV });
   const accCols = [
     { key:'deliverable', label:'Deliverable', width:'88px', render: r => esc(r.deliverable) },
@@ -1017,7 +1017,7 @@ function renderPerformance(d) {
     { key:'issue', label:'Finding', sort:false, width:'78px', render: r => r.issueId ? issueJump(r.issueId) : '&mdash;' }
   ];
   const accTable = dataTable(accCols, sc.acceptance || [], { zebra:true, dense:true, id:'tbl-acceptance',
-    rowClass: r => r.defined ? '' : 'rowtint-warn', expand: recKV });
+    rowClass: r => r.defined ? '' : 'dt-flag-warn', expand: recKV });
   const undef = (sc.acceptance || []).filter(a => !a.defined).length;
   const accNote = insight('<strong>' + undef + '</strong> of ' + (sc.acceptance || []).length + ' acceptance criteria lack an objective pass/fail standard. Expand a row for the recommendation; ties to the deemed-acceptance finding ' + issueJump('ISS-10') + '.', undef ? 'warn' : '');
   const chgCols = [
@@ -1027,7 +1027,7 @@ function renderPerformance(d) {
     { key:'issue', label:'Finding', sort:false, render: r => r.issueId ? issueJump(r.issueId) : '&mdash;' }
   ];
   const chgTable = dataTable(chgCols, sc.changeControl || [], { zebra:true, dense:true, id:'tbl-change',
-    rowClass: r => r.status === 'partial' ? 'rowtint-warn' : '',
+    rowClass: r => r.status === 'partial' ? 'dt-flag-warn' : '',
     expand: r => '<div class="sc-perf-exp"><dl class="kv">' +
       '<dt>Playbook</dt><dd>' + esc(r.playbook) + '</dd>' +
       '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.recommend) + (r.issueId ? ' ' + issueJump(r.issueId) : '') + '</dd>' +
@@ -1074,7 +1074,6 @@ function renderSowAssumptions(d) {
     { key:'ev', label:'Ev.', sort:false, render: r => evidenceChip(r.evidenceType, { short:true }) }
   ];
   const table = dataTable(cols, sa, { id:'tbl-sowassume', dense:true, zebra:true,
-    rowClass: r => onLilly(r) ? 'rowtint-warn' : '',
     expand: r => '<div class="kv">' +
       '<dt>Presumes</dt><dd>' + esc(r.presumes) + '</dd>' +
       '<dt>Recommend</dt><dd class="sc-perf-rec">' + esc(r.rec || '—') + '</dd>' +
@@ -1248,12 +1247,12 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-favors .fv-mut{color:var(--mut2)}' +
   '.contract-tab .lp-sevmix{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;color:var(--mut2)}' +
   '.contract-tab .lp-sd{display:inline-flex;align-items:center;gap:3px;font-weight:800}' +
-  '.contract-tab .lp-sd i{width:8px;height:8px;border-radius:50%;display:inline-block}' +
-  /* severity-mix dots mirror the severity-pill ramp: hard-stop burnt-orange / high plum / medium teal / low light-teal */
-  '.contract-tab .lp-sd.d-hard-stop i{background:var(--emph)}.contract-tab .lp-sd.d-hard-stop{color:var(--emph)}' +
-  '.contract-tab .lp-sd.d-high i{background:var(--plum)}.contract-tab .lp-sd.d-high{color:var(--plum)}' +
-  '.contract-tab .lp-sd.d-medium i{background:var(--sec)}.contract-tab .lp-sd.d-medium{color:var(--sec-tx)}' +
-  '.contract-tab .lp-sd.d-low i{background:color-mix(in srgb,var(--sec) 45%,var(--mut2))}.contract-tab .lp-sd.d-low{color:var(--mut2)}' +
+  '.contract-tab .lp-sd .sev-ic{width:12px;height:12px}' +
+  /* severity-mix ICONS (not dots) mirror the severity-pill ramp: hard-stop burnt-orange / high plum / medium teal / low light-teal */
+  '.contract-tab .lp-sd.d-hard-stop{color:var(--emph)}' +
+  '.contract-tab .lp-sd.d-high{color:var(--plum)}' +
+  '.contract-tab .lp-sd.d-medium{color:var(--sec-tx)}' +
+  '.contract-tab .lp-sd.d-low{color:var(--mut2)}' +
   /* must-negotiate marker */
   /* party / one-sided / balanced pills */
   '.contract-tab .pill.lp-party-supplier{background:var(--plum-t);color:var(--pri-tx)}' +

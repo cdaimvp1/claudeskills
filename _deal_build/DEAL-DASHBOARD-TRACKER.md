@@ -19,8 +19,18 @@ autonomously-doable pending work, DO NOT hallucinate or drift.
 - Repo: github.com/cdaimvp1/claudeskills, branch main. Commit + push after each unit.
 
 ## LOCKED constraints (never violate)
-- Palette: plum #5C2B50 / teal #2F6E6B / burnt-orange #C15E19 emphasis; red for CRITICAL only.
-- Light theme by default (`<html data-theme="light">` stamped by build_deal_artifact.py).
+- Palette (UPDATED 2026-07-24 evening — MID-CENTURY-MODERN, supersedes the old 3-colour/red-critical rule):
+  plum #5C2B50 + teal #2F6E6B backbone (varying shades); burnt-orange #C15E19 = emphasis/attention.
+  NON-stoplight status: settled/aligned = teal (--ok #2F6E6B), needs-attention/partial = burnt-orange
+  (--warn #C15E19), critical/deviation = deep rust (--danger #9A3B1F), info = muted blue (--ai/--info #2E5E8C).
+  NO green/red/yellow. MAY extend to complementary MCM muted blues/greens for variety. Colour rides on
+  borders / text / pills / small timeline dots — NEVER pale full-area fills (no pale-orange/amber/rust fills
+  ANYWHERE; pale plum/teal tints are OK, Marc likes them). Status pills = OUTLINE (border+text+dot, no fill).
+  Tab + subtab strips: medium-grey inactive, BLACK text + black underline active. Semantic tones live in
+  assets/theo-color.css (the Deal build reads _platform_build/assets/theo-color.css via bd.ASSETS; keep the
+  _deal_build copy in sync); structural tokens in _parts/style.css. Recolours change ONLY colour values.
+- Light theme ONLY. Dark mode REMOVED by request (dark token blocks + the theme-toggle handler deleted from
+  _parts/style.css + helpers.js; the shared theo-color.css dark block is left inert under data-theme=light).
 - No fabrication: real Visier facts = 'public'; constructed terms = contract/inference/assumption;
   unknowns gap-stated 'unavailable', never invented. No em dashes (only the '—' no-value glyph +
   genuine label/value separators). Reflect-only (no send/assign/approve; not a system of record).
@@ -226,3 +236,41 @@ FLAGGED (design judgment, easy to revert if Marc dislikes): (a) group bands are 
 per-row Issue/Obligation tag; (b) boot auto-expand makes the register start taller (capped by the 620px scroll).
 Deliberately NOT changed: register-row <tr>s were left non-focusable (no new tab stops); every finding stays
 keyboard-reachable via the focusable navigator findings which deep-link + expand the row.
+
+## 2026-07-24 (evening, with Marc live) — COLOUR SYSTEM OVERHAUL + NEGOTIATION PORTS
+All verified in-browser; commits below. See the UPDATED LOCKED palette constraint above (owner changed it).
+- NO DARK MODE: removed the dark token blocks + theme-toggle handler from _parts/style.css + helpers.js;
+  light-only. Remapped the shared theo-color.css semantic tones too (dark block left inert).
+- TAB STRIPS reverted to grey-inactive / black-active + black underline (main tabs + subtabs).
+- COLOUR SYSTEM → MCM, NO stoplight (supersedes old 3-colour/red-critical rule): killed green/red/yellow at
+  the token authority (_platform_build/assets/theo-color.css + _deal_build/assets/theo-color.css). settled=
+  teal, attention=burnt-orange, critical=deep rust, info=muted blue. Removed ALL pale-orange/amber fills:
+  Contract Assumptions amber rows dropped; expander bg neutralised; emph/danger card headers → neutral band +
+  strong accent; snapshot banner neutral; status pills + evidence (cov-*) pills → OUTLINE; rowtint flags →
+  left-edge bar (renamed dt-flag-* so the platform .rowtint-* pale-fill rule can't reapply). Scans CLEAN.
+- L&P NAVIGATOR dots → ICONS (severity-mix now uses the severity icons via new global sevIcon() in helpers.js).
+- NEGOTIATION → TRADE PLAN ported to live (replaced old objectives/leverage/ladders/simulator): locked
+  MOCKUP-negotiation-tradeplan.html — static scoreboard (prot 58→97, TCV ask→target; NO checkbox/pts per lock),
+  prominent collapsible BATNA, currency table (giveGets), categorised single-open <details> accordion of the 12
+  asks (We want=recommendedPosition · We can trade=tradeOpportunity+giveGets · floor=fallback · range=ladder ends;
+  gap+movement = coloured TEXT not dots; OUTLINE status pills). New neg.tradePlan overlay = gap/move/status read +
+  category grouping ONLY (content reused from issues, anti-drift). buildSimulator removed. Scan CLEAN (fixed 1 low
+  esc(status) nit).
+- NEGOTIATION → COMMUNICATIONS ported to live (replaced ledger+commitments+pen+derived-brief): locked
+  MOCKUP-negotiation-comms.html alignment map — unified flat-row list (12 issues, collapsed, sorted awaiting→
+  discussion→unraised), status summary COUNTS, each row expands to the gap (recommendedPosition vs supplierPosition)
+  + "the exact messages" (comms.events by direction + the redline sourceExcerpt quote) + "how it evolved" timeline +
+  next-move (recommendedResponse). Colour-reconciled (outline pills, pale-teal us / white+rust them, plum category
+  chips, no pale-orange fills). buildDerivedBrief REMOVED → see task #13.
+
+### REMAINING (tasks #11–#16 created this session; also in the harness task list):
+- #11 Port/verify Negotiation → Positions vs its locked mockup (buildPositions likely still old design).
+- #12 Wire Communications filters (status/category/search) + Expand-all — needs a DealUI delegated handler
+  (the app's _filterTable is table-only); the comms summary strip is counts-only for now.
+- #13 Re-home or drop the derived Next-Session Brief (removed from Comms in the alignment-map redesign; old code in git history).
+- #14 Full pale-fill + stray-colour sweep across Deal tabs — known: the .lp-tactic "Supplier tactic detected"
+  callout (Terms & Review → Legal) still has a pale-orange fill.
+- #15 Landscape dashboard: same MCM colour pass + no dark mode (its OWN supplier-landscape-1c344a/dashboard/
+  assets/theo-color.css copy). Marc wants both dashboards on the same palette before "done".
+- #16 Final full-tab verification sweep + full-codebase malicious-code pass (incl the single-file demo), then
+  Marc's "both dashboards done" sign-off. (Repackage the installable deliverable stays a separate release step.)

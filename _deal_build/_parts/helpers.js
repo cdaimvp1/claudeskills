@@ -141,6 +141,9 @@ function severityPill(priority) {
   return '<span class="pill sev-' + esc(p) + ' sev-iconly" title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
     (SEV_ICON[p] || '') + '<span class="sev-sr">' + esc(label) + '</span></span>';
 }
+// icon-only accessor for the severity ramp, callable from other <script> blocks.
+// (top-level `const SEV_ICON` is not visible cross-script; a function declaration is.)
+function sevIcon(p) { return SEV_ICON[p] || ''; }
 function statusPill(status, label) {
   const map = { aligned:'ok', partial:'warn', deviation:'danger', missing:'muted',
                 accept:'ok', reject:'danger', trade:'info', pending:'warn' };
@@ -391,7 +394,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-theme-toggle],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view],[data-pf-setdepth]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-pf-view],[data-pf-setdepth]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -453,12 +456,6 @@ const DealUI = {
         return;
       }
       if (t.hasAttribute('data-print')) { window.print(); return; }
-      if (t.hasAttribute('data-theme-toggle')) {
-        const cur = document.documentElement.getAttribute('data-theme');
-        const next = cur === 'dark' ? 'light' : (cur === 'light' ? 'dark'
-          : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'));
-        document.documentElement.setAttribute('data-theme', next); return;
-      }
       if (t.hasAttribute('data-reset-assumptions')) { this.resetAssumptions(); return; }
       if (t.hasAttribute('data-copy') || t.hasAttribute('data-copy-text')) {
         let text = t.getAttribute('data-copy-text');
@@ -640,7 +637,7 @@ const api = {
   // formatting
   esc, money, pct, uid, icon, M, clampp,
   // evidence + status
-  evidenceChip, coverageBadge, severityPill, statusPill,
+  evidenceChip, coverageBadge, severityPill, sevIcon, statusPill,
   // layout
   saCard, insight, dataTable, collapsible, excerpt, gapCard, jumpLink, copyBtn,
   // viz

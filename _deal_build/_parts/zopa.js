@@ -349,7 +349,7 @@ const ZOPA_BOTTOM_LEGEND = '<div class="zopalegend">' +
   '<span><i class="zlg walk"></i>walk-away</span>' +
   '<span><i class="zlg fb"></i>fallback</span>' +
   '<span><i class="zlg open"></i>Theo opening</span>' +
-  '<span><i class="zlg ask"></i>supplier ask (red = above walk-away)</span>' +
+  '<span><i class="zlg ask"></i>supplier ask (flagged when above walk-away)</span>' +
   '<span><i class="zlg bench"></i>market benchmark (point)</span>' +
   '<span class="zhint">Click a line for detail</span>' +
 '</div>';

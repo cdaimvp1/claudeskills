@@ -98,7 +98,7 @@
       if (panel && typeof fn === 'function') {
         try { panel.innerHTML = fn(d); }
         catch (e) {
-          panel.innerHTML = '<div class="wrap"><pre style="color:#b0201a;padding:16px;white-space:pre-wrap">' +
+          panel.innerHTML = '<div class="wrap"><pre style="color:var(--danger);padding:16px;white-space:pre-wrap">' +
             esc((e && e.stack) || e) + '</pre></div>';
         }
       } else if (panel) {

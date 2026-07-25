@@ -241,396 +241,261 @@ function renderTab_negotiation(d) {
   }
 
   /* ============================== 4B, TRADE PLAN ========================== */
+  /* ===== 4B, TRADE PLAN (item-driven, per locked mockup) ===================
+   * For every ask where we and the supplier are not aligned: what we want, what
+   * we would trade to get it, and our floor, with how far apart we are and how
+   * likely they move. CONTENT is looked up, never re-typed: want=recommendedPosition,
+   * floor=fallback, trade=tradeOpportunity + matching giveGets, range=ladder ends,
+   * currency=giveGets, scoreboard=protection.score + SC-ask/SC-target scenarios.
+   * neg.tradePlan adds ONLY the read (gap / movement / status) + category grouping.
+   * Static: reflects the CURRENT record; regenerated when asks are made / trades land. */
   function buildTradePlan() {
-    // objectives (priority order)
-    const objectives = (neg.objectives || []).slice().sort((a, b) => a.priority - b.priority);
-    const objHtml = objectives.map((o) =>
-      '<div class="obj-row"><span class="obj-num">' + o.priority + '</span>' +
-      '<div class="obj-body"><div>' + esc(o.text) + ' ' + evidenceChip(o.evidenceType, { short: true }) + '</div>' +
-      '<div class="obj-issues">' + o.issueIds.map(issueTag).join(' ') + '</div></div></div>').join('');
-    const objectivesCard = saCard('Objectives (priority order)', objHtml, { accent: 'plum', icon: 'flag' });
+    const tp = neg.tradePlan || {};
+    const read = tp.read || {};
+    const sb = tp.scoreboard || {};
+    const prot = d.protection || {};
+    const askScen = scenById(sb.askScenarioId || 'SC-ask');
+    const tgtScen = scenById(sb.targetScenarioId || 'SC-target');
+    const protNow = prot.score != null ? prot.score : null;
+    const protTgt = sb.protTarget != null ? sb.protTarget : null;
+    const askT = askScen ? askScen.total : null;
+    const tgtT = tgtScen ? tgtScen.total : null;
+    const clampPct = (v) => Math.max(0, Math.min(100, Math.round(v)));
 
-    // evidence-based leverage, honest strength, weak-but-named when limited
-    const leverage = (neg.leverage || []).slice().sort((a, b) => STRENGTH_RANK[a.strength] - STRENGTH_RANK[b.strength]);
-    const levCols = [
-      { key: 'text', label: 'Leverage', width: '46%', render: (r) => esc(r.text), sort: false },
-      { key: 'strength', label: 'Strength', width: '16%', render: (r) => {
-          const cls = r.strength === 'Strong' ? 'ok' : r.strength === 'Weak' ? 'muted' : 'warn';
-          return '<span class="pill ' + cls + '">' + esc(r.strength) + '</span>';
-        }, sortVal: (r) => STRENGTH_RANK[r.strength] },
-      { key: 'basis', label: 'Basis', width: '38%', render: (r) =>
-          '<span class="tiny">' + esc(r.basis) + '</span> ' + evidenceChip(r.evidenceType, { short: true }), sort: false }
-    ];
-    const bat = neg.batna || {};
-    const levHonesty = bat.hasRealAlternative
-      ? insight('A real (if modest) alternative exists, so this leverage is genuine, not manufactured tension. No competing quote is in-session.')
-      : insight('Effectively sole-source: leverage rests on timing, volume and reference value, not competitive tension. Weak leverage is named as weak, not inflated.', 'warn');
-    const leverageCard = saCard('Leverage, evidence-based',
-      levHonesty + dataTable(levCols, leverage, { id: 'negLeverageTable', dense: true }),
-      { accent: 'teal', icon: 'scale' });
-
-    // give-get 2x2 (matrixPlot): x = give cost, y = get value
-    const points = (neg.giveGets || []).map((g) => {
-      const linked = g.issueIds.map(issueById).filter(Boolean);
-      const color = linked.some((i) => i.priority === 'hard-stop') ? 'danger'
-        : linked.some((i) => i.priority === 'high') ? 'emph' : 'teal';
-      return {
-        x: MAG_LEVEL[g.giveCost], y: MAG_LEVEL[g.getValue], label: g.id,
-        color, title: g.id + ': give ' + g.give + ' → get ' + g.get, jump: 'tab:contract/sub:legal'
-      };
-    });
-    const matrix = matrixPlot(points, {
-      xLabel: 'Give cost (low → high)', yLabel: 'Get value (low → high)', xMax: 6, yMax: 6,
-      quadrants: ['Easy wins, do first', 'Key trades', 'Low priority', 'High cost, low return, avoid']
-    });
-    const ggCols = [
-      { key: 'give', label: 'Give', width: '26%', render: (r) => esc(r.give), sort: false },
-      { key: 'giveCost', label: 'Cost', width: '10%', render: (r) => magPill(r.giveCost), sortVal: (r) => MAG_LEVEL[r.giveCost] },
-      { key: 'get', label: 'Get', width: '26%', render: (r) => esc(r.get), sort: false },
-      { key: 'getValue', label: 'Value', width: '10%', render: (r) => magPill(r.getValue), sortVal: (r) => MAG_LEVEL[r.getValue] },
-      { key: 'issues', label: 'Linked issues', width: '18%', render: (r) => r.issueIds.map(issueTag).join(' '), sort: false }
-    ];
-    const ggTable = dataTable(ggCols, neg.giveGets || [], { id: 'negGiveGetTable', dense: true, zebra: true });
-    const ggMatrixCard = saCard('Give-get matrix', matrix, { accent: 'emph', icon: 'trade',
-      sub: evidenceChip('inference', { short: true }) });
-    const ggTableCard = saCard('Give / get detail', ggTable, { accent: 'plum', icon: 'handshake' });
-
-    // concession ladders, one timeline per issue
-    const laddersInner = '<div class="grid">' + (neg.concessionLadders || []).map((cl) => {
-      const iss = issueById(cl.issueId);
-      const items = cl.steps.map((s, i) => ({
-        date: 'Step ' + (i + 1), name: s,
-        tone: i === 0 ? 'pri' : (i === cl.steps.length - 1 ? 'emph' : '')
-      }));
-      return '<div class="col-4"><div class="ladder-hd">' + (iss ? issueTag(iss.id) : cl.issueId) +
-        '<span style="margin-left:6px">' + esc(iss ? iss.title : cl.issueId) + '</span></div>' +
-        timeline(items) + '</div>';
-    }).join('') + '</div>';
-    const laddersCard = saCard('Concession ladders', laddersInner + insight('Open at Step 1; drop only one step at a time and only for a matching give.'),
-      { accent: 'teal', icon: 'clock' });
-
-    // packages, bundled asks that trade together
-    const pkgCards = (neg.packages || []).map((p, i) => {
-      const accent = i === 0 ? 'plum' : i === 1 ? 'teal' : 'emph';
-      const inner =
-        '<div class="tiny muted" style="margin-bottom:6px">Priority ' + p.priority + '</div>' +
-        '<div style="margin-bottom:6px"><b>Give:</b> ' + esc(p.give) + '</div>' +
-        '<div style="margin-bottom:8px"><b>Get:</b> ' + esc(p.get) + '</div>' +
-        '<div style="margin-bottom:6px">' + p.issueIds.map(issueTag).join(' ') + '</div>' +
-        evidenceChip(p.evidenceType, { short: true });
-      return '<div class="col-4">' + saCard(p.name, inner, { accent, icon: 'target' }) + '</div>';
-    }).join('');
-    const packagesRow = '<div class="grid">' + pkgCards + '</div>';
-
-    // round plan R1/R2/R3
-    const roundCards = (neg.roundPlan || []).map((r, i) => {
-      const p = pkgById(r.packageId);
-      const accent = i === 0 ? 'plum' : i === 1 ? 'teal' : 'emph';
-      const inner =
-        '<div class="rp-focus">' + esc(r.focus) + '</div>' +
-        '<div class="insight" style="margin-top:8px"><span class="ib"></span><span><b>Target:</b> ' + esc(r.target) + '</span></div>' +
-        '<div style="margin-top:6px">' + (p ? p.issueIds.map(issueTag).join(' ') : '') + ' ' + evidenceChip(r.evidenceType, { short: true }) + '</div>';
-      return '<div class="col-4">' + saCard(r.round + ', ' + (p ? p.name : r.packageId), inner, { accent, icon: 'handshake' }) + '</div>';
-    }).join('');
-    const roundPlanBlock = (neg.roundPlan && neg.roundPlan.length)
-      ? '<div class="grid">' + roundCards + '</div>'
-      : gapCard('No round plan', 'No round-by-round plan is defined for this deal yet.');
-
-    // single deal-level BATNA floor + escalation (costed)
-    const batnaCard = (neg.batna)
-      ? saCard('BATNA, the single walk-away floor',
-          '<dl class="kv">' +
-            '<dt>Alternative</dt><dd>' + esc(bat.alternative) + ' ' + evidenceChip(bat.evidenceType, { short: true }) + '</dd>' +
-            '<dt>Costed delta</dt><dd>' + esc(bat.costDelta) + '</dd>' +
-            '<dt>Escalation trigger</dt><dd>' + esc(bat.trigger) + '</dd>' +
-          '</dl>' +
-          insight(bat.hasRealAlternative
-            ? 'A genuine alternative exists, so the floor is real, but it carries a named cost and schedule slip, not a costless walk-away.'
-            : 'No genuine alternative: this is a soft floor. Escalate internally rather than pretend a walk-away exists.',
-            bat.hasRealAlternative ? '' : 'warn'),
-          { accent: 'warn', icon: 'flag' })
-      : gapCard('No BATNA defined', 'No walk-away alternative is recorded for this deal.');
-
-    // package simulator, precomputed lookup swap (CSS radio state, no client model)
-    const simCard = buildSimulator();
-
-    return '<div class="grid">' +
-      '<div class="col-5">' + objectivesCard + '</div>' +
-      '<div class="col-7">' + leverageCard + '</div>' +
-      '<div class="col-7">' + ggMatrixCard + '</div>' +
-      '<div class="col-5">' + ggTableCard + '</div>' +
-      '<div class="col-12">' + laddersCard + '</div>' +
-      '<div class="col-12"><div class="section-lead"><span class="eyebrow">Bundled packages</span></div>' + packagesRow + '</div>' +
-      '<div class="col-12"><div class="section-lead"><span class="eyebrow">Round plan &middot; open → close</span></div>' + roundPlanBlock + '</div>' +
-      '<div class="col-12">' + batnaCard + '</div>' +
-      '<div class="col-12">' + simCard + '</div>' +
-      '</div>';
-  }
-
-  // Package simulator: a lookup-swap over PRECOMPUTED package fields. Toggling a
-  // package (CSS-only radio, same mechanism as the wording toggle) reveals that
-  // package's precomputed resultingProtectionScore / resultingNetTCO / deltas.
-  // NOT a client-side model, every number is authored into the data object.
-  function buildSimulator() {
-    const pkgs = neg.packages || [];
-    if (!pkgs.length) return gapCard('No package simulator', 'No packages with precomputed outcomes are defined.');
-    // base = nothing settled: current protection score + supplier-ask TCV.
-    const baseProt = (d.protection && d.protection.score != null) ? d.protection.score : null;
-    const askScen = scenById('SC-ask');
-    const baseTCO = askScen ? askScen.total : null;
-    const tgtScen = scenById('SC-target');
-
-    const states = [{ id: 'base', name: 'Base (as drafted)', prot: baseProt, tco: baseTCO, dProt: 0, dTco: 0,
-      issueIds: [], give: '—', get: 'Nothing settled yet', ev: 'calculated' }].concat(
-      pkgs.map((p) => ({ id: p.id, name: p.name, prot: p.resultingProtectionScore, tco: p.resultingNetTCO,
-        dProt: p.deltas ? p.deltas.protection : null, dTco: p.deltas ? p.deltas.tco : null,
-        issueIds: p.issueIds || [], give: p.give, get: p.get, ev: p.evidenceType })));
-
-    // guard: any package missing a precomputed field -> honest note, no fake number.
-    const missing = pkgs.filter((p) => p.resultingProtectionScore == null || p.resultingNetTCO == null);
-
-    const radios = states.map((s, i) =>
-      '<input type="radio" id="pkg-' + esc(s.id) + '" name="pkg-sim" class="sr-only"' + (i === 0 ? ' checked' : '') + '>').join('');
-    const labels = states.map((s) =>
-      '<label for="pkg-' + esc(s.id) + '" class="chip-filter pkg-lbl">' + esc(s.name) + '</label>').join('');
-
-    const resultBlocks = states.map((s) => {
-      const protVal = s.prot != null ? s.prot : '—';
-      const tcoVal = s.tco != null ? money(s.tco, { compact: true }) : '—';
-      const settled = s.issueIds.length ? s.issueIds.map(issueTag).join(' ') : '<span class="tiny muted">none</span>';
-      return '<div class="pkg-result pkg-r-' + esc(s.id) + '">' +
-        '<div class="pkg-metrics">' +
-          '<div class="pkg-metric"><div class="pm-lbl">Protection score</div>' +
-            '<div class="pm-val">' + protVal + '<span class="pm-max">/100</span></div>' +
-            '<div class="pm-delta">' + deltaChip(s.dProt, 'prot') + '</div></div>' +
-          '<div class="pkg-metric"><div class="pm-lbl">Net 3-yr TCO</div>' +
-            '<div class="pm-val">' + tcoVal + '</div>' +
-            '<div class="pm-delta">' + deltaChip(s.dTco, 'tco') + '</div></div>' +
+    // --- scoreboard (two gauges; static current-state) -----------------------
+    const protPct = protNow != null ? clampPct(protNow) : 0;
+    const tcvPct = (askT && tgtT) ? clampPct((tgtT / askT) * 100) : 0;
+    const scoreInner =
+      '<div class="tp-score">' +
+        '<div class="tp-gauge tp-prot">' +
+          '<div class="tp-g-top"><span class="tp-g-lbl">Protection score</span>' +
+            '<span class="tp-g-now">' + (protNow != null ? protNow : '&mdash;') + '</span></div>' +
+          '<div class="tp-g-bar"><div class="tp-g-fill" style="width:' + protPct + '%"></div>' +
+            (protTgt != null ? '<div class="tp-g-tgt" style="left:' + clampPct(protTgt) + '%"></div>' : '') + '</div>' +
+          '<div class="tp-g-marks"><span>0 &middot; Weak</span><span>now <b>' + (protNow != null ? protNow : '&mdash;') +
+            '</b></span><span>target <b>' + (protTgt != null ? protTgt : '&mdash;') + '</b></span></div>' +
         '</div>' +
-        '<div class="pkg-detail"><div class="tiny" style="margin-bottom:4px"><b>Give:</b> ' + esc(s.give) + '</div>' +
-          '<div class="tiny" style="margin-bottom:6px"><b>Get:</b> ' + esc(s.get) + '</div>' +
-          '<div class="tiny">Settles: ' + settled + ' ' + evidenceChip(s.ev, { short: true }) + '</div></div>' +
-        '</div>';
-    }).join('');
+        '<div class="tp-gauge tp-tcv">' +
+          '<div class="tp-g-top"><span class="tp-g-lbl">3-yr TCV</span>' +
+            '<span class="tp-g-now">' + (askT != null ? money(askT, { compact: true }) : '&mdash;') + '</span></div>' +
+          '<div class="tp-g-bar"><div class="tp-g-fill" style="width:100%"></div>' +
+            (tcvPct ? '<div class="tp-g-tgt" style="left:' + tcvPct + '%"></div>' : '') + '</div>' +
+          '<div class="tp-g-marks"><span>target <b>' + (tgtT != null ? money(tgtT, { compact: true }) : '&mdash;') +
+            '</b></span><span>now <b>' + (askT != null ? money(askT, { compact: true }) : '&mdash;') + '</b> ask</span></div>' +
+        '</div>' +
+        '<div class="tp-score-note">Where the deal stands now: protection <b>' + (protNow != null ? protNow : '&mdash;') +
+          '</b> (' + esc(prot.band || 'Weak') + ') at the <b>' + (askT != null ? money(askT, { compact: true }) : '&mdash;') +
+          '</b> ask. Target once the asks below land: <b>' + (protTgt != null ? protTgt : '&mdash;') + ' / ' +
+          (tgtT != null ? money(tgtT, { compact: true }) : '&mdash;') + '</b>. ' + evidenceChip('calculated', { short: true }) +
+          ' It updates when the record is regenerated as asks are made and trades close.</div>' +
+      '</div>';
+    const scoreCard = saCard('Payoff · where the current asks land the deal', scoreInner,
+      { accent: 'teal', icon: 'scenarios',
+        sub: 'target ' + (protTgt != null ? protTgt : '—') + ' / ' + (tgtT != null ? money(tgtT, { compact: true }) : '—') });
 
-    const allNote = (baseProt != null && tgtScen)
-      ? insight('Numbers are precomputed lookups, not a live model. Base = the current redline (' + baseProt +
-          '/100 at ' + money(baseTCO, { compact: true }) + '). Settling all three packages lands near protection 97/100 at ' +
-          money(tgtScen.total, { compact: true }) + ' (the target scenario).')
+    // --- BATNA strip (prominent, collapsible) --------------------------------
+    const bat = neg.batna || {};
+    const batnaBlock = bat.alternative
+      ? '<details class="tp-batna"><summary class="tp-batna-hd">' + icon('flag') +
+          '<span class="tp-bt-t">BATNA &middot; your floor</span>' +
+          '<span class="tp-bt-s">' + (bat.hasRealAlternative ? 'Real alternative exists. ' : 'Soft floor. ') + esc(bat.costDelta) + '</span>' +
+          '<span class="tp-bt-chev"></span></summary>' +
+          '<div class="tp-batna-bd"><dl class="kv">' +
+            '<dt>Alternative</dt><dd>' + esc(bat.alternative) + '</dd>' +
+            '<dt>Costed delta</dt><dd>' + esc(bat.costDelta) + '</dd>' +
+            '<dt>Trigger</dt><dd>' + esc(bat.trigger) + ' ' + evidenceChip(bat.evidenceType, { short: true }) + '</dd>' +
+          '</dl></div></details>'
       : '';
-    const missNote = missing.length
-      ? insight(missing.length + ' package(s) lack a precomputed outcome and are shown without figures.', 'warn')
-      : '';
 
-    const inner =
-      '<div class="pkg-sim">' + radios +
-        '<div class="pkg-toggle"><span class="eyebrow">Simulate a settled package</span>' + labels + '</div>' +
-        '<div class="pkg-scope">' + resultBlocks + '</div>' +
-      '</div>' + allNote + missNote;
+    // --- currency table (from giveGets) --------------------------------------
+    const curRows = (neg.giveGets || []).map((g) =>
+      '<tr><td class="tp-cur-give">' + esc(g.give) + '</td>' +
+        '<td>' + magPill(g.giveCost) + '</td>' +
+        '<td class="tp-cur-for">' + esc(g.get) + ' ' + (g.issueIds || []).map(issueTag).join(' ') + '</td></tr>').join('');
+    const curCard = saCard('What we can spend · our trading currency',
+      '<table class="tp-cur"><thead><tr><th>What we would give</th><th style="width:88px">Cost to us</th>' +
+        '<th>Best used to win</th></tr></thead><tbody>' + curRows + '</tbody></table>',
+      { accent: 'plum', icon: 'handshake', sub: 'the concessions we would actually give' });
 
-    return saCard('Package simulator', inner, { accent: 'emph', icon: 'scenarios',
-      sub: evidenceChip('calculated', { short: true }) });
-  }
+    // --- categorised accordion of asks (native single-open via name) ---------
+    const GAP = { far: 'Far apart', moderate: 'Moderate gap', close: 'Close' };
+    const GAPCLS = { far: 'tp-far', moderate: 'tp-mod', close: 'tp-close' };
+    const MOVE = { likely: 'Likely to move', possible: 'Might move', resistant: 'Resistant' };
+    const MOVECLS = { likely: 'tp-mlikely', possible: 'tp-mposs', resistant: 'tp-mres' };
+    const STT = { awaiting: 'Awaiting them', discussion: 'In discussion', unraised: 'Not yet raised' };
 
-  /* ============================ 4C, COMMUNICATIONS ======================== */
-  function buildComms() {
-    // gap-state: no thread synthesized in-session.
-    if (!comms.events && !comms.commitments && !comms.penHistory) {
-      return gapCard('No communications synthesized', 'No in-session email/Teams thread was available to distill into events, commitments or pen history.');
+    function ladderRange(issueId) {
+      const cl = (neg.concessionLadders || []).find((c) => c.issueId === issueId);
+      if (!cl || !cl.steps || cl.steps.length < 2) return '';
+      return '<div class="tp-range"><span class="tp-range-lbl">Our settlement range</span>' +
+        '<div class="tp-range-band"><span class="tp-r-e a">' + esc(cl.steps[0]) + '</span>' +
+          '<span class="tp-r-line"></span><span class="tp-r-e b">' + esc(cl.steps[cl.steps.length - 1]) + '</span></div></div>';
     }
 
-    // --- events ledger ---------------------------------------------------------
-    const KIND_CLS = { ask: 'info', position: 'warn', commitment: 'ok', concession: 'muted' };
-    const DIR_LBL = { in: 'From supplier', out: 'To supplier', internal: 'Internal' };
-    const events = (comms.events || []).slice();
-    const evCols = [
-      { key: 'date', label: 'Date', width: '10%', render: (r) => '<span class="mono tiny">' + esc(r.date) + '</span>' },
-      { key: 'channel', label: 'Channel', width: '9%', render: (r) => '<span class="tiny">' + esc(r.channel) + '</span>', sort: false },
-      { key: 'direction', label: 'Direction', width: '12%', render: (r) =>
-          '<span class="pill ' + (r.direction === 'in' ? 'warn' : r.direction === 'out' ? 'info' : 'muted') + '">' +
-          esc(DIR_LBL[r.direction] || r.direction) + '</span>', sortVal: (r) => r.direction },
-      { key: 'kind', label: 'Type', width: '10%', render: (r) =>
-          '<span class="pill ' + (KIND_CLS[r.kind] || 'muted') + '">' + esc(r.kind) + '</span>', sortVal: (r) => r.kind },
-      { key: 'text', label: 'Event', width: '39%', render: (r) => esc(r.text), sort: false },
-      { key: 'issueId', label: 'Issue', width: '10%', render: (r) => r.issueId ? issueTag(r.issueId) : '<span class="tiny muted">—</span>', sort: false },
-      { key: 'sourceRef', label: 'Source', width: '10%', render: (r) => srcChip(r.sourceRef) + ' ' + evidenceChip(r.evidenceType, { short: true }), sort: false }
-    ];
-    const evChips = ['ask', 'position', 'commitment', 'concession'].map((k) =>
-      '<button class="chip-filter" data-filterchip="' + k + '" aria-pressed="false">' + esc(k) + '</button>').join('');
-    const ledger =
-      '<div data-filter-scope>' +
-        '<div class="toolbar">' +
-          '<input type="search" placeholder="Filter events…" data-filter-input data-filter-for="negCommsTable">' +
-          evChips +
-          '<span class="spacer"></span><span class="filter-count">' + events.length + ' of ' + events.length + ' shown</span>' +
-        '</div>' +
-        dataTable(evCols, events.map((e) => Object.assign({}, e, { _facet: e.kind })), {
-          id: 'negCommsTable', zebra: true, dense: true,
-          rowClass: (r) => 'ev-row" data-facet="' + esc(r.kind)
-        }) +
-      '</div>';
-    const ledgerCard = (comms.events && comms.events.length)
-      ? saCard('Communications ledger', insight('Every ask, position, commitment and concession distilled from the in-session thread, each cited to its source and linked to the issue it moves.') + ledger,
-          { accent: 'plum', icon: 'sources', sub: coverageBadge(d.deal.evidenceCoverage) })
-      : gapCard('No events', 'No email/Teams events were available to distill.');
+    function tradeItem(id) {
+      const iss = issueById(id);
+      if (!iss) return '';
+      const r = read[id] || {};
+      const gap = r.gap || 'moderate', move = r.move || 'possible', status = r.status || 'unraised';
+      const ggForIssue = (neg.giveGets || []).filter((g) => (g.issueIds || []).indexOf(id) !== -1);
+      const tradeCol =
+        (iss.tradeOpportunity ? '<div class="tp-give"><span>' + esc(iss.tradeOpportunity) + '</span></div>' : '') +
+        ggForIssue.map((g) => '<div class="tp-give"><span>' + esc(g.give) + '</span> ' + magPill(g.giveCost) + '</div>').join('');
+      return '<details name="tp-acc" class="tp-item">' +
+        '<summary class="tp-hd"><span class="tp-chev"></span><span class="tp-id">' + esc(id) + '</span>' +
+          '<span class="tp-main"><span class="tp-t">' + esc(iss.title) + '</span>' +
+            '<span class="tp-sig"><span class="tp-status stt-' + esc(status) + '">' + esc(STT[status] || status) + '</span>' +
+              '<span class="tp-sg"><b>Gap</b><span class="' + GAPCLS[gap] + '">' + GAP[gap] + '</span></span>' +
+              '<span class="tp-sg"><b>Movement</b><span class="' + MOVECLS[move] + '">' + MOVE[move] + '</span></span>' +
+            '</span></span></summary>' +
+        '<div class="tp-body"><div class="tp-cols">' +
+          '<div class="tp-col want"><div class="tp-col-k">We want</div><div class="tp-col-v">' + esc(iss.recommendedPosition || '—') + '</div></div>' +
+          '<div class="tp-col trade"><div class="tp-col-k">We can trade</div><div class="tp-col-v">' +
+            (tradeCol || '<span class="tiny muted">No trade identified; press on the merits.</span>') + '</div></div>' +
+          '<div class="tp-col floor"><div class="tp-col-k">If they will not move</div><div class="tp-col-v">' + esc(iss.fallback || iss.hardStop || '—') + '</div></div>' +
+        '</div>' + ladderRange(id) + '</div></details>';
+    }
 
-    // --- commitments board: ours vs theirs -------------------------------------
-    const STAT_CLS = { open: 'warn', honored: 'ok', breached: 'danger', superseded: 'muted' };
-    const commitRow = (c) =>
-      '<div class="cmt-item"><div class="cmt-top"><span class="pill ' + (STAT_CLS[c.status] || 'muted') + '">' + esc(c.status) + '</span>' +
-      (c.issueId ? ' ' + issueTag(c.issueId) : '') + ' ' + srcChip(c.sourceRef) + '</div>' +
-      '<div class="cmt-text">' + esc(c.text) + '</div></div>';
-    const ours = (comms.commitments || []).filter((c) => c.owner === 'ours');
-    const theirs = (comms.commitments || []).filter((c) => c.owner === 'theirs');
-    const boardInner = '<div class="grid">' +
-      '<div class="col-6"><div class="cmt-hd">Ours <span class="tiny muted">(' + ours.length + ')</span></div>' +
-        (ours.length ? ours.map(commitRow).join('') : '<div class="tiny muted">None recorded.</div>') + '</div>' +
-      '<div class="col-6"><div class="cmt-hd">Theirs <span class="tiny muted">(' + theirs.length + ')</span></div>' +
-        (theirs.length ? theirs.map(commitRow).join('') : '<div class="tiny muted">None recorded.</div>') + '</div>' +
-      '</div>';
-    const boardCard = (comms.commitments && comms.commitments.length)
-      ? saCard('Commitments & open asks', boardInner, { accent: 'teal', icon: 'handshake' })
-      : gapCard('No commitments', 'No commitments were recorded from the thread.');
-
-    // --- pen-history timeline --------------------------------------------------
-    const penItems = (comms.penHistory || []).map((p, i, arr) => ({
-      date: p.date, name: p.party + ' holds the pen', meta: esc(p.basis),
-      tone: i === arr.length - 1 ? 'pri' : ''
-    }));
-    const penCard = (comms.penHistory && comms.penHistory.length)
-      ? saCard('Pen history', timeline(penItems) +
-          (d.deal.whoHasPen ? insight('Pen now with <b>' + esc(d.deal.whoHasPen.party) + '</b>, ' + esc(d.deal.whoHasPen.basis) + ' ' + evidenceChip('inference', { short: true })) : ''),
-          { accent: 'plum', icon: 'clock' })
-      : gapCard('No pen history', 'No redline exchange history is available.');
-
-    // --- DERIVED next-session brief (open positions x latest thread state) ------
-    const briefCard = buildDerivedBrief();
+    const catBlocks = (tp.categories || []).map((cat) => {
+      const items = (cat.issueIds || []).map(tradeItem).filter(Boolean).join('');
+      if (!items) return '';
+      return '<div class="tp-cat"><div class="tp-cat-h"><span class="tp-c-name">' + esc(cat.name) +
+        '</span><span class="tp-c-cnt">' + (cat.issueIds || []).length + ' open</span></div>' + items + '</div>';
+    }).join('');
+    const asksInner = catBlocks
+      ? '<div class="tp-cats">' + catBlocks + '</div>'
+      : '<div class="tiny muted">No open asks recorded.</div>';
+    const asksCard = saCard('The asks · what we want & what we would trade', asksInner,
+      { accent: 'emph', icon: 'trade', sub: 'by category &middot; one open at a time' });
 
     return '<div class="grid">' +
-      '<div class="col-12">' + ledgerCard + '</div>' +
-      '<div class="col-7">' + boardCard + '</div>' +
-      '<div class="col-5">' + penCard + '</div>' +
-      '<div class="col-12">' + briefCard + '</div>' +
+      '<div class="col-12">' + scoreCard + '</div>' +
+      (batnaBlock ? '<div class="col-12">' + batnaBlock + '</div>' : '') +
+      '<div class="col-12">' + curCard + '</div>' +
+      '<div class="col-12">' + asksCard + '</div>' +
       '</div>';
   }
 
-  // The next-session brief is COMPUTED from the open positions and the latest
-  // thread state (never a hand-authored monologue, so it cannot drift). Copy-only.
-  function buildDerivedBrief() {
-    const rec = d.deal.recommendation || {};
-    const openIssues = d.issues.filter((i) => i.internalDecision === 'pending');
-    const condIds = (rec.conditions || []).map((c) => c.issueId);
-    const objIds = (neg.objectives || []).filter((o) => o.priority <= 2).flatMap((o) => o.issueIds || []);
-    const askIds = Array.from(new Set(condIds.concat(objIds)))
-      .filter((id) => openIssues.some((i) => i.id === id))
-      .sort((a, b) => (PR_RANK[issueById(a).priority] - PR_RANK[issueById(b).priority]) || a.localeCompare(b));
-    const askIssues = askIds.map(issueById).filter(Boolean);
+  /* ===== 4C, COMMUNICATIONS (item-driven alignment map, per locked mockup) ===
+   * The evidence layer, organised by what we are negotiating: for every contested
+   * redline/ask, where each side stands (the gap) mapped to the SPECIFIC messages
+   * and quotes that got them there, how it evolved, and the next move. CONTENT is
+   * looked up, never re-typed: gapUs=recommendedPosition, gapThem=supplierPosition,
+   * cited messages=comms.events (by issueId + direction), the redline quote=
+   * issue.sourceExcerpt, next move=recommendedResponse. Status + category come from
+   * neg.tradePlan. Reflect-only: expand only, no send / route.
+   * NOTE: interactive filters (status / category / search + expand-all) are not yet
+   * wired (they need a delegated handler in DealUI); see the build tracker. */
+  function buildComms() {
+    const tp = neg.tradePlan || {};
+    const readOf = (id) => (tp.read && tp.read[id]) || {};
+    const catOf = (id) => {
+      const c = (tp.categories || []).find((x) => (x.issueIds || []).indexOf(id) !== -1);
+      return c ? c.name : ((issueById(id) || {}).category || '');
+    };
+    const events = comms.events || [];
+    const evForIssue = (id) => events.filter((e) => e.issueId === id)
+      .slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 
-    const pen = d.deal.whoHasPen || {};
-    const sop = d.deal.stateOfPlay || {};
-    const bat = neg.batna || {};
+    if (!d.issues || !d.issues.length) {
+      return gapCard('No contested items', 'No issues are available to map communications against.');
+    }
 
-    // derived blocks (plain objects -> both HTML and copy text come from these)
-    const openingText = 'We value the platform fit and want to move quickly. ' +
-      (rec.headline ? rec.headline + ' ' : '') +
-      'Three terms remain signature gates for us' +
-      ((rec.conditions && rec.conditions.length) ? ', ' + rec.conditions.map((c) => {
-        const iss = issueById(c.issueId); return iss ? iss.category.toLowerCase() : c.issueId;
-      }).join(', ') : '') +
-      '. We are ready to commit multi-year if platform pricing reflects that commitment.';
+    const STT = { awaiting: 'Awaiting them', discussion: 'In discussion', unraised: 'Not yet raised', agreed: 'Agreed' };
+    const CH = {
+      email: '<svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M3 6l9 7 9-7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>',
+      teams: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5h9v3H9v8H7V8H4V5z"/></svg>',
+      paper: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h9l3 3v17H6z"/></svg>'
+    };
+    const chan = (c) => c ? '<span class="co-chan co-' + esc(c) + '">' + (CH[c] || '') + '</span>' : '';
 
-    const agenda = (neg.roundPlan || []).map((r) => {
-      const p = pkgById(r.packageId);
-      return { block: r.round, item: (p ? p.name + ', ' : '') + r.focus };
+    function cite(ev, quote) {
+      const party = ev.party || (ev.direction === 'in' ? 'Supplier' : 'Lilly');
+      return '<div class="co-cite"><div class="co-cite-m">' + chan(ev.channel) +
+        '<span class="co-cite-party">' + esc(party) + '</span>' +
+        (ev.date ? '<span class="co-cite-d">' + esc(ev.date) + '</span>' : '') + '</div>' +
+        '<div class="co-cite-x' + (quote ? ' co-quote' : '') + '">' + esc(ev.text) + '</div></div>';
+    }
+
+    function itemRow(iss) {
+      const id = iss.id;
+      const status = readOf(id).status || 'unraised';
+      const evs = evForIssue(id);
+      const usEvs = evs.filter((e) => e.direction !== 'in');
+      const themEvs = evs.filter((e) => e.direction === 'in');
+      const full = evs.length > 0 || status !== 'unraised';
+      const typeLabel = 'Redline · ' + (SEV_LABEL_LOCAL[iss.priority] || iss.priority);
+
+      const head =
+        '<summary class="co-hd"><span class="co-chev"></span><span class="co-id">' + esc(id) + '</span>' +
+        '<span class="co-t">' + esc(iss.title) + '</span>' +
+        '<span class="co-type">' + esc(typeLabel) + '</span>' +
+        (catOf(id) ? '<span class="co-cat">' + esc(catOf(id)) + '</span>' : '') +
+        '<span class="co-status stt-' + esc(status) + '">' + esc(STT[status] || status) + '</span></summary>';
+
+      const gap =
+        '<div class="co-gap"><div class="co-gap-side co-us"><div class="co-gap-k">What we want</div>' +
+          '<div class="co-gap-v">' + esc(iss.recommendedPosition || '—') + '</div></div>' +
+          '<div class="co-gap-mid">vs</div>' +
+          '<div class="co-gap-side co-them"><div class="co-gap-k">What they hold</div>' +
+          '<div class="co-gap-v">' + esc(iss.supplierPosition || '—') + '</div></div></div>';
+
+      if (!full) {
+        return '<details class="co-item">' + head + '<div class="co-body">' + gap +
+          '<div class="co-open co-o-unraised"><b>Next move:</b> <span>Not yet raised with Visier; the position is set in the redline but there are no communications on it yet. Put it on the table.</span></div>' +
+          '</div></details>';
+      }
+
+      const themCites =
+        (iss.sourceExcerpt ? cite({ party: 'Visier', date: 'redline', channel: 'paper',
+          text: iss.sourceExcerpt + (iss.clause ? '  (' + iss.clause + ')' : '') }, true) : '') +
+        themEvs.map((e) => cite(e, false)).join('');
+      const usCites = usEvs.length
+        ? usEvs.map((e) => cite(e, false)).join('')
+        : '<div class="co-nocite">Our position is set in the redline; not yet put to Visier verbally.</div>';
+      const evidence =
+        '<div class="co-ev-sec">Where each position came from · the exact messages</div>' +
+        '<div class="co-ev-cols"><div class="co-ev-col co-us"><h4>Our side</h4>' + usCites + '</div>' +
+          '<div class="co-ev-col co-them"><h4>Supplier</h4>' + (themCites || '<div class="co-nocite">No supplier message recorded.</div>') + '</div></div>';
+      const exch = evs.length
+        ? '<div class="co-ev-sec">How it evolved</div><div class="co-exch">' +
+            evs.map((e) => {
+              const s = e.direction === 'in' ? 'them' : e.direction === 'internal' ? 'int' : 'us';
+              const who = s === 'them' ? 'Visier' : s === 'int' ? 'Internal' : 'Lilly';
+              return '<div class="co-exev co-' + s + '"><span class="co-ex-d">' + esc(e.date) + '</span>' +
+                '<span class="co-ex-w">' + who + '</span> ' + esc(e.text) + '</div>';
+            }).join('') + '</div>'
+        : '';
+      const openTxt = status === 'unraised'
+        ? 'Internal position established but not yet raised with Visier. Put it on the table.'
+        : (iss.recommendedResponse || 'Continue the exchange on the merits.');
+      const openLbl = status === 'awaiting' ? 'Waiting on them' : status === 'discussion' ? 'In play' : 'Next move';
+      const open = '<div class="co-open co-o-' + esc(status) + '"><b>' + openLbl + ':</b> <span>' + esc(openTxt) + '</span></div>';
+
+      return '<details class="co-item">' + head + '<div class="co-body">' + gap + evidence + exch + open + '</div></details>';
+    }
+
+    const order = { awaiting: 0, discussion: 1, unraised: 2, agreed: 3 };
+    const items = d.issues.slice().sort((a, b) => {
+      const sa = order[readOf(a.id).status || 'unraised'], sb = order[readOf(b.id).status || 'unraised'];
+      return (sa - sb) || a.id.localeCompare(b.id);
     });
-    agenda.push({ block: 'Recap', item: 'Confirm agreed points, owners, and the next-draft date.' });
+    const counts = { awaiting: 0, discussion: 0, unraised: 0, agreed: 0 };
+    d.issues.forEach((i) => { const s = readOf(i.id).status || 'unraised'; if (counts[s] != null) counts[s]++; });
 
-    const closingText = 'To recap: aligned on platform fit and ready to commit for three years. Closing depends on the ' +
-      (rec.conditions ? rec.conditions.length : 0) + ' signature terms and platform pricing that reflects the commitment. ' +
-      (bat.trigger ? 'If ' + bat.trigger.charAt(0).toLowerCase() + bat.trigger.slice(1) + ' we escalate internally rather than sign. ' : '') +
-      'Let us confirm owners and a date for the next draft.';
+    const summary = '<div class="co-summary">' +
+      ['awaiting', 'discussion', 'unraised', 'agreed'].map((k) =>
+        '<div class="co-st-card co-' + k + '"><span class="co-st-n">' + counts[k] + '</span>' +
+        '<span class="co-st-l">' + STT[k] + '</span></div>').join('') + '</div>';
+    const evNote = events.length
+      ? insight('Every contested term below shows both sides and the exact messages and quotes that got them there, cited to the M365 thread. ' + coverageBadge(d.deal.evidenceCoverage))
+      : insight('No in-session email/Teams thread was available; positions below are mapped from the redline only.', 'warn');
+    const list = '<div class="co-list">' + items.map(itemRow).join('') + '</div>';
 
-    // --- copy text builders ----
-    const agendaText = agenda.map((a) => '  ' + a.block + ', ' + a.item).join('\n');
-    const asksText = askIssues.map((i) => '  - ' + i.recommendedPosition + ' (' + i.id + ')').join('\n');
-    const pushbackText = askIssues.map((i) => '  Q: ' + i.supplierPushback + '\n  A: ' + i.recommendedResponse).join('\n');
-    const fullBriefText = [
-      'NEXT-SESSION BRIEF, ' + d.deal.title,
-      'Derived from ' + openIssues.length + ' open positions and the latest thread state.',
-      'Pen: ' + (pen.party || 'unknown') + (pen.asOf ? ' (as of ' + pen.asOf + ')' : '') + '.',
-      sop.lastMaterialEvent ? 'Last material event: ' + sop.lastMaterialEvent : '',
-      '',
-      'OPENING:',
-      openingText,
-      '',
-      'AGENDA:',
-      agendaText,
-      '',
-      'EXACT ASKS (open positions):',
-      asksText,
-      '',
-      'EXPECTED PUSHBACK / REBUTTAL:',
-      pushbackText,
-      '',
-      'CLOSING:',
-      closingText
-    ].filter((x) => x !== null).join('\n');
-
-    // --- HTML blocks (each with a per-block copy) ----
-    const metaLine =
-      '<div class="brief-meta">Derived from <b>' + openIssues.length + '</b> open positions × latest thread state. ' +
-      'Pen: <b>' + esc(pen.party || 'unknown') + '</b>' + (pen.asOf ? ' (as of ' + esc(pen.asOf) + ')' : '') + '. ' +
-      evidenceChip('inference', { short: true }) + '</div>' +
-      (sop.lastMaterialEvent ? '<div class="card-note">Last material event: ' + esc(sop.lastMaterialEvent) + '</div>' : '');
-
-    const openingBlock = saCard('Opening',
-      '<div class="excerpt" style="border-left-color:var(--pri)">' + esc(openingText) + '</div>' +
-      '<div class="btn-row">' + copyBtn('Copy opening', null, openingText) + '</div>',
-      { accent: 'plum', icon: 'handshake' });
-
-    const agendaBlock = saCard('Agenda',
-      timeline(agenda.map((a) => ({ date: a.block, name: a.item, tone: '' }))) +
-      '<div class="btn-row">' + copyBtn('Copy agenda', null, agendaText) + '</div>',
-      { accent: 'plum', icon: 'meeting' });
-
-    const asksBlock = askIssues.length
-      ? saCard('Exact asks, open positions',
-          '<ul class="plain-list">' + askIssues.map((i) =>
-            '<li>' + esc(i.recommendedPosition) + ' ' + issueTag(i.id) + ' ' + evidenceChip(i.evidenceType, { short: true }) + '</li>').join('') + '</ul>' +
-          '<div class="btn-row">' + copyBtn('Copy asks', null, asksText) + '</div>',
-          { accent: 'teal', icon: 'flag' })
-      : gapCard('No open asks', 'No open (pending) positions remain to bring to the table.');
-
-    const pbCols = [
-      { key: 'pushback', label: 'Expected pushback', width: '38%', render: (r) => '<span class="tiny">' + esc(r.supplierPushback) + '</span>', sort: false },
-      { key: 'response', label: 'Rebuttal', width: '38%', render: (r) => esc(r.recommendedResponse), sort: false },
-      { key: 'issue', label: 'Issue', width: '24%', render: (r) => issueTag(r.id) + ' ' + evidenceChip(r.evidenceType, { short: true }), sort: false }
-    ];
-    const pushbackBlock = askIssues.length
-      ? saCard('Expected pushback → rebuttal',
-          dataTable(pbCols, askIssues, { id: 'negBriefPushback', zebra: true, dense: true }) +
-          '<div class="btn-row">' + copyBtn('Copy pushback table', null, pushbackText) + '</div>',
-          { accent: 'plum', icon: 'scale' })
-      : '';
-
-    const closingBlock = saCard('Closing',
-      '<div class="excerpt" style="border-left-color:var(--emph)">' + esc(closingText) + '</div>' +
-      '<div class="btn-row">' + copyBtn('Copy closing', null, closingText) + '</div>',
-      { accent: 'emph', icon: 'meeting' });
-
-    const inner =
-      metaLine +
-      insight('This brief is generated from the spine, open issues, the round plan and the BATNA, so it stays in sync with the analysis. Text is copy-only; nothing is sent.') +
-      '<div class="grid" style="margin-top:12px">' +
-        '<div class="col-12">' + openingBlock + '</div>' +
-        '<div class="col-6">' + agendaBlock + '</div>' +
-        '<div class="col-6">' + asksBlock + '</div>' +
-        '<div class="col-12">' + pushbackBlock + '</div>' +
-        '<div class="col-12">' + closingBlock + '</div>' +
-      '</div>';
-
-    return saCard('Next-session brief (derived)', inner, { accent: 'emph', icon: 'brief',
-      sub: copyBtn('Copy full brief', null, fullBriefText) });
+    return '<div class="grid"><div class="col-12">' +
+      saCard('Alignment map · contested terms', summary + evNote + list,
+        { accent: 'plum', icon: 'sources', sub: items.length + ' contested items · click a row' }) +
+      '</div></div>';
   }
 
   /* ================================ SHELL ================================== */
@@ -700,6 +565,156 @@ function renderTab_negotiation(d) {
     '.neg-tab .cmt-text{font-size:var(--fz-sm);color:var(--ink2);line-height:1.4}' +
     /* derived brief */
     '.neg-tab .brief-meta{font-size:var(--fz-sm);color:var(--ink2);margin-bottom:6px}' +
+    /* ===== 4B Trade Plan (item-driven) ===== */
+    '.neg-tab .tp-score{display:grid;grid-template-columns:1fr 1fr;gap:22px}' +
+    '.neg-tab .tp-g-top{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}' +
+    '.neg-tab .tp-g-lbl{font:800 10px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}' +
+    '.neg-tab .tp-g-now{font:800 26px/1 var(--sans);font-variant-numeric:tabular-nums}' +
+    '.neg-tab .tp-prot .tp-g-now{color:var(--sec-tx)}' +
+    '.neg-tab .tp-tcv .tp-g-now{color:var(--pri-tx)}' +
+    '.neg-tab .tp-g-bar{position:relative;height:12px;border-radius:7px;background:var(--nested);overflow:hidden}' +
+    '.neg-tab .tp-g-fill{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:linear-gradient(90deg,var(--danger),var(--emph) 55%,var(--sec))}' +
+    '.neg-tab .tp-tcv .tp-g-fill{background:linear-gradient(90deg,var(--sec),var(--emph) 60%,var(--danger))}' +
+    '.neg-tab .tp-g-tgt{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink2)}' +
+    '.neg-tab .tp-g-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--mut2);margin-top:4px}' +
+    '.neg-tab .tp-g-marks b{color:var(--ink)}' +
+    '.neg-tab .tp-score-note{grid-column:1/-1;font-size:var(--fz-sm);color:var(--ink2);border-top:1px solid var(--line);padding-top:11px;margin-top:3px}' +
+    '.neg-tab .tp-score-note b{color:var(--ink)}' +
+    '.neg-tab .tp-batna{border:1px solid color-mix(in srgb,var(--pri) 45%,var(--line2));border-radius:var(--r);background:var(--pri-t);overflow:hidden}' +
+    '.neg-tab .tp-batna-hd{display:flex;align-items:center;gap:10px;padding:11px 15px;cursor:pointer;list-style:none}' +
+    '.neg-tab .tp-batna-hd::-webkit-details-marker{display:none}' +
+    '.neg-tab .tp-batna-hd svg{width:15px;height:15px;flex:none;stroke:var(--pri-tx);fill:none;stroke-width:2}' +
+    '.neg-tab .tp-bt-t{font:800 10px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--pri-tx);flex:none}' +
+    '.neg-tab .tp-bt-s{font-size:var(--fz-sm);color:var(--ink2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '.neg-tab .tp-bt-chev{width:8px;height:8px;border-right:2px solid var(--pri-tx);border-bottom:2px solid var(--pri-tx);transform:rotate(-45deg);transition:transform .15s;flex:none}' +
+    '.neg-tab .tp-batna[open] .tp-bt-chev{transform:rotate(45deg)}' +
+    '.neg-tab .tp-batna-bd{padding:2px 15px 13px}' +
+    '.neg-tab .tp-batna-bd .kv{display:grid;grid-template-columns:104px 1fr;gap:5px 12px;font-size:var(--fz-sm)}' +
+    '.neg-tab .tp-batna-bd dt{color:var(--pri-tx);font-weight:700}' +
+    '.neg-tab .tp-batna-bd dd{margin:0;color:var(--ink2);line-height:1.5}' +
+    '.neg-tab .tp-cur{width:100%;border-collapse:collapse;font-size:var(--fz-sm)}' +
+    '.neg-tab .tp-cur th{text-align:left;font:800 9px/1.2 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:0 10px 8px;border-bottom:1px solid var(--line2)}' +
+    '.neg-tab .tp-cur td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}' +
+    '.neg-tab .tp-cur tr:last-child td{border-bottom:0}' +
+    '.neg-tab .tp-cur-give{font-weight:700;color:var(--ink)}' +
+    '.neg-tab .tp-cur-for{color:var(--ink2)}' +
+    '.neg-tab .tp-cat{margin-bottom:14px}' +
+    '.neg-tab .tp-cat-h{display:flex;align-items:center;gap:9px;margin:2px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--pri)}' +
+    '.neg-tab .tp-c-name{font:800 11.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--pri-tx)}' +
+    '.neg-tab .tp-c-cnt{font-size:11px;color:var(--mut2)}' +
+    '.neg-tab .tp-item{border:1px solid var(--line2);border-top:0;background:var(--surface)}' +
+    '.neg-tab .tp-cat .tp-item:first-of-type{border-top:1px solid var(--line2);border-radius:9px 9px 0 0}' +
+    '.neg-tab .tp-cat .tp-item:last-of-type{border-radius:0 0 9px 9px}' +
+    '.neg-tab .tp-cat .tp-item:only-of-type{border-radius:9px}' +
+    '.neg-tab .tp-hd{display:grid;grid-template-columns:auto auto 1fr;gap:11px;align-items:center;padding:11px 14px;cursor:pointer;list-style:none}' +
+    '.neg-tab .tp-hd::-webkit-details-marker{display:none}' +
+    '.neg-tab .tp-hd:hover{background:var(--surface2)}' +
+    '.neg-tab .tp-item[open] .tp-hd{background:var(--surface2);border-bottom:1px solid var(--line)}' +
+    '.neg-tab .tp-chev{width:7px;height:7px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s}' +
+    '.neg-tab .tp-item[open] .tp-chev{transform:rotate(45deg)}' +
+    '.neg-tab .tp-id{font:800 10px/1 var(--mono);color:var(--mut)}' +
+    '.neg-tab .tp-main{min-width:0}' +
+    '.neg-tab .tp-t{font-weight:700;font-size:13px;color:var(--ink);line-height:1.3}' +
+    '.neg-tab .tp-sig{display:flex;gap:14px;flex-wrap:wrap;margin-top:5px;align-items:center}' +
+    '.neg-tab .tp-sg{font-size:10.5px;color:var(--mut2);display:inline-flex;align-items:center;gap:4px}' +
+    '.neg-tab .tp-sg b{font:800 8px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut2)}' +
+    '.neg-tab .tp-sg span{font-weight:700}' +
+    '.neg-tab .tp-status{font:800 8px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:5px;white-space:nowrap;border:1px solid transparent}' +
+    '.neg-tab .stt-awaiting{color:var(--warn-fg);border-color:color-mix(in srgb,var(--warn-bar) 52%,transparent)}' +
+    '.neg-tab .stt-discussion{color:var(--sec-tx);border-color:color-mix(in srgb,var(--sec) 50%,transparent)}' +
+    '.neg-tab .stt-unraised{color:var(--mut);border-color:var(--line2)}' +
+    '.neg-tab .tp-far{color:var(--danger-fg)}.neg-tab .tp-mod{color:var(--warn-fg)}.neg-tab .tp-close{color:var(--sec-tx)}' +
+    '.neg-tab .tp-mlikely{color:var(--sec-tx)}.neg-tab .tp-mposs{color:var(--warn-fg)}.neg-tab .tp-mres{color:var(--danger-fg)}' +
+    '.neg-tab .tp-body{padding:14px}' +
+    '.neg-tab .tp-cols{display:grid;grid-template-columns:1fr 1.2fr 1fr;border:1px solid var(--line2);border-radius:9px;overflow:hidden}' +
+    '.neg-tab .tp-col{padding:12px 13px;border-right:1px solid var(--line2)}' +
+    '.neg-tab .tp-col:last-child{border-right:0}' +
+    '.neg-tab .tp-col-k{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:7px}' +
+    '.neg-tab .tp-col.want{background:var(--sec-t)}.neg-tab .tp-col.want .tp-col-k{color:var(--sec-tx)}' +
+    '.neg-tab .tp-col.trade{background:var(--surface)}.neg-tab .tp-col.trade .tp-col-k{color:var(--emph-tx)}' +
+    '.neg-tab .tp-col.floor{background:var(--pri-t)}.neg-tab .tp-col.floor .tp-col-k{color:var(--pri-tx)}' +
+    '.neg-tab .tp-col-v{font-size:var(--fz-sm);color:var(--ink2);line-height:1.45}' +
+    '.neg-tab .tp-give{display:flex;gap:7px;align-items:baseline;margin-bottom:7px}' +
+    '.neg-tab .tp-give:last-child{margin-bottom:0}' +
+    '.neg-tab .tp-give::before{content:"\\25CB";color:var(--emph);font-size:10px;flex:none}' +
+    '.neg-tab .tp-range{margin-top:11px;font-size:11px;color:var(--mut2)}' +
+    '.neg-tab .tp-range-lbl{display:block;margin-bottom:5px}' +
+    '.neg-tab .tp-range-band{display:flex;align-items:center;font:700 10px/1.3 var(--mono)}' +
+    '.neg-tab .tp-r-e{padding:4px 8px;border-radius:5px}' +
+    '.neg-tab .tp-r-e.a{background:var(--sec-t);color:var(--sec-tx)}.neg-tab .tp-r-e.b{background:var(--pri-t);color:var(--pri-tx)}' +
+    '.neg-tab .tp-r-line{flex:1;height:2px;background:linear-gradient(90deg,var(--sec),var(--pri));min-width:24px}' +
+    '@media(max-width:760px){.neg-tab .tp-score{grid-template-columns:1fr}.neg-tab .tp-cols{grid-template-columns:1fr}}' +
+    /* ===== 4C Communications (alignment map) ===== */
+    '.neg-tab .co-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}' +
+    '.neg-tab .co-st-card{flex:1 1 150px;min-width:130px;display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line2);border-radius:10px;background:var(--surface)}' +
+    '.neg-tab .co-st-n{font:800 22px/1 var(--sans);font-variant-numeric:tabular-nums;min-width:22px;text-align:center}' +
+    '.neg-tab .co-st-l{font-size:11px;line-height:1.3;color:var(--mut2)}' +
+    '.neg-tab .co-awaiting .co-st-n{color:var(--warn-fg)}' +
+    '.neg-tab .co-discussion .co-st-n{color:var(--sec-tx)}' +
+    '.neg-tab .co-unraised .co-st-n{color:var(--mut)}' +
+    '.neg-tab .co-agreed .co-st-n{color:var(--ok-fg)}' +
+    '.neg-tab .co-list{border:1px solid var(--line2);border-radius:11px;overflow:hidden;background:var(--surface);margin-top:12px}' +
+    '.neg-tab .co-item{border-top:1px solid var(--line)}' +
+    '.neg-tab .co-list>.co-item:first-child{border-top:0}' +
+    '.neg-tab .co-hd{display:flex;align-items:center;gap:10px;padding:11px 15px;cursor:pointer;background:var(--surface);flex-wrap:wrap;list-style:none}' +
+    '.neg-tab .co-hd::-webkit-details-marker{display:none}' +
+    '.neg-tab .co-hd:hover{background:var(--surface2)}' +
+    '.neg-tab .co-item[open]>.co-hd{background:var(--surface2);border-bottom:1px solid var(--line)}' +
+    '.neg-tab .co-chev{width:8px;height:8px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s;flex:none;margin-right:1px}' +
+    '.neg-tab .co-item[open] .co-chev{transform:rotate(45deg)}' +
+    '.neg-tab .co-id{font:800 10px/1 var(--mono);color:var(--mut)}' +
+    '.neg-tab .co-t{font-weight:800;font-size:13.5px;color:var(--ink)}' +
+    '.neg-tab .co-type{font:700 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);background:var(--nested);border-radius:4px;padding:2px 6px}' +
+    '.neg-tab .co-cat{font:700 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--pri-tx);border:1px solid color-mix(in srgb,var(--pri) 30%,transparent);border-radius:4px;padding:2px 6px}' +
+    '.neg-tab .co-status{margin-left:auto;font:800 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:6px;border:1px solid transparent}' +
+    '.neg-tab .co-status.stt-awaiting{color:var(--warn-fg);border-color:color-mix(in srgb,var(--warn-bar) 52%,transparent)}' +
+    '.neg-tab .co-status.stt-discussion{color:var(--sec-tx);border-color:color-mix(in srgb,var(--sec) 50%,transparent)}' +
+    '.neg-tab .co-status.stt-unraised{color:var(--mut);border-color:var(--line2)}' +
+    '.neg-tab .co-status.stt-agreed{color:var(--ok-fg);border-color:color-mix(in srgb,var(--ok-bar) 50%,transparent)}' +
+    '.neg-tab .co-body{padding:14px 15px}' +
+    '.neg-tab .co-gap{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;margin-bottom:14px;border:1px solid var(--line2);border-radius:9px;overflow:hidden}' +
+    '.neg-tab .co-gap-side{padding:11px 13px}' +
+    '.neg-tab .co-gap-side.co-us{background:var(--sec-t)}' +
+    '.neg-tab .co-gap-side.co-them{background:var(--surface);border-left:3px solid var(--danger-bar)}' +
+    '.neg-tab .co-gap-k{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}' +
+    '.neg-tab .co-us .co-gap-k{color:var(--sec-tx)}' +
+    '.neg-tab .co-them .co-gap-k{color:var(--danger-fg)}' +
+    '.neg-tab .co-gap-v{font-size:12px;color:var(--ink2);line-height:1.4}' +
+    '.neg-tab .co-gap-mid{display:flex;align-items:center;justify-content:center;padding:0 10px;background:var(--surface);color:var(--mut2);font:800 11px/1 var(--sans);text-transform:uppercase;border-left:1px solid var(--line2);border-right:1px solid var(--line2)}' +
+    '.neg-tab .co-ev-sec{font:800 9px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:14px 0 8px}' +
+    '.neg-tab .co-ev-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}' +
+    '.neg-tab .co-ev-col h4{font:800 9px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;margin:0 0 8px}' +
+    '.neg-tab .co-ev-col.co-us h4{color:var(--sec-tx)}' +
+    '.neg-tab .co-ev-col.co-them h4{color:var(--danger-fg)}' +
+    '.neg-tab .co-cite{border-left:2px solid var(--line2);padding:6px 0 6px 11px;margin-bottom:9px}' +
+    '.neg-tab .co-ev-col.co-us .co-cite{border-color:color-mix(in srgb,var(--sec) 45%,transparent)}' +
+    '.neg-tab .co-ev-col.co-them .co-cite{border-color:color-mix(in srgb,var(--danger) 40%,transparent)}' +
+    '.neg-tab .co-cite-m{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px}' +
+    '.neg-tab .co-cite-party{font-weight:700;font-size:11px;color:var(--ink)}' +
+    '.neg-tab .co-cite-d{font:700 9px/1 var(--mono);color:var(--mut2)}' +
+    '.neg-tab .co-chan{display:inline-flex;width:16px;height:16px;border-radius:4px;align-items:center;justify-content:center;color:#fff;flex:none}' +
+    '.neg-tab .co-chan.co-email{background:var(--info-fg)}' +
+    '.neg-tab .co-chan.co-teams{background:var(--pri)}' +
+    '.neg-tab .co-chan.co-paper{background:var(--mut2)}' +
+    '.neg-tab .co-chan svg{width:10px;height:10px}' +
+    '.neg-tab .co-cite-x{font-size:12px;color:var(--ink2);line-height:1.45}' +
+    '.neg-tab .co-cite-x.co-quote{font-style:italic}' +
+    '.neg-tab .co-cite-x.co-quote::before{content:"\\201C"}.neg-tab .co-cite-x.co-quote::after{content:"\\201D"}' +
+    '.neg-tab .co-nocite{font-size:11.5px;color:var(--mut2);font-style:italic}' +
+    '.neg-tab .co-exch{border-left:2px solid var(--line2);margin-left:5px;padding-left:14px;margin-top:4px}' +
+    '.neg-tab .co-exev{position:relative;padding:5px 0;font-size:11.5px;color:var(--ink2)}' +
+    '.neg-tab .co-exev::before{content:"";position:absolute;left:-20px;top:9px;width:8px;height:8px;border-radius:50%;border:2px solid var(--surface)}' +
+    '.neg-tab .co-exev.co-us::before{background:var(--sec)}' +
+    '.neg-tab .co-exev.co-them::before{background:var(--danger-bar)}' +
+    '.neg-tab .co-exev.co-int::before{background:var(--pri)}' +
+    '.neg-tab .co-ex-d{font:700 9px/1 var(--mono);color:var(--mut2);margin-right:7px}' +
+    '.neg-tab .co-ex-w{font-weight:700;margin-right:4px}' +
+    '.neg-tab .co-open{margin-top:13px;padding:10px 12px;border-radius:9px;font-size:12px;line-height:1.45;background:var(--surface2);border-left:3px solid var(--line2)}' +
+    '.neg-tab .co-open b{font-weight:800}' +
+    '.neg-tab .co-open.co-o-awaiting{border-left-color:var(--warn-bar)}' +
+    '.neg-tab .co-open.co-o-discussion{border-left-color:var(--sec)}' +
+    '.neg-tab .co-open.co-o-unraised{border-left-color:var(--line2)}' +
+    '@media(max-width:720px){.neg-tab .co-gap{grid-template-columns:1fr}.neg-tab .co-ev-cols{grid-template-columns:1fr}}' +
     '</style>';
 
   // Consistent with every other subtabbed tab (Terms & Review, Economics): the subtab bar sits
@@ -708,8 +723,8 @@ function renderTab_negotiation(d) {
   const cov = coverageBadge(d.deal.evidenceCoverage);
   const intro = (h2, q) => '<div class="tab-intro"><h2>' + h2 + '</h2><p class="q">' + q + ' ' + cov + '</p></div>';
   const posIntro = intro('Positions', 'The 12 legal, commercial and scope terms framed as negotiating positions, each playbook-cited with the supplier stance, our ask, pushback and rebuttal, plus how they bundle and trade together.');
-  const tradeIntro = intro('Trade Plan', 'How do I move them? The give/get packages, concession ladders and round sequence, what to open with, what to trade for what, and the walk-away.');
-  const commsIntro = intro('Communications', 'The traceable thread, every position, ask and commitment keyed to the M365 source it came from, and who currently holds the pen.');
+  const tradeIntro = intro('Trade Plan', 'For each ask where we and the supplier are not aligned: what we want, what we would trade to get it, and our floor, with how far apart we are and how likely they move, plus the currency we can spend and the walk-away.');
+  const commsIntro = intro('Communications', 'Where every contested redline, ask and gap stands between us and the supplier, mapped to the specific messages and quotes on each side. The evidence layer, organised by what you are actually negotiating.');
   return scopedStyle + '<div class="neg-tab">' +
     '<div class="subtabbar" data-subtab-group="negotiation"><div class="wrap">' +
     '<button class="subtab-btn" data-subtab="positions" aria-selected="true">' + icon('target') + ' Positions</button>' +

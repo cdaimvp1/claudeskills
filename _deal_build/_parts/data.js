@@ -850,6 +850,40 @@ const dashboardData = {
       hasRealAlternative: true,
       evidenceType: 'inference'
     },
+    // Trade Plan (subtab 4B) presentation overlay. CONTENT is NOT re-typed here: the
+    // per-ask "we want" = issue.recommendedPosition, "if they won't move" = issue.fallback,
+    // "we can trade" = issue.tradeOpportunity + matching giveGets, the settlement range =
+    // the issue's concessionLadder ends, the currency table = neg.giveGets, and the
+    // scoreboard = protection.score + the SC-ask / SC-target scenarios. This object adds
+    // ONLY the negotiation read that isn't a contract fact: how far apart we are (gap) and
+    // how likely they move (movement) per ask, the status, and the category grouping.
+    tradePlan: {
+      scoreboard: { protTarget: 97, askScenarioId: 'SC-ask', targetScenarioId: 'SC-target' },
+      categories: [
+        { name: 'Legal & Liability', issueIds: ['ISS-01', 'ISS-02'] },
+        { name: 'Data & Protection', issueIds: ['ISS-03', 'ISS-08'] },
+        { name: 'Commercial', issueIds: ['ISS-12', 'ISS-04', 'ISS-11'] },
+        { name: 'Service & Delivery', issueIds: ['ISS-06', 'ISS-07', 'ISS-10', 'ISS-05', 'ISS-09'] }
+      ],
+      // gap: far | moderate | close (how far apart the positions are)
+      // move: likely | possible | resistant (chance they concede)
+      // status: awaiting | discussion | unraised (derived-able from comms; stated for clarity)
+      read: {
+        'ISS-01': { gap: 'far', move: 'possible', status: 'awaiting' },
+        'ISS-02': { gap: 'moderate', move: 'possible', status: 'unraised' },
+        'ISS-03': { gap: 'far', move: 'likely', status: 'awaiting' },
+        'ISS-08': { gap: 'moderate', move: 'likely', status: 'unraised' },
+        'ISS-12': { gap: 'far', move: 'likely', status: 'discussion' },
+        'ISS-04': { gap: 'moderate', move: 'possible', status: 'discussion' },
+        'ISS-11': { gap: 'moderate', move: 'possible', status: 'unraised' },
+        'ISS-06': { gap: 'far', move: 'resistant', status: 'unraised' },
+        'ISS-07': { gap: 'far', move: 'possible', status: 'unraised' },
+        'ISS-10': { gap: 'moderate', move: 'possible', status: 'unraised' },
+        'ISS-05': { gap: 'moderate', move: 'likely', status: 'unraised' },
+        'ISS-09': { gap: 'close', move: 'likely', status: 'unraised' }
+      },
+      evidenceType: 'inference'
+    },
     // give-get matrix: what we give vs what we get; value low/med/high to each side
     giveGets: [
       { id: 'GG-1', give: '3-year prepay', giveCost: 'low', get: 'Platform discount to target', getValue: 'high', issueIds: ['ISS-12'], evidenceType: 'internal' },
