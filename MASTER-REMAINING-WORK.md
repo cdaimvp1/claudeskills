@@ -35,7 +35,10 @@ If the session restarted/compacted, this is where things stand.
 - **#1 CONFIRMED 2026-07-25 — Marc chose "Extend deal-room as the hub."** Plan: extend `deal-room` into the
   Deal SKILL HOME (front the locked Deal dashboard + orchestrate the negotiation-prep / deal-room /
   playbook-learning skills over the persisted `deal_room_state.json`); rename commercial-negotiation-prep's
-  STATIC "Deal Room" dashboard to fix the name collision. NOT building a new `deal-workspace`. Rationale:
+  STATIC "Deal Room" dashboard to fix the name collision. NOT building a new `deal-workspace`.
+  **PLAN drafted: `_redesign_proposals/DEAL-HUB-SKILL-PLAN.md` (2026-07-25) — additive hub layer over
+  deal-room's existing engine; 2 decisions pending before ANY edit: (a) retire deal-room's locked
+  standalone 4-tab for the hub dashboard? (b) new name for commercial-prep's dashboard?** Rationale:
   `deal-room-1c344a` ALREADY exists and is
   ALREADY the stateful Deal hub: it runs one Claude Project per negotiation, ingests the opening strategy,
   keeps a persistent `deal_room_state.json` concession ledger across rounds, is seeded by commercial/legal-
