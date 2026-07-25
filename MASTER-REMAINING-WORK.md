@@ -6,10 +6,12 @@ Consolidated 2026-07-24 (evening) from ALL trackers/build-plans + a skills-updat
 
 ## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-25)
 If the session restarted/compacted, this is where things stand.
-- **Deal dashboard** (`_deal_build/`, tracker `DEAL-DASHBOARD-TRACKER.md`): all 3 Negotiation tabs ported
-  (Trade Plan/Communications/Positions), full MCM colour, no dark mode, pale-fill sweep done. Commits
-  through 6be83e9. **NOT locked** yet: #12 Communications live filters + #13 Next-Session-Brief decision
-  remain (Marc's lock gate = only lock when every pending Deal change is done).
+- **Deal dashboard** (`_deal_build/`, tracker `DEAL-DASHBOARD-TRACKER.md`): **LOCKED — design of record
+  (2026-07-25).** All 3 Negotiation tabs ported (Trade Plan / Communications incl. status+category
+  filters + expand-all / Positions), Terms & Review + Economics done, full MCM colour, no dark mode, no
+  pale fills. Every increment committed + malicious-scanned CLEAN; final in-browser sweep clean (all tabs,
+  0 console errors). No further changes without Marc's explicit request. (#13 brief = dropped per the
+  locked design; comms full-text search deferred — both optional, not blockers.)
 - **Marc APPROVED the 6 skill recommendations** (review `.txt` on Desktop): (5) claim-gate/abstention suite-wide,
   (2) update the no-green-rule foundation to permit teal [needs a brand-colors.md check first], (1) new
   `deal-workspace` hub skill + fix "Deal Room" name collision, (3) RFx→Deal handoff canonical, (6) shared

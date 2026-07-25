@@ -1,5 +1,14 @@
 # Deal Dashboard, Build Tracker
 
+> **STATUS: LOCKED — DESIGN OF RECORD (2026-07-25, commit e-series).** The Deal dashboard is
+> complete and locked per Marc's gate: all 3 Negotiation tabs ported (Trade Plan / Communications
+> incl. filters / Positions), Terms & Review + Economics done, full MCM colour system, no dark mode,
+> no pale fills, outline pills, tab strips grey/black. All increments committed + independently
+> malicious-scanned CLEAN; final in-browser sweep clean (all 4 tabs + subtabs, 0 console errors).
+> **No further changes without Marc's explicit request.** Open (post-lock, not blockers): #13
+> Next-Session Brief = dropped per the locked comms design (old code in git history if ever
+> re-homed); Communications full-text search deferred (marginal for 12 items). See §"2026-07-25 LOCK".
+
 Durable state for the Deal hub dashboard (`_deal_build/`). Read this FIRST when resuming.
 Marc asked (2026-07-24, overnight): track everything, commit + test + track OFTEN, finish
 autonomously-doable pending work, DO NOT hallucinate or drift.
@@ -298,3 +307,20 @@ All verified in-browser; commits below. See the UPDATED LOCKED palette constrain
   assets/theo-color.css copy). Marc wants both dashboards on the same palette before "done".
 - #16 Final full-tab verification sweep + full-codebase malicious-code pass (incl the single-file demo), then
   Marc's "both dashboards done" sign-off. (Repackage the installable deliverable stays a separate release step.)
+
+### 2026-07-25 — DEAL DASHBOARD LOCK
+LOCKED as design of record (banner at top). Final work before the lock:
+- #11 Positions ported to the per-term workbench (9030cac, scan CLEAN).
+- #14 pale-fill sweep: 0 pale-orange/amber/rust fills across all tabs (49310b4, CSS-only).
+- #12 Communications alignment-map filters: status-summary + category chips + expand-all/collapse-all,
+  lean attribute-toggle DealUI handler, no re-render (87987da, scan CLEAN). Full-text search deferred
+  (marginal for a 12-item list).
+- #13 Next-Session Brief: DROPPED (not in the locked comms alignment-map design; old buildDerivedBrief
+  in git history pre-comms-port if ever re-homed). Flagged optional, not a blocker.
+- Final in-browser verification: all 4 tabs + every subtab render, 0 console errors, no crash text.
+- Every increment independently malicious-scanned CLEAN.
+NEXT (post-lock, Marc's approved order; separate workstreams — do NOT reopen the Deal dashboard):
+#5 claim-gate suite-wide → #2 no-green foundation (brand-colors check first) → #1 deal-workspace hub
+skill → #3/#6 RFx→Deal handoff + comms-evidence methodology (RFx mockup = task #20, spec
+_redesign_proposals/RFx-REDESIGN-SPEC.md) → #4 Category Strategy rebuild. Landscape MCM pass (#15)
+still pending (hardcoded hexes in pv-07* engine). All under never-regress/branch + Desktop-usage-efficient.
