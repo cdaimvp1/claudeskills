@@ -1,0 +1,225 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup — Negotiation ▸ Communications (alignment map, item-driven)</title>
+<style>
+:root{
+  --plum:#5C2B50;--plum-t:#f0e6ee;--plum-tx:#5C2B50;
+  --sec:#2F6E6B;--sec-t:#e2efee;--sec-tx:#245451;--teal-d:#245451;
+  --emph:#C15E19;--emph-t:#fbeadd;--emph-tx:#9e4d15;
+  --danger:#B42318;--danger-t:#fbe9e7;--ok:#2f8a4e;--ok-t:#e5f3ea;--warn:#B25E09;--warn-t:#fbf0dd;
+  --ink:#1c1a1d;--ink2:#3f3a40;--mut:#6b6570;--mut2:#8a8490;
+  --line:#e7e3ea;--line2:#d8d3dc;--surface:#fff;--surface2:#f7f5f8;--nested:#f1eef3;
+  --bg:#eceaee;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--mono:'SF Mono',ui-monospace,'Cascadia Code',monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;padding:22px}
+.wrap{max-width:1080px;margin:0 auto}
+.mock-note{background:#fff8ec;border:1px solid var(--emph);color:var(--emph-tx);font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:16px}
+h1{font-size:20px;margin:0 0 3px}.sub{color:var(--mut);font-size:12.5px;margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:12px;margin-bottom:16px}
+.card-bd{padding:16px}
+/* summary strip */
+.summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.st-card{flex:1 1 150px;min-width:140px;display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line2);border-radius:10px;background:var(--surface);cursor:pointer}
+.st-card[aria-pressed="true"]{border-color:var(--plum);box-shadow:inset 0 0 0 1px var(--plum)}
+.st-n{font:800 22px/1 var(--sans);font-variant-numeric:tabular-nums;min-width:22px;text-align:center}
+.st-l{font-size:11px;line-height:1.3;color:var(--mut2)}
+.st-card.awaiting .st-n{color:var(--warn)} .st-card.discussion .st-n{color:var(--emph)} .st-card.unraised .st-n{color:var(--mut)} .st-card.agreed .st-n{color:var(--ok)}
+.search{display:flex;align-items:center;gap:7px;border:1px solid var(--line2);border-radius:8px;padding:8px 12px;background:var(--surface2);margin-bottom:4px}
+.search input{border:0;background:transparent;outline:none;font-size:13px;width:100%;color:var(--ink)}
+.search svg{width:15px;height:15px;stroke:var(--mut2);fill:none;stroke-width:2;flex:0 0 auto}
+/* category filter + list controls */
+.catfilter{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.cfchip{font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid var(--line2);background:var(--surface);color:var(--mut);cursor:pointer}
+.cfchip[aria-pressed="true"]{border-color:var(--plum);background:var(--plum-t);color:var(--plum)}
+.listctl{display:flex;align-items:center;gap:10px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.lc-lbl{font-size:11px;color:var(--mut2)}
+.lc-btn{margin-left:auto;font-size:11px;font-weight:700;color:var(--plum);background:none;border:0;cursor:pointer}
+/* item rows — one flat, connected list (not bubbles) */
+.itemlist{border:1px solid var(--line2);border-radius:11px;overflow:hidden;background:var(--surface)}
+.item{border-top:1px solid var(--line)}
+.itemlist>.item:first-child{border-top:0}
+.item.compact .it-body{display:none}
+.it-hd{display:flex;align-items:center;gap:10px;padding:11px 15px;cursor:pointer;background:var(--surface);flex-wrap:wrap}
+.it-hd:hover{background:var(--surface2)}
+.item:not(.compact)>.it-hd{background:var(--surface2);border-bottom:1px solid var(--line)}
+.it-hd .chev{width:8px;height:8px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto;margin-right:1px}
+.item:not(.compact) .it-hd .chev{transform:rotate(45deg)}
+.it-id{font:800 10px/1 var(--mono);color:var(--mut)}
+.it-t{font-weight:800;font-size:13.5px;color:var(--ink)}
+.it-type{font:700 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);background:var(--nested);border-radius:4px;padding:2px 6px}
+.it-status{margin-left:auto;font:800 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:6px}
+.stt-awaiting{color:var(--warn);background:var(--warn-t)} .stt-discussion{color:var(--emph-tx);background:var(--emph-t)} .stt-unraised{color:var(--mut);background:var(--nested)} .stt-agreed{color:var(--ok);background:var(--ok-t)}
+.it-body{padding:14px 15px}
+/* the gap */
+.gap{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;margin-bottom:14px;border:1px solid var(--line2);border-radius:9px;overflow:hidden}
+.gap-side{padding:11px 13px}
+.gap-us{background:var(--sec-t)} .gap-them{background:var(--danger-t)}
+.gap-k{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+.gap-us .gap-k{color:var(--sec-tx)} .gap-them .gap-k{color:var(--danger)}
+.gap-v{font-size:12px;color:var(--ink2);line-height:1.4}
+.gap-mid{display:flex;align-items:center;justify-content:center;padding:0 10px;background:var(--surface);color:var(--mut2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;border-left:1px solid var(--line2);border-right:1px solid var(--line2)}
+/* evidence columns */
+.ev-sec{font:800 9px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:14px 0 8px}
+.ev-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ev-col h4{font:800 9px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;margin:0 0 8px}
+.ev-col.us h4{color:var(--sec-tx)} .ev-col.them h4{color:var(--danger)}
+.cite{border-left:2px solid var(--line2);padding:6px 0 6px 11px;margin-bottom:9px}
+.ev-col.us .cite{border-color:#a9cfcc} .ev-col.them .cite{border-color:#e7b7b0}
+.cite-m{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px}
+.cite-party{font-weight:700;font-size:11px;color:var(--ink)}
+.cite-d{font:700 9px/1 var(--mono);color:var(--mut2)}
+.chan{display:inline-flex;width:16px;height:16px;border-radius:4px;align-items:center;justify-content:center;color:#fff;flex:0 0 auto}
+.chan.email{background:#4b6b8a}.chan.teams{background:#5b5fc7}.chan.paper{background:#7a7580}
+.chan svg{width:10px;height:10px;fill:currentColor}
+.cite-x{font-size:12px;color:var(--ink2);line-height:1.45;font-style:italic}
+.cite-x.quote::before{content:"“"}.cite-x.quote::after{content:"”"}
+.nocite{font-size:11.5px;color:var(--mut2);font-style:italic}
+/* exchange mini-timeline */
+.exch{border-left:2px solid var(--line2);margin-left:5px;padding-left:14px;margin-top:4px}
+.exev{position:relative;padding:5px 0;font-size:11.5px;color:var(--ink2)}
+.exev::before{content:"";position:absolute;left:-20px;top:9px;width:8px;height:8px;border-radius:50%;border:2px solid var(--surface)}
+.exev.us::before{background:var(--sec)}.exev.them::before{background:var(--danger)}.exev.int::before{background:var(--plum)}
+.exev .ex-d{font:700 9px/1 var(--mono);color:var(--mut2);margin-right:7px}
+.exev .ex-w{font-weight:700}
+/* open/next */
+.open{margin-top:13px;display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border-radius:9px;font-size:12px;line-height:1.45}
+.open.awaiting{background:var(--warn-t);color:#6f3d05} .open.discussion{background:var(--emph-t);color:var(--emph-tx)} .open.unraised{background:var(--nested);color:var(--ink2)}
+.open b{font-weight:800}
+/* compact unraised group */
+.gap-mini{padding:0 15px 13px;display:flex;gap:14px;font-size:12px;flex-wrap:wrap}
+.gap-mini .gm{flex:1 1 300px}
+.gap-mini .gm b{font-size:9px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);display:block}
+.gap-mini .gm.us{color:var(--sec-tx)}.gap-mini .gm.them{color:var(--danger)}
+@media(max-width:720px){.gap,.ev-cols{grid-template-columns:1fr}.gap-mid{border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:6px}}
+</style></head>
+<body><div class="wrap">
+<div class="mock-note">Mockup — Negotiation ▸ Communications redesign v2 (item-driven alignment map). Standalone; not wired. Real data. Start from the contested items; each shows both sides + the exact messages/quotes that got them there. Click a row to collapse/expand.</div>
+<h1>Communications</h1>
+<p class="sub">Where every contested redline, ask and gap stands between us and the supplier — mapped to the specific messages and quotes on each side. The evidence layer the rest of the dashboard pulls from; here it's organized by what you're actually negotiating.</p>
+
+<div class="card"><div class="card-bd">
+  <div class="summary" id="summary"></div>
+  <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="Search a term, party, or quote… (e.g. “super-cap”, “prepay”, ISS-03)"></div>
+  <div class="catfilter" id="catfilter"></div>
+  <div class="listctl"><span class="lc-lbl" id="lc-count"></span><button class="lc-btn" id="expandall">Expand all</button></div>
+</div></div>
+
+<div id="items"></div>
+</div>
+
+<script>
+const CH={email:'<svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M3 6l9 7 9-7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>',
+  teams:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5h9v3H9v8H7V8H4V5z"/></svg>',
+  paper:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h9l3 3v17H6z"/></svg>'};
+const STATUS={awaiting:'Awaiting them',discussion:'In discussion',unraised:'Not yet raised',agreed:'Agreed'};
+// contested items, each mapped to the messages + specific excerpts on each side
+const ITEMS=[
+ {id:'ISS-03',title:'Data protection — unsigned DPA, no SCCs',type:'Redline · hard-stop',status:'awaiting',
+  gapUs:'Executed DPA + EU SCCs, reviewed in-session, before signature.',gapThem:'DPA “by reference” in their standard form; not attached, no SCCs.',
+  us:[{party:'Lilly · Procurement',d:'Jul 1',ch:'email',x:'Asks Visier for the MSA, DPA and Security Exhibit for review before we redline.'},
+      {party:'Lilly · Legal',d:'Jul 14',ch:'teams',x:'The missing executed DPA is signature-blocking.'}],
+  them:[{party:'Visier',d:'Jul 8',ch:'email',q:1,x:'The parties will enter into a Data Processing Addendum in Supplier’s standard form, incorporated herein by reference.'},
+        {party:'Visier',d:'Jul 15',ch:'email',q:1,x:'Our standard DPA is sufficient and rarely modified.'}],
+  exch:[['Jul 1','us','We request the DPA + Exhibit'],['Jul 8','them','v2: DPA by reference, not attached'],['Jul 14','int','Legal flags it as a gate'],['Jul 15','them','v3 holds the standard DPA']],
+  open:'Awaiting the actual DPA text + Security Exhibit B — Visier’s open commitment. Nothing to counter until we see the paper.'},
+ {id:'ISS-01',title:'Liability cap at 12 months, all damages capped',type:'Redline · hard-stop',status:'awaiting',
+  gapUs:'24-month cap + a 3× data-breach super-cap; IP indemnity uncapped.',gapThem:'12-month aggregate cap, all categories, no carve-outs.',
+  us:[{party:'Lilly · Legal',d:'Jul 14',ch:'teams',x:'The 12-month liability cap is signature-blocking; workforce-data breach exposure far exceeds a year of fees.'}],
+  them:[{party:'Visier',d:'Jul 8',ch:'email',q:1,x:'…aggregate liability shall not exceed the fees paid by Customer in the twelve (12) months preceding the claim. (MSA §11.2)'},
+        {party:'Visier',d:'Jul 15',ch:'email',q:1,x:'Data-breach super-caps are non-standard and require executive approval.'}],
+  exch:[['Jul 8','them','v2: 12-month cap, no carve-outs'],['Jul 14','int','Legal flags it as a gate'],['Jul 15','them','v3 holds the cap'],['Jul 15','them','Super-cap “needs exec approval” (false-standard tactic)']],
+  open:'Awaiting Visier’s executive decision on the data-breach super-cap — their open commitment. Anchor the 24-month cap in R1.'},
+ {id:'ISS-12',title:'Total contract value ~15% above precedent',type:'Redline · high',status:'discussion',
+  gapUs:'Target scenario — $908K Y1 / $2.37M over the term.',gapThem:'$1.168M Y1 opening / $3.05M over the term.',
+  us:[{party:'Lilly · HR + Finance',d:'Jun 22',ch:'teams',x:'Confirms ~18,000 employees, FY27 go-live, and appetite for a 3-year prepay.'},
+      {party:'Lilly · Procurement',d:'Jul 16',ch:'teams',x:'Finance confirms a 3-year prepay is available to fund a platform discount.'}],
+  them:[{party:'Visier',d:'Jun 18',ch:'email',x:'Opens at list pricing — Year-1 all-in $1.168M (platform $780K + implementation $220K + support $95K + …).'}],
+  exch:[['Jun 18','them','Opening at $1.168M Y1'],['Jun 22','int','We confirm prepay appetite'],['Jul 15','them','Held Year-1 commercials unchanged'],['Jul 16','int','Prepay confirmed to fund the discount']],
+  open:'We hold the prepay lever and haven’t countered on price yet — that’s R2 (Commercial package). Visier has held their opening, not moved.'},
+ {id:'ISS-04',title:'Auto-renewal, 90-day notice, uncapped uplift',type:'Redline · high',status:'discussion',
+  gapUs:'Opt-in renewal, or ≤45-day notice + a renewal-price cap (CPI / 4–5%).',gapThem:'Auto-renews for 12-month terms unless cancelled 90 days out; renewal at then-current list.',
+  us:[{party:'—',d:'',ch:'',x:'Our position is set in the redline; not yet put to Visier verbally.',plain:1}],
+  them:[{party:'Visier',d:'Jul 15',ch:'email',q:1,x:'…renew automatically for successive one-year periods unless notice at least ninety (90) days prior, at Supplier’s then-current list price. (MSA §3.2)'}],
+  exch:[['Jul 15','them','v3 holds 90-day auto-renewal, list pricing']],
+  open:'Their position is on the paper; ours isn’t on the table yet. Bundle with ISS-11 in R2 (trade the 45-day window for the cap).'},
+ {id:'ISS-07',title:'Customer configs / dashboards deemed supplier IP',type:'Redline · high',status:'unraised',
+  gapUs:'Lilly owns its configs & dashboards, with export on exit.',gapThem:'All configurations and analytic models are supplier IP (paper position; not yet discussed).',
+  us:[{party:'Lilly · HR',d:'Jul 16',ch:'teams',x:'Config/dashboard ownership and a clean data export must be protected on exit.'}],
+  them:[{party:'Visier',d:'redline',ch:'paper',q:1,x:'All configurations, templates and analytic models created within the Service shall be the exclusive property of Supplier. (MSA §8.3)'}],
+  exch:[['Jul 16','int','HR establishes the internal position']],
+  open:'Internal only — never raised with Visier. Put it on the table in R3 (Service & exit package).'}
+];
+// contested redlines with no communications yet
+const UNRAISED=[
+ {id:'ISS-02',t:'No IP-infringement indemnity',us:'Add standard IP indemnity + defense',them:'Only bodily-injury/property indemnity'},
+ {id:'ISS-05',t:'No convenience termination',us:'Convenience right after month 12 + refund',them:'Breach-only termination, fees non-refundable'},
+ {id:'ISS-06',t:'Uptime SLA 99.5%, weak credits',us:'99.9% + real credits + chronic-exit',them:'99.5%, capped credits, sole remedy'},
+ {id:'ISS-08',t:'Sub-processors by reference',us:'30-day notice + objection right',them:'“Continued use = consent”'},
+ {id:'ISS-09',t:'Audit limited to annual SOC 2',us:'Add a for-cause audit right',them:'SOC 2 in lieu of any audit'},
+ {id:'ISS-10',t:'Deemed acceptance after 10 days',us:'Positive sign-off vs criteria, 20-day',them:'Silence = acceptance in 10 days'},
+ {id:'ISS-11',t:'Uncapped post-term uplift',us:'CPI/4% cap on renewals 4–5',them:'“Then-current list” after the term'}
+];
+
+const CAT_OF={'ISS-01':'Legal & Liability','ISS-02':'Legal & Liability','ISS-03':'Data & Protection','ISS-04':'Commercial','ISS-05':'Service & Delivery','ISS-06':'Service & Delivery','ISS-07':'Service & Delivery','ISS-08':'Data & Protection','ISS-09':'Service & Delivery','ISS-10':'Service & Delivery','ISS-11':'Commercial','ISS-12':'Commercial'};
+const CAT_LIST=['Legal & Liability','Data & Protection','Commercial','Service & Delivery'];
+let active=null,query='',catFilter=null,expandAll=false;
+function counts(){const c={awaiting:0,discussion:0,unraised:UNRAISED.length,agreed:0};ITEMS.forEach(i=>c[i.status]++);return c;}
+function renderCatFilter(){
+  document.getElementById('catfilter').innerHTML='<button class="cfchip" aria-pressed="'+(catFilter===null)+'" data-c="">All categories</button>'+CAT_LIST.map(c=>'<button class="cfchip" aria-pressed="'+(catFilter===c)+'" data-c="'+c+'">'+c+'</button>').join('');
+  document.querySelectorAll('.cfchip').forEach(b=>b.onclick=()=>{catFilter=b.dataset.c||null;render();});
+}
+function renderSummary(){const c=counts();
+  document.getElementById('summary').innerHTML=Object.keys(STATUS).map(k=>'<div class="st-card '+k+'" aria-pressed="'+(active===k)+'" data-k="'+k+'"><span class="st-n">'+c[k]+'</span><span class="st-l">'+STATUS[k]+'</span></div>').join('');
+  document.querySelectorAll('.st-card').forEach(el=>el.onclick=()=>{active=active===el.dataset.k?null:el.dataset.k;render();});
+}
+document.getElementById('q').oninput=e=>{query=e.target.value.toLowerCase();render();};
+function chan(c){return c?'<span class="chan '+c+'">'+CH[c]+'</span>':'';}
+function citeBlock(list){return list.map(m=>m.plain?'<div class="nocite">'+m.x+'</div>':
+  '<div class="cite"><div class="cite-m">'+chan(m.ch)+'<span class="cite-party">'+m.party+'</span>'+(m.d?'<span class="cite-d">'+m.d+'</span>':'')+'</div><div class="cite-x'+(m.q?' quote':'')+'">'+m.x+'</div></div>').join('');}
+function matchItem(i){
+  if(active&&i.status!==active)return false;
+  if(catFilter&&CAT_OF[i.id]!==catFilter)return false;
+  if(query){const hay=(i.id+' '+i.title+' '+i.gapUs+' '+i.gapThem+' '+i.us.map(m=>m.x).join(' ')+' '+i.them.map(m=>m.x).join(' ')).toLowerCase();if(!hay.includes(query))return false;}
+  return true;
+}
+function fullBody(i){
+  return '<div class="gap"><div class="gap-side gap-us"><div class="gap-k">What we want</div><div class="gap-v">'+i.gapUs+'</div></div>'+
+      '<div class="gap-mid">vs</div>'+
+      '<div class="gap-side gap-them"><div class="gap-k">What they’ve said</div><div class="gap-v">'+i.gapThem+'</div></div></div>'+
+    '<div class="ev-sec">Where each position came from · the exact messages</div>'+
+    '<div class="ev-cols"><div class="ev-col us"><h4>Our side</h4>'+citeBlock(i.us)+'</div>'+
+      '<div class="ev-col them"><h4>Supplier</h4>'+citeBlock(i.them)+'</div></div>'+
+    '<div class="ev-sec">How it evolved</div>'+
+    '<div class="exch">'+i.exch.map(e=>'<div class="exev '+e[1]+'"><span class="ex-d">'+e[0]+'</span><span class="ex-w">'+(e[1]==='them'?'Visier':e[1]==='us'?'Lilly':'Internal')+'</span> — '+e[2]+'</div>').join('')+'</div>'+
+    '<div class="open '+i.status+'"><b>'+(i.status==='awaiting'?'⏳ Waiting on them:':i.status==='discussion'?'◐ In play:':'○ Next move:')+'</b><span>'+i.open+'</span></div>';
+}
+function miniBody(i){
+  return '<div class="gap"><div class="gap-side gap-us"><div class="gap-k">What we want</div><div class="gap-v">'+i.gapUs+'</div></div>'+
+      '<div class="gap-mid">vs</div>'+
+      '<div class="gap-side gap-them"><div class="gap-k">What they hold (redline)</div><div class="gap-v">'+i.gapThem+'</div></div></div>'+
+    '<div class="open unraised"><b>○ Next move:</b><span>Not yet raised with Visier — the position is set in the redline but there are no communications on it yet. Put it on the table.</span></div>';
+}
+function allItems(){
+  return ITEMS.map(i=>Object.assign({},i)).concat(UNRAISED.map(u=>({id:u.id,title:u.t,status:'unraised',gapUs:u.us,gapThem:u.them,minimal:true,us:[],them:[],exch:[]})));
+}
+function itemRow(i){
+  return '<div class="item compact"><div class="it-hd" data-toggle><span class="chev"></span><span class="it-id">'+i.id+'</span><span class="it-t">'+i.title+'</span>'+
+    (i.type?'<span class="it-type">'+i.type+'</span>':'')+'<span class="it-status stt-'+i.status+'">'+STATUS[i.status]+'</span></div>'+
+    '<div class="it-body">'+(i.minimal?miniBody(i):fullBody(i))+'</div></div>';
+}
+function render(){
+  renderSummary();renderCatFilter();
+  const wrap=document.getElementById('items');
+  const order={awaiting:0,discussion:1,unraised:2,agreed:3};
+  const items=allItems().filter(matchItem).sort((a,b)=>order[a.status]-order[b.status]);
+  wrap.innerHTML=items.length?('<div class="itemlist">'+items.map(itemRow).join('')+'</div>'):'<div class="card"><div class="card-bd nocite" style="text-align:center">No items match. Clear the search / filter.</div></div>';
+  wrap.querySelectorAll('[data-toggle]').forEach(h=>h.onclick=()=>{h.closest('.item').classList.toggle('compact');updateExpandBtn();});
+  const n=items.length;
+  document.getElementById('lc-count').textContent=n+' contested item'+(n===1?'':'s')+(catFilter?' · '+catFilter:'')+(active?' · '+STATUS[active]:'');
+  updateExpandBtn();
+}
+function updateExpandBtn(){const items=[...document.querySelectorAll('#items .item')];const anyCompact=items.some(i=>i.classList.contains('compact'));document.getElementById('expandall').textContent=items.length&&!anyCompact?'Collapse all':'Expand all';}
+document.getElementById('expandall').onclick=()=>{const items=[...document.querySelectorAll('#items .item')];const anyCompact=items.some(i=>i.classList.contains('compact'));items.forEach(i=>i.classList.toggle('compact',!anyCompact));updateExpandBtn();};
+render();
+</script>
+</body></html>

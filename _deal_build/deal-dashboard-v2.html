@@ -175,8 +175,9 @@ a:hover{text-decoration:underline}
 .summary-strip{position:sticky; top:0; z-index:30; background:var(--surface); border-bottom:1px solid var(--line2); box-shadow:var(--shadow-1)}
 .summary-strip .wrap{display:flex; gap:10px; padding-top:9px; padding-bottom:9px; overflow-x:auto}
 .ss-item{flex:1 1 0; min-width:132px; display:flex; flex-direction:column; gap:2px; padding:7px 12px;
-  border:1px solid var(--line); border-left:3px solid var(--mut2); border-radius:var(--r-sm); background:var(--panel);
+  border:1px solid var(--line); border-left:3px solid var(--pri); border-radius:var(--r-sm); background:var(--panel);
   cursor:pointer; text-align:left; font-family:inherit}
+.ss-item .ss-val{color:var(--pri-tx)}
 .ss-item:hover{background:var(--nested); border-color:var(--line2)}
 .ss-item .ss-val{font-size:20px; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
 .ss-item .ss-lbl{font-size:var(--fz-floor); color:var(--mut); text-transform:uppercase; letter-spacing:.05em; font-weight:700}
@@ -192,15 +193,15 @@ a:hover{text-decoration:underline}
 .tab-btn{appearance:none; background:transparent; border:0; border-bottom:2.5px solid transparent; color:var(--mut);
   font:700 var(--fz)/1 var(--sans); letter-spacing:.01em; padding:14px 16px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:7px}
 .tab-btn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2}
-.tab-btn:hover{color:var(--ink)}
-.tab-btn[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
+.tab-btn:hover{color:var(--pri-tx)}
+.tab-btn[aria-selected="true"]{color:var(--pri-tx); border-bottom-color:var(--pri)}
 /* Subtab bar = same underline design as the main tab bar (not pills); active = black text + black underline. */
 .subtabbar{background:var(--surface); border-bottom:1px solid var(--line2)}
 .subtabbar .wrap{display:flex; gap:2px; overflow-x:auto}
 .subtab-btn{appearance:none; background:transparent; border:0; border-bottom:2.5px solid transparent; color:var(--mut);
   font:700 var(--fz-sm)/1 var(--sans); letter-spacing:.01em; padding:12px 15px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:7px}
-.subtab-btn:hover{color:var(--ink)}
-.subtab-btn[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
+.subtab-btn:hover{color:var(--sec-tx)}
+.subtab-btn[aria-selected="true"]{color:var(--sec-tx); border-bottom-color:var(--sec)}
 
 /* tab/subtab panels */
 [data-tabpanel]{display:none}
@@ -230,13 +231,23 @@ a:hover{text-decoration:underline}
 .sa-card.accent-emph::before{background:var(--emph)}
 .sa-card.accent-danger::before{background:var(--danger-bar)}
 .sa-card.accent-warn::before{background:var(--warn-bar)}
-.card-hd{display:flex; align-items:center; gap:9px; padding:13px 15px; border-bottom:1px solid var(--line2);
-  background:linear-gradient(180deg,var(--card-hd-a),var(--card-hd-b))}
+/* header carries the card's accent as a subtle tint + a coloured title (plum default,
+   teal / burnt-orange / red per accent) — the main way the 3-colour system reads across every panel */
+.card-hd{display:flex; align-items:center; gap:9px; padding:13px 15px;
+  border-bottom:1px solid color-mix(in srgb,var(--pri) 22%,var(--line2));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pri) 9%,var(--surface)),var(--surface))}
+.sa-card.accent-teal .card-hd{border-bottom-color:color-mix(in srgb,var(--sec) 22%,var(--line2)); background:linear-gradient(180deg,color-mix(in srgb,var(--sec) 10%,var(--surface)),var(--surface))}
+.sa-card.accent-emph .card-hd{border-bottom-color:color-mix(in srgb,var(--emph) 24%,var(--line2)); background:linear-gradient(180deg,color-mix(in srgb,var(--emph) 11%,var(--surface)),var(--surface))}
+.sa-card.accent-danger .card-hd{border-bottom-color:color-mix(in srgb,var(--danger) 24%,var(--line2)); background:linear-gradient(180deg,color-mix(in srgb,var(--danger) 9%,var(--surface)),var(--surface))}
 .card-hd .ch-ic{width:17px; height:17px; flex:none; color:var(--pri-tx)}
 .sa-card.accent-teal .card-hd .ch-ic{color:var(--sec-tx)}
 .sa-card.accent-emph .card-hd .ch-ic{color:var(--emph-tx)}
+.sa-card.accent-danger .card-hd .ch-ic{color:var(--danger-fg)}
 .card-hd .ch-ic svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:2}
-.card-hd .ct{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink)}
+.card-hd .ct{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--pri-tx)}
+.sa-card.accent-teal .card-hd .ct{color:var(--sec-tx)}
+.sa-card.accent-emph .card-hd .ct{color:var(--emph-tx)}
+.sa-card.accent-danger .card-hd .ct{color:var(--danger-fg)}
 .card-hd .cs{margin-left:auto; font-family:var(--mono); font-size:var(--fz-meta); color:var(--mut); font-weight:600; text-align:right}
 .card-bd{padding:15px 16px; flex:1; min-width:0}
 .card-bd.tight{padding:11px 13px}
@@ -297,8 +308,8 @@ a:hover{text-decoration:underline}
 .tbl-wrap{overflow-x:auto; border-radius:var(--r-sm)}
 table.dt{width:100%; border-collapse:collapse; font-size:var(--fz-sm)}
 table.dt th,table.dt td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top}
-table.dt thead th{position:sticky; top:0; background:var(--panel); color:var(--mut); font-weight:700; font-size:var(--fz-meta);
-  text-transform:uppercase; letter-spacing:.05em; border-bottom:1.5px solid var(--line2); white-space:nowrap; z-index:1}
+table.dt thead th{position:sticky; top:0; background:color-mix(in srgb,var(--pri) 7%,var(--surface2)); color:var(--pri-tx); font-weight:700; font-size:var(--fz-meta);
+  text-transform:uppercase; letter-spacing:.05em; border-bottom:1.5px solid color-mix(in srgb,var(--pri) 26%,var(--line2)); white-space:nowrap; z-index:1}
 table.dt th[data-sort]{cursor:pointer; user-select:none}
 table.dt th[data-sort]:hover{color:var(--ink)}
 table.dt th[data-sort]::after{content:"\2195"; opacity:.35; margin-left:5px; font-size:10px}

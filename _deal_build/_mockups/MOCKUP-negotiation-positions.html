@@ -1,0 +1,313 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup — Negotiation ▸ Positions (per-term workbench)</title>
+<style>
+:root{
+  --plum:#5C2B50;--plum-t:#f0e6ee;--plum-tx:#5C2B50;
+  --sec:#2F6E6B;--sec-t:#e2efee;--sec-tx:#245451;--teal-d:#245451;
+  --emph:#C15E19;--emph-t:#fbeadd;--emph-tx:#9e4d15;
+  --danger:#B42318;--danger-t:#fbe9e7;
+  --ink:#1c1a1d;--ink2:#3f3a40;--mut:#6b6570;--mut2:#8a8490;
+  --line:#e7e3ea;--line2:#d8d3dc;--surface:#fff;--surface2:#f7f5f8;--nested:#f1eef3;
+  --bg:#eceaee;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--mono:'SF Mono',ui-monospace,'Cascadia Code',monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;padding:22px}
+.wrap{max-width:1180px;margin:0 auto}
+.mock-note{background:#fff8ec;border:1px solid var(--emph);color:var(--emph-tx);font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:16px}
+h1{font-size:20px;margin:0 0 3px}
+.sub{color:var(--mut);font-size:12.5px;margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:12px;margin-bottom:16px;overflow:hidden}
+.card-hd{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--line);background:linear-gradient(var(--surface2),var(--surface))}
+.ct{font:800 11px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+.card-bd{padding:15px}
+/* severity icon */
+.sev{display:inline-flex;width:17px;height:17px;flex:0 0 auto;align-items:center;justify-content:center}
+.sev svg{width:15px;height:15px}
+.sev.stop{color:var(--emph)} .sev.high{color:var(--plum)} .sev.med{color:var(--sec)} .sev.low{color:var(--mut2)}
+/* POSTURE header */
+.posture{display:grid;grid-template-columns:1.15fr 1fr;gap:15px;margin-bottom:16px}
+.pcard{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:15px}
+.pcard h3{font:800 10px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:0 0 12px}
+.gates{display:flex;flex-direction:column;gap:9px}
+.gate{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--line2);border-radius:9px;background:var(--surface2)}
+.gate .g-top{display:flex;align-items:center;gap:9px}
+.gate .g-t{font-weight:700;font-size:12.5px;color:var(--ink)}
+.gate .g-id{margin-left:auto;font:700 9px/1 var(--mono);color:var(--mut2)}
+.gate .g-status{display:flex;flex-direction:column;gap:3px;padding-left:26px}
+.gate .g-now,.gate .g-need{font-size:11px;line-height:1.35}
+.gate .g-now{color:var(--danger)}.gate .g-need{color:var(--sec-tx)}
+.gate .g-now b,.gate .g-need b{font-weight:800;letter-spacing:.02em;text-transform:uppercase;font-size:9px;margin-right:4px}
+/* protection trajectory */
+.traj-top{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.traj-now{font:800 30px/1 var(--sans);color:var(--danger)}
+.traj-lbl{font-size:11px;color:var(--mut2)}
+.traj-arrow{color:var(--mut2);font-size:16px;margin:0 3px}
+.traj-goal{font:800 30px/1 var(--sans);color:var(--sec)}
+.traj-bar{position:relative;height:12px;border-radius:6px;background:var(--nested);overflow:hidden;margin:4px 0 3px}
+.traj-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,var(--danger),var(--emph) 55%,var(--sec))}
+.traj-marks{display:flex;font-size:10px;color:var(--mut2);justify-content:space-between;margin-top:3px}
+.pk-legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.pk-chip{font-size:10.5px;color:var(--ink2);background:var(--nested);border:1px solid var(--line2);border-radius:6px;padding:3px 8px}
+.pk-chip b{color:var(--sec-tx)}
+.diff-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+.diff-pill{font:800 10px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:4px 9px;border-radius:6px;color:var(--danger);background:var(--danger-t)}
+.dist{display:flex;gap:12px;font-size:11px;color:var(--mut)}
+.dist span{display:inline-flex;align-items:center;gap:4px}
+.dist b{color:var(--ink);font-variant-numeric:tabular-nums}
+/* filters */
+.filters{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filters .fl-lbl{font-size:11px;color:var(--mut2);margin-right:2px}
+.fchip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid var(--line2);border-radius:20px;background:var(--surface);cursor:pointer;font-size:11px;font-weight:700;color:var(--mut)}
+.fchip[aria-pressed="true"]{border-color:var(--plum);background:var(--plum-t);color:var(--plum)}
+.fchip .cnt{font-size:10px;color:var(--mut2);font-variant-numeric:tabular-nums}
+/* master-detail */
+.md{display:grid;grid-template-columns:290px 1fr;gap:0;background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.md-list{border-right:1px solid var(--line);max-height:640px;overflow:auto}
+.row{display:flex;gap:9px;align-items:flex-start;padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer}
+.row:hover{background:var(--surface2)}
+.row.sel{background:var(--plum-t)}
+.row .r-txt{min-width:0}
+.row .r-t{font-weight:700;font-size:12px;color:var(--ink);line-height:1.3}
+.row .r-c{font-size:10.5px;color:var(--mut2);margin-top:2px}
+.row .r-st{margin-left:auto;font:700 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);flex:0 0 auto}
+.md-detail{padding:18px 20px;max-height:640px;overflow:auto}
+.d-eyebrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.d-id{font:800 11px/1 var(--mono);color:var(--mut)}
+.d-clause{font-size:11px;color:var(--mut2)}
+.d-tag{font:800 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:5px}
+.d-tag.stop{color:var(--emph-tx);background:var(--emph-t)} .d-tag.high{color:var(--plum);background:var(--plum-t)} .d-tag.med{color:var(--sec-tx);background:var(--sec-t)} .d-tag.low{color:var(--mut);background:var(--nested)}
+.d-title{font-size:17px;font-weight:800;line-height:1.3;margin:3px 0 16px;color:var(--ink)}
+.sec-h{font:800 9.5px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:18px 0 9px}
+/* position ladder */
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rung{border:1px solid var(--line2);border-radius:9px;padding:10px 11px;background:var(--surface2);position:relative}
+.rung .r-k{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+.rung .r-v{font-size:11.5px;color:var(--ink2);line-height:1.4}
+.rung.supplier{border-color:#e7b7b0;background:var(--danger-t)}.rung.supplier .r-k{color:var(--danger)}
+.rung.target{border-color:#a9cfcc;background:var(--sec-t)}.rung.target .r-k{color:var(--sec-tx)}
+.rung.fallback{border-color:#d6c2d1;background:var(--plum-t)}.rung.fallback .r-k{color:var(--plum)}
+.rung.walk{border-color:var(--plum);background:#efe2ec}.rung.walk .r-k{color:var(--plum)}
+.ladder-note{font-size:10.5px;color:var(--mut2);font-style:italic;margin-top:7px}
+/* why / exchange */
+.kv{display:grid;grid-template-columns:118px 1fr;gap:5px 12px;font-size:12.5px}
+.kv dt{color:var(--mut2);font-weight:700}
+.kv dd{margin:0;color:var(--ink2);line-height:1.5}
+.exch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.exch .e{border:1px solid var(--line2);border-radius:9px;padding:11px 12px}
+.exch .e-k{font:800 9px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.exch .push{background:var(--danger-t);border-color:#e7b7b0}.exch .push .e-k{color:var(--danger)}
+.exch .rebut{background:var(--sec-t);border-color:#a9cfcc}.exch .rebut .e-k{color:var(--sec-tx)}
+.exch .e-v{font-size:12px;line-height:1.5;color:var(--ink2)}
+.tactic{display:inline-flex;align-items:center;gap:5px;margin-top:7px;font-size:10.5px;color:var(--emph-tx);background:var(--emph-t);border-radius:5px;padding:2px 7px;font-weight:700}
+.trade{margin-top:10px;font-size:12px;color:var(--ink2);background:var(--nested);border-radius:8px;padding:9px 11px}
+.trade b{color:var(--plum)}
+/* dependencies */
+.deps{display:flex;flex-wrap:wrap;gap:8px}
+.dep{font-size:11px;padding:5px 9px;border-radius:6px;border:1px solid var(--line2);background:var(--surface2)}
+.dep .dk{font:700 8.5px/1 var(--sans);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);margin-right:5px}
+.dep b{color:var(--plum)}
+/* history */
+.hist{display:flex;flex-direction:column;gap:0;border-left:2px solid var(--line2);margin-left:5px;padding-left:14px}
+.hev{position:relative;padding:7px 0}
+.hev::before{content:"";position:absolute;left:-20px;top:11px;width:8px;height:8px;border-radius:50%;background:var(--plum);border:2px solid var(--surface)}
+.hev .h-d{font:700 10px/1 var(--mono);color:var(--mut2)}
+.hev .h-t{font-size:12px;color:var(--ink2);margin-top:2px;line-height:1.4}
+.hev .h-who{font-weight:700;color:var(--plum)}
+/* stance */
+.stance{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line2)}
+.stance .s-lbl{font-size:11px;color:var(--mut2);font-weight:700}
+.stance button{font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;border:1px solid var(--line2);background:var(--surface);color:var(--mut);cursor:pointer}
+.stance button.on{border-color:var(--plum);background:var(--plum);color:#fff}
+.stance .s-note{margin-left:auto;font-size:10.5px;color:var(--mut2);font-style:italic}
+@media(max-width:820px){.posture,.md{grid-template-columns:1fr}.ladder{grid-template-columns:1fr 1fr}.exch{grid-template-columns:1fr}}
+</style></head>
+<body><div class="wrap">
+<div class="mock-note">Mockup — Negotiation ▸ Positions redesign (per-term workbench). Standalone preview; not wired to the live dashboard. Real data.</div>
+<h1>Positions</h1>
+<p class="sub">One term at a time: its full arc (as-drafted → target → fallback → walk-away), why, the exchange, its dependencies, and its history. Under an orienting posture header.</p>
+
+<!-- POSTURE -->
+<div class="posture">
+  <div class="pcard">
+    <h3>Signature gates · must win before signing</h3>
+    <div class="gates" id="gates"></div>
+  </div>
+  <div class="pcard">
+    <h3>Protection score · where we can get to</h3>
+    <div class="traj-top"><span class="traj-now">58</span><span class="traj-lbl">Weak, on the<br>current redline</span><span class="traj-arrow">→</span><span class="traj-goal">97</span><span class="traj-lbl">Strong, if the three<br>packages land</span></div>
+    <div class="traj-bar"><div class="traj-fill" style="width:58%"></div></div>
+    <div class="traj-marks"><span>0</span><span>now 58</span><span>target 97</span><span>100</span></div>
+    <div class="pk-legend">
+      <span class="pk-chip">Protection pkg <b>+21</b></span>
+      <span class="pk-chip">Commercial pkg <b>+7</b></span>
+      <span class="pk-chip">Service &amp; exit pkg <b>+11</b></span>
+    </div>
+    <div class="diff-row">
+      <span class="diff-pill">Difficulty: High</span>
+      <div class="dist" id="dist"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters" id="filters"><span class="fl-lbl">Filter:</span></div>
+
+<!-- MASTER-DETAIL -->
+<div class="md">
+  <div class="md-list" id="list"></div>
+  <div class="md-detail" id="detail"></div>
+</div>
+</div>
+
+<script>
+const SEV = {
+  'hard-stop':{cls:'stop',lbl:'Hard stop',icon:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 2h9L22 7.5v9L16.5 22h-9L2 16.5v-9L7.5 2z"/></svg>'},
+  'high':{cls:'high',lbl:'High',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>'},
+  'medium':{cls:'med',lbl:'Medium',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>'},
+  'low':{cls:'low',lbl:'Low',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>'}
+};
+function sevIcon(p){const s=SEV[p]||SEV.low;return '<span class="sev '+s.cls+'" title="'+s.lbl+'">'+s.icon+'</span>';}
+
+// per-term data (real). ladder = supplier(as-drafted) -> target -> fallback -> walk-away
+const ISS=[
+ {id:'ISS-01',p:'hard-stop',cat:'Liability',clause:'MSA §11.2',title:'Liability cap set at 12 months of fees, all damages capped',
+  supplier:'12-month aggregate cap; all categories capped, no carve-outs.',target:'24-month cap; data-breach & confidentiality carved to a 3× super-cap; IP indemnity uncapped.',fallback:'24-month cap with a 2× super-cap on data-breach only.',walk:'12-month all-inclusive cap with no data-breach carve-out.',
+  playbook:'Min 24 months for SaaS handling workforce data; breach/confidentiality/IP must be uncapped or super-capped at 3×.',impact:'A workforce-data breach could far exceed a single year of fees; a 12-month all-in cap leaves the buyer under-protected.',
+  push:'“Our standard cap is 12 months; super-caps are non-standard and require executive approval.”',rebut:'Anchor on workforce-data sensitivity & regulatory exposure; accept 24-month cap (not 3×) if the data-breach super-cap holds.',tactic:'False-standard anchoring',
+  trade:'Concede mutual 24-month cap symmetry to win the data-breach carve-out.',pkg:'Protection package',movesWith:['ISS-02','ISS-03'],against:[],
+  hist:[{d:'Jul 8',who:'Visier',t:'MSA v2 returns a 12-month cap.'},{d:'Jul 14',who:'Lilly Legal',t:'Flags the 12-month cap as signature-blocking.'},{d:'Jul 15',who:'Visier',t:'v3 holds the cap; states super-caps need executive approval.'}]},
+ {id:'ISS-02',p:'high',cat:'Liability',clause:'MSA §10.1–10.3',title:'Mutual indemnity narrow; no IP-infringement defense of the platform',
+  supplier:'Indemnity only for third-party bodily injury / property; no IP-infringement indemnity.',target:'Add standard IP-infringement indemnity with defense + repair/replace/refund; drop the “gross” qualifier.',fallback:'IP indemnity capped at the super-cap; keep “gross” on injury only.',walk:'No IP-infringement indemnity of any kind.',
+  playbook:'SaaS supplier must indemnify & defend third-party IP-infringement claims with a repair/replace/refund remedy.',impact:'If a third party alleges the platform infringes their IP, the buyer bears its own defense and any settlement.',
+  push:'“IP indemnity is covered by the general warranty.”',rebut:'Distinguish warranty (a promise) from indemnity (a defense obligation); the platform aggregates third-party connectors, raising IP exposure.',tactic:'',
+  trade:'Pair with ISS-01 super-cap as a single liability package.',pkg:'Protection package',movesWith:['ISS-01','ISS-03'],against:[],
+  hist:[{d:'Jul 15',who:'Visier',t:'v3 keeps the narrow indemnity; no IP defense.'}]},
+ {id:'ISS-03',p:'hard-stop',cat:'Data & Privacy',clause:'MSA §9.4',title:'Data-protection terms reference an unsigned DPA; no SCCs attached',
+  supplier:'DPA “will be entered into” but none attached; no EU SCCs; sub-processor notice unstated.',target:'Attach & execute a reviewed DPA with EU SCCs, 30-day sub-processor objection, 72-hour breach notice — before signature.',fallback:'Execute the DPA within 15 days of signature; production data paused until executed.',walk:'Signature with no DPA and no SCCs.',
+  playbook:'A signed DPA with EU SCCs and sub-processor change-notice must be attached & executed at signature for any processor of employee PII.',impact:'Processing global workforce PII without an executed, reviewed DPA is a compliance exposure and a policy blocker.',
+  push:'“Our standard DPA is sufficient and rarely modified.”',rebut:'Require the actual DPA text in-session; “standard, rarely modified” is not a substitute for reviewing the sub-processor & SCC terms.',tactic:'Deferred paper (incorporation by reference)',
+  trade:'Low trade value — this is a compliance gate, not a lever.',pkg:'Protection package',movesWith:['ISS-01','ISS-02'],against:['ISS-08'],
+  hist:[{d:'Jul 1',who:'Lilly',t:'Requests the MSA / DPA / Security Exhibit for review.'},{d:'Jul 8',who:'Visier',t:'v2: DPA “by reference,” Security Exhibit referenced but not attached.'},{d:'Jul 15',who:'Visier',t:'v3 holds the standard DPA posture.'}]},
+ {id:'ISS-04',p:'high',cat:'Term & Renewal',clause:'MSA §3.2 / OF §4',title:'Auto-renewal with 90-day notice and uncapped renewal uplift',
+  supplier:'Auto-renews for 12-month terms unless cancelled 90 days out; renewal at “then-current list.”',target:'Opt-in renewal, or 30-day notice with renewal uplift capped at CPI or 4%, whichever is lower.',fallback:'45-day notice with a 5% renewal cap.',walk:'90-day window with no price cap.',
+  playbook:'Auto-renewal only with a ≤30-day notice window and a cap on renewal increases (CPI or 3–5%).',impact:'A missed 90-day window locks another year at an uncapped increase; renewal leverage is lost.',
+  push:'“90 days is needed for capacity planning; list price protects our roadmap investment.”',rebut:'Offer a 45-day window in exchange for the uplift cap; capacity planning does not require a pricing free hand.',tactic:'Auto-renewal lock-in + long notice window',
+  trade:'Concede notice window (45 vs 30) to win the renewal-price cap.',pkg:'Commercial package',movesWith:['ISS-11'],against:['ISS-12'],
+  hist:[{d:'Jul 15',who:'Visier',t:'v3: holds 90-day auto-renewal, then-current list pricing.'}]},
+ {id:'ISS-05',p:'medium',cat:'Term & Renewal',clause:'MSA §12.1',title:'No termination for convenience for the customer',
+  supplier:'Termination only for uncured material breach; no convenience right; fees non-refundable.',target:'Convenience termination after month 12 with 60-day notice and pro-rata refund of unused prepaid fees.',fallback:'Convenience right only at each anniversary.',walk:'None — this is a trade item, not a gate.',
+  playbook:'Prefer a convenience-termination right after year 1 with pro-rata refund of prepaid, unused fees.',impact:'If the platform underdelivers, the buyer is locked in for the full term with no refund path.',
+  push:'“Subscriptions are committed; convenience termination undermines the discount.”',rebut:'Tie the convenience right to a sustained SLA miss rather than a free walk-away, if a clean right is refused.',tactic:'',
+  trade:'High trade value — can be conceded to protect ISS-01/03.',pkg:'Service & exit package',movesWith:['ISS-07'],against:[],
+  hist:[]},
+ {id:'ISS-06',p:'high',cat:'Service Levels',clause:'MSA §7.2 / Exh. B',title:'Uptime SLA 99.5% with weak, capped service credits',
+  supplier:'99.5% uptime; 5% credit per 1% miss, capped 15%; credits are sole remedy.',target:'99.9% target; credits scaled to 50% of monthly fee; three consecutive misses trigger a termination right.',fallback:'99.7% with a chronic-failure termination right retained.',walk:'None — but the chronic-failure exit is a firm ask.',
+  playbook:'99.9% for a system-of-engagement analytics platform; meaningful credits; chronic-failure termination right.',impact:'A quarter of degraded service yields a token credit and no exit; downtime during quarterly reporting is costly.',
+  push:'“99.5% is our contractual standard; 99.9% is an enterprise-tier upgrade.”',rebut:'Ask whether 99.9% is a genuine paid tier or a posture; require the achieved-uptime history to justify 99.5%.',tactic:'Sole-remedy limitation',
+  trade:'Data gap (Exhibit B) — resolve before trading.',pkg:'Service & exit package',movesWith:['ISS-07','ISS-10'],against:[],
+  hist:[]},
+ {id:'ISS-07',p:'high',cat:'IP',clause:'MSA §8.3',title:'Customer configurations and dashboards deemed supplier IP',
+  supplier:'All configs, dashboards & derived models are supplier IP; customer licensed during the term only.',target:'Customer owns customer-specific configs & dashboards; supplier keeps platform IP; customer data always customer-owned + export.',fallback:'Perpetual royalty-free licence to configs + a defined export format on exit.',walk:'Supplier ownership of customer data (not just configs).',
+  playbook:'Customer-specific configs/dashboards built with customer data should be customer-owned or perpetually licensed; data is customer-owned.',impact:'On exit the buyer loses the dashboards it built and paid to configure; raises switching cost & lock-in.',
+  push:'“Configurations rely on our proprietary modelling engine.”',rebut:'Separate the engine (theirs) from the buyer’s config/dashboard layer (buyer’s); require machine-readable export on exit either way.',tactic:'Broad IP capture of customer-built work',
+  trade:'Bundle with ISS-05 continuity / exit terms.',pkg:'Service & exit package',movesWith:['ISS-05'],against:[],
+  hist:[{d:'Jul 16',who:'Lilly HR',t:'Asks that config/dashboard ownership + clean data export be protected on exit.'}]},
+ {id:'ISS-08',p:'medium',cat:'Data & Privacy',clause:'MSA §9.6',title:'Sub-processors listed by reference; no change-notice or objection right',
+  supplier:'May add/replace sub-processors at any time; list on a webpage; “continued use = consent.”',target:'30-day advance email notice of new sub-processors with a good-faith objection-and-remediation right.',fallback:'Notice via a subscribed change-feed with a 15-day objection window.',walk:'None.',
+  playbook:'Advance notice of new sub-processors (≥30 days) with a right to object; onward-transfer safeguards.',impact:'A new sub-processor in a high-risk jurisdiction could be added silently, undermining the transfer posture.',
+  push:'“Web-list notice is standard SaaS practice.”',rebut:'Web-list without push notice is insufficient for employee data; require an emailed change-feed at minimum.',tactic:'Continued-use-as-consent',
+  trade:'Fold into the DPA negotiation (ISS-03).',pkg:'',movesWith:['ISS-03'],against:[],
+  hist:[]},
+ {id:'ISS-09',p:'low',cat:'Audit & Compliance',clause:'MSA §7.5',title:'Audit rights limited to a SOC 2 report once per year',
+  supplier:'Audit satisfied by an annual SOC 2 Type II report; no on-site or for-cause audit.',target:'Keep SOC 2 for routine assurance; add a for-cause audit right triggered by a reportable incident.',fallback:'For-cause right satisfied by an agreed third-party assessor’s report.',walk:'None.',
+  playbook:'SOC 2 acceptable for routine assurance, plus a for-cause audit right after a security incident.',impact:'After a breach the buyer cannot independently verify remediation.',
+  push:'“SOC 2 is comprehensive and independently assured.”',rebut:'SOC 2 is periodic & general; a for-cause right is incident-specific — complementary, not redundant.',tactic:'',
+  trade:'Low-cost concession for the supplier — an easy give to bank goodwill.',pkg:'',movesWith:[],against:[],
+  hist:[]},
+ {id:'ISS-10',p:'high',cat:'Scope & Acceptance',clause:'SOW-01 §5',title:'SOW acceptance is deemed after 10 days of silence',
+  supplier:'Each deliverable deemed accepted if not rejected in writing within 10 business days.',target:'Positive sign-off against per-milestone acceptance criteria; 20-business-day review; cure period on rejection.',fallback:'Deemed acceptance at 20 business days but only against written criteria.',walk:'Deemed acceptance with no acceptance criteria at all.',
+  playbook:'Acceptance requires positive sign-off against written criteria; deemed windows ≥20 business days with defined criteria.',impact:'A busy stakeholder could “accept” a non-conforming milestone by inaction, weakening remedies and triggering payment.',
+  push:'“Deemed acceptance keeps the project timeline moving.”',rebut:'Timelines are protected by criteria + a cure period, not by a silence trap; offer a named reviewer with a turnaround SLA.',tactic:'Deemed acceptance by silence',
+  trade:'Links to the SOW milestone schedule — negotiate together.',pkg:'Service & exit package',movesWith:['ISS-06'],against:[],
+  hist:[]},
+ {id:'ISS-11',p:'high',cat:'Commercial',clause:'Order Form §4.2',title:'Annual price uplift uncapped after the initial 3-year term',
+  supplier:'Fees fixed for the 3-year term; thereafter “at then-current list price,” no cap.',target:'Cap post-term uplift at CPI or 4% for renewals 4 & 5; extend price protection two years past the initial term.',fallback:'5% cap for the first renewal only.',walk:'None alone — but jointly with ISS-04 it is high-priority.',
+  playbook:'Post-term uplift capped at CPI or a fixed 3–5%; a price-protection window beyond the initial term.',impact:'Year-4 fees could jump materially with the buyer already locked into the platform.',
+  push:'“List pricing rises with roadmap investment.”',rebut:'Fixed-term protection is meaningless if year 4 is unbounded; a CPI cap still lets list price rise with the market.',tactic:'Unbounded post-term repricing',
+  trade:'Package with ISS-04 renewal terms.',pkg:'Commercial package',movesWith:['ISS-04'],against:[],
+  hist:[]},
+ {id:'ISS-12',p:'high',cat:'Commercial',clause:'Order Form §2 + SOW §7',title:'Total contract value anchored ~15% above internal precedent',
+  supplier:'Year-1 all-in $1.168M (platform $780K + implementation $220K + support $95K + connectors $45K + training $28K).',target:'Anchor to the target scenario ($908K Y1); implementation & premium support carry the largest concessions.',fallback:'Fallback scenario ($1.008M Y1) if the platform discount is resisted.',walk:'Above the max-acceptable Y1 of $1.07M.',
+  playbook:'Target discount to the internal-precedent benchmark; implementation & support are the most negotiable lines.',impact:'Accepting the ask overpays by ~$0.68M across the 3-year term versus a defensible target.',
+  push:'“Pricing reflects the platform’s premium analytics capability.”',rebut:'Separate platform value (defensible) from implementation/support loading (negotiable); benchmark the services lines against day-rate norms.',tactic:'High anchoring vs precedent',
+  trade:'A multi-year prepay or a case-study reference can fund a platform discount.',pkg:'Commercial package',movesWith:['ISS-04','ISS-11'],against:[],
+  hist:[{d:'Jun 18',who:'Visier',t:'Opens at list: Year-1 all-in $1.168M.'},{d:'Jul 15',who:'Visier',t:'v3 holds Year-1 commercials from the opening Order Form.'}]}
+];
+const byId=Object.fromEntries(ISS.map(x=>[x.id,x]));
+
+// gates — where each blocking term stands now vs what clears it
+const gates=[
+ ['ISS-01','Liability cap','Supplier holding a 12-month all-in cap, no carve-outs','24-month cap + a data-breach super-cap'],
+ ['ISS-03','Data protection / DPA','DPA “by reference,” not provided; no EU SCCs','Executed DPA + SCCs, reviewed in-session'],
+ ['ISS-04','Renewal & price','90-day auto-renewal at uncapped “list” pricing','≤45-day notice + a renewal-price cap']
+];
+document.getElementById('gates').innerHTML=gates.map(([id,lbl,now,need])=>{const x=byId[id];return
+ '<div class="gate"><div class="g-top">'+sevIcon(x.p)+'<span class="g-t">'+lbl+'</span><span class="g-id">'+id+' · '+x.clause+'</span></div>'+
+ '<div class="g-status"><span class="g-now"><b>Now</b>'+now+'</span><span class="g-need"><b>Need</b>'+need+'</span></div></div>';
+}).join('');
+
+// distribution
+const counts={'hard-stop':0,'high':0,'medium':0,'low':0};ISS.forEach(x=>counts[x.p]++);
+document.getElementById('dist').innerHTML=[['hard-stop','hard stop'],['high','high'],['medium','med'],['low','low']].map(([k,l])=>'<span>'+sevIcon(k)+'<b>'+counts[k]+'</b> '+l+'</span>').join('');
+
+// filters (icons)
+let active=new Set();
+const fwrap=document.getElementById('filters');
+[['hard-stop'],['high'],['medium'],['low']].forEach(([k])=>{
+  const b=document.createElement('button');b.className='fchip';b.setAttribute('aria-pressed','false');b.dataset.p=k;
+  b.innerHTML=sevIcon(k)+SEV[k].lbl+' <span class="cnt">'+counts[k]+'</span>';
+  b.onclick=()=>{if(active.has(k)){active.delete(k);b.setAttribute('aria-pressed','false');}else{active.add(k);b.setAttribute('aria-pressed','true');}renderList();};
+  fwrap.appendChild(b);
+});
+
+let selId='ISS-01';
+function renderList(){
+  const list=document.getElementById('list');
+  const shown=ISS.filter(x=>active.size===0||active.has(x.p));
+  list.innerHTML=shown.map(x=>'<div class="row'+(x.id===selId?' sel':'')+'" data-id="'+x.id+'">'+sevIcon(x.p)+
+    '<div class="r-txt"><div class="r-t">'+x.title+'</div><div class="r-c">'+x.id+' · '+x.cat+'</div></div>'+
+    '<span class="r-st">'+(x.pkg?x.pkg.replace(' package',''):'—')+'</span></div>').join('');
+  list.querySelectorAll('.row').forEach(r=>r.onclick=()=>{selId=r.dataset.id;renderList();renderDetail();});
+  if(shown.length && !shown.find(x=>x.id===selId)){selId=shown[0].id;renderDetail();}
+}
+let stance={};
+function renderDetail(){
+  const x=byId[selId];const s=SEV[x.p];
+  const rung=(cls,k,v)=>'<div class="rung '+cls+'"><div class="r-k">'+k+'</div><div class="r-v">'+v+'</div></div>';
+  const depChips=[];
+  x.movesWith.forEach(id=>depChips.push('<span class="dep"><span class="dk">moves with</span><b>'+id+'</b> '+byId[id].cat+'</span>'));
+  x.against.forEach(id=>depChips.push('<span class="dep"><span class="dk">trades against</span><b>'+id+'</b> '+byId[id].cat+'</span>'));
+  if(x.pkg) depChips.unshift('<span class="dep"><span class="dk">bundle</span><b>'+x.pkg+'</b></span>');
+  const hist=x.hist.length?('<div class="hist">'+x.hist.map(h=>'<div class="hev"><div class="h-d">'+h.d+'</div><div class="h-t"><span class="h-who">'+h.who+'</span> — '+h.t+'</div></div>').join('')+'</div>'):'<div class="ladder-note">No recorded movement on this term yet.</div>';
+  const st=stance[x.id]||'';
+  const sbtn=(k)=>'<button class="'+(st===k?'on':'')+'" data-st="'+k+'">'+k+'</button>';
+  document.getElementById('detail').innerHTML=
+   '<div class="d-eyebrow"><span class="d-id">'+x.id+'</span>'+sevIcon(x.p)+'<span class="d-tag '+s.cls+'">'+s.lbl+'</span><span class="d-clause">'+x.cat+' · '+x.clause+'</span></div>'+
+   '<div class="d-title">'+x.title+'</div>'+
+   '<div class="sec-h">Position ladder · as-drafted → walk-away</div>'+
+   '<div class="ladder">'+rung('supplier','As drafted',x.supplier)+rung('target','Target',x.target)+rung('fallback','Fallback',x.fallback)+rung('walk','Walk-away',x.walk)+'</div>'+
+   '<div class="ladder-note">Open at Target; drop only one rung at a time, and only for a matching give.</div>'+
+   '<div class="sec-h">Why it matters</div>'+
+   '<dl class="kv"><dt>Playbook</dt><dd>'+x.playbook+'</dd><dt>Impact</dt><dd>'+x.impact+'</dd></dl>'+
+   '<div class="sec-h">The exchange</div>'+
+   '<div class="exch"><div class="e push"><div class="e-k">Expected pushback</div><div class="e-v">'+x.push+'</div>'+(x.tactic?'<span class="tactic">⚑ tactic: '+x.tactic+'</span>':'')+'</div>'+
+     '<div class="e rebut"><div class="e-k">Our rebuttal</div><div class="e-v">'+x.rebut+'</div></div></div>'+
+   '<div class="trade"><b>Trade:</b> '+x.trade+'</div>'+
+   '<div class="sec-h">Dependencies</div><div class="deps">'+(depChips.length?depChips.join(''):'<span class="ladder-note">Standalone term.</span>')+'</div>'+
+   '<div class="sec-h">History · this term across redlines</div>'+hist+
+   '<div class="stance"><span class="s-lbl">My stance:</span>'+sbtn('Holding')+sbtn('Trading')+sbtn('Won')+'<span class="s-note">local prep aid · not a record</span></div>';
+  document.querySelectorAll('.stance button').forEach(b=>b.onclick=()=>{stance[x.id]=(stance[x.id]===b.dataset.st?'':b.dataset.st);renderDetail();});
+}
+renderList();renderDetail();
+</script>
+</body></html>

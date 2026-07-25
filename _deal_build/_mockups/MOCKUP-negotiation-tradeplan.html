@@ -1,0 +1,243 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup — Negotiation ▸ Trade Plan (item-driven, accordion)</title>
+<style>
+:root{
+  --plum:#5C2B50;--plum-t:#f0e6ee;--sec:#2F6E6B;--sec-t:#e2efee;--sec-tx:#245451;--teal-d:#245451;
+  --emph:#C15E19;--emph-t:#fbeadd;--emph-tx:#9e4d15;--danger:#B42318;--danger-t:#fbe9e7;--warn:#B25E09;--warn-t:#fbf0dd;--ok:#2f8a4e;--ok-t:#e5f3ea;
+  --ink:#1c1a1d;--ink2:#3f3a40;--mut:#6b6570;--mut2:#8a8490;
+  --line:#e7e3ea;--line2:#d8d3dc;--surface:#fff;--surface2:#f7f5f8;--nested:#f1eef3;
+  --bg:#eceaee;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--mono:'SF Mono',ui-monospace,'Cascadia Code',monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;padding:22px}
+.wrap{max-width:1120px;margin:0 auto}
+.mock-note{background:#fff8ec;border:1px solid var(--emph);color:var(--emph-tx);font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:16px}
+h1{font-size:20px;margin:0 0 3px}.sub{color:var(--mut);font-size:12.5px;margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:12px;margin-bottom:14px}
+.card-hd{display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--line);background:linear-gradient(var(--surface2),var(--surface));border-radius:12px 12px 0 0}
+.ct{font:800 11px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+.cs{margin-left:auto;font-size:11px;color:var(--mut2)}
+.card-bd{padding:15px}
+/* scoreboard */
+.score{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gauge .g-top{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.g-lbl{font:800 10px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
+.g-now{font:800 26px/1 var(--sans);font-variant-numeric:tabular-nums}
+.gauge.prot .g-now{color:var(--sec-tx)}.gauge.tcv .g-now{color:var(--plum)}
+.g-proj{font-size:11px;font-weight:700;color:var(--emph-tx)}
+.g-bar{position:relative;height:12px;border-radius:7px;background:var(--nested);overflow:hidden}
+.g-fill{position:absolute;left:0;top:0;bottom:0;border-radius:7px;transition:width .35s cubic-bezier(.4,1.3,.5,1)}
+.prot .g-fill{background:linear-gradient(90deg,var(--danger),var(--emph) 55%,var(--sec))}
+.tcv .g-fill{background:linear-gradient(90deg,var(--sec),var(--emph) 60%,var(--danger))}
+.g-tgt{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink2)}
+.g-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--mut2);margin-top:4px}.g-marks b{color:var(--ink)}
+.score-note{grid-column:1/-1;font-size:11.5px;color:var(--mut2);border-top:1px solid var(--line);padding-top:11px;margin-top:3px}
+.score-note b{color:var(--ink)}
+/* batna strip */
+.batna{border:1px solid var(--plum);border-radius:11px;background:var(--plum-t);margin-bottom:14px;overflow:hidden}
+.batna-hd{display:flex;align-items:center;gap:10px;padding:10px 15px;cursor:pointer}
+.batna-hd .bt-t{font:800 10px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--plum)}
+.batna-hd .bt-s{font-size:12px;color:var(--ink2)}
+.batna-hd .bt-s b{color:var(--plum)}
+.batna-hd .chev{margin-left:auto;width:8px;height:8px;border-right:2px solid var(--plum);border-bottom:2px solid var(--plum);transform:rotate(-45deg);transition:transform .15s}
+.batna.open .batna-hd .chev{transform:rotate(45deg)}
+.batna-bd{padding:0 15px 13px;display:none}.batna.open .batna-bd{display:block}
+.batna-bd .kv{display:grid;grid-template-columns:100px 1fr;gap:5px 12px;font-size:12px}
+.batna-bd dt{color:var(--plum);font-weight:700}.batna-bd dd{margin:0;color:var(--ink2);line-height:1.5}
+/* currency table */
+.cur-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.cur-tbl th{text-align:left;font:800 9px/1.2 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:0 10px 8px;border-bottom:1px solid var(--line2)}
+.cur-tbl td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cur-tbl tr:last-child td{border-bottom:0}
+.cur-give{font-weight:700;color:var(--ink)}
+.cur-for{color:var(--ink2)}
+.cost{display:inline-block;font:700 8.5px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:1px 7px;border-radius:4px}
+.cost.low{color:var(--sec-tx);background:var(--sec-t)}.cost.med{color:var(--warn);background:var(--warn-t)}.cost.high{color:var(--danger);background:var(--danger-t)}
+.cost.strong{color:var(--sec-tx);background:var(--sec-t)}.cost.weak{color:var(--mut);background:var(--nested)}
+/* category + accordion */
+.cat-h{display:flex;align-items:center;gap:9px;margin:16px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--plum)}
+.cat-h .c-name{font:800 11.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--plum)}
+.cat-h .c-cnt{font-size:11px;color:var(--mut2)}
+.item{border:1px solid var(--line2);border-top:0;background:var(--surface)}
+.catg .item:first-of-type{border-top:1px solid var(--line2);border-radius:9px 9px 0 0}
+.catg .item:last-of-type{border-radius:0 0 9px 9px}
+.catg .item:only-of-type{border-radius:9px}
+.it-hd{display:grid;grid-template-columns:auto auto 1fr;gap:11px;align-items:center;padding:11px 14px;cursor:pointer}
+.it-hd:hover{background:var(--surface2)}
+.item.open .it-hd{background:var(--surface2);border-bottom:1px solid var(--line)}
+.chev{width:7px;height:7px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease}
+.item.open .chev{transform:rotate(45deg)}
+.it-id{font:800 10px/1 var(--mono);color:var(--mut)}
+.it-main{min-width:0}
+.it-t{font-weight:700;font-size:13px;color:var(--ink);line-height:1.3}
+.it-sig{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.sig{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--mut2)}
+.sig b{font:800 8px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut2)}
+.dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.d-far{background:var(--danger)}.d-mod{background:var(--warn)}.d-close{background:var(--ok)}
+.m-likely{color:var(--ok)}.m-possible{color:var(--warn)}.m-resistant{color:var(--danger)}
+.it-status{font:800 8px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:5px;white-space:nowrap}
+.stt-awaiting{color:var(--warn);background:var(--warn-t)}.stt-discussion{color:var(--emph-tx);background:var(--emph-t)}.stt-unraised{color:var(--mut);background:var(--nested)}
+.it-right{display:flex;align-items:center;gap:11px}
+.worth{text-align:right;font-size:11px;color:var(--mut2);white-space:nowrap}
+.worth b{display:block;color:var(--sec-tx);font-variant-numeric:tabular-nums}
+.won{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--mut);cursor:pointer;user-select:none}
+.won .box{width:16px;height:16px;border-radius:4px;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px}
+.item.iswon .won .box{background:var(--sec);border-color:var(--sec)}
+.item.iswon .it-hd{background:var(--sec-t)}
+/* item body: three columns left→right */
+.it-body{display:none;padding:14px}.item.open .it-body{display:block}
+.cols{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:0;border:1px solid var(--line2);border-radius:9px;overflow:hidden}
+.col{padding:12px 13px;border-right:1px solid var(--line2)}
+.col:last-child{border-right:0}
+.col-k{font:800 8.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;margin-bottom:7px}
+.col.want{background:var(--sec-t)}.col.want .col-k{color:var(--sec-tx)}
+.col.trade{background:var(--surface)}.col.trade .col-k{color:var(--emph-tx)}
+.col.floor{background:var(--plum-t)}.col.floor .col-k{color:var(--plum)}
+.col-v{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.give{display:flex;gap:7px;font-size:12.5px;color:var(--ink2);margin-bottom:7px;align-items:baseline}
+.give:last-child{margin-bottom:0}
+.give::before{content:"○";color:var(--emph);font-size:10px}
+.give b{color:var(--ink)}
+.range{margin-top:11px;font-size:11px;color:var(--mut2)}
+.range .r-band{display:flex;align-items:center;gap:0;margin-top:5px;font:700 10px/1 var(--mono)}
+.range .r-e{padding:4px 8px;border-radius:5px}
+.range .r-e.a{background:var(--sec-t);color:var(--sec-tx)}.range .r-e.b{background:var(--plum-t);color:var(--plum)}
+.range .r-line{flex:1;height:2px;background:linear-gradient(90deg,var(--sec),var(--plum));min-width:24px}
+@media(max-width:760px){.score,.cols{grid-template-columns:1fr}.it-hd{grid-template-columns:auto 1fr}.it-right{grid-column:1/-1;justify-content:flex-end}}
+</style></head>
+<body><div class="wrap">
+<div class="mock-note">Mockup — Negotiation ▸ Trade Plan v3 (item-driven, accordion, payoff on the items). Standalone; not wired. Real data. Mark items you expect to win → the scoreboard projects. One item open at a time. Categories configure per commodity (goods &amp; services).</div>
+<h1>Trade Plan</h1>
+<p class="sub">For each redline/ask where we and the supplier aren’t aligned: what we want, what we’d trade to get it, and our floor — with how far apart we are and how likely they move. Mark expected wins to project the payoff.</p>
+
+<div class="card"><div class="card-hd"><span class="ct">Payoff · where marking your expected wins lands you</span><span class="cs">target: 97 / $2.37M</span></div><div class="card-bd">
+  <div class="score">
+    <div class="gauge prot"><div class="g-top"><span class="g-lbl">Protection score</span><span class="g-now" id="prot">58</span><span class="g-proj" id="protp"></span></div>
+      <div class="g-bar"><div class="g-fill" id="protf" style="width:58%"></div><div class="g-tgt" style="left:97%"></div></div>
+      <div class="g-marks"><span>0 · Weak</span><span>now <b id="prot2">58</b></span><span>target <b>97</b></span></div></div>
+    <div class="gauge tcv"><div class="g-top"><span class="g-lbl">3-yr TCV</span><span class="g-now" id="tcv">$3.05M</span><span class="g-proj" id="tcvp"></span></div>
+      <div class="g-bar"><div class="g-fill" id="tcvf" style="width:100%"></div><div class="g-tgt" style="left:0%"></div></div>
+      <div class="g-marks"><span>target <b>$2.37M</b></span><span>now <b id="tcv2">$3.05M</b></span><span>ask $3.05M</span></div></div>
+    <div class="score-note" id="snote">Nothing marked yet — the current redline scores <b>58</b> (Weak) at the <b>$3.05M</b> ask. Tick the items you expect to win below and this projects toward the <b>97 / $2.37M</b> target.</div>
+  </div>
+</div></div>
+
+<div class="batna" id="batna"><div class="batna-hd"><span class="bt-t">⚑ BATNA · your floor</span><span class="bt-s">Real alternative exists — <b>re-run the RFP</b> (+$180–260K/yr, 4–6mo slip). Invoke if they hold the cap <b>and</b> refuse the DPA, or TCV can’t reach ~$2.80M.</span><span class="chev"></span></div>
+  <div class="batna-bd"><dl class="kv">
+    <dt>Alternative</dt><dd>Extend the incumbent BI stack for ~12 months and re-run a competitive RFP including one named rival platform.</dd>
+    <dt>Costed delta</dt><dd>+$180K–$260K/yr in retained analyst effort and a ~4–6 month FY27 slip. A real alternative, but not costless — so push hard, not recklessly.</dd>
+    <dt>Trigger</dt><dd>Invoke if Visier holds the 12-month cap <b>and</b> refuses an executed DPA, <b>or</b> if 3-yr TCV can’t get at/below ~$2.80M.</dd>
+  </dl></div>
+</div>
+
+<div class="card"><div class="card-hd"><span class="ct">What we can spend · our trading currency</span><span class="cs">the concessions we’d actually give</span></div><div class="card-bd" style="padding:6px 15px 10px">
+  <table class="cur-tbl"><thead><tr><th>What we’d give</th><th style="width:110px">Cost to us</th><th>Best used to win</th></tr></thead><tbody id="cur"></tbody></table>
+</div></div>
+
+<div class="card"><div class="card-hd"><span class="ct">The asks · what we want &amp; what we’d trade</span><span class="cs">by category · one open at a time</span></div><div class="card-bd" id="cats"></div></div>
+</div>
+
+<script>
+const BASE_P=58,BASE_T=3051000,TGT_T=2372000;
+const M=n=>{const a=Math.abs(n);return (n<0?'−$':'$')+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?Math.round(a/1e3)+'K':a);};
+const CUR=[
+ ['3-year prepay','strong','The platform discount to target — ISS-12'],
+ ['Case-study / reference consent','low','A support-tier discount — ISS-12'],
+ ['45-day renewal notice (vs 30)','low','The renewal-price cap — ISS-04'],
+ ['Mutual 24-month cap (both sides)','low','The data-breach super-cap — ISS-01'],
+ ['Concede clean convenience-termination','med','Config ownership + the SLA — ISS-07 / ISS-06'],
+ ['End-of-quarter timing','weak','General pressure, if it lines up']
+];
+// dist: far|mod|close (how far apart) · move: likely|possible|resistant (chance they concede)
+const CATS=[
+ {name:'Legal & Liability',items:[
+   {id:'ISS-01',t:'Liability cap at 12 months',status:'awaiting',dist:'far',move:'possible',prot:9,tcv:0,
+     want:'24-month cap + a 3× data-breach super-cap; IP uncapped.',
+     trades:[['Accept a <b>mutual</b> 24-month cap (both sides)','low'],['Commit to the <b>3-year term</b>','low']],
+     floor:'2× super-cap → breach carve-out only',rangeA:'24mo + 3× super-cap',rangeB:'24mo + carve-out'},
+   {id:'ISS-02',t:'No IP-infringement indemnity',status:'unraised',dist:'mod',move:'possible',prot:4,tcv:0,
+     want:'Standard IP indemnity with a defense obligation.',
+     trades:[['Bundle into the liability package — the cap symmetry is the give','low']],
+     floor:'IP indemnity capped at the super-cap'}]},
+ {name:'Data & Protection',items:[
+   {id:'ISS-03',t:'Unsigned DPA, no SCCs',status:'awaiting',dist:'far',move:'likely',prot:6,tcv:0,gate:1,
+     want:'Executed DPA + EU SCCs, reviewed, before signature.',
+     trades:[['Compliance gate — little to trade; offer 15-day post-signature execution with prod paused','low']],
+     floor:'Execute within 15 days; prod data paused until done'},
+   {id:'ISS-08',t:'Sub-processors by reference',status:'unraised',dist:'mod',move:'likely',prot:2,tcv:0,
+     want:'30-day advance notice + an objection right.',
+     trades:[['Fold into the DPA ask (ISS-03) — one negotiation','low']],
+     floor:'15-day subscribed change-feed'}]},
+ {name:'Commercial',items:[
+   {id:'ISS-12',t:'Total contract value ~15% high',status:'discussion',dist:'far',move:'likely',prot:3,tcv:-540000,
+     want:'Target scenario — $2.37M over the term.',
+     trades:[['<b>3-year prepay</b> — our strongest chip','strong'],['<b>Case-study / reference</b> consent','low']],
+     floor:'Fallback $2.63M',rangeA:'$2.37M target',rangeB:'$2.80M walk'},
+   {id:'ISS-04',t:'Auto-renewal, 90-day, uncapped uplift',status:'discussion',dist:'mod',move:'possible',prot:2,tcv:-40000,
+     want:'≤45-day notice + a renewal-price cap (CPI/4%).',
+     trades:[['Concede the <b>45-day window</b> (vs 30) to win the cap','low']],
+     floor:'45-day notice + 5% cap',rangeA:'CPI/4% cap',rangeB:'5% cap'},
+   {id:'ISS-11',t:'Uncapped post-term uplift',status:'unraised',dist:'mod',move:'possible',prot:2,tcv:-21000,
+     want:'CPI/4% cap on renewals 4–5.',
+     trades:[['Bundle with ISS-04 renewal terms — trade as one','low']],
+     floor:'5% cap on the first renewal only'}]},
+ {name:'Service & Delivery',items:[
+   {id:'ISS-06',t:'Uptime SLA 99.5%, weak credits',status:'unraised',dist:'far',move:'resistant',prot:3,tcv:-78000,
+     want:'99.9% + real credits + a chronic-failure exit.',
+     trades:[['Resolve the Exhibit B data gap first, then trade for the 99.9% tier','low']],
+     floor:'99.7% + chronic-failure exit retained',rangeA:'99.9%',rangeB:'99.7%'},
+   {id:'ISS-07',t:'Configs deemed supplier IP',status:'unraised',dist:'far',move:'possible',prot:3,tcv:0,
+     want:'Lilly owns its configs/dashboards + export on exit.',
+     trades:[['<b>Concede clean convenience-termination</b> (ISS-05) to win config ownership','med']],
+     floor:'Perpetual licence + a defined export format'},
+   {id:'ISS-10',t:'Deemed acceptance after 10 days',status:'unraised',dist:'mod',move:'possible',prot:2,tcv:0,
+     want:'Positive sign-off vs criteria; 20-day review.',
+     trades:[['Offer a <b>named reviewer + turnaround SLA</b> — protects their timeline','low']],
+     floor:'20-day deemed acceptance vs written criteria'},
+   {id:'ISS-05',t:'No convenience termination',status:'unraised',dist:'mod',move:'likely',prot:2,tcv:0,cur:1,
+     want:'Convenience right after month 12 + pro-rata refund.',
+     trades:[['This is <b>our currency</b> — concede it to protect ISS-01 / ISS-03 / ISS-07','med']],
+     floor:'Convenience right tied to a sustained SLA miss'},
+   {id:'ISS-09',t:'Audit limited to annual SOC 2',status:'unraised',dist:'close',move:'likely',prot:1,tcv:0,
+     want:'A for-cause audit right after an incident.',
+     trades:[['Low cost for them — ask for it as a goodwill give','low']],
+     floor:'For-cause satisfied by a third-party assessor’s report'}]}
+];
+const STT={awaiting:'Awaiting them',discussion:'In discussion',unraised:'Not yet raised'};
+const DIST={far:['d-far','Far apart'],mod:['d-mod','Moderate gap'],close:['d-close','Close']};
+const MOVE={likely:['m-likely','Likely to move'],possible:['m-possible','Might move'],resistant:['m-resistant','Resistant']};
+let openId=null;
+
+function score(){
+  // static — reflects the CURRENT negotiation record; regenerated when asks are made / trades land.
+  prot.textContent=BASE_P;prot2.textContent=BASE_P;protf.style.width=BASE_P+'%';protp.textContent='';
+  tcv.textContent=M(BASE_T);tcv2.textContent=M(BASE_T);tcvf.style.width='100%';tcvp.textContent='';
+  snote.innerHTML='Where the deal stands now: protection <b>58</b> (Weak) at the <b>$3.05M</b> ask. Target once the asks below land: <b>97 / $2.37M</b>. Updates when the dashboard is regenerated from the negotiation record — as asks are made and trades close.';
+}
+document.getElementById('cur').innerHTML=CUR.map(c=>'<tr><td class="cur-give">'+c[0]+'</td><td><span class="cost '+c[1]+'">'+c[1]+'</span></td><td class="cur-for">'+c[2]+'</td></tr>').join('');
+document.getElementById('batna').querySelector('.batna-hd').onclick=()=>document.getElementById('batna').classList.toggle('open');
+
+function itemHTML(i){
+  const d=DIST[i.dist],m=MOVE[i.move];
+  const range=i.rangeA?'<div class="range">Our settlement range:<div class="r-band"><span class="r-e a">'+i.rangeA+'</span><span class="r-line"></span><span class="r-e b">'+i.rangeB+'</span></div></div>':'';
+  return '<div class="item'+(openId===i.id?' open':'')+'" data-id="'+i.id+'">'+
+    '<div class="it-hd" data-toggle><span class="chev"></span><span class="it-id">'+i.id+'</span>'+
+      '<span class="it-main"><span class="it-t">'+i.t+'</span>'+
+        '<span class="it-sig"><span class="it-status stt-'+i.status+'">'+STT[i.status]+'</span>'+
+          '<span class="sig"><b>Gap</b><span class="dot '+d[0]+'"></span>'+d[1]+'</span>'+
+          '<span class="sig"><b>Movement</b><span class="'+m[0]+'" style="font-weight:700">'+m[1]+'</span></span></span></span></div>'+
+    '<div class="it-body"><div class="cols">'+
+      '<div class="col want"><div class="col-k">We want</div><div class="col-v">'+i.want+'</div></div>'+
+      '<div class="col trade"><div class="col-k">We can trade</div><div class="col-v">'+i.trades.map(t=>'<span class="give">'+t[0]+' <span class="cost '+t[1]+'">'+t[1]+'</span></span>').join('')+'</div></div>'+
+      '<div class="col floor"><div class="col-k">If they won’t move</div><div class="col-v">'+i.floor+'</div></div>'+
+    '</div>'+range+'</div></div>';
+}
+function render(){
+  document.getElementById('cats').innerHTML=CATS.map(cat=>'<div class="catg"><div class="cat-h"><span class="c-name">'+cat.name+'</span><span class="c-cnt">'+cat.items.length+' open</span></div>'+cat.items.map(itemHTML).join('')+'</div>').join('');
+  document.querySelectorAll('.item [data-toggle]').forEach(h=>h.onclick=()=>{const id=h.closest('.item').dataset.id;openId=openId===id?null:id;render();});
+  score();
+}
+render();
+</script>
+</body></html>
