@@ -1050,6 +1050,24 @@ Where a skill vendors a numeric/decision kernel (a Python module, such as `numer
 - **Scope:** this guardrail applies only to the specific skills that vendor a kernel (see each such skill's own HARD RULE kernel-wiring text for the exact function(s) and call sites). It does not require every skill in the suite to have a kernel; it requires that skills which do have one actually use it for everything the kernel covers.
 - **The anti-collapse signal:** if the output contains a number that falls inside the kernel's covered scope but the working notes show no corresponding kernel call, the computation was collapsed into prose arithmetic. Stop, call the kernel, and replace the figure with its return value before continuing.
 
+## G12: Claim-Gate, Cite or Abstain (HARD RULE, suite-wide)
+
+Every CLAIM a skill emits is either cited or abstained. A claim is any assertion of fact, status, number, benchmark, score rationale, risk, or recommendation placed in a deliverable (dashboard, DOCX, deck, workbook, redline, or chat analysis). This consolidates the anti-fabrication rules already stated in GLOBAL OPERATING RULES 3 and 8 and the supplier-risk reference into one enforceable guardrail. It is an output-integrity discipline, not a computation: it adds no material token cost and requires no heavier model (a quick check still gets a light pass; a signing-stage deliverable gets the careful one).
+
+- **CITED:** carries a specific, checkable source shown as a small evidence badge (not prose): a document plus section/page, a dated communication (email / Teams / call), a named dataset plus field, an accessed web source with URL plus capture date, or an explicit input the user supplied.
+- **ABSTAINED:** if a claim cannot be cited, do NOT soften it into a vague generality and do NOT invent a plausible value. Emit an explicit gap marker: `[CONFIRM: exactly what is needed]` in prose or DOCX, or a labeled NEEDS_INPUT / NOT VERIFIED / RESEARCH PENDING / NOT APPLICABLE state in a dashboard (never a blanked or dropped section).
+- **DROP, do not dilute:** a generated finding that cannot cite a source is dropped, not reworded into an unsupported observation.
+
+Hard prohibitions:
+
+1. **No fabricated "illustrative defaults."** Never fill a missing operational input with a made-up plausible value (a delivery-model split, a percentage, a sample supplier or rate) and disclose it afterward. Missing input means an abstain marker up front, never a guess.
+2. **No premium or licensed-source leakage.** Never present a Gartner, Forrester, IDC, S&P Capital IQ, D&B, or Bloomberg finding as if it were queried unless it was actually accessed in this session. If it was not accessed, abstain. Canonical examples must not contain such results either.
+3. **No unverified status assertions.** Never assert a debarment, sanctions, breach, financial-distress, or certification-held status without a cited source; "not verified, requires a formal screen" is the answer, and gating items route to the named SME (the supplier-risk reference stays authoritative for the SME-routing specifics).
+
+Confidence: when a claim is cited but the inference is soft, label it (a High / Moderate / Low band or an `Estimate` tag with the basis on hover or expand), never a bare "confidence: 73%."
+
+**The anti-collapse signal:** if a deliverable contains a finding, number, status, or recommendation with no cited source and no abstain marker, the claim-gate was skipped. Stop, attach the citation, convert the claim to an abstain marker, or drop it.
+
 ---
 
 ## INLINED: references/risk-scoring.md
