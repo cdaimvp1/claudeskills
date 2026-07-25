@@ -76,6 +76,14 @@ If the session restarted/compacted, this is where things stand.
   orange fills" but is the locked design's leader-highlight treatment (converting it to an outline/frame is
   a render-engine change to a LOCKED template); (b) dead dark-mode CSS remains (unreachable) in pv.css +
   theo-brand.js. Both deferred pending Marc's confirmation that #15 should go to full Deal-parity fill->outline.
+- **#3/#6 DONE 2026-07-25.** Canonical doc `_redesign_proposals/RFX-DEAL-HANDOFF-AND-COMMS-EVIDENCE.md`:
+  (#3) locks the RfxToDealHandoff contract (schema from RFx spec section C) + how deal-room consumes it;
+  (#6) defines the shared comms-evidence methodology (5-step cite-or-abstain, an application of G12, used by
+  deal-room Communications + pen band, the negotiation-prep skills, and future rfx-hub). WIRED the existing
+  consumer: deal-room Phase 1 accepts an RfxToDealHandoff seed (citation-gated: uncited commitment seeds as
+  OPEN [CONFIRM ...], never agreed), schema `seeded_from.rfx_handoff` added, and the Communications map +
+  pen band now follow the comms-evidence methodology. Emitter side (rfx-hub "Send winner to Deal" action)
+  deferred until rfx-hub is built (honestly flagged). Em-dash-free.
 - **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
   orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
   (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new

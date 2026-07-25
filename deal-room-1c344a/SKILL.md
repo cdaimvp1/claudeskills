@@ -160,6 +160,13 @@ and composes the specialist deal skills onto it, reflect-only, without re-runnin
 - **Post-close (hand off):** at close, Phase 8 emits `negotiation_outcome.json` to
   negotiation-playbook-learning.
 
+**Communications as cited evidence.** The Communications subtab (commitment-alignment map) and the Overview
+pen band (who holds the redline) follow the shared comms-evidence methodology (cite-or-abstain, an application
+of guardrail G12; see `_redesign_proposals/RFX-DEAL-HANDOFF-AND-COMMS-EVIDENCE.md`): every commitment,
+alignment state, and pen-holder read either shows an evidence badge (source + date/channel) or abstains with
+`[CONFIRM ...]`, confidence-labeled (a comms read is best-effort). Never fabricate a commitment, an alignment,
+or a "supplier confirmed" to fill the map; a contradiction is flagged, never silently resolved.
+
 **One pane, one object.** The hub does not open a second dashboard or a second state file. Everything
 renders from `deal_room_state.json` into the four-tab Deal hub dashboard (Phase 7). A specialist skill's
 subtab fills in once that skill has run and produced its slice; until then it shows NEEDS_INPUT. The hub
@@ -203,6 +210,7 @@ Deal Room sits in a specific, narrow slot in the negotiation-and-contracting pip
 - **Approval boundaries:** which moves, thresholds, or issue types require internal sign-off before being offered, and from whom (route through the inlined SME matrix and, for approval-threshold/FRAP questions, process-navigator-1c344a; this skill flags, it does not adjudicate policy).
 - **Packages:** any issues the user already knows are linked as a bundled or conditional trade (see Phase 1).
 - **A seed briefing** from commercial-negotiation-prep-1c344a and/or legal-negotiation-prep-1c344a, which pre-populates the issues list and Lilly positions (opening/target/fallback/walk-away, playbook fallbacks, predicted pushback) so Phase 1 intake is largely a confirm-and-adjust pass rather than a blank-page exercise.
+- **An `RfxToDealHandoff`** from rfx-hub (the winner selected in an RFx evaluation), which seeds the issues list from the selected supplier's requirement model, commitments, award conditions, and indicative normalized TCO, each carrying its `evidence[]` citation. Per the RFx-to-Deal handoff contract (`_redesign_proposals/RFX-DEAL-HANDOFF-AND-COMMS-EVIDENCE.md`): a commitment without a citation seeds as an OPEN issue labeled `[CONFIRM ...]`, never as an agreed position; the indicative TCO is tagged "indicative, firm in negotiation" and re-derived here; nothing from RFx is treated as locked (`draft:true`), so Deal Room re-validates viability and exit terms in negotiation.
 - **Prior `deal_room_state.json`**, if resuming a negotiation already in progress (see Step 0).
 
 ### Per-round (Phase 2; the skill's steady-state input, every time the user has something to log)
@@ -541,6 +549,7 @@ The single source of truth for `deal_room_state.json`, the persistent work objec
     "seeded_from": {
       "commercial_negotiation_prep": "boolean",
       "legal_negotiation_prep": "boolean",
+      "rfx_handoff": "boolean - seeded from an rfx-hub RfxToDealHandoff (winner selection)",
       "source_notes": "string | null"
     }
   },
