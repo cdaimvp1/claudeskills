@@ -84,6 +84,14 @@ If the session restarted/compacted, this is where things stand.
   OPEN [CONFIRM ...], never agreed), schema `seeded_from.rfx_handoff` added, and the Communications map +
   pen band now follow the comms-evidence methodology. Emitter side (rfx-hub "Send winner to Deal" action)
   deferred until rfx-hub is built (honestly flagged). Em-dash-free.
+- **#4 Category Strategy rebuild - PHASE 0 (plan) DONE 2026-07-25.** It is a real skill rebuild, so it is
+  scoped + phased before any build: `_redesign_proposals/CATEGORY-STRATEGY-REBUILD-PLAN.md`. Direction:
+  11 tabs -> 7 (Overview, Spend & Suppliers, Market & Risk, Strategy, Savings & Scorecard, Supplier Program,
+  Execution) + canonical fixes (MCM palette - it currently uses the DOCUMENT palette; claim-gate to remove
+  fabricated defaults; every-tab-always-renders) + never-regress the 3 modes (DEVELOP/MANAGE/PREPARE).
+  Build phases 1-4 (spec -> reference JSX -> workflow/interpretive content -> verify/package) AWAIT Marc's
+  approval of the plan + 3 open decisions (the 11->7 mapping; Execution as 7th vs 8th tab; confirm MCM here).
+  NO category-strategy files edited yet.
 - **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
   orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
   (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new
