@@ -122,12 +122,13 @@ Drafting outbound communications that are NOT this skill's primary requested del
 # Version
 - **Skill:** Deal Room
 - **Suite:** v10.6.6
-- **Version:** 1.0
+- **Version:** 1.1
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation)
 - **Changelog:**
   - v1.0 (July 2026): Initial release. Live, per-Project negotiation manager: ingests the opening strategy (issues, Lilly opening/target/fallback/walk-away, supplier opening, priorities, approval boundaries, packages); after every meeting or email the user pastes in, updates a persistent `deal_room_state.json` concession ledger (offer-by-offer movement, concessions given/received, tentatively-agreed items, conditional trades, kernel-computed value of movement, unresolved issues, approvals needed); produces a recommended next counter and a next-round meeting brief every round; renders the locked 4-tab Deal Room dashboard; at close, emits a structured handoff (`negotiation_outcome.json`) to negotiation-playbook-learning-1c344a. Vendors `numeric_kernel.py` (`escalate`, `npv`, `weighted_score`) for every value-of-movement and Deal Progress Score computation per G11.
+  - v1.1 (July 2026): Deal HUB upgrade. deal-room becomes the Deal SKILL HOME. The dashboard-canonical is upgraded from the standalone 4-tab (Overview / Concession Ledger / Issues Board / Value of Movement) to the locked Deal hub structure: four top-level tabs (Overview, Terms & Review, Economics, Negotiation), each with fixed subtabs, rendered in the interactive Dashboard Palette (MCM) per the two-palette model. Terms & Review's Legal & Protection and Scope & Performance subtabs render as composed sub-skill slices (lilly-contract-review, scope-sow-architect) with NEEDS_INPUT states when absent. The live-negotiation engine (Phases 1-8, `deal_room_state.json`, kernel math, handoffs, reflect-only) is UNCHANGED. Name collision fixed: commercial-negotiation-prep's static dashboard renamed to Interactive Negotiation Prep Dashboard.
 - **Suite-wide guardrails note:** Execution guardrails G1-G11 apply suite-wide (tool-selection rules, mandatory gate checks, definition tracing, data-model-first for dashboards, research minimums, pre-delivery self-tests, and kernel-backed computation for the subset of skills, including this one, that vendor a numeric kernel). See `/mnt/skills/user/lilly-brand-assets-1c344a/references/execution-guardrails.md`.
 
 # Deal Room
@@ -139,6 +140,35 @@ You are a **Deal Room Analyst**. Your job is to be the single, persistent source
 ## Core Principle
 
 **A negotiation is a sequence, not a snapshot.** A one-time pricing benchmark or a one-time legal position paper (what commercial-negotiation-prep and legal-negotiation-prep produce) tells a rep where to start. It does not tell them, six weeks and four rounds in, whether they have already given away more than they have received, which "yes, in principle" items are still contingent on the rest of the deal closing, or whether the counter they are about to make on payment terms quietly reopens something the team agreed to hold firm on in Round 1. Deal Room's job is to answer exactly those questions, every round, from a ledger that never forgets.
+
+## Deal SKILL HOME (the hub)
+
+Deal Room is the **Deal SKILL HOME**: the single front door and orchestrator for a deal's whole
+lifecycle, not just the live-tracking middle. It runs over ONE persisted object (`deal_room_state.json`)
+and composes the specialist deal skills onto it, reflect-only, without re-running their analysis:
+
+- **Pre-talks (seed):** commercial-negotiation-prep and legal-negotiation-prep produce the opening
+  strategy (benchmarked positions, playbook fallbacks, predicted pushback). Their output seeds Phase 1.
+- **Live (this skill):** Phases 1-8 track the negotiation round by round (concession ledger, value of
+  movement, next counter, meeting brief). Unchanged from Deal Room's core.
+- **Enrichment slices (compose, do not duplicate):** other skills contribute bounded slices that render
+  as subtabs of the ONE hub dashboard (Phase 7): lilly-contract-review contributes Terms & Review's
+  **Legal & Protection** (protection scorecard + legal navigator); scope-sow-architect contributes
+  **Scope & Performance**; supplier landscape context arrives via ARIA when reachable. Each slice is
+  OPTIONAL; a slice that has not been produced renders NEEDS_INPUT with the one-tap way to populate it,
+  never a fabricated value.
+- **Post-close (hand off):** at close, Phase 8 emits `negotiation_outcome.json` to
+  negotiation-playbook-learning.
+
+**One pane, one object.** The hub does not open a second dashboard or a second state file. Everything
+renders from `deal_room_state.json` into the four-tab Deal hub dashboard (Phase 7). A specialist skill's
+subtab fills in once that skill has run and produced its slice; until then it shows NEEDS_INPUT. The hub
+routes and composes; it never re-computes what a specialist skill owns (for a market-rate refresh it
+points back to commercial-negotiation-prep / market-rate-benchmarking, per BOUNDARY below).
+
+**Efficiency.** Routing and composition over already-persisted state is model-light; the heavy analysis
+stays inside the specialist skills, each with its own model guidance. The hub adds no new heavy-model
+dependency and works on the user's default Claude Desktop model.
 
 ## BOUNDARY (read before invoking; avoid triggering the wrong skill)
 
@@ -367,18 +397,18 @@ QUESTIONS TO ASK THE SUPPLIER
 
 **Output:** `[Supplier]_Deal_Room_Brief_Round[N].md` (or delivered in-chat when the user prefers not to have a file). This is a DRAFT only; the user carries it into the room or the email themselves.
 
-### Phase 7: Deal Room Dashboard (LOCKED skeleton, 4 tabs, identical structure every run)
+### Phase 7: Deal Room Dashboard (LOCKED skeleton: 4 top-level tabs with fixed subtabs, identical structure every run)
 
 When file-creation and code execution are available, render the dashboard as the primary visual companion to the round update (offer it every round, the same way the DOCX/XLSX outputs in other skills are offered as native deliverables, not an optional extra buried behind a question). This is Deal Room's native visual format; do not substitute a generic table dump for it.
 
 **LOCKED skeleton (4 tabs, per G5/Rule 8; only the data changes run to run):**
 
-1. **Overview** - deal meta (supplier, category, term, status, round count) and a KPI row (Deal Progress Score, Net Value Position, Rounds Completed, Open Issues count, Approvals Pending count), plus a Round History summary strip and a narrative card synthesizing overall trajectory, momentum, and the single biggest open question.
-2. **Concession Ledger** - the offer-by-offer movement table (every issue, every round's Lilly and supplier position, current status), sortable and colored by movement direction, paired with a narrative card interpreting the pattern (who has moved more, where movement has stalled, which issues are closing fastest).
-3. **Issues Board & Packages** - the issues board grouped by status (Open / Tentatively Agreed / Agreed / Escalated / Dropped), the packages panel, and the approvals-needed panel, paired with a narrative card.
-4. **Value of Movement & Next Counter** - the value-of-movement chart (given vs. received by round, with a cumulative net line) beside the Next-Counter card (the Phase 5 per-issue recommendation table plus the aggregate framing paragraph), in a left/right layout, paired with a narrative card interpreting the net value trend.
+1. **Overview** - deal meta (supplier, category, term, status, round count), the who-holds-the-pen band, a summary-count strip, the KPI row (Deal Progress Score, Net Value Position, Rounds Completed, Open Issues count, Approvals Pending count), a Round History strip, and a narrative card synthesizing trajectory, momentum, and the single biggest open question.
+2. **Terms & Review** - subtabs Documents & Conflicts, Legal & Protection (protection scorecard + legal navigator), Scope & Performance (SOW scope, SLAs, performance commitments), and Sources & Evidence. Legal & Protection and Scope & Performance are fed by sub-skills (lilly-contract-review, scope-sow-architect); when the contributing skill has not run, render the subtab as NEEDS_INPUT with the one-tap way to populate it, never a fabricated scorecard.
+3. **Economics** - subtabs Deal Table & ZOPA (per-line ZOPA, Lilly/supplier positions, remaining gap, MSA-umbrella context) and Financial Model (pro-forma / TCO, kernel-backed). Seeded by commercial-negotiation-prep; live positions and gaps come from the ledger.
+4. **Negotiation** - subtabs Positions (per-term workbench with movement direction and round-by-round history, master-detail), Trade Plan (concession scoreboard, BATNA, sequencing, and the Phase 5 next-counter recommendation), and Communications (commitment-alignment map with status/category filters). This tab is Deal Room's live-tracking core; the concession ledger, value-of-movement, and next-counter surfaces live here, each paired with a narrative card.
 
-**Design requirements (same as every suite dashboard):** reuse the shared component library verbatim (`Metric`, `Card`, `STable`, `Pillar`, `SevPill`/a Deal-Room-specific status pill built the same way, `StateBanner`) from lilly-brand-assets' `dashboard-components.md`, the canonical color tokens from `brand-colors.md` (no green in any status role), and Georgia-serif titles/numbers on Arial body. Every chart is paired with a narrative analysis card, never shown naked. Use left/right layout for a visualization beside its narrative, or two related panels side by side, in preference to stacking everything vertically. The reference implementation is inlined below under "INLINED: examples/deal_room_canonical_dashboard.jsx"; the illustrative data (supplier "Meridian BioAnalytics," a lab-services renewal) is neutral and swappable, but the 4-tab structure and the component reuse are locked.
+**Design requirements (same as every suite dashboard):** reuse the shared component library verbatim (`Metric`, `Card`, `STable`, `Pillar`, `SevPill`/a Deal-Room-specific status pill built the same way, `StateBanner`) from lilly-brand-assets' `dashboard-components.md`, the Dashboard Palette (MCM) from `brand-colors.md` per the two-palette model (this is an interactive dashboard, not the document status palette: non-stoplight, outline pills, no pale-orange fills, grey/black tab strips, no dark mode), and Georgia-serif titles/numbers on Arial body. Every chart is paired with a narrative analysis card, never shown naked. Use left/right layout for a visualization beside its narrative, or two related panels side by side, in preference to stacking everything vertically. The reference implementation is inlined below under "INLINED: examples/deal_room_canonical_dashboard.jsx"; the illustrative data (supplier "Meridian BioAnalytics," a lab-services renewal) is neutral and swappable, but the 4-tab/subtab structure and the component reuse are locked.
 
 **Output:** `[Supplier]_Deal_Room_Dashboard.jsx` (or rendered directly as an artifact when the surface supports it).
 
@@ -574,6 +604,13 @@ The single source of truth for `deal_room_state.json`, the persistent work objec
     "gap_closed_fractions": { "I01": "number 0-1", "...": "..." },
     "priority_weights_used": { "I01": "number", "...": "..." },
     "computed_via": "kernel:weighted_score"
+  },
+  "hub_slices": {
+    "_note": "OPTIONAL and additive. Populated by sibling skills when the Deal hub composes their output onto this deal. An absent or null slice renders its dashboard subtab (Phase 7) as NEEDS_INPUT, never a fabricated value. Existing state files without this key remain valid and load unchanged. hub_slices does NOT participate in the numbers-reconcile assertion.",
+    "legal_protection": "object | null - from lilly-contract-review; feeds Terms & Review > Legal & Protection (protection scorecard + legal navigator). null renders NEEDS_INPUT.",
+    "scope_performance": "object | null - from scope-sow-architect; feeds Terms & Review > Scope & Performance (scope, SLAs, performance commitments). null renders NEEDS_INPUT.",
+    "landscape": "object | null - supplier landscape context via ARIA when reachable; feeds Overview context. null renders NEEDS_INPUT.",
+    "provenance": { "legal_protection": "string | null - source skill + generatedAt", "scope_performance": "string | null", "landscape": "string | null" }
   }
 }
 ```
@@ -758,23 +795,27 @@ Continuing the worked example in `deal-room-state-schema.md` above one more (hyp
 
 ## INLINED: references/dashboard-canonical.md
 
-# Deal Room Dashboard - Canonical Specification
+# Deal Room Dashboard - Canonical Specification (the Deal hub)
 
-The single source of truth for the Deal Room dashboard. The structure is LOCKED (per G5/Rule 8): exactly FOUR tabs, in this order, on every run. Do not add, drop, reorder, or rename tabs based on the deal's category or how many rounds have been logged. When a tab has little to show (a brand-new deal with only Round 1 logged), render it in a clearly labeled state (NEEDS_INPUT / NOT APPLICABLE / RESEARCH PENDING is not typically applicable here; use a plain "Round 1 in progress; movement and value-of-movement views populate from Round 2 onward" note) rather than removing it.
+The single source of truth for the Deal Room dashboard, which IS the Deal hub (visual design-of-record: the locked `_deal_build` Deal hub dashboard). The structure is LOCKED (per G5/Rule 8): FOUR top-level tabs, in this order, on every run, each carrying a fixed set of subtabs (below). Do not add, drop, reorder, or rename tabs or subtabs based on the deal's category or how many rounds have been logged. When a surface has little to show (a brand-new deal with only Round 1 logged, or a subtab fed by a sub-skill that has not run), render a clearly labeled state (NEEDS_INPUT with the one-tap way to populate it, or "Round 1 in progress; movement and value-of-movement views populate from Round 2 onward") rather than removing it.
 
-## House style (locked; identical to every other suite dashboard)
+## House style (locked; interactive-dashboard palette)
 
-Pull exact values from the foundation's `brand-colors.md` and `dashboard-components.md` (both inlined in lilly-brand-assets-1c344a): dark charcoal header (`#212121`) with a Lilly-red (`#E1251B`) left rule and eyebrow, Bold Blue (`#0F3A85`) as the positive/primary accent, Georgia serif titles and large numbers, Arial body, no green or teal anywhere in the status palette. Reuse the shared component library verbatim: `Metric`, `Card`, `STable`, `Pillar`, `StateBanner`, plus the Deal-Room-specific `IssuePill` and `DirectionPill` defined in the reference JSX below (built with the same color-token discipline as the foundation's `SevPill`/`PrioPill`, no new hexes introduced).
+Pull exact values from the foundation's `brand-colors.md` and `dashboard-components.md` (both inlined in lilly-brand-assets-1c344a). This is an INTERACTIVE dashboard, so per the two-palette model in brand-colors.md it uses the **Dashboard Palette (MCM)**, NOT the document status palette: plum `#5C2B50` primary, teal `#2F6E6B` secondary/settled, burnt-orange `#C15E19` emphasis/attention, deep rust `#9A3B1F` critical, muted blue `#2E5E8C` info, Bold Grey `#8A969E` neutral, ink `#212121`. Status is NON-STOPLIGHT (no green/amber/red): it rides on borders, text, outline pills, and dots/icons, never on saturated fills; pale plum/teal tints are allowed as bands, no pale-orange fills anywhere. Tab and subtab strips are grey when inactive, black text with a black underline when active. No dark mode. Georgia serif titles and large numbers, Arial body. Reuse the shared component library verbatim (`Metric`, `Card`, `STable`, `Pillar`, `StateBanner`) plus the Deal-Room-specific `IssuePill` and `DirectionPill` defined in the reference JSX below, colored with the MCM Dashboard Palette tokens (no new hexes beyond that palette).
 
-## The four locked tabs
+## The four locked top-level tabs (each with its fixed subtabs)
 
-**Tab 1: Overview.** Deal meta (supplier, category, term, status, round count) as a header strip; a 5-metric KPI row (Deal Progress Score, Net Value Position, Rounds Completed, Open Issues, Approvals Pending); a Round History strip (one chip per round, colored by that round's net value contribution); a narrative card synthesizing trajectory and the single biggest open question.
+**Tab 1: Overview.** Deal meta (supplier, category, term, status, round count) as a header strip; the who-holds-the-pen band (best-effort read from communications, confidence-labeled); a summary-count strip (up to 5 counts); the 5-metric KPI row (Deal Progress Score, Net Value Position, Rounds Completed, Open Issues, Approvals Pending); a Round History strip (one chip per round, colored by that round's net value contribution); a narrative card synthesizing trajectory and the single biggest open question. This is the live-tracker landing.
 
-**Tab 2: Concession Ledger.** An `STable` of every issue with its current status, current Lilly/supplier positions, and remaining gap; each row expandable (or a companion small-multiple) to show the full round-by-round offer history for that issue. Rows are colored by movement direction using `DirectionPill` (favorable-to-Lilly, favorable-to-supplier, mutual, stalled). Paired with a narrative card interpreting the pattern: who has moved more, where movement has stalled, which issues are closing fastest.
+**Tab 2: Terms & Review.** Subtabs, in order: **Documents & Conflicts** (the governing-document map and any cross-document conflicts), **Legal & Protection** (the protection scorecard and legal-position navigator), **Scope & Performance** (SOW scope, SLAs, performance commitments), and **Sources & Evidence** (provenance for every figure and assertion). Legal & Protection and Scope & Performance are FED BY SUB-SKILLS (see Data composition): when the contributing skill (lilly-contract-review, scope-sow-architect) has not run, the subtab renders NEEDS_INPUT with the one-tap way to populate it, never a fabricated scorecard.
 
-**Tab 3: Issues Board & Packages.** The issues board as four status columns (Open, Tentatively Agreed, Agreed, Escalated; Dropped issues collapse into a small footer count rather than taking a full column) using `IssuePill`-coded cards; the packages panel (each package's linked issues and trade logic); the approvals-needed panel (each pending approval, its route, and status). Paired with a narrative card.
+**Tab 3: Economics.** Subtabs, in order: **Deal Table & ZOPA** (per-line ZOPA with Lilly/supplier positions and remaining gap, plus any MSA-umbrella context) and **Financial Model** (the pro-forma / TCO model, kernel-backed via `npv()`/`escalate()`). Seeded by commercial-negotiation-prep; live positions and the current gap come from the concession ledger.
 
-**Tab 4: Value of Movement & Next Counter.** Left: the value-of-movement chart, a `ComposedChart` with grouped bars (given vs. received per round) and an overlaid `Line` for cumulative net, built from `dashboard-components.md`'s required imports. Right: the Next-Counter card, the Phase 5 per-issue recommendation table plus the aggregate framing paragraph. Below both: a narrative card interpreting the net-value trend and calling out any reciprocity flag from Phase 4.
+**Tab 4: Negotiation.** Subtabs, in order: **Positions** (the per-term workbench: each issue's current position, movement direction via `DirectionPill`, and an expandable round-by-round history, master-detail), **Trade Plan** (the concession scoreboard, BATNA, concession sequencing, and the Phase 5 next-counter recommendation), and **Communications** (the commitment-alignment map with status and category filters). This tab is Deal Room's live-tracking core: the concession ledger, value-of-movement, and next-counter surfaces live here, each paired with a narrative card.
+
+## Data composition (one persisted object)
+
+`deal_room_state.json` is the canonical persisted object. The hub composes optional sub-skill slices onto it: commercial/legal-negotiation-prep seed the issues and positions; lilly-contract-review contributes the Legal & Protection slice; scope-sow-architect contributes the Scope & Performance slice. Each slice is OPTIONAL and additive; an absent slice renders its subtab as NEEDS_INPUT, never a fabricated value. The dashboard renders from this one object; the ledger writes to it; there is no second source of truth (see `deal-room-state-schema.md`).
 
 ## Numbers-reconcile assertion (required before rendering)
 
@@ -782,41 +823,50 @@ Any data object backing this dashboard must satisfy the same assertions as `deal
 
 ## Worked example (illustrative; same Meridian BioAnalytics deal as the schema and handoff-mapping worked examples above; numbers reconcile across all three)
 
-KPI row at Round 3: Deal Progress Score 78.5, Net Value Position +$547,600, Rounds Completed 3, Open Issues 4 (I01, I02, I03, I06), Approvals Pending 2 (I05 Legal sign-off; PKG01 Sourcing VP threshold review, since the 35,000-sample floor implied by PKG01 pushes the deal's committed value past the $3M approval boundary set in Phase 1). Value-of-movement chart: Round 1 given $160,000 / received $338,400 / net $178,400; Round 2 given $138,400 / received $418,400 / net $280,000 (cumulative $458,400); Round 3 given $40,000 / received $129,200 / net $89,200 (cumulative $547,600). These are the exact figures carried into the reference JSX below; a cloner who changes the underlying `LINES`/`ROUNDS` data must keep the KPI row, the chart, and the Concession Ledger table all deriving from that same data object, per G5, rather than hand-typing the totals separately.
+KPI row at Round 3: Deal Progress Score 78.5, Net Value Position +$547,600, Rounds Completed 3, Open Issues 4 (I01, I02, I03, I06), Approvals Pending 2 (I05 Legal sign-off; PKG01 Sourcing VP threshold review, since the 35,000-sample floor implied by PKG01 pushes the deal's committed value past the $3M approval boundary set in Phase 1). Value-of-movement chart: Round 1 given $160,000 / received $338,400 / net $178,400; Round 2 given $138,400 / received $418,400 / net $280,000 (cumulative $458,400); Round 3 given $40,000 / received $129,200 / net $89,200 (cumulative $547,600). These are the exact figures carried into the reference JSX below; a cloner who changes the underlying `LINES`/`ROUNDS` data must keep the KPI row (Overview), the value-of-movement chart (Negotiation > Trade Plan), and the Negotiation > Positions table all deriving from that same data object, per G5, rather than hand-typing the totals separately.
 
 ---
 
 ## INLINED: examples/deal_room_canonical_dashboard.jsx
 
-Reference implementation of the Deal Room dashboard described in "Phase 7: Deal Room Dashboard" above. LOCKED 4-tab structure (Overview, Concession Ledger, Issues Board and Packages, Value of Movement and Next Counter); only the data changes per run. Illustrative data below is the same "Meridian BioAnalytics" lab-services deal used in `deal-room-state-schema.md`, `handoff-mapping.md`, and `dashboard-canonical.md` above; every number in this file reconciles with those worked examples. Reuses the shared component library and color tokens from lilly-brand-assets' `dashboard-components.md` / `brand-colors.md` verbatim.
+Reference implementation of the Deal hub dashboard described in "Phase 7: Deal Room Dashboard" and "dashboard-canonical.md" above: four top-level tabs (Overview, Terms & Review, Economics, Negotiation), each with its fixed subtabs, in the interactive Dashboard Palette (MCM). The illustrative "Meridian BioAnalytics" data is identical to `deal-room-state-schema.md` / `handoff-mapping.md` / `dashboard-canonical.md`; every number reconciles (Deal Progress Score 78.5; cumulative net position $547,600 through Round 3). Terms & Review's Legal & Protection and Scope & Performance render NEEDS_INPUT (composed from sibling skills), never fabricated.
 
 ```jsx
 import { useState, useMemo } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, LabelList, ComposedChart, Line, ReferenceLine } from "recharts";
+import { Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ComposedChart, Line } from "recharts";
 
 // ---------------------------------------------------------------------------
-// Deal Room - CANONICAL DASHBOARD (reference implementation)
+// Deal Room - CANONICAL DASHBOARD (the Deal hub, reference implementation)
 // LOCKED structure. See "Phase 7: Deal Room Dashboard" earlier in this file.
-// 4 tabs, identical on every run for every deal. Only the data changes per run.
+// FOUR top-level tabs (Overview, Terms & Review, Economics, Negotiation), each
+// with fixed subtabs. Identical on every run for every deal; only data changes.
 // Data below is ILLUSTRATIVE (Meridian BioAnalytics, a lab-services renewal).
 // Clone the structure, swap the data. Every figure reconciles with the worked
 // examples in deal-room-state-schema.md, handoff-mapping.md, and
 // dashboard-canonical.md above (Deal Progress Score 78.5; cumulative net
 // value position $547,600 through Round 3).
-// House style: SUITE STANDARD (Arial body, Georgia titles, dark #212121
-// header with red rule, Lilly-approved palette). Same family as every other
-// suite dashboard. See lilly-brand-assets-1c344a, references/dashboard-
-// components.md for component implementations.
+// House style: INTERACTIVE DASHBOARD PALETTE (MCM) per the two-palette model in
+// brand-colors.md. Plum / teal / burnt-orange, NON-STOPLIGHT status (no green,
+// amber, or red). Status rides on borders, text, and OUTLINE pills, never on
+// saturated fills; no pale-orange fills. Grey/black tab strips. No dark mode
+// toggle. Georgia titles, Arial body.
 // ---------------------------------------------------------------------------
 
-// Color tokens: copied verbatim from dashboard-components.md. No green
-// anywhere; positive signal uses Bold Blue (BLU) / Neutral Sky (OK), never a
-// "GRN" token.
-const R = "#E1251B", DK = "#212121", BRN = "#521207",
-  CARD = "#E4EBF1", WARM = "#FFF0D8", RISK = "#FDE8E5", OK = "#D4E5F7", BD = "#E4EBF1",
-  MUT = "#8A969E", BLU = "#0F3A85", AMB = "#B45309";
+// MCM Dashboard Palette tokens (brand-colors.md > "Dashboard Palette"). No green,
+// no stoplight. PLUM primary, TEAL settled/positive, ORANGE attention, RUST
+// critical, INFO muted-blue, MUT neutral. Tints are pale plum/teal only.
+const PLUM = "#5C2B50", TEAL = "#2F6E6B", ORANGE = "#C15E19", RUST = "#9A3B1F",
+  INFO = "#2E5E8C", INK = "#212121", MUT = "#8A969E",
+  CARD = "#F4F1ED", BD = "#E3DDD3",
+  TINT_PLUM = "#EFE6EC", TINT_TEAL = "#E3EEEC",
+  HEAD_ACCENT = "#C9A0BC"; // light plum, legible on the dark header
 
-const TABS = ["Overview", "Concession Ledger", "Issues Board & Packages", "Value of Movement & Next Counter"];
+const TOP_TABS = ["Overview", "Terms & Review", "Economics", "Negotiation"];
+const SUBS = {
+  "Terms & Review": ["Documents & Conflicts", "Legal & Protection", "Scope & Performance", "Sources & Evidence"],
+  "Economics": ["Deal Table & ZOPA", "Financial Model"],
+  "Negotiation": ["Positions", "Trade Plan", "Communications"],
+};
 
 // --- Currency / percent helpers (copied verbatim from dashboard-components.md) ------------
 function f$(v) {
@@ -852,29 +902,34 @@ function weightedScoreJS(scores, weights) {
   return keys.reduce(function (s, k) { return s + scores[k] * weights[k]; }, 0);
 }
 
-// --- Shared components (verbatim from dashboard-components.md) ----------------------------
-function Metric({ label, value, sub, accent, warn, good }) {
-  var bar = accent ? R : warn ? R : good ? BLU : BD;
-  return <div style={{ background: accent ? WARM : warn ? RISK : good ? OK : "#fff", borderRadius: 8, padding: "14px 16px", borderLeft: "4px solid " + bar, minWidth: 0 }}>
-    <div style={{ fontSize: 10, fontWeight: 700, color: accent ? R : MUT, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
-    <div style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, color: warn ? R : good ? BLU : DK, marginTop: 4 }}>{value}</div>
+// --- Shared components, recolored to the MCM Dashboard Palette (outline discipline) -------
+function Metric({ label, value, sub, tone }) {
+  // tone: "attention" | "good" | "critical" | undefined. Color rides on the left
+  // border and the value text; the card stays neutral (no saturated status fill).
+  var edge = tone === "attention" ? ORANGE : tone === "good" ? TEAL : tone === "critical" ? RUST : BD;
+  var valColor = tone === "attention" ? ORANGE : tone === "good" ? TEAL : tone === "critical" ? RUST : INK;
+  return <div style={{ background: "#fff", borderRadius: 8, padding: "14px 16px", border: "1px solid " + BD, borderLeft: "4px solid " + edge, minWidth: 0 }}>
+    <div style={{ fontSize: 10, fontWeight: 700, color: MUT, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
+    <div style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, color: valColor, marginTop: 4 }}>{value}</div>
     {sub && <div style={{ fontSize: 11, color: MUT, marginTop: 2 }}>{sub}</div>}
   </div>;
 }
 function Card({ title, note, children }) {
   return <div style={{ background: "#fff", borderRadius: 8, padding: 18, border: "1px solid " + BD, marginBottom: 14 }}>
-    {title && <div style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 700, color: DK, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
-      <div style={{ width: 3, height: 14, background: R, borderRadius: 2 }} />{title}
+    {title && <div style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 700, color: INK, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ width: 3, height: 14, background: PLUM, borderRadius: 2 }} />{title}
       {note && <span style={{ fontFamily: "Arial", fontSize: 10, fontWeight: 600, color: MUT, marginLeft: "auto" }}>{note}</span>}
     </div>}{children}
   </div>;
 }
 function StateBanner({ kind, msg }) {
-  var map = { NEEDS_INPUT: [AMB, WARM, "Needs input"], NOT_APPLICABLE: [MUT, CARD, "Not applicable"], RESEARCH_PENDING: [MUT, CARD, "Research pending"] };
+  // NEEDS_INPUT uses an ORANGE (attention) border and text on a NEUTRAL tint,
+  // never an orange fill. NOT_APPLICABLE / RESEARCH_PENDING stay muted.
+  var map = { NEEDS_INPUT: [ORANGE, CARD, "Needs input"], NOT_APPLICABLE: [MUT, CARD, "Not applicable"], RESEARCH_PENDING: [MUT, CARD, "Research pending"] };
   var c = map[kind] || map.NOT_APPLICABLE;
   return <div style={{ background: c[1], border: "1px solid " + c[0] + "55", borderLeft: "4px solid " + c[0], borderRadius: 8, padding: "12px 16px", marginBottom: 14 }}>
     <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", color: c[0], textTransform: "uppercase" }}>{c[2]}</span>
-    <div style={{ fontSize: 12, color: DK, marginTop: 4, lineHeight: 1.5 }}>{msg}</div>
+    <div style={{ fontSize: 12, color: INK, marginTop: 4, lineHeight: 1.5 }}>{msg}</div>
   </div>;
 }
 function STable({ columns, rows }) {
@@ -900,12 +955,12 @@ function STable({ columns, rows }) {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead><tr>{columns.map(function (h, i) {
           var active = sort.col === i;
-          return <th key={i} onClick={function () { setSort({ col: i, dir: active && sort.dir === "desc" ? "asc" : "desc" }); }} style={{ padding: "7px 8px", fontWeight: 600, color: active ? R : MUT, fontSize: 11, borderBottom: "2px solid " + BD, cursor: "pointer", textAlign: h.a || "left", whiteSpace: "nowrap" }}>{h.l}{active ? (sort.dir === "asc" ? " ^" : " v") : ""}</th>;
+          return <th key={i} onClick={function () { setSort({ col: i, dir: active && sort.dir === "desc" ? "asc" : "desc" }); }} style={{ padding: "7px 8px", fontWeight: 600, color: active ? PLUM : MUT, fontSize: 11, borderBottom: "2px solid " + BD, cursor: "pointer", textAlign: h.a || "left", whiteSpace: "nowrap" }}>{h.l}{active ? (sort.dir === "asc" ? " ^" : " v") : ""}</th>;
         })}</tr></thead>
         <tbody>{filtered.map(function (row, ri) {
           return <tr key={ri} style={{ background: ri % 2 === 0 ? "#fff" : CARD }}>
             {row.map(function (cell, ci) {
-              return <td key={ci} style={{ padding: "6px 8px", fontSize: 12, borderBottom: "1px solid " + BD, textAlign: columns[ci].a || "left", fontWeight: cell.b ? 700 : 400, color: cell.c || DK }}>{cell.d}</td>;
+              return <td key={ci} style={{ padding: "6px 8px", fontSize: 12, borderBottom: "1px solid " + BD, textAlign: columns[ci].a || "left", fontWeight: cell.b ? 700 : 400, color: cell.c || INK }}>{cell.d}</td>;
             })}
           </tr>;
         })}</tbody>
@@ -914,27 +969,20 @@ function STable({ columns, rows }) {
   </div>;
 }
 
-// --- Dashboard-specific pills (same color discipline as the foundation's SevPill/PrioPill;
-// no new hexes) --------------------------------------------------------------------------
-const STATUS = { OPEN: [MUT, CARD], TENTATIVELY_AGREED: [AMB, WARM], AGREED: [BLU, OK], ESCALATED: [R, RISK], DROPPED: [MUT, CARD] };
-function IssuePill({ s }) {
-  var c = STATUS[s] || [MUT, CARD];
-  var label = s.replace(/_/g, " ");
-  return <span style={{ color: c[0], background: c[1], border: "1px solid " + c[0] + "40", fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{label}</span>;
+// --- Dashboard-specific pills (OUTLINE discipline: colored border + text, white fill; no
+// saturated status fills; non-stoplight tones) -------------------------------------------
+function Pill({ color, label }) {
+  return <span style={{ color: color, background: "#fff", border: "1px solid " + color, fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{label}</span>;
 }
-const DIRECTION = { lilly_favorable: [BLU, OK, "Toward Lilly"], supplier_favorable: [R, RISK, "Toward supplier"], mutual: [AMB, WARM, "Mutual movement"], stalled: [MUT, CARD, "Stalled"] };
-function DirectionPill({ d }) {
-  var c = DIRECTION[d] || DIRECTION.stalled;
-  return <span style={{ color: c[0], background: c[1], border: "1px solid " + c[0] + "40", fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{c[2]}</span>;
-}
-const PRIO = { High: R, Medium: AMB, Low: BLU };
-const PRIOBG = { High: RISK, Medium: WARM, Low: OK };
-function PrioPill({ p }) {
-  return <span style={{ color: PRIO[p], background: PRIOBG[p], border: "1px solid " + PRIO[p] + "40", fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{p}</span>;
-}
+const STATUS = { OPEN: MUT, TENTATIVELY_AGREED: ORANGE, AGREED: TEAL, ESCALATED: RUST, DROPPED: MUT };
+function IssuePill({ s }) { return <Pill color={STATUS[s] || MUT} label={s.replace(/_/g, " ")} />; }
+const DIRECTION = { lilly_favorable: [TEAL, "Toward Lilly"], supplier_favorable: [RUST, "Toward supplier"], mutual: [ORANGE, "Mutual movement"], stalled: [MUT, "Stalled"] };
+function DirectionPill({ d }) { var c = DIRECTION[d] || DIRECTION.stalled; return <Pill color={c[0]} label={c[1]} />; }
+const PRIO = { High: RUST, Medium: ORANGE, Low: TEAL };
+function PrioPill({ p }) { return <Pill color={PRIO[p] || MUT} label={p} />; }
 function Tip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
-  return <div style={{ background: DK, borderRadius: 6, padding: "10px 14px", color: "#fff", fontSize: 12 }}>
+  return <div style={{ background: INK, borderRadius: 6, padding: "10px 14px", color: "#fff", fontSize: 12 }}>
     {label && <div style={{ fontWeight: 600, color: MUT }}>{label}</div>}
     {payload.map(function (p, i) { return <div key={i}>{p.name}: <strong>{f$(p.value)}</strong></div>; })}
   </div>;
@@ -956,11 +1004,9 @@ const META = {
   status: "OPEN",
   roundsCompleted: 3,
   preparedDate: "August 4, 2026",
+  pen: { party: "Lilly", basis: "Lilly holds the current redline after Round 3", confidence: "Medium" },
 };
 
-// Priority raw points (High=3, Medium=2, Low=1) normalized to fractions summing to 1.0 across
-// the six weighted issues, exactly as Phase 1 Step 3 specifies. I07 is package-tracked, not in
-// the weighted set (see META / PACKAGES below).
 const RAW_POINTS = { High: 3, Medium: 2, Low: 1 };
 
 const ISSUES = [
@@ -1044,8 +1090,6 @@ const DEAL_PROGRESS_SCORE = DEAL_PROGRESS_RAW == null ? null : Math.round(DEAL_P
 
 // --- Derived: per-round value of movement (kernel-backed for I03; plain, labeled, for I01) -
 function plainRoundValue(iss, roundIdx) {
-  // roundIdx: 1..N (movement from roundIdx-1 to roundIdx). Positive lillyDelta = Lilly gave;
-  // positive supplierDelta (moving toward Lilly, i.e. price/ask falling) = Lilly received.
   var lillyFrom = iss.lillyPath[roundIdx - 1], lillyTo = iss.lillyPath[roundIdx];
   var supFrom = iss.supplierPath[roundIdx - 1], supTo = iss.supplierPath[roundIdx];
   var given = Math.max(0, lillyTo - lillyFrom) * iss.volume * META.contractTermYears;
@@ -1053,9 +1097,6 @@ function plainRoundValue(iss, roundIdx) {
   return { given: given, received: received };
 }
 function escalateRoundValue(iss, roundIdx) {
-  // Base = settled Year-1 run rate at the current (Round 3) I01 rate x I01 volume, per the
-  // worked example in deal-room-state-schema.md. year=1: a 2-year term has one escalation
-  // event, applied in Year 2. compounding=true, per the supplier's own clause language.
   var i01 = ISSUES.find(function (x) { return x.id === "I01"; });
   var base = i01.lillyPath[i01.lillyPath.length - 1] * i01.volume;
   var lillyFrom = iss.lillyPath[roundIdx - 1] / 100, lillyTo = iss.lillyPath[roundIdx] / 100;
@@ -1095,39 +1136,182 @@ const NEXT_COUNTER = [
 ];
 const RECIPROCITY_FLAGS = [];
 
+// Year-1 base and one escalation event (Year 2), kernel-backed, for the Financial Model subtab.
+const FM_BASE_Y1 = ISSUES.find(function (x) { return x.id === "I01"; }).lillyPath[3] * ISSUES.find(function (x) { return x.id === "I01"; }).volume; // 46 x 40000 = 1,840,000
+const FM_RATE = ISSUES.find(function (x) { return x.id === "I03"; }).lillyPath[3] / 100; // 3.0%
+const FM_Y2 = escalateJS(FM_BASE_Y1, FM_RATE, 1, true); // 1,895,200
+const FM_TCO = FM_BASE_Y1 + FM_Y2; // 3,735,200
+
+// Illustrative commitment-alignment rows (Communications subtab): each ties to a logged item.
+const COMMITMENTS = [
+  { item: "Round 3 per-sample rate hold ($46) contingent on volume floor", source: "Supplier email, Round 3", status: "conditional" },
+  { item: "Payment terms Net 45", source: "Round 1 minutes", status: "aligned" },
+  { item: "Post-termination data return + certified destruction", source: "Redline, pending Legal", status: "pending" },
+  { item: "Turnaround SLA 8 business days", source: "Round 3 discussion", status: "open" },
+];
+const COMMIT_TONE = { aligned: TEAL, conditional: ORANGE, pending: INFO, open: MUT };
+
 // ---------------------------------------------------------------------------
 // RENDERING (data model above is complete; this section only presents it)
 // ---------------------------------------------------------------------------
 
+function PenBand() {
+  var p = META.pen;
+  return <div style={{ display: "flex", alignItems: "center", gap: 10, background: TINT_PLUM, border: "1px solid " + PLUM + "40", borderRadius: 8, padding: "8px 14px", marginBottom: 14 }}>
+    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: PLUM }}>Pen</span>
+    <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>{p.party}</span>
+    <span style={{ fontSize: 11, color: MUT }}>{p.basis}</span>
+    <span style={{ marginLeft: "auto" }}><Pill color={p.confidence === "High" ? TEAL : p.confidence === "Low" ? RUST : ORANGE} label={p.confidence + " confidence"} /></span>
+  </div>;
+}
+
 function OverviewTab() {
   var approvalsPending = APPROVALS.filter(function (a) { return a.status !== "APPROVED" && a.status !== "DENIED"; }).length;
   return <div>
+    <PenBand />
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
-      <Metric label="Deal Progress Score" value={DEAL_PROGRESS_SCORE + "/100"} good sub="weighted_score(), priority-weighted" />
-      <Metric label="Net Value Position" value={f$(NET_POSITION)} good sub={"given " + f$(TOTAL_GIVEN) + " / received " + f$(TOTAL_RECEIVED)} />
+      <Metric label="Deal Progress Score" value={DEAL_PROGRESS_SCORE + "/100"} tone="good" sub="weighted_score(), priority-weighted" />
+      <Metric label="Net Value Position" value={f$(NET_POSITION)} tone="good" sub={"given " + f$(TOTAL_GIVEN) + " / received " + f$(TOTAL_RECEIVED)} />
       <Metric label="Rounds Completed" value={META.roundsCompleted} />
       <Metric label="Open Issues" value={OPEN_ISSUES.length} sub={ISSUES.length + " total issues"} />
-      <Metric label="Approvals Pending" value={approvalsPending} accent={approvalsPending > 0} />
+      <Metric label="Approvals Pending" value={approvalsPending} tone={approvalsPending > 0 ? "attention" : undefined} />
     </div>
     <Card title={META.supplier + " - " + META.category} note={META.dealId}>
-      <div style={{ fontSize: 12, color: DK, lineHeight: 1.6, marginBottom: 10 }}>{META.scope}</div>
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.6, marginBottom: 10 }}>{META.scope}</div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {ROUNDS_CUM.map(function (r) {
-          return <div key={r.round} style={{ background: r.net >= 0 ? OK : RISK, border: "1px solid " + (r.net >= 0 ? BLU : R) + "40", borderRadius: 20, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: r.net >= 0 ? BLU : R }}>
+          var tone = r.net >= 0 ? TEAL : RUST;
+          return <div key={r.round} style={{ background: "#fff", border: "1px solid " + tone, borderRadius: 20, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: tone }}>
             {r.label}: net {f$(r.net)} (cumulative {f$(r.cumulativeNet)})
           </div>;
         })}
       </div>
     </Card>
     <Card title="Where This Deal Stands">
-      <div style={{ fontSize: 12, color: DK, lineHeight: 1.7 }}>
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
         Three rounds in, the deal has moved decisively in Lilly's favor on the two dollarized issues: cumulative net value received stands at {f$(NET_POSITION)} against {f$(TOTAL_GIVEN)} given, and the priority-weighted Deal Progress Score of {DEAL_PROGRESS_SCORE} out of 100 reflects that four of six weighted issues (I01, I03, I04, I05) are more than 75 percent closed. The two issues still furthest from resolution are the per-sample rate (I01, a $120,000 two-year gap remaining between Lilly's target and the supplier's last offer) and the liability cap (I06, still a full point of multiplier apart). The single biggest open question heading into Round 4 is whether the supplier will accept the volume-commitment package (PKG01): accepting it is the cleanest path to closing the remaining I01 gap without a further unilateral concession, but it needs Sourcing VP sign-off before it can be offered, since the implied 35,000-sample floor pushes committed value past the $3M approval boundary set at intake.
       </div>
     </Card>
   </div>;
 }
 
-function LedgerTab() {
+// --- Terms & Review subtabs -------------------------------------------------------------
+function DocumentsTab() {
+  var docs = [
+    { name: "Master Services Agreement (MSA)", note: "Governing; escalation clause in Sec. 7.2", flag: null },
+    { name: "Statement of Work (SOW) - Immunoassay Program", note: "Scope + SLA source", flag: null },
+    { name: "Pricing Exhibit A", note: "Per-sample rate schedule", flag: "conflict" },
+    { name: "Data Protection Addendum (DPA)", note: "Retention language under redline (I05)", flag: null },
+  ];
+  return <div>
+    <Card title="Governing Documents" note={docs.length + " in scope"}>
+      {docs.map(function (d, i) {
+        return <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < docs.length - 1 ? "1px solid " + BD : "none" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{d.name}</div>
+            <div style={{ fontSize: 11, color: MUT }}>{d.note}</div>
+          </div>
+          {d.flag === "conflict" && <Pill color={ORANGE} label="Conflict to reconcile" />}
+        </div>;
+      })}
+    </Card>
+    <Card title="Open Conflict">
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        The Pricing Exhibit A rate schedule and the MSA Sec. 7.2 escalation clause reference different compounding bases for the annual increase. Reconcile before signature so the escalation cap agreed in the negotiation (I03) maps cleanly to one contractual formula, not two.
+      </div>
+    </Card>
+  </div>;
+}
+function LegalProtectionTab() {
+  return <div>
+    <StateBanner kind="NEEDS_INPUT" msg="Run lilly-contract-review on the governing MSA/DPA to populate the protection scorecard and the legal-position navigator here. Until then this subtab intentionally shows no scorecard; it is composed from a sibling skill, never fabricated." />
+    <Card title="What populates this subtab">
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        Legal & Protection is a composed slice: lilly-contract-review contributes the protection scorecard (data rights, liability, indemnity, termination, IP, audit) and the legal-position navigator. The hub renders that slice from `deal_room_state.json > hub_slices.legal_protection` when it is present. Issue I05 (data ownership) and I06 (liability cap) from this deal will map into it once the review has run.
+      </div>
+    </Card>
+  </div>;
+}
+function ScopePerformanceTab() {
+  return <div>
+    <StateBanner kind="NEEDS_INPUT" msg="Run scope-sow-architect on the SOW to populate scope, SLAs, and performance commitments here. This subtab is composed from a sibling skill; it is not fabricated when the source has not run." />
+    <Card title="What populates this subtab">
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        Scope & Performance is a composed slice: scope-sow-architect contributes the SOW scope breakdown, the SLA set (including this deal's Turnaround SLA, I02), and the performance/credit commitments. The hub renders it from `deal_room_state.json > hub_slices.scope_performance` when present.
+      </div>
+    </Card>
+  </div>;
+}
+function SourcesTab() {
+  var rows = [
+    { d: "I01-I07 positions and round history" }, { d: "User-logged Round 1-3 emails and meeting summaries" }, { d: "Observed" },
+    { d: "Value of movement (I01)" }, { d: "Plain arithmetic: delta x volume x term" }, { d: "Computed" },
+    { d: "Value of movement (I03)" }, { d: "numeric_kernel.py escalate(base, rate, 1, compounding=true)" }, { d: "Kernel" },
+    { d: "Deal Progress Score" }, { d: "numeric_kernel.py weighted_score(gap_closed, priority_weights)" }, { d: "Kernel" },
+    { d: "$3M approval boundary" }, { d: "Phase 1 intake (user-confirmed)" }, { d: "Observed" },
+  ];
+  var table = [];
+  for (var i = 0; i < rows.length; i += 3) table.push([{ d: rows[i].d, b: true }, { d: rows[i + 1].d }, { d: <Pill color={rows[i + 2].d === "Kernel" ? TEAL : rows[i + 2].d === "Computed" ? INFO : MUT} label={rows[i + 2].d} /> }]);
+  return <Card title="Sources & Evidence" note="Provenance for every figure">
+    <STable columns={[{ l: "Figure / assertion", a: "left" }, { l: "Source / method", a: "left" }, { l: "Kind", a: "left" }]} rows={table} />
+  </Card>;
+}
+
+// --- Economics subtabs ------------------------------------------------------------------
+function ZopaTab() {
+  var columns = [
+    { l: "Issue", a: "left" }, { l: "Priority", a: "left" }, { l: "Lilly Open", a: "left" }, { l: "Target", a: "left" },
+    { l: "Walk-away", a: "left" }, { l: "Supplier Open", a: "left" }, { l: "Current (L / S)", a: "left" }, { l: "Remaining Gap", a: "left" },
+  ];
+  function gapLabel(iss) {
+    if (iss.lillyPath == null) return iss.status === "AGREED" ? "closed" : "qualitative";
+    var last = iss.lillyPath.length - 1;
+    var gap = Math.abs(iss.lillyPath[last] - iss.supplierPath[last]);
+    return iss.unit === "$/sample" ? f$(gap * iss.volume * META.contractTermYears) + " (2-yr)" : gap.toFixed(2) + " " + iss.unit;
+  }
+  var rows = ISSUES.filter(function (i) { return i.lillyPath != null; }).map(function (iss) {
+    var last = iss.lillyPath.length - 1;
+    return [
+      { d: iss.name, b: true }, { d: <PrioPill p={iss.priority} />, v: iss.priority },
+      { d: String(iss.opening) }, { d: String(iss.target) }, { d: String(iss.walkaway) },
+      { d: iss.supplierOpening == null ? "-" : String(iss.supplierOpening) },
+      { d: "L " + iss.lillyPath[last] + " / S " + iss.supplierPath[last] },
+      { d: gapLabel(iss) },
+    ];
+  });
+  return <div>
+    <Card title="Deal Table & ZOPA" note="Numeric issues; qualitative issues tracked on Positions">
+      <STable columns={columns} rows={rows} />
+    </Card>
+    <Card title="Reading the ZOPA">
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        The zone of possible agreement is open on the per-sample rate (I01: Lilly target 46, supplier last 47.5, a {f$(1.5 * 40000 * 2)} two-year gap) and on the escalation cap (I03: 3.0 percent vs 3.5 percent). Payment terms (I04) sit inside the ZOPA and are agreed. The volume-commitment lever (I07, package PKG01) is the mechanism most likely to collapse the remaining I01 gap without a further unilateral Lilly concession.
+      </div>
+    </Card>
+  </div>;
+}
+function FinancialModelTab() {
+  return <div>
+    <Card title="Pro-Forma / TCO" note="Kernel-backed (escalate)">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 12 }}>
+        <Metric label="Year 1 base" value={fF(FM_BASE_Y1)} sub="$46/sample x 40,000" />
+        <Metric label="Year 2 (esc. 3.0%)" value={fF(FM_Y2)} tone="attention" sub="escalate(base, 0.03, 1, compound)" />
+        <Metric label="2-year TCO" value={fF(FM_TCO)} tone="good" sub="Year 1 + Year 2" />
+      </div>
+      <div style={{ fontSize: 11, color: MUT, lineHeight: 1.6 }}>
+        The Year-2 figure is produced by the vendored numeric_kernel.py escalate() at the current settled escalation cap (I03 = 3.0 percent), never by hand arithmetic. Change the rate on the Deal Table and this model moves with it.
+      </div>
+    </Card>
+    <Card title="What this shows">
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        At the Round 3 positions, the two-year committed spend is {fF(FM_TCO)}. Every 0.5-point movement on the escalation cap (I03) shifts the Year-2 figure by about {fF(FM_BASE_Y1 * 0.005)}, which is why holding I03 at 3.0 percent is worth pairing with the PKG01 volume lever rather than conceding it alone.
+      </div>
+    </Card>
+  </div>;
+}
+
+// --- Negotiation subtabs ----------------------------------------------------------------
+function PositionsTab() {
   var columns = [
     { l: "Issue", a: "left" }, { l: "Priority", a: "left" }, { l: "Status", a: "left" },
     { l: "Round 1", a: "left" }, { l: "Round 2", a: "left" }, { l: "Round 3 (current)", a: "left" },
@@ -1138,7 +1322,7 @@ function LedgerTab() {
     return "L " + iss.lillyPath[idx] + " / S " + (iss.supplierPath[idx] == null ? "-" : iss.supplierPath[idx]);
   }
   function gapLabel(iss) {
-    if (iss.lillyPath == null) return iss.status === "AGREED" ? "closed" : "qualitative, see Issues Board";
+    if (iss.lillyPath == null) return iss.status === "AGREED" ? "closed" : "qualitative";
     var last = iss.lillyPath.length - 1;
     var gap = Math.abs(iss.lillyPath[last] - iss.supplierPath[last]);
     return iss.unit === "$/sample" ? f$(gap * iss.volume * META.contractTermYears) + " (2-yr)" : gap.toFixed(2) + " " + iss.unit;
@@ -1162,68 +1346,37 @@ function LedgerTab() {
       { d: gapLabel(iss) }, { d: <DirectionPill d={directionFor(iss)} />, v: directionFor(iss) },
     ];
   });
-  return <div>
-    <Card title="Concession Ledger" note="Offer-by-offer, all 7 issues, Rounds 1-3">
-      <STable columns={columns} rows={rows} />
-    </Card>
-    <Card title="Reading the Ledger">
-      <div style={{ fontSize: 12, color: DK, lineHeight: 1.7 }}>
-        The supplier has moved on every dollarized issue in every round logged so far; Lilly's own movement has been smaller and, on the escalation cap (I03), stopped entirely after Round 2 once Lilly reached its stated target. That pattern, consistent forward motion from the supplier against a Lilly position that settles and holds, is the strongest evidence behind the 78.5 Deal Progress Score: this is a negotiation that is closing, not stalling. Payment terms (I04) closed in Round 1 with no Lilly movement at all, a genuine early win. The turnaround SLA (I02) and liability cap (I06) are the two issues where the supplier still has the most ground left to cover relative to where they started.
-      </div>
-    </Card>
-  </div>;
-}
-
-function IssuesBoardTab() {
   var cols = ["OPEN", "TENTATIVELY_AGREED", "AGREED", "ESCALATED"];
   var colLabels = { OPEN: "Open", TENTATIVELY_AGREED: "Tentatively Agreed", AGREED: "Agreed", ESCALATED: "Escalated" };
-  var dropped = ISSUES.filter(function (i) { return i.status === "DROPPED"; });
   return <div>
+    <Card title="Positions Workbench" note="Offer-by-offer, all 7 issues, Rounds 1-3">
+      <STable columns={columns} rows={rows} />
+    </Card>
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
       {cols.map(function (col) {
         var items = ISSUES.filter(function (i) { return i.status === col; });
-        return <div key={col} style={{ background: "#fff", borderRadius: 8, border: "1px solid " + BD, padding: 12, minHeight: 120 }}>
+        var tone = col === "AGREED" ? TEAL : col === "TENTATIVELY_AGREED" ? ORANGE : col === "ESCALATED" ? RUST : MUT;
+        return <div key={col} style={{ background: "#fff", borderRadius: 8, border: "1px solid " + BD, borderTop: "3px solid " + tone, padding: 12, minHeight: 110 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: MUT, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{colLabels[col]} ({items.length})</div>
           {items.length === 0 && <div style={{ fontSize: 11, color: MUT }}>None</div>}
           {items.map(function (iss) {
-            return <div key={iss.id} style={{ background: CARD, borderRadius: 6, padding: "8px 10px", marginBottom: 6 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: DK }}>{iss.name}</div>
+            return <div key={iss.id} style={{ borderLeft: "3px solid " + BD, paddingLeft: 8, marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{iss.name}</div>
               <div style={{ marginTop: 4 }}><PrioPill p={iss.priority} /></div>
             </div>;
           })}
         </div>;
       })}
     </div>
-    {dropped.length > 0 && <div style={{ fontSize: 11, color: MUT, marginBottom: 14 }}>{dropped.length} dropped issue(s), collapsed from the board above.</div>}
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
-      <Card title="Packages" note={PACKAGES.length + " package(s)"}>
-        {PACKAGES.map(function (p) {
-          return <div key={p.id} style={{ marginBottom: 10 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: DK }}>{p.name} <span style={{ color: MUT, fontWeight: 400 }}>({p.linkedIssueIds.join(" + ")})</span></div>
-            <div style={{ fontSize: 11, color: MUT, marginTop: 2 }}>{p.tradeLogic}</div>
-            <div style={{ marginTop: 4 }}><IssuePill s={p.status === "PROPOSED" ? "TENTATIVELY_AGREED" : p.status === "ACCEPTED" ? "AGREED" : "OPEN"} /> <span style={{ fontSize: 10, color: MUT, marginLeft: 6 }}>{p.status}</span></div>
-          </div>;
-        })}
-      </Card>
-      <Card title="Approvals Needed" note={APPROVALS.length + " pending"}>
-        {APPROVALS.map(function (a, i) {
-          return <div key={i} style={{ marginBottom: 10 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: DK }}>{a.approval}</div>
-            <div style={{ fontSize: 11, color: MUT, marginTop: 2 }}>Route to: {a.routeTo}</div>
-            <div style={{ marginTop: 4 }}><span style={{ fontSize: 10, fontWeight: 700, color: a.status === "REQUESTED" ? AMB : MUT, background: a.status === "REQUESTED" ? WARM : CARD, padding: "2px 8px", borderRadius: 20 }}>{a.status.replace(/_/g, " ")}</span></div>
-          </div>;
-        })}
-      </Card>
-    </div>
-    <Card title="Board and Package Read">
-      <div style={{ fontSize: 12, color: DK, lineHeight: 1.7 }}>
-        Four issues remain open (I01, I02, I03, I06); one is tentatively agreed pending a Legal sign-off (I05, data ownership); one is fully agreed (I04, payment terms). The single package on the table, PKG01, is the fastest route to closing the largest remaining dollar gap (I01), but it cannot be offered yet: the volume floor it implies crosses the $3M approval boundary set at Phase 1 intake, so it is sitting behind a Sourcing VP approval request rather than being blocked by anything the supplier has said. Both open approvals should be resolved before Round 4 if the goal is to have PKG01 and the finalized data-ownership language both ready to put on the table in the same session.
+    <Card title="Reading the Positions">
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        The supplier has moved on every dollarized issue in every round; Lilly's own movement has been smaller and, on the escalation cap (I03), stopped after Round 2 once Lilly reached its target. That pattern, consistent forward motion from the supplier against a Lilly position that settles and holds, is the strongest evidence behind the 78.5 Deal Progress Score. Payment terms (I04) closed in Round 1 with no Lilly movement. The turnaround SLA (I02) and liability cap (I06) are where the supplier still has the most ground to cover.
       </div>
     </Card>
   </div>;
 }
 
-function ValueMovementTab() {
+function TradePlanTab() {
   return <div>
     <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 14, marginBottom: 14 }}>
       <Card title="Value of Movement by Round" note="I01 + I03 only; see exclusions below">
@@ -1233,43 +1386,103 @@ function ValueMovementTab() {
             <XAxis dataKey="label" tick={{ fontSize: 11, fill: MUT }} />
             <YAxis tickFormatter={f$} tick={{ fontSize: 11, fill: MUT }} />
             <Tooltip content={<Tip />} />
-            <Bar dataKey="given" name="Value Given" fill={R} radius={[4, 4, 0, 0]} />
-            <Bar dataKey="received" name="Value Received" fill={BLU} radius={[4, 4, 0, 0]} />
-            <Line dataKey="cumulativeNet" name="Cumulative Net" stroke={BRN} strokeWidth={2.5} dot={{ r: 4 }} />
+            <Bar dataKey="given" name="Value Given" fill={ORANGE} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="received" name="Value Received" fill={TEAL} radius={[4, 4, 0, 0]} />
+            <Line dataKey="cumulativeNet" name="Cumulative Net" stroke={PLUM} strokeWidth={2.5} dot={{ r: 4 }} />
           </ComposedChart>
         </ResponsiveContainer>
         <div style={{ fontSize: 10, color: MUT, marginTop: 6 }}>
-          Excluded from this chart (no reliable common-dollar unit): {EXCLUDED.map(function (e) { return e.id; }).join(", ")}. See each issue's reason on the Concession Ledger tab.
+          Excluded (no reliable common-dollar unit): {EXCLUDED.map(function (e) { return e.id; }).join(", ")}. See each issue's reason on Positions.
         </div>
       </Card>
       <Card title="Next-Counter Recommendation" note={"Round " + (META.roundsCompleted + 1)}>
         {NEXT_COUNTER.map(function (nc) {
           var iss = ISSUES.find(function (x) { return x.id === nc.issueId; });
           return <div key={nc.issueId} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid " + BD }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: DK }}>{iss.name} <span style={{ fontSize: 10, color: MUT, fontWeight: 400 }}>({nc.tier})</span></div>
-            <div style={{ fontSize: 11, color: DK, marginTop: 3, lineHeight: 1.5 }}>{nc.recommendation}</div>
-            <div style={{ fontSize: 10, color: nc.reciprocity.indexOf("UNILATERAL") === 0 ? AMB : BLU, marginTop: 3, fontWeight: 700 }}>{nc.reciprocity}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{iss.name} <span style={{ fontSize: 10, color: MUT, fontWeight: 400 }}>({nc.tier})</span></div>
+            <div style={{ fontSize: 11, color: INK, marginTop: 3, lineHeight: 1.5 }}>{nc.recommendation}</div>
+            <div style={{ fontSize: 10, color: nc.reciprocity.indexOf("UNILATERAL") === 0 ? ORANGE : INFO, marginTop: 3, fontWeight: 700 }}>{nc.reciprocity}</div>
+          </div>;
+        })}
+      </Card>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+      <Card title="Packages" note={PACKAGES.length + " on the table"}>
+        {PACKAGES.map(function (p) {
+          return <div key={p.id} style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{p.name} <span style={{ color: MUT, fontWeight: 400 }}>({p.linkedIssueIds.join(" + ")})</span></div>
+            <div style={{ fontSize: 11, color: MUT, marginTop: 2 }}>{p.tradeLogic}</div>
+            <div style={{ marginTop: 4 }}><IssuePill s={p.status === "PROPOSED" ? "TENTATIVELY_AGREED" : p.status === "ACCEPTED" ? "AGREED" : "OPEN"} /> <span style={{ fontSize: 10, color: MUT, marginLeft: 6 }}>{p.status}</span></div>
+          </div>;
+        })}
+      </Card>
+      <Card title="Approvals Needed" note={APPROVALS.length + " pending"}>
+        {APPROVALS.map(function (a, i) {
+          return <div key={i} style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{a.approval}</div>
+            <div style={{ fontSize: 11, color: MUT, marginTop: 2 }}>Route to: {a.routeTo}</div>
+            <div style={{ marginTop: 4 }}><Pill color={a.status === "REQUESTED" ? ORANGE : MUT} label={a.status.replace(/_/g, " ")} /></div>
           </div>;
         })}
       </Card>
     </div>
     <Card title="Net Value Trend">
-      <div style={{ fontSize: 12, color: DK, lineHeight: 1.7 }}>
-        Net value has moved in Lilly's favor every round: {f$(ROUNDS_CUM[0].net)} in Round 1, {f$(ROUNDS_CUM[1].net)} in Round 2 (cumulative {f$(ROUNDS_CUM[1].cumulativeNet)}), and {f$(ROUNDS_CUM[2].net)} in Round 3 (cumulative {f$(ROUNDS_CUM[2].cumulativeNet)}). The per-round net has narrowed as both sides approach their respective targets, which is the expected shape as a negotiation converges rather than a sign of stalling. {RECIPROCITY_FLAGS.length === 0 ? "No reciprocity flags: every Lilly concession to date has been paired with, or followed by, a supplier concession of greater value." : RECIPROCITY_FLAGS.join(" ")}
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        Net value has moved in Lilly's favor every round: {f$(ROUNDS_CUM[0].net)} in Round 1, {f$(ROUNDS_CUM[1].net)} in Round 2 (cumulative {f$(ROUNDS_CUM[1].cumulativeNet)}), and {f$(ROUNDS_CUM[2].net)} in Round 3 (cumulative {f$(ROUNDS_CUM[2].cumulativeNet)}). The per-round net has narrowed as both sides approach their targets, the expected shape as a negotiation converges. {RECIPROCITY_FLAGS.length === 0 ? "No reciprocity flags: every Lilly concession to date has been paired with, or followed by, a supplier concession of greater value." : RECIPROCITY_FLAGS.join(" ")}
       </div>
     </Card>
   </div>;
 }
 
+function CommunicationsTab() {
+  return <div>
+    <Card title="Commitment-Alignment Map" note="Best-effort read from logged correspondence">
+      {COMMITMENTS.map(function (c, i) {
+        return <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i < COMMITMENTS.length - 1 ? "1px solid " + BD : "none" }}>
+          <div style={{ width: 4, height: 32, background: COMMIT_TONE[c.status], borderRadius: 2 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{c.item}</div>
+            <div style={{ fontSize: 11, color: MUT }}>{c.source}</div>
+          </div>
+          <Pill color={COMMIT_TONE[c.status]} label={c.status} />
+        </div>;
+      })}
+    </Card>
+    <Card title="Reading the Alignment">
+      <div style={{ fontSize: 12, color: INK, lineHeight: 1.7 }}>
+        The only conditional commitment is the Round 3 rate hold, which the supplier tied to a volume floor: it aligns cleanly with package PKG01 and is safe to build the next counter around. Payment terms are fully aligned and agreed. The data-return commitment is pending Legal sign-off (I05) and should not be treated as settled until that approval clears.
+      </div>
+    </Card>
+  </div>;
+}
+
+const RENDER = {
+  "Overview": OverviewTab,
+  "Terms & Review|Documents & Conflicts": DocumentsTab,
+  "Terms & Review|Legal & Protection": LegalProtectionTab,
+  "Terms & Review|Scope & Performance": ScopePerformanceTab,
+  "Terms & Review|Sources & Evidence": SourcesTab,
+  "Economics|Deal Table & ZOPA": ZopaTab,
+  "Economics|Financial Model": FinancialModelTab,
+  "Negotiation|Positions": PositionsTab,
+  "Negotiation|Trade Plan": TradePlanTab,
+  "Negotiation|Communications": CommunicationsTab,
+};
+
 export default function DealRoomDashboard() {
-  var _t = useState(TABS[0]); var tab = _t[0]; var setTab = _t[1];
-  return <div style={{ fontFamily: "Arial, sans-serif", background: "#F7F8FA", minHeight: "100%" }}>
-    <div style={{ background: DK, padding: "12px 24px 8px" }}>
+  var _t = useState("Overview"); var tab = _t[0]; var setTab = _t[1];
+  var _s = useState(""); var sub = _s[0]; var setSub = _s[1];
+  function selectTab(t) { setTab(t); setSub(SUBS[t] ? SUBS[t][0] : ""); }
+  var subs = SUBS[tab] || [];
+  var key = subs.length ? tab + "|" + (sub || subs[0]) : tab;
+  var Body = RENDER[key] || OverviewTab;
+  return <div style={{ fontFamily: "Arial, sans-serif", background: "#F7F6F3", minHeight: "100%" }}>
+    <div style={{ background: INK, padding: "12px 24px 8px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 4, height: 40, background: R, borderRadius: 2 }} />
+          <div style={{ width: 4, height: 40, background: HEAD_ACCENT, borderRadius: 2 }} />
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: R }}>DEAL ROOM</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: HEAD_ACCENT }}>DEAL ROOM</div>
             <div style={{ fontFamily: "Georgia,serif", fontSize: 18, fontWeight: 700, color: "#fff", marginTop: 1 }}>{META.supplier} - {META.category}</div>
           </div>
         </div>
@@ -1277,22 +1490,24 @@ export default function DealRoomDashboard() {
       </div>
     </div>
     <div style={{ background: "#fff", borderBottom: "1px solid " + BD, padding: "0 24px", display: "flex", overflowX: "auto" }}>
-      {TABS.map(function (t) {
+      {TOP_TABS.map(function (t) {
         var active = t === tab;
-        return <button key={t} onClick={function () { setTab(t); }} style={{ padding: "10px 14px", fontSize: 11, fontWeight: active ? 700 : 500, color: active ? R : MUT, background: "transparent", border: "none", borderBottom: active ? "2.5px solid " + R : "2.5px solid transparent", cursor: "pointer", whiteSpace: "nowrap" }}>{t}</button>;
+        return <button key={t} onClick={function () { selectTab(t); }} style={{ padding: "10px 14px", fontSize: 12, fontWeight: active ? 700 : 500, color: active ? INK : MUT, background: "transparent", border: "none", borderBottom: active ? "2.5px solid " + INK : "2.5px solid transparent", cursor: "pointer", whiteSpace: "nowrap" }}>{t}</button>;
       })}
     </div>
+    {subs.length > 0 && <div style={{ background: "#fff", borderBottom: "1px solid " + BD, padding: "0 24px", display: "flex", gap: 4, overflowX: "auto" }}>
+      {subs.map(function (s) {
+        var active = s === (sub || subs[0]);
+        return <button key={s} onClick={function () { setSub(s); }} style={{ padding: "7px 12px", fontSize: 11, fontWeight: active ? 700 : 500, color: active ? INK : MUT, background: "transparent", border: "none", borderBottom: active ? "2px solid " + INK : "2px solid transparent", cursor: "pointer", whiteSpace: "nowrap" }}>{s}</button>;
+      })}
+    </div>}
     <div style={{ padding: "18px 24px 40px", maxWidth: 1280, margin: "0 auto" }}>
-      {tab === "Overview" && <OverviewTab />}
-      {tab === "Concession Ledger" && <LedgerTab />}
-      {tab === "Issues Board & Packages" && <IssuesBoardTab />}
-      {tab === "Value of Movement & Next Counter" && <ValueMovementTab />}
+      <Body />
     </div>
-    <div style={{ background: DK, padding: "10px 24px", display: "flex", justifyContent: "space-between", fontSize: 10, color: MUT }}>
+    <div style={{ background: INK, padding: "10px 24px", display: "flex", justifyContent: "space-between", fontSize: 10, color: MUT }}>
       <div>REFLECT-ONLY: every recommendation above is a draft; nothing here has been sent to the supplier or written to any external system.</div>
       <div>Company Confidential | Deal Room | 2026</div>
     </div>
   </div>;
 }
 ```
-

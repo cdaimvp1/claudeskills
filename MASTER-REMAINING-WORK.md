@@ -38,9 +38,14 @@ If the session restarted/compacted, this is where things stand.
   STATIC "Deal Room" dashboard to fix the name collision. NOT building a new `deal-workspace`.
   **PLAN: `_redesign_proposals/DEAL-HUB-SKILL-PLAN.md` (2026-07-25). Both decisions ANSWERED: retire
   the 4-tab (hub becomes canonical); rename to "Interactive Negotiation Prep Dashboard." STEP 1 (rename)
-  DONE (c0da7e7). STEP 2 next = rewrite deal-room dashboard-canonical 4-tab -> 9-tab hub + MCM palette +
-  reference-JSX rewrite + cross-skill NEEDS_INPUT composition (substantial; see plan §8). Then steps 3-5
-  (hub front-door section, schema slices, self-test/scan).** Rationale:
+  DONE (c0da7e7). ALL STEPS DONE 2026-07-25: dashboard-canonical rewritten to the 4 top-level tabs +
+  subtabs Deal hub (Overview; Terms & Review = Documents / Legal & Protection / Scope & Performance /
+  Sources; Economics = Deal Table & ZOPA / Financial Model; Negotiation = Positions / Trade Plan /
+  Communications) in the MCM palette; reference JSX rewritten (verified: brackets balanced, numbers
+  reconcile 78.5 / $547,600, 0 banned hexes, 0 em dashes, outline pills, malicious-scan clean, Legal &
+  Protection + Scope & Performance render NEEDS_INPUT not fabricated); Deal SKILL HOME front-door section
+  added; state schema gained optional hub_slices; version -> v1.1. deal-room's live-negotiation engine
+  (Phases 1-8, ledger, kernel math, handoffs, reflect-only) UNCHANGED (never-regress).** Rationale:
   `deal-room-1c344a` ALREADY exists and is
   ALREADY the stateful Deal hub: it runs one Claude Project per negotiation, ingests the opening strategy,
   keeps a persistent `deal_room_state.json` concession ledger across rounds, is seeded by commercial/legal-
