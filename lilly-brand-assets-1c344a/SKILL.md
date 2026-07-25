@@ -138,6 +138,21 @@ directly in DOCX/PPTX. Backgrounds are already transparent; do not add a fill.
 
 This file is the single source of truth for colors across all procurement skill dashboards and documents. All colors are from the approved Lilly 16-color palette unless explicitly noted.
 
+## Two-palette model: Documents vs Dashboards (READ FIRST)
+
+The suite runs TWO coordinated palettes with a hard boundary. Match the palette to the medium.
+
+| Medium | Palette | Positive / settled signal | Character |
+|--------|---------|---------------------------|-----------|
+| Documents (DOCX, decks, print, any static export) | Lilly 16-color (this file's Core + Secondary tables) plus the Canonical Status Palette below | Bold Blue #0F3A85 / Neutral Sky #D4E5F7 | strictly green-free, brand-governed |
+| Interactive dashboards (skill-generated dashboards and the Deal / Landscape / RFx builds) | the Dashboard Palette (MCM) below | Teal #2F6E6B (settled) | mid-century-modern, scoped teal/plum allowance |
+
+Rules:
+- A DOCX, deck, or any static export ALWAYS uses the Lilly 16-color plus the Canonical Status Palette. Never put MCM plum or teal into a document.
+- An interactive dashboard uses the Dashboard Palette (MCM). Its teal and plum are an approved, dashboard-only allowance (parallel to the existing Slide Template allowance), scoped so it never touches documents.
+- The specific prohibited green hexes (see "Prohibited Colors") stay prohibited in BOTH palettes. The dashboard allowance is only the MCM teal and plum tones named below, only in interactive dashboards.
+- Neutral, ink, and structure (Bold Grey, Lilly Black, card, border) are shared by both palettes.
+
 ## Core Palette (4)
 
 | Color | Hex | Use |
@@ -209,8 +224,15 @@ below; if they ever disagree, the tables are authoritative and this block is the
     "NEU": "#8A969E"
   },
   "chartPalette": ["#E1251B", "#0F3A85", "#521207", "#F58E7D", "#FFC709", "#99BFE5"],
+  "statusPaletteScope": "documents and static exports (DOCX, decks, print); interactive dashboards use dashboardPalette",
+  "dashboardPalette": {
+    "MCM_PRIMARY": "#5C2B50", "MCM_SECONDARY": "#2F6E6B", "MCM_EMPHASIS": "#C15E19",
+    "MCM_INK": "#212121", "MCM_MUT": "#8A969E",
+    "MCM_OK": "#2F6E6B", "MCM_WARN": "#C15E19", "MCM_DANGER": "#9A3B1F", "MCM_INFO": "#2E5E8C",
+    "scope": "interactive dashboards only", "nonStoplight": true, "darkMode": false
+  },
   "noGreen": true,
-  "greenException": null
+  "greenException": "Dashboard Palette teal #2F6E6B and plum #5C2B50 in interactive dashboards only; Slide Template PPTX sage #C6DCD8 only. Neither ever appears in DOCX, decks, or the Canonical Status Palette."
 }
 ```
 
@@ -225,10 +247,10 @@ below; if they ever disagree, the tables are authoritative and this block is the
 | Negative (<50%) | #FDE8E5 | Neutral Rose |
 | N/A | #E4EBF1 | Neutral Stone |
 
-## Canonical Status Palette (OWNED HERE - single source of truth, NO GREEN)
+## Canonical Status Palette (OWNED HERE - single source of truth for DOCUMENTS/static, NO GREEN)
 
-This is the one status palette every dashboard and report uses for positive / warning / negative / neutral
-signals. It is intentionally GREEN-FREE: Lilly's brand palette contains no green, so "positive / good /
+This is the status palette every DOCUMENT and static export (DOCX, decks, print) uses for positive / warning / negative / neutral
+signals. Interactive dashboards use the non-stoplight Dashboard Palette below instead (see the two-palette model at the top). This document palette is intentionally GREEN-FREE: Lilly's brand palette contains no green, so "positive / good /
 passing" is carried by Bold Blue and Neutral Sky, never by a green. There are SEVEN distinct,
 uniquely-named hexes here and no two share a value. Do not introduce a green to mean "good."
 
@@ -254,6 +276,40 @@ tints (Neutral Sky, Neutral Cream, Neutral Rose, Neutral Stone) are BACKGROUND-o
 tint as text color, and always place dark text (#212121) or a dark status text token on top of them. When
 a positive and a negative cell sit adjacent, rely on the label ("Pass" / "Fail") plus the icon, not only
 the blue-vs-red distinction.
+
+## Dashboard Palette (interactive, mid-century-modern)
+
+The palette every INTERACTIVE dashboard uses (skill-generated dashboards and the Deal / Landscape / RFx
+builds). It is a mid-century-modern system: plum plus teal plus burnt-orange, with NON-STOPLIGHT status.
+It does NOT govern documents (see the two-palette model at the top). In the Deal / Landscape / RFx builds
+the machine-authoritative token layer is `assets/theo-color.css`; the tokens here are the source a skill
+uses when it generates a dashboard.
+
+| Role | Token | Hex | Note |
+|------|-------|-----|------|
+| Primary / brand accent | MCM_PRIMARY | #5C2B50 | Plum. Headers, section accents. |
+| Secondary | MCM_SECONDARY | #2F6E6B | Teal. Settled / positive tone. |
+| Emphasis | MCM_EMPHASIS | #C15E19 | Burnt-orange. Attention / highlight. |
+| Ink / text | MCM_INK | #212121 | Lilly Black. Body text; active tab text and underline. |
+| Neutral / muted | MCM_MUT | #8A969E | Bold Grey (shared). Inactive tabs, secondary text. |
+
+Non-stoplight status (dashboards do NOT use green / amber / red stoplight signals):
+
+| Status role | Token | Hex | Note |
+|-------------|-------|-----|------|
+| Settled / OK / aligned | MCM_OK | #2F6E6B | Teal, not green. |
+| Attention / warning | MCM_WARN | #C15E19 | Burnt-orange, not amber. |
+| Critical | MCM_DANGER | #9A3B1F | Deep rust, not bright red. |
+| Info / AI-derived | MCM_INFO | #2E5E8C | Muted blue. |
+| Neutral / N/A | MCM_MUT | #8A969E | Bold Grey. |
+
+Dashboard rules (LOCKED with the Deal dashboard, 2026-07-25):
+- Status rides on BORDERS, TEXT, PILLS, and DOTS or ICONS, never on saturated fills. Outline status pills.
+- Pale PLUM and TEAL tints are allowed as background bands. NO pale-orange, amber, or rust fills anywhere.
+- Tab and subtab strips: grey (MUT) when inactive; BLACK (ink) text with a black underline when active.
+- No dark mode. No stoplight green / red / yellow.
+- Status is always carried by a color AND a word or icon, never color alone (CVD accessibility, same rule as
+  the document palette).
 
 ## The Slide Template green/teal allowance (currently unused)
 
@@ -289,7 +345,7 @@ See the inlined `docx-design-system.md` section below for the complete DOCX spec
 
 ## Prohibited Colors
 
-Do NOT use any green colors in dashboards, DOCX reports, or any status palette. This includes:
+Do NOT use the prohibited green hexes below in any dashboard, DOCX report, or status palette (the Dashboard Palette's teal #2F6E6B and plum #5C2B50 are a distinct, dashboard-only allowance, see below). This includes:
 - #144B2D (former Bold Green)
 - #C6DCD8 (Neutral Sage)
 - #DCFCE7 (off-brand light green)
@@ -300,11 +356,15 @@ Where green was previously used, substitute:
 - Positive/success backgrounds: use Neutral Sky (#D4E5F7)
 - Chart series that was green: use Bold Brown (#521207)
 
-**Sole documented allowance:** the Slide Template (PPTX) house style may use sage `#C6DCD8` and
-greens/teals for positive data, because it mirrors Lilly's official slide masters. See "The Slide
-Template green/teal allowance" above. That allowance is scoped to Slide Template PPTX output only;
-it never applies to dashboards, DOCX reports, or the Canonical Status Palette, which stay green-free.
-No shipped skill currently produces Slide Template output, so no skill may use a green today.
+**Documented allowances (two, both scoped):**
+1. Interactive dashboards use the Dashboard Palette (MCM): teal `#2F6E6B` and plum `#5C2B50` are approved
+   dashboard tones (see "Dashboard Palette (interactive)" and the two-palette model at the top). This is
+   the ONLY teal/plum allowance for dashboards; the specific banned green hexes listed above stay banned in
+   dashboards too. It never applies to DOCX reports, decks, or the Canonical Status Palette.
+2. The Slide Template (PPTX) house style may use sage `#C6DCD8` and greens/teals for positive data, because
+   it mirrors Lilly's official slide masters. See "The Slide Template green/teal allowance" above. Scoped to
+   Slide Template PPTX output only; it never applies to dashboards, DOCX reports, or the Canonical Status
+   Palette. No shipped skill currently produces Slide Template output.
 
 ## Logo Path
 All Lilly logos are in this skill's `assets/logos/` folder. Use Black or Red variants on light backgrounds, White on dark. Backgrounds are transparent. (Single-file install: read logos from the bundled `assets/logos/` directory, not from any `/mnt/...` path.)

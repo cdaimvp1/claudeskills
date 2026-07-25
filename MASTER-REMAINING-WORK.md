@@ -17,6 +17,37 @@ If the session restarted/compacted, this is where things stand.
   `deal-workspace` hub skill + fix "Deal Room" name collision, (3) RFx→Deal handoff canonical, (6) shared
   comms-evidence methodology starting with deal-room + the 2 negotiation-prep skills, (4) Category Strategy
   rebuild (phased). Recommended order: finish the dashboard first, then #5 → #2 → #1 → #3/#6 → #4.
+  STATUS 2026-07-25: dashboard LOCKED; **#5 claim-gate DONE** (foundation guardrail G12, ebdc557).
+- **#2 DONE 2026-07-25 — Marc chose "Split: MCM=dashboards, brand=docs."** Encoded in `lilly-brand-assets`
+  brand-colors.md: new "Two-palette model (READ FIRST)" + "Dashboard Palette (interactive, MCM)" sections,
+  Canonical Status Palette scoped to DOCUMENTS/static, JSON manifest `dashboardPalette` block +
+  `statusPaletteScope`, Prohibited-Colors allowances reconciled (two scoped allowances). Additive (no
+  document/DOCX colour changed), JSON valid, em-dash-free. Propagates to all skills via house-styles
+  "pull exact values from brand-colors.md". This UNBLOCKS the dashboard builds (#20 RFx, #15 Landscape).
+  The finding that drove the decision, for the record: the Lilly brand palette (`lilly-brand-assets`
+  brand-colors.md) has **NO green AND NO teal**: positive/settled = light-blue **Neutral Sky #D4E5F7**,
+  which the file says "replaces former green tints." So the "no green rule" is a REAL Lilly brand fact
+  (green isn't a Lilly colour), and **teal isn't a Lilly colour either.** The MCM dashboard palette
+  (plum/teal/burnt-orange) Marc approved + locked for Deal/Landscape therefore DIVERGES from the Lilly
+  brand palette. #2 is NOT a small "permit teal" edit. Recommended resolution: **scope MCM to the
+  interactive DASHBOARDS only; keep DOCX/decks on the Lilly brand palette** (brand-colors.md governs
+  documents). Do NOT add teal to the brand foundation without Marc's explicit brand/architecture decision.
+- **#1 CONFIRMED 2026-07-25 — Marc chose "Extend deal-room as the hub."** Plan: extend `deal-room` into the
+  Deal SKILL HOME (front the locked Deal dashboard + orchestrate the negotiation-prep / deal-room /
+  playbook-learning skills over the persisted `deal_room_state.json`); rename commercial-negotiation-prep's
+  STATIC "Deal Room" dashboard to fix the name collision. NOT building a new `deal-workspace`. Rationale:
+  `deal-room-1c344a` ALREADY exists and is
+  ALREADY the stateful Deal hub: it runs one Claude Project per negotiation, ingests the opening strategy,
+  keeps a persistent `deal_room_state.json` concession ledger across rounds, is seeded by commercial/legal-
+  negotiation-prep, and hands off to negotiation-playbook-learning at close. Creating a new `deal-workspace`
+  hub would DUPLICATE it. Recommended resolution: **EXTEND `deal-room` into the Deal SKILL HOME** (front the
+  locked Deal dashboard + orchestrate the negotiation-prep/deal-room/playbook-learning skills over the
+  persisted state), do NOT create `deal-workspace`. The "Deal Room" name collision is already documented in
+  deal-room's own description: commercial-negotiation-prep's STATIC dashboard is also titled "Deal Room";
+  fix = rename that static dashboard so "Deal Room" means only the live skill. NEEDS Marc's confirmation.
+- **Dashboard builds UNBLOCKED (#2 done).** #20 RFx mockup and #15 Landscape MCM can now build against the
+  documented Dashboard Palette (MCM plum/teal/burnt-orange, non-stoplight, no dark mode) that matches the
+  locked Deal dashboard. NEXT after #1: build #20 (RFx dashboard mockup for review).
 - **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
   orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
   (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new
