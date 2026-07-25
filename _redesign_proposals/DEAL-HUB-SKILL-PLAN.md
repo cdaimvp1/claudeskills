@@ -96,3 +96,39 @@ dependency is introduced by the hub layer. Dashboard render is deterministic fro
    Dashboard." Fine, or prefer another (e.g. "Pre-Talks ZOPA Model", "Negotiation Prep Model")?
 
 Nothing in deal-room or commercial-negotiation-prep is edited until these two are answered.
+
+---
+
+## 8. Progress + refined step-2 scope (updated 2026-07-25)
+
+**DONE:** Step 1 (name-collision rename) committed (`c0da7e7`). Both decisions answered:
+retire the 4-tab (hub becomes canonical), and rename to "Interactive Negotiation Prep Dashboard."
+
+**Refined understanding of step 2 (dashboard-canonical upgrade), found while doing step 1.** The
+current `references/dashboard-canonical.md` is a detailed LOCKED spec: a 4-tab React/recharts
+dashboard using the DOCUMENT status palette (Bold Blue positive), with a large inlined reference JSX
+and a reconciled Meridian-BioAnalytics worked example. Making the hub canonical is bigger than a "port":
+
+- **Technology:** the skill generates a self-contained React artifact at runtime; the `_deal_build`
+  Deal hub is vanilla-JS + multi-file + python-built. So the skill's new canonical must be a React
+  9-tab hub that MATCHES `_deal_build`'s structure and MCM palette. `_deal_build` stays the visual
+  design-of-record reference; the inlined reference JSX is rewritten from 4 tabs to the 9-tab hub.
+- **Palette flip:** deal-room's dashboard is INTERACTIVE, so per #2 it moves from the document status
+  palette (Bold Blue positive) to the MCM Dashboard Palette (teal settled / burnt-orange attention /
+  deep rust critical / muted blue info; outline pills; no pale-orange fills; grey/black tab strips).
+- **Cross-skill composition:** 5 of the 9 tabs (Landscape, Terms & Review, Scope & Performance,
+  Protection Scorecard) are fed by OTHER sub-skills. deal-room renders them from the composed data
+  object with the canonical NEEDS_INPUT / NOT APPLICABLE state until a sub-skill contributes. This is
+  the hub pattern (orchestrator over one persisted object; sub-skills return slices).
+- **Reconcile the worked example** so the KPI/ledger/value numbers still reconcile across
+  dashboard-canonical.md, deal-room-state-schema.md, and handoff-mapping.md (never-regress the math).
+
+**Step 2 execution plan (its own focused increment):**
+1. Confirm the `_deal_build` dashboard's ACTUAL current tab list + structure post-lock (do not spec from memory).
+2. Rewrite `dashboard-canonical.md` skeleton: 4-tab -> 9-tab hub, MCM palette, per-tab content +
+   NEEDS_INPUT states, data-composition note, point to `_deal_build` as design-of-record.
+3. Rewrite the inlined reference JSX to the 9-tab hub (bulky, low-judgment; candidate for a Sonnet
+   subagent per the cheaper-workflow-models rule, then verify).
+4. Update Phase 7 + changelog (v1.1) + version; extend deal-room-state-schema with optional hub slices.
+5. Self-test (numbers reconcile, every canonical tab renders a state), independent malicious-code scan,
+   commit. Then step 3 (hub front-door section) and step 4 (schema) per section 6.
