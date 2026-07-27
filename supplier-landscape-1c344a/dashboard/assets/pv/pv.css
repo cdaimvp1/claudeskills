@@ -2468,3 +2468,28 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 .pvsl .owntree-scroll::-webkit-scrollbar{height:10px}
 .pvsl .owntree-scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:30px;border:2px solid var(--sh-t1)}
 .pvsl .owntree-canvas{display:inline-block;padding:6px;transition:transform .12s ease}
+
+/* ===== PANEL: Landscape > Head-to-Head > The Decision Could Turn On ========================
+   Rebuilt panel (scores + weight + per-vendor read + verdict). Shading is set explicitly here,
+   not inherited from a global token, so this panel is predictable on its own. */
+.pvsl .dto-row{padding:13px 14px;border:1px solid #C9BCC4;border-radius:10px;margin-bottom:10px;background:#F4EFF2}
+.pvsl .dto-row.dto-decides{background:#EADFE6;border-color:#5C2B50;box-shadow:inset 3px 0 0 #5C2B50}
+.pvsl .dto-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.pvsl .dto-req{font-size:13.5px;font-weight:800;color:#241A21}
+.pvsl .dto-w{font:700 10px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:#5A5058;
+  background:#FFF;border:1px solid #C9BCC4;border-radius:30px;padding:2px 9px}
+.pvsl .dto-flag{margin-left:auto;font:800 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  color:#9A4A13;border:1px solid #C15E19;border-radius:30px;padding:2px 9px}
+.pvsl .dto-scores{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:9px}
+.pvsl .dto-sc{font-size:12.5px;color:#3A323A}
+.pvsl .dto-sc b{color:#241A21}
+.pvsl .dto-win b{color:#5C2B50}
+.pvsl .dto-gapv{font:800 13px var(--mono);color:#5C2B50;background:#FFF;border:1px solid #C9BCC4;
+  border-radius:30px;padding:2px 10px}
+.pvsl .dto-read{font-size:12.2px;line-height:1.55;color:#3A323A;padding:7px 0 0;border-top:1px solid #DDD3D9;margin-top:7px}
+.pvsl .dto-rk{display:inline-block;font:800 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  color:#5C2B50;margin-right:7px}
+.pvsl .dto-verdict{font-size:12.8px;line-height:1.6;color:#241A21;background:#E4D9E1;
+  border-left:4px solid #5C2B50;border-radius:9px;padding:12px 14px;margin-top:4px}
+.pvsl .dto-note{font-size:11.4px;line-height:1.55;color:#5A5058;margin-top:11px;padding-top:9px;
+  border-top:1px dashed #C9BCC4}

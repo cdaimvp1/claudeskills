@@ -206,7 +206,7 @@ function pvDD2OwnershipTree(ownership, a, cand) {
       + '<button type="button" class="owntree-btn owntree-reset" title="Reset zoom" aria-label="Reset zoom" onclick="pvOwnZoom(this,0)">Reset</button>'
       + '<span class="owntree-hint">scrolls horizontally</span>'
     + '</div>'
-    + '<div class="owntree-scroll"><div class="owntree-canvas">' + pvDD2TreeNodeH(root) + '</div></div>'
+    + '<div class="owntree-scroll"><div class="owntree-canvas">' + pvDD2TreeNode(root, 0) + '</div></div>'   // Marc 2026-07-27: VERTICAL tree
   + '</div>';
 }
 /* real world basemap: accurate country geometry (world-atlas 110m) projected equirectangular in

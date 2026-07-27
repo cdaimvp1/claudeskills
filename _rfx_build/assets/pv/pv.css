@@ -2258,3 +2258,39 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 
 .schm thead th:first-child{background:var(--sh-2)}
 .schm thead th.lead{background:var(--sh-3)}
+
+/* ===== PANEL: RFx > Scoring > Scoring Matrix (Marc 2026-07-27, 3rd pass) ====================
+   Treated as ONE panel, not via global tokens. Verified against the rendered table.
+   Bubbles removed: a score is a bold number with a thin proportional bar beneath. Weight is a
+   plain figure. Shading is a real step darker so the label column, the leader column and the
+   footer separate without borders doing all the work. */
+.schm{border-collapse:separate;border-spacing:0}
+.schm thead th,.schm thead th:first-child{background:#D3C4CE;color:#2A1F27;
+  border-bottom:2px solid #5C2B50;padding:11px 10px;font:800 9px var(--mono);letter-spacing:.05em}
+.schm thead th.lead{background:#C0ACBA}
+.schm tbody td{padding:12px 10px;border-bottom:1px solid #CFC6CB;background:#FBF9FA}
+.schm tbody td:first-child{background:#EFE7EC;font-weight:700;color:#241A21;border-right:1px solid #C9BCC4}
+.schm tbody td.lead{background:#F1E7EE;box-shadow:inset 2px 0 0 #5C2B50,inset -2px 0 0 #5C2B50}
+.schm tbody tr:hover td{background:#F4EEF1}
+.schm tbody tr:hover td:first-child{background:#E7DCE4}
+.schm .schm-w{font:700 11.5px var(--mono);color:#5A5058;text-align:center;background:#F6F2F4}
+/* the score cell: number + bar, no shape around it */
+.schm .scv{display:inline-block;min-width:46px;text-align:center;line-height:1.15}
+.schm .scv b{display:block;font:800 15px var(--sans);color:#241A21;letter-spacing:-.01em}
+.schm .scv i{display:block;height:3px;border-radius:2px;background:#5C2B50;margin:4px auto 0;opacity:.85}
+.schm td.lead .scv i{background:#5C2B50;opacity:1;height:4px}
+.schm .scv-na{color:#8C8189;font:700 12px var(--mono);letter-spacing:.06em}
+/* footer reads as the summary */
+.schm tfoot td{background:#D3C4CE;border-top:2px solid #5C2B50;border-bottom:none;padding:12px 10px}
+.schm tfoot .wtotrow td{font:800 15px var(--sans);color:#241A21}
+.schm tfoot .wtotrow td.lead{background:#C0ACBA}
+.schm tfoot .gaterow td{padding-top:0;background:#D3C4CE}
+
+/* The two rules at pv.css:1143/1146 carry !important (they predate this work), so the matrix
+   panel has to answer in kind for exactly those cells. Scoped to .schm only. */
+.schm tbody td.lead{background:#F1E7EE !important}
+.schm thead th.lead{background:#C0ACBA !important}
+.schm tfoot .wtotrow td.lead{background:#C0ACBA !important}
+.schm tbody td{background:#FBF9FA}
+.schm tbody td:first-child{background:#EFE7EC}
+.schm tfoot td,.schm tfoot .gaterow td{background:#D3C4CE}

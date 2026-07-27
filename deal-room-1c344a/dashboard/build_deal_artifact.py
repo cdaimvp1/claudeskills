@@ -58,7 +58,12 @@ JS_ORDER = [
 #     <html data-theme="light"> and ships no toggle, so they can never match.
 # Everything dropped is inert for THIS artifact; nothing else is touched.
 # ---------------------------------------------------------------------------
-FONT_FAMILIES_USED = ("Libre Franklin", "Roboto Mono")
+# Sacramento is the THEO WORDMARK face (.theomark .twm in theo-brand.js). It was dropped in the
+# first D9 pass because the reference scan covered _parts + the platform CSS files but NOT
+# theo-brand.js, which carries the chrome CSS. That regressed the header wordmark to a generic
+# cursive. Keep-list is now derived against the chrome too; do not trim a family without
+# grepping theo-brand.js.
+FONT_FAMILIES_USED = ("Libre Franklin", "Roboto Mono", "Sacramento")
 FONT_WEIGHTS_USED = {400, 500, 600, 700, 800}
 
 _FACE_RE = re.compile(r"@font-face\s*\{[^}]*\}", re.S)

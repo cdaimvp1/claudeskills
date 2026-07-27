@@ -777,27 +777,84 @@ function pvDecisionLeverageHtml(refl) {
  * ======================================================================================== */
 function pvDecisionTurnsOnHtml(A, B, per) {
   if (!A || !B || !per || !per.length) return '';
+  var input = PVSL_INPUT || {};
+  var reqs = input.requirements || [];
+  var wOf = {}; var wsum = 0;
+  reqs.forEach(function (r) { wOf[r.label] = r.weight || 0; wsum += (r.weight || 0); });
+  var narrOf = function (vendId, label) {
+    var cand = (typeof pvCandById === 'function') ? pvCandById(vendId) : null;
+    var dd = (cand && cand.deepDive) || {};
+    var n = dd.reqNarr || {};
+    // reqNarr is keyed by requirement id; map the label back to an id
+    var hit = null;
+    reqs.forEach(function (r) { if (r.label === label && n[r.id]) hit = n[r.id]; });
+    return hit;
+  };
   var mat = per.filter(function (d) { return Math.abs(d.delta) >= 0.4; })
                .sort(function (x, y) { return Math.abs(y.delta) - Math.abs(x.delta); });
-  var body;
+
   if (!mat.length) {
-    body = '<div class="dto-none">No requirement separates ' + escD(A.name) + ' and ' + escD(B.name)
-      + ' by more than 0.4 of a point. On this evidence the choice does not turn on capability; it turns on '
-      + 'commercial terms and risk posture, neither of which this scan can settle.</div>';
-  } else {
-    body = '<ul class="dto-list">' + mat.slice(0, 5).map(function (d) {
-      var lead = d.delta > 0 ? A : B, lag = d.delta > 0 ? B : A;
-      return '<li><span class="dto-req">' + escD(d.label) + '</span>'
-        + '<span class="dto-gap">' + Math.abs(d.delta).toFixed(2) + '</span>'
-        + '<span class="dto-txt"><b>' + escD(lead.name) + '</b> leads <b>' + escD(lag.name) + '</b></span></li>';
-    }).join('') + '</ul>';
+    return '<div class="sa-card"><div class="card-hd">'
+      + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg>'
+      + '<span class="ct">The Decision Could Turn On</span><span class="dto-cap">where these two actually diverge</span></div>'
+      + '<div class="dto-none">No requirement separates <b>' + escD(A.name) + '</b> and <b>' + escD(B.name)
+      + '</b> by more than 0.4 of a point on the weighted model. On this evidence the choice does not turn on '
+      + 'capability at all: it turns on commercial terms and risk posture, neither of which a public-source scan '
+      + 'can settle. Take both to the RFx and let price and contract terms decide.</div></div>';
   }
+
+  // how much of the composite gap these dimensions actually explain
+  var explained = 0;
+  mat.forEach(function (d) { explained += Math.abs(d.delta) * ((wOf[d.label] || 0) / (wsum || 1)); });
+  var totalGap = 0;
+  per.forEach(function (d) { totalGap += Math.abs(d.delta) * ((wOf[d.label] || 0) / (wsum || 1)); });
+  var share = totalGap ? Math.round(explained / totalGap * 100) : 0;
+
+  var rows = mat.slice(0, 5).map(function (d) {
+    var lead = d.delta > 0 ? A : B, lag = d.delta > 0 ? B : A;
+    var w = wOf[d.label] || 0;
+    var wPct = wsum ? Math.round(w / wsum * 100) : 0;
+    var leadScore = d.delta > 0 ? d.scoreA : d.scoreB;
+    var lagScore = d.delta > 0 ? d.scoreB : d.scoreA;
+    var lr = narrOf(lead.id, d.label), gr = narrOf(lag.id, d.label);
+    var decides = wPct >= 15 && Math.abs(d.delta) >= 0.8;
+    return '<div class="dto-row' + (decides ? ' dto-decides' : '') + '">'
+      + '<div class="dto-hd">'
+        + '<span class="dto-req">' + escD(d.label) + '</span>'
+        + '<span class="dto-w">' + wPct + '% of the model</span>'
+        + (decides ? '<span class="dto-flag">Can decide it</span>' : '')
+      + '</div>'
+      + '<div class="dto-scores">'
+        + '<span class="dto-sc dto-win"><b>' + escD(lead.name) + '</b> ' + leadScore + '/5</span>'
+        + '<span class="dto-gapv">+' + Math.abs(d.delta).toFixed(2) + '</span>'
+        + '<span class="dto-sc"><b>' + escD(lag.name) + '</b> ' + lagScore + '/5</span>'
+      + '</div>'
+      + (lr ? '<div class="dto-read"><span class="dto-rk">' + escD(lead.name) + '</span>' + escD(lr) + '</div>' : '')
+      + (gr ? '<div class="dto-read"><span class="dto-rk">' + escD(lag.name) + '</span>' + escD(gr) + '</div>' : '')
+      + '</div>';
+  }).join('');
+
+  var decisive = mat.filter(function (d) {
+    var wPct = wsum ? Math.round((wOf[d.label] || 0) / wsum * 100) : 0;
+    return wPct >= 15 && Math.abs(d.delta) >= 0.8;
+  });
+  var verdict = decisive.length
+    ? 'On this evidence the choice turns on <b>' + decisive.map(function (d) { return escD(d.label); }).join('</b> and <b>')
+      + '</b>: a gap that size on a dimension carrying that much weight is not recoverable through the others.'
+    : 'None of these gaps is individually decisive: each is either small or sits on a lightly-weighted dimension. '
+      + 'Treat them as clarification topics for the RFx, not as grounds to pick now.';
+
   return '<div class="sa-card"><div class="card-hd">'
-    + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">The Decision Could Turn On</span>'
-    + '<span class="dto-cap">where these two actually diverge</span></div>' + body
-    + '<div class="dto-note">Only gaps of 0.4 points or more are listed. Anything smaller is inside the noise of a '
-    + 'public-source scan and should not decide an award.</div></div>';
+    + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg>'
+    + '<span class="ct">The Decision Could Turn On</span>'
+    + '<span class="dto-cap">' + escD(A.name) + ' vs ' + escD(B.name) + '</span></div>'
+    + rows
+    + '<div class="dto-verdict">' + verdict + '</div>'
+    + '<div class="dto-note">Only gaps of 0.4 points or more are listed; anything smaller is inside the noise of a '
+    + 'public-source scan. These dimensions account for <b>' + share + '%</b> of the weighted score gap between the '
+    + 'two. Scores are read from public documentation, not demonstrated to Lilly.</div></div>';
 }
+
 
 /* ---- Field funnel, TOP of Overview (Marc 2026-07-27) -------------------------------------
    Scanned -> Assessed -> Credible field -> Advance to RFx. Marc wants this first: it is the

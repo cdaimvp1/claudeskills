@@ -2848,6 +2848,42 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 
 .schm thead th:first-child{background:var(--sh-2)}
 .schm thead th.lead{background:var(--sh-3)}
+
+/* ===== PANEL: RFx > Scoring > Scoring Matrix (Marc 2026-07-27, 3rd pass) ====================
+   Treated as ONE panel, not via global tokens. Verified against the rendered table.
+   Bubbles removed: a score is a bold number with a thin proportional bar beneath. Weight is a
+   plain figure. Shading is a real step darker so the label column, the leader column and the
+   footer separate without borders doing all the work. */
+.schm{border-collapse:separate;border-spacing:0}
+.schm thead th,.schm thead th:first-child{background:#D3C4CE;color:#2A1F27;
+  border-bottom:2px solid #5C2B50;padding:11px 10px;font:800 9px var(--mono);letter-spacing:.05em}
+.schm thead th.lead{background:#C0ACBA}
+.schm tbody td{padding:12px 10px;border-bottom:1px solid #CFC6CB;background:#FBF9FA}
+.schm tbody td:first-child{background:#EFE7EC;font-weight:700;color:#241A21;border-right:1px solid #C9BCC4}
+.schm tbody td.lead{background:#F1E7EE;box-shadow:inset 2px 0 0 #5C2B50,inset -2px 0 0 #5C2B50}
+.schm tbody tr:hover td{background:#F4EEF1}
+.schm tbody tr:hover td:first-child{background:#E7DCE4}
+.schm .schm-w{font:700 11.5px var(--mono);color:#5A5058;text-align:center;background:#F6F2F4}
+/* the score cell: number + bar, no shape around it */
+.schm .scv{display:inline-block;min-width:46px;text-align:center;line-height:1.15}
+.schm .scv b{display:block;font:800 15px var(--sans);color:#241A21;letter-spacing:-.01em}
+.schm .scv i{display:block;height:3px;border-radius:2px;background:#5C2B50;margin:4px auto 0;opacity:.85}
+.schm td.lead .scv i{background:#5C2B50;opacity:1;height:4px}
+.schm .scv-na{color:#8C8189;font:700 12px var(--mono);letter-spacing:.06em}
+/* footer reads as the summary */
+.schm tfoot td{background:#D3C4CE;border-top:2px solid #5C2B50;border-bottom:none;padding:12px 10px}
+.schm tfoot .wtotrow td{font:800 15px var(--sans);color:#241A21}
+.schm tfoot .wtotrow td.lead{background:#C0ACBA}
+.schm tfoot .gaterow td{padding-top:0;background:#D3C4CE}
+
+/* The two rules at pv.css:1143/1146 carry !important (they predate this work), so the matrix
+   panel has to answer in kind for exactly those cells. Scoped to .schm only. */
+.schm tbody td.lead{background:#F1E7EE !important}
+.schm thead th.lead{background:#C0ACBA !important}
+.schm tfoot .wtotrow td.lead{background:#C0ACBA !important}
+.schm tbody td{background:#FBF9FA}
+.schm tbody td:first-child{background:#EFE7EC}
+.schm tfoot td,.schm tfoot .gaterow td{background:#D3C4CE}
 </style><style>/* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *
@@ -6392,14 +6428,18 @@ function rfxScoringMatrixHTML(){var R=RFX,leader=rfxLeader();
  // N3: score cells move OFF the blue Landscape ramp (pvHmRamp) onto the same plum intensity ramp the
  // Coverage heatmap on Analysis already uses, so the two heat surfaces in this dashboard read as one
  // system. Empty cells follow the R7 convention (-- + "Data not available"), never a bare dash.
+ // Marc 2026-07-27 (3rd pass): the score "bubbles" are gone. Tinted pills at eight different
+ // opacities read as blobs and made the grid look noisy, and the tint fought the leader column's
+ // own ground. A score is now a plain bold number with a thin proportional bar beneath it: the
+ // number is the value, the bar is the comparison, and nothing is wrapped in a shape.
  var hcSpan=function(v){
-   if(v==null)return '<span class="hcell hc-na" title="Data not available">--</span>';
+   if(v==null)return '<span class="scv scv-na" title="Data not available">--</span>';
    var pct=Math.max(0,Math.min(100,(v/5)*100));
-   return '<span class="hcell" style="background:'+rfxCovCol(pct)+';color:'+rfxCovFg(pct)+'">'+v.toFixed(1)+'</span>';};
+   return '<span class="scv"><b>'+v.toFixed(1)+'</b><i style="width:'+pct.toFixed(0)+'%"></i></span>';};
  h+='<div class="mxwrap"><table class="mx schm" style="width:100%"><thead><tr><th style="text-align:left">Category</th><th>Weight</th>'+supHead+'</tr></thead><tbody>';
  h+=R.criteria.map(function(c,ci){
    var cells=R.suppliers.map(function(s,si){return '<td'+(si===leader?' class="lead"':'')+'>'+hcSpan(rfxAgg(si,ci))+'</td>';}).join('');
-   return '<tr><td style="text-align:left"><span class="schm-cn">'+escapeHtmlPV(titleCase(c.cat))+'</span></td><td class="schm-w"><span class="schm-wchip">'+c.w+'%</span></td>'+cells+'</tr>';
+   return '<tr><td style="text-align:left"><span class="schm-cn">'+escapeHtmlPV(titleCase(c.cat))+'</span></td><td class="schm-w">'+c.w+'%</td>'+cells+'</tr>';
  }).join('');
  var wtCells=R.suppliers.map(function(s,si){return '<td'+(si===leader?' class="lead"':'')+'><b>'+rfxWeighted(si).toFixed(1)+'</b></td>';}).join('');
  var gateCells=R.suppliers.map(function(s,si){var gp=rfxGatePass(si);return '<td>'+rfxMcmPill(gp?'Pass':'Gated',gp?'teal':'rust')+'</td>';}).join('');   // N3: same pill family as the rest of the tab

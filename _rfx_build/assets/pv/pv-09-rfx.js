@@ -957,14 +957,18 @@ function rfxScoringMatrixHTML(){var R=RFX,leader=rfxLeader();
  // N3: score cells move OFF the blue Landscape ramp (pvHmRamp) onto the same plum intensity ramp the
  // Coverage heatmap on Analysis already uses, so the two heat surfaces in this dashboard read as one
  // system. Empty cells follow the R7 convention (-- + "Data not available"), never a bare dash.
+ // Marc 2026-07-27 (3rd pass): the score "bubbles" are gone. Tinted pills at eight different
+ // opacities read as blobs and made the grid look noisy, and the tint fought the leader column's
+ // own ground. A score is now a plain bold number with a thin proportional bar beneath it: the
+ // number is the value, the bar is the comparison, and nothing is wrapped in a shape.
  var hcSpan=function(v){
-   if(v==null)return '<span class="hcell hc-na" title="Data not available">--</span>';
+   if(v==null)return '<span class="scv scv-na" title="Data not available">--</span>';
    var pct=Math.max(0,Math.min(100,(v/5)*100));
-   return '<span class="hcell" style="background:'+rfxCovCol(pct)+';color:'+rfxCovFg(pct)+'">'+v.toFixed(1)+'</span>';};
+   return '<span class="scv"><b>'+v.toFixed(1)+'</b><i style="width:'+pct.toFixed(0)+'%"></i></span>';};
  h+='<div class="mxwrap"><table class="mx schm" style="width:100%"><thead><tr><th style="text-align:left">Category</th><th>Weight</th>'+supHead+'</tr></thead><tbody>';
  h+=R.criteria.map(function(c,ci){
    var cells=R.suppliers.map(function(s,si){return '<td'+(si===leader?' class="lead"':'')+'>'+hcSpan(rfxAgg(si,ci))+'</td>';}).join('');
-   return '<tr><td style="text-align:left"><span class="schm-cn">'+escapeHtmlPV(titleCase(c.cat))+'</span></td><td class="schm-w"><span class="schm-wchip">'+c.w+'%</span></td>'+cells+'</tr>';
+   return '<tr><td style="text-align:left"><span class="schm-cn">'+escapeHtmlPV(titleCase(c.cat))+'</span></td><td class="schm-w">'+c.w+'%</td>'+cells+'</tr>';
  }).join('');
  var wtCells=R.suppliers.map(function(s,si){return '<td'+(si===leader?' class="lead"':'')+'><b>'+rfxWeighted(si).toFixed(1)+'</b></td>';}).join('');
  var gateCells=R.suppliers.map(function(s,si){var gp=rfxGatePass(si);return '<td>'+rfxMcmPill(gp?'Pass':'Gated',gp?'teal':'rust')+'</td>';}).join('');   // N3: same pill family as the rest of the tab
