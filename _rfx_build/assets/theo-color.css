@@ -1,0 +1,139 @@
+/* ===========================================================================
+ * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
+ *
+ * Single source of truth for the visual-hierarchy system. Every page links this
+ * (after its own base stylesheet) and references these tokens; do not hardcode
+ * hex in components. If a shade you need is missing, add it HERE, once, with a
+ * light and a dark value - never invent a one-off hex in a page.
+ *
+ * Three jobs, kept separate:
+ *   1. NEUTRAL SHADE LADDER  page < card < panel < nested < well
+ *      Carries visual hierarchy and panel separation. This does most of the
+ *      work and stays fully neutral, so a page can be layered yet read calm.
+ *   2. SEMANTIC TONES  warn / info / danger / ok
+ *      Carry status only. Each has a background tint, a foreground text/icon
+ *      colour, and (except ok) a left accent bar. Applied by content meaning.
+ *   3. ENTITY COLOURS  ent-1..5
+ *      Differentiate suppliers / evaluators. Assigned once, reused everywhere.
+ *      Never carry status meaning; never reuse a semantic tone as an entity.
+ *
+ * OWNER RULES:
+ *   - Green IS allowed. Success / done = green (--ok-*). Just never cluster a
+ *     lot of green and red together, it reads like Christmas; keep them apart.
+ *   - Lilly Red (--red) stays scarce: reserved for the header and DANGER only.
+ *     Never decorative, never a categorical/entity colour.
+ *   - CONTRAST FLOOR (both modes): text stays readable. Muted text is a MID
+ *     stop (--mut / --mut2), never a light gray on a light surface, exactly as
+ *     dark text is never used on a dark surface. Hairline tokens (--line*) are
+ *     for borders only, never for text.
+ *
+ * Both light and dark are defined for every token. Light is intentionally
+ * off-white at the page level so white cards separate (fixes white-on-white).
+ * ======================================================================== */
+:root{
+  /* 1. neutral shade ladder (hierarchy backbone) */
+  --bg:#E2E6E1;        /* page background - off-white, a clear step below card */
+  --surface:#FFFFFF;   /* elevated card / primary panel */
+  --panel:#F5F2ED;     /* sub-panel inside a card (one step down) */
+  --nested:#EDEAE3;    /* nested block (two steps) */
+  --well:#E4E0D8;      /* inset / deepest well */
+  --line:#E3DED6;      /* hairline */
+  --line2:#D3CDC3;     /* stronger hairline / divider */
+  --ink:#1A1A1A;       /* primary text */
+  --ink2:#3A362F;      /* secondary text */
+  --mut:#505A64;       /* muted text (AA-safe) */
+  --mut2:#564F48;      /* secondary muted */
+
+  /* brand - header + danger only */
+  --red:#E1251B; --red-d:#B41E16;
+
+  /* 2. semantic tones: -bg tint, -fg text/icon, -bar accent */
+  --warn-bg:#FBF1DA;  --warn-fg:#8A5A00;  --warn-bar:#B45309;  /* needs your action */
+  --info-bg:#E8EEF6;  --info-fg:#0F3A85;  --info-bar:#0F3A85;  /* notable / recommendation */
+  --danger-bg:#FBE7E3;--danger-fg:#B41E16;--danger-bar:#E1251B;/* hard gate / blocker / late */
+  --ok-bg:#E4F1E6;    --ok-fg:#2E7D46;                          /* cleared / done - green */
+
+  /* 3. categorical entity colours (differentiation only) */
+  --ent-1:#0F3A85;  /* navy */
+  --ent-2:#6A4C93;  /* violet */
+  --ent-3:#A6541C;  /* copper */
+  --ent-4:#3C7A78;  /* teal */
+  --ent-5:#8A5A00;  /* gold */
+
+  /* purple family (participation table: lavender zebra, plum footer, accents) */
+  --lav:#E7DEF5; --lav2:#D9C9EE; --lav-hd:#EFEAF8; --plum:#5C2B50; --plum-fg:#F2ECF8; --plum-t:#EDDFE9; --teal-t:#DCEBE9; --emph-fg:#C15E19;
+
+  /* ---- ROLE-BASED COLOUR SYSTEM ----------------------------------------------------------
+     A view sets ONE .pal-* class; that re-points the role tokens (--pri* primary, --sec*
+     secondary). Components reference ROLE tokens, never a raw hue. --emph is a SINGLE accent
+     app-wide (burnt orange) so "the ring = the standout" reads the same everywhere. Each hue
+     has: solid / -t light tint / -fg on-colour, defined for light AND dark (dark is hand-
+     tuned, not inverted). Shades of one hue count as one colour (3-colour rule). */
+  --hue-plum:#5C2B50;     --hue-plum-t:#EDDFE9;     --hue-plum-fg:#F3ECF1;
+  --hue-teal:#2F6E6B;     --hue-teal-t:#DCEBE9;     --hue-teal-fg:#EAF4F2;
+  --hue-navy:#123C82;     --hue-navy-t:#E1E8F4;     --hue-navy-fg:#EAF0FA;
+  --hue-burgundy:#7A2436; --hue-burgundy-t:#F1DEE3; --hue-burgundy-fg:#F9E9EC;
+  --hue-green:#2E6B47;    --hue-green-t:#DCEEE1;    --hue-green-fg:#E9F5EC;
+  --hue-gold:#8A5A00;     --hue-gold-t:#F3E7C9;     --hue-gold-fg:#FBF3DE;
+  --hue-copper:#A6541C;   --hue-copper-t:#F4E2D5;   --hue-copper-fg:#FBEEE3;
+  --hue-graphite:#403A33; --hue-graphite-t:#E7E2DA; --hue-graphite-fg:#F1EEE8;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --hue-plum-txt:#5C2B50; --hue-teal-txt:#2F6E6B; --hue-navy-txt:#123C82; --hue-burgundy-txt:#7A2436; --hue-green-txt:#2E6B47; --hue-gold-txt:#8A5A00; --hue-copper-txt:#A6541C; --hue-graphite-txt:#403A33;
+  --pri-tx:var(--hue-plum-txt);
+  --pri:var(--hue-plum); --pri-t:var(--hue-plum-t); --pri-fg:var(--hue-plum-fg);
+  --sec:var(--hue-teal); --sec-t:var(--hue-teal-t); --sec-fg:var(--hue-teal-fg);
+
+  --shadow-card:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
+}
+html[data-theme="dark"]{
+  --bg:#1C1C1C; --surface:#262626; --panel:#2E2E2E; --nested:#343434; --well:#3B3B3B;
+  --line:#333333; --line2:#454545; --ink:#ECECEC; --ink2:#C9C6C0; --mut:#B0B0B0; --mut2:#8A8A8A;
+  --red:#F0574C; --red-d:#D2453A;
+  --warn-bg:#332905;  --warn-fg:#E8C24A;  --warn-bar:#DBAA50;
+  --info-bg:#16233A;  --info-fg:#8FB4E6;  --info-bar:#6E9AD8;
+  --danger-bg:#3A1E1A;--danger-fg:#F2A79E;--danger-bar:#F0574C;
+  --ok-bg:#182A1D;    --ok-fg:#7BC894;
+  --ent-1:#6E9AD8; --ent-2:#B58BD8; --ent-3:#D08A50; --ent-4:#49B291; --ent-5:#DBAA50;
+  --lav:#2A2440; --lav2:#342A4E; --lav-hd:#242031; --plum:#3A1E34; --plum-fg:#EADEF5; --plum-t:#33253B; --teal-t:#1E302D; --emph-fg:#EF9A5A;
+  /* dark hue library: solid = mid-dark (reads as a frame above the near-black canvas);
+     -t = deep wash just above the canvas; -fg = light on-colour. --emph brightens. */
+  --hue-plum:#3A1E34;     --hue-plum-t:#33253B;     --hue-plum-fg:#EADEF5;
+  --hue-teal:#245552;     --hue-teal-t:#1E302D;     --hue-teal-fg:#DDF0ED;
+  --hue-navy:#20386A;     --hue-navy-t:#1A2740;     --hue-navy-fg:#DCE6F5;
+  --hue-burgundy:#5A2231; --hue-burgundy-t:#331E24; --hue-burgundy-fg:#F2D9DE;
+  --hue-green:#245239;    --hue-green-t:#1C2E23;    --hue-green-fg:#D6EEDD;
+  --hue-gold:#6E4A0E;     --hue-gold-t:#2E2716;     --hue-gold-fg:#F0DFB4;
+  --hue-copper:#8A461A;   --hue-copper-t:#2F2318;   --hue-copper-fg:#F2D5C0;
+  --hue-graphite:#4A443C; --hue-graphite-t:#2B2822; --hue-graphite-fg:#E8E3DB;
+  --emph:#EF9A5A; --emph-t:#33241A;
+  --hue-plum-txt:#C99BD1; --hue-teal-txt:#5FBAAE; --hue-navy-txt:#7BA5DE; --hue-burgundy-txt:#E08A99; --hue-green-txt:#6FB98C; --hue-gold-txt:#D8B25A; --hue-copper-txt:#E0956A; --hue-graphite-txt:#B0A99E;
+  --pri-tx:var(--hue-plum-txt);
+  --pri:var(--hue-plum); --pri-t:var(--hue-plum-t); --pri-fg:var(--hue-plum-fg);
+  --sec:var(--hue-teal); --sec-t:var(--hue-teal-t); --sec-fg:var(--hue-teal-fg);
+  --shadow-card:0 1px 2px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.4);
+}
+/* palette selectors: set one on a view root; only primary/secondary change, --emph is constant.
+   These reference the mode-aware --hue-* vars, so a palette works in light AND dark unchanged. */
+.pal-plum-teal{--pri-tx:var(--hue-plum-txt);--pri:var(--hue-plum);--pri-t:var(--hue-plum-t);--pri-fg:var(--hue-plum-fg);--sec:var(--hue-teal);--sec-t:var(--hue-teal-t);--sec-fg:var(--hue-teal-fg)}
+.pal-navy-teal{--pri-tx:var(--hue-navy-txt);--pri:var(--hue-navy);--pri-t:var(--hue-navy-t);--pri-fg:var(--hue-navy-fg);--sec:var(--hue-teal);--sec-t:var(--hue-teal-t);--sec-fg:var(--hue-teal-fg)}
+.pal-burgundy-navy{--pri-tx:var(--hue-burgundy-txt);--pri:var(--hue-burgundy);--pri-t:var(--hue-burgundy-t);--pri-fg:var(--hue-burgundy-fg);--sec:var(--hue-navy);--sec-t:var(--hue-navy-t);--sec-fg:var(--hue-navy-fg)}
+.pal-green-navy{--pri-tx:var(--hue-green-txt);--pri:var(--hue-green);--pri-t:var(--hue-green-t);--pri-fg:var(--hue-green-fg);--sec:var(--hue-navy);--sec-t:var(--hue-navy-t);--sec-fg:var(--hue-navy-fg)}
+.pal-graphite-plum{--pri-tx:var(--hue-graphite-txt);--pri:var(--hue-graphite);--pri-t:var(--hue-graphite-t);--pri-fg:var(--hue-graphite-fg);--sec:var(--hue-plum);--sec-t:var(--hue-plum-t);--sec-fg:var(--hue-plum-fg)}
+
+/* ---- the single Callout treatment (one class set, applied to existing blocks) ----
+   Wraps content unchanged; only tints the block, colours its text, and adds a
+   square-cornered left accent bar. Text on a tinted surface uses the tone's own
+   -fg stop, never default black/white/gray. */
+.callout{position:relative;border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+.callout.tone-warn,.callout.tone-info,.callout.tone-danger{border-color:transparent;border-left-width:3px;border-left-style:solid;border-radius:0 10px 10px 0}
+.callout.tone-warn{background:var(--warn-bg);border-left-color:var(--warn-bar);color:var(--warn-fg)}
+.callout.tone-info{background:var(--info-bg);border-left-color:var(--info-bar);color:var(--info-fg)}
+.callout.tone-danger{background:var(--danger-bg);border-left-color:var(--danger-bar);color:var(--danger-fg)}
+.callout.tone-ok{background:var(--ok-bg);border-color:var(--line);color:var(--ok-fg)}
+
+/* row-tint helpers for status propagation (a row whose chip is warn/danger gets
+   the matching low tint; neutral/info statuses do NOT propagate) */
+.rowtint-warn{background:var(--warn-bg)}
+.rowtint-danger{background:var(--danger-bg)}
+/* neutral zebra for tables past a few rows (shading, never colour) */
+.zebra > *:nth-child(even){background:var(--panel)}

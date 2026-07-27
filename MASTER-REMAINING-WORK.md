@@ -184,6 +184,16 @@ If the session restarted/compacted, this is where things stand.
   · **Deal Economics footnote (Marc 2026-07-26): SYNTHESIZE the two overlapping footnotes into ONE** (approved text
     in chat). One block described the REMOVED simple pro-forma ("amortized over 3-yr") - drop that; align to the
     Mini P&L that's kept (implementation + training = one-time Year-1, not escalated). Apply with the light-only pass.
+  · **RFx PORT DONE 2026-07-26 (`wf_d367568e` + amortized fix).** Light-only conversion (build-time `data-theme=
+    "light"` stamp like Deal; no toggle; dark structurally unreachable; drifted BC colors restored fill-token
+    var(--plum)); Deal Economics footnote synthesized (one block); Model-the-Decision right column redesigned
+    (3-col grid, DE-BUBBLED: scores top / grounded insights middle [leader+margin, closest-lever, gate note,
+    per-supplier strongest+softest via rfxCatFit] / color legend stacked bottom; old full-width ranking block
+    removed). Verify = clean EXCEPT one medium (Deal Economics subhead + Impl KPI card still said "amortized")
+    -> FIXED to "one-time, Year 1" (remaining "amortized" in built HTML is the Analysis bid-leveling normalized
+    all-in, correct there). Built 3.45MB. **CAVEAT: Playwright was down this session -> agents did static verify
+    only; Marc's Edge visual review is the live check.** NEXT: Marc reviews in Edge; deliver HTMLs to OneDrive;
+    then final malicious sweep -> LOCK RFx -> `rfx-hub`.
   · **Dashboards remaining after RFx (roadmap updated by Marc 2026-07-26):** THREE - (1) Category Strategy
     (task #25, next; build locked dash from #4 7-tab draft on shared shell), (2) Deep Dive (supplier-deep-dive
     hub, home TBD), (3) **My Work** (NEW) - a near-exact mirror of the Theo PLATFORM's "My Work" page; build =
