@@ -4,22 +4,32 @@ Consolidated 2026-07-24 (evening) from ALL trackers/build-plans + a skills-updat
 
 **Tags:** `[do-now]` autonomously doable · `[Marc]` needs your decision · `[hold]` on-hold/sensitive · `[release]` packaging/release step · `[blocked]` needs Lilly network · `[verify]` status contradiction to resolve. Source tracker in parens.
 
-## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-26)
+## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-27)
 If the session restarted/compacted, this is where things stand.
 
-**>>> RESUME 2026-07-26 (computer restart) — START HERE <<<**
-- **RFx dashboard LOCKED** = design of record: light-only (no dark mode), 6-section Business Case tab
-  (header+KPIs+pre-award banner / Decision Rationale / Deal Terms & the Field / Deal Economics [TCV<->Waterfall
-  toggle + Mini P&L] / The Ask / Path to Close accordion + left 1-7 stepper), and a flipped CATEGORY-spoke radar
-  with the redesigned Model-the-Decision panel (radar center, sliders left, right column = scores / grounded
-  insights / no separate legend). Deal + Landscape also built (Landscape has a WS2 finish batch left).
-- **The 3 locked dashboard HTMLs are in `C:\Users\marcs\OneDrive\Desktop\dashboards`** (landscape / deal / rfx).
-- **FULL sequenced roadmap + ALL decisions = `PROGRAM-MASTER-PLAN.md`** (5 phases, WS0-WS9 + CC1-CC3 mandates +
-  the 2026-07-26 Decisions log). READ IT FIRST, then this file for granular history.
-- **NEXT UP (Phase 1 continues): build the Category Strategy dashboard** (deterministic Python build, MCM palette,
-  shared shell, + its hub skill), then Deep Dive, then My Work (+ #44 handover). Also owed for RFx: the `rfx-hub`
-  skill + the RFx->Deal handoff emitter. Only OPEN decision: A2 (is the Landscape Deep-Dive complete - Marc was
-  reviewing it in Edge). Latest commits on `main`: RFx lock + radar-size + plan/decisions.
+**>>> RESUME 2026-07-27 (restart / NEW conversation) — START HERE <<<**
+- **RFx + Deal dashboards LOCKED (light-only, no dark mode); Landscape built (WS2 uplift pending).** All the HTMLs
+  are in `C:\Users\marcs\OneDrive\Desktop\dashboards`: the 3 locked hubs (rfx/deal/landscape), the skill
+  reference-JSX set (`reference-skill-dashboards\`), the 3 skill previews (category-strategy / supplier-deep-dive /
+  my-work-personal-command-center), and the 2 PLATFORM pages (`platform-my-work.html`, `platform-category-strategy.html`).
+- **ACTIVE THREAD = the dashboard-polish backlog.** 14 change-mockups were produced
+  (`C:\Users\marcs\OneDrive\Desktop\dashboard-mockups\` in rfx/ deal/ landscape/) and TRIAGED by Marc. **ALL
+  decisions are in repo `DASHBOARD-CHANGE-DECISIONS.md` — READ THAT FIRST for this thread.**
+- **5 items PENDING Marc's call before any build** (ask him): (1) D2 inference-labeling cleaner approach (rec:
+  dotted-underline + one key + hover, NOT chips-everywhere); (2) R4 split Business Case into subtabs ("The Case" /
+  "The Ask & Approval", R4 in the latter); (3) R6 build-or-skip the Risk-Roll-Up provenance split (RFx-response vs
+  external-diligence risk); (4) R7 flip Participation + Completeness panels (MOCK first to confirm "fits better");
+  (5) H2H launcher-button removal (A1) still on? THEN: mock D2 / R4 / R7-flip for approval, then **batch each
+  dashboard's approved changes + its "do" items into ONE rebuild per dashboard** (never rebuild a locked dashboard
+  piecemeal). Landscape changes are ADDITIVE (Marc conservative: "do not change anything else"); e.g. Overview gets
+  the full Market Decision Brief added but its evaluation-summary + recommendation panels stay untouched.
+- **FULL program roadmap + all decisions = `PROGRAM-MASTER-PLAN.md`** (5 phases, WS0-WS9, CC1-CC3, Decisions log).
+- **AFTER the dashboard polish: Phase 1 continues** — build Category Strategy dashboard (deterministic, MCM, shared
+  shell) + hub, then Deep Dive, then My Work (+#44), then finish Landscape (WS2 = a DESIGN UPLIFT to Deal/RFx
+  caliber + generalize the supplier data model skill-side). Also owed for RFx: `rfx-hub` skill + RFx->Deal handoff
+  emitter. 4 ChatGPT dashboard reviews were folded into the change backlog (context in chat/DASHBOARD-CHANGE-DECISIONS).
+- Marc is CONSERVATIVE now: additive-only where possible, mock every VISIBLE change before touching a locked file,
+  NO drift. Latest `main` commits: RFx lock + radar-size + plan/decisions + DASHBOARD-CHANGE-DECISIONS.
 - **Deal dashboard** (`_deal_build/`, tracker `DEAL-DASHBOARD-TRACKER.md`): **LOCKED — design of record
   (2026-07-25).** All 3 Negotiation tabs ported (Trade Plan / Communications incl. status+category
   filters + expand-all / Positions), Terms & Review + Economics done, full MCM colour, no dark mode, no
