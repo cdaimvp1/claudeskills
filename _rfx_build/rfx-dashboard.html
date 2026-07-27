@@ -7050,7 +7050,7 @@ function rfxModelDecisionHTML(){
  var capLbl='font:800 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)';
  var h='<div class="sect"><div class="secthd"><div class="t">Model The Decision</div>'+rfxCap('adjust the weights · live re-rank · reflect-only')+'</div>';
  if(scored.length<2){h+='<div class="card"><div style="font-size:12.5px;color:var(--mut)">Fewer than two scored suppliers, nothing to model yet.</div></div></div>';return h;}
- h+='<div class="card"><div style="display:grid;grid-template-columns:220px minmax(280px,340px) minmax(0,1fr);gap:22px;align-items:start">';
+ h+='<div class="card"><div style="display:grid;grid-template-columns:220px minmax(360px,420px) minmax(0,1fr);gap:22px;align-items:start">';
  // COL 1 (left): the weight sliders, unchanged.
  h+='<div><div style="'+capLbl+';margin-bottom:8px">Category Weights</div>';
  h+=cats.map(function(c,i){var pct=Math.round(base[c]||0);
