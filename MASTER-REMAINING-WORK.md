@@ -194,6 +194,13 @@ If the session restarted/compacted, this is where things stand.
     all-in, correct there). Built 3.45MB. **CAVEAT: Playwright was down this session -> agents did static verify
     only; Marc's Edge visual review is the live check.** NEXT: Marc reviews in Edge; deliver HTMLs to OneDrive;
     then final malicious sweep -> LOCK RFx -> `rfx-hub`.
+  · **RFx FINAL change + LOCK (Marc 2026-07-26).** Model-the-Decision: radar shrunk (grid `220px minmax(280,340)
+    minmax(0,1fr)` -> radar shorter than the sliders list, freeing right-column width), ranking rows tightened
+    (padding 8->5px), bottom "Suppliers" colour legend REMOVED (the Ranking rows carry swatch+name = the legend).
+    Rebuilt 3.45MB; node --check clean; rfxMdLegend container gone. **RFx dashboard LOCKED = design of record**
+    (layout-only change, no new logic/egress; port's malicious scan was clean). HTMLs delivered to
+    `OneDrive\Desktop\dashboards` (landscape/deal/rfx). Committed. Remaining for RFx workstream: build the
+    `rfx-hub` skill (carry the locked dashboard, model authors data) + the RFx->Deal handoff emitter.
   · **Dashboards remaining after RFx (roadmap updated by Marc 2026-07-26):** THREE - (1) Category Strategy
     (task #25, next; build locked dash from #4 7-tab draft on shared shell), (2) Deep Dive (supplier-deep-dive
     hub, home TBD), (3) **My Work** (NEW) - a near-exact mirror of the Theo PLATFORM's "My Work" page; build =

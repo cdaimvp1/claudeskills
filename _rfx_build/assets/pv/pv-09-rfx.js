@@ -1843,7 +1843,7 @@ function rfxModelDecisionHTML(){
  var capLbl='font:800 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)';
  var h='<div class="sect"><div class="secthd"><div class="t">Model The Decision</div>'+rfxCap('adjust the weights · live re-rank · reflect-only')+'</div>';
  if(scored.length<2){h+='<div class="card"><div style="font-size:12.5px;color:var(--mut)">Fewer than two scored suppliers, nothing to model yet.</div></div></div>';return h;}
- h+='<div class="card"><div style="display:grid;grid-template-columns:220px 1fr 250px;gap:22px;align-items:start">';
+ h+='<div class="card"><div style="display:grid;grid-template-columns:220px minmax(280px,340px) minmax(0,1fr);gap:22px;align-items:start">';
  // COL 1 (left): the weight sliders, unchanged.
  h+='<div><div style="'+capLbl+';margin-bottom:8px">Category Weights</div>';
  h+=cats.map(function(c,i){var pct=Math.round(base[c]||0);
@@ -1858,7 +1858,6 @@ function rfxModelDecisionHTML(){
  h+='<div style="display:flex;flex-direction:column;min-width:0">';
  h+='<div style="padding-bottom:12px"><div style="'+capLbl+';margin-bottom:8px">Ranking Under These Weights</div><div id="rfxMdScores"></div></div>';
  h+='<div style="padding:12px 0;border-top:1px solid var(--line)"><div id="rfxMdExplain" style="font-size:12px;line-height:1.6;color:var(--mut)"></div></div>';
- h+='<div style="padding-top:12px;border-top:1px solid var(--line)"><div style="'+capLbl+';margin-bottom:8px">Suppliers</div><div id="rfxMdLegend" style="display:flex;flex-direction:column;gap:7px"></div></div>';
  h+='</div>';
  h+='</div></div>';
  h+='</div></div>';
@@ -1884,7 +1883,7 @@ function rfxModelDecisionHTML(){
  function renderScores(fits){
   var order=RFX.suppliers.map(function(s,si){return si;}).sort(function(a,b){var ca=conf(a),cb=conf(b);if(ca!==cb)return ca?-1:1;return fits[b]-fits[a];});
   var html=order.map(function(si,oi){var s=RFX.suppliers[si],col=rfxSupplierColor(si),ok=conf(si);
-   return '<div style="display:flex;align-items:center;gap:9px;padding:'+(oi===0?'0':'8px')+' 0 8px'+(oi===0?'':';border-top:1px solid var(--line)')+(ok?'':';opacity:.75')+'">'
+   return '<div style="display:flex;align-items:center;gap:9px;padding:'+(oi===0?'0':'5px')+' 0 5px'+(oi===0?'':';border-top:1px solid var(--line)')+(ok?'':';opacity:.75')+'">'
     +'<span style="flex:none;width:9px;height:9px;border-radius:50%;background:'+col+'"></span>'
     +'<div style="flex:1;min-width:0"><span style="font-weight:700;font-size:12.5px;color:var(--ink)">'+escapeHtmlPV(s.n)+'</span>'
     +(ok?'':' '+rfxMcmPill('Gated','rust'))+'</div>'
@@ -2027,7 +2026,7 @@ function rfxModelDecisionHTML(){
   var leaderSi=curLeader(fits);
   renderScores(fits);
   composeExplain(raw,fits,leaderSi);
-  renderColorLegend();   // static; re-painting it every recompute is cheap and keeps it correct across re-mounts
+  // colour legend removed (Marc 2026-07-26): the Ranking Under These Weights list already carries swatch + name and serves as the legend
   renderRadar();   // static per-category fit shape; cheap to redraw, keeps it correct across re-mounts
  };
  window.rfxMdReset=function(){

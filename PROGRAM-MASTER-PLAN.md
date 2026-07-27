@@ -163,10 +163,25 @@ dashboards/skills optimization; the Phase-0 native-tool co-orchestration spike i
 
 ---
 
-## Open contradictions needing your call
-1. Landscape H2H launcher: add (P6) vs remove (OV1).
-2. Landscape P2 deep-dive: "complete" vs "remaining 5 tabs' viz."
-3. Help-desk: sibling skill vs fold into process-navigator.
+## Decisions log (Marc 2026-07-26)
+- **A1 Landscape H2H — RESOLVED.** Remove ONLY the "Compare candidates head-to-head" LAUNCHER BUTTON at the bottom of the Overview tab (P6 add / OV1 remove-directive). KEEP the full Head-to-Head TAB (spine + per-supplier analysis, `pvH2HHtml`/pv-07b) — the one built carefully. Do in WS2.
+- **A2 Landscape Deep-Dive completeness** — Marc reviewing live in Edge; he confirms complete or lists gaps.
+- **A3 help-desk — design for EFFICIENCY / USABILITY / QUALITY / ACCURACY.** Lean MERGE into `process-navigator` (one skill): determine the user's role/intent via the M365 connector if on, else from the question or a quick clarifier — NO up-front mode picker. Leave help-desk AS-IS for now; finalize at Phase 3/WS6 on the efficiency criterion.
+- **A4 #114** contract-review Protection-Score deduction-kernel: **GREEN LIT** — also evaluate the most accurate method (deterministic deduction vs SEMANTIC vs heuristic); prefer semantic where more accurate.
+- **A4 #80** contract-review hybrid clause pipeline: **GREEN LIT.**
+- **A4 #113** playbook-learning stats kernel -> `numeric_kernel`: **GREEN LIT** — design for with/without ARIA/Cowork; enhance via them later.
+- **A4 #102** cross-cut scoring layer: **pending** (explanation given in chat; awaiting go).
+- **A4 #86** invoice-rate-card platform mapping: **SHELVED** (not deprecated) — system can't yet see invoices + contracts together; ahead of its time.
+- **NEW cross-cutting — HEURISTIC->SEMANTIC upgrade (add to WS3):** audit suite-wide; where heuristic review is used but SEMANTIC would be more accurate/higher-quality, upgrade to semantic (deterministic + semantic primary, heuristic fallback).
+- **NEW task — SKILL INVENTORY + SHELVING (not yet):** later, list every skill + what it does + what data it needs, so Marc can decide which to SHELVE (not deprecate) for now (skills ahead of current data access, e.g. #86).
+- **re-paper-SOW: GREEN LIT** — NEW skill: port content FROM a supplier's paper/SOW ONTO Lilly's template; likely its own skill, may reuse parts of `lilly-contract-review`. Add to the build list.
+- **#32 dashboard-as-code** = the deterministic-build standard ALREADY adopted (Python builds each dashboard; only the DATA changes, which may vary specific panels / how fully built, but tabs/panels/organization/design stay consistent). NOT a separate task — it IS the approach.
+- **Deferred / explained-in-chat / may-green-light-later:** Landscape enrichments (supplier-type-aware deep-dive layout · segmentation-quadrant tuning · D&B/Bloomberg), #44 handover brief, Landscape narrative reconciliation, the 3 non-numeric decision kernels (legal-neg tier-tree, comment-cleanup matrix, workflow-map cascade), ARIA Fabric telemetry / `skill_outcome` loop.
+
+## Still open (your call)
+1. **A2** Landscape Deep-Dive completeness — you're reviewing it in Edge now.
+2. **A4 #102** cross-cut scoring layer — build or skip (explanation given).
+3. Landscape enrichments · #44 · narrative reconciliation · the 3 non-numeric kernels — explained in chat; defer or green-light.
 
 ## Sequence
 See **PRIORITY ORDER (phased)** near the top. In brief:
