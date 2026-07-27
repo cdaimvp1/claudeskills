@@ -83,14 +83,14 @@ CC1-CC3 are woven through EVERY phase (designed into each build; formally verifi
 Each = locked deterministic build (engine carried in the skill, model authors data), MCM palette, shared shell, + a thin hub orchestrator skill, + a final in-browser + malicious-code sweep before lock.
 1. **Category Strategy** — Phase-0 plan approved (11->7 tabs + new Execution tab, MCM, claim-gate). Write the Phase-1 deterministic spec, build, carry into a Category Strategy hub. (Also add its numeric kernel — see WS3.)
 2. **Deep Dive** (`supplier-deep-dive`) — spec exists (DEEP-DIVE-REDESIGN-SPEC v3). Build the deterministic dashboard (renders at 4 depths: Landscape tab / RFx bidder / Deal light / standalone full+internal); hub home TBD.
-3. **My Work** (NEW) — deterministic port of the platform's My Work page; My Work hub skill.
+3. **My Work** (NEW) — deterministic port of the platform's My Work page; My Work hub skill. **Includes #44 handover/custody brief** (GREEN LIT, Marc 2026-07-26): the de-identified handover brief lives here (My Work is where a user's work + handovers belong).
 
 ## WS2 — Finish Landscape  `[next]` (more than optional)
 1. Recolor the render ENGINE to MCM — hardcoded stoplight hex in `pv-07*`/`pv.css` bypasses the CSS-var layer; re-sync/rebuild into the skill.
 2. R2 deep-dive review batch: global reskin G1-G4 + per-tab fixes (Supplier Summary, Company/Ownership, Capabilities, Financial & Market quadrant, Risk & Resilience accordion/events, Lilly-Fit); Overview funnel + single score scale.
 3. Seed bugs: score-scale drift, 7-vs-9 supplier count, ESG mis-shown. Remove dead code (`pvRequestDataCard`/`pvDDSection`).
 4. `[Marc]` Resolve contradictions: H2H launcher add (P6) vs remove (OV1); P2 deep-dive "complete" vs "remaining 5 tabs' viz."
-5. `[opt/Marc]` supplier-type-aware deep-dive layout; segmentation quadrant tuning; D&B/Bloomberg enrichment backlog.
+5. **GREEN LIT (Marc 2026-07-26):** supplier-type-aware deep-dive layout; segmentation-quadrant tuning; D&B/Bloomberg firmographic/financial enrichment.
 
 ## WS3a — Skills file CLEANUP  `[next]` (Phase 2, BEFORE WS3; prerequisite to WS9)
 Marc 2026-07-26: make every skill file CLEAN so Claude isn't weeding through retired material at runtime, and so
@@ -110,6 +110,8 @@ All 31 rated data-source "clear" and output "clear" — this is enhancement, not
 4. **Works-as-designed verification** — exercise the flagged logic: evaluation-engine AI-vs-stakeholder reconciliation; rfp-response <-> evaluation-engine no double-weighting; pro-forma NPV t=0 propagation to consumers; contract-review Contract-Stack-Mapper path.
 5. `lilly-brand-assets` drift check — inlined copies in other skills vs the master.
 6. **Verify the cross-cutting mandates per skill:** CC1 commodity-agnostic (takes a commodity context and adapts), CC2 efficient deep research + performance-as-usability, CC3 Cowork-ready workflow structure (discrete confirmable steps + guardrails). This is where CC1-CC3 get inspected/retrofitted across the suite before WS9.
+7. **Non-numeric decision kernels (GREEN LIT, Marc 2026-07-26):** encode deterministic decision logic for legal-negotiation-prep (issue tier-tree), comment-cleanup (keep/resolve/delete matrix), workflow-map (step/dependency cascade).
+8. **Heuristic->semantic upgrade (GREEN LIT, Marc 2026-07-26):** audit the suite; wherever heuristic review is used but SEMANTIC would be more accurate/higher-quality, upgrade to semantic (deterministic + semantic primary, heuristic fallback).
 
 ## WS4 — Conversational intake / routing / the orchestration web  `[Marc]` gate, then build
 1. **#108** Rebuild Theo as a true conversational intake (diagnose -> recommend -> confirm -> hand off); retire the static menu-as-default; keep direct trigger phrases for named tasks.
@@ -144,7 +146,7 @@ All 31 rated data-source "clear" and output "clear" — this is enhancement, not
 2. numeric_kernel gaps: ROI/payback/waterfall, sensitivity/perturbation, correlated-drivers.
 3. `[held]` #114 contract-review Protection-Score deduction-kernel (sensitive).
 4. `[held]` #80 contract-review hybrid clause-analysis pipeline (sensitive).
-5. `[Marc]` #86 invoice-rate-card platform mapping; #102 cross-cut scoring layer (risky, site-wide).
+5. **#102 cross-cut scoring layer — GREEN LIT but DEFERRED to here (Marc 2026-07-26):** one shared scoring/ranking engine so a score/tier means the same thing across skills; site-wide + risky, so sequence it AFTER the per-skill kernels (#113/#114/#80) + the cleanup. Must be done, just late. (#86 invoice-rate-card = SHELVED, not deprecated — needs invoices + contracts together, not yet available.)
 
 ## WS9 — Convert to ARIA recipes + build the procurement ARIA plugin  `[capstone]`
 The final layer, after WS1-WS8 and once CC1-CC3 are baked in. Per ARIA-BUILD-PLAN.md: execute AFTER the
@@ -170,18 +172,17 @@ dashboards/skills optimization; the Phase-0 native-tool co-orchestration spike i
 - **A4 #114** contract-review Protection-Score deduction-kernel: **GREEN LIT** — also evaluate the most accurate method (deterministic deduction vs SEMANTIC vs heuristic); prefer semantic where more accurate.
 - **A4 #80** contract-review hybrid clause pipeline: **GREEN LIT.**
 - **A4 #113** playbook-learning stats kernel -> `numeric_kernel`: **GREEN LIT** — design for with/without ARIA/Cowork; enhance via them later.
-- **A4 #102** cross-cut scoring layer: **pending** (explanation given in chat; awaiting go).
+- **A4 #102** cross-cut scoring layer: **GREEN LIT, DEFERRED to WS8/Phase 4** (Marc 2026-07-26) — must be done, sequenced after the per-skill kernels + cleanup (site-wide, so late).
 - **A4 #86** invoice-rate-card platform mapping: **SHELVED** (not deprecated) — system can't yet see invoices + contracts together; ahead of its time.
 - **NEW cross-cutting — HEURISTIC->SEMANTIC upgrade (add to WS3):** audit suite-wide; where heuristic review is used but SEMANTIC would be more accurate/higher-quality, upgrade to semantic (deterministic + semantic primary, heuristic fallback).
 - **NEW task — SKILL INVENTORY + SHELVING (not yet):** later, list every skill + what it does + what data it needs, so Marc can decide which to SHELVE (not deprecate) for now (skills ahead of current data access, e.g. #86).
 - **re-paper-SOW: GREEN LIT** — NEW skill: port content FROM a supplier's paper/SOW ONTO Lilly's template; likely its own skill, may reuse parts of `lilly-contract-review`. Add to the build list.
 - **#32 dashboard-as-code** = the deterministic-build standard ALREADY adopted (Python builds each dashboard; only the DATA changes, which may vary specific panels / how fully built, but tabs/panels/organization/design stay consistent). NOT a separate task — it IS the approach.
-- **Deferred / explained-in-chat / may-green-light-later:** Landscape enrichments (supplier-type-aware deep-dive layout · segmentation-quadrant tuning · D&B/Bloomberg), #44 handover brief, Landscape narrative reconciliation, the 3 non-numeric decision kernels (legal-neg tier-tree, comment-cleanup matrix, workflow-map cascade), ARIA Fabric telemetry / `skill_outcome` loop.
+- **GREEN LIT (Marc 2026-07-26):** Landscape enrichments (all 3) -> WS2; #44 handover/custody brief -> built WITH the My Work dashboard (WS1); the 3 non-numeric decision kernels -> WS3; the heuristic->semantic upgrade -> WS3.
+- **Still deferred:** Landscape narrative reconciliation (parked, not needed now); ARIA Fabric telemetry / `skill_outcome` loop (returns in/after WS9).
 
 ## Still open (your call)
-1. **A2** Landscape Deep-Dive completeness — you're reviewing it in Edge now.
-2. **A4 #102** cross-cut scoring layer — build or skip (explanation given).
-3. Landscape enrichments · #44 · narrative reconciliation · the 3 non-numeric kernels — explained in chat; defer or green-light.
+1. **A2** Landscape Deep-Dive completeness — you're reviewing it in Edge now. (Everything else from the A/B review is now decided.)
 
 ## Sequence
 See **PRIORITY ORDER (phased)** near the top. In brief:
