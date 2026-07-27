@@ -229,7 +229,7 @@ const LIVESLA=_PVBOOT.liveSla||[];
 const MATERIALS=[
  {n:'Supplier landscape',d:'Suppliers vs market · references · risk signals',tab:'landscape',label:'Landscape',icon:'landscape',steps:['t-enable']},
  {n:'Negotiation prep',d:'Leverage points · BATNA · target terms',tab:'negprep',label:'Negotiation Prep',icon:'neg',steps:['r-legal']},
- {n:'Contract Review',d:'Protection Score · gaps · redlines',tab:'contract',label:'Contract Review',icon:'contract',steps:['r-legal','t-wwtp','r-cyber']},
+ {n:'Contract Review',d:'Playbook Alignment Score · gaps · redlines',tab:'contract',label:'Contract Review',icon:'contract',steps:['r-legal','t-wwtp','r-cyber']},
  {n:'RFx analysis',d:'Bid scoring, competitive sourcing only',tab:'rfx',label:'RFx Analysis',icon:'scoring',steps:[]}
 ];
 // per-type line icons (stroke glyphs, landscape / chart / contract / scoring)

@@ -162,7 +162,7 @@ function cmLeverInner(){
    '<div class="cmnp-bars">'+bars+'</div>'+
    '<div class="cmnp-row"><span class="k">Annual cost</span><span class="v">'+cm$(CM_LEV_BASE.annual)+' → <b>'+cm$(annualAfter)+'</b>'+(saveYr>0?' <span class="save">(−'+cm$(saveYr)+'/yr)</span>':'')+'</span></div>'+
    '<div class="cmnp-row"><span class="k">3-year contract value</span><span class="v">'+cm$(m.threeYrBefore)+' → <b>'+cm$(m.threeYrAfter)+'</b></span></div>'+
-   '<div class="cmnp-row"><span class="k">Protection Score <i>(higher = better)</i></span><span class="v">'+m.protBase+' → <b>'+m.protAfter+'</b>'+(m.protDelta!==0?' <span class="save">('+(m.protDelta>0?'+':'')+m.protDelta+' pts)</span>':'')+' <i>/100</i></span></div>'+
+   '<div class="cmnp-row"><span class="k">Playbook Alignment Score <i>(higher = better)</i></span><span class="v">'+m.protBase+' → <b>'+m.protAfter+'</b>'+(m.protDelta!==0?' <span class="save">('+(m.protDelta>0?'+':'')+m.protDelta+' pts)</span>':'')+' <i>/100</i></span></div>'+
    '<div class="cmnp-protbar"><i style="width:'+m.protAfter+'%"></i></div>'+
    '<div class="cmnp-row"><span class="k">Est. negotiation rounds</span><span class="v">'+(m.rounds<=1?'1':'~'+m.rounds)+(m.rounds>=4?'+':'')+' round'+(m.rounds===1?'':'s')+'</span></div>'+
    '<div class="cmnp-note">Directional model on the WO pricing, <b>not Finance-approved</b>. Overlapping price levers are de-rated against a shared price pool, not summed. Nothing is countered or signed on your behalf.</div>'+
@@ -173,7 +173,7 @@ function cmLeverInner(){
 function cmToggleLever(id){var s=cmLeverSel();if(s[id])delete s[id];else s[id]=true;var m=document.getElementById('cmLeverMount');if(m)m.innerHTML=cmLeverInner();}
 function cmSetHorizon(h){CM_HORIZON=h;var m=document.getElementById('cmLeverMount');if(m)m.innerHTML=cmLeverInner();}
 function cmLeverHTML(){
- return '<div class="sect">'+cmHd('Model the negotiation, levers & Protection Score','price + protection deltas · Yr-1 / 3-yr horizon')+
+ return '<div class="sect">'+cmHd('Model the negotiation, levers & Playbook Alignment Score','price + protection deltas · Yr-1 / 3-yr horizon')+
   '<div class="spnote" style="margin-bottom:10px">A distinct commercial modeling panel (not the Pro-forma NPV slider). Toggle pricing and protective levers to model the blended effect on cost and protection; overlapping price discounts are de-rated, not summed.</div>'+
   '<div id="cmLeverMount">'+cmLeverInner()+'</div></div>';
 }

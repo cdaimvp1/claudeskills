@@ -39,7 +39,7 @@ function dealRiskGauge(score){
  function pt(r,deg){var a=(180-deg)*Math.PI/180;return [cx+r*Math.cos(a),cy-r*Math.sin(a)];}
  function arc(r,d0,d1){var p0=pt(r,d0),p1=pt(r,d1),large=(d1-d0)>180?1:0;return 'M'+p0[0].toFixed(1)+' '+p0[1].toFixed(1)+' A'+r+' '+r+' 0 '+large+' 1 '+p1[0].toFixed(1)+' '+p1[1].toFixed(1);}
  function band(r0,r1,d0,d1,fill){var oa=arc(r1,d0,d1),iaP0=pt(r0,d1),iaP1=pt(r0,d0),large=(d1-d0)>180?1:0;return '<path d="'+oa+' L'+iaP0[0].toFixed(1)+' '+iaP0[1].toFixed(1)+' A'+r0+' '+r0+' 0 '+large+' 0 '+iaP1[0].toFixed(1)+' '+iaP1[1].toFixed(1)+' Z" fill="'+fill+'"/>';}
- var s='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="Protection score '+score+' of 100">';
+ var s='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="Playbook Alignment score '+score+' of 100">';
  s+=band(rI,rO,0,45,'#FDE0DC');      // 0-24 Critical track
  s+=band(rI,rO,45,90,'#F5C9C5');     // 25-49 High track
  s+=band(rI,rO,90,135,'#FCE3BF');    // 50-74 Moderate track
@@ -83,7 +83,7 @@ function dealOverviewHTML(){
  var highs=dealFindings().filter(function(x){return x.sev==='high';}).length;
  var kpi='<div class="rvkpi">'+
   '<div class="rvk"><div class="kl">Annual value</div><div class="kv" style="color:var(--plum)">$600K/yr</div><div class="ks">$1.8M TCO (3-yr) · $1,500/seat @ 400 seats</div></div>'+
-  '<div class="rvk"><div class="kl">Protection score</div><div class="kv" style="color:'+scoreCol+'">'+C.score+'/100</div><div class="ks">'+band+' · higher = better</div></div>'+
+  '<div class="rvk"><div class="kl">Playbook Alignment score</div><div class="kv" style="color:'+scoreCol+'">'+C.score+'/100</div><div class="ks">'+band+' · higher = better</div></div>'+
   '<div class="rvk"><div class="kl">Hard stops</div><div class="kv">0</div><div class="ks">No deal-breakers; '+highs+' high findings to resolve</div></div>'+
   '<div class="rvk"><div class="kl">Est. rounds</div><div class="kv">2-3</div><div class="ks">Moderate complexity (supplier paper)</div></div>'+
   '</div>';
@@ -107,7 +107,7 @@ function dealOverviewHTML(){
   'so terms are negotiated from the Lilly standard, not an established relationship. Every finding below cross-references the governing documents.</div>'+
   '<div style="font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);margin:12px 0 6px">Definition traces completed</div>'+traces+'</div>';
  return kpi+
-  '<div class="sect"><div class="secthd"><div class="t">Overall protection score</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">higher = better protected</span></div>'+gauge+'</div>'+
+  '<div class="sect"><div class="secthd"><div class="t">Overall playbook alignment score</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">higher = better protected</span></div>'+gauge+'</div>'+
   '<div class="sect"><div class="secthd"><div class="t">Score methodology</div></div>'+meth+'</div>'+
   '<div class="sect"><div class="secthd"><div class="t">Governing agreement</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">reviewed against</span></div>'+gov+'</div>'+
   dealConditionsHTML();
@@ -294,7 +294,7 @@ function dealDocTypeReadHTML(){
  if(!P){return '<div class="sect"><div class="secthd"><div class="t">Document type</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">derived · read-only</span></div><p class="cnote" style="margin:0">Document type: pending classification.</p></div>';}
  var dt=dealDocType();var def=cdrDocTypeDef(dt)||{label:dt};var lbl=escapeHtmlPV(def.label||dt);var msa=dealGoverningMSA();
  var body=isLeahDocType(dt)
-  ? '<div class="cdrgate"><b style="color:var(--plum)">Document type: '+lbl+'</b> - authored and reviewed in LEAH, the CLM system of record. The Protection Score engine here covers the non-MSA paper (WO, SOW, Order Form, Short Form, Evaluation Agreement).<div style="margin-top:7px"><a class="dlk" data-leah="1" style="color:var(--plum)">Open in LEAH -&gt;</a></div></div>'
+  ? '<div class="cdrgate"><b style="color:var(--plum)">Document type: '+lbl+'</b> - authored and reviewed in LEAH, the CLM system of record. The Playbook Alignment Score engine here covers the non-MSA paper (WO, SOW, Order Form, Short Form, Evaluation Agreement).<div style="margin-top:7px"><a class="dlk" data-leah="1" style="color:var(--plum)">Open in LEAH -&gt;</a></div></div>'
   : '<p class="cnote" style="margin:0">Document type: <b>'+lbl+'</b>'+(msa?' (reviewed against the '+escapeHtmlPV(msa)+')':'')+'. Derived from the project; routed to the contract-review engine below. Reflect-only.</p>';
  return '<div class="sect"><div class="secthd"><div class="t">Document type</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">derived · read-only</span></div>'+body+'</div>';
 }
@@ -318,8 +318,8 @@ function dealReviewLiveHTML(data){
  var rev=data.review||{};var prot=rev.protection||{};
  var score=(typeof prot.score==='number')?prot.score:0;var col=cdrScoreColor(score);var deg=Math.round(score/100*360);
  var bandLab=score>=75?'Strong protection':score>=50?'Moderate protection':'Weak protection';
- var summ=escapeHtmlPV(rev.summary||('Protection Score '+score+' from '+((rev.findings||[]).length)+' finding(s).'));
- var h='<div class="sect"><div class="secthd"><div class="t">Protection Score</div><span class="autopill live">Live</span></div><div class="card"><div class="pscore"><div class="pgauge" style="background:conic-gradient('+col+' '+deg+'deg, var(--line) 0)"><div class="pin"><div class="pnum" style="color:'+col+'">'+escapeHtmlPV(score)+'</div><div class="pof">/ 100</div></div></div><div class="pmeta"><div class="pml" style="color:'+col+'">'+bandLab+'</div><div class="pmd">Higher is better. '+summ+'</div></div></div></div></div>';
+ var summ=escapeHtmlPV(rev.summary||('Playbook Alignment Score '+score+' from '+((rev.findings||[]).length)+' finding(s).'));
+ var h='<div class="sect"><div class="secthd"><div class="t">Playbook Alignment Score</div><span class="autopill live">Live</span></div><div class="card"><div class="pscore"><div class="pgauge" style="background:conic-gradient('+col+' '+deg+'deg, var(--line) 0)"><div class="pin"><div class="pnum" style="color:'+col+'">'+escapeHtmlPV(score)+'</div><div class="pof">/ 100</div></div></div><div class="pmeta"><div class="pml" style="color:'+col+'">'+bandLab+'</div><div class="pmd">Higher is better. '+summ+'</div></div></div></div></div>';
  var gg=rev.goNoGo||'';var ggLab=gg==='GO'?'GO':gg==='NO_GO'?'NO-GO':'GO with modifications';var ggCol=gg==='NO_GO'?'var(--red,#C8202E)':gg==='GO'?'var(--plum)':'var(--amber-d,#8A6D00)';
  h+='<div class="sect"><div class="secthd"><div class="t">Go / No-Go</div></div><div class="card"><div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap"><span style="font:700 13px var(--sans,system-ui,sans-serif);color:#fff;background:'+ggCol+';border-radius:30px;padding:4px 14px">'+escapeHtmlPV(ggLab)+'</span><span style="font-size:12.5px;color:var(--mut,#4A4540)">'+(rev.hardStop?'A mandatory protection is missing or weak. Legal review before execution.':'Reflect-only recommendation; Legal accepts redlines in Word.')+'</span></div></div></div>';
  var fs=rev.findings||[];
@@ -803,7 +803,7 @@ function dealOverviewModeHTML(){
  var highs=dealFindings().filter(function(x){return x.sev==='high';}).length;
  var kpi='<div class="rvkpi">'+
   '<div class="rvk"><div class="kl">Annual value</div><div class="kv" style="color:var(--plum)">$600K/yr</div><div class="ks">$1.8M TCO (3-yr) · illustrative</div></div>'+
-  '<div class="rvk"><div class="kl">Protection score</div><div class="kv" style="color:'+scoreCol+'">'+C.score+'/100</div><div class="ks">'+band+' · higher = better</div></div>'+
+  '<div class="rvk"><div class="kl">Playbook Alignment score</div><div class="kv" style="color:'+scoreCol+'">'+C.score+'/100</div><div class="ks">'+band+' · higher = better</div></div>'+
   '<div class="rvk"><div class="kl">Hard stops</div><div class="kv">0</div><div class="ks">'+highs+' high finding'+(highs===1?'':'s')+' to resolve</div></div>'+
   '<div class="rvk"><div class="kl">Est. rounds</div><div class="kv">2-3</div><div class="ks">Moderate complexity · supplier paper</div></div>'+
  '</div>';
@@ -812,7 +812,7 @@ function dealOverviewModeHTML(){
   '<div style="font-size:12px;color:var(--mut2);margin-top:6px;line-height:1.55">Higher = better protected. '+escD(C.summary)+'</div></div></div>'+dealDemoGoNoGoHTML()+'</div>';
  var cite='<div class="spnote">Score starts at 100 and deducts by finding severity against combined protection (MSA + amendments + Change Order 3). Full methodology, findings and governing-agreement detail are in the Review tab.</div>';
  return kpi+
-  '<div class="sect"><div class="secthd"><div class="t">Decision · protection score &amp; Go/No-Go</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">the recommendation</span></div>'+gauge+cite+'</div>'+
+  '<div class="sect"><div class="secthd"><div class="t">Decision · playbook alignment score &amp; Go/No-Go</div><span style="font-size:var(--fz-meta);color:var(--mut2);font-weight:500">the recommendation</span></div>'+gauge+cite+'</div>'+
   dealZopaReadoutHTML()+
   dealConditionsHTML();
 }
@@ -845,7 +845,7 @@ function dealHTML(){
   +'<a href="dashboard-contract.html" title="Open full negotiation dashboard" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line2);border-radius:8px;color:var(--mut);cursor:pointer;text-decoration:none"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"><path d="M4 20V10M10 20V4M16 20v-7"/><path d="M2 20h20"/></svg></a>'
   +'</div></div>';
  if(mode==='overview'){
-  h+=dealOverviewModeHTML();   // decision headline: Protection Score + Go/No-Go + Conditions + Total-deal ZOPA/TCO
+  h+=dealOverviewModeHTML();   // decision headline: Playbook Alignment Score + Go/No-Go + Conditions + Total-deal ZOPA/TCO
  }else if(mode==='strategy'){
   h+=dealStrategyHTML();       // Negotiate breakout 1: strategy + positions (playbook w/ tier toggle, red lines, sequencing, SME/MSA collapsed)
  }else if(mode==='pricing'){

@@ -80,7 +80,7 @@
   --hue-gold:#8A5A00;     --hue-gold-t:#F3E7C9;     --hue-gold-fg:#FBF3DE;
   --hue-copper:#A6541C;   --hue-copper-t:#F4E2D5;   --hue-copper-fg:#FBEEE3;
   --hue-graphite:#403A33; --hue-graphite-t:#E7E2DA; --hue-graphite-fg:#F1EEE8;
-  --emph:#C15E19; --emph-t:#F6DDC9;
+  --emph:#C15E19; --emph-t:#F1EFEC;
   --hue-plum-txt:#5C2B50; --hue-teal-txt:#2F6E6B; --hue-navy-txt:#123C82; --hue-burgundy-txt:#7A2436; --hue-green-txt:#2E6B47; --hue-gold-txt:#8A5A00; --hue-copper-txt:#A6541C; --hue-graphite-txt:#403A33;
   --pri-tx:var(--hue-plum-txt);
   --pri:var(--hue-plum); --pri-t:var(--hue-plum-t); --pri-fg:var(--hue-plum-fg);

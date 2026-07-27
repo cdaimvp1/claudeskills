@@ -262,7 +262,7 @@ function renderSourcesEvidence(d) {
  * into the live architecture: pure string builders + delegated DealUI interaction,
  * NOT the mockup's imperative getElementById()/re-render loop).
  *
- * Layout: (1) Protection Scorecard (col-12) = compact banded gauge + deduction
+ * Layout: (1) Playbook Alignment Scorecard (col-12) = compact banded gauge + deduction
  * waterfall (100 -> the 8 issue categories -> 58) + teal current->achievable band
  * (58 -> best negotiation.packages resultingProtectionScore = 79). (2) a 2-column
  * row: LEFT Navigator (~33%, segmented Protections | Obligations, native single-open
@@ -372,7 +372,7 @@ function lpGauge(d) {
   const cx = 92, cy = 90, r = 72, sw = 18;
   const bg = lpArc(cx, cy, r, 180, 0), fg = lpArc(cx, cy, r, 180, 180 - 1.8 * score);
   const achPt = lpPolar(cx, cy, r, 180 - 1.8 * ach);
-  const svg = '<svg class="lp-gaugesvg" viewBox="0 0 184 104" role="img" aria-label="Protection score ' + score + ' of 100, band ' + esc(p.band) + '">' +
+  const svg = '<svg class="lp-gaugesvg" viewBox="0 0 184 104" role="img" aria-label="Playbook Alignment score ' + score + ' of 100, band ' + esc(p.band) + '">' +
     '<path d="' + bg + '" stroke="var(--line2)" stroke-width="' + sw + '" fill="none" stroke-linecap="round"/>' +
     '<path d="' + fg + '" stroke="' + color + '" stroke-width="' + sw + '" fill="none" stroke-linecap="round"/>' +
     '<circle cx="' + achPt.x.toFixed(1) + '" cy="' + achPt.y.toFixed(1) + '" r="3.4" fill="var(--surface)" stroke="var(--sec)" stroke-width="2.4"><title>Achievable ' + ach + ' with the top package</title></circle>' +
@@ -439,7 +439,7 @@ function lpScorecard(d) {
     '<div class="lp-wf-s">100 playbook-aligned baseline, less each category’s deductions. Widest bar is the biggest lever. Click a bar to open its lead finding. ' + evidenceChip(p.evidenceType, { short: true }) + '</div>' +
     '</div>' + lpWaterfall(d) + legend + '</div>';
   const body = '<div class="lp-sc-grid"><div>' + lpGauge(d) + '</div>' + right + '</div>';
-  return saCard('Protection Scorecard', body, { icon: 'shield', accent: 'emph', sub: 'Supplier redline v3 &middot; before negotiation' });
+  return saCard('Playbook Alignment Scorecard', body, { icon: 'shield', accent: 'emph', sub: 'Supplier redline v3 &middot; before negotiation' });
 }
 
 /* =========================================================================
@@ -627,8 +627,21 @@ function lpRegister(d) {
   const emptyState = '<div class="lp-reg-empty" data-filter-empty hidden>' + LP_IC.info +
     '<div class="lp-re-t">No findings match the current search and filters.</div>' +
     '<button class="lp-re-btn" type="button" data-lpclear>Show all findings</button></div>';
-  const table = '<div class="lp-reg-scroll"><table class="dt dense" id="tbl-lp-register"><tbody>' +
-    bodyRows + '</tbody></table>' + emptyState + '</div>';
+  // D8 (Marc 2026-07-27, Option B): the register scrolls inside its own panel, and now SAYS SO.
+  // Affordances: an always-visible scrollbar (gutter reserved so it never appears/disappears), a fade
+  // at the bottom edge of the scroll area, and an "N of M" cue. The cue is rendered only when the row
+  // count actually exceeds what the 620px panel can show, so it never claims a scroll that isn't there.
+  const regScrolls = total > 10;
+  // DN1: the focus-mode bar. Hidden until a navigator click focuses a single finding.
+  const focusBar = '<div class="lp-focus-bar is-hidden" data-focus-bar>'
+    + '<button type="button" class="lp-focus-back" data-unfocus>&#8592; Back to all findings</button>'
+    + '<span class="lp-focus-of">Showing <b data-focus-label></b> of ' + total + '</span></div>';
+  const table = focusBar + '<div class="lp-reg-wrap' + (regScrolls ? ' is-scrolling' : '') + '">' +
+    '<div class="lp-reg-scroll"><table class="dt dense" id="tbl-lp-register"><tbody>' +
+    bodyRows + '</tbody></table>' + emptyState + '</div>' +
+    (regScrolls ? '<div class="lp-reg-cue"><span data-regshown>' + Math.min(10, total) + '</span> of ' +
+      total + ' findings shown, scroll inside the list for the rest</div>' : '') +
+  '</div>';
   return saCard('Findings Register', '<div data-filter-scope>' + toolbar + table + '</div>',
     { icon: 'flag', accent: 'teal', sub: total + ' findings &middot; issues + obligations' });
 }
@@ -747,7 +760,7 @@ function lpObligationDetail(o, d) {
 }
 
 function renderLegalProtection(d) {
-  return '<div class="tab-intro"><h2>Legal &amp; Protection</h2><p class="q">Reflect-only. Where the protection score was lost, and every finding behind it. ' +
+  return '<div class="tab-intro"><h2>Legal &amp; Protection</h2><p class="q">Reflect-only. Where the playbook alignment score was lost, and every finding behind it. ' +
     coverageBadge(d.deal.evidenceCoverage) + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-12">' + lpScorecard(d) + '</div>' +
@@ -1273,7 +1286,16 @@ const CONTRACT_STYLE =
   '.contract-tab .lp-reg-clear{border:1px solid var(--line2);background:var(--surface);color:var(--sec-tx);font:800 11px/1 var(--sans);cursor:pointer;padding:6px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}' +
   '.contract-tab .lp-reg-clear:hover{background:var(--sec-t)}' +
   '.contract-tab .lp-reg-clear .lp-ic{width:12px;height:12px}' +
-  '.contract-tab .lp-reg-scroll{max-height:620px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-sm);margin-top:10px}' +
+  '.contract-tab .lp-reg-wrap{position:relative;margin-top:10px}' +
+  '.contract-tab .lp-reg-scroll{max-height:620px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-sm)}' +
+  /* D8: make the scrollbar permanently visible (and reserve its gutter) so the panel reads as scrollable */
+  '.contract-tab .lp-reg-scroll{scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:var(--line2) transparent}' +
+  '.contract-tab .lp-reg-scroll::-webkit-scrollbar{width:10px}' +
+  '.contract-tab .lp-reg-scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:30px;border:2px solid var(--surface)}' +
+  '.contract-tab .lp-reg-scroll::-webkit-scrollbar-track{background:rgba(33,25,17,.04);border-radius:30px}' +
+  /* D8: fade the bottom edge of the scroll area, sitting above the scrollbar gutter */
+  '.contract-tab .lp-reg-wrap.is-scrolling:after{content:"";position:absolute;left:1px;right:11px;bottom:29px;height:30px;pointer-events:none;border-radius:0 0 var(--r-sm) var(--r-sm);background:linear-gradient(to bottom,rgba(255,255,255,0),var(--surface))}' +
+  '.contract-tab .lp-reg-cue{display:flex;align-items:center;gap:6px;font:600 11px var(--sans);color:var(--mut);padding:7px 2px 0}' +
   '.contract-tab #tbl-lp-register{width:100%}' +
   '.contract-tab #tbl-lp-register td{vertical-align:middle}' +
   /* Issues / Obligations group bands + zero-result empty-state */

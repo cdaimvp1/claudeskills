@@ -69,7 +69,7 @@ function ensureDealCss(){ if(document.getElementById('deal-css'))return; var s=d
  '.ztchip.tgt{background:rgba(92,43,80,.12);color:var(--plum)}.ztchip.walk{background:var(--blue-t,#E4EBF1);color:var(--plum)}.ztchip.open{background:var(--surface);border:1.5px solid var(--plum);color:var(--plum)}'+
  '.ztchip.ok{background:var(--sec-t);color:var(--sec)}.ztchip.over{background:var(--emph-t);color:var(--emph)}'+
  '.ztarrow{font-size:11px;color:var(--mut2,#8A827C)}'+
- // demo Go/No-Go headline (rendered next to the Protection Score gauge)
+ // demo Go/No-Go headline (rendered next to the Playbook Alignment Score gauge)
  '.dggo{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--line,#E3E2DF)}'+
  '.dgpill{font:700 13px var(--sans,system-ui,sans-serif);color:#fff;border-radius:30px;padding:4px 14px;white-space:nowrap}'+
  '.dgnote{font-size:12.5px;color:var(--mut,#3E3933);flex:1;min-width:180px;line-height:1.45}'+

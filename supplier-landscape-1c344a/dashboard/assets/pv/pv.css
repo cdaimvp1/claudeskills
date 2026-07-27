@@ -1,4 +1,4 @@
-:root{--red:#E1251B;--red-d:#B41E16;--ink:#1A1A1A;--mut:#3E3933;--mut2:#4A443C;--line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--surface:#FFFFFF;--panel:#E4E3E0;--nested:#E4E4DF;--well:#DDDCD8;--pink-t:#FBE7E3;--pink-2:#F0C7BF;--ti-blue:#D2E1F2;--ti-gray:#E1E1DD;--ti-red:#F6D5CE;--ti-purple:#E3D8F0;--ti-amber:#F4E6BC;--tib-blue:#A9C4E6;--tib-gray:#CBC8C1;--tib-red:#E7B6A9;--tib-purple:#D0BEEA;--tib-amber:#E0CB8C;--teal-t:#EFF7F3;--teal-d:#2F6E6B;--amber-t:#FBF1DA;--amber:#FFC709;--amber-d:var(--amber-d);--blue-t:#E4EFEC;--blue:#A7CBC6;--blue-d:#2F6E6B;--cci-orange:#D2691E;--cci-red:#C0392B;--ai:#7A0E8C;--ai-t:#F6ECF8;--shadow:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);--shadow-lg:0 12px 34px rgba(38,30,20,.14);--glow:0 8px 24px rgba(225,37,27,.28);--sans:'Libre Franklin',system-ui,Arial,sans-serif;--mono:'Libre Franklin',system-ui,Arial,sans-serif;--fz-h:17px;--fz-title:15.5px;--fz-body:14px;--fz-sm:13px;--fz-meta:12px;--fz-mono:12px;--header:#E1251B;--teal:#2F6E6B;--navy:#5C2B50;--riskred:#A23A30;}
+:root{--red:#E1251B;--red-d:#B41E16;--ink:#1A1A1A;--mut:#3E3933;--mut2:#4A443C;--line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--surface:#FFFFFF;--panel:#E4E3E0;--nested:#E4E4DF;--well:#DDDCD8;--pink-t:#F1EFEC;--pink-2:#F0C7BF;--ti-blue:#D2E1F2;--ti-gray:#E1E1DD;--ti-red:#F6D5CE;--ti-purple:#E3D8F0;--ti-amber:#F1EFEC;--tib-blue:#E1E0DC;--tib-gray:#CBC8C1;--tib-red:#E7B6A9;--tib-purple:#D0BEEA;--tib-amber:#E0CB8C;--teal-t:#EFF7F3;--teal-d:#2F6E6B;--amber-t:#F1EFEC;--amber:#FFC709;--amber-d:var(--amber-d);--blue-t:#E4EFEC;--blue:#A7CBC6;--blue-d:#2F6E6B;--cci-orange:#D2691E;--cci-red:#C0392B;--ai:#7A0E8C;--ai-t:#F6ECF8;--shadow:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);--shadow-lg:0 12px 34px rgba(38,30,20,.14);--glow:0 8px 24px rgba(225,37,27,.28);--sans:'Libre Franklin',system-ui,Arial,sans-serif;--mono:'Libre Franklin',system-ui,Arial,sans-serif;--fz-h:17px;--fz-title:15.5px;--fz-body:14px;--fz-sm:13px;--fz-meta:12px;--fz-mono:12px;--header:#E1251B;--teal:#2F6E6B;--navy:#5C2B50;--riskred:#C15E19;}
 /* ===== Dark theme, PURELY ADDITIVE token override (color layer only; no rule/markup changed, so light stays byte-identical). Toggle sets data-theme="dark" on <html>. ===== */
 html[data-theme="dark"]{--tint-a4c2e6:#172637;--tint-c6d8ee:#172536;--tint-c6dfe7:#162d34;--tint-cbddef:#172736;--tint-cde8de:#173228;--tint-e0daec:#201830;--tint-e1e3e7:#292929;--tint-e3dac7:#302818;--tint-e4e0d7:#29251c;--tint-e4e4df:#292929;--tint-e7a33e:#3b2d19;--tint-eaf0f9:#172437;--tint-ece8f2:#211a2d;--tint-edece8:#26241d;--tint-eef0f3:#1c2128;--tint-efece8:#28231c;--tint-efedea:#26231d;--tint-efeeec:#292929;--tint-f1e3bc:#383018;--tint-f2eeee:#261d1d;--tint-f4d1cc:#381c18;--tint-f4f1ea:#2f2819;--tint-f4f1ec:#2d261a;--tint-f4f2ee:#2a251b;--tint-f4f6fb:#171f35;--tint-f4f7fb:#172435;--tint-f6e9e8:#341916;--tint-f7dbaf:#3b2e19;--tint-f7f5f1:#2d271a;--tint-f7f5f2:#2b251b;--tint-fafaf9:#292929;--tint-fbe7c7:#3c2f1a;--tint-fbeae8:#391c19;--tint-fbefc9:#3c341a;--tint-fbf4e6:#3a2f19;--tint-fce4e0:#3b1e19;--tint-fff0d8:#3e311b;color-scheme:dark;
  --ink:#ECECEC;--mut:#B0B0B0;--mut2:#8A8A8A;--line:#3A3A3A;--line2:#484848;
@@ -6,7 +6,7 @@ html[data-theme="dark"]{--tint-a4c2e6:#172637;--tint-c6d8ee:#172536;--tint-c6dfe
  --header:#0A0A0A;
  --red:#F0574C;--red-d:#D2453A;--riskred:#F0857B;--pink-t:#3A211E;--pink-2:#5A342E;
  --ti-blue:#22324A;--ti-gray:#2A2E34;--ti-red:#40241F;--ti-purple:#322842;--ti-amber:#33290F;
- --tib-blue:#3C5476;--tib-gray:#474C55;--tib-red:#603830;--tib-purple:#4C3F66;--tib-amber:#57481F;
+ --tib-blue:#6A655F;--tib-gray:#474C55;--tib-red:#603830;--tib-purple:#4C3F66;--tib-amber:#57481F;
  --teal-t:#15271F;--teal-d:#49B591;--teal:#49B591;--amber-t:#2E2713;--amber:#FFC709;--amber-d:#DBAA50;
  --blue-t:#2A2230;--blue:#C79AB8;--blue-d:#C79AB8;--navy:#C79AB8;
  --cci-orange:#E08A45;--cci-red:#E06456;--ai:#B267C6;--ai-t:#2A1830;
@@ -1158,7 +1158,7 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
    are re-pinned inside .pvsl so the ported classes render with the SL palette
    (project-view's --blue is a lighter hue). Every rule is scoped to .pvsl so it
    cannot leak into the rest of the page. ========================================= */
-.pvsl{--blue:var(--navy);--blue-d:var(--navy);--blue-t:#E8EEF6;--amber:#C9A227;--amber-d:var(--amber-d);--amber-t:#FFF6E6;--red:#E1251B;--red-d:#B41E16;--pink-t:#FBE7E3;--ai:#2E5E8C;--ai-t:#E4EBF1;--fz-title:16px;--fz-body:14px;--fz-sm:13px;--fz-meta:11.5px;--fz-mono:10.5px;color:var(--ink)}
+.pvsl{--blue:var(--navy);--blue-d:var(--navy);--blue-t:#E8EEF6;--amber:#C9A227;--amber-d:var(--amber-d);--amber-t:#F1EFEC;--red:#E1251B;--red-d:#B41E16;--pink-t:#F1EFEC;--ai:#2E5E8C;--ai-t:#E4EBF1;--fz-title:16px;--fz-body:14px;--fz-sm:13px;--fz-meta:11.5px;--fz-mono:10.5px;color:var(--ink)}
 .pvsl .reflect{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line2);border-left:3px solid var(--blue);background:var(--surface);border-radius:10px;padding:11px 15px;margin:0 0 16px;font-size:12.5px;color:var(--mut);line-height:1.55}
 .pvsl .reflect svg{width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:2;flex:none;margin-top:1px}
 .pvsl .reflect b{color:var(--ink);font-weight:700}
@@ -2074,7 +2074,7 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
    Native chrome comes from .tabbody (.card plum top-rule, .secthd, .ovfacts, .ovnarr, tables).
    Everything here is report-specific, scoped under .rfxrpt, styled only with app tokens.
    Three-colour system: plum (structure) + teal (positive) + burnt orange (emphasis). No red. */
-.rfxrpt{--emph:#C15E19;--emph-t:#F7E7D8}
+.rfxrpt{--emph:#C15E19;--emph-t:#F1EFEC}
 .rfxrpt .em{color:var(--emph);font-weight:600} .rfxrpt .pos{color:var(--teal-d);font-weight:600}
 .rfxrpt .rtitle{display:flex;align-items:center;gap:11px;margin-bottom:13px}
 .rfxrpt .rtitle .nm{font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
@@ -2155,3 +2155,160 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 .rfxrpt .xs-fold>summary::-webkit-details-marker{display:none}
 .rfxrpt .xs-fold>summary::before{content:'\25B8  '}
 .rfxrpt .xs-fold[open]>summary::before{content:'\25BE  '}
+
+/* Decision strip (Marc 2026-07-27), Landscape Overview. Dividers, not tiles-in-boxes, per the
+   de-bubble rule; the number carries the emphasis and colour stays out of it. */
+.pvsl .pvdecstrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 16px;
+  border:1px solid var(--line2);border-radius:10px;background:var(--surface);overflow:hidden}
+.pvsl .pvdec-t{padding:12px 14px;border-right:1px solid var(--line2)}
+.pvsl .pvdec-t:last-child{border-right:none}
+.pvsl .pvdec-v{font:800 26px/1.05 var(--sans);color:var(--ink);letter-spacing:-.02em}
+.pvsl .pvdec-l{font:700 11px var(--sans);color:var(--ink);margin-top:5px}
+.pvsl .pvdec-s{font-size:10.5px;color:var(--mut2);margin-top:2px;line-height:1.35}
+@media(max-width:760px){.pvsl .pvdecstrip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pvsl .pvdec-t:nth-child(2){border-right:none}}
+
+/* ---- Market Decision Brief (Marc 2026-07-27), Landscape Overview -------------------------
+   Numbered sections separated by rules, not nested cards (de-bubble rule). Colour does one job:
+   the section number and the evidence chips. Everything else is type and space. */
+.pvsl .mdb .mdb-cap{margin-left:auto;font:600 11px var(--mono);color:var(--mut2)}
+.pvsl .mdb-body{padding:2px 0 0}
+.pvsl .mdb-sec{padding:16px 0;border-top:1px solid var(--line)}
+.pvsl .mdb-sec:first-child{border-top:none;padding-top:8px}
+.pvsl .mdb-hd{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+.pvsl .mdb-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+  border-radius:50%;background:var(--plum,#5C2B50);color:#fff;font:800 11px var(--mono);flex:none}
+.pvsl .mdb-t{font-size:14.5px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+.pvsl .mdb-sub{font-size:11.5px;color:var(--mut2)}
+.pvsl .mdb-note{font-size:11.8px;line-height:1.55;color:var(--mut);margin-top:10px}
+.pvsl .mdb-none{font-size:12.2px;line-height:1.55;color:var(--mut);padding:2px 0}
+.pvsl .mdb-mut{color:var(--mut2);font-size:11.5px}
+/* 1 - funnel */
+.pvsl .mdb-funnel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;
+  border:1px solid var(--line2);border-radius:9px;overflow:hidden}
+.pvsl .mdb-fstep{padding:11px 13px;border-right:1px solid var(--line2)}
+.pvsl .mdb-fstep:last-child{border-right:none}
+.pvsl .mdb-fv{font:800 22px/1.05 var(--sans);color:var(--ink);letter-spacing:-.02em}
+.pvsl .mdb-fl{font:700 11px var(--sans);color:var(--ink);margin-top:4px}
+.pvsl .mdb-fs{font-size:10.5px;color:var(--mut2);margin-top:2px;line-height:1.35}
+/* 2 - slate */
+.pvsl .mdb-slate{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.pvsl .mdb-card{border-left:3px solid var(--plum,#5C2B50);padding:2px 0 2px 11px}
+.pvsl .mdb-cname{font-size:13.5px;font-weight:800;color:var(--ink)}
+.pvsl .mdb-inc{margin-left:7px;font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.04em;
+  color:var(--mut2);border:1px solid var(--line2);border-radius:30px;padding:1px 7px}
+.pvsl .mdb-cmeta{font:600 11px var(--mono);color:var(--mut2);margin-top:4px}
+.pvsl .mdb-cwhy{font-size:12.2px;line-height:1.5;color:var(--mut);margin-top:5px}
+/* 3 - two columns */
+.pvsl .mdb-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.pvsl .mdb-colhd{font:700 10px var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--mut2);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+/* lists */
+.pvsl .mdb-list{margin:0;padding-left:17px;font-size:12.3px;line-height:1.6;color:var(--ink)}
+.pvsl .mdb-list li{margin-bottom:5px}
+.pvsl .mdb-qs li{color:var(--mut)}
+.pvsl .mdb-unc li{color:var(--mut)}
+/* evidence chips */
+.pvsl .mdb-ev{display:inline-block;font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.04em;
+  padding:2px 8px;border-radius:30px;margin-right:5px;border:1px solid currentColor}
+.pvsl .mdb-ev-e{color:#2F6E6B}
+.pvsl .mdb-ev-s{color:#C15E19}
+.pvsl .mdb-ev-u{color:var(--mut2)}
+@media(max-width:760px){
+  .pvsl .mdb-funnel{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pvsl .mdb-fstep:nth-child(2){border-right:none}
+  .pvsl .mdb-two{grid-template-columns:1fr}
+}
+
+/* ---- Deep dive > Data Coverage (Marc 2026-07-27) ---------------------------------------- */
+.pvsl .ddcov-cap{margin-left:auto;font:600 11px var(--mono);color:var(--mut2)}
+.pvsl .ddcov-meter{display:flex;align-items:center;gap:12px;margin:2px 0 12px}
+.pvsl .ddcov-bar{flex:1;height:8px;border-radius:5px;background:var(--line2);overflow:hidden}
+.pvsl .ddcov-bar i{display:block;height:100%;border-radius:5px;background:var(--ddacc,#5C2B50)}
+.pvsl .ddcov-mv{font:800 16px var(--sans);color:var(--ink);min-width:44px;text-align:right}
+.pvsl .ddcov-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-bottom:13px;
+  border:1px solid var(--line2);border-radius:9px;overflow:hidden}
+.pvsl .ddcov-counts>div{padding:9px 12px;border-right:1px solid var(--line2);font-size:11.5px;color:var(--mut2)}
+.pvsl .ddcov-counts>div:last-child{border-right:none}
+.pvsl .ddcov-counts b{display:block;font:800 18px/1.1 var(--sans);color:var(--ink)}
+.pvsl .ddcov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:7px}
+.pvsl .ddcov-cell{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:7px 10px;border:1px solid var(--line2);border-radius:8px;font-size:12px}
+.pvsl .ddcov-cell.ddcov-p{border-left:3px solid var(--ddacc,#5C2B50)}
+.pvsl .ddcov-cell.ddcov-e{border-left:3px solid #C15E19}
+.pvsl .ddcov-cell.ddcov-a{border-left:3px solid var(--line2);color:var(--mut2)}
+.pvsl .ddcov-cl{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pvsl .ddcov-pill{font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.04em;
+  padding:2px 8px;border-radius:30px;border:1px solid currentColor;white-space:nowrap;flex:none}
+.pvsl .ddcov-p .ddcov-pill,.pvsl .ddcov-pill.ddcov-p{color:#2F6E6B}
+.pvsl .ddcov-pill.ddcov-e{color:#C15E19}
+.pvsl .ddcov-pill.ddcov-a{color:var(--mut2)}
+.pvsl .ddcov-note{font-size:11.5px;line-height:1.55;color:var(--mut);margin-top:12px;
+  padding-top:10px;border-top:1px dashed var(--line2)}
+.pvsl .ddcov-tblwrap{overflow-x:auto}
+.pvsl .ddcov-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.pvsl .ddcov-tbl th{text-align:left;font:700 9px var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--mut2);padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.pvsl .ddcov-tbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.pvsl .ddcov-tbl tr:last-child td{border-bottom:none}
+.pvsl .ddcov-k{font-family:var(--mono);font-size:11px;color:var(--ink);font-weight:700;white-space:nowrap}
+.pvsl .ddcov-d{color:var(--mut2)}
+.pvsl .ddcov-m{font-family:var(--mono);font-size:11px;color:var(--mut2);white-space:nowrap}
+@media(max-width:760px){.pvsl .ddcov-counts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---- Decision Leverage (L9/L14) + The Decision Could Turn On (L10), Marc 2026-07-27 ------- */
+.pvsl .dlv-cap,.pvsl .dto-cap{margin-left:auto;font:600 11px var(--mono);color:var(--mut2)}
+.pvsl .dlv-wrap{overflow-x:auto}
+.pvsl .dlv-tbl{width:100%;border-collapse:collapse;font-size:12.3px}
+.pvsl .dlv-tbl th{text-align:left;font:700 9px var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--mut2);padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.pvsl .dlv-tbl td{padding:9px 10px;border-bottom:1px solid var(--line)}
+.pvsl .dlv-tbl tr:last-child td{border-bottom:none}
+.pvsl .dlv-tbl tr:first-child td{font-weight:700}
+.pvsl .dlv-l{font-weight:600;color:var(--ink)}
+.pvsl .dlv-n,.pvsl th.dlv-n{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--mut2);white-space:nowrap}
+.pvsl .dlv-bar{width:190px}
+.pvsl .dlv-bar span{display:inline-block;width:140px;height:8px;border-radius:5px;background:var(--line2);
+  overflow:hidden;vertical-align:middle}
+.pvsl .dlv-bar i{display:block;height:100%;border-radius:5px;background:var(--plum,#5C2B50)}
+.pvsl .dlv-bar b{margin-left:8px;font:800 11.5px var(--mono);color:var(--ink)}
+.pvsl .dlv-read{font-size:12.3px;line-height:1.6;color:var(--mut);margin-top:12px}
+.pvsl .dlv-read b{color:var(--ink)}
+.pvsl .dlv-note,.pvsl .dto-note{font-size:11.4px;line-height:1.55;color:var(--mut2);margin-top:11px;
+  padding-top:9px;border-top:1px dashed var(--line2)}
+.pvsl .dto-list{list-style:none;margin:0;padding:0}
+.pvsl .dto-list li{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.pvsl .dto-list li:last-child{border-bottom:none}
+.pvsl .dto-req{font-weight:700;font-size:12.6px;color:var(--ink);min-width:220px}
+.pvsl .dto-gap{font:800 12px var(--mono);color:#C15E19;min-width:44px;text-align:right}
+.pvsl .dto-txt{font-size:12.2px;color:var(--mut)}
+.pvsl .dto-none{font-size:12.3px;line-height:1.6;color:var(--mut)}
+@media(max-width:760px){.pvsl .dto-req{min-width:0}.pvsl .dlv-bar{width:120px}.pvsl .dlv-bar span{width:80px}}
+
+/* ---- Peer Position, categorical quadrant (Marc 2026-07-27) ------------------------------- */
+.pvsl .pq-wrap{position:relative;padding:0 0 0 20px}
+.pvsl .pq-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"sw ss" "ww ws";gap:10px}
+.pvsl .pq-cell{border:1px solid var(--line2);border-radius:10px;padding:11px 12px;min-height:96px;background:var(--surface)}
+.pvsl .pq-strong-weak{grid-area:sw} .pvsl .pq-strong-strong{grid-area:ss}
+.pvsl .pq-weak-weak{grid-area:ww}   .pvsl .pq-weak-strong{grid-area:ws}
+.pvsl .pq-cell.pq-has-sel{border-color:var(--ddacc,#5C2B50);box-shadow:inset 0 0 0 1px var(--ddacc,#5C2B50)}
+.pvsl .pq-t{font-size:12.4px;font-weight:800;color:var(--ink);line-height:1.3}
+.pvsl .pq-d{font-size:10.8px;color:var(--mut2);margin-top:3px;line-height:1.4}
+.pvsl .pq-vs{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.pvsl .pq-v{font:600 11px var(--sans);color:var(--ink);border:1px solid var(--line2);
+  border-radius:30px;padding:2px 9px;white-space:nowrap}
+.pvsl .pq-v.pq-sel{background:var(--ddacc,#5C2B50);border-color:var(--ddacc,#5C2B50);color:#fff;font-weight:700}
+.pvsl .pq-v.pq-inel{color:var(--mut2);border-style:dashed}
+.pvsl .pq-empty{font-size:11px;color:var(--mut2);font-style:italic}
+.pvsl .pq-axl{font:700 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
+.pvsl .pq-axl-x{margin-top:8px;text-align:right}
+.pvsl .pq-axl-y{position:absolute;left:0;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left center;white-space:nowrap}
+.pvsl .pq-note{font-size:11.2px;line-height:1.55;color:var(--mut2);margin-top:10px;padding-top:9px;border-top:1px dashed var(--line2)}
+
+/* Segmentation quadrant reuses the Peer Position .pq-* system; these two additions are the only
+   things it needs that Peer Position does not: a screened-out row, and a wider left gutter for
+   the rotated axis label inside the narrower Overview column. */
+.pvsl .pq-dq{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:10px;
+  border-top:1px solid var(--line)}
+.pvsl .pq-dqk{font:700 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
+.pvsl .segL .pq-wrap{padding-left:22px}

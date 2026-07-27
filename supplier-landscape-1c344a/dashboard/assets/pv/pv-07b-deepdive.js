@@ -121,7 +121,7 @@ function pvDD2Summary(x, a, cand, input) {
   // Evidence coverage panel, rather than sitting in the Recommendation hero.
   var dshort = { 'identity & ownership':'Identity', 'capability & fit':'Capability', 'financial viability':'Financial', 'operational resilience':'Resilience', 'integrity & compliance':'Integrity', 'quality & regulatory':'Quality', 'cyber & privacy':'Cyber', 'responsible sourcing':'Responsible' };
   var dimStrip = '<div style="display:flex;flex-wrap:wrap;gap:8px">' + x.dimensions.map(function(d){
-      var col = /strong|^low$/i.test(d.concern) ? 'var(--teal-d,#2F6E6B)' : /moderate/i.test(d.concern) ? 'var(--emph,#C15E19)' : /high/i.test(d.concern) ? 'var(--emph,#C15E19)' : /critical/i.test(d.concern) ? '#A23A30' : 'var(--mut2,#6a655f)';
+      var col = /strong|^low$/i.test(d.concern) ? 'var(--teal-d,#2F6E6B)' : /moderate/i.test(d.concern) ? 'var(--emph,#C15E19)' : /high/i.test(d.concern) ? 'var(--emph,#C15E19)' : /critical/i.test(d.concern) ? '#C15E19' : 'var(--mut2,#6a655f)';
       return '<span title="' + pvAEsc(d.label + ': ' + d.concern) + '" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--ink);background:var(--nested,#EDEAE3);border-radius:20px;padding:4px 11px"><span style="width:8px;height:8px;border-radius:50%;background:' + col + '"></span>' + pvAEsc(dshort[String(d.label).toLowerCase()] || d.label) + '</span>';
     }).join('') + '</div>';
   var evidBody = '<div style="font:700 9px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:9px">Assessment across dimensions</div>'
@@ -136,7 +136,7 @@ function pvDD2Summary(x, a, cand, input) {
 }
 
 /* ------------------------------------------------ 1. COMPANY & OWNERSHIP */
-function pvDD2OwnTag(t){ return t === 'public' ? 'var(--teal-d,#2F6E6B)' : t === 'entity' ? 'var(--plum,#5C2B50)' : t === 'offering' ? '#2F6E6B' : t === 'infra' ? '#B4560F' : 'var(--mut2,#6a655f)'; }
+function pvDD2OwnTag(t){ return t === 'public' ? 'var(--teal-d,#2F6E6B)' : t === 'entity' ? 'var(--plum,#5C2B50)' : t === 'offering' ? '#2F6E6B' : t === 'infra' ? '#C15E19' : 'var(--mut2,#6a655f)'; }
 
 /* ownership tree: nested + collapsible (native <details>) with connector rails + horizontal scroll,
    so it scales to a wide/deep corporate family instead of "barely fitting". */
@@ -197,14 +197,14 @@ function pvDD2GeoMap(locations){
   var grat = '';
   for (var lon = -120; lon <= 120; lon += 60) grat += '<line x1="' + (lon + 180) + '" y1="0" x2="' + (lon + 180) + '" y2="180" stroke="#8FA6AC" stroke-width="0.3" opacity="0.5"/>';
   for (var lat = -60; lat <= 60; lat += 30) grat += '<line x1="0" y1="' + (90 - lat) + '" x2="360" y2="' + (90 - lat) + '" stroke="#8FA6AC" stroke-width="0.3" opacity="0.5"/>';
-  var tcol = function(t){ return /hq|registered/i.test(t) ? 'var(--plum,#5C2B50)' : /hub|operational/i.test(t) ? 'var(--teal-d,#2F6E6B)' : /service|delivery|cloud/i.test(t) ? '#B4560F' : 'var(--mut2,#6a655f)'; };
+  var tcol = function(t){ return /hq|registered/i.test(t) ? 'var(--plum,#5C2B50)' : /hub|operational/i.test(t) ? 'var(--teal-d,#2F6E6B)' : /service|delivery|cloud/i.test(t) ? '#C15E19' : 'var(--mut2,#6a655f)'; };
   var dots = placed.map(function(p){
     var x = px(p.lon), y = py(p.lat), c = tcol(p.type), miss = /missing/i.test(p.conf), lab = p.sub || p.name.split(/[,(]/)[0];
     return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.7" fill="' + c + '" opacity="' + (miss ? 0.45 : 0.98) + '" stroke="#fff" stroke-width="0.8"><title>' + pvAEsc(p.name + ', ' + p.type + (p.region ? ' (' + p.region + ')' : '') + ', ' + p.conf) + '</title></circle>'
-      + '<text x="' + (x + 3.8).toFixed(1) + '" y="' + (y + 1.7).toFixed(1) + '" font-size="5" font-family="var(--sans)" font-weight="700" fill="var(--ink)" paint-order="stroke" stroke="#DCE7EC" stroke-width="1.1">' + pvAEsc(lab) + '</text>';
+      + '<text x="' + (x + 3.8).toFixed(1) + '" y="' + (y + 1.7).toFixed(1) + '" font-size="5" font-family="var(--sans)" font-weight="700" fill="var(--ink)" paint-order="stroke" stroke="#E1E0DC" stroke-width="1.1">' + pvAEsc(lab) + '</text>';
   }).join('');
-  var legend = '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:11px">' + [['Registered HQ', 'var(--plum,#5C2B50)'], ['Operational hub', 'var(--teal-d,#2F6E6B)'], ['Service / cloud region', '#B4560F']].map(function(li){ return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut)"><span style="width:9px;height:9px;border-radius:50%;background:' + li[1] + '"></span>' + li[0] + '</span>'; }).join('') + '</div>';
-  return '<div style="overflow:hidden;border-radius:8px;border:1px solid var(--line2);background:#DCE7EC"><svg viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block">' + land + grat + dots + '</svg></div>' + legend;
+  var legend = '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:11px">' + [['Registered HQ', 'var(--plum,#5C2B50)'], ['Operational hub', 'var(--teal-d,#2F6E6B)'], ['Service / cloud region', '#C15E19']].map(function(li){ return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut)"><span style="width:9px;height:9px;border-radius:50%;background:' + li[1] + '"></span>' + li[0] + '</span>'; }).join('') + '</div>';
+  return '<div style="overflow:hidden;border-radius:8px;border:1px solid var(--line2);background:#E1E0DC"><svg viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block">' + land + grat + dots + '</svg></div>' + legend;
 }
 function pvDD2LocTable(locations){
   locations = locations || [];
@@ -235,8 +235,8 @@ function pvDD2Footprint(locations) {
 function pvDD2Firmographics(rows){
   var chip = function(st){
     if (!st) return '';
-    var c = /verif/i.test(st) ? 'var(--teal-d,#2F6E6B)' : /assert/i.test(st) ? '#B4560F' : 'var(--mut2,#6a655f)';
-    var bg = /verif/i.test(st) ? 'var(--teal-t,#DCEBE9)' : /assert/i.test(st) ? 'var(--ti-amber,#FBF1DA)' : 'var(--nested,#EDEAE3)';
+    var c = /verif/i.test(st) ? 'var(--teal-d,#2F6E6B)' : /assert/i.test(st) ? '#C15E19' : 'var(--mut2,#6a655f)';
+    var bg = /verif/i.test(st) ? 'var(--teal-t,#DCEBE9)' : /assert/i.test(st) ? 'var(--ti-amber,#F1EFEC)' : 'var(--nested,#EDEAE3)';
     return '<span style="font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + c + ';background:' + bg + ';border-radius:20px;padding:2px 8px;white-space:nowrap">' + pvAEsc(st) + '</span>';
   };
   return '<table style="width:100%;border-collapse:collapse;font-size:12.5px">' + rows.filter(function(r){ return r && r.v; }).map(function(r){
@@ -281,9 +281,9 @@ function pvDD2Company(x, a, cand, input) {
 function pvDD2CapCell(s) {
   return s === 'Confirmed' ? {c:'#fff', bg:'var(--teal-d,#2F6E6B)', t:'Confirmed'}
     : s === 'Partially confirmed' ? {c:'#153B37', bg:'#9DC6C0', t:'Partial'}
-    : s === 'Supplier asserted' ? {c:'#fff', bg:'#B4560F', t:'Asserted'}
-    : s === 'Not demonstrated' ? {c:'#fff', bg:'#A23A30', t:'Not dem.'}
-    : s === 'Gap' ? {c:'#fff', bg:'#A23A30', t:'Gap'}
+    : s === 'Supplier asserted' ? {c:'#fff', bg:'#C15E19', t:'Asserted'}
+    : s === 'Not demonstrated' ? {c:'#fff', bg:'#C15E19', t:'Not dem.'}
+    : s === 'Gap' ? {c:'#fff', bg:'#C15E19', t:'Gap'}
     : {c:'var(--mut2,#6a655f)', bg:'var(--nested,#EDEAE3)', t:'N/A'};
 }
 /* capability-to-requirement heatmap: solid, high-visibility cells (matches the Requirements Heatmap weight). */
@@ -295,12 +295,12 @@ function pvDD2CapHeatmap(capabilities) {
       + r.cells.map(function(s){ var m = pvDD2CapCell(s); return '<td style="padding:3px"><div title="' + pvAEsc(s) + '" style="font:700 9.5px var(--mono,monospace);letter-spacing:.02em;text-transform:uppercase;color:' + m.c + ';background:' + m.bg + ';border-radius:5px;padding:10px 4px;text-align:center;line-height:1.1">' + m.t + '</div></td>'; }).join('')
       + '</tr>';
   }).join('');
-  var legend = '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:11px;font-size:11px;color:var(--mut)">' + [['Confirmed', 'var(--teal-d,#2F6E6B)'], ['Partial', '#9DC6C0'], ['Asserted', '#B4560F'], ['Not demonstrated / gap', '#A23A30'], ['N/A', 'var(--nested,#EDEAE3)']].map(function(l){ return '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:10px;border-radius:3px;background:' + l[1] + '"></span>' + l[0] + '</span>'; }).join('') + '</div>';
+  var legend = '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:11px;font-size:11px;color:var(--mut)">' + [['Confirmed', 'var(--teal-d,#2F6E6B)'], ['Partial', '#9DC6C0'], ['Asserted', '#C15E19'], ['Not demonstrated / gap', '#C15E19'], ['N/A', 'var(--nested,#EDEAE3)']].map(function(l){ return '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:10px;border-radius:3px;background:' + l[1] + '"></span>' + l[0] + '</span>'; }).join('') + '</div>';
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>' + legend;
 }
 function pvDD2RefTick(v) {
   return v === true ? '<span style="color:#2F6E6B;font-weight:800">&#10003;</span>'
-    : v === 'partial' ? '<span style="color:#B4560F;font-weight:700">~</span>'
+    : v === 'partial' ? '<span style="color:#C15E19;font-weight:700">~</span>'
     : '<span style="color:var(--mut2,#6a655f)">, </span>';
 }
 function pvDD2RefMatrix(refs) {
@@ -315,7 +315,7 @@ function pvDD2RefMatrix(refs) {
 function pvDD2Readiness(items){
   if (!items || !items.length) return '<div style="font-size:12px;color:var(--mut2)">No delivery-readiness assessment on file.</div>';
   var order = { 'Needed':1, 'Confirmation needed':1, 'Proxy':2, 'Partial':3, 'Partially validated':3, 'Demonstrated':4, 'Complete':5 };
-  var col = function(n){ return n >= 4 ? 'var(--teal-d,#2F6E6B)' : n === 3 ? '#B4560F' : 'var(--mut2,#6a655f)'; };
+  var col = function(n){ return n >= 4 ? 'var(--teal-d,#2F6E6B)' : n === 3 ? '#C15E19' : 'var(--mut2,#6a655f)'; };
   return '<div style="display:flex;flex-direction:column;gap:12px">' + items.map(function(it){
       var n = order[it.state] || 1, c = col(n), segs = '';
       for (var i = 1; i <= 5; i++) segs += '<span style="flex:1;height:7px;border-radius:3px;background:' + (i <= n ? c : 'var(--line,#e5e1db)') + '"></span>';
@@ -367,7 +367,7 @@ function pvDD2PeerScatter(refl, input, selId) {
     var finDim = pv.dimensions.find(function(d){ return d.id === 'financial'; }) || {};
     var fav = (THEO_CONCERN[finDim.concern] || {fav:0.5}).fav;
     var x = sx(fav * 5), y = sy(pv.fit.score5 || 0), sel = av.id === selId;
-    return '<circle cx="' + x + '" cy="' + y + '" r="' + (sel ? 7 : 5) + '" fill="' + (sel ? '#A23A30' : '#5C2B50') + '" opacity="' + (av.eligible ? 0.9 : 0.35) + '"/><text x="' + (x + 8) + '" y="' + (y + 3) + '" font-family="var(--mono,monospace)" font-size="9" fill="' + (sel ? '#A23A30' : 'var(--mut,#4A443C)') + '">' + pvAEsc((av.name || '').split(/[,]/)[0]) + '</text>';
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + (sel ? 7 : 5) + '" fill="' + (sel ? '#C15E19' : '#5C2B50') + '" opacity="' + (av.eligible ? 0.9 : 0.35) + '"/><text x="' + (x + 8) + '" y="' + (y + 3) + '" font-family="var(--mono,monospace)" font-size="9" fill="' + (sel ? '#C15E19' : 'var(--mut,#4A443C)') + '">' + pvAEsc((av.name || '').split(/[,]/)[0]) + '</text>';
   }).join('');
   return '<div style="overflow-x:auto"><svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:' + W + 'px;height:auto">'
     + grid
@@ -377,7 +377,7 @@ function pvDD2PeerScatter(refl, input, selId) {
     + dots + '</svg></div>'
     + pvDD2Foot('Each supplier plotted by financial viability (x) and capability fit (y); the selected supplier is highlighted. Surfaces strong-capability / weak-financial vs. balanced candidates.');
 }
-function pvDD2VarColor(v){ return /high|significant|exposure/i.test(v) ? 'var(--emph,#C15E19)' : /moderate/i.test(v) ? '#B4560F' : 'var(--teal-d,#2F6E6B)'; }
+function pvDD2VarColor(v){ return /high|significant|exposure/i.test(v) ? 'var(--emph,#C15E19)' : /moderate/i.test(v) ? '#C15E19' : 'var(--teal-d,#2F6E6B)'; }
 function pvDD2CommercialDrivers(drivers) {
   if (!drivers || !drivers.length) return '';
   var w = function(v){ return /high|significant/i.test(v) ? 92 : /exposure/i.test(v) ? 68 : /moderate/i.test(v) ? 52 : 28; };
@@ -439,7 +439,7 @@ function pvDD2FinMetricTable(metrics){
     + metrics.map(function(m){
         var neg = /^\(|^-|loss|^\$\(/.test(String(m.value));
         return '<tr style="border-top:1px solid var(--line)"><td style="padding:6px 0;color:var(--ink)">' + pvAEsc(m.label) + '</td>'
-          + '<td style="padding:6px 0 6px 10px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:' + (neg ? '#B4560F' : 'var(--ink)') + '">' + pvAEsc(m.value) + '</td>'
+          + '<td style="padding:6px 0 6px 10px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:' + (neg ? '#C15E19' : 'var(--ink)') + '">' + pvAEsc(m.value) + '</td>'
           + '<td style="padding:6px 0 6px 10px;text-align:right;color:var(--mut2);white-space:nowrap;font-size:11px">' + pvAEsc(m.period || '') + '</td>'
           + '<td style="padding:6px 0 6px 8px;text-align:right">' + pvDD2FinDots(m.conf || 'High') + '</td></tr>';
       }).join('') + '</tbody></table>';
@@ -452,7 +452,7 @@ function pvDD2FinRatios(ratios){
         var neg = /^-|\(/.test(String(r.value));
         return '<div style="background:var(--nested,#f1efec);border-radius:9px;padding:8px 11px">'
           + '<div style="font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(r.label) + '</div>'
-          + '<div style="font-size:17px;font-weight:800;color:' + (neg ? '#B4560F' : 'var(--teal-d,#2F6E6B)') + ';font-variant-numeric:tabular-nums;margin:2px 0 1px">' + pvAEsc(r.value) + '</div>'
+          + '<div style="font-size:17px;font-weight:800;color:' + (neg ? '#C15E19' : 'var(--teal-d,#2F6E6B)') + ';font-variant-numeric:tabular-nums;margin:2px 0 1px">' + pvAEsc(r.value) + '</div>'
           + '<div style="font-size:10px;color:var(--mut);line-height:1.35">' + pvAEsc(r.basis || '') + '</div></div>';
       }).join('') + '</div>'
     + '<div style="font-size:10px;color:var(--mut2);margin-top:7px">Calculated from the figures above, not reported values.</div>';
@@ -468,7 +468,7 @@ function pvDD2FinBridge(fin){
     { k:'Cash generation', band: cashM ? 'good' : 'gap', assess: cashM ? 'Strong' : 'Not in snapshot', ev: cashM ? cashM[0].replace(/^./, function(c){ return c.toUpperCase(); }) : 'Free-cash-flow figure not isolated in the public snapshot.', conf: cashM ? 'High' : 'Low' },
     { k:'Leverage & obligations', band:'gap', assess:'Not in snapshot', ev:'Debt, leverage and balance-sheet detail are not in this public snapshot; precise figures come from filings or an RFx financial pack.', conf:'Low' }
   ];
-  var col = { good:'var(--teal-d,#2F6E6B)', warn:'#B4560F', gap:'var(--mut2,#6a655f)' };
+  var col = { good:'var(--teal-d,#2F6E6B)', warn:'#C15E19', gap:'var(--mut2,#6a655f)' };
   return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px">' + dims.map(function(d){
       return '<div style="border-left:3px solid ' + col[d.band] + ';padding:1px 0 1px 11px">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font:700 9.5px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(d.k) + '</span>' + pvDD2FinDots(d.conf) + '</div>'
@@ -513,6 +513,59 @@ function pvDD2PeerScatterBig(refl, input, selId){
     + '<text x="14" y="' + (padT + plotH / 2) + '" text-anchor="middle" font-size="10.5" font-family="var(--sans)" fill="var(--mut2)" transform="rotate(-90 14 ' + (padT + plotH / 2) + ')">Capability fit &rarr;</text>'
     + dots + '</svg></div>' + pvDD2Foot('Axes zoomed to the candidate range so the field spreads; the selected supplier is highlighted. Upper-right = strong capability + low financial risk.');
 }
+
+/* ---- Peer Position as a CATEGORICAL QUADRANT (Marc 2026-07-27) --------------------------
+   Replaces the continuous scatter. The underlying inputs are a concern BAND (favourability
+   bucket) and a 0-5 fit score, neither of which supports plotting a vendor at a precise x/y
+   point: the scatter implied a resolution the evidence does not have. The same two inputs
+   support a categorical read perfectly well, so vendors are placed in one of four named
+   quadrants and listed, with no pixel position implying a decimal.
+   The Financial Health panel above is deliberately untouched, per Marc's scope. */
+function pvDD2PeerQuadrant(refl, input, selId) {
+  var asmts = (refl && refl.landscape && refl.landscape.assessments) || [];
+  if (asmts.length < 2 || typeof pvCandById !== 'function' || typeof pvAssess !== 'function') return '';
+  var pts = asmts.map(function (av) {
+    var pv = pvAssess(av, pvCandById(av.id), input);
+    var finDim = pv.dimensions.find(function (d) { return d.id === 'financial'; }) || {};
+    var fav = (THEO_CONCERN[finDim.concern] || { fav: 0.5 }).fav;
+    return {
+      id: av.id, name: (av.name || '').split(/[,]/)[0],
+      fin: fav, fit: (pv.fit.score5 || 0) / 5,
+      elig: !!av.eligible, sel: av.id === selId
+    };
+  });
+  var QUADS = [
+    { k: 'strong-strong', t: 'Strong fit, sound finances', d: 'advance without a financial condition' },
+    { k: 'strong-weak',   t: 'Strong fit, financial watch', d: 'advance only with a financial condition' },
+    { k: 'weak-strong',   t: 'Weaker fit, sound finances', d: 'leverage, or a niche use case' },
+    { k: 'weak-weak',     t: 'Weaker fit, financial watch', d: 'no basis to advance on this evidence' }
+  ];
+  var key = function (p) {
+    var f = p.fit >= 0.7, m = p.fin >= 0.6;
+    return f ? (m ? 'strong-strong' : 'strong-weak') : (m ? 'weak-strong' : 'weak-weak');
+  };
+  var cells = QUADS.map(function (q) {
+    var mem = pts.filter(function (p) { return key(p) === q.k; });
+    var chips = mem.length
+      ? mem.map(function (p) {
+          return '<span class="pq-v' + (p.sel ? ' pq-sel' : '') + (p.elig ? '' : ' pq-inel') + '">'
+            + pvAEsc(p.name) + '</span>';
+        }).join('')
+      : '<span class="pq-empty">none</span>';
+    return '<div class="pq-cell pq-' + q.k + (mem.some(function (p) { return p.sel; }) ? ' pq-has-sel' : '') + '">'
+      + '<div class="pq-t">' + pvAEsc(q.t) + '</div>'
+      + '<div class="pq-d">' + pvAEsc(q.d) + '</div>'
+      + '<div class="pq-vs">' + chips + '</div></div>';
+  }).join('');
+  return '<div class="pq-wrap">'
+    + '<div class="pq-axl pq-axl-y">Capability fit &rarr;</div>'
+    + '<div class="pq-grid">' + cells + '</div>'
+    + '<div class="pq-axl pq-axl-x">Financial standing &rarr;</div>'
+    + '<div class="pq-note">Placed by BAND, not by coordinate. Fit is the weighted 0-5 requirement score and '
+    + 'financial standing is a concern band, so neither input supports a precise position; a quadrant is the '
+    + 'honest resolution of this evidence. The highlighted vendor is the one selected above.</div>'
+    + '</div>';
+}
 /* peer comps table (fills the right column of Peer Position with real comparison) */
 function pvDD2PeerComps(refl, input, selId){
   var asmts = (refl && refl.landscape && refl.landscape.assessments) || [];
@@ -525,7 +578,7 @@ function pvDD2PeerComps(refl, input, selId){
   var th = function(t, i){ return '<th style="text-align:' + (i ? 'right' : 'left') + ';padding:0 0 6px ' + (i ? '10px' : '0') + ';font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + t + '</th>'; };
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + ['Supplier', 'Capability fit', 'Financial risk'].map(th).join('') + '</tr></thead><tbody>'
     + rows.map(function(r){
-        return '<tr style="border-top:1px solid var(--line)' + (r.sel ? ';background:var(--emph-t,#F6DDC9)' : '') + '">'
+        return '<tr style="border-top:1px solid var(--line)' + (r.sel ? ';background:var(--emph-t,#F1EFEC)' : '') + '">'
           + '<td style="padding:7px 0 7px ' + (r.sel ? '6px' : '0') + ';font-weight:' + (r.sel ? '800' : '600') + ';color:var(--ink)">' + pvAEsc(r.name) + '</td>'
           + '<td style="padding:7px 0 7px 10px;text-align:right;color:var(--ink)">' + pvAEsc(r.fit) + '</td>'
           + '<td style="padding:7px 0 7px 10px;text-align:right;color:var(--mut)">' + pvAEsc(r.risk) + '</td></tr>';
@@ -560,8 +613,8 @@ function pvDD2FinEnrich(list){
           + '<div style="font-size:11px;color:var(--mut);line-height:1.4">' + pvAEsc(e.note) + '</div>'
           + '<div style="font-size:10px;color:var(--mut2);margin-top:6px;font-style:italic">Awaiting licensed feed</div></div>';
       }).join('') + '</div>'
-    + pvDD2Foot('Standard D&amp;B / Bloomberg fields we do not license in this snapshot, shown as schema-ready slots so the profile is explicit about what is evidenced vs. what needs a paid source.');
-  return '<details style="margin-top:-2px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--plum,#5C2B50);padding:2px 0">Show ' + list.length + ' enrichment slots (D&amp;B / Bloomberg), not licensed in this snapshot</summary><div style="padding-top:13px">' + inner + '</div></details>';
+    + pvDD2Foot('Fields this scan did not collect, kept as schema-ready slots so the profile stays explicit about what is evidenced and what is simply not held. No provider is named or implied: which source fills them is a sourcing decision, not a property of the vendor.');
+  return '<details style="margin-top:-2px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--plum,#5C2B50);padding:2px 0">Show ' + list.length + ' unfilled fields, not collected in this scan</summary><div style="padding-top:13px">' + inner + '</div></details>';
 }
 function pvDD2FinMkt(x, a, cand, input, refl){
   var dd = cand.deepDive || {}, fin = cand.financials || dd.financials || {}, at = dd.attrs || {};
@@ -581,7 +634,9 @@ function pvDD2FinMkt(x, a, cand, input, refl){
     : metricTbl;
   var evLabel = (x && (x.dimensions.find(function(d){ return d.id === 'financial'; }) || {}).concern) || 'Unknown';
   // peer position: enlarged scatter + comps table
-  var scatter = (typeof pvDD2PeerScatterBig === 'function') ? pvDD2PeerScatterBig(refl, input, a && a.id) : '';
+  // Marc 2026-07-27: Peer Position renders the CATEGORICAL QUADRANT. pvDD2PeerScatterBig is retained
+  // (now unused) so the previous view can be restored without rebuilding it.
+  var scatter = (typeof pvDD2PeerQuadrant === 'function') ? pvDD2PeerQuadrant(refl, input, a && a.id) : '';
   var comps = (typeof pvDD2PeerComps === 'function') ? pvDD2PeerComps(refl, input, a && a.id) : '';
   var peerRight = '<div style="min-width:0">' + pvDD2PeerRead(refl, input, a, at, x) + (comps ? '<div style="margin-top:16px">' + comps + '</div>' : '') + '</div>';
   var peerBlock = scatter
@@ -598,12 +653,12 @@ function pvDD2FinMkt(x, a, cand, input, refl){
         pvDD2Card('Financial Health Bridge', pvDD2FinBridge(fin), 'var(--plum)', 'Growth · profitability · cash · leverage', PVIC_BRIDGE, { fill:true }),
         (x.commercialDrivers ? pvDD2Card('Commercial Model', pvDD2CommercialDrivers(x.commercialDrivers), 'var(--emph)', null, PVIC_COMM, { fill:true }) : '')
       )
-    + (showEnrich ? pvDD2Card('Credit &amp; Market Enrichment', pvDD2FinEnrich(st.enrichment), 'var(--plum)', 'D&amp;B / Bloomberg feed', PVIC_ENRICH) : '');
+    + (showEnrich ? pvDD2Card('Credit &amp; Market Enrichment', pvDD2FinEnrich(st.enrichment), 'var(--plum)', 'schema-ready, not collected', PVIC_ENRICH) : '');
 }
 
 /* ------------------------------------------------ 4. RISK & RESILIENCE */
 var PVDD2_LVL = {Low:1, Medium:2, High:3};
-function pvDD2ImpColor(imp){ return imp === 'High' ? '#A23A30' : imp === 'Medium' ? '#B4560F' : '#5C2B50'; }
+function pvDD2ImpColor(imp){ return imp === 'High' ? '#C15E19' : imp === 'Medium' ? '#C15E19' : '#5C2B50'; }
 
 /* impact x likelihood matrix: 3x3 grid, risks placed in their cell as chips; gate
    risks get a ring, colour = impact, zone tint = combined severity. */
@@ -612,7 +667,7 @@ function pvDD2RiskMatrix(risks) {
   var byCell = {};
   risks.forEach(function(rk){ var k = rk.impact + '|' + rk.likelihood; (byCell[k] = byCell[k] || []).push(rk); });
   var impacts = ['High','Medium','Low'], likes = ['Low','Medium','High'];
-  var zoneBg = function(imp, lk){ var s = (PVDD2_LVL[imp] || 1) + (PVDD2_LVL[lk] || 1); return s >= 5 ? 'var(--ti-red,#FBE7E3)' : s >= 4 ? '#F7E3D3' : 'var(--teal-t,#EFF7F3)'; };
+  var zoneBg = function(imp, lk){ var s = (PVDD2_LVL[imp] || 1) + (PVDD2_LVL[lk] || 1); return s >= 5 ? 'var(--ti-red,#F1EFEC)' : s >= 4 ? '#F1EFEC' : 'var(--teal-t,#EFF7F3)'; };
   var rows = impacts.map(function(imp){
     var cells = likes.map(function(lk){
       var items = (byCell[imp + '|' + lk] || []).map(function(rk){
@@ -630,7 +685,7 @@ function pvDD2RiskMatrix(risks) {
 /* material-events timeline with directness classification */
 function pvDD2EventTimeline(events) {
   if (!events || !events.length) return '';
-  var dcol = function(d){ return /service/i.test(d) ? '#A23A30' : /division/i.test(d) ? '#B4560F' : 'var(--mut2,#6a655f)'; };
+  var dcol = function(d){ return /service/i.test(d) ? '#C15E19' : /division/i.test(d) ? '#C15E19' : 'var(--mut2,#6a655f)'; };
   return '<div style="position:relative;padding-left:6px">'
     + '<div style="position:absolute;left:4px;top:5px;bottom:5px;width:2px;background:var(--line)"></div>'
     + events.map(function(ev){
@@ -645,7 +700,7 @@ function pvDD2EventTimeline(events) {
 
 function pvDD2RiskSeverity(rk){
   var m = { High:3, Medium:2, Low:1 }, s = (m[rk.impact] || 1) + (m[rk.likelihood] || 1);
-  return s >= 6 ? { t:'Critical', c:'#A23A30', bg:'var(--ti-red,#FBE7E3)' } : s >= 5 ? { t:'High', c:'var(--emph,#C15E19)', bg:'var(--emph-t,#F6DDC9)' } : s >= 4 ? { t:'Moderate', c:'#B4560F', bg:'var(--ti-amber,#FBF1DA)' } : { t:'Low', c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)' };
+  return s >= 6 ? { t:'Critical', c:'#C15E19', bg:'var(--ti-red,#F1EFEC)' } : s >= 5 ? { t:'High', c:'var(--emph,#C15E19)', bg:'var(--emph-t,#F1EFEC)' } : s >= 4 ? { t:'Moderate', c:'#C15E19', bg:'var(--ti-amber,#F1EFEC)' } : { t:'Low', c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)' };
 }
 /* ranked material-risks register (replaces the thin narrative beside the matrix) */
 function pvDD2RiskRegister(risks){
@@ -656,7 +711,7 @@ function pvDD2RiskRegister(risks){
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + th('Risk') + th('Type') + th('Severity') + th('Conf.', 'right') + '</tr></thead><tbody>'
     + sorted.map(function(rk){
         var sv = pvDD2RiskSeverity(rk);
-        return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + (rk.gate ? ' <span style="font:700 8px var(--mono,monospace);color:var(--emph,#C15E19);background:var(--emph-t,#F6DDC9);border-radius:20px;padding:1px 6px;vertical-align:middle">GATE</span>' : '') + '</td>'
+        return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + (rk.gate ? ' <span style="font:700 8px var(--mono,monospace);color:var(--emph,#C15E19);background:var(--emph-t,#F1EFEC);border-radius:20px;padding:1px 6px;vertical-align:middle">GATE</span>' : '') + '</td>'
           + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top">' + pvAEsc(rk.type) + '</td>'
           + '<td style="padding:8px 10px 8px 0;vertical-align:top"><span style="font:700 9.5px var(--mono,monospace);color:' + sv.c + ';background:' + sv.bg + ';border-radius:20px;padding:2px 9px">' + sv.t.toUpperCase() + '</span></td>'
           + '<td style="padding:8px 0;vertical-align:top;text-align:right">' + pvDD2FinDots(rk.confidence) + '</td></tr>';
@@ -669,7 +724,7 @@ function pvDD2MitigationBoard(risks){
   var th = function(h, al){ return '<th style="text-align:' + (al || 'left') + ';padding:0 10px 6px 0;font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + h + '</th>'; };
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + th('Risk') + th('Treatment') + th('Gate?', 'center') + th('Status') + '</tr></thead><tbody>'
     + risks.map(function(rk){
-        var status = rk.gate ? 'Open' : 'Monitor', sc = rk.gate ? '#B4560F' : 'var(--teal-d,#2F6E6B)';
+        var status = rk.gate ? 'Open' : 'Monitor', sc = rk.gate ? '#C15E19' : 'var(--teal-d,#2F6E6B)';
         return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + '</td>'
           + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top;line-height:1.45">' + pvAEsc(rk.mitigation) + '</td>'
           + '<td style="padding:8px 10px 8px 0;vertical-align:top;text-align:center">' + (rk.gate ? '<b style="color:var(--emph,#C15E19)">Yes</b>' : '<span style="color:var(--mut2)">No</span>') + '</td>'
@@ -694,7 +749,7 @@ function pvDD2Risk(x, a, cand, input) {
 function pvDD2DiligenceFunnel(stages) {
   if (!stages || !stages.length) return '';
   return '<div style="display:flex;flex-direction:column;gap:7px">' + stages.map(function(s){
-      var c = s.pct >= 75 ? '#2F6E6B' : s.pct >= 40 ? '#2F6E6B' : s.pct > 0 ? '#B4560F' : 'var(--mut2,#6a655f)';
+      var c = s.pct >= 75 ? '#2F6E6B' : s.pct >= 40 ? '#2F6E6B' : s.pct > 0 ? '#C15E19' : 'var(--mut2,#6a655f)';
       return '<div style="display:grid;grid-template-columns:200px 1fr 40px;gap:12px;align-items:center"><span style="font-size:12px;color:var(--ink)">' + pvAEsc(s.stage) + '</span><div style="height:9px;border-radius:30px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:' + s.pct + '%;background:' + c + '"></i></div><span style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:' + c + ';text-align:right">' + s.pct + '%</span></div>';
     }).join('') + '</div>' + pvDD2Foot('Progress toward advancement, not a wall of open questions.');
 }
@@ -702,8 +757,8 @@ function pvDD2ActionBoard(actions) {
   if (!actions || !actions.length) return '';
   var th = function(h, al, w){ return '<th style="text-align:' + (al || 'left') + ';padding:0 8px 7px 0;font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)' + (w ? ';width:' + w : '') + '">' + h + '</th>'; };
   var rows = actions.map(function(act){
-      var sc = act.status === 'Open' ? '#B4560F' : act.status === 'Not started' ? '#A23A30' : '#2F6E6B';
-      var gate = act.gate ? '<b style="color:#B4560F">Yes</b>' : '<span style="color:var(--mut2)">No</span>';
+      var sc = act.status === 'Open' ? '#C15E19' : act.status === 'Not started' ? '#C15E19' : '#2F6E6B';
+      var gate = act.gate ? '<b style="color:#C15E19">Yes</b>' : '<span style="color:var(--mut2)">No</span>';
       return '<tr style="border-top:1px solid var(--line)">'
         + '<td style="padding:8px 8px 8px 0;font-weight:600;color:var(--ink);vertical-align:top;line-height:1.45">' + pvAEsc(act.action) + '</td>'
         + '<td style="padding:8px 8px 8px 0;vertical-align:top;color:var(--mut2)">' + pvAEsc(act.owner) + '</td>'
@@ -800,9 +855,9 @@ function pvR2Cell(level, confidence) {
   return '<div title="' + pvAEsc(level + ' · confidence ' + (confidence || 'n/a')) + '" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:' + s[0] + ';border:1px solid rgba(0,0,0,.06);border-radius:5px;padding:6px 5px"><span style="font:700 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.02em;color:' + s[1] + '">' + pvAEsc(level) + '</span>' + (confidence ? '<span style="display:inline-flex;gap:2px">' + dots + '</span>' : '') + '</div>';
 }
 function pvR2Disposition(x) {
-  if (x.gates.some(function(g){ return g.kind === 'hard'; })) return {l:'Hard stop', c:'#A23A30'};
-  if (x.gates.length) return {l:'Escalate', c:'#B4560F'};
-  if (x.risk.level === 'High' || x.risk.level === 'Critical') return {l:'Mitigate', c:'#B4560F'};
+  if (x.gates.some(function(g){ return g.kind === 'hard'; })) return {l:'Hard stop', c:'#C15E19'};
+  if (x.gates.length) return {l:'Escalate', c:'#C15E19'};
+  if (x.risk.level === 'High' || x.risk.level === 'Critical') return {l:'Mitigate', c:'#C15E19'};
   if (x.risk.level === 'Unknown') return {l:'Evidence required', c:'var(--mut2,#6a655f)'};
   return {l:'Accept / monitor', c:'#2F6E6B'};
 }
@@ -953,7 +1008,7 @@ function pvH2HHtml(refl) {
   var deltas = (A.x.reqGroups || []).map(function(ga, i){
     var gb = (B.x.reqGroups || [])[i] || {}, va = ga.fit, vb = gb.fit;
     var a2 = (va == null || vb == null) ? 'Not scored' : Math.abs(va - vb) < 0.15 ? 'Tie' : (va > vb ? nm(A.av) : nm(B.av)) + ' +' + Math.abs(va - vb).toFixed(1);
-    return '<div style="display:grid;grid-template-columns:150px 1fr 1fr 120px;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(ga.label) + (ga.must ? ' <span style="font:700 8px var(--mono,monospace);color:#A23A30">MUST</span>' : '') + '</span>' + pvH2HBarCell(va, '#5C2B50') + pvH2HBarCell(vb, '#2F6E6B') + '<span style="font-size:11px;font-weight:600;color:var(--mut)">' + pvAEsc(a2) + '</span></div>';
+    return '<div style="display:grid;grid-template-columns:150px 1fr 1fr 120px;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(ga.label) + (ga.must ? ' <span style="font:700 8px var(--mono,monospace);color:#C15E19">MUST</span>' : '') + '</span>' + pvH2HBarCell(va, '#5C2B50') + pvH2HBarCell(vb, '#2F6E6B') + '<span style="font-size:11px;font-weight:600;color:var(--mut)">' + pvAEsc(a2) + '</span></div>';
   }).join('');
 
   var riskDiff = PVR2_RISK_DIMS.map(function(rd){
@@ -972,12 +1027,122 @@ function pvH2HHtml(refl) {
   return pvDD2Card('Head-to-Head', pickers, 'var(--navy,#5C2B50)')
     + pvDD2Card('Comparison summary', strip, 'var(--ai,#5C2B50)')
     + pvDD2Card('Category delta', deltas || '<div style="font-size:12px;color:var(--mut2)">No requirement groups to compare.</div>', 'var(--teal-d,#2F6E6B)')
-    + pvDD2Card('Risk difference', '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="font-size:11px;color:#5C2B50;padding-bottom:6px">' + pvAEsc(nm(A.av)) + '</th><th style="font-size:11px;color:#2F6E6B;padding-bottom:6px">' + pvAEsc(nm(B.av)) + '</th></tr></thead><tbody>' + riskDiff + '</tbody></table></div>', 'var(--amber-d,#B4560F)')
+    + pvDD2Card('Risk difference', '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="font-size:11px;color:#5C2B50;padding-bottom:6px">' + pvAEsc(nm(A.av)) + '</th><th style="font-size:11px;color:#2F6E6B;padding-bottom:6px">' + pvAEsc(nm(B.av)) + '</th></tr></thead><tbody>' + riskDiff + '</tbody></table></div>', 'var(--amber-d,#C15E19)')
     + pvDD2Card('Evidence confidence', cov, 'var(--mut2,#6a655f)')
     + commCard
     + pvDD2Card('Conclusion', conclusion, 'var(--navy,#5C2B50)');
 }
 
+
+/* =============================================================================
+   DATA COVERAGE (Marc 2026-07-27): two ADDITIVE sections on their own subtab,
+   "Coverage by Section" and "Full Schema, Field-by-Field". Nothing in the six
+   existing deep-dive subtabs changes; this is a seventh.
+
+   Both are computed from the vendor's own deepDive record against the schema the
+   deep dive renders, so they answer "what does this scan actually know about this
+   vendor, and where is it silent" without asserting anything the data does not
+   carry. A field is POPULATED, EMPTY (present but blank) or ABSENT (never
+   collected); the three are different and are reported separately.
+   ============================================================================= */
+var PVDD_SCHEMA = [
+  ['overview',     'Overview',                'Positioning summary'],
+  ['company',      'Company & ownership',     'Legal entity, ownership, scale'],
+  ['identity',     'Identity',                'Category identity and naming'],
+  ['offerings',    'Offerings',               'Product and module set'],
+  ['solution',     'Solution fit',            'How the platform meets the requirement set'],
+  ['attrs',        'Attributes',              'Structured attribute grid'],
+  ['attrsSrc',     'Attribute sources',       'Provenance for the attribute grid'],
+  ['finHealth',    'Financial health',        'Financial posture and signals'],
+  ['commercial',   'Commercial',              'Pricing posture and commercial model'],
+  ['clients',      'Clients & references',    'Named customers and reference base'],
+  ['news',         'News & signals',          'Recent public events'],
+  ['riskPosture',  'Risk posture',            'Risk stance across dimensions'],
+  ['risksNarr',    'Risk narrative',          'Per-dimension risk rationale'],
+  ['gating',       'Gating items',            'Hard screens and blockers'],
+  ['conditions',   'Conditions',              'Conditions to proceed'],
+  ['reqNarr',      'Requirements narrative',  'Per-requirement read'],
+  ['reqSubNarr',   'Sub-requirement narrative', 'Per-sub-requirement read'],
+  ['strengths',    'Strengths',               'Evidenced strengths'],
+  ['lillyFit',     'Lilly fit',               'Fit against Lilly context'],
+  ['whyLilly',     'Why Lilly',               'Vendor-side rationale'],
+  ['relationship', 'Relationship',            'Existing Lilly relationship']
+];
+
+function pvDdFieldState(dd, key) {
+  if (!dd || !(key in dd)) return 'absent';
+  var v = dd[key];
+  if (v == null) return 'empty';
+  if (typeof v === 'string') return v.trim() ? 'populated' : 'empty';
+  if (Array.isArray(v)) return v.length ? 'populated' : 'empty';
+  if (typeof v === 'object') return Object.keys(v).length ? 'populated' : 'empty';
+  return 'populated';
+}
+
+function pvDdStatePill(st) {
+  var m = { populated: ['Populated', 'ddcov-p'], empty: ['Empty', 'ddcov-e'], absent: ['Not collected', 'ddcov-a'] };
+  var c = m[st] || m.absent;
+  return '<span class="ddcov-pill ' + c[1] + '">' + c[0] + '</span>';
+}
+
+// RETIRED (Marc 2026-07-27): the Data Coverage subtab was removed, a user never needs it.
+// The renderer is kept, unreachable, rather than deleted, in case it is wanted as an internal view.
+function pvDD2Coverage(x, a, cand, input) {
+  var dd = (cand && cand.deepDive) || {};
+  var rows = PVDD_SCHEMA.map(function (f) {
+    return { key: f[0], label: f[1], desc: f[2], state: pvDdFieldState(dd, f[0]) };
+  });
+  var pop = rows.filter(function (r) { return r.state === 'populated'; }).length;
+  var emp = rows.filter(function (r) { return r.state === 'empty'; }).length;
+  var abs = rows.filter(function (r) { return r.state === 'absent'; }).length;
+  var pct = rows.length ? Math.round(pop / rows.length * 100) : 0;
+
+  /* ---- section 1: coverage by section ---- */
+  var meter = '<div class="ddcov-meter"><div class="ddcov-bar"><i style="width:' + pct + '%"></i></div>'
+    + '<div class="ddcov-mv">' + pct + '%</div></div>';
+  var counts = '<div class="ddcov-counts">'
+    + '<div><b>' + pop + '</b> populated</div>'
+    + '<div><b>' + emp + '</b> present but empty</div>'
+    + '<div><b>' + abs + '</b> not collected</div>'
+    + '<div><b>' + rows.length + '</b> fields in the schema</div>'
+    + '</div>';
+  var grid = '<div class="ddcov-grid">' + rows.map(function (r) {
+    return '<div class="ddcov-cell ddcov-' + r.state.charAt(0) + '">'
+      + '<span class="ddcov-cl">' + escD(r.label) + '</span>' + pvDdStatePill(r.state) + '</div>';
+  }).join('') + '</div>';
+  var s1 = '<div class="sa-card"><div class="card-hd">'
+    + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">Coverage by Section</span>'
+    + '<span class="ddcov-cap">' + escD((a && a.name) || '') + ' &middot; this scan only</span></div>'
+    + meter + counts + grid
+    + '<div class="ddcov-note">Coverage is what THIS scan collected from public sources, not a judgement on the vendor. '
+    + '<b>Not collected</b> means the field was never gathered in this pass; <b>Empty</b> means it was gathered and '
+    + 'came back with nothing. Neither is a low score.</div></div>';
+
+  /* ---- section 2: full schema, field by field ---- */
+  var body = rows.map(function (r) {
+    var v = dd[r.key];
+    var detail = '';
+    if (r.state === 'populated') {
+      if (typeof v === 'string') detail = v.length + ' chars';
+      else if (Array.isArray(v)) detail = v.length + ' item' + (v.length === 1 ? '' : 's');
+      else if (typeof v === 'object') detail = Object.keys(v).length + ' key' + (Object.keys(v).length === 1 ? '' : 's');
+      else detail = String(v);
+    } else if (r.state === 'empty') { detail = 'present, no content'; }
+    else { detail = 'not in this vendor record'; }
+    return '<tr><td class="ddcov-k">' + escD(r.key) + '</td><td>' + escD(r.label) + '</td>'
+      + '<td class="ddcov-d">' + escD(r.desc) + '</td>'
+      + '<td>' + pvDdStatePill(r.state) + '</td>'
+      + '<td class="ddcov-m">' + escD(detail) + '</td></tr>';
+  }).join('');
+  var s2 = '<div class="sa-card"><div class="card-hd">'
+    + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">Full Schema, Field-by-Field</span>'
+    + '<span class="ddcov-cap">' + rows.length + ' fields</span></div>'
+    + '<div class="ddcov-tblwrap"><table class="ddcov-tbl"><thead><tr>'
+    + '<th>Field</th><th>Section</th><th>What it holds</th><th>State</th><th>Content</th>'
+    + '</tr></thead><tbody>' + body + '</tbody></table></div></div>';
+
+  return s1 + s2;
+}
 function pvDD2Section(ddt, a, cand, refl, input) {
   var x = pvAssess(a, cand, input);
   if (ddt === 'company') return pvDD2Company(x, a, cand, input);
@@ -1068,9 +1233,9 @@ function pvDD2RiskAccordion(dims) {
   var CMAP = {
     'Low':                   {c: 'var(--teal-d,#2F6E6B)', bg: 'var(--teal-t,#DCEBE9)'},
     'Strong':                {c: 'var(--teal-d,#2F6E6B)', bg: 'var(--teal-t,#DCEBE9)'},
-    'Moderate':              {c: '#B4560F',               bg: 'var(--ti-amber,#FBF1DA)'},
-    'High':                  {c: 'var(--emph,#C15E19)',   bg: 'var(--emph-t,#F6DDC9)'},
-    'Critical':              {c: '#A23A30',               bg: 'var(--ti-red,#FBE7E3)'},
+    'Moderate':              {c: '#C15E19',               bg: 'var(--ti-amber,#F1EFEC)'},
+    'High':                  {c: 'var(--emph,#C15E19)',   bg: 'var(--emph-t,#F1EFEC)'},
+    'Critical':              {c: '#C15E19',               bg: 'var(--ti-red,#F1EFEC)'},
     'Insufficient evidence': {c: 'var(--mut2,#6a655f)',   bg: 'var(--nested,#f1efec)'}
   };
   var styleFor = function (concern) { return CMAP[concern] || CMAP['Insufficient evidence']; };
@@ -1147,7 +1312,7 @@ function pvDD2TypedEvents(events) {
   }
   function dirColor(d) {
     d = String(d || '');
-    return /service/i.test(d) ? 'var(--emph,#C15E19)' : /division/i.test(d) ? '#B4560F' : 'var(--mut2,#6a655f)';
+    return /service/i.test(d) ? 'var(--emph,#C15E19)' : /division/i.test(d) ? '#C15E19' : 'var(--mut2,#6a655f)';
   }
   var rootId = 'dd2te' + Math.random().toString(36).slice(2, 9);
   var tagged = events.map(function (ev) { return {ev: ev, t: typeOf(ev)}; });
@@ -1264,7 +1429,7 @@ function pvDD2FootprintMap(locations) {
      lands on the label. */
   var CONF = {
     'Verified':          { c: 'var(--teal-d,#2F6E6B)', fill: 'solid' },
-    'Partial':           { c: '#B4560F',              fill: 'hatch' },
+    'Partial':           { c: '#C15E19',              fill: 'hatch' },
     'Supplier asserted': { c: 'var(--plum,#5C2B50)',  fill: 'outline' },
     'Proxy':             { c: 'var(--mut2,#6a655f)',  fill: 'outline' },
     'Missing':           { c: 'var(--mut2,#6a655f)',  fill: 'none' }
@@ -1352,7 +1517,7 @@ function pvDD2FinViz(fin) {
     return 0;
   }
 
-  var TEAL = 'var(--teal-d,#2F6E6B)', AMBER = '#B4560F', PLUM = 'var(--plum,#5C2B50)', MUT2 = 'var(--mut2,#6a655f)';
+  var TEAL = 'var(--teal-d,#2F6E6B)', AMBER = '#C15E19', PLUM = 'var(--plum,#5C2B50)', MUT2 = 'var(--mut2,#6a655f)';
 
   var latestRevenue = fin.latestRevenue || fin.revenue || '';
   var marketCap = fin.valuationOrMarketCap || fin.cash || '';

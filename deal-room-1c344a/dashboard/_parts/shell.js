@@ -41,6 +41,8 @@
       '<div class="dh-sub">' + esc(buyer) + ' &harr; ' + esc(deal.supplier || '') +
         (deal.negotiationType ? ' &middot; ' + esc(deal.negotiationType) : '') +
         ' &middot; session snapshot, advisory only, not a system of record</div>' +
+      // D2: the ONE inference key for the page, stated here and nowhere else.
+      (typeof inferenceKey === 'function' ? inferenceKey() : '') +
     '</div>';
 
   /* ---- persistent strip: <=5 counts only. The who-has-the-pen chip + coverage
@@ -107,6 +109,21 @@
       }
     });
     if (global.DealUI && typeof global.DealUI.init === 'function') global.DealUI.init();
+    syncSubnavOffset();
+  }
+
+  // D7 (Marc 2026-07-27): the secondary subnav sticks directly BELOW the sticky head, matching the
+  // main tab bar's behaviour. The head's height is not a constant (the summary strip wraps at narrow
+  // widths), so publish it as --subnav-top and keep it in sync on resize rather than hardcoding a number.
+  function syncSubnavOffset() {
+    var head = document.querySelector('.sticky-head');
+    if (!head) return;
+    var top = Math.round(head.getBoundingClientRect().height) +
+      (parseInt(getComputedStyle(head).top, 10) || 0);
+    document.documentElement.style.setProperty('--subnav-top', top + 'px');
+  }
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('resize', function () { syncSubnavOffset(); });
   }
 
   // #app precedes this script, so the DOM target exists: mount synchronously.

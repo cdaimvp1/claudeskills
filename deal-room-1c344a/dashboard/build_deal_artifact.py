@@ -15,6 +15,15 @@ families win (identical to Landscape).
 Security note: OFFLINE artifact, no runtime user input; all data authored at build time
 and every rendered value passes through esc(); the innerHTML render pattern is safe.
 """
+
+# ============================================================================
+# THE Deal dashboard builder (single build path, collapsed 2026-07-27).
+# Content + logic come from _parts/*.js (see JS_ORDER); chrome from
+# _platform_build/. `dashboard/assets/**` is a dev-serving copy of the platform
+# app and is NOT read here, so editing it alone changes nothing in the output.
+# The old mirrors under _deal_build/ are retired -- see _deal_build/SOURCE-OF-TRUTH.md.
+# ============================================================================
+
 import argparse
 import os
 import re
@@ -33,6 +42,67 @@ JS_ORDER = [
 # exists at mount; tab-sources.js intentionally NOT inlined (Sources & Gaps folds
 # into Overview + Economics).
 
+
+
+# ---------------------------------------------------------------------------
+# D9 (Marc 2026-07-27): CSS weight reduction, applied at BUILD time only.
+# fonts-inline.css / theo-color.css / app-shell.css are SHARED platform assets
+# (the Landscape build reads the same files), so they are not edited on disk.
+# This trims them as they are composed into the Deal artifact:
+#   * @font-face families the Deal dashboard never references (Newsreader,
+#     Sacramento) are dropped whole;
+#   * weights outside the set the Deal sources actually use are dropped, with
+#     400 kept as the browser's fallback weight and every italic face kept
+#     (the dashboard does use italics);
+#   * html[data-theme="dark"] blocks are dropped, since the artifact stamps
+#     <html data-theme="light"> and ships no toggle, so they can never match.
+# Everything dropped is inert for THIS artifact; nothing else is touched.
+# ---------------------------------------------------------------------------
+FONT_FAMILIES_USED = ("Libre Franklin", "Roboto Mono")
+FONT_WEIGHTS_USED = {400, 500, 600, 700, 800}
+
+_FACE_RE = re.compile(r"@font-face\s*\{[^}]*\}", re.S)
+
+
+def trim_fonts(css):
+    kept, dropped_family, dropped_weight = [], 0, 0
+    pos, out = 0, []
+    for m in _FACE_RE.finditer(css):
+        out.append(css[pos:m.start()]); pos = m.end()
+        block = m.group(0)
+        fam = re.search(r"font-family:\s*'([^']+)'", block)
+        wt = re.search(r"font-weight:\s*(\d{3})", block)
+        italic = "font-style: italic" in block or "font-style:italic" in block
+        if fam and fam.group(1) not in FONT_FAMILIES_USED:
+            dropped_family += 1; continue
+        if wt and int(wt.group(1)) not in FONT_WEIGHTS_USED and not italic:
+            dropped_weight += 1; continue
+        kept.append(block); out.append(block)
+    out.append(css[pos:])
+    print('  D9 fonts: kept {} faces, dropped {} (unused family) + {} (unused weight)'.format(
+        len(kept), dropped_family, dropped_weight))
+    return ''.join(out)
+
+
+def drop_dark_blocks(css):
+    """Remove html[data-theme="dark"]{...} rules: unreachable in a light-stamped artifact."""
+    out, i, n = [], 0, 0
+    while True:
+        j = css.find('html[data-theme="dark"]', i)
+        if j == -1:
+            out.append(css[i:]); break
+        out.append(css[i:j])
+        k = css.find('{', j)
+        if k == -1:
+            out.append(css[j:]); break
+        depth, m = 1, k + 1
+        while m < len(css) and depth:
+            if css[m] == '{': depth += 1
+            elif css[m] == '}': depth -= 1
+            m += 1
+        i = m; n += 1
+    print('  D9 dark: dropped {} html[data-theme="dark"] block(s)'.format(n))
+    return ''.join(out)
 
 def read(path):
     with open(path, encoding='utf-8') as f:
@@ -68,6 +138,14 @@ def platform_chrome():
         '.sa-title .dh-sub{font-size:13px;color:var(--mut);margin-top:8px}')
     gutter_css = ('.sa-main{padding:28px 40px 70px;max-width:1320px;margin:0 auto}'
         '@media(max-width:760px){.sa-main{padding:22px 16px 60px}}'
+        # D1 (Marc 2026-07-27): the fixed 32px .theo-foot bar was OVERLAYING the last rows of Deal
+        # content. The platform reserves that clearance with .sa-main's 70px bottom padding, but the
+        # Deal artifact renders into #app, not .sa-main, so nothing reserved it here. Same recipe,
+        # applied to the container this dashboard actually uses (NOT theo-brand's body:has(.theo-foot)
+        # rail rule, which this build deliberately excludes -- see the Footer bar CSS note in
+        # _platform_build/build_dashboard.py).
+        '#app{padding-bottom:70px}'
+        '@media(max-width:760px){#app{padding-bottom:60px}}'
         # the sticky strip/tabbar must clear the 56px sticky topbar (not top:0,
         # which would stack it ON the topbar and float both mid-page in a
         # full-page screen capture)
@@ -91,6 +169,7 @@ def build(out_path):
 
     deal_style = read(os.path.join(PARTS, 'style.css'))
     chrome_css, topbar, footer = platform_chrome()
+    chrome_css = drop_dark_blocks(trim_fonts(chrome_css))   # D9
     # Deal component CSS first; platform chrome families + tokens LAST so they win (matches Landscape).
     css = deal_style + '\n' + chrome_css
 

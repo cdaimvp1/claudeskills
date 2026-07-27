@@ -169,6 +169,19 @@ function renderShouldCost(d) {
  * stream (proforma.valueComponents), held flat past its ramp for a longer term. All
  * money is computed here, not read from precomputed arrays, so the term/uplift/WACC
  * sliders reshape the whole model live. */
+/* D3 (Marc 2026-07-27, Option A): does this deal actually have credible financial-model inputs?
+ * The engine needs BOTH a cost side (commercial lines to model) and a value side (a business-value
+ * stream). With neither, the pro-forma / P&L / cash-flow engine has nothing to compute, and rendering
+ * it anyway would show a model built out of zeroes. When this returns false the Financial Model subtab
+ * is kept visible but greyed, disabled and labelled with the reason (never hidden, never fabricated). */
+function pfHasInputs(d) {
+  const pf = (d && d.proforma) || {};
+  const hasValue = (pf.valueComponents || []).some(c =>
+    (c && Array.isArray(c.byYear) ? c.byYear : []).some(v => typeof v === 'number' && v > 0));
+  const hasCost = ((d && d.commercialLines) || []).length > 0;
+  return hasCost && hasValue;
+}
+
 function pfModel(d) {
   const pf = d.proforma || {};
   const years = Math.max(1, Math.round(assumVal(d, 'ASM-2', 3)));
@@ -453,18 +466,22 @@ function recompute(d) {
 function renderTab_commercials(d) {
   const wacc0 = assumVal(d, 'ASM-5', 6);
 
-  /* ---- 3A: Deal Table & ZOPA (order: room + renewal on top, then the interactive ZOPA
-       (sensitivity drivers + benchmark ticks), then should-cost and the negotiated-value ladder) ---- */
+  /* ---- 3A: Deal Table & ZOPA (order: room + renewal on top, then should-cost, then the interactive ZOPA
+       (sensitivity drivers + benchmark ticks), then the negotiated-value ladder) ---- */
   const deal =
     '<div class="tab-intro"><h2>Deal Table &amp; ZOPA</h2><p class="q">Where the negotiable room is, the supplier ask against Lilly’s target, fallback and walk-away, per-line leverage, and how the number moves with the deal’s drivers. ' + coverageBadge('Strong') + '</p></div>' +
     '<div class="grid">' +
       '<div class="col-6">' + renderDiscountArchitecture(d) + '</div>' +
       '<div class="col-6">' + renderRenewalBand(d) + '</div>' +
+      // DN2 (Marc 2026-07-27): Should-Cost moves ABOVE the ZOPA. Should-cost is an INPUT to the ZOPA,
+      // it is where the target and walk-away come from, so reading it first makes the ZOPA legible.
+      // The Value Ladder deliberately stays BELOW: it is the OUTPUT (ask down to negotiated result),
+      // and putting it above the ZOPA would place a conclusion before its own premise.
+      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
       '<div class="col-12">' + saCard('Total-Deal ZOPA · Sensitivity & Benchmarks',
         window.DealZopa.sensitivity(d) + '<div id="cml-zopa-live">' + window.DealZopa.render(d) + '</div>' +
         collapsible('<span>Normalized line-item table</span>', renderDealTable(d), { open: false }),
         { accent: 'plum', icon: 'target', sub: (d.commercialLines || []).length + ' lines · leverage · benchmark ticks · live drivers' }) + '</div>' +
-      '<div class="col-12">' + renderShouldCost(d) + '</div>' +
       '<div class="col-12">' + saCard('Ask → Negotiated Value Ladder', renderScenarioWaterfall(d),
         { accent: 'plum', icon: 'scenarios', sub: 'supplier ask down to target, step by step' }) + '</div>' +
     '</div>';
@@ -552,16 +569,29 @@ function renderTab_commercials(d) {
     '.commercials-tab .btn-icon{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid var(--line2);border-radius:7px;background:var(--surface);color:var(--mut);cursor:pointer}' +
     '.commercials-tab .btn-icon:hover{color:var(--plum);border-color:var(--plum)}' +
     '.commercials-tab .btn-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}' +
+    /* D3: disabled Financial Model subtab + the reason line under the strip */
+    '.commercials-tab .subtab-btn.is-disabled{color:var(--mut2);opacity:.55;cursor:not-allowed;pointer-events:none}' +
+    '.commercials-tab .subtab-btn.is-disabled svg{opacity:.6}' +
+    '.commercials-tab .subtab-note{font-size:12px;color:var(--mut);padding:8px 0 0;max-width:1320px;margin:0 auto}' +
   '</style>';
+
+  // D3: no credible inputs -> the Financial Model subtab stays in the strip, greyed and NON-EXPANDABLE
+  // (no data-subtab, so the delegated click handler cannot route to it), with the reason stated inline.
+  const pfOk = pfHasInputs(d);
+  const pfBtn = pfOk
+    ? '<button class="subtab-btn" data-subtab="proforma">' + icon('scale') + ' Financial Model</button>'
+    : '<button class="subtab-btn is-disabled" aria-disabled="true" tabindex="-1" title="Needs business-value / finance inputs">' + icon('scale') + ' Financial Model</button>';
+  const pfNote = pfOk ? '' :
+    '<div class="subtab-note">Financial Model, needs business-value / finance inputs; not available in this snapshot.</div>';
 
   return scopedStyle + '<div class="commercials-tab">' +
     '<div class="subtabbar" data-subtab-group="commercials"><div class="wrap">' +
       '<button class="subtab-btn" data-subtab="deal" aria-selected="true">' + icon('money') + ' Deal Table &amp; ZOPA</button>' +
-      '<button class="subtab-btn" data-subtab="proforma">' + icon('scale') + ' Financial Model</button>' +
-    '</div></div>' +
+      pfBtn +
+    '</div></div>' + pfNote +
     '<div class="tab-body"><div class="wrap">' +
       '<div data-subpanel="commercials/deal" class="is-active">' + deal + '</div>' +
-      '<div data-subpanel="commercials/proforma">' + financial + '</div>' +
+      (pfOk ? '<div data-subpanel="commercials/proforma">' + financial + '</div>' : '') +
     '</div></div>' +
   '</div>';
 }

@@ -77,17 +77,42 @@ function rfxFlags(si){var flags=[];RFX.requirements.forEach(function(r){var v=rf
   flags.push({reqId:r.id,category:r.category,text:r.text,type:type,severity:severity,priority:priority,detail:q,mandatory:r.mandatory});});
  return flags;}
 function rfxRiskLevel(si){var f=rfxFlags(si);if(f.some(function(x){return x.severity==='critical';}))return 'critical';if(f.some(function(x){return x.severity==='high';}))return 'high';if(f.some(function(x){return x.severity==='medium';}))return 'medium';return f.length?'low':'none';}
+// ---- R6 provenance helpers -------------------------------------------------
+// A supplier's profile.redFlags list mixes two different kinds of finding: facts about the BID
+// (already counted on the response side of the Risk roll-up) and facts about the COMPANY (from the
+// Landscape profile). Each seed entry may declare {t,src}; a plain string is accepted and defaults to
+// 'diligence'. rfxProfileFlags is the diligence-only subset, which is what the roll-up's profile
+// column counts, so a single finding can never be counted on both sides of that table.
+function rfxRedFlags(si){var s=RFX.suppliers[si]||{},pr=s.profile||{};
+ return (pr.redFlags||[]).map(function(f){
+  return (f&&typeof f==='object')?{t:f.t||'',src:f.src==='submission'?'submission':'diligence'}
+                                 :{t:String(f),src:'diligence'};});}
+function rfxProfileFlags(si){return rfxRedFlags(si).filter(function(f){return f.src==='diligence';});}
+function rfxSubmissionSourcedFlags(si){return rfxRedFlags(si).filter(function(f){return f.src==='submission';});}
 function rfxStrengths(si){return RFX.requirements.filter(function(r){return rfxLevel(si,r.id)==='fully';})
   .sort(function(a,b){if(a.mandatory!==b.mandatory)return a.mandatory?-1:1;return b.weight-a.weight;}).slice(0,5);}
 function rfxGaps(si){return RFX.requirements.filter(function(r){var l=rfxLevel(si,r.id);return l==='does-not'||l==='na';})
   .sort(function(a,b){if(a.mandatory!==b.mandatory)return a.mandatory?-1:1;return b.weight-a.weight;}).slice(0,5);}
+// R3 (Marc 2026-07-27): the gate vocabulary now says what the two leaders actually are. The top scorer
+// carrying an open Must-Have reads "Merit Leader - Gated" (it leads on merit, and it is gated), and the
+// highest-scored bidder that clears every Must-Have reads "Conforming Leader", so the panel's real choice
+// is legible from the labels alone instead of "Leader · Gate Risk" versus a generic "Secondary".
+function rfxConformingLeaderSi(){var order=rfxReqRanking();
+ if(!order.length)return -1;
+ var lead=order[0],lc=rfxCoverage(lead);
+ if(!(lc.answered>0&&lc.disqualified))return -1;   // only meaningful when the merit leader is gated
+ for(var i=1;i<order.length;i++){var c=rfxCoverage(order[i]);if(c.answered>0&&!c.disqualified)return order[i];}
+ return -1;}
 function rfxAwardTier(si,rankIdx){var c=rfxCoverage(si);
  if(c.answered===0)return {label:'Not Recommended',col:'#C8202E',bg:'var(--pink-t,#FBE7E3)',key:'not'};
  // Ranking policy: the #1 scorer keeps the #1 slot even with an open Must-Have gap, flagged (not demoted).
  if(c.disqualified)return rankIdx===0
-  ?{label:'Leader · Gate Risk',col:'var(--amber-d)',bg:'var(--amber-t,#FBF1DA)',key:'leadergate'}
+  ?{label:'Merit Leader - Gated',col:'var(--amber-d)',bg:'var(--amber-t,#FBF1DA)',key:'leadergate'}
   :{label:'Conditional',col:'var(--amber-d)',bg:'var(--amber-t,#FBF1DA)',key:'cond'};
- return rankIdx===0?{label:'Primary',col:'var(--plum)',bg:'rgba(92,43,80,.12)',key:'primary'}:{label:'Secondary',col:'var(--plum)',bg:'var(--blue-t,#E4EBF1)',key:'sec'};}
+ if(rankIdx===0)return {label:'Primary',col:'var(--plum)',bg:'rgba(92,43,80,.12)',key:'primary'};
+ return (si===rfxConformingLeaderSi())
+  ?{label:'Conforming Leader',col:'var(--plum)',bg:'rgba(92,43,80,.12)',key:'confleader'}
+  :{label:'Secondary',col:'var(--plum)',bg:'var(--blue-t,#E4EBF1)',key:'sec'};}
 // grounded per-supplier award rationale (fixed copy carries intentional <b>; dynamic values escaped)
 function rfxRecoText(si,rankIdx){var c=rfxCoverage(si),tier=rfxAwardTier(si,rankIdx),s=RFX.suppliers[si],st=rfxStrengths(si),f=rfxFlags(si);
  if(c.answered===0)return escapeHtmlPV(s.n)+' did not complete the requirements matrix in this run; coverage shows as Not Scored across all categories. It cannot advance on the advisory ranking until a completed, scored response is submitted.';
@@ -137,7 +162,7 @@ function rfxAv(v){RFX_AV=v;if(v!=='compare'){var i=parseInt(v,10);if(!isNaN(i))R
 function rfxHTML(){if(typeof ensureDealCss==='function')ensureDealCss();
  // #3 (Marc): RFx subtabs use the page-detail underline-tab style (.rfxstbar/.rfxst), not the pill segmented control.
  // Business Case added as a 5th subtab (artifact-audit Part 2): reflects the recommended supplier's case, read-only.
- var subs=[['overview','Overview'],['scoring','Scoring'],['analysis','Analysis'],['recommendation','Recommendation'],['businesscase','Business Case']].map(function(m){return '<button class="rfxst'+(m[0]===RFX_SUB?' on':'')+'" onclick="rfxSub(\''+m[0]+'\')">'+m[1]+'</button>';}).join('');
+ var subs=[['overview','Overview'],['scoring','Scoring'],['analysis','Analysis'],['recommendation','Recommendation'],['businesscase','Business Case & Approval']].map(function(m){return '<button class="rfxst'+(m[0]===RFX_SUB?' on':'')+'" onclick="rfxSub(\''+m[0]+'\')">'+m[1]+'</button>';}).join('');
  // #5 (Marc): header = "RFx - <name>" + a 3-5 sentence purpose/scope (grounded in the RFx seed: bidders, CCI, TCO).
  var _R=RFX;var _bn=_R.suppliers.map(function(s){return escapeHtmlPV(s.n);});
  var _bt=_bn.length>1?(_bn.slice(0,-1).join(', ')+' and '+_bn[_bn.length-1]):(_bn[0]||'the invited bidders');
@@ -204,7 +229,7 @@ function rfxOverviewHTML(){var R=RFX;var rank=rfxReqRanking(),top=rank[0];
  // Round-2 #1 (Marc) BUG FIX: each grid cell gets min-width:0 so a wide .mxwrap table inside it
  // scrolls WITHIN its own panel (overflow-x:auto is already on .mxwrap) instead of forcing the
  // 1fr grid track wider than the column and overflowing the page's right edge.
- h+='<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px"><div style="min-width:0">'+rfxParticipationHTML()+'</div><div style="min-width:0">'+rfxCompletenessRiskHTML()+'</div></div>';
+ h+='<div class="rfxrow2" style="margin-top:14px"><div style="min-width:0">'+rfxParticipationHTML()+'</div><div style="min-width:0">'+rfxCompletenessRiskHTML()+'</div></div>';
  // Condensed, expandable What Happens Next (small, collapsed by default): the full version with all
  // 4 stages lives on the Recommendation subtab; this is just enough to orient without leaving Overview.
  h+='<div style="margin-top:14px">'+rfxWhatsNextMiniHTML()+'</div>';
@@ -216,7 +241,12 @@ function rfxOverviewHTML(){var R=RFX;var rank=rfxReqRanking(),top=rank[0];
 // fabricated status).
 // Round-2 #2 (Marc): pill/bubble chrome removed, just the shape glyph + the label text (no
 // border/background/border-radius), the shape alone still carries the state, no color-only cue.
+// R7 (Marc 2026-07-27): a field with NO DATA on file no longer carries a "Not tracked" label. It reads
+// "--" with a hover of "Data not available", so an absent source field is visibly distinct from a real
+// business state. Business-legit states (not yet responded, no MSA on file, not yet scheduled) keep
+// their own glyph and label; only true source-data gaps get the dashes.
 function rfxGlyph(kind,label){var m={done:['✓','var(--plum)'],half:['◐','#2E5E8C'],flag:['⚠','#C8202E'],dash:['○','var(--mut2)'],nt:['–','var(--mut2)']};var c=m[kind]||m.nt;
+ if(kind==='nt')return '<span title="Data not available" style="display:inline-flex;align-items:center;font-family:var(--mono,monospace);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--mut2);cursor:help;white-space:nowrap">--</span>';
  return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink);white-space:nowrap"><span style="font-size:12px;font-weight:700;width:12px;text-align:center;flex:none;color:'+c[1]+'">'+c[0]+'</span>'+escapeHtmlPV(label)+'</span>';}
 // Small pill chip, reused by Completeness & Risk roll-up below.
 function rfxChip(label,col,bg){return '<span style="display:inline-block;font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+col+';background:'+bg+'">'+escapeHtmlPV(label)+'</span>';}
@@ -248,8 +278,8 @@ function rfxParticipationHTML(){var R=RFX,p=R.phase||{};
  }).join('');
  var total=p.suppliersTotal!=null?p.suppliersTotal:R.suppliers.length;
  var awaitTxt=(p.suppliersAwaiting>0)?(p.suppliersAwaiting+' of '+total+' invited supplier(s) still to respond.'):('All '+total+' invited supplier(s) have responded.');
- var key='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:10.5px;color:var(--mut2)"><span>Glyph key:</span>'+rfxGlyph('done','done')+rfxGlyph('half','in progress')+rfxGlyph('flag','blocked / attention')+rfxGlyph('dash','not started')+rfxGlyph('nt','not tracked in this RFx')+'</div>';
- return '<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:2px">Participation</div><div class="spnote" style="margin:0 0 8px">'+escapeHtmlPV(awaitTxt)+' Agreed is inferred from appearing on the invited-bidder list; CDA and demo scheduling are not tracked fields in this RFx case, shown as Not tracked rather than guessed.</div><div class="mxwrap"><table class="mx" style="width:100%"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>'+key+'</div>';
+ var key='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:10.5px;color:var(--mut2)"><span>Glyph key:</span>'+rfxGlyph('done','done')+rfxGlyph('half','in progress')+rfxGlyph('flag','blocked / attention')+rfxGlyph('dash','not started')+rfxGlyph('nt','')+'<span style="margin-left:-4px">data not available (hover for detail)</span></div>';
+ return '<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:2px">Participation</div><div class="spnote" style="margin:0 0 8px">'+escapeHtmlPV(awaitTxt)+' Agreed is inferred from appearing on the invited-bidder list; CDA and demo scheduling carry no data on file in this RFx case, shown as -- (data not available) rather than guessed.</div><div class="mxwrap"><table class="mx" style="width:100%"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>'+key+'</div>';
 }
 // Completeness & Risk roll-up (Overview; ported from the RFx-MOCKUP.html design, bound to real RFX).
 // Supplier x Conforming / Completeness % / Red-flags / Gating items / Award tier, all read from the
@@ -268,7 +298,7 @@ function rfxCompletenessRiskHTML(){var R=RFX,esc=escapeHtmlPV;var rank=rfxReqRan
     +'<td class="n">'+gating+'</td>'
     +'<td class="n">'+rfxChip(tier.label,tier.col,tier.bg)+'</td></tr>';
  }).join('');
- return '<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:2px">Completeness &amp; risk roll-up</div><div class="spnote" style="margin:0 0 8px">Conforming reads the mandatory-requirement conformance check; Red-flags and Gating are response-grounded counts from the same red-flag analysis behind each supplier&rsquo;s Analysis report; Award tier is the same advisory tier shown across the tab (a gate risk on the leader is flagged there, not a hidden demotion here).</div><div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th style="text-align:left">Supplier</th><th>Conforming</th><th>Completeness</th><th>Red-flags</th><th>Gating</th><th>Award tier</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+ return '<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:2px">Completeness &amp; Risk Roll-up</div><div class="spnote" style="margin:0 0 8px">Conforming = the mandatory-requirement check. Red-flags and Gating are response-grounded, from the same analysis behind each supplier&rsquo;s Analysis report. Award tier is the same advisory tier shown across the tab (a gate risk on the leader is flagged there, not a hidden demotion here).</div><div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th style="text-align:left">Supplier</th><th>Conforming</th><th>Completeness</th><th>Red-flags</th><th>Gating</th><th>Award tier</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 // Reusable member ROSTER, avatar · name · role, stacked in N columns (never a comma line).
 // role is real per-project data ({n, role}); reused anywhere we list a project's people.
@@ -449,14 +479,13 @@ function rfxRptProfile(s,prof){var esc=escapeHtmlPV,pr=s.profile||{};
  if(pr.founded)top.push(fact('Founded',pr.founded));
  if(pr.ownership)top.push(fact('Ownership',pr.ownership));
  if(yib)top.push(fact('Years in business',yib));
- if(pr.revenue||pr.employees){
-  var stack='<div class="ovfact">';
-  if(pr.revenue)stack+='<div class="glabhd" style="margin-bottom:3px">Revenue</div><div class="val">'+esc(pr.revenue)+'</div>';
-  if(pr.employees)stack+='<div class="glabhd" style="margin-bottom:3px'+(pr.revenue?';margin-top:10px':'')+'">Employees</div><div class="val">'+esc(pr.employees)+'</div>';
-  stack+='</div>';
-  top.push(stack);
- }
- var factsHTML=top.length?'<div class="ovfacts" style="grid-template-columns:repeat(auto-fit,minmax(126px,1fr))">'+top.join('')+'</div>':'';
+ // N8 (Marc 2026-07-27): Revenue and Employees used to share ONE cell as a vertical stack while every
+ // other fact had its own, and the grid was auto-fit, so the column count moved with the container and
+ // the block read as a ragged list rather than a table of facts. Each fact is now its own cell on a
+ // fixed 3-column grid (2 at narrow widths), which lands these six as a clean 3 x 2.
+ if(pr.revenue)top.push(fact('Revenue',pr.revenue));
+ if(pr.employees)top.push(fact('Employees',pr.employees));
+ var factsHTML=top.length?'<div class="ovfacts ovfacts-3">'+top.join('')+'</div>':'';
  var riskHTML='';
  if(prof.risk)riskHTML='<div class="glabhd" style="margin-bottom:5px">Public risk markers</div><div class="risk">'+prof.risk.map(function(r){return '<div class="rr"><span class="dot '+r.sev+'"></span><span class="cat">'+esc(r.cat)+'</span><span class="tx">'+esc(r.tx)+'</span><span class="rsev '+r.sev+'">'+esc(r.sevlabel)+'</span></div>';}).join('')+'</div>';
  var h='<div class="sect"><div class="secthd"><div class="t">Company profile</div><div class="lk">Landscape vendor record</div></div>';
@@ -585,13 +614,15 @@ function rfxAnalysisIndividualLegacyHTML(){var R=RFX;var rank=rfxReqRanking();
  var roll=rfxCatRollup(si);
  h+='<div id="rfxi-fit" class="sect"><div class="secthd"><div class="t">Requirements fit · per category</div></div><div class="mxwrap"><table class="mx" style="width:100%;min-width:640px"><thead><tr><th style="text-align:left">Category</th><th>Requirements</th><th>Fully</th><th>Partial</th><th>Does not</th><th>Not answered</th><th>Coverage %</th></tr></thead><tbody>'+roll.map(function(r){return '<tr><td style="text-align:left;font-weight:600">'+escapeHtmlPV(titleCase(r.cat))+'</td><td>'+r.total+'</td><td>'+r.fully+'</td><td>'+r.partial+'</td><td>'+r.doesNot+'</td><td>'+r.na+'</td><td style="font-weight:700;color:'+(c.answered===0?'var(--mut2)':rfxPcCol(r.coveragePct))+'">'+(c.answered===0?'-':r.coveragePct+'%')+'</td></tr>';}).join('')+'</tbody></table></div></div>';
  // 3) Strengths, gaps & risks, strengths (top by weight) · gaps (does-not / not-answered) · response-grounded red flags
- var st=rfxStrengths(si),gp=rfxGaps(si),fl=(pr.redFlags||[]);
+ var st=rfxStrengths(si),gp=rfxGaps(si),fl=rfxRedFlags(si);   // R6: normalized {t,src}; same list, same order
  h+='<div id="rfxi-sgr" class="sect"><div class="secthd"><div class="t">Strengths, gaps &amp; risks</div></div>';
  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:10px">';
  h+='<div class="card" style="margin:0"><div style="font-weight:700;font-size:12.5px;margin-bottom:7px">Strengths</div>'+(st.length?st.map(function(r){return '<div style="font-size:12px;line-height:1.5;margin-bottom:5px;display:flex;gap:7px"><span style="color:var(--plum);font-weight:700">✓</span><span>'+escapeHtmlPV(r.text)+' <span style="color:var(--mut2)">('+escapeHtmlPV(r.category)+')</span></span></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No fully-met requirements recorded.</div>')+'</div>';
  h+='<div class="card" style="margin:0"><div style="font-weight:700;font-size:12.5px;margin-bottom:7px">Gaps</div>'+(gp.length?gp.map(function(r){var lvl=rfxLevel(si,r.id);return '<div style="font-size:12px;line-height:1.5;margin-bottom:6px;display:flex;gap:7px;align-items:baseline"><span style="font:700 8px var(--mono);text-transform:uppercase;padding:2px 6px;border-radius:30px;white-space:nowrap;color:'+(lvl==='na'?'var(--mut2)':'#C8202E')+';background:'+(lvl==='na'?'#EFECE8':'var(--pink-t,#FBE7E3)')+'">'+escapeHtmlPV(rfxLevelLabel(lvl))+'</span><span>'+escapeHtmlPV(r.text)+(r.mandatory?' <b style="color:#C8202E">· Must-have</b>':'')+'</span></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No gaps, fully meets every requirement.</div>')+'</div>';
  h+='</div>';
- h+='<div class="card"><div style="font-weight:700;font-size:12.5px;margin-bottom:7px">Red Flags <span style="font-weight:500;color:var(--mut2);font-size:11px">· response-grounded</span></div>'+(fl.length?fl.map(function(f){return '<div class="obrow high" style="margin-bottom:7px"><div class="obd" style="margin:0">'+escapeHtmlPV(f)+'</div></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No red flags recorded for this supplier.</div>')+'</div></div>';
+ // R6 follow-on (Marc 2026-07-27): this card carried the same false "response-grounded" label the roll-up did.
+ // Each flag now shows the source it actually came from, using the same provenance the roll-up counts on.
+ h+='<div class="card"><div style="font-weight:700;font-size:12.5px;margin-bottom:7px">Red Flags <span style="font-weight:500;color:var(--mut2);font-size:11px">· each flag labelled by source</span></div>'+(fl.length?fl.map(function(f){var sub=f.src==='submission';return '<div class="obrow high" style="margin-bottom:7px"><div class="obd" style="margin:0">'+escapeHtmlPV(f.t)+' <span class="rfxsk '+(sub?'a':'b')+'" style="margin-left:4px;vertical-align:1px"><span class="dot"></span>'+(sub?'This bid':'Diligence')+'</span></div></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No red flags recorded for this supplier.</div>')+'</div></div>';
  // 4) Commercial & operational, pricing + legal + implementation + integration
  var pc=s.pricing||{},nr=s.narr||{};
  h+='<div id="rfxi-com" class="sect"><div class="secthd"><div class="t">Commercial &amp; operational</div></div><div class="card"><div class="kv"><div class="k">Pricing model</div><div class="v">'+rfxPriceVal(pc.model)+'</div><div class="k">Annual fee</div><div class="v">'+rfxPriceVal(pc.annual)+'</div><div class="k">List price</div><div class="v">'+rfxPriceVal(pc.list)+'</div><div class="k">Discount</div><div class="v">'+rfxPriceVal(pc.discount)+'</div><div class="k">Implementation</div><div class="v">'+rfxPriceVal(pc.impl)+'</div><div class="k">Term</div><div class="v">'+rfxPriceVal(pc.terms)+'</div><div class="k">Escalator</div><div class="v">'+rfxPriceVal(pc.escalator)+'</div><div class="k">Pricing binding</div><div class="v">'+rfxPriceVal(pc.binding)+'</div></div><div style="margin-top:11px;display:grid;gap:9px"><div><span class="dicolh">Legal &amp; contracting</span><div style="font-size:12.5px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.legal||'No legal narrative on file for this supplier.')+'</div></div><div><span class="dicolh">Implementation</span><div style="font-size:12.5px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.impl||'No implementation narrative on file.')+'</div></div><div><span class="dicolh">Integration with the Lilly stack</span><div style="font-size:12.5px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.integ||'No integration narrative on file.')+'</div></div></div></div></div>';
@@ -635,13 +666,36 @@ function rfxCompareReadHTML(){var R=RFX;
  h+='<div class="card"><div style="font-size:13px;line-height:1.62;color:var(--ink)">'+parts.join(' ')+'</div></div></div>';
  return h;
 }
+// R5 (Marc 2026-07-27): the normalized all-in math, extracted so the value map plots exactly the figure
+// the Commercial comparison table publishes. ONE source of truth: the table's own presentation logic is
+// untouched, it just reads .total from here instead of recomputing it. Returns {seats,years,refAllIn,
+// bySi:{si:{total|null}}}; total is null for a bidder missing any normalized line (never estimated).
+function rfxNormAllIn(){var R=RFX,N=(typeof RFX_NORM!=='undefined'&&RFX_NORM)?RFX_NORM:null;
+ var out={seats:null,years:null,refAllIn:null,bySi:{}};
+ if(!N||!N.bidders||!N.bidders.length||!N.lines)return out;
+ var termM=/([\d,]+)\s*seats?\D+(\d+)-yr/i.exec(N.termNote||'');
+ var seats=termM?parseInt(termM[1].replace(/,/g,''),10):(N.bidders.length?400:1),years=termM?parseInt(termM[2],10):3;
+ var platform=N.lines[0],impl=N.lines.filter(function(L){return /implement/i.test(L.item);})[0],support=N.lines.filter(function(L){return /support/i.test(L.item);})[0];
+ out.seats=seats;out.years=years;
+ out.refAllIn=(platform?platform.target:0)+(support?support.target:0)+((impl?impl.target*1000:0)/years/seats);
+ R.suppliers.forEach(function(s,si){
+   var b=N.bidders.filter(function(x){return x.name===s.n;})[0];
+   if(!b){out.bySi[si]=null;return;}
+   var p=platform?platform.asks[b.id]:null,sup=support?support.asks[b.id]:null,i=impl?impl.asks[b.id]:null;
+   if(p==null||sup==null||i==null){out.bySi[si]={total:null};return;}
+   var implPerSeat=(i*1000)/years/seats;
+   out.bySi[si]={total:p+sup+implPerSeat,platform:p,support:sup,impl:i,implPerSeat:implPerSeat};});
+ return out;}
 // Increment 4: data-bound value map (Field at a glance). x = weighted fit; y = annual price (lower = up);
 // dot size = coverage; a Must-Have gate fail gets a red ring; a bidder with no submitted price is NOT placed
 // on the price axis (honest) but shown as a hollow dot in a "price not submitted" lane, by fit only.
 function rfxValueMapHTML(){var R=RFX,esc=escapeHtmlPV;
- function fmtP(n){return n>=1e6?('$'+(n/1e6).toFixed(2)+'M'):('$'+Math.round(n/1000)+'K');}
+ function fmtP(n){return '$'+Math.round(n).toLocaleString('en-US');}   // R5: $/seat/yr, not $M
  // ANCHORED ON PANEL SCORE (the binding evaluation). Theo's weighted-fit is a secondary advisory overlay (note below).
- var sup=R.suppliers.map(function(s,si){var c=rfxCoverage(si);return {si:si,name:s.n,ps:rfxWeighted(si),fit:c.weightedFit,cov:c.coveragePct,price:rfxAnnualNum(si),gate:!rfxGatePass(si),color:(typeof pvSupColor==='function'?pvSupColor({id:s.n}):'#123C82')};});
+ // R5: the cost axis is the NORMALIZED all-in ($/seat/yr, bid-levelled), not the raw annual ask, so the
+ // map compares like with like. A bidder with no normalized figure is not placed on the cost axis.
+ var _norm=rfxNormAllIn();
+ var sup=R.suppliers.map(function(s,si){var c=rfxCoverage(si),nn=_norm.bySi[si];return {si:si,name:s.n,ps:rfxWeighted(si),fit:c.weightedFit,cov:c.coveragePct,price:(nn&&nn.total!=null)?nn.total:null,gate:!rfxGatePass(si),color:(typeof pvSupColor==='function'?pvSupColor({id:s.n}):'#123C82')};});
  var priced=sup.filter(function(x){return x.price!=null;}),unpriced=sup.filter(function(x){return x.price==null;});
  var W=900,H=482,padL=74,padR=40,padT=42,plotB=348;
  var psv=sup.map(function(x){return x.ps;}),pMin=Math.min.apply(null,psv),pMax=Math.max.apply(null,psv);if(pMin===pMax){pMin-=0.5;pMax+=0.5;}
@@ -651,13 +705,13 @@ function rfxValueMapHTML(){var R=RFX,esc=escapeHtmlPV;
  function Y(p){return padT+(p-pLo)/(pHi-pLo)*(plotB-padT);}
  var g='';
  g+='<rect x="'+X(xLo+(xHi-xLo)*0.60).toFixed(0)+'" y="'+padT+'" width="'+(W-padR-X(xLo+(xHi-xLo)*0.60)).toFixed(0)+'" height="'+((plotB-padT)*0.46).toFixed(0)+'" rx="10" style="fill:var(--teal-t)" opacity="0.5"></rect>';
- g+='<text x="'+(W-padR-8)+'" y="'+(padT+15)+'" text-anchor="end" font-family="var(--mono)" font-size="10" font-weight="700" style="fill:var(--teal-d)" opacity="0.85">higher panel score &middot; lower cost</text>';
+ g+='<text x="'+(W-padR-8)+'" y="'+(padT+15)+'" text-anchor="end" font-family="var(--mono)" font-size="10" font-weight="700" style="fill:var(--teal-d)" opacity="0.85">higher panel score &middot; lower normalized all-in</text>';
  g+='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+plotB+'" style="stroke:var(--line2)" stroke-width="1.2"></line>';
  g+='<line x1="'+padL+'" y1="'+plotB+'" x2="'+(W-padR)+'" y2="'+plotB+'" style="stroke:var(--line2)" stroke-width="1.2"></line>';
  sup.forEach(function(x){g+='<text x="'+X(x.ps).toFixed(1)+'" y="'+(plotB+18)+'" text-anchor="middle" font-family="var(--mono)" font-size="10" style="fill:var(--mut2)">'+x.ps.toFixed(1)+'</text>';});
  g+='<text x="'+((padL+W-padR)/2).toFixed(0)+'" y="'+(plotB+40)+'" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="700" letter-spacing="0.06em" style="fill:var(--mut2)">PANEL SCORE (0&ndash;5) &rarr;</text>';
  if(haveP){priced.forEach(function(x){g+='<text x="'+(padL-8)+'" y="'+(Y(x.price)+3).toFixed(1)+'" text-anchor="end" font-family="var(--mono)" font-size="10" style="fill:var(--mut2)">'+fmtP(x.price)+'</text>';});
-  g+='<text transform="rotate(-90 22 '+((padT+plotB)/2).toFixed(0)+')" x="22" y="'+((padT+plotB)/2).toFixed(0)+'" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="700" letter-spacing="0.06em" style="fill:var(--mut2)">&larr; LOWER ANNUAL PRICE</text>';}
+  g+='<text transform="rotate(-90 22 '+((padT+plotB)/2).toFixed(0)+')" x="22" y="'+((padT+plotB)/2).toFixed(0)+'" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="700" letter-spacing="0.06em" style="fill:var(--mut2)">&larr; LOWER NORMALIZED ALL-IN ($/SEAT/YR)</text>';}
  priced.forEach(function(x){var cx=X(x.ps),cy=Y(x.price),r=10+(x.cov/100)*11;
   if(x.gate)g+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(r+5).toFixed(1)+'" fill="none" style="stroke:var(--emph,#C15E19)" stroke-width="2" stroke-dasharray="4 3" opacity="0.9"></circle>';
   g+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+x.color+'" fill-opacity="0.88" style="stroke:var(--surface)" stroke-width="2"></circle>';
@@ -673,9 +727,9 @@ function rfxValueMapHTML(){var R=RFX,esc=escapeHtmlPV;
  var byPs=sup.slice().sort(function(a,b){return b.ps-a.ps;});
  var fitOrder=byFit.map(function(x){return esc(x.name)+' ('+x.fit+')';}).join(' &gt; ');
  var diverge=byFit[0].si!==byPs[0].si;
- var h='<div class="sect" id="rfxc-map"><div class="secthd"><div class="t">Field at a glance</div><span style="font:600 11px var(--mono);color:var(--mut2)">panel score &times; annual price &middot; dot size = coverage</span></div>';
- h+='<div class="card"><div style="overflow-x:auto"><svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;max-width:600px;margin:0 auto" font-family="var(--sans)" role="img" aria-label="Value map of panel score against annual price">'+g+'</svg></div>';
- h+='<div class="tnote" style="margin-top:8px">Upper-right is a higher panel score at lower cost. The <b>panel&rsquo;s weighted 0&ndash;5 score</b> is the binding evaluation and anchors this view; a burnt-orange ring is a Must-Have gate fail (bars award regardless of position), and a bidder with no submitted price sits in the lower lane by score only.</div>';
+ var h='<div class="sect" id="rfxc-map"><div class="secthd"><div class="t">Field at a glance</div><span style="font:600 11px var(--mono);color:var(--mut2)">panel score &times; normalized all-in &middot; dot size = coverage</span></div>';
+ h+='<div class="card"><div style="overflow-x:auto"><svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;max-width:600px;margin:0 auto" font-family="var(--sans)" role="img" aria-label="Value map of panel score against normalized all-in cost per seat per year">'+g+'</svg></div>';
+ h+='<div class="tnote" style="margin-top:8px">Upper-right is a higher panel score at lower cost. The <b>panel&rsquo;s weighted 0&ndash;5 score</b> is the binding evaluation and anchors this view; a burnt-orange ring is a Must-Have gate fail (bars award regardless of position), and a bidder with no normalized all-in figure sits in the lower lane by score only.</div>';
  h+='<div class="tnote" style="margin-top:6px">Advisory overlay: Theo&rsquo;s weighted-fit ranks '+fitOrder+'.'+(diverge?' This differs from the panel, which places <b>'+esc(byPs[0].name)+'</b> first; the divergence is the point, see the assessment.':' This agrees with the panel ranking.')+'</div></div></div>';
  return h;
 }
@@ -686,7 +740,7 @@ function rfxCrossRollupHTML(){var R=RFX,esc=escapeHtmlPV;
  var rows=award.map(function(si,i){var s=R.suppliers[si],c=rfxCoverage(si),pn=rfxAnnualNum(si),gate=rfxGatePass(si);
    var price=pn!=null?fmtM(pn):'<span class="pcell em">Not submitted</span>';
    var gcell=gate?'<span class="pcell pos">Pass</span>':'<span class="pcell em">Fail</span>';
-   var badges=(i===0)?' <span class="badge hi" style="font-size:8px;padding:1px 6px;vertical-align:middle">RECOMMENDED</span>'+(!gate?' <span class="badge mid" style="font-size:8px;padding:1px 6px;vertical-align:middle;background:#C8202E;color:#fff">GATE RISK</span>':''):'';
+   var badges=(i===0)?' <span class="badge hi" style="font-size:8px;padding:1px 6px;vertical-align:middle">RECOMMENDED</span>'+(!gate?' <span class="badge mid" style="font-size:8px;padding:1px 6px;vertical-align:middle;background:#C8202E;color:#fff">GATED</span>':''):'';
    var lead=(i===0)?' style="background:var(--pri-t)"':'';
    return '<tr'+lead+'><td style="font-weight:'+(i===0?'800':'600')+'">'+esc(s.n)+badges+'</td><td class="n" style="font-weight:800">'+rfxWeighted(si).toFixed(1)+'</td><td class="n">'+gcell+'</td><td class="n">'+(c.answered===0?'&ndash;':c.coveragePct+'%')+'</td><td class="n">'+c.completenessPct+'%</td><td class="n">'+(c.answered===0?'&ndash;':c.conforming?'<span class="pcell pos">Yes</span>':'<span class="pcell em">No</span>')+'</td><td class="n">'+price+'</td></tr>';
  }).join('');
@@ -717,28 +771,44 @@ function rfxAnalysisCrossHTML(){var R=RFX;
 // (which supplier carries the field's risk, how many gating items are open, who's cleanest) lives
 // directly BENEATH the table inside this SAME panel, materialized from the same rfxCoverage / rfxFlags
 // / rfxRiskLevel helpers the table reads, so it can never drift from the numbers above it.
+// R6 (Marc 2026-07-27, Option A): the columns are GROUPED under two spanned provenance headers,
+// "From submissions" (risk level / conforming / gating, all computed from this RFx's responses) and
+// "From diligence" (profile flags, from the supplier's Landscape profile), separated by a rule. The
+// old "Red flags" column read profile.redFlags while the panel caption claimed the whole table was
+// response-grounded, which was false for that column AND double-counted: a supplier's gating item
+// (e.g. Nimbus's SOC 2 Type II gap) also appeared in its red-flag list. The profile column now counts
+// rfxProfileFlags (diligence-sourced only), so no finding is counted on both sides.
 function rfxRiskCompactHTML(){var R=RFX,esc=escapeHtmlPV;
+ var reclassTotal=0;
  var rows=R.suppliers.map(function(s,si){
-   var c=rfxCoverage(si),rl=rfxRiskLevel(si),fl=rfxFlags(si),gating=fl.filter(function(f){return f.priority==='GATING';}).length,pr=s.profile||{},redFlags=(pr.redFlags||[]).length;
+   var c=rfxCoverage(si),rl=rfxRiskLevel(si),fl=rfxFlags(si),gating=fl.filter(function(f){return f.priority==='GATING';}).length;
+   var prof=rfxProfileFlags(si),profN=prof.length;reclassTotal+=rfxSubmissionSourcedFlags(si).length;
    var rlHigh=(rl==='critical'||rl==='high');
    var rlCol=rlHigh?'#C8202E':rl==='medium'?'#8A5A00':'var(--plum)';
    var rlBg=rlHigh?'var(--pink-t,#FBE7E3)':rl==='medium'?'var(--amber-t,#FBF1DA)':'rgba(92,43,80,.10)';
    var confChip=c.answered===0?rfxChip('Pending','var(--mut2)','#EFECE8'):rfxChip(c.conforming?'Conforming':'Non-conforming',c.conforming?'var(--plum)':'#C8202E',c.conforming?'rgba(92,43,80,.10)':'var(--pink-t,#FBE7E3)');
-   return '<tr onclick="rfxAv('+si+')" style="cursor:pointer" title="Open '+esc(s.n)+'&rsquo;s deep-dive"><td style="text-align:left;font-weight:600">'+esc(s.n)+'</td><td class="n">'+rfxChip(rl.charAt(0).toUpperCase()+rl.slice(1),rlCol,rlBg)+'</td><td class="n">'+confChip+'</td><td class="n">'+redFlags+'</td><td class="n">'+gating+'</td></tr>';
+   var profTitle=profN?esc(prof.map(function(f){return f.t;}).join(' | ')):'No diligence-sourced flags on file for this supplier';
+   return '<tr onclick="rfxAv('+si+')" style="cursor:pointer" title="Open '+esc(s.n)+'&rsquo;s deep-dive"><td style="text-align:left;font-weight:600">'+esc(s.n)+'</td><td class="n">'+rfxChip(rl.charAt(0).toUpperCase()+rl.slice(1),rlCol,rlBg)+'</td><td class="n">'+confChip+'</td><td class="n">'+gating+'</td><td class="n rfxprovb" title="'+profTitle+'">'+profN+'</td></tr>';
  }).join('');
  var gatedCount=R.suppliers.filter(function(s){return s.mustFail&&s.mustFail.length;}).length;
- return '<div class="sect"><div class="secthd"><div class="t">Risk roll-up</div>'+rfxCap('response-grounded · click a row to open the deep-dive')+'</div><div class="card"><div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th style="text-align:left">Supplier</th><th>Risk level</th><th>Conforming</th><th>Red flags</th><th>Gating</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+ return '<div class="sect"><div class="secthd"><div class="t">Risk roll-up</div>'+rfxCap('two sources · click a row to open the deep-dive')+'</div><div class="card rfxpair"><div class="mxwrap rfxpairscroll"><table class="mx" style="width:100%"><thead>'
+  +'<tr class="rfxprovhd"><th style="text-align:left"></th><th class="rfxprova" colspan="3">From submissions</th><th class="rfxprovb" colspan="1">From diligence</th></tr>'
+  +'<tr><th style="text-align:left">Supplier</th><th>Risk level</th><th>Conforming</th><th>Gating</th><th class="rfxprovb">Profile flags</th></tr>'
+  +'</thead><tbody>'+rows+'</tbody></table></div>'
+  +'<div class="rfxsrcrow"><div><span class="rfxsk a"><span class="dot"></span>From submissions</span> Requirements-matrix answers, gate status and submitted artefacts for this RFx. Changes the moment a response changes.</div>'
+  +'<div><span class="rfxsk b"><span class="dot"></span>From diligence</span> The supplier&rsquo;s Landscape profile: filings, funding, certifications, public record. Refreshes on Landscape&rsquo;s cadence, not this RFx&rsquo;s.</div></div>'
   +'<div class="xs-ins" style="margin-top:11px">'+rfxRiskInsight()+'</div>'
-  +'<div class="spnote" style="margin-top:8px">Red-flags and gating counts are response-grounded, the same GATING-priority draft-clarification list behind each supplier&rsquo;s Analysis &rsaquo; Individual report, so this view can never drift from the evidence there.'+(gatedCount?' '+gatedCount+' of '+R.suppliers.length+' supplier(s) carry an independent Must-Have gate despite a non-trivial score, the reason the advisory ranking flags a gate risk on the leader rather than hiding it.':'')+' Reflect-only.</div></div></div>';
+  +'<div class="spnote" style="margin-top:8px">The two sides are sourced independently and do not add together. Gating counts come from the same GATING-priority draft-clarification list behind each supplier&rsquo;s Analysis &rsaquo; Individual report, so this view can never drift from the evidence there.'+(gatedCount?' '+gatedCount+' of '+R.suppliers.length+' supplier(s) carry an independent Must-Have gate despite a non-trivial score, the reason the advisory ranking flags a gate risk on the leader rather than hiding it.':'')+(reclassTotal?' '+reclassTotal+' recorded flag(s) describe a supplier&rsquo;s bid rather than the company, and are counted once on the submissions side only, never also as a profile flag.':'')+' Reflect-only.</div></div></div>';
 }
 // Data-bound narrative for the Risk roll-up table above (materialized from the same helpers the
 // table uses: rfxRiskLevel, rfxFlags, the vendor-profile red-flag list), so it cannot drift.
 function rfxRiskInsight(){var R=RFX,esc=escapeHtmlPV;
  var ord={critical:3,high:2,medium:1,low:0,none:-1};
- var rows=R.suppliers.map(function(s,si){return {si:si,n:s.n,rl:rfxRiskLevel(si),gating:rfxFlags(si).filter(function(f){return f.priority==='GATING';}).length,redFlags:((s.profile&&s.profile.redFlags)||[]).length};});
+ // R6: the two sides are named separately here too, so the narrative can never imply one total.
+ var rows=R.suppliers.map(function(s,si){return {si:si,n:s.n,rl:rfxRiskLevel(si),gating:rfxFlags(si).filter(function(f){return f.priority==='GATING';}).length,profFlags:rfxProfileFlags(si).length};});
  var parts=[];
  var worst=rows.slice().sort(function(a,b){return ord[b.rl]-ord[a.rl];})[0];
- if(worst&&(worst.rl==='critical'||worst.rl==='high'))parts.push('<b>'+esc(worst.n)+'</b> carries the field&rsquo;s highest risk read ('+worst.rl+'), with '+worst.redFlags+' red flag(s) on file'+(worst.gating?' and '+worst.gating+' open gating item(s)':'')+'.');
+ if(worst&&(worst.rl==='critical'||worst.rl==='high'))parts.push('<b>'+esc(worst.n)+'</b> carries the field&rsquo;s highest risk read ('+worst.rl+') on its submission'+(worst.gating?', with '+worst.gating+' open gating item(s)':'')+(worst.profFlags?', and separately '+worst.profFlags+' diligence flag(s) against the company from its Landscape profile':', with no diligence flag against the company')+'.');
  var totalGating=rows.reduce(function(a,r){return a+r.gating;},0);
  if(totalGating)parts.push(totalGating+' gating clarification item(s) are open across the field, each tied to a Must-Have or high-weight requirement.');
  var clean=rows.filter(function(r){return r.rl==='none'||r.rl==='low';});
@@ -865,22 +935,30 @@ function rfxScoringMatrixHTML(){var R=RFX,leader=rfxLeader();
    var whoTxt=pending.map(function(e){var hint=rfxRoleCategoryHint(e.role);return '<b>'+escapeHtmlPV(e.n)+'</b>'+(e.role?' <span style="color:var(--mut2)">('+escapeHtmlPV(e.role)+')</span>':'')+(hint?' <span style="color:var(--mut2)">· '+escapeHtmlPV(hint)+'</span>':'');}).join(', ');
    h+='<div class="rfxgate warn" style="margin:0 0 12px">Still to submit: '+whoTxt+'.'+(dueTxt?' Next milestone: <b>'+dueTxt+'</b>.':' No due date on file.')+'</div>';
  }
- var supHead=R.suppliers.map(function(s,si){return '<th'+(si===leader?' class="lead"':'')+'>'+(si===leader?'★ ':'')+escapeHtmlPV(s.n)+'</th>';}).join('');
- var hcSpan=function(v){return v==null?'<span class="hcell" style="background:var(--bg);color:var(--mut2)">–</span>':'<span class="hcell" style="'+pvHmRamp(v)+'">'+v.toFixed(1)+'</span>';};
+ // N3 (Marc 2026-07-27): supplier headers carry the canonical supplier swatch used everywhere else on
+ // this tab, instead of a star glyph, and the leader is marked structurally (a rule) not with a tint.
+ var supHead=R.suppliers.map(function(s,si){return '<th'+(si===leader?' class="lead"':'')+'>'+rfxSupplierSwatch(si)+escapeHtmlPV(s.n)+'</th>';}).join('');
+ // N3: score cells move OFF the blue Landscape ramp (pvHmRamp) onto the same plum intensity ramp the
+ // Coverage heatmap on Analysis already uses, so the two heat surfaces in this dashboard read as one
+ // system. Empty cells follow the R7 convention (-- + "Data not available"), never a bare dash.
+ var hcSpan=function(v){
+   if(v==null)return '<span class="hcell hc-na" title="Data not available">--</span>';
+   var pct=Math.max(0,Math.min(100,(v/5)*100));
+   return '<span class="hcell" style="background:'+rfxCovCol(pct)+';color:'+rfxCovFg(pct)+'">'+v.toFixed(1)+'</span>';};
  h+='<div class="mxwrap"><table class="mx schm" style="width:100%"><thead><tr><th style="text-align:left">Category</th><th>Weight</th>'+supHead+'</tr></thead><tbody>';
  h+=R.criteria.map(function(c,ci){
    var cells=R.suppliers.map(function(s,si){return '<td'+(si===leader?' class="lead"':'')+'>'+hcSpan(rfxAgg(si,ci))+'</td>';}).join('');
-   return '<tr><td style="text-align:left"><span class="schm-cn">'+escapeHtmlPV(titleCase(c.cat))+'</span></td><td class="schm-w">'+c.w+'%</td>'+cells+'</tr>';
+   return '<tr><td style="text-align:left"><span class="schm-cn">'+escapeHtmlPV(titleCase(c.cat))+'</span></td><td class="schm-w"><span class="schm-wchip">'+c.w+'%</span></td>'+cells+'</tr>';
  }).join('');
  var wtCells=R.suppliers.map(function(s,si){return '<td'+(si===leader?' class="lead"':'')+'><b>'+rfxWeighted(si).toFixed(1)+'</b></td>';}).join('');
- var gateCells=R.suppliers.map(function(s,si){var gp=rfxGatePass(si);return '<td>'+(gp?'<span class="gate ok">Pass</span>':'<span class="gate fail">Fail</span>')+'</td>';}).join('');
+ var gateCells=R.suppliers.map(function(s,si){var gp=rfxGatePass(si);return '<td>'+rfxMcmPill(gp?'Pass':'Gated',gp?'teal':'rust')+'</td>';}).join('');   // N3: same pill family as the rest of the tab
  h+='</tbody><tfoot><tr class="wtotrow"><td style="text-align:left">Weighted total <span style="font-weight:400;color:var(--mut2)">(0-5)</span></td><td></td>'+wtCells+'</tr><tr class="gaterow"><td style="text-align:left">Gate · Must-Have</td><td></td>'+gateCells+'</tr></tfoot>';
  h+='</table><div class="spnote" style="margin-top:6px">Category-level panel average on the Landscape heatmap ramp (lighter = lower); reads only <b>submitted</b> evaluators. Requirement-level detail is in the Criterion Cards below, not expanded here. The <b>Gate</b> row is Must-Have pass/fail. The ★ column leads.</div>';
  // Round-2 #10 (Marc) DEDUPE: the Must-Have gate fail is stated prominently ONCE, here on the
  // matrix; it is not re-explained elsewhere on this tab (Criterion Cards / Requirements Register
  // carry the underlying requirement data but do not repeat this callout).
  var koList=R.suppliers.filter(function(s){return s.mustFail&&s.mustFail.length;});
- if(koList.length){ h+='<div class="rfxgate" style="margin:9px 0 0;border:1px solid #E4B4AE;border-left:3px solid #A23A30;background:var(--pink-t,#FBE7E3);color:var(--ink)"><b style="color:var(--riskred)">&#10007; Must-Have FAIL:</b> '+koList.map(function(s){return '<b>'+escapeHtmlPV(s.n)+'</b> does not meet <b>'+escapeHtmlPV(s.mustFail.join(', '))+'</b>';}).join('; ')+'. A Must-Have is a <b>hard gate</b>, a fail bars the award regardless of the weighted total. To advance this supplier the team must resolve it internally (Cyber review of whether we can proceed) and/or with the supplier (do they hold the certification, and if not, if/when they will). Reflect-only, nothing is decided here.</div>'; }
+ if(koList.length){ h+='<div class="rfxgate" style="margin:9px 0 0;border:1px solid var(--line2,#BDBAB3);border-left:3px solid #9A3B1F;background:transparent;color:var(--ink)"><b style="color:var(--riskred)">&#10007; Must-Have FAIL:</b> '+koList.map(function(s){return '<b>'+escapeHtmlPV(s.n)+'</b> does not meet <b>'+escapeHtmlPV(s.mustFail.join(', '))+'</b>';}).join('; ')+'. A Must-Have is a <b>hard gate</b>, a fail bars the award regardless of the weighted total. To advance this supplier the team must resolve it internally (Cyber review of whether we can proceed) and/or with the supplier (do they hold the certification, and if not, if/when they will). Reflect-only, nothing is decided here.</div>'; }
  h+='<div class="spnote" style="margin-top:6px">The side-by-side response comparison and cross-supplier pricing live on <b>Analysis &rsaquo; Cross-Supplier</b>.'+rfxCalibrationNoteHTML()+'</div>';
  h+='</div></div>';
  return h;
@@ -907,17 +985,18 @@ function rfxScoringHTML(){
 function rfxReqMatrixHTML(){var R=RFX;var rank=rfxReqRanking();var rankOf={fully:3,partial:2,'does-not':1,na:0};
  var lvlWord={fully:'Met',partial:'Partial','does-not':'Gap',na:'–'};
  var supW=rank.length?Math.max(8,Math.floor(58/rank.length)):12;
- var head='<tr><th style="text-align:left;width:24%">Requirement</th><th>Category</th><th>MoSCoW</th><th>Must</th>'+rank.map(function(si){return '<th style="width:'+supW+'%">'+escapeHtmlPV(R.suppliers[si].n)+'</th>';}).join('')+'</tr>';
+ // N7 (Marc 2026-07-27): supplier columns carry the canonical swatch, matching the Scoring matrix.
+ var head='<tr><th style="text-align:left;width:24%">Requirement</th><th>Category</th><th>MoSCoW</th><th>Must</th>'+rank.map(function(si){return '<th style="width:'+supW+'%">'+rfxSupplierSwatch(si)+escapeHtmlPV(R.suppliers[si].n)+'</th>';}).join('')+'</tr>';
  var rows=R.requirements.map(function(r){
   var lv=rank.map(function(si){return {si:si,lvl:rfxLevel(si,r.id),v:rfxRqScore(si,r.id)};});
   var best=-1;lv.forEach(function(x){best=Math.max(best,rankOf[x.lvl]);});
   var leaders=best>=rankOf.partial?lv.filter(function(x){return rankOf[x.lvl]===best;}).map(function(x){return x.si;}):[];
   var cells=lv.map(function(x){var isLeader=leaders.indexOf(x.si)>=0&&leaders.length<rank.length;
    // Capability #1 (Marc): match the Landscape Requirements-Heatmap, .hcell + pvHmRamp (0-5 blue ramp), ringed leader.
-   return '<td style="text-align:center;padding:6px 8px" title="'+escapeHtmlPV(rfxLevelLabel(x.lvl))+(x.v!=null?' ('+x.v+'/5)':'')+'">'+(x.v==null?'<span class="hcell" style="background:var(--bg);color:var(--mut2)">–</span>':'<span class="hcell'+(isLeader?' lead':'')+'" style="'+pvHmRamp(x.v)+';font-size:10.5px;font-weight:800">'+lvlWord[x.lvl]+'</span>')+'</td>';}).join('');
-  return '<tr><td style="text-align:left;font-weight:600;white-space:normal;max-width:230px">'+escapeHtmlPV(r.text)+'<span style="font-size:10px;color:var(--mut2)"> · conf '+Math.round((r.confidence||0)*100)+'%</span></td><td style="font-size:11px;color:var(--mut2)">'+escapeHtmlPV(titleCase(r.category))+'</td><td>'+rfxMoscowChip(r.moscow)+'</td><td>'+(r.mandatory?'<span style="font:700 8px var(--mono);text-transform:uppercase;padding:2px 6px;border-radius:30px;color:#C8202E;background:var(--pink-t,#FBE7E3)">Yes</span>':'<span style="color:var(--mut2)">-</span>')+'</td>'+cells+'</tr>';
+   return '<td style="text-align:center;padding:6px 8px" title="'+escapeHtmlPV(rfxLevelLabel(x.lvl))+(x.v!=null?' ('+x.v+'/5)':'')+'">'+(x.v==null?'<span class="hcell hc-na" title="Data not available">--</span>':'<span class="hcell'+(isLeader?' lead':'')+'" style="background:'+rfxCovCol((x.v/5)*100)+';color:'+rfxCovFg((x.v/5)*100)+';font-size:10.5px;font-weight:800">'+lvlWord[x.lvl]+'</span>')+'</td>';}).join('');
+  return '<tr><td style="text-align:left;font-weight:600;white-space:normal;max-width:230px">'+escapeHtmlPV(r.text)+'<span style="font-size:10px;color:var(--mut2)"> · conf '+Math.round((r.confidence||0)*100)+'%</span></td><td style="font-size:11px;color:var(--mut2)">'+escapeHtmlPV(titleCase(r.category))+'</td><td>'+rfxMoscowChip(r.moscow)+'</td><td>'+(r.mandatory?rfxMcmPill('Must','rust'):'<span style="color:var(--mut2)">-</span>')+'</td>'+cells+'</tr>';
  }).join('');
- return '<div class="sect"><div class="secthd"><div class="t">Requirements Matrix</div>'+rfxCap('cross-supplier · '+R.requirements.length+' requirements')+'</div><div class="spnote" style="margin:0 0 8px">Each cell shows the MoSCoW-aware status (<b>Met</b> / <b>Partial</b> / <b>Gap</b>) on the Landscape heatmap ramp (lighter = lower, deeper blue = higher); hover a cell for the underlying 0–5 score. Grey = not answered. A leading supplier on a row is <b>ringed</b>. Reflect-only first-pass analysis.</div><div class="mxwrap"><table class="mx" style="width:100%;min-width:720px"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div></div>';
+ return '<div class="sect"><div class="secthd"><div class="t">Requirements Matrix</div>'+rfxCap('cross-supplier · '+R.requirements.length+' requirements')+'</div><div class="spnote" style="margin:0 0 8px">Each cell shows the MoSCoW-aware status (<b>Met</b> / <b>Partial</b> / <b>Gap</b>) on the same plum intensity ramp as the Coverage heatmap (lighter = lower); hover a cell for the underlying 0-5 score. A dashed -- cell means not answered. A leading supplier on a row is <b>ringed</b>. Reflect-only first-pass analysis.</div><div class="mxwrap"><table class="mx" style="width:100%;min-width:720px"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 // (rfxPricingTableHTML removed, Round-2 #12: "Commercial comparison"'s raw-asks table is now
 // folded into the merged rfxCommercialComparisonHTML() below, alongside the Bid-Leveling gate and
@@ -939,10 +1018,17 @@ const RFX_NORM=(_PVRN&&_PVRN.bidders)?_PVRN:{unit:'$ / seat / yr',termNote:'',bi
 // normalized" fold stay, moved below the merged table (supplementary detail, not the headline).
 function rfxCommercialComparisonHTML(){
  var R=RFX,N=RFX_NORM,esc=escapeHtmlPV,rank=rfxReqRanking();
- var dims=[['model','Pricing model'],['annual','Annual fee'],['list','List price'],['discount','Volume discount'],['impl','Implementation'],['terms','Term'],['escalator','Escalator'],['binding','Pricing binding']];
+ // N6 (Marc 2026-07-27): the eight pricing dimensions are split. The four COST dimensions stay open,
+ // they are what this panel exists to compare. The four commercial TERMS dimensions move into a fold
+ // below, still one click away, so the panel stops running far taller than the value map beside it.
+ var dimsCost=[['annual','Annual fee'],['list','List price'],['discount','Volume discount'],['impl','Implementation']];
+ var dimsTerms=[['model','Pricing model'],['terms','Term'],['escalator','Escalator'],['binding','Pricing hold']];
+ var dims=dimsCost.concat(dimsTerms);
  var anyPending=R.suppliers.some(function(s){return s.pricing&&s.pricing.annual==='Not submitted';});
  var rawHead0='<tr><th style="text-align:left">Pricing dimension</th>'+rank.map(function(si){return '<th>'+esc(R.suppliers[si].n)+'</th>';}).join('')+'</tr>';
- var rawRows0=dims.map(function(d){return '<tr><td style="text-align:left;font-weight:600">'+esc(d[1])+'</td>'+rank.map(function(si){var pc=R.suppliers[si].pricing||{};return '<td style="white-space:normal">'+rfxPriceVal(pc[d[0]])+'</td>';}).join('')+'</tr>';}).join('');
+ function rawRowsFor(list){return list.map(function(d){return '<tr><td style="text-align:left;font-weight:600">'+esc(d[1])+'</td>'+rank.map(function(si){var pc=R.suppliers[si].pricing||{};return '<td style="white-space:normal">'+rfxPriceVal(pc[d[0]])+'</td>';}).join('')+'</tr>';}).join('');}
+ var rawRows0=rawRowsFor(dimsCost);
+ var termRows0=rawRowsFor(dimsTerms);
  var pendingNote=anyPending?'<div class="rfxgate warn" style="margin:0 0 9px">One or more suppliers have not submitted pricing in this run. Each cell stays labeled <b>Not submitted</b> until a proposal arrives, prices are never fabricated, and Not submitted is not a zero.</div>':'';
  var h='<div class="sect"><div class="secthd"><div class="t">Commercial comparison</div>'+rfxCap('raw asks · normalized all-in · read')+'</div>';
  h+='<div class="card">';
@@ -953,13 +1039,13 @@ function rfxCommercialComparisonHTML(){
   var seats=termM?parseInt(termM[1].replace(/,/g,''),10):(N.bidders.length?400:1),years=termM?parseInt(termM[2],10):3;
   var platform=N.lines[0],impl=N.lines.filter(function(L){return /implement/i.test(L.item);})[0],support=N.lines.filter(function(L){return /support/i.test(L.item);})[0];
   var refAllIn=(platform?platform.target:0)+(support?support.target:0)+((impl?impl.target*1000:0)/years/seats);
-  var normBySi={};
+  var normBySi={},_shared=rfxNormAllIn();   // R5: the figure comes from the shared helper the value map plots
   rank.forEach(function(si){
     var s=R.suppliers[si],b=N.bidders.filter(function(x){return x.name===s.n;})[0];
     if(!b){normBySi[si]=null;return;}
-    var p=platform?platform.asks[b.id]:null,sup=support?support.asks[b.id]:null,i=impl?impl.asks[b.id]:null;
-    if(p==null||sup==null||i==null){normBySi[si]={total:null};return;}
-    var implPerSeat=(i*1000)/years/seats,total=p+sup+implPerSeat;
+    var _n=_shared.bySi[si];
+    if(!_n||_n.total==null){normBySi[si]={total:null};return;}
+    var p=_n.platform,sup=_n.support,i=_n.impl,implPerSeat=_n.implPerSeat,total=_n.total;
     var recon=esc(s.n)+': $'+p.toLocaleString('en-US')+' platform + $'+sup.toLocaleString('en-US')+' support, + ($'+(i*1000).toLocaleString('en-US')+' impl &divide; '+years+'yr &divide; '+seats+' seats = $'+Math.round(implPerSeat).toLocaleString('en-US')+') = <b>$'+Math.round(total).toLocaleString('en-US')+'/seat/yr</b>';
     var delta=refAllIn?((total-refAllIn)/refAllIn*100):0;
     var read=delta<=-5?'BELOW':delta>=5?'ABOVE':'IN_LINE';
@@ -989,7 +1075,8 @@ function rfxCommercialComparisonHTML(){
  } else {
   footNote='<div class="spnote" style="margin-top:8px">No normalized cross-supplier pricing basis on file (RFX_NORM); Normalized all-in and Normalize read stay blank.</div>';
  }
- h+='<div class="mxwrap" style="margin-top:8px"><table class="mx" style="min-width:560px">'+rawHead0+'<tbody>'+rawRows0+normRowsHTML+'</tbody></table></div>'+footNote+belowHTML;
+ h+='<div class="mxwrap" style="margin-top:8px"><table class="mx" style="min-width:560px">'+rawHead0+'<tbody>'+rawRows0+normRowsHTML+'</tbody></table></div>'
+  +'<details class="xs-fold rfxterms"><summary>Commercial terms, '+dimsTerms.length+' dimensions</summary><div class="mxwrap"><table class="mx" style="min-width:560px">'+rawHead0+'<tbody>'+termRows0+'</tbody></table></div></details>'+footNote+belowHTML;
  h+='</div></div>';
  return h;
 }
@@ -1051,7 +1138,7 @@ function rfxNormZopaHTML(){
  }).join('');
  var h='<div class="sect"><div class="secthd"><div class="t">Cross-Supplier ZOPA</div>'+rfxCap('every bidder’s ask vs. target & walk-away')+'</div>'
   +'<div class="card rzopa">'+rows+'</div>'
-  +'<div class="spnote">Every priced bidder&rsquo;s ask plotted against the negotiation target and walk-away for that line item; a burnt-orange ring is Theo&rsquo;s opening offer, an ask above walk-away turns red. A bidder with no submitted price for a line is named in the read, not plotted. The individual per-supplier ZOPA is on Analysis &rsaquo; Individual. Reflect-only; targets and walk-aways are the team&rsquo;s to set.</div></div>';
+  +'<div class="spnote">Each priced bidder&rsquo;s ask against that line&rsquo;s target and walk-away. Burnt-orange ring = Theo&rsquo;s opening offer; an ask above walk-away turns red. A bidder with no submitted price for a line is named in the read, not plotted. The individual per-supplier ZOPA is on Analysis &rsaquo; Individual. Reflect-only; targets and walk-aways are the team&rsquo;s to set.</div></div>';
  return h;
 }
 // #73 (Marc): the INDIVIDUAL per-supplier ZOPA for RFx › Analysis › Individual, a single-supplier bar per
@@ -1243,7 +1330,8 @@ function rfxRecommendationHTML(){var R=RFX;var rank=rfxReqRanking();var recSi=ra
  // 1) FINAL recommendation banner + supporting argument. Ranking policy: the advisory recommendation
  // LEADS with the top scorer even when it carries an open Must-Have gate; the gate is a prominent flag
  // (badge + business-call note) here, never a reason to drop to the #2 bidder.
- var h='<div class="sect"><div class="secthd"><div class="t">Final recommendation</div></div>';
+ // R1 (Marc 2026-07-27): "Final recommendation" overstated it, this is advisory and pre-award.
+ var h='<div class="sect"><div class="secthd"><div class="t">Recommendation to Award</div></div>';
  h+='<div class="card" style="border-left:3px solid '+recTier.col+'"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px"><span style="font-weight:800;font-size:15px;color:'+recTier.col+'">'+escapeHtmlPV(rec.n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:'+recTier.col+';background:'+recTier.bg+'">'+escapeHtmlPV(recTier.label)+' · advisory</span><span style="font-size:12px;color:var(--mut2)">weighted fit '+recC.weightedFit+'/100 · coverage '+recC.coveragePct+'%</span>'+(recGated?' <span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:#C8202E;background:var(--pink-t,#FBE7E3)">&#9888; Must-Have gate: '+escapeHtmlPV(rec.mustFail.join(', '))+'</span>':'')+'</div>';
  var arg='On the first-pass response analysis, <b>'+escapeHtmlPV(rec.n)+'</b> is the advisory recommendation, the top panel score in the field: '+rfxRecoText(recSi,0)+(sc.recAnnual!=null?(' Recommended commercial baseline: '+rfxFmtUsd(sc.recAnnual)+'/yr.'):' A firm annual price is still required for the commercial case.');
  if(recGated){
@@ -1416,12 +1504,12 @@ function rfxBcTermsMatrixHTML(recSi){
  body+=row('Escalator Cap',function(i){return rfxPriceVal(R.suppliers[i].pricing&&R.suppliers[i].pricing.escalator);});
  body+=row('Pricing Hold',function(i){return rfxPriceVal(R.suppliers[i].pricing&&R.suppliers[i].pricing.binding);});
  body+=row('Risk Level',function(i){var r=rfxRiskLevel(i);var tone=(r==='critical')?'rust':((r==='high')?'emph':((r==='medium')?'blue':'teal'));return rfxMcmPill(r.charAt(0).toUpperCase()+r.slice(1),tone);});
- body+=row('Gate Status',function(i){var g=!!(R.suppliers[i].mustFail&&R.suppliers[i].mustFail.length);return g?rfxMcmPill('Gate Risk','rust'):rfxMcmPill('Clear','teal');});
+ body+=row('Gate Status',function(i){var g=!!(R.suppliers[i].mustFail&&R.suppliers[i].mustFail.length);return g?rfxMcmPill('Gated','rust'):rfxMcmPill('Clear','teal');});
  body+=row('Exit Terms',function(){return '<span style="color:var(--mut2)">Not yet negotiated</span>';});
  var h='<div class="card">';
  h+='<div class="secthd"><div class="t">Supplier Comparison · Terms vs the Field</div><div class="cap">all evaluated suppliers · '+esc(R.suppliers[recSi].n)+' highlighted</div></div>';
  h+='<div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th style="text-align:left">Term</th>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div>';
- h+='<div class="spnote">Panel score is the weighted 0-5 evaluation; price, discount, model, term, escalator and pricing hold are as submitted in the pricing schedule. Est. 3-Yr TCV is annual price × 3, indicative and pre-negotiation, excluding implementation and escalation. A supplier with no submitted price shows Not Submitted, never estimated. Reflect-only; this is the tab&rsquo;s one full-field terms comparison.</div>';
+ h+='<div class="spnote">Panel score is the weighted 0-5 evaluation. Commercial rows are as submitted. Est. 3-Yr TCV is annual price × 3, indicative and pre-negotiation, excluding implementation and escalation. A supplier with no submitted price shows Not Submitted, never estimated. Reflect-only; this is the tab&rsquo;s one full-field terms comparison.</div>';
  h+='</div>';
  return h;
 }
@@ -1530,7 +1618,7 @@ function rfxBcDealEconomicsHTML(recSi){
  h+='<div class="kstrip">';
  h+='<div class="card kc"><div class="kl">Annual Subscription</div><div class="kn">'+rfxFmtUsd(annual)+'</div><div class="ks">'+(pr.model?(esc(pr.model)+' · '):'')+(escPct?('capped '+escPct+'%/yr escalator'):'no escalator on file')+'</div></div>';
  h+='<div class="card kc"><div class="kl">Implementation</div><div class="kn">'+(impl!=null?rfxFmtUsd(impl):'-')+'</div><div class="ks">'+(impl!=null?('fixed fee · one-time, Year 1'):'not on file')+'</div></div>';
- h+='<div class="card kc"><div class="kl">3-Yr TCV (Simple)</div><div class="kn" style="color:var(--plum)">'+rfxFmtUsd(tco3)+'</div><div class="ks">annual price × 3, pre-escalation / implementation</div></div>';
+ h+='<div class="card kc"><div class="kl">3-Yr Subscription Baseline</div><div class="kn" style="color:var(--plum)">'+rfxFmtUsd(tco3)+'</div><div class="ks">annual price × 3, pre-escalation / implementation</div></div>';
  h+='<div class="card kc"><div class="kl">Total 3-Yr Outlay</div><div class="kn" style="color:var(--emph,#C15E19)">'+rfxFmtUsd(totAll)+'</div><div class="ks">with escalation + implementation, not TCV</div></div>';
  h+='</div>';
  h+='<div style="display:grid;grid-template-columns:minmax(230px,320px) 1fr;gap:20px;align-items:start;margin-top:14px">';
@@ -2187,6 +2275,19 @@ function rfxMoscowChip(m){var map={must:['var(--plum)','rgba(92,43,80,.12)','Mus
 // (no longer a <details> "reference" fold, and no separate reference surface exists elsewhere on
 // the tab to duplicate it), the fuller register: ID / requirement / MoSCoW / acceptance / traces-to
 // / in-cat wt / cat wt / confidence. Sits at the bottom of Scoring, closing the tab.
+// N5 (Marc 2026-07-27): a flat r1..rN sequence tells a reader nothing and does not survive a set of
+// 400+. The DISPLAY id is derived from the requirement's own category plus its index within that
+// category (SEC-02, INT-04), so an id says where you are. The STORED id is untouched: it is the
+// traceability key other panels resolve against, so renaming it would be a data change, not a label
+// change. The stored id rides along as a secondary so nothing is lost.
+function rfxCatPrefix(cat){
+ var words=String(cat||'').replace(/[^A-Za-z ]/g,' ').split(/\s+/).filter(Boolean);
+ if(!words.length)return 'REQ';
+ return (words[0].length>=3?words[0].slice(0,3):(words[0]+(words[1]||'')).slice(0,3)).toUpperCase();
+}
+function rfxDisplayReqId(cat,idxInCat){
+ return rfxCatPrefix(cat)+'-'+String(idxInCat+1).replace(/^(\d)$/,'0$1');
+}
 function rfxRequirementsRegisterHTML(){var R=RFX;var cw=rfxCategoryWeights();
  var h='<div class="sect"><div class="secthd"><div class="t">Requirements register</div>'+rfxCap(R.requirements.length+' requirements · MoSCoW · acceptance · traceability · confidence')+'</div>';
  h+='<div class="spnote" style="margin:0 0 10px">The requirement set behind the scoring: each requirement’s MoSCoW priority, acceptance criterion, the business objective it traces to, and Theo’s first-pass extraction confidence. Set-level category weights are derived from the requirement weights. Reflect-only.</div>';
@@ -2200,18 +2301,34 @@ function rfxRequirementsRegisterHTML(){var R=RFX;var cw=rfxCategoryWeights();
  // Marc: ONE compact row per requirement, banded by category (a shaded blue-tint header row per
  // category with its weight + count), Mandatory shown as a chip (not plain text), Must / mandatory
  // rows carry a subtle left accent.
- h+='<div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th>ID</th><th style="text-align:left;width:20%">Requirement</th><th>Priority</th><th style="text-align:left;width:23%">Acceptance criterion</th><th style="text-align:left;width:23%">Traces to</th><th>In-cat wt</th><th>Cat wt</th><th>Conf</th></tr></thead><tbody>';
+ // N5: the table itself is COLLAPSED, and inside it each category is its own accordion with only one
+ // open at a time (native <details name>, so the exclusivity needs no script). Each category header
+ // stays readable while closed and carries its own summary, count, mandatory count, weight, because
+ // collapsing is useless if it hides the very numbers people scan for.
+ var regTableHead='<thead><tr><th>ID</th><th style="text-align:left;width:20%">Requirement</th><th>Priority</th><th style="text-align:left;width:23%">Acceptance criterion</th><th style="text-align:left;width:23%">Traces to</th><th>In-cat wt</th><th>Cat wt</th><th>Conf</th></tr></thead><tbody>';
+ h+='<details class="rfxreg"><summary class="rfxreg-sum">Requirement detail, '+R.requirements.length+' requirements across '+cw.length+' categories</summary><div class="rfxreg-body">';
  cw.forEach(function(w){
   var rs=R.requirements.filter(function(r){return r.category===w.cat;});
   if(!rs.length)return;
   var mand=rs.filter(function(r){return r.mandatory;}).length;
   var inCatTotal=rs.reduce(function(a,r){return a+(r.weight||0);},0)||1;
-  h+='<tr><td colspan="8" style="background:var(--blue-t,#E4EBF1);padding:6px 11px;border-top:1px solid var(--line2,#E0DCD5)"><span style="display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font:700 9.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--plum)">'+escapeHtmlPV(titleCase(w.cat))+'</span><span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)">'+w.pct+'% weight · '+rs.length+' req'+(rs.length===1?'':'s')+(mand?' · '+mand+' mandatory':'')+'</span></span></td></tr>';
+  var hasMust=rs.some(function(r){return (r.moscow==='must')||r.mandatory;});
+  // the header stays legible while CLOSED: count, mandatory count, weight, and whether the category
+  // holds a Must-Have, which is the one thing a reader must not have to open a fold to discover.
+  h+='<details class="rfxreqcat" name="rfxreqcat"><summary>'
+   +'<span class="rc-caret" aria-hidden="true">&#9656;</span>'
+   +'<span class="rc-name">'+escapeHtmlPV(titleCase(w.cat))+'</span>'
+   +'<span class="rc-pre">'+rfxCatPrefix(w.cat)+'</span>'
+   +'<span class="rc-meta">'+rs.length+' req'+(rs.length===1?'':'s')+'</span>'
+   +(mand?'<span class="rc-meta rc-mand">'+mand+' mandatory</span>':'')
+   +(hasMust?rfxMcmPill('Holds a Must-Have','rust'):'')
+   +'<span class="rc-wt">'+w.pct+'%</span>'
+   +'</summary><div class="mxwrap"><table class="mx" style="width:100%">'+regTableHead+'<tbody>';
   rs.forEach(function(r){var conf=Math.round((r.confidence||0)*100);var confCol=conf>=85?'var(--plum)':conf>=70?'#2E5E8C':'#8A5A00';
    var isMust=(r.moscow==='must')||r.mandatory;
    var inCatPct=Math.round((r.weight||0)/inCatTotal*100);
    h+='<tr>'
-    +'<td style="font-family:var(--mono);color:var(--mut2)">'+escapeHtmlPV(r.id)+'</td>'
+    +'<td style="font-family:var(--mono)"><span class="rq-id">'+escapeHtmlPV(rfxDisplayReqId(w.cat,rs.indexOf(r)))+'</span><span class="rq-id-raw" title="Stored requirement id, used for traceability">'+escapeHtmlPV(r.id)+'</span></td>'
     +'<td style="text-align:left;font-weight:600;white-space:normal'+(isMust?';box-shadow:inset 3px 0 0 var(--plum)':'')+'">'+escapeHtmlPV(r.text)+(r.mandatory?'<div style="margin-top:4px"><span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:30px;color:var(--riskred);background:var(--pink-t,#FBE7E3)">Mandatory</span></div>':'')+'</td>'
     +'<td>'+rfxMoscowChip(r.moscow)+'</td>'
     +'<td style="text-align:left;white-space:normal;font-size:11.5px;color:var(--mut);line-height:1.45">'+escapeHtmlPV(r.acceptance||'-')+'</td>'
@@ -2220,8 +2337,9 @@ function rfxRequirementsRegisterHTML(){var R=RFX;var cw=rfxCategoryWeights();
     +'<td style="font-family:var(--mono);color:var(--mut2)">'+w.pct+'%</td>'
     +'<td><div style="display:flex;align-items:center;gap:6px;justify-content:center"><div style="width:42px;height:6px;border-radius:4px;background:var(--nested);overflow:hidden;flex:none"><i style="display:block;height:100%;width:'+conf+'%;background:'+confCol+'"></i></div><span style="font-family:var(--mono);font-size:10.5px;font-weight:700;color:'+confCol+'">'+conf+'%</span></div></td></tr>';
   });
+  h+='</tbody></table></div></details>';
  });
- h+='</tbody></table></div></div>';
+ h+='</div></details></div>';
  return h;
 }
 // (Dead code removed per rfx_platform_audit.md Part 1 dead-code item: rfxOpenScoring/rfxSetMyScore,

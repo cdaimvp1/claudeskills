@@ -20,7 +20,7 @@ var _PVDOM = (_PV04 && typeof Theo !== 'undefined' && !Theo.isDNA(_PV04) && _PV0
 
 // ---- Negotiation prep (target / walk-away / ZOPA · leverage · issue agenda) ----
 const NEGPREP = _PVDOM.negprep || { agenda: [], talking: [], redlines: [] };
-// ---- Contract review (Protection Score + gaps + redlines) ----
+// ---- Contract review (Playbook Alignment Score + gaps + redlines) ----
 const CONTRACT = _PVDOM.contract || { gaps: [] };
 // ---- 14-category governing-PROTECTION scan (Deal / Review). Each protection
 // category carries a status trichotomy (Covered / Confirm / Gap) + a governing-doc

@@ -1,6 +1,8 @@
 :root{--red:#E1251B;--red-d:#B41E16;--ink:#1A1A1A;--mut:#3E3933;--mut2:#4A443C;--line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--surface:#FFFFFF;--panel:#E4E3E0;--nested:#E4E4DF;--well:#DDDCD8;--pink-t:#FBE7E3;--pink-2:#F0C7BF;--ti-blue:#D2E1F2;--ti-gray:#E1E1DD;--ti-red:#F6D5CE;--ti-purple:#E3D8F0;--ti-amber:#F4E6BC;--tib-blue:#A9C4E6;--tib-gray:#CBC8C1;--tib-red:#E7B6A9;--tib-purple:#D0BEEA;--tib-amber:#E0CB8C;--teal-t:#EFF7F3;--teal-d:#1F7A5A;--amber-t:#FBF1DA;--amber:#FFC709;--amber-d:var(--amber-d);--blue-t:#E4EBF1;--blue:#99BFE5;--blue-d:#2E5E8C;--cci-orange:#D2691E;--cci-red:#C0392B;--ai:#7A0E8C;--ai-t:#F6ECF8;--shadow:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);--shadow-lg:0 12px 34px rgba(38,30,20,.14);--glow:0 8px 24px rgba(225,37,27,.28);--sans:'Libre Franklin',system-ui,Arial,sans-serif;--mono:'Libre Franklin',system-ui,Arial,sans-serif;--fz-h:17px;--fz-title:15.5px;--fz-body:14px;--fz-sm:13px;--fz-meta:12px;--fz-mono:12px;--header:#E1251B;--teal:#1F7A5A;--navy:#0F3A85;--riskred:#A23A30;}
-/* ===== Dark theme, PURELY ADDITIVE token override (color layer only; no rule/markup changed, so light stays byte-identical). Toggle sets data-theme="dark" on <html>. ===== */
-html[data-theme="dark"]{--tint-a4c2e6:#172637;--tint-c6d8ee:#172536;--tint-c6dfe7:#162d34;--tint-cbddef:#172736;--tint-cde8de:#173228;--tint-e0daec:#201830;--tint-e1e3e7:#292929;--tint-e3dac7:#302818;--tint-e4e0d7:#29251c;--tint-e4e4df:#292929;--tint-e7a33e:#3b2d19;--tint-eaf0f9:#172437;--tint-ece8f2:#211a2d;--tint-edece8:#26241d;--tint-eef0f3:#1c2128;--tint-efece8:#28231c;--tint-efedea:#26231d;--tint-efeeec:#292929;--tint-f1e3bc:#383018;--tint-f2eeee:#261d1d;--tint-f4d1cc:#381c18;--tint-f4f1ea:#2f2819;--tint-f4f1ec:#2d261a;--tint-f4f2ee:#2a251b;--tint-f4f6fb:#171f35;--tint-f4f7fb:#172435;--tint-f6e9e8:#341916;--tint-f7dbaf:#3b2e19;--tint-f7f5f1:#2d271a;--tint-f7f5f2:#2b251b;--tint-fafaf9:#292929;--tint-fbe7c7:#3c2f1a;--tint-fbeae8:#391c19;--tint-fbefc9:#3c341a;--tint-fbf4e6:#3a2f19;--tint-fce4e0:#3b1e19;--tint-fff0d8:#3e311b;color-scheme:dark;
+/* ===== R11 (Marc 2026-07-27): the dark-theme token override block and its two dark-only rules were
+   REMOVED as inert. This dashboard is light-only: the build stamps <html data-theme="light"> and ships
+   no toggle, so nothing could ever select them. The html:not([data-theme="dark"]) rules below are the
+   ACTIVE light rules and are deliberately kept exactly as they are. ===== */
  --ink:#ECECEC;--mut:#B0B0B0;--mut2:#8A8A8A;--line:#3A3A3A;--line2:#484848;
  --bg:#1C1C1C;--surface:#262626;--panel:#2B2B2B;--nested:#303030;--well:#363636;
  --header:#0A0A0A;
@@ -87,7 +89,6 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .bub.own{border-color:var(--red)}.bub.rep{border-color:var(--amber-d)}.bub.stk{border-color:var(--blue-d)}.bub.sys{border-color:var(--mut2)}.bub.ai{border-color:var(--navy)}
 /* User's own message bubble: warm dark charcoal + white text in light; dark warm surface + off-white text with a 1px off-white outline in dark. (Was red/white; me=red identity kept for avatars/names elsewhere.) */
 .msg.me .bub{background:#423C35;color:#fff;border-color:#423C35;border-bottom-left-radius:15px;border-bottom-right-radius:5px}
-html[data-theme="dark"] .msg.me .bub{background:#33302A;color:#E8E4DC;border:1px solid #E8E4DC}
 .aidraft{border:1px solid var(--line);border-radius:11px;padding:9px 10px;background:var(--bg);margin-top:7px;color:var(--ink)}
 .aidraft .akv{font-family:var(--mono);font-size:var(--fz-mono);color:var(--mut2)}.aidraft .akv b{color:var(--ink);font-weight:600}.aidraft .abody{font-size:var(--fz-sm);white-space:pre-line;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}.aidraft .aacts{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}.aidraft .anote{font-family:var(--mono);font-size:9.5px;color:var(--mut2);margin-top:7px}
 .chatpinned{display:inline-flex;align-items:center;min-width:0}
@@ -434,7 +435,13 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .inbbody{font-size:var(--fz-meta);color:var(--ink);line-height:1.5;margin-bottom:10px}.inbbody b{font-weight:700}
 .inbacts{display:flex;gap:8px;margin-bottom:9px}
 .inbnote{font-size:var(--fz-meta);color:var(--mut);line-height:1.45;border-top:1px solid #D4E2F0;padding-top:8px}.secthd .t{font-family:var(--mono);font-size:var(--fz-mono);letter-spacing:.02em;text-transform:capitalize;color:var(--mut2);font-weight:700;padding-left:10px;border-left:3px solid var(--pri-tx);line-height:1.15}.secthd .lk{font-family:var(--mono);font-size:var(--fz-mono);color:var(--red);cursor:pointer;font-weight:600}.secthd .lk:hover{text-decoration:underline}
-.kv{display:grid;grid-template-columns:128px 1fr;gap:9px 12px;font-size:var(--fz-sm)}.kv .k{color:var(--mut2);font-family:var(--mono);font-size:var(--fz-mono);text-transform:uppercase;padding-top:2px;font-weight:600}.kv .v{font-weight:600}
+.kv{display:grid;grid-template-columns:128px 1fr;gap:9px 12px;font-size:var(--fz-sm)}
+/* N8: company-profile facts on a fixed 3-column grid (2 at narrow), one fact per cell. Dividers
+   rather than boxes, per the de-bubble rule, so it reads as a fact table not a set of tiles. */
+.ovfacts.ovfacts-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 22px}
+.ovfacts.ovfacts-3 .ovfact{min-width:0;padding-bottom:2px}
+.ovfacts.ovfacts-3 .ovfact .val{font-size:12.8px;line-height:1.45;color:var(--ink);word-break:break-word}
+@media(max-width:760px){.ovfacts.ovfacts-3{grid-template-columns:repeat(2,minmax(0,1fr))}}.kv .k{color:var(--mut2);font-family:var(--mono);font-size:var(--fz-mono);text-transform:uppercase;padding-top:2px;font-weight:600}.kv .v{font-weight:600}
 .sect>.kv{background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-card);padding:12px 14px}
 .prow{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line)}.prow:first-of-type{border-top:none}.prow .pn{font-size:var(--fz-body);font-weight:600}.prow .pr2{font-family:var(--mono);font-size:var(--fz-mono);color:var(--mut2)}.prow .pact{margin-left:auto;font-family:var(--mono);font-size:var(--fz-meta);color:var(--mut2);cursor:pointer;border:1px solid var(--line2);border-radius:30px;padding:4px 10px}.prow .pact:hover{border-color:var(--red);color:var(--red)}
 /* documents tree */
@@ -608,6 +615,24 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .rfx-tab .hcell{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:24px;border-radius:7px;font:600 12.5px var(--sans);padding:0 6px;cursor:default}
 .rfx-tab .hcell.sub{min-width:40px;height:22px;font-size:11.5px}
 .rfx-tab .hcell.lead{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.85),0 0 0 2px var(--plum)}
+/* N3 (Marc 2026-07-27): Scoring matrix brought up to the rest of the dashboard's finish.
+   Structural leader emphasis (a rule, never a tint), a quiet mono weight chip, generous row
+   rhythm, and a clearly separated total/gate footer. Colour still does a job: the score ramp
+   is the same plum intensity ramp as the Coverage heatmap, so both heat surfaces read as one. */
+.rfx-tab .schm{border-collapse:separate;border-spacing:0}
+.rfx-tab .schm thead th{padding:9px 10px;font:700 9px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);white-space:nowrap;border-bottom:1px solid var(--line2)}
+.rfx-tab .schm thead th.lead{color:var(--ink)}
+.rfx-tab .schm td{padding:8px 10px;border-bottom:1px solid var(--line)}
+.rfx-tab .schm tbody tr:last-child td{border-bottom:1px solid var(--line2)}
+.rfx-tab .schm td.lead,.rfx-tab .schm th.lead{box-shadow:inset 1px 0 0 var(--plum),inset -1px 0 0 var(--plum);background:transparent}
+.rfx-tab .schm tbody tr:hover td{background:rgba(92,43,80,.03)}
+.rfx-tab .schm .schm-cn{font-weight:600;font-size:12.6px;color:var(--ink)}
+.rfx-tab .schm-wchip{display:inline-block;font:700 9.5px var(--mono);letter-spacing:.02em;color:var(--mut2);background:var(--well,#F1EEEA);border-radius:30px;padding:2px 8px}
+.rfx-tab .schm .hcell{min-width:46px;height:26px;border-radius:7px;font:700 12.5px var(--sans)}
+.rfx-tab .schm .hcell.hc-na{background:transparent;color:var(--mut2);font-family:var(--mono);font-weight:700;letter-spacing:.06em;cursor:help;border:1px dashed var(--line2)}
+.rfx-tab .schm tfoot td{padding:10px;border-top:1px solid var(--line2);border-bottom:none}
+.rfx-tab .schm tfoot .wtotrow td{font-size:13px;font-weight:800;color:var(--ink);background:transparent}
+.rfx-tab .schm tfoot .gaterow td{padding-top:2px}
 /* RFx Scoring #11, merged score-entry (mode toggle + inputs + side-by-side you/panel) */
 .scmode-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 11px}
 .scmode-hint{font-size:11.5px;color:var(--mut2);line-height:1.4}
@@ -1840,7 +1865,6 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 /* Theo chat avatar: just the dino, blended (black in light, off-white in dark), no circle. One identity for every assistant turn. */
 .mav.theo{background:transparent;overflow:visible}
 .mav.theo img{width:23px;height:23px;display:block;filter:brightness(0)}
-html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 /* --- Start-an-RFx: fuller flow --- */
 .pvsl .rfxsec{margin-top:15px}
 .pvsl .rfxsechd{font:700 10px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin:0 0 8px}
@@ -2009,13 +2033,89 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 
 /* Cross-Supplier layout bands (value+cost side-by-side, capability heatmap+read, per-req fold) */
 .rfxrpt .xs2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-.rfxrpt .xs2col-hm{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start}
+/* Risk roll-up + Coverage heatmap. Marc 2026-07-27: the two panels in this pair MATCH HEIGHT, and
+   whichever one outgrows the pair scrolls inside itself rather than stretching the row. */
+.rfxrpt .xs2col-hm{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:stretch}
+/* the grid's children are plain wrappers, so the fill has to be threaded wrapper > sect > card */
+.rfxrpt .xs2col-hm>div{display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-hm>div>.sect{display:flex;flex-direction:column;flex:1;min-height:0}
+.rfxrpt .xs2col-hm>div>.sect>.card{flex:1;display:flex;flex-direction:column;min-height:0}
+/* level the two section headers so both cards start on the same line, not just end on it */
+.rfxrpt .xs2col-hm>div>.sect>.secthd{min-height:20px;align-items:center}
+/* the table area is the part that gives: it scrolls, the reads and source notes below stay put */
+.rfxrpt .rfxpairscroll{overflow-y:auto;min-height:0;max-height:46vh;
+  scrollbar-width:thin;scrollbar-color:var(--line2,#BDBAB3) transparent}
+.rfxrpt .rfxpairscroll::-webkit-scrollbar{width:9px}
+.rfxrpt .rfxpairscroll::-webkit-scrollbar-thumb{background:var(--line2,#BDBAB3);border-radius:30px}
+.rfxrpt .rfxpairscroll::-webkit-scrollbar-track{background:rgba(33,25,17,.04)}
+.rfxrpt .rfxpairscroll thead th{position:sticky;top:0;z-index:1;background:var(--canvas,#F7F6F3)}
 /* Round-3 (Marc item 2): Field-at-a-glance value map LEFT · Commercial comparison table RIGHT.
    Slightly favors the right column since the commercial table carries a supplier column per bidder. */
 .rfxrpt .xs2col-comm{display:grid;grid-template-columns:1fr 1.1fr;gap:16px;align-items:start}
 @media(max-width:900px){.rfxrpt .xs2col,.rfxrpt .xs2col-hm,.rfxrpt .xs2col-comm{grid-template-columns:1fr}}
 .rfxrpt .xs2col>.sect,.rfxrpt .xs2col-hm>.sect,.rfxrpt .xs2col-comm>.sect{margin-bottom:0}
+/* R6 provenance grouping in the Risk roll-up (Option A, Marc 2026-07-27) */
+.rfxrpt .rfxprovhd th{font:700 8.4px var(--mono);letter-spacing:.05em;text-transform:uppercase;padding-bottom:3px;border-bottom:2px solid var(--line2,#BDBAB3)}
+.rfxrpt .rfxprovhd th.rfxprova{color:var(--pri-tx,#5C2B50);border-bottom-color:var(--pri-tx,#5C2B50)}
+.rfxrpt .rfxprovhd th.rfxprovb{color:#2E5E8C;border-bottom-color:#2E5E8C}
+.rfxrpt .mx th.rfxprovb,.rfxrpt .mx td.rfxprovb{border-left:1px solid var(--line2,#BDBAB3)}
+.rfxrpt .rfxsrcrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;font-size:10.5px;color:var(--mut2);line-height:1.5}
+.rfxrpt .rfxsrcrow>div{flex:1 1 210px}
+.rfxrpt .rfxsk{display:inline-flex;align-items:center;gap:5px;font:700 8.6px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+.rfxrpt .rfxsk .dot{width:6px;height:6px;border-radius:50%}
+.rfxrpt .rfxsk.a{color:var(--pri-tx,#5C2B50)} .rfxrpt .rfxsk.a .dot{background:var(--pri-tx,#5C2B50)}
+.rfxrpt .rfxsk.b{color:#2E5E8C} .rfxrpt .rfxsk.b .dot{background:#2E5E8C}
 .rfxrpt .xs-read{margin-top:14px}
+/* ================= N1 (Marc 2026-07-27): THE ROW RULE, dashboard-wide ======================
+   Panels are organised into ROWS. Every COLUMN in a row ends on the same line, whether the column
+   holds ONE panel or a STACK of panels (stack + gaps = the single panel's height). Where a column
+   would outgrow the row, the panel that grew scrolls inside itself rather than stretching the row.
+   Applied to all three side-by-side rows: Overview Participation/Completeness, Analysis value-map
+   /commercial-comparison (a 1-vs-2-stacked row), and Analysis risk-rollup/coverage-heatmap. ====== */
+/* N5 (Marc 2026-07-27): Requirements register = collapsed table, categories as an exclusive accordion.
+   Native <details name> gives one-open-at-a-time with no script. Category headers read while closed. */
+.rfxreg{border:1px solid var(--line2,#BDBAB3);border-radius:10px;background:var(--card,#fff);overflow:hidden}
+.rfxreg>.rfxreg-sum{list-style:none;cursor:pointer;padding:11px 14px;font:700 11px var(--mono);
+  letter-spacing:.03em;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:8px}
+.rfxreg>.rfxreg-sum::-webkit-details-marker{display:none}
+.rfxreg>.rfxreg-sum:before{content:"B8";font-size:10px;color:var(--plum);transition:transform .12s}
+.rfxreg[open]>.rfxreg-sum:before{transform:rotate(90deg)}
+.rfxreg[open]>.rfxreg-sum{border-bottom:1px solid var(--line)}
+.rfxreg-body{padding:0}
+.rfxreqcat{border-bottom:1px solid var(--line)}
+.rfxreqcat:last-child{border-bottom:none}
+.rfxreqcat>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:9px 14px;background:transparent}
+.rfxreqcat>summary::-webkit-details-marker{display:none}
+.rfxreqcat>summary:hover{background:rgba(92,43,80,.03)}
+.rfxreqcat[open]>summary{border-bottom:1px solid var(--line);box-shadow:inset 3px 0 0 var(--plum)}
+.rfxreqcat .rc-caret{font-size:9px;color:var(--plum);transition:transform .12s;display:inline-block;width:10px}
+.rfxreqcat[open] .rc-caret{transform:rotate(90deg)}
+.rfxreqcat .rc-name{font-weight:700;font-size:12.8px;color:var(--ink)}
+.rfxreqcat .rc-pre{font:700 9px var(--mono);letter-spacing:.06em;color:var(--mut2);border:1px solid var(--line2);border-radius:30px;padding:1px 7px}
+.rfxreqcat .rc-meta{font:600 10.5px var(--mono);color:var(--mut2)}
+.rfxreqcat .rc-mand{color:var(--plum)}
+.rfxreqcat .rc-wt{margin-left:auto;font:800 11.5px var(--mono);color:var(--plum)}
+.rq-id{display:block;font-weight:800;font-size:11px;color:var(--ink);letter-spacing:.03em}
+.rq-id-raw{display:block;font-size:9.5px;color:var(--mut2);margin-top:1px}
+.rfxrow2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.rfxrow2>div{min-width:0;display:flex;flex-direction:column}
+.rfxrow2>div>.card{flex:1;display:flex;flex-direction:column;min-height:0}
+/* value map + its read card, stacked, against the commercial comparison: the MAP absorbs the slack
+   so the read stays snug to its text and the two columns still finish level. */
+.rfxrpt .xs2col-comm{align-items:stretch}
+.rfxrpt .xs2col-comm>div{display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-comm>div>.sect{display:flex;flex-direction:column;flex:1;min-height:0}
+.rfxrpt .xs2col-comm>div>.sect>.card{flex:1;display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-comm>div>.card.xs-read{flex:0 0 auto}
+/* whichever table in an equalised row outgrows its column scrolls inside it, same affordance as the
+   Risk roll-up: thin permanent scrollbar, sticky header, never a silent clip. */
+.rfxrpt .xs2col-comm .mxwrap{overflow-y:auto;min-height:0;max-height:52vh;
+  scrollbar-width:thin;scrollbar-color:var(--line2,#BDBAB3) transparent}
+.rfxrpt .xs2col-comm .mxwrap::-webkit-scrollbar{width:9px}
+.rfxrpt .xs2col-comm .mxwrap::-webkit-scrollbar-thumb{background:var(--line2,#BDBAB3);border-radius:30px}
+.rfxrpt .xs2col-comm .mxwrap thead th{position:sticky;top:0;z-index:1;background:var(--canvas,#F7F6F3)}
+.rfxrpt .rfxterms{margin-top:10px}
 .rfxrpt .xs-ins{font-size:12.6px;line-height:1.6;color:var(--mut)} .rfxrpt .xs-ins b{color:var(--ink)}
 .rfxrpt .xs-ins .il{font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--pri-tx);margin-bottom:5px;display:block}
 .rfxrpt .xs-fold{margin-top:12px;border-top:1px solid var(--line)}

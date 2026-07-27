@@ -106,13 +106,33 @@ const EV_META = {
   unavailable: { label: 'Unavailable',     cls: 'ev-unavailable' }
 };
 // evidenceChip(type, {short, sources}) -> chip; if sources given, becomes a jump-to-source affordance.
+//
+// D2 (Marc 2026-07-27): a Claude INFERENCE no longer renders as a per-item chip. Chips on every
+// inferred read was rejected as noise; the agreed convention is ONE quiet mark, ONE key, and the
+// basis on hover. So type 'inference' renders a small dotted ring mark instead of a chip, carrying
+// the basis in its tooltip. Every OTHER evidence type keeps its chip unchanged: a contract fact, a
+// calculation and an inference are different things, and only the inference needed de-emphasising.
+// Implemented here, in the one helper all ~57 call sites already use, so no call site has to change
+// and the convention cannot be applied inconsistently.
+function inferenceMark(basis) {
+  const why = basis ? ('Claude inference · ' + basis) : 'Claude inference · read from the deal record, not a stated fact';
+  return '<span class="ev-inf" role="img" tabindex="0" aria-label="' + esc(why) + '" title="' + esc(why) + '">&#9702;</span>';
+}
 function evidenceChip(type, opts) {
   const o = opts || {}; const m = EV_META[type] || EV_META.inference;
+  if ((EV_META[type] ? type : 'inference') === 'inference') {
+    return inferenceMark(o.basis || ((o.sources && o.sources.length) ? o.sources.join(', ') : ''));
+  }
   const txt = o.short ? m.label.split(' ')[0] : m.label;
   const src = (o.sources && o.sources.length)
     ? ' data-jump="tab:brief" title="' + esc(m.label) + ' · ' + esc(o.sources.join(', ')) + '"'
     : ' title="' + esc(m.label) + '"';
   return '<span class="ev ' + m.cls + '"' + src + '>' + esc(txt) + '</span>';
+}
+// D2: the single key for the whole page, rendered once (see shell.js), never per panel.
+function inferenceKey() {
+  return '<div class="ev-inf-key">' + inferenceMark('') +
+    '<span>marks a Claude inference, a read rather than a stated fact. Hover any mark for its basis.</span></div>';
 }
 // coverageBadge('Strong'|'Moderate'|'Limited')
 function coverageBadge(level) {
@@ -360,8 +380,58 @@ const DealUI = {
     if (subM && tabM) this.showSubtab(tabM[1], subM[1]);
   },
 
+  // DN1 (Marc 2026-07-27): the Findings Register has a FOCUS mode. Clicking a finding in the
+  // Navigator (or any other data-gotofinding source) shows that finding ALONE in the register
+  // panel with a Back control; clicking a different navigator item swaps straight to it without
+  // needing Back first. Back restores the full list AND the scroll position it was left at, so
+  // returning does not dump the reader at the top of a 22-row register.
+  focusFinding(id) {
+    const scope = document.querySelector('[data-filter-scope]');
+    if (!scope) return false;
+    const row = scope.querySelector('[data-exprow="' + id + '"]');
+    if (!row) return false;
+    const scroller = scope.querySelector('.lp-reg-scroll');
+    if (!scope.classList.contains('is-focused')) {
+      scope.setAttribute('data-prev-scroll', scroller ? String(scroller.scrollTop) : '0');
+    }
+    scope.classList.add('is-focused');
+    scope.setAttribute('data-focus-id', id);
+    // hide every row + group header except the focused finding and its expander
+    scope.querySelectorAll('[data-exprow]').forEach(r => {
+      const on = r.getAttribute('data-exprow') === id;
+      r.classList.toggle('lp-focus-off', !on);
+      if (on) r.classList.add('is-open');
+    });
+    scope.querySelectorAll('[data-expfor]').forEach(x => {
+      const on = x.getAttribute('data-expfor') === id;
+      x.classList.toggle('lp-focus-off', !on);
+      if (on) x.classList.remove('is-hidden');
+    });
+    scope.querySelectorAll('[data-grouphd]').forEach(g => g.classList.add('lp-focus-off'));
+    const bar = scope.querySelector('[data-focus-bar]');
+    if (bar) {
+      bar.classList.remove('is-hidden');
+      const lbl = bar.querySelector('[data-focus-label]');
+      if (lbl) lbl.textContent = id;
+    }
+    if (scroller) scroller.scrollTop = 0;
+    row.classList.add('flash'); setTimeout(() => row.classList.remove('flash'), 1400);
+    return true;
+  },
+  unfocusFinding() {
+    const scope = document.querySelector('[data-filter-scope]');
+    if (!scope) return;
+    scope.classList.remove('is-focused');
+    scope.removeAttribute('data-focus-id');
+    scope.querySelectorAll('.lp-focus-off').forEach(el => el.classList.remove('lp-focus-off'));
+    const bar = scope.querySelector('[data-focus-bar]');
+    if (bar) bar.classList.add('is-hidden');
+    const scroller = scope.querySelector('.lp-reg-scroll');
+    const prev = parseInt(scope.getAttribute('data-prev-scroll') || '0', 10);
+    if (scroller && !isNaN(prev)) scroller.scrollTop = prev;
+  },
   gotoFinding(id) {
-    // Deep-link from the Protection Scorecard / Cross-Doc panel to the EXACT finding
+    // Deep-link from the Playbook Alignment Scorecard / Cross-Doc panel to the EXACT finding
     // row in the Findings Register (Legal & Protection subtab): switch there, expand
     // that row, scroll it into view + flash. Used by [data-gotofinding="ISS-xx"].
     this.jump('tab:contract/sub:legal');
@@ -374,6 +444,8 @@ const DealUI = {
         const exp = document.querySelector('[data-expfor="' + id + '"]');
         if (exp) exp.classList.remove('is-hidden');
       }
+      // DN1: show it alone rather than scrolling a long list to it.
+      if (this.focusFinding(id)) return;
       row.scrollIntoView({ behavior: 'smooth', block: 'center' });
       row.classList.add('flash'); setTimeout(() => row.classList.remove('flash'), 1400);
     };
@@ -394,7 +466,7 @@ const DealUI = {
 
     // one delegated click handler for the whole document
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-cofilter],[data-coexpand],[data-pf-view],[data-pf-setdepth]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-unfocus],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-cofilter],[data-coexpand],[data-pf-view],[data-pf-setdepth]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -404,6 +476,7 @@ const DealUI = {
         return;
       }
       if (t.hasAttribute('data-jump')) { this.jump(t.getAttribute('data-jump')); return; }
+      if (t.hasAttribute('data-unfocus')) { this.unfocusFinding(); return; }   // DN1 back control
       if (t.hasAttribute('data-gotofinding')) { this.gotoFinding(t.getAttribute('data-gotofinding')); return; }
       // Legal & Protection navigator: segmented toggle between the Protections and
       // Obligations accordion groups. Scoped to the nearest .lp-nav so it never
@@ -504,7 +577,7 @@ const DealUI = {
     });
 
     // keyboard activation for NON-native controls (role="button" divs/spans in the
-    // Legal & Protection scorecard, navigator, and cross-links): Enter/Space fire the
+    // Legal & Playbook Alignment scorecard, navigator, and cross-links): Enter/Space fire the
     // same delegated click. Native <button>/<a> handle these keys themselves, so they
     // are excluded to avoid double-firing. Space is prevent-defaulted so it activates
     // the control instead of scrolling the page.
@@ -668,7 +741,7 @@ const api = {
   // formatting
   esc, money, pct, uid, icon, M, clampp,
   // evidence + status
-  evidenceChip, coverageBadge, severityPill, sevIcon, statusPill,
+  evidenceChip, inferenceMark, inferenceKey, coverageBadge, severityPill, sevIcon, statusPill,
   // layout
   saCard, insight, dataTable, collapsible, excerpt, gapCard, jumpLink, copyBtn,
   // viz

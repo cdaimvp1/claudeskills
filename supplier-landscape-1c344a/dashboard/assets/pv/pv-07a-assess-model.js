@@ -17,8 +17,8 @@
 var THEO_DISPO = {
   'Advance':                {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)'},
   'Advance with conditions':{c:'var(--plum,#5C2B50)', bg:'var(--plum-t,#EDDFE9)'},
-  'Hold as alternate':      {c:'#B4560F', bg:'var(--ti-amber,#FBF1DA)'},
-  'Do not advance':         {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)'},
+  'Hold as alternate':      {c:'#C15E19', bg:'var(--ti-amber,#F1EFEC)'},
+  'Do not advance':         {c:'#C15E19', bg:'var(--ti-red,#F1EFEC)'},
   'Screened out':           {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)'}
 };
 // Palette (Marc, LOCKED): teal-primary for good/low, amber moderate, BURNT-ORANGE (--emph) high, red critical,
@@ -26,21 +26,21 @@ var THEO_DISPO = {
 var THEO_CONCERN = {
   'Low':                    {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',  fav:0.90},
   'Strong':                 {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)',  fav:0.92},
-  'Moderate':               {c:'#B4560F', bg:'var(--ti-amber,#FBF1DA)',fav:0.58},
-  'High':                   {c:'var(--emph,#C15E19)', bg:'#FBEAD9',   fav:0.32},
-  'Critical':               {c:'#A23A30', bg:'var(--ti-red,#FBE7E3)', fav:0.15},
+  'Moderate':               {c:'#C15E19', bg:'var(--ti-amber,#F1EFEC)',fav:0.58},
+  'High':                   {c:'var(--emph,#C15E19)', bg:'#F1EFEC',   fav:0.32},
+  'Critical':               {c:'#C15E19', bg:'var(--ti-red,#F1EFEC)', fav:0.15},
   'Insufficient evidence':  {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)', fav:0}
 };
 var THEO_RISKBAND = {
   'Low':     {c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)'},
-  'Moderate':{c:'#B4560F', bg:'var(--ti-amber,#FBF1DA)'},
-  'High':    {c:'var(--emph,#C15E19)', bg:'#FBEAD9'},
-  'Critical':{c:'#A23A30', bg:'var(--ti-red,#FBE7E3)'},
+  'Moderate':{c:'#C15E19', bg:'var(--ti-amber,#F1EFEC)'},
+  'High':    {c:'var(--emph,#C15E19)', bg:'#F1EFEC'},
+  'Critical':{c:'#C15E19', bg:'var(--ti-red,#F1EFEC)'},
   'Unknown': {c:'var(--mut2,#6a655f)', bg:'var(--nested,#f1efec)'}
 };
 var THEO_EVID = {
   'Verified':         {c:'var(--teal-d,#2F6E6B)', fill:'solid', key:'verified'},
-  'Partial':          {c:'#B4560F', fill:'hatch', key:'partial'},
+  'Partial':          {c:'#C15E19', fill:'hatch', key:'partial'},
   'Supplier asserted':{c:'var(--plum,#5C2B50)', fill:'outline',key:'supplier'},
   'Proxy':            {c:'var(--mut2,#6a655f)', fill:'outline', key:'proxy'},
   'Missing':          {c:'var(--mut2,#6a655f)', fill:'none',   key:'missing'}
@@ -438,7 +438,7 @@ function pvEvidCoverageBar(cov) {
   cov = cov || {};
   var segs = [
     ['Verified', cov.verified || 0, 'var(--teal-d,#2F6E6B)'],
-    ['Partial', cov.partial || 0, '#B4560F'],
+    ['Partial', cov.partial || 0, '#C15E19'],
     ['Supplier input', cov.supplier || 0, 'var(--plum,#5C2B50)'],
     ['Missing', cov.missing || 0, 'var(--line2,#CECCC7)']
   ];
@@ -451,11 +451,11 @@ function pvEvidCoverageBar(cov) {
 
 /* requirements-group mini heatmap (semantic cells) */
 function pvReqGroupMini(reqGroups) {
-  var col = function(lbl){ return lbl === 'Strong' ? '#5C2B50' : lbl === 'Meets' ? '#2F6E6B' : lbl === 'Partial' ? '#B4560F' : lbl === 'Validate' ? '#B4560F' : lbl === 'Gap' ? '#A23A30' : 'var(--mut2,#6a655f)'; };
-  var bg = function(lbl){ return lbl === 'Strong' ? '#EDDFE9' : lbl === 'Meets' ? '#DCEBE9' : lbl === 'Partial' || lbl === 'Validate' ? '#F7E3D3' : lbl === 'Gap' ? 'var(--ti-red,#FBE7E3)' : 'var(--nested,#f1efec)'; };
+  var col = function(lbl){ return lbl === 'Strong' ? '#5C2B50' : lbl === 'Meets' ? '#2F6E6B' : lbl === 'Partial' ? '#C15E19' : lbl === 'Validate' ? '#C15E19' : lbl === 'Gap' ? '#C15E19' : 'var(--mut2,#6a655f)'; };
+  var bg = function(lbl){ return lbl === 'Strong' ? '#EDDFE9' : lbl === 'Meets' ? '#DCEBE9' : lbl === 'Partial' || lbl === 'Validate' ? '#F1EFEC' : lbl === 'Gap' ? 'var(--ti-red,#F1EFEC)' : 'var(--nested,#f1efec)'; };
   return '<div style="display:flex;flex-direction:column;gap:5px">' + reqGroups.map(function(g){
     return '<div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:7px 11px;border-radius:9px;background:' + bg(g.fitLabel) + '">'
-      + '<span style="font-size:12.5px;font-weight:600;color:var(--ink,#1A1A1A)">' + pvAEsc(g.label) + (g.must ? ' <span style="font:700 8px var(--mono,monospace);color:#A23A30;letter-spacing:.03em">MUST</span>' : '') + '</span>'
+      + '<span style="font-size:12.5px;font-weight:600;color:var(--ink,#1A1A1A)">' + pvAEsc(g.label) + (g.must ? ' <span style="font:700 8px var(--mono,monospace);color:#C15E19;letter-spacing:.03em">MUST</span>' : '') + '</span>'
       + '<span style="font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + col(g.fitLabel) + '">' + pvAEsc(g.fitLabel) + (g.fit != null ? ' · ' + g.fit : '') + '</span>'
       + '</div>';
   }).join('') + '</div>';
@@ -469,7 +469,7 @@ function pvOppConcern(opps, concerns) {
   };
   return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">'
     + list('Reasons to advance', opps, '#2F6E6B', '✓')
-    + list('Material concerns', concerns, '#A23A30', '●')
+    + list('Material concerns', concerns, '#C15E19', '●')
     + '</div>';
 }
 

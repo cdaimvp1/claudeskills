@@ -146,7 +146,11 @@ a:hover{text-decoration:underline}
 .tab-btn:hover{color:var(--ink)}
 .tab-btn[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
 /* Subtab bar = same underline design as the main tab bar (not pills); active = black text + black underline. */
-.subtabbar{background:var(--surface); border-bottom:1px solid var(--line2)}
+/* D7: the secondary subnav is sticky too, parked directly under the sticky head (--subnav-top is
+   published by shell.js on mount + resize; the fallback keeps it sane before the first measure).
+   Same surface + underline treatment as .tabbar, one z-index below it so the head always wins. */
+.subtabbar{background:var(--surface); border-bottom:1px solid var(--line2);
+  position:sticky; top:var(--subnav-top, 56px); z-index:24; box-shadow:0 1px 0 var(--line2), 0 6px 12px -10px rgba(33,25,17,.30)}
 .subtabbar .wrap{display:flex; gap:2px; overflow-x:auto}
 .subtab-btn{appearance:none; background:transparent; border:0; border-bottom:2.5px solid transparent; color:var(--mut);
   font:700 var(--fz-sm)/1 var(--sans); letter-spacing:.01em; padding:12px 15px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:7px}
@@ -221,6 +225,16 @@ a:hover{text-decoration:underline}
 .ev-public{background:transparent; color:var(--info-fg); border-color:color-mix(in srgb,var(--info-fg) 42%,transparent)}
 .ev-calculated{background:transparent; color:var(--emph-tx); border-color:color-mix(in srgb,var(--emph) 45%,transparent)}
 .ev-inference{background:transparent; color:var(--warn-fg); border-color:color-mix(in srgb,var(--warn-bar) 45%,transparent)}
+/* D2: the inference MARK (replaces the per-item inference chip) + its single page-level key.
+   Deliberately quiet: it should register as a qualifier on the value it follows, never compete
+   with it. The dotted ring is the mark; the underline convention rides on the hover target. */
+.ev-inf{display:inline-block; width:1em; text-align:center; color:var(--mut2); font-size:.95em;
+  line-height:1; vertical-align:baseline; cursor:help; border-bottom:1px dotted var(--line2);
+  margin-left:3px}
+.ev-inf:hover,.ev-inf:focus-visible{color:var(--plum); border-bottom-color:var(--plum); outline:none}
+.ev-inf-key{display:flex; align-items:center; gap:6px; margin-top:7px;
+  font:600 var(--fz-floor)/1.4 var(--sans); color:var(--mut2)}
+.ev-inf-key .ev-inf{cursor:default}
 .ev-assumption{background:transparent; color:var(--pri-tx); border-color:color-mix(in srgb,var(--pri) 45%,transparent); border-style:dashed}
 .ev-unavailable{background:var(--well); color:var(--mut); border-color:var(--line2)}
 .ev-unavailable::before{background:var(--mut)}
@@ -473,3 +487,21 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 .pen-chip.pen-moderate .pen-conf{color:var(--emph-tx); border-color:var(--emph)}
 .pen-chip.pen-low .pen-conf{color:var(--danger-fg); border-color:var(--danger-bar)}
 @media (max-width:760px){ .pen-chip .pen-basis{display:none} }
+
+/* ---- DN1 (Marc 2026-07-27): Findings Register focus mode ---------------------------------
+   Clicking a finding in the Navigator shows that finding alone, with a Back control. Rows are
+   hidden by class rather than re-rendered, so the register's filters, expanders and scroll
+   position all survive the round trip. */
+.lp-focus-off{display:none !important}
+.lp-focus-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 0;
+  padding:8px 11px;border:1px solid var(--line2);border-left:3px solid var(--plum);border-radius:8px}
+.lp-focus-bar.is-hidden{display:none}
+.lp-focus-back{appearance:none;border:1px solid var(--line2);background:var(--surface);color:var(--plum);
+  font:700 11.5px var(--sans);padding:5px 11px;border-radius:30px;cursor:pointer}
+.lp-focus-back:hover{border-color:var(--plum);background:var(--plum);color:#fff}
+.lp-focus-of{font:600 11.5px var(--sans);color:var(--mut)}
+.lp-focus-of b{color:var(--ink);font-family:var(--mono);font-size:11px}
+/* in focus mode the register does not need its own scroll cue: one row is showing */
+[data-filter-scope].is-focused .lp-reg-cue{display:none}
+[data-filter-scope].is-focused .lp-reg-wrap.is-scrolling:after{display:none}
+[data-filter-scope].is-focused .lp-reg-scroll{max-height:none}

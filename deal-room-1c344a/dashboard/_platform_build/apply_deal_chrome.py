@@ -1,3 +1,6 @@
+# SUPERSEDED 2026-07-27: one-off chrome graft against the retired _deal_build artifact.
+# The Deal dashboard is built by deal-room-1c344a/dashboard/build_deal_artifact.py, which
+# grafts the chrome itself. Kept for reference only; the DEAL path below no longer exists.
 """Graft the platform's authentic page chrome (dark Lilly/Theo topbar + gray eyebrow/h1
 title block + Help-Center footer + content gutters) onto the self-contained Deal dashboard,
 so it matches the landscape dashboard exactly. Reuses build_dashboard.extract_chrome()."""

@@ -7,7 +7,7 @@
 :root{
   /* #61 Wave 0, darkened warm neutral ramp (design-system-spec-v2 §7) */
   --red:#E1251B;--red-d:#B41E16;--ink:#1A1A1A;--mut:#3E3933;--mut2:#4A443C;
-  --line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--pink-t:#FBE7E3;--ai:#2E5E8C;--ai-t:#E4EBF1;
+  --line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--pink-t:#F1EFEC;--ai:#2E5E8C;--ai-t:#E4EBF1;
   --bblue:#0F3A85;--teal:#0A5266;--ai-prov:#7A0E8C;
   --surface:#FFFFFF;--panel:#E4E3E0;--nested:#E4E4DF;--well:#DDDCD8;
   --shadow:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);

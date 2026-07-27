@@ -47,7 +47,7 @@
       contract: {
         score: 72,
         $src: { score: [stub('Contract protection scoring, reflect-only read of the Visier MSA', 1)] },
-        summary: 'Protection Score reflects how well the current draft protects Lilly (0–100, higher is better). The MSA is broadly sound but three protection gaps hold the score down, liability cap, sub-processor control, and renewal pricing. Closing the two high-severity gaps would lift it into the 80s.',
+        summary: 'Playbook Alignment Score reflects how well the current draft protects Lilly (0–100, higher is better). The MSA is broadly sound but three protection gaps hold the score down, liability cap, sub-processor control, and renewal pricing. Closing the two high-severity gaps would lift it into the 80s.',
         gaps: [
           { sev: 'high', sevt: 'High', sec: '§4', n: 'Liability cap below playbook', d: '§4 caps Visier\'s liability at 2× fees but applies the same cap to a personal-data breach. Lilly playbook requires PI-breach liability to sit outside the general cap.', fix: 'Carve PI-breach liability out of the §4 cap (uncapped, or a separate higher cap).' },
           { sev: 'high', sevt: 'High', sec: '§11', n: 'Sub-processors not controlled', d: '§11 lets Visier appoint sub-processors with notice only. For employee PI this needs a prior-approval right.', fix: 'Insert a prior-approval right plus an annual audit right (Lilly DPA cl. 7).' },

@@ -125,7 +125,7 @@ function renderTab_negotiation(d) {
     const dist = ['hard-stop', 'high', 'medium', 'low'].map((k) =>
       '<span class="ps-dist-i">' + sevIcon(k) + '<b>' + counts[k] + '</b> ' + (k === 'hard-stop' ? 'hard stop' : k === 'medium' ? 'med' : k) + '</span>').join('');
     const trajPct = protNow != null ? Math.max(0, Math.min(100, protNow)) : 0;
-    const trajCard = '<div class="ps-pcard"><div class="ps-pc-h">Protection score &middot; where we can get to</div>' +
+    const trajCard = '<div class="ps-pcard"><div class="ps-pc-h">Playbook Alignment score &middot; where we can get to</div>' +
       '<div class="ps-traj-top"><span class="ps-traj-now">' + (protNow != null ? protNow : '&mdash;') + '</span>' +
       '<span class="ps-traj-lbl">' + esc(prot.band || 'Weak') + ', on the<br>current redline</span>' +
       '<span class="ps-traj-arr">&rarr;</span><span class="ps-traj-goal">' + (protTgt != null ? protTgt : '&mdash;') + '</span>' +
@@ -222,7 +222,7 @@ function renderTab_negotiation(d) {
     const scoreInner =
       '<div class="tp-score">' +
         '<div class="tp-gauge tp-prot">' +
-          '<div class="tp-g-top"><span class="tp-g-lbl">Protection score</span>' +
+          '<div class="tp-g-top"><span class="tp-g-lbl">Playbook Alignment score</span>' +
             '<span class="tp-g-now">' + (protNow != null ? protNow : '&mdash;') + '</span></div>' +
           '<div class="tp-g-bar"><div class="tp-g-fill" style="width:' + protPct + '%"></div>' +
             (protTgt != null ? '<div class="tp-g-tgt" style="left:' + clampPct(protTgt) + '%"></div>' : '') + '</div>' +
@@ -773,7 +773,7 @@ function renderTab_negotiation(d) {
   // (there is no separate tab-level "Negotiation" heading).
   const cov = coverageBadge(d.deal.evidenceCoverage);
   const intro = (h2, q) => '<div class="tab-intro"><h2>' + h2 + '</h2><p class="q">' + q + ' ' + cov + '</p></div>';
-  const posIntro = intro('Positions', 'One term at a time: its full arc (as-drafted → target → fallback → walk-away), why it matters, the exchange, its dependencies and its history, under an orienting posture header of the signature gates and where the protection score can get to.');
+  const posIntro = intro('Positions', 'One term at a time: its full arc (as-drafted → target → fallback → walk-away), why it matters, the exchange, its dependencies and its history, under an orienting posture header of the signature gates and where the playbook alignment score can get to.');
   const tradeIntro = intro('Trade Plan', 'For each ask where we and the supplier are not aligned: what we want, what we would trade to get it, and our floor, with how far apart we are and how likely they move, plus the currency we can spend and the walk-away.');
   const commsIntro = intro('Communications', 'Where every contested redline, ask and gap stands between us and the supplier, mapped to the specific messages and quotes on each side. The evidence layer, organised by what you are actually negotiating.');
   return scopedStyle + '<div class="neg-tab">' +

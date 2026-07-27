@@ -142,7 +142,13 @@
             profile: { hq: 'San Francisco, USA', founded: '2015', employees: '480', revenue: '$88M (2024 est.)', ownership: 'Private, VC-backed (Series D)', analyst: 'Gartner Visionary (2024)',
               strengths: ['Best-in-class self-service analytics UX', 'Aggressive, transparent pricing with a firm 90-day hold', 'Rapid feature velocity (6-week release train)'],
               weaknesses: ['SOC 2 Type II not yet certified (Type I only)', 'Thin pharma / GxP reference base', 'Smaller balance sheet, continuity risk at Lilly scale'],
-              redFlags: ['SOC 2 Type II certification in progress, not complete, a Must-Have gap', 'Single recent funding round; request audited financials before award'] },
+              // R6 provenance: each red flag declares WHERE it came from. 'submission' = a fact about this
+              // supplier's bid (already counted on the response side of the Risk roll-up, so it must not be
+              // counted again as a profile flag); 'diligence' = a fact about the company, from the Landscape
+              // profile, which no clarification to this RFx can change. Plain strings are still accepted and
+              // default to 'diligence' (see rfxRedFlags in pv-09).
+              redFlags: [{ t: 'SOC 2 Type II certification in progress, not complete, a Must-Have gap', src: 'submission' },
+                         { t: 'Single recent funding round; request audited financials before award', src: 'diligence' }] },
             narr: { legal: 'Standard Nimbus SaaS MSA offered; redlines assessed as moderate, the liability cap and a PI carve-out remain open.', impl: '8–10 week implementation with named Nimbus delivery consultants; SI partners Accenture and Slalom.', integ: 'REST/GraphQL APIs plus pre-built connectors; SAP integration runs through middleware, not native, to be validated against the Lilly stack.' },
             lilly: { relationship: 'Registered supplier; no Lilly contracts on file', spend: null, tprm: { status: 'under-review', open: 2 }, defender: null },
             report: {
@@ -279,7 +285,9 @@
             profile: { hq: 'Austin, USA', founded: '2009', employees: '1,050', revenue: 'Not disclosed (private)', ownership: 'Private', analyst: 'Gartner Challenger (2024)',
               strengths: ['Native SAP / legacy integration depth', 'Lowest run-cost via consumption economics', 'Strong query throughput at very large scale'],
               weaknesses: ['Did not submit a full commercial proposal', 'Self-service analytics UX lags the field', 'Left the AI-roadmap requirement unanswered'],
-              redFlags: ['Commercial submission incomplete, pricing shows Not submitted across the board'] },
+              // R6 provenance: this is a fact about Helio's BID (no pricing submitted), not about the company,
+              // so it is sourced 'submission' and does not count as a diligence/profile flag.
+              redFlags: [{ t: 'Commercial submission incomplete, pricing shows Not submitted across the board', src: 'submission' }] },
             narr: { legal: 'No MSA redlines submitted in this run; contract risk cannot be assessed until legal materials are provided.', impl: 'No formal implementation plan submitted; delivery typically via in-house consultants.', integ: 'Native SAP / S4HANA adapters, the strongest integration posture in the field given the Lilly SAP backbone.' },
             lilly: { relationship: 'Registered supplier; 1 expired order on file', spend: null, tprm: { status: 'not-started' }, defender: { count: 1, recoverable: null } },
             report: {
