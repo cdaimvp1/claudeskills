@@ -2493,3 +2493,38 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
   border-left:4px solid #5C2B50;border-radius:9px;padding:12px 14px;margin-top:4px}
 .pvsl .dto-note{font-size:11.4px;line-height:1.55;color:#5A5058;margin-top:11px;padding-top:9px;
   border-top:1px dashed #C9BCC4}
+
+/* ===== SURGICAL SHADING: Landscape > Overview tab ONLY (Marc 2026-07-27) ====================
+   Panel-by-panel, explicit values, no tokens. Each selector below is a panel Marc has reviewed
+   on the Overview tab. Nothing structural changes: background only.
+   Measured before -> set after:
+     funnel step        #E9E2E7 -> #DCCFD8   plum, medium
+     funnel last step   #CDBFC9 -> #BFACBA   plum, one step deeper (it is the outcome)
+     card header        #E9E2E7 -> #D9CBD4   plum, medium
+     next step block    #DCD1DA -> #D3C4CE   plum, medium (burnt rule unchanged)
+     recommendation row #EDDFE9 -> #DFCFDA   plum, medium
+     brief alt section  #E9E2E7 -> #DFD4DB   plum, medium
+     brief note         #DCD1DA -> #D0C2CB   plum, medium-deep
+     quadrant cell      #DEE9E8 -> #CBDCDA   teal, medium (secondary surface)
+     quadrant lead cell #DCD1DA -> #C6D5D3   teal, medium-deep
+   ========================================================================================= */
+.pvsl .pvfn-step{background:#DCCFD8}
+.pvsl .pvfn-last{background:#BFACBA}
+.pvsl .sa-card > .card-hd{background:#D9CBD4}
+.pvsl .pvnext{background:#D3C4CE}
+/* Recommendation table, row by row. The generic .rgrid rule was aimed at the wrong element (the
+   first .rgrid is the HEADER, styled by .pvsl .pvrec .rhead at higher specificity), and the
+   shortlist band was rendering BLUE (#D2E1F2), which is off-palette. Set per row type:
+     header       -> plum medium
+     leader row   -> plum, deepest (it is the recommendation)
+     shortlisted  -> teal medium (secondary emphasis, was blue)
+     plain row    -> near-white base so the shaded rows read against it */
+.pvsl .pvrec .rhead{background:#D3C4CE}
+.pvsl .pvrec .rgrid.lead{background:#CFBCC9}
+.pvsl .pvrec .rgrid.run.shortlisted{background:#CBDCDA}
+.pvsl .pvrec .rgrid.run{background:#F6F2F4}
+.pvsl .mdb-sec:nth-child(even){background:#DFD4DB}
+.pvsl .mdb-note{background:#D0C2CB}
+.pvsl .mdb-none{background:#D0C2CB}
+.pvsl .pq-cell{background:#CBDCDA}
+.pvsl .pq-cell.pq-ss{background:#C6D5D3}
