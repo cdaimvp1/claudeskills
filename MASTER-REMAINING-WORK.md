@@ -4,8 +4,22 @@ Consolidated 2026-07-24 (evening) from ALL trackers/build-plans + a skills-updat
 
 **Tags:** `[do-now]` autonomously doable · `[Marc]` needs your decision · `[hold]` on-hold/sensitive · `[release]` packaging/release step · `[blocked]` needs Lilly network · `[verify]` status contradiction to resolve. Source tracker in parens.
 
-## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-25)
+## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-26)
 If the session restarted/compacted, this is where things stand.
+
+**>>> RESUME 2026-07-26 (computer restart) — START HERE <<<**
+- **RFx dashboard LOCKED** = design of record: light-only (no dark mode), 6-section Business Case tab
+  (header+KPIs+pre-award banner / Decision Rationale / Deal Terms & the Field / Deal Economics [TCV<->Waterfall
+  toggle + Mini P&L] / The Ask / Path to Close accordion + left 1-7 stepper), and a flipped CATEGORY-spoke radar
+  with the redesigned Model-the-Decision panel (radar center, sliders left, right column = scores / grounded
+  insights / no separate legend). Deal + Landscape also built (Landscape has a WS2 finish batch left).
+- **The 3 locked dashboard HTMLs are in `C:\Users\marcs\OneDrive\Desktop\dashboards`** (landscape / deal / rfx).
+- **FULL sequenced roadmap + ALL decisions = `PROGRAM-MASTER-PLAN.md`** (5 phases, WS0-WS9 + CC1-CC3 mandates +
+  the 2026-07-26 Decisions log). READ IT FIRST, then this file for granular history.
+- **NEXT UP (Phase 1 continues): build the Category Strategy dashboard** (deterministic Python build, MCM palette,
+  shared shell, + its hub skill), then Deep Dive, then My Work (+ #44 handover). Also owed for RFx: the `rfx-hub`
+  skill + the RFx->Deal handoff emitter. Only OPEN decision: A2 (is the Landscape Deep-Dive complete - Marc was
+  reviewing it in Edge). Latest commits on `main`: RFx lock + radar-size + plan/decisions.
 - **Deal dashboard** (`_deal_build/`, tracker `DEAL-DASHBOARD-TRACKER.md`): **LOCKED — design of record
   (2026-07-25).** All 3 Negotiation tabs ported (Trade Plan / Communications incl. status+category
   filters + expand-all / Positions), Terms & Review + Economics done, full MCM colour, no dark mode, no
