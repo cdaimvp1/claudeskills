@@ -534,3 +534,27 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 .dt tbody tr:nth-child(even) td{background:var(--sh-1)}
 .dt tbody tr:hover td{background:var(--sh-2)}
 .dt.heat tbody tr:nth-child(even) td,.dt.heat tbody tr:hover td{background:transparent}
+
+/* ===== SHADING v2 + COLOUR REBALANCE (Marc 2026-07-27) - Deal ============================= */
+:root{
+  --sh-1:#E9E2E7;      /* plum ~10% */
+  --sh-2:#DCD1DA;      /* plum ~17% */
+  --sh-3:#CDBFC9;      /* plum ~24% */
+  --sh-t1:#DEE9E8;     /* teal ~10% */
+  --sh-t2:#CBDCDA;     /* teal ~17% */
+  --burnt:#C15E19;
+  --burnt-d:#9A4A13;
+  --depth-1:0 1px 2px rgba(33,25,17,.07), 0 3px 8px -4px rgba(33,25,17,.12);
+  --depth-2:0 1px 3px rgba(33,25,17,.10), 0 10px 20px -8px rgba(33,25,17,.20);
+}
+.sa-card > .sa-card-hd,.sa-card > .card-hd{background:var(--sh-1)}
+.tab-intro{background:var(--sh-1)}
+.insight,.dt-note,.sa-note{background:var(--sh-1);border-left:3px solid var(--plum)}
+.lp-focus-bar{background:var(--sh-2);border-left:3px solid var(--plum)}
+.lp-focus-back{border-color:var(--plum);color:var(--plum)}
+.lp-focus-back:hover{background:var(--plum);color:#fff}
+.dt tbody tr:nth-child(even) td{background:var(--sh-1)}
+.dt tbody tr:hover td{background:var(--sh-2)}
+.dt.heat tbody tr:nth-child(even) td,.dt.heat tbody tr:hover td{background:transparent}
+/* emphasis block keeps burnt orange; it is the action surface */
+.is-emph,.sa-card.is-emph{background:var(--sh-2);border-left:4px solid var(--burnt)}

@@ -168,6 +168,25 @@ function pvDD2TreeNodeH(n){
     + '<span style="width:14px;height:2px;background:var(--line);flex:none"></span>'
     + '<div style="display:flex;flex-direction:column;gap:8px;border-left:2px solid var(--line)">' + kidRows + '</div></div>';
 }
+
+/* Ownership tree zoom (Marc 2026-07-27). Scales the canvas in place and keeps the scroll
+   position; deliberately does NOT re-render the tab, which would reset the reader's view.
+   Steps are coarse (10%) and clamped, so it cannot be zoomed into uselessness either way. */
+function pvOwnZoom(btn, dir){
+  var wrap = btn && btn.closest ? btn.closest('.owntree') : null;
+  if (!wrap) return;
+  var canvas = wrap.querySelector('.owntree-canvas');
+  var label = wrap.querySelector('[data-owzoom-label]');
+  if (!canvas) return;
+  var z = parseFloat(canvas.getAttribute('data-z') || '1');
+  if (dir === 0) z = 1;
+  else z = Math.max(0.6, Math.min(1.6, z + (dir > 0 ? 0.1 : -0.1)));
+  z = Math.round(z * 100) / 100;
+  canvas.setAttribute('data-z', String(z));
+  canvas.style.transform = 'scale(' + z + ')';
+  canvas.style.transformOrigin = 'top left';
+  if (label) label.textContent = Math.round(z * 100) + '%';
+}
 function pvDD2OwnershipTree(ownership, a, cand) {
   var dd = (cand && cand.deepDive) || {}, idn = dd.identity || {};
   var root = ownership && ownership.treeRoot;
@@ -179,7 +198,16 @@ function pvDD2OwnershipTree(ownership, a, cand) {
     if (Array.isArray(flat)) { for (var i = flat.length - 1; i >= 0; i--) { root = Object.assign({}, flat[i], { children: root ? [root] : [] }); } }
   }
   if (!root) return '<div style="font-size:12px;color:var(--mut2)">No ownership structure on file.</div>';
-  return '<div style="display:inline-block;padding:2px 2px 6px">' + pvDD2TreeNodeH(root) + '</div>';
+  return '<div class="owntree">'
+    + '<div class="owntree-ctrl">'
+      + '<button type="button" class="owntree-btn" title="Zoom out" aria-label="Zoom out" onclick="pvOwnZoom(this,-1)">&#8722;</button>'
+      + '<span class="owntree-lvl" data-owzoom-label>100%</span>'
+      + '<button type="button" class="owntree-btn" title="Zoom in" aria-label="Zoom in" onclick="pvOwnZoom(this,1)">+</button>'
+      + '<button type="button" class="owntree-btn owntree-reset" title="Reset zoom" aria-label="Reset zoom" onclick="pvOwnZoom(this,0)">Reset</button>'
+      + '<span class="owntree-hint">scrolls horizontally</span>'
+    + '</div>'
+    + '<div class="owntree-scroll"><div class="owntree-canvas">' + pvDD2TreeNodeH(root) + '</div></div>'
+  + '</div>';
 }
 /* real world basemap: accurate country geometry (world-atlas 110m) projected equirectangular in
    PVGEO_LAND (assets/pv-worldmap.js), viewBox 0 0 360 180 = degrees, dots at (lon+180, 90-lat). */
@@ -193,18 +221,31 @@ function pvDD2GeoMap(locations){
   });
   if (!placed.length) return (typeof pvDD2FootprintMap === 'function') ? pvDD2FootprintMap(locations) : '';
   var px = function(lon){ return lon + 180; }, py = function(lat){ return 90 - lat; };
-  var land = (typeof PVGEO_LAND !== 'undefined') ? '<path d="' + PVGEO_LAND + '" fill="#B7C3BE" stroke="#9AA8A2" stroke-width="0.15"/>' : '';
+  var land = (typeof PVGEO_LAND !== 'undefined') ? '<path d="' + PVGEO_LAND + '" fill="#CBD6D3" stroke="#A9B8B4" stroke-width="0.22"/>' : '';
   var grat = '';
-  for (var lon = -120; lon <= 120; lon += 60) grat += '<line x1="' + (lon + 180) + '" y1="0" x2="' + (lon + 180) + '" y2="180" stroke="#8FA6AC" stroke-width="0.3" opacity="0.5"/>';
-  for (var lat = -60; lat <= 60; lat += 30) grat += '<line x1="0" y1="' + (90 - lat) + '" x2="360" y2="' + (90 - lat) + '" stroke="#8FA6AC" stroke-width="0.3" opacity="0.5"/>';
-  var tcol = function(t){ return /hq|registered/i.test(t) ? 'var(--plum,#5C2B50)' : /hub|operational/i.test(t) ? 'var(--teal-d,#2F6E6B)' : /service|delivery|cloud/i.test(t) ? '#C15E19' : 'var(--mut2,#6a655f)'; };
+  for (var lon = -120; lon <= 120; lon += 60) grat += '<line x1="' + (lon + 180) + '" y1="0" x2="' + (lon + 180) + '" y2="180" stroke="#9FB3B0" stroke-width="0.22" opacity="0.38"/>';
+  for (var lat = -60; lat <= 60; lat += 30) grat += '<line x1="0" y1="' + (90 - lat) + '" x2="360" y2="' + (90 - lat) + '" stroke="#9FB3B0" stroke-width="0.22" opacity="0.38"/>';
+  var tcol = function(t){ return /hq|registered/i.test(t) ? 'var(--plum,#5C2B50)' : /hub|operational/i.test(t) ? 'var(--teal-d,#2F6E6B)' : /service|delivery|cloud/i.test(t) ? '#1F4E4C' : '#7A4B86'; };
   var dots = placed.map(function(p){
-    var x = px(p.lon), y = py(p.lat), c = tcol(p.type), miss = /missing/i.test(p.conf), lab = p.sub || p.name.split(/[,(]/)[0];
-    return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.7" fill="' + c + '" opacity="' + (miss ? 0.45 : 0.98) + '" stroke="#fff" stroke-width="0.8"><title>' + pvAEsc(p.name + ', ' + p.type + (p.region ? ' (' + p.region + ')' : '') + ', ' + p.conf) + '</title></circle>'
-      + '<text x="' + (x + 3.8).toFixed(1) + '" y="' + (y + 1.7).toFixed(1) + '" font-size="5" font-family="var(--sans)" font-weight="700" fill="var(--ink)" paint-order="stroke" stroke="#E1E0DC" stroke-width="1.1">' + pvAEsc(lab) + '</text>';
+    var x = px(p.lon), y = py(p.lat), miss = /missing/i.test(p.conf);
+    // burnt orange is the emphasis colour: here it marks ONLY a location whose evidence is missing
+    var c = miss ? '#C15E19' : tcol(p.type);
+    var lab = p.sub || p.name.split(/[,(]/)[0];
+    return '<g class="pvgeo-pin">'
+      + '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="5.2" fill="' + c + '" opacity="0.16"/>'
+      + '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.9" fill="' + c + '" stroke="#fff" stroke-width="1"'
+      + (miss ? ' stroke-dasharray="1.6 1.2"' : '') + '>'
+      + '<title>' + pvAEsc(p.name) + (p.type ? ' - ' + pvAEsc(p.type) : '') + (miss ? ' (evidence missing)' : '') + '</title></circle>'
+      + '<text x="' + (x + 4.4).toFixed(1) + '" y="' + (y + 1.8).toFixed(1) + '" font-size="5.2" font-family="var(--sans)" font-weight="700" fill="var(--ink)" paint-order="stroke" stroke="#E7EDEC" stroke-width="1.6">' + pvAEsc(lab) + '</text>'
+      + '</g>';
   }).join('');
-  var legend = '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:11px">' + [['Registered HQ', 'var(--plum,#5C2B50)'], ['Operational hub', 'var(--teal-d,#2F6E6B)'], ['Service / cloud region', '#C15E19']].map(function(li){ return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut)"><span style="width:9px;height:9px;border-radius:50%;background:' + li[1] + '"></span>' + li[0] + '</span>'; }).join('') + '</div>';
-  return '<div style="overflow:hidden;border-radius:8px;border:1px solid var(--line2);background:#E1E0DC"><svg viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block">' + land + grat + dots + '</svg></div>' + legend;
+  var legend = '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:11px">' + [['Registered HQ', 'var(--plum,#5C2B50)'], ['Operational hub', 'var(--teal-d,#2F6E6B)'], ['Service / cloud region', '#1F4E4C'], ['Evidence missing', '#C15E19']].map(function(k){ return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut)"><span style="width:9px;height:9px;border-radius:50%;background:' + k[1] + ';box-shadow:0 0 0 2px #fff"></span>' + k[0] + '</span>'; }).join('') + '</div>';
+  return '<div class="pvgeo-frame">'
+    + '<svg viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block" role="img" aria-label="Operating footprint map">'
+    + '<defs><radialGradient id="pvgeoSea" cx="50%" cy="42%" r="78%">'
+    + '<stop offset="0%" stop-color="#EDF2F1"/><stop offset="100%" stop-color="#DFE8E6"/></radialGradient></defs>'
+    + '<rect x="0" y="0" width="360" height="180" fill="url(#pvgeoSea)"/>'
+    + grat + land + dots + '</svg></div>' + legend;
 }
 function pvDD2LocTable(locations){
   locations = locations || [];

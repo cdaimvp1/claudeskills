@@ -1140,10 +1140,10 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 /* opt-in row zebra for non-.pvsl .mx tables (Deal-RFx panels), mirrors the .pvsl .mx zebra */
 .mx.mxz tbody tr:nth-child(even) td,.mx.mxz tbody tr:nth-child(even) td:first-child{background:var(--nested)}
 /* flipped weighted-scoring: leader column tint + emphasized footer rows (darkened, Marc: was too light to see) */
-.mx td.lead,.mx th.lead{background:var(--tint-c6d8ee,#C6D8EE) !important}
-.mx thead th.lead{color:var(--navy);border-bottom:2px solid #6E9BCE}
+.mx td.lead,.mx th.lead{background:var(--sh-1,#E9E2E7) !important}
+.mx thead th.lead{color:var(--ink);border-bottom:2px solid var(--plum,#5C2B50)}
 .mx tfoot .wtotrow td{background:var(--tint-c6d8ee,#C6D8EE);font-weight:800;border-top:2px solid #6E9BCE;font-family:var(--mono)}
-.mx tfoot .wtotrow td.lead{background:var(--tint-a4c2e6,#A4C2E6) !important}
+.mx tfoot .wtotrow td.lead{background:var(--sh-3,#CDBFC9) !important}
 .mx tfoot .gaterow td{background:var(--tint-e1e3e7,#E1E3E7)}
 .mx tfoot td:first-child{text-align:left;font-weight:700}
 .mxbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}
@@ -2181,3 +2181,80 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .rfx-tab .bcsub.on{color:var(--ink);border-bottom-color:var(--plum);font-weight:800}
 .rfx-tab .bcpane{display:none}
 .rfx-tab .bcpane.on{display:block}
+
+/* ===== SHADING v2 + COLOUR REBALANCE (Marc 2026-07-27) - RFx ============================== */
+.rfx-tab{
+  --sh-1:#E9E2E7;      /* plum ~10% */
+  --sh-2:#DCD1DA;      /* plum ~17% */
+  --sh-3:#CDBFC9;      /* plum ~24% */
+  --sh-t1:#DEE9E8;     /* teal ~10% */
+  --sh-t2:#CBDCDA;     /* teal ~17% */
+  --burnt:#C15E19;
+  --burnt-d:#9A4A13;
+  --depth-1:0 1px 2px rgba(33,25,17,.07), 0 3px 8px -4px rgba(33,25,17,.12);
+  --depth-2:0 1px 3px rgba(33,25,17,.10), 0 10px 20px -8px rgba(33,25,17,.20);
+}
+.rfx-tab .sect > .secthd{background:var(--sh-1)}
+.rfxrpt .grp{background:var(--sh-2)}
+.rfxrpt .xs-ins{background:var(--sh-1);border-left:3px solid var(--plum)}
+.rfxrpt .spnote{background:var(--sh-1)}
+.rfx-tab .rfxsrcrow{background:var(--sh-t1)}
+.rfx-tab .rfxreg > .rfxreg-sum{background:var(--sh-1)}
+.rfx-tab .rfxreqcat[open] > summary{background:var(--sh-2)}
+.rfx-tab .rfxreqcat > summary:hover{background:var(--sh-1)}
+.rfx-tab .schm tbody tr:hover td{background:var(--sh-1)}
+.rfx-tab .bcsubbar{border-bottom-color:var(--line2)}
+/* burnt orange stays ONLY on an open gate, which is a real alert */
+.rfx-tab .rfxgate.warn{background:var(--sh-2);border-left:4px solid var(--burnt)}
+
+/* ===== Scoring matrix, second visual pass (Marc 2026-07-27: "still looks ugly") =============
+   The first pass fixed the ramp and the vocabulary but left it reading as a plain grid. What was
+   actually wrong: every row carried equal visual weight, the leader column was marked only by a
+   hairline, the category column had no hierarchy against the numbers, and the total/gate footer
+   floated. Now: a banded header, a category column that reads as a label column, a leader column
+   with a real plum ground, generous row rhythm, and a footer that is clearly a summary. */
+.schm{border-collapse:separate;border-spacing:0;width:100%}
+.schm thead th{background:var(--sh-2);padding:11px 10px;font:800 9px var(--mono);
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink);border-bottom:2px solid var(--plum)}
+.schm thead th:first-child{text-align:left;border-radius:8px 0 0 0}
+.schm thead th:last-child{border-radius:0 8px 0 0}
+.schm tbody td{padding:11px 10px;border-bottom:1px solid var(--line)}
+.schm tbody td:first-child{background:var(--sh-1);font-weight:700;color:var(--ink);
+  border-right:1px solid var(--line2)}
+.schm tbody tr:hover td{background:var(--sh-2)}
+.schm tbody tr:hover td:first-child{background:var(--sh-2)}
+/* the leader column gets a real ground, not a hairline */
+.schm td.lead,.schm th.lead{background:var(--sh-1);
+  box-shadow:inset 2px 0 0 var(--plum),inset -2px 0 0 var(--plum)}
+.schm thead th.lead{background:var(--sh-3)}
+/* score cells sit ON the row rather than in it */
+.schm .hcell{min-width:52px;height:28px;border-radius:8px;font:800 13px var(--sans);
+  box-shadow:0 1px 2px rgba(33,25,17,.14)}
+/* weight chip reads as metadata, not data */
+.schm-wchip{background:var(--surface);border:1px solid var(--line2);color:var(--mut)}
+/* footer = summary, visibly separated */
+.schm tfoot td{background:var(--sh-2);border-top:2px solid var(--plum);border-bottom:none;
+  padding:12px 10px}
+.schm tfoot .wtotrow td{font:800 14px var(--sans);color:var(--ink)}
+.schm tfoot .wtotrow td:first-child{background:var(--sh-2)}
+.schm tfoot .gaterow td{padding-top:0;background:var(--sh-2)}
+.schm tfoot .gaterow td:first-child{background:var(--sh-2);font-weight:700}
+
+/* The shading tokens must exist OUTSIDE .rfx-tab too: the Scoring subtab and the individual
+   supplier report render outside that scope, so scoped tokens resolved to nothing there and old
+   BLUE leader tints showed through. Defined at :root, with the stray blues overridden. */
+:root{
+  --sh-1:#E9E2E7; --sh-2:#DCD1DA; --sh-3:#CDBFC9;
+  --sh-t1:#DEE9E8; --sh-t2:#CBDCDA;
+  --burnt:#C15E19; --burnt-d:#9A4A13;
+}
+.schm thead th{background:var(--sh-2)}
+.schm thead th.lead{background:var(--sh-3)}
+.schm tbody td:first-child{background:var(--sh-1)}
+.schm tbody td.lead,.schm th.lead{background:var(--sh-1)}
+.schm tfoot td,.schm tfoot .wtotrow td:first-child,.schm tfoot .gaterow td,
+.schm tfoot .gaterow td:first-child{background:var(--sh-2);border-top-color:var(--plum)}
+.schm tbody tr:hover td,.schm tbody tr:hover td:first-child{background:var(--sh-2)}
+
+.schm thead th:first-child{background:var(--sh-2)}
+.schm thead th.lead{background:var(--sh-3)}

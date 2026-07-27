@@ -500,12 +500,18 @@ function rfxRptProfile(s,prof){var esc=escapeHtmlPV,pr=s.profile||{};
  if(prof.risk)riskHTML='<div class="glabhd" style="margin-bottom:5px">Public risk markers</div><div class="risk">'+prof.risk.map(function(r){return '<div class="rr"><span class="dot '+r.sev+'"></span><span class="cat">'+esc(r.cat)+'</span><span class="tx">'+esc(r.tx)+'</span><span class="rsev '+r.sev+'">'+esc(r.sevlabel)+'</span></div>';}).join('')+'</div>';
  var h='<div class="sect"><div class="secthd"><div class="t">Company profile</div><div class="lk">Landscape vendor record</div></div>';
  h+='<div class="card"><div class="rshd">'+rfxSupplierSwatchByName(s.n)+'<span class="rn">'+esc(s.n)+'</span><span class="rsub">vendor profile &amp; financials · not the RFP response</span>'+(prof.score!=null?'<span class="rscore '+rfxScoreCls(prof.score)+'">'+prof.score+'<small>/10</small></span>':'')+'</div>';
- if(factsHTML||riskHTML)h+='<div class="cprow" style="grid-template-columns:1.5fr 1fr;margin-bottom:2px">'+(factsHTML?'<div>'+factsHTML+'</div>':'<div></div>')+(riskHTML?'<div>'+riskHTML+'</div>':'<div></div>')+'</div>';
  var lft='';
  var topSpacer=(factsHTML||riskHTML)?'15px':'0';
  if(prof.leadership)lft+='<div class="glabhd" style="margin-bottom:8px;margin-top:'+topSpacer+'">Leadership</div><div class="lead">'+prof.leadership.map(function(l){return '<div class="p">'+l+'</div>';}).join('')+'</div>';
  if(prof.backers)lft+='<div class="glabhd" style="margin:'+(prof.leadership?'14px':topSpacer)+' 0 8px">Backers &amp; partners</div><div class="chips">'+prof.backers.map(function(b){return '<span class="chip'+(b.hl?' hl':'')+'">'+esc(b.t)+'</span>';}).join('')+'</div>';
- h+=lft;
+ // Marc 2026-07-27: left column = facts + leadership + backers, right column = risk markers.
+ // Both columns now carry real content, so neither ends in dead space.
+ if(factsHTML||riskHTML||lft){
+   h+='<div class="cprow cprow-fill" style="grid-template-columns:1.5fr 1fr;margin-bottom:2px">'
+     +'<div>'+(factsHTML||'')+lft+'</div>'
+     +'<div>'+(riskHTML||'')+'</div>'
+   +'</div>';
+ } else { h+=lft; }
  if(prof.read)h+='<div class="read" style="margin-top:15px"><div class="rl">The read</div>'+prof.read+'</div>';
  h+='</div></div>';return h;}
 function rfxRptOverall(ov){var esc=escapeHtmlPV;

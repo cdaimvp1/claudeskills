@@ -2411,3 +2411,60 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 .pvsl .dlv-must{display:inline-block;margin-left:8px;font:800 8.5px var(--mono);letter-spacing:.05em;
   text-transform:uppercase;color:#9A4A13;border:1px solid #C15E19;border-radius:30px;padding:1px 7px;vertical-align:1px}
 .pvsl .mdb-res{display:block;margin-top:4px;font-size:11.3px;color:var(--mut2);font-style:italic}
+
+/* ===== SHADING v2 + COLOUR REBALANCE (Marc 2026-07-27) - Landscape ========================
+   Shading up a full step and tinted plum/teal (primary/secondary). Burnt orange pulled back to
+   emphasis only: the next-step block and open gates. See the block comment in shading_v2. */
+.pvsl{
+  --sh-1:#E9E2E7;      /* plum ~10% */
+  --sh-2:#DCD1DA;      /* plum ~17% */
+  --sh-3:#CDBFC9;      /* plum ~24% */
+  --sh-t1:#DEE9E8;     /* teal ~10% */
+  --sh-t2:#CBDCDA;     /* teal ~17% */
+  --burnt:#C15E19;
+  --burnt-d:#9A4A13;
+  --depth-1:0 1px 2px rgba(33,25,17,.07), 0 3px 8px -4px rgba(33,25,17,.12);
+  --depth-2:0 1px 3px rgba(33,25,17,.10), 0 10px 20px -8px rgba(33,25,17,.20);
+}
+/* section grounds, now visible */
+.pvsl .sa-card > .card-hd{background:var(--sh-1);border-bottom:1px solid var(--line2)}
+.pvsl .mdb-sec:nth-child(even){background:var(--sh-1)}
+.pvsl .mdb-note{background:var(--sh-2)}
+.pvsl .mdb-none{background:var(--sh-2)}
+.pvsl .well,.pvsl .nested,.pvsl .scc-b .subrow{background:var(--sh-1)}
+.pvsl tbody tr:hover td{background:var(--sh-1)}
+/* funnel: plum is the primary, so the funnel reads plum. The LAST step is the outcome, which
+   earns weight through a deeper plum ground, NOT through the emphasis colour. */
+.pvsl .pvfn-step{background:var(--sh-1)}
+.pvsl .pvfn-last{background:var(--sh-3);box-shadow:inset 3px 0 0 var(--plum)}
+.pvsl .pvfn-last .pvfn-v{color:var(--plum)}
+/* the ONE burnt-orange block on the tab: the action to take next */
+.pvsl .pvnext{background:var(--sh-2);border-left:4px solid var(--burnt)}
+.pvsl .pvnext-k{color:var(--burnt-d)}
+/* quadrants: teal for the secondary surface, plum for the selected corner */
+.pvsl .pq-cell{background:var(--sh-t1)}
+.pvsl .pq-cell.pq-ss{background:var(--sh-2)}
+/* these were burnt orange and should not have been: they are notable, not actions */
+.pvsl .dto-gap{color:var(--plum)}
+.pvsl .dlv-must{color:var(--plum);border-color:var(--plum)}
+.pvsl .mdb-qs li::marker{color:var(--plum)}
+.pvsl .dlv-read{background:var(--sh-1);border-left:3px solid var(--plum)}
+.pvsl .dlv-tbl tbody tr:first-child td{background:var(--sh-2)}
+.pvsl .dlv-bar span{background:var(--sh-3)}
+.pvsl .dlv-bar i{background:var(--plum)}
+.pvsl .dto-list li{background:var(--sh-t1)}
+
+/* ---- Ownership & Control: horizontal tree, scroll + zoom (Marc 2026-07-27) --------------- */
+.pvsl .owntree-ctrl{display:flex;align-items:center;gap:7px;margin:0 0 10px}
+.pvsl .owntree-btn{appearance:none;min-width:28px;height:26px;padding:0 9px;border:1px solid var(--line2);
+  background:var(--surface);color:var(--plum);font:800 13px var(--sans);border-radius:7px;cursor:pointer;line-height:1}
+.pvsl .owntree-btn:hover{background:var(--plum);border-color:var(--plum);color:#fff}
+.pvsl .owntree-btn.owntree-reset{font:700 10.5px var(--sans)}
+.pvsl .owntree-lvl{font:800 11px var(--mono);color:var(--ink);min-width:42px;text-align:center}
+.pvsl .owntree-hint{margin-left:auto;font:600 10.5px var(--mono);color:var(--mut2)}
+.pvsl .owntree-scroll{overflow-x:auto;overflow-y:hidden;padding:4px 2px 10px;
+  border:1px solid var(--line2);border-radius:9px;background:var(--sh-t1);
+  scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+.pvsl .owntree-scroll::-webkit-scrollbar{height:10px}
+.pvsl .owntree-scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:30px;border:2px solid var(--sh-t1)}
+.pvsl .owntree-canvas{display:inline-block;padding:6px;transition:transform .12s ease}
