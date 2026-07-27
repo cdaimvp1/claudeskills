@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RFx Recommendation Tab, Panel Options Round 2</title>
+<style>
+:root{
+  --plum:#5C2B50; --plum-t:#EDDFE9; --plum-fg:#F3ECF1;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#E7E4DC; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+  --serif:Georgia,'Times New Roman',Times,serif;
+  --sans:Arial,Helvetica,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --plum:#8A5B80; --plum-t:#33253B;
+    --teal:#5FAFA9; --teal-t:#1E302D;
+    --emph:#E0925A; --emph-t:#33241A;
+    --rust:#D07A5C; --rust-t:#3A241C;
+    --blue:#7CA6E2; --blue-t:#1E2A38;
+    --grey:#A3ADB4; --grey-t:#2B2E31;
+    --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+    --line:#3A3833; --line2:#4A4740;
+    --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 30px 90px}
+b{font-weight:700}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+a{color:inherit}
+
+/* ---- page head ---- */
+.page-head{border-bottom:3px solid var(--ink);padding-bottom:22px;margin-bottom:22px}
+.page-head .kicker{font:800 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--plum);margin-bottom:8px}
+.page-head h1{font-size:27px;letter-spacing:-.01em;margin-bottom:10px}
+.page-head .sub{font-size:14px;color:var(--mut);line-height:1.65;max-width:900px}
+.page-head .sub b{color:var(--ink)}
+.datanote{margin-top:14px;padding:11px 14px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--mut);line-height:1.55;max-width:900px}
+
+/* ---- jump nav ---- */
+.jumpnav{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 40px;padding:14px 16px;background:var(--panel);border:1px solid var(--line2);border-radius:10px}
+.jumpnav .jn-lbl{font:800 10px var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);align-self:center;margin-right:2px}
+.jumpnav a{font-family:var(--sans);font-weight:700;font-size:12px;color:var(--plum);text-decoration:none;padding:6px 13px;border:1.5px solid var(--plum);border-radius:30px;background:var(--surface);white-space:nowrap}
+.jumpnav a:hover{background:var(--plum-t)}
+
+/* ---- panel section ---- */
+.panel{margin-bottom:64px;padding-top:26px;border-top:3px solid var(--ink);scroll-margin-top:16px}
+.panel-num{display:inline-block;font:800 10.5px var(--sans);letter-spacing:.08em;color:#fff;background:var(--ink);padding:3px 10px;border-radius:4px;margin-bottom:12px}
+.panel-head h2{font-size:23px;margin-bottom:9px;color:var(--ink)}
+.panel-head .purpose{font-size:13.5px;color:var(--mut);line-height:1.65;max-width:880px;margin-bottom:22px}
+.panel-head .purpose b{color:var(--ink)}
+
+/* ---- option card shell ---- */
+.opt{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:22px 24px 24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.opt-hd{display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:15px;border-bottom:1px solid var(--line)}
+.opt-tag{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 14px var(--sans);color:#fff}
+.opt[data-opt="a"] .opt-tag{background:var(--plum)}
+.opt[data-opt="b"] .opt-tag{background:var(--teal)}
+.opt[data-opt="c"] .opt-tag{background:var(--emph)}
+.opt-titlewrap{flex:1;min-width:220px}
+.opt-name{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--ink);line-height:1.3}
+.opt-caption{font-size:12.5px;color:var(--mut2);font-style:italic;margin-top:4px;line-height:1.5}
+
+/* ---- shared pills / tones ---- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;border:1.5px solid currentColor;background:transparent;white-space:nowrap}
+.pill.sm{font-size:9px;padding:2px 8px}
+.pill.plum{color:var(--plum)}
+.pill.teal{color:var(--teal)}
+.pill.emph{color:var(--emph)}
+.pill.rust{color:var(--rust)}
+.pill.blue{color:var(--blue)}
+.pill.grey{color:var(--grey)}
+.tx-plum{color:var(--plum)}.tx-teal{color:var(--teal)}.tx-emph{color:var(--emph)}.tx-rust{color:var(--rust)}.tx-blue{color:var(--blue)}.tx-mut{color:var(--mut2)}
+
+/* ---- generic bits ---- */
+.subnote{font-size:12px;color:var(--mut2);margin-top:12px;line-height:1.55}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line2);border-radius:10px}
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+table.tbl th{text-align:left;font:800 10px var(--sans);text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);background:var(--panel);padding:9px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
+table.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table.tbl tbody tr:last-child td{border-bottom:0}
+table.tbl td.n{text-align:center;white-space:nowrap}
+
+.slider-row{margin-bottom:11px}
+.slider-label{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:2px}
+.slider-label span:first-child{font-weight:700}
+.slider-pct{font-weight:800;color:var(--plum);font-family:var(--sans)}
+input[type="range"]{width:100%;height:4px;accent-color:var(--plum);margin:2px 0}
+.rank-row{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.rank-n{width:14px;font-weight:800;font-size:11.5px;color:var(--mut2);text-align:center;flex:none}
+.rank-name{width:118px;flex:none;font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bartrack{flex:1;height:13px;border-radius:5px;background:var(--nested);overflow:hidden}
+.barfill{display:block;height:100%}
+.barfill.plum{background:var(--plum)}
+.barfill.grey{background:var(--blue)}
+.barfill.outline-grey{background:var(--grey);opacity:.5}
+.rank-val{width:38px;text-align:right;font-weight:800;font-size:11.5px;flex:none}
+.verdict-box{margin-top:11px;padding:10px 13px;border-radius:8px;background:var(--panel);font-size:12px;line-height:1.55}
+.btn-reset{margin-top:12px;font:700 12px var(--sans);color:var(--plum);background:transparent;border:1.5px solid var(--plum);border-radius:30px;padding:6px 15px;cursor:pointer}
+.btn-reset:hover{background:var(--plum-t)}
+
+/* ==================== PANEL 1: readiness, condensed ==================== */
+/* -- A: dense strip, click to expand -- */
+.rdya-wrap{position:relative}
+.rdya-wrap input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
+.rdya-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+.rdya-vchip{font:800 11px var(--sans);padding:4px 12px;border-radius:30px;white-space:nowrap}
+.rdya-vchip.notready{background:var(--rust-t);color:var(--rust)}
+.rdya-sub{font-size:12px;color:var(--mut)}
+.rdya-strip{display:flex;gap:6px;flex-wrap:wrap}
+.rdya-strip label{flex:1 1 128px;min-width:118px;cursor:pointer;display:block;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line2);background:var(--panel);border-left-width:3px}
+.rdya-strip label.cleared{border-left-color:var(--plum)}
+.rdya-strip label.blocked{border-left-color:var(--rust)}
+.rdya-strip .sg-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.rdya-strip .sg-lbl{font-weight:700;font-size:11.3px;line-height:1.3}
+#rdy-1:checked ~ .rdya-strip label[for="rdy-1"],
+#rdy-2:checked ~ .rdya-strip label[for="rdy-2"],
+#rdy-3:checked ~ .rdya-strip label[for="rdy-3"],
+#rdy-4:checked ~ .rdya-strip label[for="rdy-4"],
+#rdy-5:checked ~ .rdya-strip label[for="rdy-5"]{background:var(--surface);box-shadow:var(--shadow);border-color:var(--ink)}
+.rdya-details>div{display:none}
+.rdya-detail-box{margin-top:10px;padding:11px 14px;background:var(--panel);border:1px solid var(--line2);border-radius:9px;font-size:12.3px;color:var(--mut);line-height:1.55}
+.rdya-detail-box b{color:var(--ink)}
+#rdy-1:checked ~ .rdya-details .rdya-detail-1,
+#rdy-2:checked ~ .rdya-details .rdya-detail-2,
+#rdy-3:checked ~ .rdya-details .rdya-detail-3,
+#rdy-4:checked ~ .rdya-details .rdya-detail-4,
+#rdy-5:checked ~ .rdya-details .rdya-detail-5{display:block}
+
+/* -- B: two-column compact checklist -- */
+.rdyb-banner{border-radius:8px;padding:9px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--rust-t);border-left:4px solid var(--rust)}
+.rdyb-banner b{color:var(--rust);font-size:13px}
+.rdyb-banner span{font-size:12px;color:var(--mut)}
+.rdyb-cols{column-count:2;column-gap:22px}
+.rdyb-item{break-inside:avoid;padding:8px 0;border-top:1px solid var(--line)}
+.rdyb-item .rb-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px}
+.rdyb-item .rb-lbl{font-weight:700;font-size:12px}
+.rdyb-item .rb-ev{font-size:11.2px;color:var(--mut);line-height:1.45}
+
+/* -- C: one-row table, sticky verdict -- */
+.rdyc-scroll{max-height:216px;overflow-y:auto;border:1px solid var(--line2);border-radius:10px}
+.rdyc-verdict{position:sticky;top:0;z-index:2;background:var(--rust-t);border-bottom:2px solid var(--rust);padding:9px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rdyc-verdict .vchip{font:800 11px var(--sans);color:var(--rust)}
+.rdyc-verdict .vsub{font-size:11.5px;color:var(--mut)}
+.rdyc-scroll table.tbl{min-width:0}
+
+/* ==================== PANEL 2: model the decision ==================== */
+.m2a-grid{display:grid;grid-template-columns:290px 1fr;gap:28px;align-items:start}
+@media(max-width:760px){.m2a-grid{grid-template-columns:1fr}}
+.m2-collabel{font:800 9.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:10px}
+.m2a-sliders .slider-row{margin-bottom:8px}
+.m2a-sliders .slider-label{font-size:10.6px}
+
+.m2-sens-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:11.3px}
+.m2-sens-row:first-child{border-top:0}
+.m2-sens-cat{flex:1;font-weight:700}
+.m2-sens-val{flex:none;font-size:10.5px;color:var(--mut2);text-align:right;white-space:nowrap}
+
+.radar-shell{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.radar-chart-col{flex:1 1 320px;min-width:280px;max-width:460px}
+.radar-svg{width:100%;height:auto;display:block}
+.radar-axislabel{font:700 12.5px var(--sans)}
+.radar-gridlabel{font:700 9px var(--sans)}
+.radar-legend{flex:1 1 230px;min-width:210px}
+.radar-legend-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.radar-swatch{flex:none;width:20px;height:0;border-top-width:3px;border-top-style:solid;margin-top:8px}
+.radar-swatch.dashed{border-top-style:dashed}
+.radar-legend-name{font-weight:800;font-size:12.5px}
+.radar-legend-desc{font-size:11.2px;color:var(--mut);line-height:1.5;margin-top:2px}
+.radar-scalenote{font-size:10.5px;color:var(--mut2);margin-top:6px;line-height:1.5}
+.radar-evtbl{margin-top:16px}
+.radar-live-readout{margin-top:14px}
+
+.m2c-grid{display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start}
+@media(max-width:820px){.m2c-grid{grid-template-columns:1fr}}
+.m2c-sliders .slider-row{margin-bottom:7px}
+.m2c-sliders .slider-label{font-size:10.6px}
+
+/* ---- footer ---- */
+.page-foot{margin-top:40px;padding-top:20px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="kicker">Design exploration, round 2, not a change to the live dashboard</div>
+    <h1>RFx Recommendation Tab, Panel Options Round 2</h1>
+    <div class="sub">A follow-up pass on two of the five Recommendation-tab panels. <b>Evaluation Readiness</b> keeps every item, status, and piece of evidence from the two directions already liked, condensed into a far smaller footprint. <b>Model the Decision</b> adds a merged sliders-plus-sensitivity layout and two new radar variants that put suppliers, not requirement categories, on the axes. The other three panels (What Happens Next, The Case Per Supplier, Theo-Modeled Alternatives) are unchanged and not repeated here. Reflect-only: nothing on this page scores, sends, advances, or awards anything.</div>
+    <div class="datanote"><b>Reading the data:</b> Nimbus Data is the top panel score (4.4 of 5) and the lowest, most transparent price ($980,000/yr), but it holds a SOC&nbsp;2 Type&nbsp;I report against a Must-Have Type&nbsp;II requirement, an open gate. Lakehouse Co scores second on the panel (4.2 of 5) at $1,060,000/yr but clears every Must-Have, the clean conforming alternative. Helio Warehouse (3.2 of 5) has the field's strongest SAP integration but submitted no price, no MSA, and no implementation plan, an incomplete bid. The category weights and per-supplier fit scores below reuse the same requirement model as the original Model the Decision panel, so both documents stay consistent.</div>
+  </div>
+
+  <div class="jumpnav">
+    <span class="jn-lbl">Jump to</span>
+    <a href="#panel-readiness">1. Evaluation Readiness, Condensed</a>
+    <a href="#panel-model">2. Model the Decision, Merged + Radar</a>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PANEL 1: EVALUATION READINESS, CONDENSED -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-readiness">
+    <div class="panel-head">
+      <div class="panel-num">Panel 1 of 2</div>
+      <h2>Evaluation Readiness, Condensed</h2>
+      <div class="purpose">A checklist of the preconditions that should be true before this recommendation is treated as final: bid leveling, complete pricing, resolved gating clarifications, an acknowledged gate conflict, and cleared mandatory reviews. The gated-checklist and completeness-ring directions from the first pass carried the right detail but ran long down the page. All three variants below keep every item, its status, and its evidence; they just cost far less vertical space. In this RFx, only <b>1 of 5</b> items clear today.</div>
+    </div>
+
+    <div class="opt" data-opt="a">
+      <div class="opt-hd">
+        <div class="opt-tag">A</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Dense readiness strip, click to expand</div>
+          <div class="opt-caption">All five items compressed into a single horizontal strip with a verdict chip; click (or tab to and press enter on) any segment to expand its evidence in the box below, without leaving the strip.</div>
+        </div>
+      </div>
+      <div class="rdya-wrap">
+        <input type="radio" name="rdy" id="rdy-1" checked>
+        <input type="radio" name="rdy" id="rdy-2">
+        <input type="radio" name="rdy" id="rdy-3">
+        <input type="radio" name="rdy" id="rdy-4">
+        <input type="radio" name="rdy" id="rdy-5">
+        <div class="rdya-head">
+          <span class="rdya-vchip notready">NOT READY</span>
+          <span class="rdya-sub">1 of 5 items cleared, 4 require action before this recommendation is final.</span>
+        </div>
+        <div class="rdya-strip">
+          <label for="rdy-1" class="cleared" title="Click to expand"><span class="sg-top"><span class="sg-lbl">Bid leveling</span><span class="pill plum sm">Cleared</span></span></label>
+          <label for="rdy-2" class="blocked" title="Click to expand"><span class="sg-top"><span class="sg-lbl">Pricing</span><span class="pill rust sm">Blocked</span></span></label>
+          <label for="rdy-3" class="blocked" title="Click to expand"><span class="sg-top"><span class="sg-lbl">Gating items</span><span class="pill rust sm">Blocked</span></span></label>
+          <label for="rdy-4" class="blocked" title="Click to expand"><span class="sg-top"><span class="sg-lbl">Gate conflict</span><span class="pill rust sm">Blocked</span></span></label>
+          <label for="rdy-5" class="blocked" title="Click to expand"><span class="sg-top"><span class="sg-lbl">TPRM review</span><span class="pill rust sm">Blocked</span></span></label>
+        </div>
+        <div class="rdya-details">
+          <div class="rdya-detail-1 rdya-detail-box"><b>Bid leveling, cleared.</b> Nimbus Data and Lakehouse Co are both normalized to a common unit on the cross-supplier ZOPA. Helio Warehouse has not priced its bid, so it is not part of this check.</div>
+          <div class="rdya-detail-2 rdya-detail-box"><b>Pricing complete, blocked.</b> Helio Warehouse has not submitted a firm annual price. Every field on its pricing schedule reads "Not submitted."</div>
+          <div class="rdya-detail-3 rdya-detail-box"><b>Gating clarifications resolved, blocked.</b> 1 open GATING item across the field: Nimbus Data's SOC&nbsp;2 Type&nbsp;II certification (Type&nbsp;I on file, Type&nbsp;II required at award).</div>
+          <div class="rdya-detail-4 rdya-detail-box"><b>Gate-conflict acknowledged, blocked.</b> Nimbus Data leads the panel score but carries the open SOC&nbsp;2 gap. The panel has not yet recorded a decision to accept that risk or require remediation before award. <span class="tx-mut">[Confirm]</span></div>
+          <div class="rdya-detail-5 rdya-detail-box"><b>Mandatory reviews cleared, blocked.</b> TPRM on Nimbus Data (the recommended supplier) is under review, 2 items open.</div>
+        </div>
+      </div>
+      <div class="subnote">CSS-only expand, no page state lost on refresh. Reflect-only, derived from the bid-leveling, pricing, clarification, and TPRM data on file; a field the data model does not track stays marked [Confirm], never guessed.</div>
+    </div>
+
+    <div class="opt" data-opt="b">
+      <div class="opt-hd">
+        <div class="opt-tag">B</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Compact two-column checklist</div>
+          <div class="opt-caption">Every item and its evidence stay visible at once, no interaction required; flowed into two columns so the block reads short and wide instead of long and thin.</div>
+        </div>
+      </div>
+      <div class="rdyb-banner"><b>NOT READY.</b> <span>1 of 5 readiness items cleared; 4 require action before this recommendation should be treated as final.</span></div>
+      <div class="rdyb-cols">
+        <div class="rdyb-item">
+          <div class="rb-top"><span class="rb-lbl">Bid leveling</span><span class="pill plum sm">Cleared</span></div>
+          <div class="rb-ev">Nimbus Data and Lakehouse Co normalized to a common unit; Helio excluded, not yet priced.</div>
+        </div>
+        <div class="rdyb-item">
+          <div class="rb-top"><span class="rb-lbl">Pricing complete</span><span class="pill rust sm">Blocked</span></div>
+          <div class="rb-ev">Helio Warehouse has not submitted a firm annual price.</div>
+        </div>
+        <div class="rdyb-item">
+          <div class="rb-top"><span class="rb-lbl">Gating clarifications</span><span class="pill rust sm">Blocked</span></div>
+          <div class="rb-ev">1 open GATING item: Nimbus Data's SOC&nbsp;2 Type&nbsp;II certification.</div>
+        </div>
+        <div class="rdyb-item">
+          <div class="rb-top"><span class="rb-lbl">Gate-conflict ack.</span><span class="pill rust sm">Blocked</span></div>
+          <div class="rb-ev">No panel decision on record to accept the risk or require remediation. <span class="tx-mut">[Confirm]</span></div>
+        </div>
+        <div class="rdyb-item">
+          <div class="rb-top"><span class="rb-lbl">Mandatory reviews</span><span class="pill rust sm">Blocked</span></div>
+          <div class="rb-ev">TPRM on Nimbus Data under review, 2 items open.</div>
+        </div>
+      </div>
+      <div class="subnote">Pure CSS multi-column flow, no click required to see any item; the tradeoff is that each evidence line has to stay short enough to fit two columns cleanly.</div>
+    </div>
+
+    <div class="opt" data-opt="c">
+      <div class="opt-hd">
+        <div class="opt-tag">C</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">One-row-per-item table, sticky verdict</div>
+          <div class="opt-caption">A dense table, one row per item; the verdict bar stays pinned at the top of the scroll region so it is never out of view even if the checklist grows past five items.</div>
+        </div>
+      </div>
+      <div class="rdyc-scroll">
+        <div class="rdyc-verdict">
+          <span class="vchip">NOT READY</span>
+          <span class="vsub">1 of 5 cleared, 4 require action before this recommendation is final.</span>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>Item</th><th>Status</th><th style="text-align:left">Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Bid leveling</td><td class="n"><span class="pill plum sm">Cleared</span></td><td style="text-align:left">Nimbus Data and Lakehouse Co normalized to a common unit; Helio excluded, not yet priced.</td></tr>
+            <tr><td>Pricing complete</td><td class="n"><span class="pill rust sm">Blocked</span></td><td style="text-align:left">Helio Warehouse has not submitted a firm annual price.</td></tr>
+            <tr><td>Gating clarifications</td><td class="n"><span class="pill rust sm">Blocked</span></td><td style="text-align:left">1 open GATING item: Nimbus Data's SOC&nbsp;2 Type&nbsp;II certification (Type&nbsp;I on file).</td></tr>
+            <tr><td>Gate-conflict ack.</td><td class="n"><span class="pill rust sm">Blocked</span></td><td style="text-align:left">No panel decision on record to accept the risk or require remediation. <span class="tx-mut">[Confirm]</span></td></tr>
+            <tr><td>Mandatory reviews</td><td class="n"><span class="pill rust sm">Blocked</span></td><td style="text-align:left">TPRM on Nimbus Data (recommended supplier) under review, 2 items open.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="subnote">The verdict bar uses <code>position: sticky</code> inside the scroll region, so it demonstrates real sticky behavior even though the current list is short enough to fit without scrolling on most screens.</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PANEL 2: MODEL THE DECISION, MERGED + RADAR -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-model">
+    <div class="panel-head">
+      <div class="panel-num">Panel 2 of 2</div>
+      <h2>Model the Decision, Merged + Radar</h2>
+      <div class="purpose">Two new directions for the award-scenario modeler. Option A merges the category-weight sliders and the sensitivity read into one panel instead of two. Options B and C flip the usual radar chart around: instead of one axis per requirement category, each axis is a <b>supplier</b>, so the shape traces how a weighting scenario reshuffles the field. Reflect-only: the panel's real weights and scores never change, this is a what-if sandbox layered on top of them.</div>
+    </div>
+
+    <div class="opt" data-opt="a">
+      <div class="opt-hd">
+        <div class="opt-tag">A</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Compact sliders plus live sensitivity read</div>
+          <div class="opt-caption">Narrow weight sliders on the left; a live ranking and a live "which lever flips the leader" read on the right, in one panel. The sliders and the sensitivity list are both live.</div>
+        </div>
+      </div>
+      <div class="m2a-grid">
+        <div>
+          <div class="m2-collabel">Category weights</div>
+          <div class="m2a-sliders">
+            <div class="slider-row"><div class="slider-label"><span>Functional fit</span><span class="slider-pct" id="m2aPct0">23%</span></div><input type="range" min="0" max="50" value="23" id="m2aW0" oninput="m2aRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Integration &amp; architecture</span><span class="slider-pct" id="m2aPct1">21%</span></div><input type="range" min="0" max="50" value="21" id="m2aW1" oninput="m2aRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Security &amp; compliance</span><span class="slider-pct" id="m2aPct2">26%</span></div><input type="range" min="0" max="50" value="26" id="m2aW2" oninput="m2aRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Performance &amp; scalability</span><span class="slider-pct" id="m2aPct3">8%</span></div><input type="range" min="0" max="50" value="8" id="m2aW3" oninput="m2aRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Operational support</span><span class="slider-pct" id="m2aPct4">6%</span></div><input type="range" min="0" max="50" value="6" id="m2aW4" oninput="m2aRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Total cost (TCO)</span><span class="slider-pct" id="m2aPct5">8%</span></div><input type="range" min="0" max="50" value="8" id="m2aW5" oninput="m2aRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Innovation &amp; roadmap</span><span class="slider-pct" id="m2aPct6">4%</span></div><input type="range" min="0" max="50" value="4" id="m2aW6" oninput="m2aRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Risk &amp; stability</span><span class="slider-pct" id="m2aPct7">4%</span></div><input type="range" min="0" max="50" value="4" id="m2aW7" oninput="m2aRecompute()"></div>
+          </div>
+          <button class="btn-reset" onclick="m2aReset()">Reset to filed weights</button>
+        </div>
+        <div>
+          <div class="m2-collabel">Ranking under these weights</div>
+          <div id="m2aRanking"></div>
+          <div class="verdict-box" id="m2aVerdict"></div>
+          <div class="m2-collabel" style="margin-top:16px">Sensitivity, closest lever first</div>
+          <div id="m2aSensitivity"></div>
+          <div class="subnote" id="m2aSensNote" style="margin-top:9px"></div>
+        </div>
+      </div>
+      <div class="subnote">Nimbus Data is excluded from the ranking regardless of the weights, its SOC&nbsp;2 gate is a Must-Have failure and a Must-Have failure is weight-invariant. "Flips" means pushing that one category to its maximum slider weight, holding every other slider where it is now, changes which of Lakehouse Co and Helio Warehouse leads.</div>
+    </div>
+
+    <div class="opt" data-opt="b">
+      <div class="opt-hd">
+        <div class="opt-tag">B</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Sensitivity radar, three scenarios</div>
+          <div class="opt-caption">One axis per supplier, here three; the same layout scales to however many bidders are in the RFx (N suppliers, axes spaced 360 &divide; N degrees apart). One polygon per weighting scenario, plotted as an inline SVG, no chart library.</div>
+        </div>
+      </div>
+      <div class="radar-shell">
+        <div class="radar-chart-col" id="radarB"></div>
+        <div class="radar-legend">
+          <div class="radar-legend-row">
+            <span class="radar-swatch" style="border-color:var(--plum)"></span>
+            <div><div class="radar-legend-name">Base weights (filed)</div><div class="radar-legend-desc">The RFx panel's filed category weights, as scored today. No single category dominates.</div></div>
+          </div>
+          <div class="radar-legend-row">
+            <span class="radar-swatch" style="border-color:var(--emph)"></span>
+            <div><div class="radar-legend-name">Cost-priority</div><div class="radar-legend-desc">Total Cost (TCO) pushed to 50% of the weight, the rest compressed proportionally.</div></div>
+          </div>
+          <div class="radar-legend-row">
+            <span class="radar-swatch" style="border-color:var(--teal)"></span>
+            <div><div class="radar-legend-name">Security-priority</div><div class="radar-legend-desc">Security &amp; Compliance pushed to 50% of the weight, the rest compressed proportionally.</div></div>
+          </div>
+          <div class="radar-scalenote">Grid rings mark fit scores of 60, 80, and 100; the center point represents 40. Values below the read the same requirement-fit model as the sliders in Option A.</div>
+        </div>
+      </div>
+      <div class="radar-evtbl">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th style="text-align:left">Scenario</th><th>Nimbus Data</th><th>Lakehouse Co</th><th>Helio Warehouse</th></tr></thead>
+            <tbody id="radarBTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="subnote">How to read it: Helio Warehouse's spoke is the tightest cluster across the three scenarios, about an 11-point spread, the most stable position in the field regardless of weighting, though never the top scorer. Nimbus Data and Lakehouse Co both swing about 17 points depending on the scenario: Lakehouse leads under Base and Security-priority weights, Nimbus leads only under Cost-priority, and would still need its SOC&nbsp;2 gate resolved to be awardable even then. Illustrative, not the panel's live scorecard.</div>
+    </div>
+
+    <div class="opt" data-opt="c">
+      <div class="opt-hd">
+        <div class="opt-tag">C</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Sensitivity radar, live weights</div>
+          <div class="opt-caption">The same one-axis-per-supplier layout, but with one live polygon driven directly by the sliders below it. Drag a weight and the shape reshapes in real time; the filed weights stay plotted as a dashed reference so a drag's effect is easy to judge.</div>
+        </div>
+      </div>
+      <div class="m2c-grid">
+        <div class="radar-chart-col" id="radarC" style="max-width:none"></div>
+        <div>
+          <div class="m2-collabel">Category weights</div>
+          <div class="m2c-sliders">
+            <div class="slider-row"><div class="slider-label"><span>Functional fit</span><span class="slider-pct" id="m2cPct0">23%</span></div><input type="range" min="0" max="50" value="23" id="m2cW0" oninput="m2cRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Integration &amp; architecture</span><span class="slider-pct" id="m2cPct1">21%</span></div><input type="range" min="0" max="50" value="21" id="m2cW1" oninput="m2cRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Security &amp; compliance</span><span class="slider-pct" id="m2cPct2">26%</span></div><input type="range" min="0" max="50" value="26" id="m2cW2" oninput="m2cRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Performance &amp; scalability</span><span class="slider-pct" id="m2cPct3">8%</span></div><input type="range" min="0" max="50" value="8" id="m2cW3" oninput="m2cRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Operational support</span><span class="slider-pct" id="m2cPct4">6%</span></div><input type="range" min="0" max="50" value="6" id="m2cW4" oninput="m2cRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Total cost (TCO)</span><span class="slider-pct" id="m2cPct5">8%</span></div><input type="range" min="0" max="50" value="8" id="m2cW5" oninput="m2cRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Innovation &amp; roadmap</span><span class="slider-pct" id="m2cPct6">4%</span></div><input type="range" min="0" max="50" value="4" id="m2cW6" oninput="m2cRecompute()"></div>
+            <div class="slider-row"><div class="slider-label"><span>Risk &amp; stability</span><span class="slider-pct" id="m2cPct7">4%</span></div><input type="range" min="0" max="50" value="4" id="m2cW7" oninput="m2cRecompute()"></div>
+          </div>
+          <button class="btn-reset" onclick="m2cReset()">Reset to filed weights</button>
+          <div class="radar-live-readout">
+            <div class="m2-collabel">Live weighted score</div>
+            <div id="m2cReadout"></div>
+          </div>
+        </div>
+      </div>
+      <div class="subnote">Dashed grey triangle: filed weights, unchanged. Solid plum triangle: the weights on the sliders right now. Same axis-per-supplier idea as Option B, generalizes to N suppliers the same way; this variant trades the three fixed scenarios for one fully interactive one.</div>
+    </div>
+  </section>
+
+  <div class="page-foot">
+    Design-exploration mockup, round 2, generated for side-by-side review alongside RFx-RECOMMENDATION-OPTIONS.html. Not connected to live data and not part of the shipped dashboard. All supplier names, scores, and dollar figures are illustrative, matching the seeded Enterprise Data Platform RFx (Nimbus Data, Lakehouse Co, Helio Warehouse) used across the rest of the product. Colors follow the MCM palette: plum as primary, teal as secondary, burnt orange as the single emphasis accent, deep rust reserved for blocked/critical states, muted blue for neutral information, and bold grey for pending or not-tracked items.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var CATS=['Functional fit','Integration &amp; architecture','Security &amp; compliance','Performance &amp; scalability','Operational support','Total cost (TCO)','Innovation &amp; roadmap','Risk &amp; stability'];
+  var BASE=[23,21,26,8,6,8,4,4];
+  var COST=[10,8,10,5,4,50,5,8];
+  var SEC=[10,10,50,5,5,8,4,8];
+  var FIT={
+    nimbus:   [100,82,59,80,80,100,100,40],
+    lakehouse:[80,89,100,80,100,60,80,100],
+    helio:    [55,78,74,100,60,100,0,60]
+  };
+  var CONF={nimbus:false,lakehouse:true,helio:true};
+  var NAME={nimbus:'Nimbus Data',lakehouse:'Lakehouse Co',helio:'Helio Warehouse'};
+  var ORDER=['nimbus','lakehouse','helio'];
+  var SUPPLIERS=ORDER.map(function(k){ return {key:k,name:NAME[k]}; });
+
+  function computeFits(weights){
+    var sum=0; for(var i=0;i<weights.length;i++) sum+=weights[i];
+    if(!sum) sum=1;
+    var out={};
+    ORDER.forEach(function(k){
+      var f=0;
+      FIT[k].forEach(function(v,i){ f+=(weights[i]/sum)*v; });
+      out[k]=f;
+    });
+    return out;
+  }
+
+  function renderRanking(elId, fits, curLeader){
+    var rank=ORDER.slice().sort(function(a,b){
+      if(CONF[a]!==CONF[b]) return CONF[a]?-1:1;
+      return fits[b]-fits[a];
+    });
+    var maxFit=0; ORDER.forEach(function(k){ if(fits[k]>maxFit) maxFit=fits[k]; }); if(!maxFit) maxFit=1;
+    var rk=0, html='';
+    rank.forEach(function(k){
+      var w=Math.round(fits[k]/maxFit*100);
+      var barclass, lbl;
+      if(CONF[k]){
+        rk++; lbl=rk;
+        barclass=(k===curLeader)?'barfill plum':'barfill grey';
+      } else {
+        lbl='-';
+        barclass='barfill outline-grey';
+      }
+      html+='<div class="rank-row"><span class="rank-n">'+lbl+'</span><span class="rank-name">'+NAME[k]+(CONF[k]?'':' <span class="pill rust sm">Gated</span>')+'</span>'
+        +'<div class="bartrack"><span class="'+barclass+'" style="width:'+w+'%"></span></div>'
+        +'<span class="rank-val">'+fits[k].toFixed(1)+'</span></div>';
+    });
+    document.getElementById(elId).innerHTML=html;
+  }
+
+  /* ---------------- Panel 2, Option A: merged sliders + sensitivity ---------------- */
+  window.m2aRecompute=function(){
+    var raw=CATS.map(function(c,i){ var el=document.getElementById('m2aW'+i); return el?(parseInt(el.value,10)||0):BASE[i]; });
+    var sum=0; raw.forEach(function(v){sum+=v;}); if(!sum) sum=1;
+    raw.forEach(function(v,i){ var lbl=document.getElementById('m2aPct'+i); if(lbl) lbl.textContent=Math.round(v/sum*100)+'%'; });
+
+    var fits=computeFits(raw);
+    var curLeader=fits.lakehouse>=fits.helio?'lakehouse':'helio';
+    renderRanking('m2aRanking', fits, curLeader);
+
+    var baseFits=computeFits(BASE);
+    var baseLeader=baseFits.lakehouse>=baseFits.helio?'lakehouse':'helio';
+    var isAdjusted=raw.some(function(v,i){return v!==BASE[i];});
+    var verdict;
+    if(curLeader!==baseLeader && isAdjusted){
+      verdict='<b class="tx-emph">Leader flips to '+NAME[curLeader]+'.</b> The panel\'s filed weights favor '+NAME[baseLeader]+'; this order is sensitive to the weights just set, confirm before relying on it.';
+    } else if(isAdjusted){
+      verdict='<b class="tx-plum">'+NAME[curLeader]+' still leads</b> under these weights, the ranking is robust to this shift.';
+    } else {
+      verdict='<b class="tx-plum">'+NAME[curLeader]+' leads</b> on the filed requirement-category weights. Drag a slider to test sensitivity. Nimbus Data scores higher on raw requirement fit but is excluded from ranking here, a Must-Have gate is weight-invariant.';
+    }
+    document.getElementById('m2aVerdict').innerHTML=verdict;
+
+    var sensRows=CATS.map(function(c,i){
+      var w2=raw.slice(); w2[i]=50;
+      var f2=computeFits(w2);
+      var newLeader=f2.lakehouse>=f2.helio?'lakehouse':'helio';
+      var gap=Math.abs(f2.lakehouse-f2.helio);
+      return {cat:c, flips:newLeader!==curLeader, gap:gap, newLeader:newLeader};
+    });
+    sensRows.sort(function(a,b){ return a.gap-b.gap; });
+    var sHtml='';
+    sensRows.forEach(function(r){
+      var pill=r.flips?'<span class="pill rust sm">Flips</span>':'<span class="pill grey sm">Stable</span>';
+      var val=r.flips?('&rarr; '+NAME[r.newLeader]):('gap '+r.gap.toFixed(1));
+      sHtml+='<div class="m2-sens-row"><span class="m2-sens-cat">'+r.cat+'</span>'+pill+'<span class="m2-sens-val">'+val+'</span></div>';
+    });
+    document.getElementById('m2aSensitivity').innerHTML=sHtml;
+
+    var nearest=sensRows[0], sensNote;
+    if(nearest.flips){
+      sensNote='Nearest lever: pushing <b>'+nearest.cat+'</b> to its maximum weight flips the leader to <b class="tx-emph">'+NAME[nearest.newLeader]+'</b>. Every other single-lever push leaves '+NAME[curLeader]+' in front.';
+    } else {
+      sensNote='<b class="tx-plum">'+NAME[curLeader]+'</b> stays in front under every single-lever push from here; the closest lever is <b>'+nearest.cat+'</b>, with a '+nearest.gap.toFixed(1)+'-point gap remaining.';
+    }
+    document.getElementById('m2aSensNote').innerHTML=sensNote;
+  };
+
+  window.m2aReset=function(){
+    CATS.forEach(function(c,i){ var el=document.getElementById('m2aW'+i); if(el) el.value=BASE[i]; });
+    m2aRecompute();
+  };
+
+  /* ---------------- Radar geometry, N-agnostic ---------------- */
+  function polarPoint(cx,cy,R,angleDeg,frac){
+    var rad=angleDeg*Math.PI/180;
+    return [cx+R*frac*Math.cos(rad), cy+R*frac*Math.sin(rad)];
+  }
+
+  function renderRadar(elId, suppliers, scenarios, domainMin, domainMax){
+    var W=480, H=420, cx=240, cy=200, R=120, labelR=150;
+    var N=suppliers.length;
+    var angles=suppliers.map(function(s,i){ return -90 + i*(360/N); });
+    var parts=[];
+
+    [1/3,2/3,1].forEach(function(f){
+      var pts=angles.map(function(a){ var p=polarPoint(cx,cy,R,a,f); return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+      parts.push('<polygon points="'+pts+'" fill="none" style="stroke:var(--line2)" stroke-width="1"></polygon>');
+    });
+    angles.forEach(function(a){
+      var p=polarPoint(cx,cy,R,a,1);
+      parts.push('<line x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'" style="stroke:var(--line2)" stroke-width="1"></line>');
+    });
+    [1/3,2/3,1].forEach(function(f){
+      var val=domainMin+(domainMax-domainMin)*f;
+      var p=polarPoint(cx,cy,R,-90,f);
+      parts.push('<text x="'+(p[0]+7).toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" class="radar-gridlabel" style="fill:var(--mut2)">'+Math.round(val)+'</text>');
+    });
+    angles.forEach(function(a,i){
+      var p=polarPoint(cx,cy,labelR,a,1);
+      var cosv=Math.cos(a*Math.PI/180);
+      var anchor=cosv>0.25?'start':(cosv<-0.25?'end':'middle');
+      parts.push('<text x="'+p[0].toFixed(1)+'" y="'+p[1].toFixed(1)+'" text-anchor="'+anchor+'" class="radar-axislabel" style="fill:var(--ink)">'+suppliers[i].name+'</text>');
+    });
+
+    scenarios.forEach(function(sc){
+      var fits=computeFits(sc.weights);
+      var pts=suppliers.map(function(s,i){
+        var v=fits[s.key];
+        var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+        var p=polarPoint(cx,cy,R,angles[i],frac);
+        return p[0].toFixed(1)+','+p[1].toFixed(1);
+      }).join(' ');
+      var dashAttr=sc.dashed?' stroke-dasharray="6,5"':'';
+      var op=sc.dashed?0.03:0.12;
+      parts.push('<polygon points="'+pts+'" style="fill:'+sc.color+';fill-opacity:'+op+';stroke:'+sc.color+'" stroke-width="2.5"'+dashAttr+'></polygon>');
+      if(!sc.dashed){
+        suppliers.forEach(function(s,i){
+          var v=fits[s.key];
+          var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+          var p=polarPoint(cx,cy,R,angles[i],frac);
+          parts.push('<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4.5" style="fill:'+sc.color+'"></circle>');
+        });
+      }
+    });
+
+    document.getElementById(elId).innerHTML='<svg viewBox="0 0 '+W+' '+H+'" class="radar-svg" role="img" aria-label="Sensitivity radar, one axis per supplier">'+parts.join('')+'</svg>';
+  }
+
+  /* ---------------- Panel 2, Option B: three fixed scenarios ---------------- */
+  var SCENARIOS_B=[
+    {key:'base', name:'Base weights (filed)', color:'var(--plum)', weights:BASE},
+    {key:'cost', name:'Cost-priority', color:'var(--emph)', weights:COST},
+    {key:'security', name:'Security-priority', color:'var(--teal)', weights:SEC}
+  ];
+
+  function buildRadarBTable(){
+    var rows='';
+    SCENARIOS_B.forEach(function(sc){
+      var fits=computeFits(sc.weights);
+      rows+='<tr><td style="text-align:left"><b>'+sc.name+'</b></td>'
+        +'<td class="n">'+fits.nimbus.toFixed(1)+'</td>'
+        +'<td class="n">'+fits.lakehouse.toFixed(1)+'</td>'
+        +'<td class="n">'+fits.helio.toFixed(1)+'</td></tr>';
+    });
+    document.getElementById('radarBTable').innerHTML=rows;
+  }
+
+  /* ---------------- Panel 2, Option C: one live polygon + dashed reference ---------------- */
+  window.m2cRecompute=function(){
+    var raw=CATS.map(function(c,i){ var el=document.getElementById('m2cW'+i); return el?(parseInt(el.value,10)||0):BASE[i]; });
+    var sum=0; raw.forEach(function(v){sum+=v;}); if(!sum) sum=1;
+    raw.forEach(function(v,i){ var lbl=document.getElementById('m2cPct'+i); if(lbl) lbl.textContent=Math.round(v/sum*100)+'%'; });
+
+    renderRadar('radarC', SUPPLIERS, [
+      {key:'filed', color:'var(--grey)', weights:BASE, dashed:true},
+      {key:'live', color:'var(--plum)', weights:raw, dashed:false}
+    ], 40, 100);
+
+    var fits=computeFits(raw);
+    var order=SUPPLIERS.slice().sort(function(a,b){ return fits[b.key]-fits[a.key]; });
+    var html='';
+    order.forEach(function(s,i){
+      html+='<div class="m2-sens-row"><span class="m2-sens-cat">'+(i+1)+'. '+s.name+'</span><span class="m2-sens-val">'+fits[s.key].toFixed(1)+'</span></div>';
+    });
+    document.getElementById('m2cReadout').innerHTML=html;
+  };
+
+  window.m2cReset=function(){
+    CATS.forEach(function(c,i){ var el=document.getElementById('m2cW'+i); if(el) el.value=BASE[i]; });
+    m2cRecompute();
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    m2aRecompute();
+    renderRadar('radarB', SUPPLIERS, SCENARIOS_B, 40, 100);
+    buildRadarBTable();
+    m2cRecompute();
+  });
+})();
+</script>
+</body>
+</html>

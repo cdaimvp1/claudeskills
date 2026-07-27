@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RFx Recommendation Tab, Model the Decision, Round 6</title>
+<style>
+:root{
+  --plum:#5C2B50; --plum-t:#EDDFE9; --plum-fg:#F3ECF1;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#E7E4DC; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+  --serif:Georgia,'Times New Roman',Times,serif;
+  --sans:Arial,Helvetica,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --plum:#8A5B80; --plum-t:#33253B;
+    --teal:#5FAFA9; --teal-t:#1E302D;
+    --emph:#E0925A; --emph-t:#33241A;
+    --rust:#D07A5C; --rust-t:#3A241C;
+    --blue:#7CA6E2; --blue-t:#1E2A38;
+    --grey:#A3ADB4; --grey-t:#2B2E31;
+    --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+    --line:#3A3833; --line2:#4A4740;
+    --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:26px 26px 50px}
+b{font-weight:700}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+a{color:inherit}
+
+/* ---- page head ---- */
+.page-head{border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:20px}
+.page-head .kicker{font:800 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--plum);margin-bottom:7px}
+.page-head h1{font-size:24px;letter-spacing:-.01em;margin-bottom:8px}
+.page-head .sub{font-size:13px;color:var(--mut);line-height:1.6;max-width:880px}
+.page-head .sub b{color:var(--ink)}
+.datanote{margin-top:11px;padding:9px 13px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;font-size:12px;color:var(--mut);line-height:1.5;max-width:880px}
+
+/* ---- option card shell ---- */
+.opt{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:18px 20px 20px;box-shadow:var(--shadow)}
+.opt-hd{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.opt-tag{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 13px var(--sans);color:#fff;background:var(--plum)}
+.opt-titlewrap{flex:1;min-width:220px}
+.opt-name{font-family:var(--serif);font-weight:700;font-size:16.5px;color:var(--ink);line-height:1.3}
+.opt-caption{font-size:12px;color:var(--mut2);font-style:italic;margin-top:3px;line-height:1.45}
+
+/* ---- shared pills / tones ---- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;border:1.5px solid currentColor;background:transparent;white-space:nowrap}
+.pill.sm{font-size:9px;padding:2px 8px}
+.pill.rust{color:var(--rust)}
+.tx-plum{color:var(--plum)}.tx-teal{color:var(--teal)}.tx-emph{color:var(--emph)}.tx-rust{color:var(--rust)}.tx-blue{color:var(--blue)}.tx-mut{color:var(--mut2)}
+
+/* ---- sliders ---- */
+.slider-row{margin-bottom:6px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.slider-label span:first-child{font-weight:700}
+.slider-pct{font-weight:800;color:var(--plum);font-family:var(--sans)}
+input[type="range"]{width:100%;height:4px;accent-color:var(--plum);margin:2px 0}
+.btn-reset{margin-top:10px;font:700 12px var(--sans);color:var(--plum);background:transparent;border:1.5px solid var(--plum);border-radius:30px;padding:6px 15px;cursor:pointer}
+.btn-reset:hover{background:var(--plum-t)}
+
+/* ==================== Model the Decision, grid + stack ==================== */
+.md-grid{display:grid;grid-template-columns:270px 1fr;gap:22px;align-items:start}
+@media(max-width:720px){.md-grid{grid-template-columns:1fr}}
+.md-collabel{font:800 9.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:8px}
+.md-sliders .slider-row{margin-bottom:6px}
+.md-sliders .slider-label{font-size:10.6px}
+
+.md-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.md-block{min-width:0}
+.md-block-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+
+/* ---- ranking, small cards across the top ---- */
+.rank-cards-row{display:flex;gap:8px}
+.rank-card{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--line2);border-radius:0 8px 8px 0;padding:6px 9px;display:flex;flex-direction:column;gap:3px}
+.rank-card.leader{border-left-color:var(--plum)}
+.rank-card.gated{border-left-color:var(--rust)}
+.rc-top{display:flex;align-items:center;gap:6px;min-width:0}
+.rc-badge{flex:none;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 10px var(--sans);background:var(--ink);color:#fff}
+.rc-badge.dash{background:var(--nested);color:var(--mut2);border:1px solid var(--line2)}
+.rc-name{flex:1;min-width:0;font-weight:700;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.rc-name.leader{color:var(--plum)}
+.rc-bottom{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.rc-score{font-weight:800;font-size:15px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.rc-score.leader{color:var(--plum)}
+
+/* ---- fuller explanation text, visible, not a tooltip ---- */
+.rank-explain{margin-top:8px;font-size:12.5px;line-height:1.6;color:var(--mut)}
+.rank-explain b{color:var(--ink)}
+.rank-explain p{margin:0 0 4px}
+.rank-explain p:last-child{margin-bottom:0}
+
+/* ---- scenario descriptions, smaller than body text but fully visible ---- */
+.scenario-legend{display:flex;flex-direction:column;gap:4px;margin-top:2px}
+.scenario-legend-item{display:flex;align-items:baseline;gap:7px;font-size:10.8px;line-height:1.5;color:var(--mut2)}
+.scenario-legend-swatch{flex:none;width:12px;height:0;border-top-width:2.5px;border-top-style:solid;position:relative;top:-2px}
+.scenario-legend-swatch.dashed{border-top-style:dashed}
+.scenario-legend-name{font-weight:800;color:var(--ink)}
+
+/* ---- radar, tight-fit viewBox set at render time ---- */
+.radar-chart-col{max-width:340px;margin:8px auto 0}
+.radar-svg{width:100%;height:auto;display:block}
+.radar-axislabel{font:700 12px var(--sans)}
+.radar-gridlabel{font:700 8.5px var(--sans)}
+
+/* ---- footer ---- */
+.page-foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="kicker">Design exploration, round 6, one panel only, layout refinement, not a change to the live dashboard</div>
+    <h1>RFx Recommendation Tab, Model the Decision</h1>
+    <div class="sub">The award-scenario modeler from the Recommendation tab, re-laid out per review feedback. Category-weight sliders on the left drive a row of small ranking cards live; the fuller ranking read and the three scenario descriptions sit underneath as plain visible text, and the compact sensitivity radar closes out the panel with its own faint live polygon. Reflect-only: the panel's real weights and scores never change, this is a what-if sandbox layered on top of them.</div>
+    <div class="datanote"><b>Reading the data:</b> Nimbus Data is the top panel score (4.4 of 5) at $980,000/yr but holds a SOC&nbsp;2 Type&nbsp;I report against a Must-Have Type&nbsp;II gate, so it is excluded from the ranking regardless of weights. Lakehouse Co (4.2 of 5, $1,060,000/yr) clears every Must-Have. Helio Warehouse (3.2 of 5) has the strongest SAP integration but submitted no price, no MSA, and no implementation plan.</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODEL THE DECISION, ROUND 6 -->
+  <!-- ============================================================ -->
+  <div class="opt" data-opt="a" id="mcm-panel">
+    <div class="opt-hd">
+      <div class="opt-tag">6</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Model the Decision</div>
+        <div class="opt-caption">Sliders left; small ranking cards, explanation text, scenario descriptions, and the compact radar stacked right, in that order.</div>
+      </div>
+    </div>
+    <div class="md-grid">
+      <div>
+        <div class="md-collabel">Category weights</div>
+        <div class="md-sliders">
+          <div class="slider-row"><div class="slider-label"><span>Functional fit</span><span class="slider-pct" id="mPct0">23%</span></div><input type="range" min="0" max="50" value="23" id="mW0" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Integration and architecture</span><span class="slider-pct" id="mPct1">21%</span></div><input type="range" min="0" max="50" value="21" id="mW1" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Security and compliance</span><span class="slider-pct" id="mPct2">26%</span></div><input type="range" min="0" max="50" value="26" id="mW2" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Performance and scalability</span><span class="slider-pct" id="mPct3">8%</span></div><input type="range" min="0" max="50" value="8" id="mW3" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Operational support</span><span class="slider-pct" id="mPct4">6%</span></div><input type="range" min="0" max="50" value="6" id="mW4" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Total cost (TCO)</span><span class="slider-pct" id="mPct5">8%</span></div><input type="range" min="0" max="50" value="8" id="mW5" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Innovation and roadmap</span><span class="slider-pct" id="mPct6">4%</span></div><input type="range" min="0" max="50" value="4" id="mW6" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Risk and stability</span><span class="slider-pct" id="mPct7">4%</span></div><input type="range" min="0" max="50" value="4" id="mW7" oninput="mdRecompute()"></div>
+        </div>
+        <button class="btn-reset" onclick="mdReset()" type="button">Reset to filed weights</button>
+      </div>
+      <div class="md-stack" id="mdStack">
+
+        <!-- 1: small ranking cards + 2: fuller explanation text -->
+        <div class="md-block" id="rankBlock">
+          <div class="md-block-hd">
+            <div class="md-collabel" style="margin-bottom:0">Ranking under these weights</div>
+          </div>
+          <div class="rank-cards-row" id="mRankCards"></div>
+          <div class="rank-explain" id="mExplain"></div>
+        </div>
+
+        <!-- 3: scenario descriptions + 4: compact radar -->
+        <div class="md-block" id="radarBlock">
+          <div class="md-block-hd">
+            <div class="md-collabel" style="margin-bottom:0">Sensitivity radar, three scenarios</div>
+          </div>
+          <div class="scenario-legend" id="mScenarioLegend"></div>
+          <div class="radar-chart-col" id="mRadar"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot">
+    Design-exploration mockup, round 6, layout refinement on one panel ("Model the Decision" on the RFx Recommendation tab), built on the compact radar and scoring logic from RFx-RECOMMENDATION-OPTIONS-5.html and the weight profiles, fit matrix, and scenario descriptions from RFx-RECOMMENDATION-OPTIONS-4.html. Same data, weights, and scoring logic; the ranking is now a row of small cards across the top of the right column, with the fuller leader-and-lever read as visible text underneath, the three scenario descriptions as visible small text below that, and the same tight, bounding-box-fit radar last, now with a faint live polygon tracking the sliders on top of the three fixed reference scenarios. Not connected to live data and not part of the shipped dashboard. Colors follow the MCM palette: plum as primary, teal as secondary, burnt orange as the single emphasis accent, deep rust reserved for blocked or critical states, muted blue for neutral information.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var CATS=['Functional fit','Integration and architecture','Security and compliance','Performance and scalability','Operational support','Total cost (TCO)','Innovation and roadmap','Risk and stability'];
+  var BASE=[23,21,26,8,6,8,4,4];
+  var COST=[10,8,10,5,4,50,5,8];
+  var SEC=[10,10,50,5,5,8,4,8];
+  var FIT={
+    nimbus:   [100,82,59,80,80,100,100,40],
+    lakehouse:[80,89,100,80,100,60,80,100],
+    helio:    [55,78,74,100,60,100,0,60]
+  };
+  var CONF={nimbus:false,lakehouse:true,helio:true};
+  var NAME={nimbus:'Nimbus Data',lakehouse:'Lakehouse Co',helio:'Helio Warehouse'};
+  var ORDER=['nimbus','lakehouse','helio'];
+  var SUPPLIERS=ORDER.map(function(k){ return {key:k,name:NAME[k]}; });
+
+  var SCENARIOS_3=[
+    {key:'base', name:'Base weights (filed)', color:'var(--plum)', weights:BASE},
+    {key:'cost', name:'Cost-priority', color:'var(--emph)', weights:COST},
+    {key:'security', name:'Security-priority', color:'var(--teal)', weights:SEC}
+  ];
+  var SCEN_NAME={base:'Base weights (filed)', cost:'Cost-priority', security:'Security-priority'};
+  var SCEN_DESC={
+    base:'the panel\'s filed weights, as scored today, no category dominates.',
+    cost:'Total Cost (TCO) pushed to 50% of the weight, the rest compressed proportionally.',
+    security:'Security & Compliance pushed to 50% of the weight, the rest compressed proportionally.'
+  };
+
+  function computeFits(weights){
+    var sum=0; for(var i=0;i<weights.length;i++) sum+=weights[i];
+    if(!sum) sum=1;
+    var out={};
+    ORDER.forEach(function(k){
+      var f=0;
+      FIT[k].forEach(function(v,i){ f+=(weights[i]/sum)*v; });
+      out[k]=f;
+    });
+    return out;
+  }
+
+  /* ---------------- Ranking, small cards across the top ---------------- */
+  function renderRankCards(elId, fits, curLeader){
+    var rank=ORDER.slice().sort(function(a,b){
+      if(CONF[a]!==CONF[b]) return CONF[a]?-1:1;
+      return fits[b]-fits[a];
+    });
+    var rk=0, html='';
+    rank.forEach(function(k){
+      var lbl;
+      if(CONF[k]){ rk++; lbl=rk; } else { lbl='-'; }
+      var isLeader=(k===curLeader && CONF[k]);
+      var cardCls='rank-card'+(isLeader?' leader':'')+(CONF[k]?'':' gated');
+      var badgeCls='rc-badge'+(CONF[k]?'':' dash');
+      var nameCls='rc-name'+(isLeader?' leader':'');
+      var scoreCls='rc-score'+(isLeader?' leader':'');
+      var pill=CONF[k]?'':'<span class="pill rust sm">Gated</span>';
+      html+='<div class="'+cardCls+'">'
+        +'<div class="rc-top"><span class="'+badgeCls+'">'+lbl+'</span><span class="'+nameCls+'">'+NAME[k]+'</span></div>'
+        +'<div class="rc-bottom"><span class="'+scoreCls+'">'+fits[k].toFixed(1)+'</span>'+pill+'</div>'
+        +'</div>';
+    });
+    var el=document.getElementById(elId); if(el) el.innerHTML=html;
+  }
+
+  /* ---------------- Fuller explanation text, visible under the cards ---------------- */
+  function composeExplain(raw, fits, curLeader){
+    var baseFits=computeFits(BASE);
+    var baseLeader=baseFits.lakehouse>=baseFits.helio?'lakehouse':'helio';
+    var isAdjusted=raw.some(function(v,i){ return v!==BASE[i]; });
+
+    var lead;
+    if(curLeader!==baseLeader && isAdjusted){
+      lead='<b class="tx-emph">Leader flips to '+NAME[curLeader]+'.</b> The panel\'s filed weights favor '+NAME[baseLeader]+'; this order is sensitive to the weights just set, confirm before relying on it.';
+    } else if(isAdjusted){
+      lead='<b class="tx-plum">'+NAME[curLeader]+' still leads</b> under these weights, the ranking is robust to this shift.';
+    } else {
+      lead='<b class="tx-plum">'+NAME[curLeader]+' leads</b> on the filed requirement-category weights. Nimbus Data scores higher on raw requirement fit but is excluded from ranking here, a Must-Have gate is weight-invariant.';
+    }
+
+    var sensRows=CATS.map(function(c,i){
+      var w2=raw.slice(); w2[i]=50;
+      var f2=computeFits(w2);
+      var newLeader=f2.lakehouse>=f2.helio?'lakehouse':'helio';
+      return {cat:c, flips:newLeader!==curLeader, gap:Math.abs(f2.lakehouse-f2.helio), newLeader:newLeader};
+    });
+    sensRows.sort(function(a,b){ return a.gap-b.gap; });
+    var nearest=sensRows[0], sens;
+    if(nearest.flips){
+      sens='Closest lever: <b>'+nearest.cat+'</b>, pushing it to its maximum weight flips the leader to <b class="tx-emph">'+NAME[nearest.newLeader]+'</b>. Every other single-lever push leaves '+NAME[curLeader]+' in front.';
+    } else {
+      sens='Closest lever: <b>'+nearest.cat+'</b>, a '+nearest.gap.toFixed(1)+'-point gap remains even at maximum weight; <b class="tx-plum">'+NAME[curLeader]+'</b> stays in front under every single-lever push from here.';
+    }
+
+    return '<p>'+lead+'</p><p>'+sens+'</p>';
+  }
+
+  /* ---------------- Scenario descriptions, smaller visible text ---------------- */
+  function renderScenarioLegend(elId, scenarios){
+    var el=document.getElementById(elId); if(!el) return;
+    var html='';
+    scenarios.forEach(function(sc){
+      html+='<div class="scenario-legend-item"><span class="scenario-legend-swatch" style="border-color:'+sc.color+'"></span><span><span class="scenario-legend-name">'+SCEN_NAME[sc.key]+':</span> '+SCEN_DESC[sc.key]+'</span></div>';
+    });
+    el.innerHTML=html;
+  }
+
+  /* ---------------- Radar geometry, N-agnostic, tight-fit viewBox ---------------- */
+  function polarPoint(cx,cy,R,angleDeg,frac){
+    var rad=angleDeg*Math.PI/180;
+    return [cx+R*frac*Math.cos(rad), cy+R*frac*Math.sin(rad)];
+  }
+
+  function renderRadar(elId, suppliers, scenarios, domainMin, domainMax){
+    var cx=200, cy=200, R=142, labelR=166;
+    var N=suppliers.length;
+    var angles=suppliers.map(function(s,i){ return -90 + i*(360/N); });
+    var parts=[];
+
+    [1/3,2/3,1].forEach(function(f){
+      var pts=angles.map(function(a){ var p=polarPoint(cx,cy,R,a,f); return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+      parts.push('<polygon points="'+pts+'" fill="none" style="stroke:var(--line2)" stroke-width="1"></polygon>');
+    });
+    angles.forEach(function(a){
+      var p=polarPoint(cx,cy,R,a,1);
+      parts.push('<line x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'" style="stroke:var(--line2)" stroke-width="1"></line>');
+    });
+    [1/3,2/3,1].forEach(function(f){
+      var val=domainMin+(domainMax-domainMin)*f;
+      var p=polarPoint(cx,cy,R,-90,f);
+      parts.push('<text x="'+(p[0]+6).toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" class="radar-gridlabel" style="fill:var(--mut2)">'+Math.round(val)+'</text>');
+    });
+    angles.forEach(function(a,i){
+      var p=polarPoint(cx,cy,labelR,a,1);
+      var cosv=Math.cos(a*Math.PI/180);
+      var anchor=cosv>0.25?'start':(cosv<-0.25?'end':'middle');
+      parts.push('<text x="'+p[0].toFixed(1)+'" y="'+p[1].toFixed(1)+'" text-anchor="'+anchor+'" class="radar-axislabel" style="fill:var(--ink)">'+suppliers[i].name+'</text>');
+    });
+
+    scenarios.forEach(function(sc){
+      var fits=computeFits(sc.weights);
+      var pts=suppliers.map(function(s,i){
+        var v=fits[s.key];
+        var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+        var p=polarPoint(cx,cy,R,angles[i],frac);
+        return p[0].toFixed(1)+','+p[1].toFixed(1);
+      }).join(' ');
+      var dashAttr=sc.dashed?' stroke-dasharray="5,4"':'';
+      var fillOp=sc.dashed?0.05:0.13;
+      parts.push('<polygon points="'+pts+'" style="fill:'+sc.color+';fill-opacity:'+fillOp+';stroke:'+sc.color+'" stroke-width="2.5"'+dashAttr+'></polygon>');
+      if(!sc.dashed){
+        suppliers.forEach(function(s,i){
+          var v=fits[s.key];
+          var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+          var p=polarPoint(cx,cy,R,angles[i],frac);
+          parts.push('<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4.5" style="fill:'+sc.color+'"></circle>');
+        });
+      }
+    });
+
+    var el=document.getElementById(elId);
+    if(!el) return;
+    el.innerHTML='<svg viewBox="0 0 400 400" class="radar-svg" role="img" aria-label="Sensitivity radar, one axis per supplier">'+parts.join('')+'</svg>';
+
+    /* Tighten the viewBox to the shape's own rendered bounding box so the
+       drawn radar (rings, spokes, dots, and spoke labels) fills the SVG's
+       box instead of sitting inside a fixed, oversized canvas. */
+    var svg=el.querySelector('svg');
+    try{
+      var bbox=svg.getBBox();
+      var pad=13;
+      var vx=(bbox.x-pad).toFixed(1), vy=(bbox.y-pad).toFixed(1);
+      var vw=(bbox.width+2*pad).toFixed(1), vh=(bbox.height+2*pad).toFixed(1);
+      svg.setAttribute('viewBox', vx+' '+vy+' '+vw+' '+vh);
+    }catch(e){ /* getBBox unsupported or el not rendered, keep default viewBox */ }
+  }
+
+  /* ---------------- Live recompute: cards, explanation text, and the radar's live polygon ---------------- */
+  window.mdRecompute=function(){
+    var raw=CATS.map(function(c,i){ var el=document.getElementById('mW'+i); return el?(parseInt(el.value,10)||0):BASE[i]; });
+    var sum=0; raw.forEach(function(v){sum+=v;}); if(!sum) sum=1;
+    raw.forEach(function(v,i){ var lbl=document.getElementById('mPct'+i); if(lbl) lbl.textContent=Math.round(v/sum*100)+'%'; });
+
+    var fits=computeFits(raw);
+    var curLeader=fits.lakehouse>=fits.helio?'lakehouse':'helio';
+    renderRankCards('mRankCards', fits, curLeader);
+
+    var explainEl=document.getElementById('mExplain');
+    if(explainEl) explainEl.innerHTML=composeExplain(raw, fits, curLeader);
+
+    var liveScenario={key:'live', name:'Live (sliders now)', color:'var(--blue)', weights:raw, dashed:true};
+    renderRadar('mRadar', SUPPLIERS, SCENARIOS_3.concat([liveScenario]), 40, 100);
+  };
+
+  window.mdReset=function(){
+    CATS.forEach(function(c,i){ var el=document.getElementById('mW'+i); if(el) el.value=BASE[i]; });
+    mdRecompute();
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    renderScenarioLegend('mScenarioLegend', SCENARIOS_3);
+    mdRecompute();
+  });
+})();
+</script>
+</body>
+</html>

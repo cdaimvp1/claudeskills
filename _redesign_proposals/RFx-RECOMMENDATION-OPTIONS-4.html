@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RFx Recommendation Tab, Model the Decision, Layout Variants</title>
+<style>
+:root{
+  --plum:#5C2B50; --plum-t:#EDDFE9; --plum-fg:#F3ECF1;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#E7E4DC; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+  --serif:Georgia,'Times New Roman',Times,serif;
+  --sans:Arial,Helvetica,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --plum:#8A5B80; --plum-t:#33253B;
+    --teal:#5FAFA9; --teal-t:#1E302D;
+    --emph:#E0925A; --emph-t:#33241A;
+    --rust:#D07A5C; --rust-t:#3A241C;
+    --blue:#7CA6E2; --blue-t:#1E2A38;
+    --grey:#A3ADB4; --grey-t:#2B2E31;
+    --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+    --line:#3A3833; --line2:#4A4740;
+    --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 30px 90px}
+b{font-weight:700}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+a{color:inherit}
+
+/* ---- page head ---- */
+.page-head{border-bottom:3px solid var(--ink);padding-bottom:22px;margin-bottom:22px}
+.page-head .kicker{font:800 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--plum);margin-bottom:8px}
+.page-head h1{font-size:27px;letter-spacing:-.01em;margin-bottom:10px}
+.page-head .sub{font-size:14px;color:var(--mut);line-height:1.65;max-width:900px}
+.page-head .sub b{color:var(--ink)}
+.datanote{margin-top:14px;padding:11px 14px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--mut);line-height:1.55;max-width:900px}
+
+/* ---- jump nav ---- */
+.jumpnav{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 40px;padding:14px 16px;background:var(--panel);border:1px solid var(--line2);border-radius:10px}
+.jumpnav .jn-lbl{font:800 10px var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);align-self:center;margin-right:2px}
+.jumpnav a{font-family:var(--sans);font-weight:700;font-size:12px;color:var(--plum);text-decoration:none;padding:6px 13px;border:1.5px solid var(--plum);border-radius:30px;background:var(--surface);white-space:nowrap}
+.jumpnav a:hover{background:var(--plum-t)}
+
+/* ---- panel section ---- */
+.panel{margin-bottom:64px;padding-top:26px;border-top:3px solid var(--ink);scroll-margin-top:16px}
+.panel-num{display:inline-block;font:800 10.5px var(--sans);letter-spacing:.08em;color:#fff;background:var(--ink);padding:3px 10px;border-radius:4px;margin-bottom:12px}
+.panel-head h2{font-size:23px;margin-bottom:9px;color:var(--ink)}
+.panel-head .purpose{font-size:13.5px;color:var(--mut);line-height:1.65;max-width:880px;margin-bottom:22px}
+.panel-head .purpose b{color:var(--ink)}
+
+/* ---- option card shell ---- */
+.opt{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:22px 24px 24px;margin-bottom:20px;box-shadow:var(--shadow);scroll-margin-top:16px}
+.opt-hd{display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:15px;border-bottom:1px solid var(--line)}
+.opt-tag{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 14px var(--sans);color:#fff}
+.opt[data-opt="a"] .opt-tag{background:var(--plum)}
+.opt[data-opt="b"] .opt-tag{background:var(--teal)}
+.opt[data-opt="c"] .opt-tag{background:var(--emph)}
+.opt-titlewrap{flex:1;min-width:220px}
+.opt-name{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--ink);line-height:1.3}
+.opt-caption{font-size:12.5px;color:var(--mut2);font-style:italic;margin-top:4px;line-height:1.5}
+
+/* ---- shared pills / tones ---- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;border:1.5px solid currentColor;background:transparent;white-space:nowrap}
+.pill.sm{font-size:9px;padding:2px 8px}
+.pill.plum{color:var(--plum)}
+.pill.teal{color:var(--teal)}
+.pill.emph{color:var(--emph)}
+.pill.rust{color:var(--rust)}
+.pill.blue{color:var(--blue)}
+.pill.grey{color:var(--grey)}
+.tx-plum{color:var(--plum)}.tx-teal{color:var(--teal)}.tx-emph{color:var(--emph)}.tx-rust{color:var(--rust)}.tx-blue{color:var(--blue)}.tx-mut{color:var(--mut2)}
+
+/* ---- generic bits ---- */
+.subnote{font-size:12px;color:var(--mut2);margin-top:12px;line-height:1.55}
+
+.slider-row{margin-bottom:9px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.slider-label span:first-child{font-weight:700}
+.slider-pct{font-weight:800;color:var(--plum);font-family:var(--sans)}
+input[type="range"]{width:100%;height:4px;accent-color:var(--plum);margin:2px 0}
+.btn-reset{margin-top:12px;font:700 12px var(--sans);color:var(--plum);background:transparent;border:1.5px solid var(--plum);border-radius:30px;padding:6px 15px;cursor:pointer}
+.btn-reset:hover{background:var(--plum-t)}
+.verdict-box{margin-top:11px;padding:10px 13px;border-radius:8px;background:var(--panel);font-size:12px;line-height:1.55}
+
+/* ==================== Model the Decision, shared grid + stack ==================== */
+.md-grid{display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:start}
+@media(max-width:760px){.md-grid{grid-template-columns:1fr}}
+.md-collabel{font:800 9.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:10px}
+.md-sliders .slider-row{margin-bottom:8px}
+.md-sliders .slider-label{font-size:10.6px}
+
+.md-stack{display:flex;flex-direction:column;gap:22px}
+.md-block{min-width:0}
+.md-block-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+
+/* ---- ranking, scores only ---- */
+.rank-simple{border:1px solid var(--line2);border-radius:9px;overflow:hidden;background:var(--panel)}
+.rank-simple-row{display:flex;align-items:center;gap:10px;padding:7px 12px;border-top:1px solid var(--line);font-size:12.5px}
+.rank-simple-row:first-child{border-top:0}
+.rank-simple-n{width:16px;font-weight:800;font-size:11.5px;color:var(--mut2);text-align:center;flex:none}
+.rank-simple-name{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-simple-val{flex:none;font-weight:800;font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ---- radar ---- */
+.radar-chart-col{max-width:440px;margin:0 auto}
+.radar-svg{width:100%;height:auto;display:block}
+.radar-axislabel{font:700 12.5px var(--sans)}
+.radar-gridlabel{font:700 9px var(--sans)}
+
+/* ---- mini legend, minimized ---- */
+.mini-legend{display:flex;flex-direction:column;gap:5px;max-width:440px;margin:8px auto 0;padding-top:9px;border-top:1px solid var(--line)}
+.mini-legend-item{display:flex;align-items:baseline;gap:7px;font-size:10.3px;line-height:1.45;color:var(--mut2)}
+.mini-legend-swatch{flex:none;width:12px;height:0;border-top-width:2.5px;border-top-style:solid;position:relative;top:-2px}
+.mini-legend-swatch.dashed{border-top-style:dashed}
+.mini-legend-name{font-weight:800;color:var(--ink)}
+
+/* ---- footer ---- */
+.page-foot{margin-top:40px;padding-top:20px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="kicker">Design exploration, round 4, one panel only, not a change to the live dashboard</div>
+    <h1>RFx Recommendation Tab, Model the Decision, Layout Variants</h1>
+    <div class="sub">Three refined layouts for a single panel: <b>Model the Decision</b>, the award-scenario modeler on the Recommendation tab. The left column keeps the compact category-weight sliders from the round-2 merged option, already approved. The right side is now always a <b>vertical stack</b>, never a side-by-side middle column, and the sensitivity radar is back to the three-scenario version, "Base weights (filed)," "Cost-priority," and "Security-priority," overlaid with their short descriptions, not the two-polygon filed-versus-live version. The ranking block shows supplier scores only, no bar graphs, with a one-line leader read and a one-line "closest lever" sensitivity read, and it now sits above the radar in most variants. The legend has been minimized and moved underneath the chart. Reflect-only: the panel's real weights and scores never change, this is a what-if sandbox layered on top of them.</div>
+    <div class="datanote"><b>Reading the data:</b> Nimbus Data is the top panel score (4.4 of 5) and the lowest, most transparent price ($980,000/yr), but it holds a SOC&nbsp;2 Type&nbsp;I report against a Must-Have Type&nbsp;II requirement, an open gate, so it is excluded from the ranking regardless of weights. Lakehouse Co scores second on the panel (4.2 of 5) at $1,060,000/yr and clears every Must-Have. Helio Warehouse (3.2 of 5) has the field's strongest SAP integration but submitted no price, no MSA, and no implementation plan. The category weights and per-supplier fit scores below reuse the same requirement model as the prior two rounds, so all three documents stay consistent.</div>
+  </div>
+
+  <div class="jumpnav">
+    <span class="jn-lbl">Jump to</span>
+    <a href="#variant-1">Variant 1, ranking on top</a>
+    <a href="#variant-2">Variant 2, radar on top</a>
+    <a href="#variant-3">Variant 3, live overlay</a>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODEL THE DECISION, LAYOUT VARIANTS -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-model">
+    <div class="panel-head">
+      <div class="panel-num">Single panel, 3 layout variants</div>
+      <h2>Model the Decision</h2>
+      <div class="purpose">Same sliders, same three-scenario radar, same scores-only ranking, three different orderings of the right-hand stack. In Variants 1 and 3 the ranking reads first, so the score and the "why" land before the shape. In Variant 2 the radar reads first, so the sensitivity picture lands before the numbers. Variant 3 adds a fourth, faint polygon to the radar that tracks the sliders live, so dragging a weight still visibly moves the chart even though the three reference scenarios themselves never move. In every variant, the left-hand sliders drive the ranking's scores live as they are dragged.</div>
+    </div>
+
+    <!-- ============ VARIANT 1 ============ -->
+    <div class="opt" data-opt="a" id="variant-1">
+      <div class="opt-hd">
+        <div class="opt-tag">1</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Variant 1, ranking on top, radar and mini legend below</div>
+          <div class="opt-caption">Sliders on the left; on the right, the scores-only ranking reads first, then the three-scenario radar, then the minimized legend at the very bottom.</div>
+        </div>
+      </div>
+      <div class="md-grid">
+        <div>
+          <div class="md-collabel">Category weights</div>
+          <div class="md-sliders">
+            <div class="slider-row"><div class="slider-label"><span>Functional fit</span><span class="slider-pct" id="v1Pct0">23%</span></div><input type="range" min="0" max="50" value="23" id="v1W0" oninput="mdRecompute('v1')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Integration &amp; architecture</span><span class="slider-pct" id="v1Pct1">21%</span></div><input type="range" min="0" max="50" value="21" id="v1W1" oninput="mdRecompute('v1')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Security &amp; compliance</span><span class="slider-pct" id="v1Pct2">26%</span></div><input type="range" min="0" max="50" value="26" id="v1W2" oninput="mdRecompute('v1')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Performance &amp; scalability</span><span class="slider-pct" id="v1Pct3">8%</span></div><input type="range" min="0" max="50" value="8" id="v1W3" oninput="mdRecompute('v1')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Operational support</span><span class="slider-pct" id="v1Pct4">6%</span></div><input type="range" min="0" max="50" value="6" id="v1W4" oninput="mdRecompute('v1')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Total cost (TCO)</span><span class="slider-pct" id="v1Pct5">8%</span></div><input type="range" min="0" max="50" value="8" id="v1W5" oninput="mdRecompute('v1')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Innovation &amp; roadmap</span><span class="slider-pct" id="v1Pct6">4%</span></div><input type="range" min="0" max="50" value="4" id="v1W6" oninput="mdRecompute('v1')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Risk &amp; stability</span><span class="slider-pct" id="v1Pct7">4%</span></div><input type="range" min="0" max="50" value="4" id="v1W7" oninput="mdRecompute('v1')"></div>
+          </div>
+          <button class="btn-reset" onclick="mdReset('v1', false)">Reset to filed weights</button>
+        </div>
+        <div class="md-stack">
+          <div class="md-block">
+            <div class="md-block-hd"><div class="md-collabel" style="margin-bottom:0">Ranking under these weights</div></div>
+            <div class="rank-simple" id="v1Ranking"></div>
+            <div class="verdict-box" id="v1Verdict"></div>
+            <div class="subnote" id="v1SensNote" style="margin-top:8px"></div>
+          </div>
+          <div class="md-block">
+            <div class="md-collabel">Sensitivity radar, three scenarios</div>
+            <div class="radar-chart-col" id="v1Radar"></div>
+            <div class="mini-legend">
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--plum)"></span><span><span class="mini-legend-name">Base weights (filed):</span> the panel's filed weights, as scored today, no category dominates.</span></div>
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--emph)"></span><span><span class="mini-legend-name">Cost-priority:</span> Total Cost (TCO) pushed to 50% of the weight, the rest compressed proportionally.</span></div>
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--teal)"></span><span><span class="mini-legend-name">Security-priority:</span> Security &amp; Compliance pushed to 50% of the weight, the rest compressed proportionally.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="subnote">Nimbus Data is excluded from the ranking regardless of the weights, its SOC&nbsp;2 gate is a Must-Have failure and a Must-Have failure is weight-invariant; its spoke still plots on the radar so its shape stays comparable. "Closest lever" means pushing that one category to its maximum slider weight, holding every other slider where it is now, and checking whether that alone changes which of Lakehouse Co and Helio Warehouse leads.</div>
+    </div>
+
+    <!-- ============ VARIANT 2 ============ -->
+    <div class="opt" data-opt="b" id="variant-2">
+      <div class="opt-hd">
+        <div class="opt-tag">2</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Variant 2, radar on top with legend directly under it, ranking below</div>
+          <div class="opt-caption">Sliders on the left; on the right, the three-scenario radar reads first with its minimized legend immediately beneath the chart, then the scores-only ranking reads last.</div>
+        </div>
+      </div>
+      <div class="md-grid">
+        <div>
+          <div class="md-collabel">Category weights</div>
+          <div class="md-sliders">
+            <div class="slider-row"><div class="slider-label"><span>Functional fit</span><span class="slider-pct" id="v2Pct0">23%</span></div><input type="range" min="0" max="50" value="23" id="v2W0" oninput="mdRecompute('v2')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Integration &amp; architecture</span><span class="slider-pct" id="v2Pct1">21%</span></div><input type="range" min="0" max="50" value="21" id="v2W1" oninput="mdRecompute('v2')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Security &amp; compliance</span><span class="slider-pct" id="v2Pct2">26%</span></div><input type="range" min="0" max="50" value="26" id="v2W2" oninput="mdRecompute('v2')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Performance &amp; scalability</span><span class="slider-pct" id="v2Pct3">8%</span></div><input type="range" min="0" max="50" value="8" id="v2W3" oninput="mdRecompute('v2')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Operational support</span><span class="slider-pct" id="v2Pct4">6%</span></div><input type="range" min="0" max="50" value="6" id="v2W4" oninput="mdRecompute('v2')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Total cost (TCO)</span><span class="slider-pct" id="v2Pct5">8%</span></div><input type="range" min="0" max="50" value="8" id="v2W5" oninput="mdRecompute('v2')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Innovation &amp; roadmap</span><span class="slider-pct" id="v2Pct6">4%</span></div><input type="range" min="0" max="50" value="4" id="v2W6" oninput="mdRecompute('v2')"></div>
+            <div class="slider-row"><div class="slider-label"><span>Risk &amp; stability</span><span class="slider-pct" id="v2Pct7">4%</span></div><input type="range" min="0" max="50" value="4" id="v2W7" oninput="mdRecompute('v2')"></div>
+          </div>
+          <button class="btn-reset" onclick="mdReset('v2', false)">Reset to filed weights</button>
+        </div>
+        <div class="md-stack">
+          <div class="md-block">
+            <div class="md-collabel">Sensitivity radar, three scenarios</div>
+            <div class="radar-chart-col" id="v2Radar"></div>
+            <div class="mini-legend">
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--plum)"></span><span><span class="mini-legend-name">Base weights (filed):</span> the panel's filed weights, as scored today, no category dominates.</span></div>
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--emph)"></span><span><span class="mini-legend-name">Cost-priority:</span> Total Cost (TCO) pushed to 50% of the weight, the rest compressed proportionally.</span></div>
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--teal)"></span><span><span class="mini-legend-name">Security-priority:</span> Security &amp; Compliance pushed to 50% of the weight, the rest compressed proportionally.</span></div>
+            </div>
+          </div>
+          <div class="md-block">
+            <div class="md-block-hd"><div class="md-collabel" style="margin-bottom:0">Ranking under these weights</div></div>
+            <div class="rank-simple" id="v2Ranking"></div>
+            <div class="verdict-box" id="v2Verdict"></div>
+            <div class="subnote" id="v2SensNote" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="subnote">Nimbus Data is excluded from the ranking regardless of the weights, its SOC&nbsp;2 gate is a Must-Have failure and a Must-Have failure is weight-invariant; its spoke still plots on the radar so its shape stays comparable. "Closest lever" means pushing that one category to its maximum slider weight, holding every other slider where it is now, and checking whether that alone changes which of Lakehouse Co and Helio Warehouse leads.</div>
+    </div>
+
+    <!-- ============ VARIANT 3 ============ -->
+    <div class="opt" data-opt="c" id="variant-3">
+      <div class="opt-hd">
+        <div class="opt-tag">3</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Variant 3, ranking on top, radar with a live overlay below, mini legend under</div>
+          <div class="opt-caption">Same order as Variant 1, ranking first, but the radar now also plots a fourth, faint, dashed polygon for the weights on the sliders right now, on top of the three fixed scenarios, so dragging a slider still visibly reshapes the chart.</div>
+        </div>
+      </div>
+      <div class="md-grid">
+        <div>
+          <div class="md-collabel">Category weights</div>
+          <div class="md-sliders">
+            <div class="slider-row"><div class="slider-label"><span>Functional fit</span><span class="slider-pct" id="v3Pct0">23%</span></div><input type="range" min="0" max="50" value="23" id="v3W0" oninput="mdRecompute('v3', true)"></div>
+            <div class="slider-row"><div class="slider-label"><span>Integration &amp; architecture</span><span class="slider-pct" id="v3Pct1">21%</span></div><input type="range" min="0" max="50" value="21" id="v3W1" oninput="mdRecompute('v3', true)"></div>
+            <div class="slider-row"><div class="slider-label"><span>Security &amp; compliance</span><span class="slider-pct" id="v3Pct2">26%</span></div><input type="range" min="0" max="50" value="26" id="v3W2" oninput="mdRecompute('v3', true)"></div>
+            <div class="slider-row"><div class="slider-label"><span>Performance &amp; scalability</span><span class="slider-pct" id="v3Pct3">8%</span></div><input type="range" min="0" max="50" value="8" id="v3W3" oninput="mdRecompute('v3', true)"></div>
+            <div class="slider-row"><div class="slider-label"><span>Operational support</span><span class="slider-pct" id="v3Pct4">6%</span></div><input type="range" min="0" max="50" value="6" id="v3W4" oninput="mdRecompute('v3', true)"></div>
+            <div class="slider-row"><div class="slider-label"><span>Total cost (TCO)</span><span class="slider-pct" id="v3Pct5">8%</span></div><input type="range" min="0" max="50" value="8" id="v3W5" oninput="mdRecompute('v3', true)"></div>
+            <div class="slider-row"><div class="slider-label"><span>Innovation &amp; roadmap</span><span class="slider-pct" id="v3Pct6">4%</span></div><input type="range" min="0" max="50" value="4" id="v3W6" oninput="mdRecompute('v3', true)"></div>
+            <div class="slider-row"><div class="slider-label"><span>Risk &amp; stability</span><span class="slider-pct" id="v3Pct7">4%</span></div><input type="range" min="0" max="50" value="4" id="v3W7" oninput="mdRecompute('v3', true)"></div>
+          </div>
+          <button class="btn-reset" onclick="mdReset('v3', true)">Reset to filed weights</button>
+        </div>
+        <div class="md-stack">
+          <div class="md-block">
+            <div class="md-block-hd"><div class="md-collabel" style="margin-bottom:0">Ranking under these weights</div></div>
+            <div class="rank-simple" id="v3Ranking"></div>
+            <div class="verdict-box" id="v3Verdict"></div>
+            <div class="subnote" id="v3SensNote" style="margin-top:8px"></div>
+          </div>
+          <div class="md-block">
+            <div class="md-collabel">Sensitivity radar, three scenarios plus live weights</div>
+            <div class="radar-chart-col" id="v3Radar"></div>
+            <div class="mini-legend">
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--plum)"></span><span><span class="mini-legend-name">Base weights (filed):</span> the panel's filed weights, as scored today, no category dominates.</span></div>
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--emph)"></span><span><span class="mini-legend-name">Cost-priority:</span> Total Cost (TCO) pushed to 50% of the weight, the rest compressed proportionally.</span></div>
+              <div class="mini-legend-item"><span class="mini-legend-swatch" style="border-color:var(--teal)"></span><span><span class="mini-legend-name">Security-priority:</span> Security &amp; Compliance pushed to 50% of the weight, the rest compressed proportionally.</span></div>
+              <div class="mini-legend-item"><span class="mini-legend-swatch dashed" style="border-color:var(--blue)"></span><span><span class="mini-legend-name">Live (sliders now):</span> whatever weights are set on the sliders at left, for comparison against the three fixed scenarios.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="subnote">Nimbus Data is excluded from the ranking regardless of the weights, its SOC&nbsp;2 gate is a Must-Have failure and a Must-Have failure is weight-invariant; its spoke still plots on the radar so its shape stays comparable. The three reference scenarios never move; only the dashed live polygon tracks the sliders. "Closest lever" means pushing that one category to its maximum slider weight, holding every other slider where it is now.</div>
+    </div>
+  </section>
+
+  <div class="page-foot">
+    Design-exploration mockup, round 4, one panel only ("Model the Decision" on the RFx Recommendation tab), generated for review alongside RFx-RECOMMENDATION-OPTIONS.html, RFx-RECOMMENDATION-OPTIONS-2.html, and RFx-RECOMMENDATION-OPTIONS-3.html. Not connected to live data and not part of the shipped dashboard. All supplier names, scores, and dollar figures are illustrative, matching the seeded Enterprise Data Platform RFx (Nimbus Data, Lakehouse Co, Helio Warehouse) used across the rest of the product. Colors follow the MCM palette: plum as primary, teal as secondary, burnt orange as the single emphasis accent, deep rust reserved for blocked or critical states, muted blue for neutral information, and bold grey for pending or not-tracked items.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var CATS=['Functional fit','Integration &amp; architecture','Security &amp; compliance','Performance &amp; scalability','Operational support','Total cost (TCO)','Innovation &amp; roadmap','Risk &amp; stability'];
+  var BASE=[23,21,26,8,6,8,4,4];
+  var COST=[10,8,10,5,4,50,5,8];
+  var SEC=[10,10,50,5,5,8,4,8];
+  var FIT={
+    nimbus:   [100,82,59,80,80,100,100,40],
+    lakehouse:[80,89,100,80,100,60,80,100],
+    helio:    [55,78,74,100,60,100,0,60]
+  };
+  var CONF={nimbus:false,lakehouse:true,helio:true};
+  var NAME={nimbus:'Nimbus Data',lakehouse:'Lakehouse Co',helio:'Helio Warehouse'};
+  var ORDER=['nimbus','lakehouse','helio'];
+  var SUPPLIERS=ORDER.map(function(k){ return {key:k,name:NAME[k]}; });
+
+  var SCENARIOS_3=[
+    {key:'base', name:'Base weights (filed)', color:'var(--plum)', weights:BASE},
+    {key:'cost', name:'Cost-priority', color:'var(--emph)', weights:COST},
+    {key:'security', name:'Security-priority', color:'var(--teal)', weights:SEC}
+  ];
+
+  function computeFits(weights){
+    var sum=0; for(var i=0;i<weights.length;i++) sum+=weights[i];
+    if(!sum) sum=1;
+    var out={};
+    ORDER.forEach(function(k){
+      var f=0;
+      FIT[k].forEach(function(v,i){ f+=(weights[i]/sum)*v; });
+      out[k]=f;
+    });
+    return out;
+  }
+
+  /* ---------------- Ranking, scores only, no bar graphs ---------------- */
+  function renderScoresOnly(elId, fits, curLeader){
+    var rank=ORDER.slice().sort(function(a,b){
+      if(CONF[a]!==CONF[b]) return CONF[a]?-1:1;
+      return fits[b]-fits[a];
+    });
+    var rk=0, html='';
+    rank.forEach(function(k){
+      var lbl;
+      if(CONF[k]){ rk++; lbl=rk; } else { lbl='-'; }
+      var nameCls=(k===curLeader && CONF[k])?' class="tx-plum"':'';
+      html+='<div class="rank-simple-row"><span class="rank-simple-n">'+lbl+'</span>'
+        +'<span class="rank-simple-name"'+nameCls+'>'+NAME[k]+(CONF[k]?'':' <span class="pill rust sm">Gated</span>')+'</span>'
+        +'<span class="rank-simple-val">'+fits[k].toFixed(1)+'</span></div>';
+    });
+    var el=document.getElementById(elId); if(el) el.innerHTML=html;
+  }
+
+  /* ---------------- Radar geometry, N-agnostic ---------------- */
+  function polarPoint(cx,cy,R,angleDeg,frac){
+    var rad=angleDeg*Math.PI/180;
+    return [cx+R*frac*Math.cos(rad), cy+R*frac*Math.sin(rad)];
+  }
+
+  function renderRadar(elId, suppliers, scenarios, domainMin, domainMax){
+    var W=480, H=420, cx=240, cy=200, R=120, labelR=150;
+    var N=suppliers.length;
+    var angles=suppliers.map(function(s,i){ return -90 + i*(360/N); });
+    var parts=[];
+
+    [1/3,2/3,1].forEach(function(f){
+      var pts=angles.map(function(a){ var p=polarPoint(cx,cy,R,a,f); return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+      parts.push('<polygon points="'+pts+'" fill="none" style="stroke:var(--line2)" stroke-width="1"></polygon>');
+    });
+    angles.forEach(function(a){
+      var p=polarPoint(cx,cy,R,a,1);
+      parts.push('<line x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'" style="stroke:var(--line2)" stroke-width="1"></line>');
+    });
+    [1/3,2/3,1].forEach(function(f){
+      var val=domainMin+(domainMax-domainMin)*f;
+      var p=polarPoint(cx,cy,R,-90,f);
+      parts.push('<text x="'+(p[0]+7).toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" class="radar-gridlabel" style="fill:var(--mut2)">'+Math.round(val)+'</text>');
+    });
+    angles.forEach(function(a,i){
+      var p=polarPoint(cx,cy,labelR,a,1);
+      var cosv=Math.cos(a*Math.PI/180);
+      var anchor=cosv>0.25?'start':(cosv<-0.25?'end':'middle');
+      parts.push('<text x="'+p[0].toFixed(1)+'" y="'+p[1].toFixed(1)+'" text-anchor="'+anchor+'" class="radar-axislabel" style="fill:var(--ink)">'+suppliers[i].name+'</text>');
+    });
+
+    scenarios.forEach(function(sc){
+      var fits=computeFits(sc.weights);
+      var pts=suppliers.map(function(s,i){
+        var v=fits[s.key];
+        var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+        var p=polarPoint(cx,cy,R,angles[i],frac);
+        return p[0].toFixed(1)+','+p[1].toFixed(1);
+      }).join(' ');
+      var dashAttr=sc.dashed?' stroke-dasharray="6,5"':'';
+      var op=sc.dashed?0.03:0.12;
+      parts.push('<polygon points="'+pts+'" style="fill:'+sc.color+';fill-opacity:'+op+';stroke:'+sc.color+'" stroke-width="2.5"'+dashAttr+'></polygon>');
+      if(!sc.dashed){
+        suppliers.forEach(function(s,i){
+          var v=fits[s.key];
+          var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+          var p=polarPoint(cx,cy,R,angles[i],frac);
+          parts.push('<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4.5" style="fill:'+sc.color+'"></circle>');
+        });
+      }
+    });
+
+    var el=document.getElementById(elId);
+    if(el) el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" class="radar-svg" role="img" aria-label="Sensitivity radar, one axis per supplier">'+parts.join('')+'</svg>';
+  }
+
+  /* ---------------- Shared recompute, one per variant prefix ---------------- */
+  window.mdRecompute=function(prefix, liveRadar){
+    var raw=CATS.map(function(c,i){ var el=document.getElementById(prefix+'W'+i); return el?(parseInt(el.value,10)||0):BASE[i]; });
+    var sum=0; raw.forEach(function(v){sum+=v;}); if(!sum) sum=1;
+    raw.forEach(function(v,i){ var lbl=document.getElementById(prefix+'Pct'+i); if(lbl) lbl.textContent=Math.round(v/sum*100)+'%'; });
+
+    var fits=computeFits(raw);
+    var curLeader=fits.lakehouse>=fits.helio?'lakehouse':'helio';
+    renderScoresOnly(prefix+'Ranking', fits, curLeader);
+
+    var baseFits=computeFits(BASE);
+    var baseLeader=baseFits.lakehouse>=baseFits.helio?'lakehouse':'helio';
+    var isAdjusted=raw.some(function(v,i){return v!==BASE[i];});
+    var verdict;
+    if(curLeader!==baseLeader && isAdjusted){
+      verdict='<b class="tx-emph">Leader flips to '+NAME[curLeader]+'.</b> The panel\'s filed weights favor '+NAME[baseLeader]+'; this order is sensitive to the weights just set, confirm before relying on it.';
+    } else if(isAdjusted){
+      verdict='<b class="tx-plum">'+NAME[curLeader]+' still leads</b> under these weights, the ranking is robust to this shift.';
+    } else {
+      verdict='<b class="tx-plum">'+NAME[curLeader]+' leads</b> on the filed requirement-category weights. Nimbus Data scores higher on raw requirement fit but is excluded from ranking here, a Must-Have gate is weight-invariant.';
+    }
+    var vEl=document.getElementById(prefix+'Verdict'); if(vEl) vEl.innerHTML=verdict;
+
+    var sensRows=CATS.map(function(c,i){
+      var w2=raw.slice(); w2[i]=50;
+      var f2=computeFits(w2);
+      var newLeader=f2.lakehouse>=f2.helio?'lakehouse':'helio';
+      var gap=Math.abs(f2.lakehouse-f2.helio);
+      return {cat:c, flips:newLeader!==curLeader, gap:gap, newLeader:newLeader};
+    });
+    sensRows.sort(function(a,b){ return a.gap-b.gap; });
+    var nearest=sensRows[0], sensNote;
+    if(nearest.flips){
+      sensNote='Closest lever: <b>'+nearest.cat+'</b>, pushing it to its maximum weight flips the leader to <b class="tx-emph">'+NAME[nearest.newLeader]+'</b>. Every other single-lever push leaves '+NAME[curLeader]+' in front.';
+    } else {
+      sensNote='Closest lever: <b>'+nearest.cat+'</b>, a '+nearest.gap.toFixed(1)+'-point gap remains even at maximum weight; <b class="tx-plum">'+NAME[curLeader]+'</b> stays in front under every single-lever push from here.';
+    }
+    var sEl=document.getElementById(prefix+'SensNote'); if(sEl) sEl.innerHTML=sensNote;
+
+    if(liveRadar){
+      var scenarios=SCENARIOS_3.concat([{key:'live', name:'Live (sliders now)', color:'var(--blue)', weights:raw, dashed:true}]);
+      renderRadar(prefix+'Radar', SUPPLIERS, scenarios, 40, 100);
+    }
+  };
+
+  window.mdReset=function(prefix, liveRadar){
+    CATS.forEach(function(c,i){ var el=document.getElementById(prefix+'W'+i); if(el) el.value=BASE[i]; });
+    mdRecompute(prefix, liveRadar);
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    mdRecompute('v1', false);
+    mdRecompute('v2', false);
+    mdRecompute('v3', true);
+    renderRadar('v1Radar', SUPPLIERS, SCENARIOS_3, 40, 100);
+    renderRadar('v2Radar', SUPPLIERS, SCENARIOS_3, 40, 100);
+  });
+})();
+</script>
+</body>
+</html>

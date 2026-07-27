@@ -105,6 +105,92 @@ If the session restarted/compacted, this is where things stand.
   on the shared shell; plus a NEW business-case-deck skill (gap: exec-summary-package is ATC/ATS approval, not
   a winner business-case deck; decision-deck retired). Shared shell = the platform chrome (`theo-brand.js` +
   `theo-color.css` via `_platform_build/build_dashboard.py`), already used by Deal + Landscape.
+- **RFx DASHBOARD BUILD IN FLIGHT (2026-07-26).** Engine dir `_rfx_build/` (render `assets/pv/pv-09-rfx.js`,
+  builder `build_dashboard_rfx.py`, seed `assets/seed/project-view.js`). Platform RFx tab bundled + reworked
+  tab-by-tab per Marc's keep/cut list; hybrid = platform shell + Marc's stronger mockup panels, reflect-only
+  (platform-only controls stripped). **Recommendation tab = the last piece; iterated via mockups in
+  `_redesign_proposals/RFx-RECOMMENDATION-OPTIONS*.html`.** Approved variants LOCKED: Evaluation Readiness =
+  gauge+checklist Layout A (OPTIONS-3); **Model the Decision = OPTIONS-6 (LOCKED 2026-07-26** — small ranking
+  cards across top → fuller explanation → 3 smaller scenario descriptions w/ swatches → compact getBBox-
+  tightened radar w/ 3 fixed scenario polygons + faint dashed live polygon; left sliders drive cards+radar);
+  Case Per Supplier = Option A (OPTIONS.html, detail in <details>); Theo-Modeled Alternatives = Option A
+  (OPTIONS.html); What-Happens-Next = simple checklist on Recommendation + condensed-expandable on Overview +
+  full workflow on Business Case tab. Build agent porting all 5 into pv-09 recommendation subtab (faithful
+  port, rebind to RFX/RFX_NORM, finer Model data authored into the seed as RFX.modelDecision). THEN lock RFx
+  dashboard + carry into new `rfx-hub` skill. Business Case tab redesign (exec-committee-grade: pro-forma,
+  cash-flow non-bar, real savings-waterfall viz, robust The Ask, deal terms, supplier comparison, what's-left
+  workflow) still pending after Recommendation lands.
+- **RECOMMENDATION TAB BUILT + VERIFIED (2026-07-26).** All 5 approved panels ported into pv-09 recommendation
+  subtab (Readiness gauge Layout A · Model OPTIONS-6 · Case A · Alternatives A · What-Happens-Next checklist);
+  independent adversarial + malicious-code verify = SAFE-AND-FAITHFUL (zero egress, data reconciled, no
+  regressions). Post-verify fixes applied + rebuilt: removed stray "Live" legend row (match OPTIONS-6), single
+  gate pill on gated leader (kept for gated non-leader), and Title-Cased all `.secthd .t` section headers
+  (uppercase -> capitalize, letter-spacing .1em -> .02em) across the RFx dashboard.
+- **RFx FEEDBACK ROUND 2 (2026-07-26) — Marc review of Recommendation + Business Case tabs. IN PROGRESS.**
+  MOCKUP WORKFLOW running: `wf_75fd7516-14a` (5 parallel Sonnet agents) producing option files in
+  `_redesign_proposals/`: RADAR-FLIP (2 var), BC-FINANCIALS (3), BC-THE-ASK (3), BC-PATH-TO-CLOSE (3),
+  BC-DEAL-TERMS (3). Open each in Edge when done; Marc picks; THEN build. Work list:
+  · **Radar FLIP** (Model the Decision): categories on spokes, SUPPLIERS as colored polygons (not the current
+    supplier-spoke octagon that shrinks the plot), dynamic to #categories/#suppliers, legend to the RIGHT,
+    and a CANONICAL per-supplier color reused dashboard-wide (Nimbus plum / Lakehouse teal / Helio burnt-orange,
+    extend for up to 8). Old 3-scenario weight-polygon concept retired from the radar; sliders+ranking cards stay.
+  · **Move What-Happens-Next OFF Recommendation** -> Business Case, MERGED with Path to Close (one richer section).
+  · **BC Financials** (pro-forma/cash-flow/waterfall): too big + too thin -> medium-detail real financial case
+    (cost components, multi-supplier TCO, unit economics, sensitivity, proper compact waterfall), better space.
+  · **BC The Ask**: too thin -> exec-committee/RFP-grade.
+  · **BC Deal Terms & the Field**: Supplier Comparison to the RIGHT of Current Deal Terms + both better.
+  · Direct fixes (build w/ rebuild): Title Case "Business Case" heading (line 1426 `.rtitle .nm`, NOT a .secthd);
+    REMOVE reflect-only disclaimer boilerplate on ALL tabs (lines 178 tail, 1139, 1176/1184, 1449, 1764 tail -
+    the "nothing actioned/sent/systems-of-record/not sent or exported" class; KEEP useful data captions);
+    SWAP RFx footer -> Landscape/Deal footer (footer defined in `assets/theo-brand.js`; each build has own copy,
+    compare RFx vs supplier-landscape/deal-room theo-brand.js and align).
+  · **PICKS after mockup round 1 (2026-07-26):** RADAR = Option A DECLUTTERED (LOCKED for build): remove the
+    top ranking cards, the "Each polygon is one supplier's fit..." caption, and the gate-exclusion caption;
+    live weighted scores stay in the right-side legend; flip stays (category spokes / supplier polygons /
+    canonical per-supplier colors). THE ASK = Option A (LOCKED). Financials/Deal-Terms/Path REJECTED as
+    standalone -> Marc wants FULL-TAB renders (no redundancy). Financials = collapse to: recommended-supplier
+    deal line items + TCV (TCO if data), ONE simple supplier comparison, a REAL pro-forma/cash-flow (ground on
+    `pro-forma-builder` + `executive-summary-package` skills, present visually), + savings waterfall; drop the
+    rest. Deal Terms = C term-sheet card LEFT + B terms-vs-field matrix RIGHT. Path to Close = VERTICAL ACCORDION,
+    first entry B's "Advisory & Group Decision", then all of C's ledger rows (status/owner/depends-on/what-unblocks).
+  · **MOCKUP ROUND 2 DONE** - 3 full BC tab renders (BC-FULLTAB-A/B/C). Marc picked a MERGE (2026-07-26,
+    "exactly this and nothing else"): BC tab top->bottom = (1) header+KPIs+pre-award banner from C, (2) Decision
+    Rationale from A, (3) Deal Terms & the Field from A (term-sheet card left + Terms-vs-Field matrix right),
+    (4) Deal Economics from B (4 stat cards) w/ B's per-year bar REPLACED by a TOGGLE between C's "3-Yr TCV by
+    Supplier" and C's "Savings Waterfall" on the LEFT + A's Mini P&L table on the RIGHT, (5) The Ask option A,
+    (6) Path to Close accordion + vertical 1-7 stepper down the LEFT (merges What-Happens-Next in). **REVISED
+    2026-07-26 (Marc):** DROP B's simple supplier comparison entirely (A's Terms-vs-Field matrix in #3 is the
+    tab's ONLY comparison); the Deal Economics RIGHT-side table = A's Mini P&L (Subscription/license · Support &
+    maintenance · Implementation · Training x Yr1-3), which ALSO removes the standalone line-item section (one
+    pro-forma view, not two). Net = 6 sections, no redundancy. **HEADING STYLE: ALL BC-tab headings match mockup
+    A's heading style uniformly.**
+  · **FINAL BUILD `wf_5736ada0-554` DONE** (BC 8-block merge + radar flip + supplier colors + direct fixes +
+    rebuild). Verify = **NEEDS-FIXES**: 2 dark-mode BLOCKERS (BC KPI numbers use var(--plum) = near-black in
+    dark; `.rfxrpt` pv.css:1938 hard-locks --emph/--emph-t to light hex -> pre-award banner + rationale .take
+    light-on-light in dark), 1 HIGH content bug (Path-to-Close step 2 "held held 90 days"/"capped at a capped"),
+    1 LOW (Model-the-decision header sentence case). Malicious/data/fidelity PASSED clean. Footer now matches
+    Landscape/Deal (static "Lilly Global Procurement | Theo v0.1"); note Deal dash still on old link-bar footer.
+  · **FIX+REVISE pass running: `wf_d3da161c-a5f`** - fixes the 2 dark blockers + content bug + case, AND folds
+    in Marc's revisions: DROP simple supplier comparison; Deal Economics right table -> A's Mini P&L (remove
+    standalone line-item section) = 6 sections; normalize all BC headings to mockup A's style. Rebuild + re-verify
+    (light + DARK). AFTER it lands: open in Edge, confirm, THEN final in-browser + malicious sweep -> LOCK RFx ->
+    carry into `rfx-hub`.
+  · **CORRECTION (Marc 2026-07-26): RFx dashboard is LIGHT-ONLY - NO dark mode.** It follows the locked shared-shell
+    design like Landscape (#15 "no dark mode") + Deal. The dark-mode verify blockers were MISDIRECTED effort. TODO:
+    strip the dark-mode toggle/tokens the RFx build inherited from the platform chrome so there's no dark theme;
+    REVERT any light-mode color drift the dark-safe text-token swaps introduced (restore approved --plum text etc.).
+    A dark-fix workflow (`wn3nb5hpv`/`wf_b3ddb9ca-20d`) was running when Marc corrected this - it is now MOOT; do not
+    build on its dark output. `_rfx_build` IS the RFx dashboard (rfx-hub will carry it), light-only.
+  · **Deal Economics footnote (Marc 2026-07-26): SYNTHESIZE the two overlapping footnotes into ONE** (approved text
+    in chat). One block described the REMOVED simple pro-forma ("amortized over 3-yr") - drop that; align to the
+    Mini P&L that's kept (implementation + training = one-time Year-1, not escalated). Apply with the light-only pass.
+  · **Dashboards remaining after RFx (roadmap updated by Marc 2026-07-26):** THREE - (1) Category Strategy
+    (task #25, next; build locked dash from #4 7-tab draft on shared shell), (2) Deep Dive (supplier-deep-dive
+    hub, home TBD), (3) **My Work** (NEW) - a near-exact mirror of the Theo PLATFORM's "My Work" page; build =
+    deterministic PORT of the platform My Work render (same pattern as RFx from pv-09). **PCC dashboard RETIRED**
+    (Marc: likely make PCC strictly a CONVERSATION-LED skill that spins up ad-hoc dashboards via Claude only when
+    needed - no locked PCC dashboard). Landscape + Deal LOCKED. (Landscape D&B/Bloomberg spec-gap = enhancement
+    to a locked dash, separate.)
 - **HUB PATTERN confirmed**: the 5-hub consolidation (Landscape/Deep Dive/RFx/Deal/PCC) — each hub = a thin
   orchestrator skill over a persisted data object + lens skills feeding bounded cited slices. Landscape
   (supplier-landscape) + PCC (personal-command-center) have homes; Deal → new `deal-workspace`; RFx → new

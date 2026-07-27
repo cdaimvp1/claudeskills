@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RFx Recommendation Tab, Model the Decision, Compact</title>
+<style>
+:root{
+  --plum:#5C2B50; --plum-t:#EDDFE9; --plum-fg:#F3ECF1;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#E7E4DC; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+  --serif:Georgia,'Times New Roman',Times,serif;
+  --sans:Arial,Helvetica,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --plum:#8A5B80; --plum-t:#33253B;
+    --teal:#5FAFA9; --teal-t:#1E302D;
+    --emph:#E0925A; --emph-t:#33241A;
+    --rust:#D07A5C; --rust-t:#3A241C;
+    --blue:#7CA6E2; --blue-t:#1E2A38;
+    --grey:#A3ADB4; --grey-t:#2B2E31;
+    --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+    --line:#3A3833; --line2:#4A4740;
+    --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:26px 26px 50px}
+b{font-weight:700}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+a{color:inherit}
+
+/* ---- page head ---- */
+.page-head{border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:20px}
+.page-head .kicker{font:800 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--plum);margin-bottom:7px}
+.page-head h1{font-size:24px;letter-spacing:-.01em;margin-bottom:8px}
+.page-head .sub{font-size:13px;color:var(--mut);line-height:1.6;max-width:880px}
+.page-head .sub b{color:var(--ink)}
+.datanote{margin-top:11px;padding:9px 13px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;font-size:12px;color:var(--mut);line-height:1.5;max-width:880px}
+
+/* ---- option card shell ---- */
+.opt{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:18px 20px 20px;box-shadow:var(--shadow)}
+.opt-hd{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.opt-tag{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 13px var(--sans);color:#fff;background:var(--plum)}
+.opt-titlewrap{flex:1;min-width:220px}
+.opt-name{font-family:var(--serif);font-weight:700;font-size:16.5px;color:var(--ink);line-height:1.3}
+.opt-caption{font-size:12px;color:var(--mut2);font-style:italic;margin-top:3px;line-height:1.45}
+.btn-order{align-self:center;margin-left:auto;flex:none;font:700 11px var(--sans);color:var(--teal);background:transparent;border:1.5px solid var(--teal);border-radius:30px;padding:5px 13px;cursor:pointer;white-space:nowrap}
+.btn-order:hover{background:var(--teal-t)}
+
+/* ---- shared pills / tones ---- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;border:1.5px solid currentColor;background:transparent;white-space:nowrap}
+.pill.sm{font-size:9px;padding:2px 8px}
+.pill.rust{color:var(--rust)}
+.tx-plum{color:var(--plum)}.tx-teal{color:var(--teal)}.tx-emph{color:var(--emph)}.tx-rust{color:var(--rust)}.tx-blue{color:var(--blue)}.tx-mut{color:var(--mut2)}
+
+/* ---- sliders ---- */
+.slider-row{margin-bottom:6px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.slider-label span:first-child{font-weight:700}
+.slider-pct{font-weight:800;color:var(--plum);font-family:var(--sans)}
+input[type="range"]{width:100%;height:4px;accent-color:var(--plum);margin:2px 0}
+.btn-reset{margin-top:10px;font:700 12px var(--sans);color:var(--plum);background:transparent;border:1.5px solid var(--plum);border-radius:30px;padding:6px 15px;cursor:pointer}
+.btn-reset:hover{background:var(--plum-t)}
+
+/* ==================== Model the Decision, grid + stack ==================== */
+.md-grid{display:grid;grid-template-columns:270px 1fr;gap:22px;align-items:start}
+@media(max-width:720px){.md-grid{grid-template-columns:1fr}}
+.md-collabel{font:800 9.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:9px}
+.md-sliders .slider-row{margin-bottom:6px}
+.md-sliders .slider-label{font-size:10.6px}
+
+.md-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.md-block{min-width:0}
+.md-block-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+
+/* ---- ranking, scores only ---- */
+.rank-simple{border:1px solid var(--line2);border-radius:9px;overflow:hidden;background:var(--panel)}
+.rank-simple-row{display:flex;align-items:center;gap:10px;padding:6px 12px;border-top:1px solid var(--line);font-size:12.5px}
+.rank-simple-row:first-child{border-top:0}
+.rank-simple-n{width:16px;font-weight:800;font-size:11.5px;color:var(--mut2);text-align:center;flex:none}
+.rank-simple-name{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-simple-val{flex:none;font-weight:800;font-size:12.5px;font-variant-numeric:tabular-nums}
+
+.one-liner{margin-top:7px;padding:7px 11px;background:var(--panel);border-radius:7px;font-size:11.5px;line-height:1.5;color:var(--mut)}
+
+/* ---- radar, tight-fit viewBox set at render time ---- */
+.radar-chart-col{max-width:400px;margin:0 auto}
+.radar-svg{width:100%;height:auto;display:block}
+.radar-axislabel{font:700 12px var(--sans)}
+.radar-gridlabel{font:700 8.5px var(--sans)}
+
+/* ---- mini legend, swatch + name only, tooltips carry the copy ---- */
+.mini-legend{display:flex;flex-wrap:wrap;align-items:center;gap:12px;max-width:400px;margin:6px auto 0;padding-top:7px;border-top:1px solid var(--line)}
+.leg-chip{display:inline-flex;align-items:center;gap:5px;position:relative;cursor:help;padding:2px 3px;border-radius:5px}
+.leg-chip:hover,.leg-chip:focus{outline:none;background:var(--panel)}
+.leg-swatch{flex:none;width:11px;height:0;border-top-width:2.5px;border-top-style:solid}
+.leg-name{font:800 10.5px var(--sans);color:var(--ink)}
+
+/* ---- info tooltip, shared by ranking header and legend ---- */
+.info-i{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;flex:none;border-radius:50%;background:var(--nested);border:1px solid var(--line2);color:var(--mut2);font:800 9px var(--sans);cursor:help;position:relative}
+.info-tip{display:none;position:absolute;z-index:30;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);width:230px;background:var(--surface);border:1px solid var(--line2);border-radius:8px;box-shadow:var(--shadow);padding:9px 11px;font:400 11px var(--sans);line-height:1.5;color:var(--mut);text-align:left;cursor:default}
+.leg-chip:last-child .info-tip{left:auto;right:0;transform:none}
+.info-i:hover .info-tip,.info-i:focus .info-tip{display:block}
+.leg-chip:hover .info-tip,.leg-chip:focus .info-tip{display:block}
+
+/* ---- footer ---- */
+.page-foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="kicker">Design exploration, round 5, one panel only, compact pass, not a change to the live dashboard</div>
+    <h1>RFx Recommendation Tab, Model the Decision</h1>
+    <div class="sub">The award-scenario modeler from the Recommendation tab, condensed. Category-weight sliders on the left drive the scores-only ranking live; the three-scenario sensitivity radar and its legend sit below, both re-cut to remove blank margins. Reflect-only: the panel's real weights and scores never change, this is a what-if sandbox layered on top of them.</div>
+    <div class="datanote"><b>Reading the data:</b> Nimbus Data is the top panel score (4.4 of 5) at $980,000/yr but holds a SOC&nbsp;2 Type&nbsp;I report against a Must-Have Type&nbsp;II gate, so it is excluded from the ranking regardless of weights. Lakehouse Co (4.2 of 5, $1,060,000/yr) clears every Must-Have. Helio Warehouse (3.2 of 5) has the strongest SAP integration but submitted no price, no MSA, and no implementation plan.</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODEL THE DECISION, COMPACT -->
+  <!-- ============================================================ -->
+  <div class="opt" data-opt="a" id="mcm-panel">
+    <div class="opt-hd">
+      <div class="opt-tag">5</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Model the Decision</div>
+        <div class="opt-caption">Sliders left; ranking and radar stacked right, tight to their content, mini legend at the very bottom.</div>
+      </div>
+      <button class="btn-order" id="orderToggle" onclick="toggleOrder()" type="button">Radar first</button>
+    </div>
+    <div class="md-grid">
+      <div>
+        <div class="md-collabel">Category weights</div>
+        <div class="md-sliders">
+          <div class="slider-row"><div class="slider-label"><span>Functional fit</span><span class="slider-pct" id="mPct0">23%</span></div><input type="range" min="0" max="50" value="23" id="mW0" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Integration and architecture</span><span class="slider-pct" id="mPct1">21%</span></div><input type="range" min="0" max="50" value="21" id="mW1" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Security and compliance</span><span class="slider-pct" id="mPct2">26%</span></div><input type="range" min="0" max="50" value="26" id="mW2" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Performance and scalability</span><span class="slider-pct" id="mPct3">8%</span></div><input type="range" min="0" max="50" value="8" id="mW3" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Operational support</span><span class="slider-pct" id="mPct4">6%</span></div><input type="range" min="0" max="50" value="6" id="mW4" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Total cost (TCO)</span><span class="slider-pct" id="mPct5">8%</span></div><input type="range" min="0" max="50" value="8" id="mW5" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Innovation and roadmap</span><span class="slider-pct" id="mPct6">4%</span></div><input type="range" min="0" max="50" value="4" id="mW6" oninput="mdRecompute()"></div>
+          <div class="slider-row"><div class="slider-label"><span>Risk and stability</span><span class="slider-pct" id="mPct7">4%</span></div><input type="range" min="0" max="50" value="4" id="mW7" oninput="mdRecompute()"></div>
+        </div>
+        <button class="btn-reset" onclick="mdReset()" type="button">Reset to filed weights</button>
+      </div>
+      <div class="md-stack" id="mdStack">
+        <div class="md-block" id="rankBlock" style="order:1">
+          <div class="md-block-hd">
+            <div class="md-collabel" style="margin-bottom:0">Ranking under these weights</div>
+            <span class="info-i" tabindex="0" aria-label="Why Nimbus is excluded">i<span class="info-tip">Nimbus Data scores highest on raw requirement fit but holds a SOC&nbsp;2 Type&nbsp;I report against a Must-Have Type&nbsp;II requirement, an open gate. A Must-Have gate exclusion is weight-invariant, so Nimbus never enters the ranking regardless of the sliders; its row still shows for reference. Closest lever means pushing that one category to its maximum slider weight, holding every other slider fixed, and checking whether that alone changes which of the two ranked suppliers leads.</span></span>
+          </div>
+          <div class="rank-simple" id="mRanking"></div>
+          <div class="one-liner" id="mOneLiner"></div>
+        </div>
+        <div class="md-block" id="radarBlock" style="order:2">
+          <div class="md-block-hd">
+            <div class="md-collabel" style="margin-bottom:0">Sensitivity radar, three scenarios</div>
+          </div>
+          <div class="radar-chart-col" id="mRadar"></div>
+          <div class="mini-legend" id="mLegend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot">
+    Design-exploration mockup, round 5, compact pass on one panel ("Model the Decision" on the RFx Recommendation tab), built from the Variant 1 structure in RFx-RECOMMENDATION-OPTIONS-4.html (sliders left, ranking then radar then mini legend on the right). Same data, weights, and scoring logic; the radar's SVG viewBox is now computed from the shape's own rendered bounding box on every draw, so it hugs the axes and spoke labels instead of sitting in a fixed oversized canvas. Not connected to live data and not part of the shipped dashboard. Colors follow the MCM palette: plum as primary, teal as secondary, burnt orange as the single emphasis accent, deep rust reserved for blocked or critical states, muted blue for neutral information.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var CATS=['Functional fit','Integration and architecture','Security and compliance','Performance and scalability','Operational support','Total cost (TCO)','Innovation and roadmap','Risk and stability'];
+  var SHORT=['Functional fit','Integration','Security','Performance','Ops support','TCO','Innovation','Risk'];
+  var BASE=[23,21,26,8,6,8,4,4];
+  var COST=[10,8,10,5,4,50,5,8];
+  var SEC=[10,10,50,5,5,8,4,8];
+  var FIT={
+    nimbus:   [100,82,59,80,80,100,100,40],
+    lakehouse:[80,89,100,80,100,60,80,100],
+    helio:    [55,78,74,100,60,100,0,60]
+  };
+  var CONF={nimbus:false,lakehouse:true,helio:true};
+  var NAME={nimbus:'Nimbus Data',lakehouse:'Lakehouse Co',helio:'Helio Warehouse'};
+  var ORDER=['nimbus','lakehouse','helio'];
+  var SUPPLIERS=ORDER.map(function(k){ return {key:k,name:NAME[k]}; });
+
+  var SCENARIOS_3=[
+    {key:'base', name:'Base weights (filed)', color:'var(--plum)', weights:BASE},
+    {key:'cost', name:'Cost-priority', color:'var(--emph)', weights:COST},
+    {key:'security', name:'Security-priority', color:'var(--teal)', weights:SEC}
+  ];
+  var LEG_SHORT={base:'Base',cost:'Cost-priority',security:'Security-priority'};
+  var LEG_DESC={
+    base:'The filed panel weights, as scored today; no category dominates.',
+    cost:'Total cost (TCO) pushed to 50 percent of weight, the rest compressed proportionally.',
+    security:'Security and compliance pushed to 50 percent of weight, the rest compressed proportionally.'
+  };
+
+  function computeFits(weights){
+    var sum=0; for(var i=0;i<weights.length;i++) sum+=weights[i];
+    if(!sum) sum=1;
+    var out={};
+    ORDER.forEach(function(k){
+      var f=0;
+      FIT[k].forEach(function(v,i){ f+=(weights[i]/sum)*v; });
+      out[k]=f;
+    });
+    return out;
+  }
+
+  /* ---------------- Ranking, scores only, no bar graphs ---------------- */
+  function renderRanking(elId, fits, curLeader){
+    var rank=ORDER.slice().sort(function(a,b){
+      if(CONF[a]!==CONF[b]) return CONF[a]?-1:1;
+      return fits[b]-fits[a];
+    });
+    var rk=0, html='';
+    rank.forEach(function(k){
+      var lbl;
+      if(CONF[k]){ rk++; lbl=rk; } else { lbl='-'; }
+      var nameCls=(k===curLeader && CONF[k])?' class="tx-plum"':'';
+      html+='<div class="rank-simple-row"><span class="rank-simple-n">'+lbl+'</span>'
+        +'<span class="rank-simple-name"'+nameCls+'>'+NAME[k]+(CONF[k]?'':' <span class="pill rust sm">Gated</span>')+'</span>'
+        +'<span class="rank-simple-val">'+fits[k].toFixed(1)+'</span></div>';
+    });
+    var el=document.getElementById(elId); if(el) el.innerHTML=html;
+  }
+
+  function composeOneLiner(raw){
+    var fits=computeFits(raw);
+    var curLeader=fits.lakehouse>=fits.helio?'lakehouse':'helio';
+    var baseFits=computeFits(BASE);
+    var baseLeader=baseFits.lakehouse>=baseFits.helio?'lakehouse':'helio';
+    var isAdjusted=raw.some(function(v,i){ return v!==BASE[i]; });
+
+    var sensRows=CATS.map(function(c,i){
+      var w2=raw.slice(); w2[i]=50;
+      var f2=computeFits(w2);
+      var newLeader=f2.lakehouse>=f2.helio?'lakehouse':'helio';
+      return {short:SHORT[i], flips:newLeader!==curLeader, gap:Math.abs(f2.lakehouse-f2.helio), newLeader:newLeader};
+    });
+    sensRows.sort(function(a,b){ return a.gap-b.gap; });
+    var nearest=sensRows[0];
+
+    var leadPart = (isAdjusted && curLeader!==baseLeader)
+      ? '<b class="tx-emph">'+NAME[curLeader]+'</b> now leads, flipped from '+NAME[baseLeader]
+      : '<b class="tx-plum">'+NAME[curLeader]+'</b> leads '+(isAdjusted?'under these weights':'on filed weights');
+
+    var leverDetail = nearest.flips
+      ? 'flips lead to '+NAME[nearest.newLeader]
+      : nearest.gap.toFixed(1)+'-pt gap';
+
+    return leadPart+'; Nimbus is #1 on fit but gated. Closest lever: <b>'+nearest.short+'</b> ('+leverDetail+').';
+  }
+
+  /* ---------------- Radar geometry, N-agnostic ---------------- */
+  function polarPoint(cx,cy,R,angleDeg,frac){
+    var rad=angleDeg*Math.PI/180;
+    return [cx+R*frac*Math.cos(rad), cy+R*frac*Math.sin(rad)];
+  }
+
+  function renderRadar(elId, suppliers, scenarios, domainMin, domainMax){
+    var cx=200, cy=200, R=142, labelR=166;
+    var N=suppliers.length;
+    var angles=suppliers.map(function(s,i){ return -90 + i*(360/N); });
+    var parts=[];
+
+    [1/3,2/3,1].forEach(function(f){
+      var pts=angles.map(function(a){ var p=polarPoint(cx,cy,R,a,f); return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+      parts.push('<polygon points="'+pts+'" fill="none" style="stroke:var(--line2)" stroke-width="1"></polygon>');
+    });
+    angles.forEach(function(a){
+      var p=polarPoint(cx,cy,R,a,1);
+      parts.push('<line x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'" style="stroke:var(--line2)" stroke-width="1"></line>');
+    });
+    [1/3,2/3,1].forEach(function(f){
+      var val=domainMin+(domainMax-domainMin)*f;
+      var p=polarPoint(cx,cy,R,-90,f);
+      parts.push('<text x="'+(p[0]+6).toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" class="radar-gridlabel" style="fill:var(--mut2)">'+Math.round(val)+'</text>');
+    });
+    angles.forEach(function(a,i){
+      var p=polarPoint(cx,cy,labelR,a,1);
+      var cosv=Math.cos(a*Math.PI/180);
+      var anchor=cosv>0.25?'start':(cosv<-0.25?'end':'middle');
+      parts.push('<text x="'+p[0].toFixed(1)+'" y="'+p[1].toFixed(1)+'" text-anchor="'+anchor+'" class="radar-axislabel" style="fill:var(--ink)">'+suppliers[i].name+'</text>');
+    });
+
+    scenarios.forEach(function(sc){
+      var fits=computeFits(sc.weights);
+      var pts=suppliers.map(function(s,i){
+        var v=fits[s.key];
+        var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+        var p=polarPoint(cx,cy,R,angles[i],frac);
+        return p[0].toFixed(1)+','+p[1].toFixed(1);
+      }).join(' ');
+      parts.push('<polygon points="'+pts+'" style="fill:'+sc.color+';fill-opacity:.13;stroke:'+sc.color+'" stroke-width="2.5"></polygon>');
+      suppliers.forEach(function(s,i){
+        var v=fits[s.key];
+        var frac=Math.max(0,Math.min(1,(v-domainMin)/(domainMax-domainMin)));
+        var p=polarPoint(cx,cy,R,angles[i],frac);
+        parts.push('<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4.5" style="fill:'+sc.color+'"></circle>');
+      });
+    });
+
+    var el=document.getElementById(elId);
+    if(!el) return;
+    el.innerHTML='<svg viewBox="0 0 400 400" class="radar-svg" role="img" aria-label="Sensitivity radar, one axis per supplier">'+parts.join('')+'</svg>';
+
+    /* Tighten the viewBox to the shape's own rendered bounding box so the
+       drawn radar (rings, spokes, dots, and spoke labels) fills the SVG's
+       box instead of sitting inside a fixed, oversized canvas. */
+    var svg=el.querySelector('svg');
+    try{
+      var bbox=svg.getBBox();
+      var pad=13;
+      var vx=(bbox.x-pad).toFixed(1), vy=(bbox.y-pad).toFixed(1);
+      var vw=(bbox.width+2*pad).toFixed(1), vh=(bbox.height+2*pad).toFixed(1);
+      svg.setAttribute('viewBox', vx+' '+vy+' '+vw+' '+vh);
+    }catch(e){ /* getBBox unsupported or el not rendered, keep default viewBox */ }
+  }
+
+  function renderLegend(elId, scenarios){
+    var el=document.getElementById(elId); if(!el) return;
+    var html='';
+    scenarios.forEach(function(sc){
+      html+='<span class="leg-chip" tabindex="0"><span class="leg-swatch" style="border-color:'+sc.color+'"></span>'
+        +'<span class="leg-name">'+LEG_SHORT[sc.key]+'</span>'
+        +'<span class="info-tip">'+LEG_DESC[sc.key]+'</span></span>';
+    });
+    html+='<span class="info-i" tabindex="0" aria-label="About the reference scenarios">i<span class="info-tip">Reference scenarios use fixed weight profiles and never move as the sliders change. Nimbus Data still plots on the radar for shape comparison, though it is excluded from the ranking by a Must-Have security gate.</span></span>';
+    el.innerHTML=html;
+  }
+
+  /* ---------------- Live recompute, ranking only (radar stays the fixed 3-scenario reference) ---------------- */
+  window.mdRecompute=function(){
+    var raw=CATS.map(function(c,i){ var el=document.getElementById('mW'+i); return el?(parseInt(el.value,10)||0):BASE[i]; });
+    var sum=0; raw.forEach(function(v){sum+=v;}); if(!sum) sum=1;
+    raw.forEach(function(v,i){ var lbl=document.getElementById('mPct'+i); if(lbl) lbl.textContent=Math.round(v/sum*100)+'%'; });
+
+    var fits=computeFits(raw);
+    var curLeader=fits.lakehouse>=fits.helio?'lakehouse':'helio';
+    renderRanking('mRanking', fits, curLeader);
+
+    var oneEl=document.getElementById('mOneLiner');
+    if(oneEl) oneEl.innerHTML=composeOneLiner(raw);
+  };
+
+  window.mdReset=function(){
+    CATS.forEach(function(c,i){ var el=document.getElementById('mW'+i); if(el) el.value=BASE[i]; });
+    mdRecompute();
+  };
+
+  window.toggleOrder=function(){
+    var rankBlock=document.getElementById('rankBlock');
+    var radarBlock=document.getElementById('radarBlock');
+    var btn=document.getElementById('orderToggle');
+    var flipped=rankBlock.style.order==='2';
+    if(flipped){
+      rankBlock.style.order='1'; radarBlock.style.order='2'; btn.textContent='Radar first';
+    } else {
+      rankBlock.style.order='2'; radarBlock.style.order='1'; btn.textContent='Ranking first';
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    renderRadar('mRadar', SUPPLIERS, SCENARIOS_3, 40, 100);
+    renderLegend('mLegend', SCENARIOS_3);
+    mdRecompute();
+  });
+})();
+</script>
+</body>
+</html>

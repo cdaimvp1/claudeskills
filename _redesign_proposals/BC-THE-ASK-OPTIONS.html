@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Case, The Ask, 3 Redesign Options</title>
+<style>
+:root{
+  --plum:#5C2B50; --plum-t:#EDDFE9;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#F7F6F3; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+  --serif:Georgia,'Times New Roman',Times,serif;
+  --sans:Arial,Helvetica,'Segoe UI',sans-serif;
+  --mono:'Consolas','SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --plum:#8A5B80; --plum-t:#33253B;
+    --teal:#5FAFA9; --teal-t:#1E302D;
+    --emph:#E0925A; --emph-t:#33241A;
+    --rust:#D07A5C; --rust-t:#3A241C;
+    --blue:#7CA6E2; --blue-t:#1E2A38;
+    --grey:#A3ADB4; --grey-t:#2B2E31;
+    --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+    --line:#3A3833; --line2:#4A4740;
+    --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --plum:#8A5B80; --plum-t:#33253B; --teal:#5FAFA9; --teal-t:#1E302D;
+  --emph:#E0925A; --emph-t:#33241A; --rust:#D07A5C; --rust-t:#3A241C;
+  --blue:#7CA6E2; --blue-t:#1E2A38; --grey:#A3ADB4; --grey-t:#2B2E31;
+  --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85; --line:#3A3833; --line2:#4A4740;
+  --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+}
+:root[data-theme="light"]{
+  --plum:#5C2B50; --plum-t:#EDDFE9; --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9; --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1; --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459; --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#F7F6F3; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55}
+body{overflow-x:hidden}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 26px 60px}
+b{font-weight:700}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+table{border-collapse:collapse}
+
+/* ---- page head ---- */
+.page-head{border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:26px}
+.page-head .kicker{font:800 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--plum);margin-bottom:7px}
+.page-head h1{font-size:25px;letter-spacing:-.01em;margin-bottom:8px}
+.page-head .sub{font-size:13px;color:var(--mut);line-height:1.6;max-width:880px}
+.page-head .sub b{color:var(--ink)}
+.datanote{margin-top:12px;padding:10px 14px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;font-size:12px;color:var(--mut);line-height:1.55;max-width:900px}
+.datanote b{color:var(--ink)}
+
+/* ---- option band shell ---- */
+.opt-band{margin-bottom:46px}
+.opt-hd{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.opt-badge{flex:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 16px var(--serif);color:#fff}
+.opt-badge.a{background:var(--plum)}
+.opt-badge.b{background:var(--teal)}
+.opt-badge.c{background:var(--emph)}
+.opt-titlewrap{flex:1;min-width:240px}
+.opt-name{font-family:var(--serif);font-weight:700;font-size:19px;color:var(--ink);line-height:1.3}
+.opt-caption{font-size:12.5px;color:var(--mut2);font-style:italic;margin-top:4px;line-height:1.5;max-width:760px}
+
+/* ---- generic card / section ---- */
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:10px;box-shadow:var(--shadow)}
+.sect{margin-bottom:14px}
+.grp{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:18px 0 8px}
+.grp:first-child{margin-top:0}
+.gt{font:800 12.5px var(--sans);text-transform:uppercase;letter-spacing:.04em;color:var(--plum)}
+.gsub{font-size:11.5px;color:var(--mut2)}
+.cap{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
+
+/* ---- fact / label-value rows (reused from platform "the ask" pattern) ---- */
+.rowset{background:var(--surface);border:1px solid var(--line2);border-radius:10px;box-shadow:var(--shadow)}
+.lvrow{padding:11px 16px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap}
+.lvrow:first-child{border-top:none}
+.lvlab{flex:0 0 160px;font-weight:700;font-size:11px;color:var(--plum);text-transform:uppercase;letter-spacing:.03em;font-family:var(--mono)}
+.lvval{flex:1 1 280px;min-width:0;font-size:12.8px;line-height:1.6;color:var(--ink)}
+.lvval b{color:var(--ink)}
+
+/* ---- kpi strip ---- */
+.kstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+@media(max-width:760px){.kstrip{grid-template-columns:repeat(2,1fr)}}
+.kc{padding:12px 13px}
+.kc.teal{border-left:3px solid var(--teal)}
+.kc.emph{border-left:3px solid var(--emph)}
+.kl{font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);margin-bottom:4px}
+.kn{font:800 19px var(--sans);color:var(--ink);line-height:1.15}
+.ks{font-size:10.8px;color:var(--mut2);margin-top:3px;line-height:1.4}
+
+/* ---- pills / tags ---- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:700 9.5px var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:30px;white-space:nowrap}
+.pill.rust{color:var(--rust);background:var(--rust-t)}
+.pill.teal{color:var(--teal);background:var(--teal-t)}
+.pill.plum{color:var(--plum);background:var(--plum-t)}
+.pill.grey{color:var(--mut2);background:var(--grey-t);border:1px dashed var(--line2)}
+
+/* ---- condition callout ---- */
+.callout{border-left:3px solid var(--emph);background:var(--emph-t);border-radius:0 10px 10px 0;padding:13px 16px}
+.callout .lbl{font:800 10.5px var(--sans);text-transform:uppercase;letter-spacing:.04em;color:var(--rust);margin-bottom:5px}
+.callout .txt{font-size:12.8px;line-height:1.6;color:var(--ink)}
+
+/* ---- Option A: decision-path cards ---- */
+.decision-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:760px){.decision-grid{grid-template-columns:1fr}}
+.dcard{border-radius:10px;padding:13px 14px;background:var(--surface);border:1px solid var(--line2)}
+.dcard.approve{border-top:3px solid var(--teal)}
+.dcard.cond{border-top:3px solid var(--plum)}
+.dcard.decline{border-top:3px solid var(--rust)}
+.dcard .dtitle{font:800 12.5px var(--sans);letter-spacing:.02em;margin-bottom:3px}
+.dcard.approve .dtitle{color:var(--teal)}
+.dcard.cond .dtitle{color:var(--plum)}
+.dcard.decline .dtitle{color:var(--rust)}
+.dcard .dtag{font-size:10px;color:var(--mut2);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.dcard .dtrig{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);margin:9px 0 3px}
+.dcard .dtxt{font-size:12.2px;line-height:1.55;color:var(--ink)}
+
+/* ---- Option B: memo styling ---- */
+.memo{padding:20px 22px}
+.memo-head{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12.3px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line2)}
+.memo-head .mk{font-weight:800;color:var(--mut2);font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;padding-top:1px}
+.memo-head .mv{color:var(--ink)}
+.memo-head .mv b{color:var(--plum)}
+.memo p{font-size:12.8px;line-height:1.65;color:var(--ink);margin:0 0 13px}
+.memo .mlabel{display:block;font:800 10.5px var(--sans);text-transform:uppercase;letter-spacing:.04em;color:var(--plum);margin-bottom:5px}
+.finline{background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:12px 15px;font-size:13px;line-height:1.7;color:var(--ink);margin-bottom:14px}
+.finline b{color:var(--plum);font-family:var(--mono);font-size:12.5px}
+.memo-decision{border-top:1px solid var(--line2);padding-top:14px;margin-top:4px}
+.chkrow{display:flex;align-items:flex-start;gap:10px;padding:7px 0;font-size:12.6px;line-height:1.5}
+.chkbox{flex:none;width:15px;height:15px;border:1.5px solid var(--mut2);border-radius:3px;margin-top:2px}
+.chkrow b{color:var(--ink)}
+.sigblock{display:grid;grid-template-columns:1fr 1fr;gap:20px 30px;margin-top:20px}
+@media(max-width:600px){.sigblock{grid-template-columns:1fr}}
+.sigline{border-top:1px solid var(--ink);padding-top:5px;margin-top:26px}
+.sigline .sname{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.03em;font-weight:700}
+
+/* ---- Option C: decision-card layout ---- */
+.ask-hero{background:var(--plum-t);border:1px solid var(--line2);border-left:5px solid var(--plum);border-radius:10px;padding:20px 22px;margin-bottom:18px}
+.ask-hero .ahk{font:800 10.5px var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--plum);margin-bottom:8px}
+.ask-hero .ahtxt{font-family:var(--serif);font-size:19px;font-weight:700;line-height:1.4;color:var(--ink)}
+.support-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:820px){.support-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.support-grid{grid-template-columns:1fr}}
+.scard{padding:13px 14px}
+.scard .sh{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.scard .sicon{flex:none;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font:800 10px var(--sans);color:#fff}
+.scard .sh .st{font:800 11.5px var(--sans);text-transform:uppercase;letter-spacing:.02em;color:var(--ink)}
+.scard .sb{font-size:12.2px;line-height:1.58;color:var(--ink)}
+.scard .sb .mini{display:block;padding:3px 0;border-top:1px dashed var(--line);font-size:11.8px}
+.scard .sb .mini:first-child{border-top:none;padding-top:0}
+.scard .sb .mini b{color:var(--ink)}
+
+/* ---- footer ---- */
+.page-foot{margin-top:30px;padding-top:16px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="kicker">RFx Dashboard &middot; Business Case &middot; &ldquo;The Ask&rdquo; Section</div>
+    <h1>The Ask, Three Redesign Options</h1>
+    <div class="sub">The current render is a six-row label/value list (Recommendation, Value, Risk &amp; Mitigation, Amount, Approval Sought, Timeline). It reads as a summary, not an exec-committee decision document. The three options below rebuild the same section at exec-committee / RFP grade, using the real submitted figures for the recommended award: <b>Nimbus Data</b>, panel score <b>4.4 / 5</b>, <b>79%</b> of requirements fully met, carrying an open Must-Have gate (<b>SOC 2 Type II</b>), at an indicative <b>$980,000/yr</b> (<b>$2.94M</b> over 3 years, pre-negotiation).</div>
+    <div class="datanote"><b>Grounding.</b> Every dollar figure, score and requirement status below is read from the seed (Nimbus and Lakehouse pricing schedules, the requirements matrix, the panel&rsquo;s Q1 clarification). Anywhere a richer breakdown is shown to demonstrate the design, it is explicitly labeled indicative / pre-negotiation / illustrative. Helio&rsquo;s price is marked <b>NEEDS_INPUT</b>, no commercial proposal was submitted. Nothing here is a locked or executed price.</div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION A -->
+  <!-- ================================================================ -->
+  <div class="opt-band">
+    <div class="opt-hd">
+      <div class="opt-badge a">A</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Executive Decision Brief</div>
+        <div class="opt-caption">A single-page brief built for a live committee read: recommendation with grounded rationale, value, risk &amp; mitigation, named conditions, the specific approval sought, and three explicit decision paths, each stating exactly what it triggers.</div>
+      </div>
+    </div>
+
+    <div class="grp"><span class="gt">Recommendation</span></div>
+    <div class="callout" style="border-left-color:var(--plum);background:var(--plum-t)">
+      <div class="lbl" style="color:var(--plum)">The Ask</div>
+      <div class="txt">Award the enterprise data platform contract to <b>Nimbus Data</b>, subject to the SOC 2 Type II condition below and to final contract execution.</div>
+    </div>
+
+    <div class="grp"><span class="gt">Grounded Rationale</span><span class="gsub cap">why Nimbus, on the panel&rsquo;s own criteria</span></div>
+    <div class="sect card" style="padding:14px 16px">
+      <div style="font-size:12.8px;line-height:1.65;color:var(--ink)">Nimbus Data returned the highest weighted panel score in the field, <b>4.4 out of 5</b>, and fully meets <b>79%</b> of the fourteen RFP requirements, leading the field on functional fit, commercial offer and self-service usability. It does not lead on security &amp; compliance, which is why the SOC 2 gate below stands as a named condition rather than a silent risk. The evaluation policy keeps the top scorer as the advisory recommendation with the gate flagged, not demoted.</div>
+      <div class="kstrip" style="margin-top:12px">
+        <div class="card kc teal"><div class="kl">Panel score</div><div class="kn">4.4 / 5</div><div class="ks">field-leading, all suppliers scored</div></div>
+        <div class="card kc"><div class="kl">Coverage</div><div class="kn">79%</div><div class="ks">of 14 requirements fully met</div></div>
+        <div class="card kc"><div class="kl">Field</div><div class="kn">3 scored</div><div class="ks">+ 1 incomplete bid (Helio, no price)</div></div>
+        <div class="card kc emph"><div class="kl">Gate status</div><div class="kn">1 open</div><div class="ks">SOC 2 Type II, Must-Have</div></div>
+      </div>
+    </div>
+
+    <div class="grp"><span class="gt">Value</span><span class="gsub cap">indicative, pre-negotiation</span></div>
+    <div class="sect rowset">
+      <div class="lvrow"><div class="lvlab">Annual price</div><div class="lvval"><b>$980,000</b>/yr, 31% below the $1,420,000 list price, held firm 90 days.</div></div>
+      <div class="lvrow"><div class="lvlab">Implementation</div><div class="lvval"><b>$210,000</b> fixed fee (not time-and-materials).</div></div>
+      <div class="lvrow"><div class="lvlab">Terms</div><div class="lvval">Annual, prepaid; escalator capped at <b>3%/yr</b>.</div></div>
+      <div class="lvrow"><div class="lvlab">Indicative 3-yr TCO</div><div class="lvval"><b>$2,940,000</b> (annual &times; 3, before implementation and escalators). Illustrative only, not the negotiated contract value.</div></div>
+    </div>
+
+    <div class="grp"><span class="gt">Risk &amp; Mitigation</span></div>
+    <div class="sect card" style="padding:14px 16px">
+      <div style="font-size:12.8px;line-height:1.65;color:var(--ink)">The open item is <b>SOC 2 Type II certification</b>, a Must-Have (weight 5, mandatory) under Security &amp; compliance. Nimbus submitted a Type I report only; per the panel&rsquo;s Q1 clarification to bidders, <i>&ldquo;a Type I plus a dated Type II roadmap may be clarified but does not satisfy the gate at award.&rdquo;</i> It is the only Must-Have Nimbus fails.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:11px">
+        <div style="flex:1 1 220px;min-width:0;padding:9px 12px;background:var(--panel);border-radius:8px;border:1px solid var(--line2)"><div style="font:800 10px var(--sans);color:var(--plum);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px">Preferred mitigation</div><div style="font-size:11.8px;line-height:1.5">Secure a dated SOC 2 Type II remediation commitment from Nimbus; hold contract execution until it is received.</div></div>
+        <div style="flex:1 1 220px;min-width:0;padding:9px 12px;background:var(--panel);border-radius:8px;border:1px solid var(--line2)"><div style="font:800 10px var(--sans);color:var(--mut2);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px">Accept-risk fallback</div><div style="font-size:11.8px;line-height:1.5">Panel documents formal acceptance of the gap and proceeds without remediation; requires explicit sign-off, not a default.</div></div>
+        <div style="flex:1 1 220px;min-width:0;padding:9px 12px;background:var(--panel);border-radius:8px;border:1px solid var(--line2)"><div style="font:800 10px var(--sans);color:var(--rust);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px">Walk-away comparator</div><div style="font-size:11.8px;line-height:1.5">Lakehouse Co is clean on every Must-Have today (current SOC 2 Type II + FedRAMP Moderate) at an indicative $1,060,000/yr, about $80,000/yr above Nimbus.</div></div>
+      </div>
+    </div>
+
+    <div class="grp"><span class="gt">Conditions &amp; Contingencies</span></div>
+    <div class="sect card" style="padding:12px 16px">
+      <ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.75;color:var(--ink)">
+        <li>Nimbus must deliver a dated SOC 2 Type II certification commitment before contract execution proceeds to signature.</li>
+        <li>Negotiation targets the $210,000 fixed-fee implementation quote and confirms the 3%/yr escalator cap survives redline.</li>
+        <li>If Nimbus cannot commit to a dated Type II path, the recommendation reverts to Lakehouse Co, the conforming alternative, per the response analysis.</li>
+      </ul>
+    </div>
+
+    <div class="grp"><span class="gt">Approval Sought</span></div>
+    <div class="callout">
+      <div class="lbl">Specific to this session</div>
+      <div class="txt">Panel confirmation of Nimbus Data as the recommended award, and authorization to proceed into contract negotiation. The award itself remains conditional on contract execution and on satisfying the SOC 2 condition above; this is not a final award decision.</div>
+    </div>
+
+    <div class="grp"><span class="gt">Committee Decision</span><span class="gsub cap">choose one, each path states what it triggers</span></div>
+    <div class="sect decision-grid">
+      <div class="dcard approve">
+        <div class="dtitle">Approve</div>
+        <div class="dtag">Proceed on current terms</div>
+        <div class="dtxt">Negotiation begins immediately. The panel accepts the SOC 2 gate as a documented, known risk carried into contract execution.</div>
+        <div class="dtrig">Triggers</div>
+        <div class="dtxt">Category team opens negotiation this week; no remediation condition attached.</div>
+      </div>
+      <div class="dcard cond">
+        <div class="dtitle">Approve With Conditions</div>
+        <div class="dtag">Recommended path</div>
+        <div class="dtxt">Negotiation begins, but contract execution is held until Nimbus delivers a dated SOC 2 Type II certification commitment.</div>
+        <div class="dtrig">Triggers</div>
+        <div class="dtxt">Legal and procurement track the SOC 2 condition to close; execution blocked until cleared.</div>
+      </div>
+      <div class="dcard decline">
+        <div class="dtitle">Decline</div>
+        <div class="dtag">Do not pursue Nimbus</div>
+        <div class="dtxt">The panel refers to Lakehouse Co, the clean gate-pass alternative, or directs the category team to reopen the field.</div>
+        <div class="dtrig">Triggers</div>
+        <div class="dtxt">Nimbus negotiation does not open; Lakehouse business case is prepared for the next session.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION B -->
+  <!-- ================================================================ -->
+  <div class="opt-band">
+    <div class="opt-hd">
+      <div class="opt-badge b">B</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Structured One-Page Approval Memo</div>
+        <div class="opt-caption">A formal memo register: To / From / Re header, narrative context and recommendation, a single boxed financial-summary line, a risk-posture paragraph, the authorization requested, and a signature-block decision record.</div>
+      </div>
+    </div>
+
+    <div class="card memo">
+      <div class="memo-head">
+        <div class="mk">To</div><div class="mv">IT Procurement Executive Committee</div>
+        <div class="mk">From</div><div class="mv">Category Team, Enterprise Data Platform RFP</div>
+        <div class="mk">Re</div><div class="mv"><b>Award Recommendation, Nimbus Data</b></div>
+        <div class="mk">Status</div><div class="mv">Pre-award, subject to contract</div>
+      </div>
+
+      <span class="mlabel">Context</span>
+      <p>This RFP ran a competitive process to select an enterprise data platform to consolidate Lilly&rsquo;s analytics workloads onto one governed platform (~$3.2M three-year TCO planning estimate, Yellow CCI; award is subject to contract). Three suppliers were fully evaluated against fourteen weighted requirements across eight categories: functional fit, integration &amp; architecture, security &amp; compliance, performance &amp; scalability, operational support, total cost, innovation &amp; roadmap, and risk &amp; stability. A fourth supplier, Helio, submitted an incomplete bid, no commercial proposal was included (price <span class="pill grey">NEEDS_INPUT</span>), and is not eligible for award consideration until pricing is on file.</p>
+
+      <span class="mlabel">Recommendation</span>
+      <p>The category team recommends award to <b>Nimbus Data</b>. It returned the field&rsquo;s highest panel score, <b>4.4 out of 5</b>, and fully meets <b>79%</b> of requirements, leading on functional fit, commercial terms and self-service usability. Nimbus carries one open Must-Have gap, SOC 2 Type II certification (submitted at Type I only), carried forward here as a named condition rather than a disqualification; the top-scoring bidder stays the advisory recommendation with the gate flagged, not demoted.</p>
+
+      <span class="mlabel">Financial Summary</span>
+      <div class="finline"><b>$980,000</b>/yr indicative &middot; <b>$2,940,000</b> indicative 3-yr TCO &middot; <b>31%</b> below list ($1,420,000) &middot; <b>$210,000</b> fixed-fee implementation &middot; escalator capped <b>3%/yr</b> &middot; quote held firm 90 days. All figures are Nimbus&rsquo;s submitted, pre-negotiation proposal.</div>
+
+      <span class="mlabel">Risk Posture</span>
+      <p>Primary risk: the SOC 2 Type II gate. Per the panel&rsquo;s clarification to bidders (Q1), a Type I report plus a roadmap does not satisfy a Must-Have at award; Nimbus must deliver a current Type II report or a dated remediation commitment. Secondary, non-gating items flagged in the response analysis: SAP/S4HANA integration runs through unproven middleware rather than a native adapter, and Nimbus is a venture-stage vendor on an unaudited balance sheet. The conforming comparator, Lakehouse Co, is clean on every Must-Have (current SOC 2 Type II, FedRAMP Moderate) at an indicative $1,060,000/yr, roughly $80,000/yr above Nimbus, with a shallower 10.2% discount.</p>
+
+      <span class="mlabel">Authorization Requested</span>
+      <p>The committee&rsquo;s authorization is limited to two actions: (1) confirm Nimbus Data as the recommended award, and (2) authorize the category team to proceed into contract negotiation. No contract is executed by this approval; execution remains conditional on closing the SOC 2 condition and completing legal review.</p>
+
+      <div class="memo-decision">
+        <span class="mlabel">Decision</span>
+        <div class="chkrow"><div class="chkbox"></div><div><b>Approve</b>, proceed to negotiation on current terms, gate risk accepted.</div></div>
+        <div class="chkrow"><div class="chkbox"></div><div><b>Approve with conditions</b>, proceed to negotiation, execution held on the SOC 2 Type II commitment.</div></div>
+        <div class="chkrow"><div class="chkbox"></div><div><b>Decline</b>, refer to Lakehouse Co or return the field for renegotiation.</div></div>
+
+        <div class="sigblock">
+          <div class="sigline"><div class="sname">Committee Chair &middot; Signature &amp; Date</div></div>
+          <div class="sigline"><div class="sname">Category Lead &middot; Signature &amp; Date</div></div>
+          <div class="sigline"><div class="sname">Finance Reviewer &middot; Signature &amp; Date</div></div>
+          <div class="sigline"><div class="sname">Legal Reviewer &middot; Signature &amp; Date</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION C -->
+  <!-- ================================================================ -->
+  <div class="opt-band">
+    <div class="opt-hd">
+      <div class="opt-badge c">C</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Decision Card Layout</div>
+        <div class="opt-caption">The ask stated as one bold sentence up top, then six scannable supporting cards: why now, value, risks &amp; mitigations, what you are authorizing, alternatives considered, and timeline, readable in any order.</div>
+      </div>
+    </div>
+
+    <div class="ask-hero">
+      <div class="ahk">The Ask</div>
+      <div class="ahtxt">Approve <b>Nimbus Data</b> for the enterprise data platform award at an indicative <b>$980,000</b>/yr, and authorize contract negotiation conditional on a dated SOC 2 Type II remediation commitment.</div>
+    </div>
+
+    <div class="support-grid">
+      <div class="card scard">
+        <div class="sh"><div class="sicon" style="background:var(--plum)">1</div><div class="st">Why Now</div></div>
+        <div class="sb">The competitive RFP evaluation is complete: three suppliers fully scored, one incomplete bid. Nimbus leads the field on the panel&rsquo;s own weighted criteria. Holding the decision open past this window re-opens the field to re-scoring and delays the consolidation this RFP was chartered to deliver (~$3.2M three-year planning estimate, Yellow CCI).</div>
+      </div>
+      <div class="card scard">
+        <div class="sh"><div class="sicon" style="background:var(--teal)">2</div><div class="st">Value</div></div>
+        <div class="sb">
+          <span class="mini"><b>Panel score</b> 4.4 / 5, field-leading</span>
+          <span class="mini"><b>Coverage</b> 79% of 14 requirements fully met</span>
+          <span class="mini"><b>Annual</b> $980,000, indicative, 31% below $1,420,000 list</span>
+          <span class="mini"><b>Implementation</b> $210,000 fixed fee</span>
+          <span class="mini"><b>3-yr TCO</b> $2,940,000, indicative, before implementation &amp; escalators</span>
+        </div>
+      </div>
+      <div class="card scard">
+        <div class="sh"><div class="sicon" style="background:var(--rust)">3</div><div class="st">Risks &amp; Mitigations</div></div>
+        <div class="sb">Primary: SOC 2 Type II gate, Type I submitted only, a Must-Have (requirement r8, weight 5). Mitigation: dated remediation commitment before contract execution, or documented panel acceptance of the risk. Secondary: SAP integration via unproven middleware, not native; venture-stage balance sheet. Both are negotiation items, not gates.</div>
+      </div>
+      <div class="card scard">
+        <div class="sh"><div class="sicon" style="background:var(--blue)">4</div><div class="st">What You Are Authorizing</div></div>
+        <div class="sb">Panel confirmation of the recommendation and authorization to proceed into contract negotiation with Nimbus Data. Not a final award: contract execution stays conditional on the SOC 2 condition and standard legal review.</div>
+      </div>
+      <div class="card scard">
+        <div class="sh"><div class="sicon" style="background:var(--mut2)">5</div><div class="st">Alternatives Considered</div></div>
+        <div class="sb">
+          <span class="mini"><b>Lakehouse Co</b>, clean on every Must-Have (current SOC 2 Type II + FedRAMP Moderate), indicative $1,060,000/yr (~$80K above Nimbus, 10.2% discount). The conforming fallback if the panel prefers certainty over gate risk.</span>
+          <span class="mini"><b>Helio</b>, incomplete bid, price <span class="pill grey">NEEDS_INPUT</span>, no commercial proposal submitted. Strongest native SAP integration, but security posture under-documented and the AI/roadmap requirement unanswered; not ready for award.</span>
+        </div>
+      </div>
+      <div class="card scard">
+        <div class="sh"><div class="sicon" style="background:var(--plum)">6</div><div class="st">Timeline</div></div>
+        <div class="sb">Next, the category team opens contract negotiation with Nimbus and tracks the SOC 2 Type II condition to close. Then, the business case and commercial terms route through the FRAP approval chain once negotiation and legal are settled. Award executes only after both close.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot">Grounded in <span style="font-family:var(--mono)">assets/seed/project-view.js</span> (Nimbus and Lakehouse pricing schedules, the 14-item requirements matrix, the panel&rsquo;s Q1 clarification, and the RFP intent line). All three options are candidate layouts for the same underlying data; none is wired to the live dashboard yet.</div>
+
+</div>
+</body>
+</html>

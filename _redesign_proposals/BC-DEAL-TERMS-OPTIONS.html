@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Case, Deal Terms &amp; The Field, Three Layout Options</title>
+<style>
+:root{
+  --plum:#5C2B50; --plum-t:#EDDFE9; --plum-fg:#F3ECF1;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#F7F6F3; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+  --serif:Georgia,'Times New Roman',Times,serif;
+  --sans:Arial,Helvetica,'Segoe UI',sans-serif;
+  --mono:'Consolas','SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --plum:#8A5B80; --plum-t:#33253B;
+    --teal:#5FAFA9; --teal-t:#1E302D;
+    --emph:#E0925A; --emph-t:#33241A;
+    --rust:#D07A5C; --rust-t:#3A241C;
+    --blue:#7CA6E2; --blue-t:#1E2A38;
+    --grey:#A3ADB4; --grey-t:#2B2E31;
+    --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+    --line:#3A3833; --line2:#4A4740;
+    --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --plum:#8A5B80; --plum-t:#33253B;
+  --teal:#5FAFA9; --teal-t:#1E302D;
+  --emph:#E0925A; --emph-t:#33241A;
+  --rust:#D07A5C; --rust-t:#3A241C;
+  --blue:#7CA6E2; --blue-t:#1E2A38;
+  --grey:#A3ADB4; --grey-t:#2B2E31;
+  --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+  --line:#3A3833; --line2:#4A4740;
+  --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+}
+:root[data-theme="light"]{
+  --plum:#5C2B50; --plum-t:#EDDFE9;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#F7F6F3; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1120px;margin:0 auto;padding:26px 26px 50px}
+b{font-weight:700}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+
+/* ---- page head ---- */
+.page-head{border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:24px}
+.page-head .kicker{font:800 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--plum);margin-bottom:7px}
+.page-head h1{font-size:24px;letter-spacing:-.01em;margin-bottom:8px}
+.page-head .sub{font-size:13px;color:var(--mut);line-height:1.6;max-width:920px}
+.page-head .sub b{color:var(--ink)}
+.datanote{margin-top:11px;padding:9px 13px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;font-size:12px;color:var(--mut);line-height:1.5;max-width:920px}
+.datanote b{color:var(--ink)}
+
+/* ---- option band shell ---- */
+.opt{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:18px 20px 20px;box-shadow:var(--shadow);margin-bottom:26px}
+.opt-hd{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.opt-tag{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 14px var(--sans);color:#fff;background:var(--plum)}
+.opt-titlewrap{flex:1;min-width:220px}
+.opt-name{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--ink);line-height:1.3}
+.opt-caption{font-size:12.5px;color:var(--mut2);font-style:italic;margin-top:3px;line-height:1.45;max-width:760px}
+
+/* ---- shared section / card language, matched to the live pv-09 dashboard ---- */
+.grp{display:flex;align-items:baseline;gap:9px;margin:0 0 12px;flex-wrap:wrap}
+.grp .gt{font-family:var(--serif);font-weight:700;font-size:14.5px;color:var(--ink)}
+.grp .gsub{font-size:11.5px;color:var(--mut2)}
+.card{border:1px solid var(--line2);border-radius:9px;background:var(--surface);padding:13px 15px;box-shadow:0 1px 2px rgba(28,28,34,.04),0 4px 11px -4px rgba(28,28,34,.09)}
+.secthd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+.secthd .t{font-weight:700;font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink)}
+.secthd .cap{font-size:11px;color:var(--mut2)}
+.kv{display:grid;grid-template-columns:118px 1fr;gap:8px 12px;font-size:13px}
+.kv .k{color:var(--mut2);font-family:var(--mono);font-size:10.5px;text-transform:uppercase;padding-top:2px;font-weight:600;letter-spacing:.02em}
+.kv .v{font-weight:600;color:var(--ink)}
+.kv .v.needs{color:var(--emph);font-weight:700}
+.spnote{font-size:11px;color:var(--mut2);margin-top:11px;line-height:1.5}
+.mxwrap{overflow-x:auto;border:1px solid var(--line2);border-radius:10px}
+.mx{border-collapse:collapse;font-size:12.5px;min-width:100%;white-space:nowrap}
+.mx th,.mx td{padding:7px 10px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:center}
+.mx th:last-child,.mx td:last-child{border-right:none}
+.mx tr:last-child td{border-bottom:none}
+.mx thead th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);font-weight:700;background:var(--panel)}
+.mx tbody td:first-child,.mx thead th:first-child{text-align:left;font-weight:700;position:sticky;left:0;background:var(--surface)}
+.mx thead th:first-child{background:var(--panel)}
+.mx td.lead{background:var(--plum-t) !important}
+.mx tr.recrow{background:var(--plum-t)}
+.mx tr.recborder td:first-child{border-left:3px solid var(--plum)}
+
+/* ---- headline stat ---- */
+.hstat{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:2px}
+.hstat .n{font-family:var(--serif);font-weight:700;font-size:22px;color:var(--plum);line-height:1}
+.hstat .u{font-size:11px;color:var(--mut2)}
+.hsub{font-size:11px;color:var(--mut2);line-height:1.5;margin-top:3px}
+.hsub b{color:var(--ink)}
+
+/* ---- pills ---- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:700 9.5px var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;border:1.5px solid currentColor;white-space:nowrap}
+.pill .dot{width:6px;height:6px;background:currentColor;flex:none}
+.pill.critical{color:var(--rust)}
+.pill.high{color:var(--emph)}
+.pill.medium{color:var(--blue)}
+.pill.clear{color:var(--teal)}
+.pill.gate{color:var(--rust)}
+.pill.recommended{color:#fff;background:var(--plum);border-color:var(--plum);font-size:8.5px;padding:1px 7px}
+.needs-chip{display:inline-block;font:700 9.5px var(--mono);color:var(--emph);background:var(--emph-t);border-radius:4px;padding:1px 6px}
+
+/* ---- Option A: term sheet left / tight table right ---- */
+.a-grid{display:grid;grid-template-columns:290px 1fr;gap:18px;align-items:start}
+@media(max-width:760px){.a-grid{grid-template-columns:1fr}}
+
+/* ---- Option B: single matrix ---- */
+.b-note{font-size:11.5px;color:var(--mut2);margin-bottom:10px;line-height:1.5}
+
+/* ---- Option C: term sheet left (accent border) / delta table right ---- */
+.c-grid{display:grid;grid-template-columns:290px 1fr;gap:18px;align-items:start}
+@media(max-width:760px){.c-grid{grid-template-columns:1fr}}
+.c-card{border-left:3px solid var(--plum)}
+.delta{font-family:var(--mono);font-weight:700;font-size:11.5px}
+.delta.pos{color:var(--plum)}
+.delta.neg{color:var(--mut2)}
+.field-read{margin-top:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--emph);border-radius:0 8px 8px 0;font-size:11.5px;color:var(--mut);line-height:1.55}
+.field-read b{color:var(--ink)}
+
+/* ---- footer ---- */
+.page-foot{margin-top:8px;padding-top:16px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="kicker">Design exploration · Business Case · "Deal Terms &amp; The Field" section · three layout options · not a change to the live dashboard</div>
+    <h1>Deal Terms &amp; The Field</h1>
+    <div class="sub">The current render stacks a plain Current Deal Terms key/value list directly above a full-width Supplier Comparison table, both full width. Minimum fix: Supplier Comparison moves beside Current Deal Terms, side by side. All three options below meet that minimum and go further, each with a distinct approach to making both halves earn their space.</div>
+    <div class="datanote"><b>Reading the data:</b> Nimbus Data is the recommended supplier: panel score 4.4 of 5, $980,000/yr (31% below the $1.42M list, held firm 90 days), but it carries the RFP's only Must-Have gate risk (SOC&nbsp;2 Type&nbsp;II) and is flagged Critical risk on that basis. Lakehouse Co scores 4.2 of 5 at $1,060,000/yr, Medium risk, and is gate-clear. Helio Warehouse scores 3.2 of 5, High risk, gate-clear, and submitted no price, no term, and no escalator, only a pricing model is on file. All figures are as submitted, pre-negotiation, reflect-only.</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- OPTION A -->
+  <!-- ============================================================ -->
+  <div class="opt">
+    <div class="opt-hd">
+      <div class="opt-tag">A</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Term Sheet + Tight Comparison</div>
+        <div class="opt-caption">A compact term-sheet card for Nimbus on the left; a narrower, denser Supplier Comparison table on the right with small pill risk/gate indicators in place of the old stoplight coloring.</div>
+      </div>
+    </div>
+
+    <div class="grp"><span class="gt">Deal Terms &amp; The Field</span><span class="gsub">current terms for Nimbus Data, and how it compares to the rest of the field</span></div>
+
+    <div class="a-grid">
+      <div class="card">
+        <div class="secthd"><div class="t">Current Deal Terms</div><div class="cap">Nimbus Data · as submitted</div></div>
+        <div class="hstat"><span class="n">$980,000</span><span class="u">/yr</span></div>
+        <div class="hsub">31% below the $1,420,000 list, held firm 90 days.</div>
+        <div class="kv" style="margin-top:12px">
+          <div class="k">Term</div><div class="v">Annual, prepaid</div>
+          <div class="k">Pricing model</div><div class="v">Per-seat SaaS subscription</div>
+          <div class="k">Escalator cap</div><div class="v">Capped 3%/yr</div>
+          <div class="k">Pricing hold</div><div class="v">Yes, held 90 days</div>
+          <div class="k">Volume discount</div><div class="v">31%</div>
+          <div class="k">Exit terms</div><div class="v" style="color:var(--mut2);font-weight:500">Not yet negotiated; addressed in the MSA</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="secthd"><div class="t">Supplier Comparison</div><div class="cap">all evaluated suppliers · exec depth</div></div>
+        <div class="mxwrap">
+          <table class="mx" style="width:100%">
+            <thead><tr><th style="text-align:left">Supplier</th><th>Score</th><th>Annual Price</th><th>Risk</th><th>Gate</th></tr></thead>
+            <tbody>
+              <tr class="recrow">
+                <td>Nimbus Data <span class="pill recommended">Rec.</span></td>
+                <td>4.4 / 5</td>
+                <td>$980,000</td>
+                <td><span class="pill critical"><span class="dot"></span>Critical</span></td>
+                <td><span class="pill gate"><span class="dot"></span>Gate risk</span></td>
+              </tr>
+              <tr>
+                <td>Lakehouse Co</td>
+                <td>4.2 / 5</td>
+                <td>$1,060,000</td>
+                <td><span class="pill medium"><span class="dot"></span>Medium</span></td>
+                <td><span class="pill clear"><span class="dot"></span>Clear</span></td>
+              </tr>
+              <tr>
+                <td>Helio Warehouse</td>
+                <td>3.2 / 5</td>
+                <td><span class="needs-chip">NEEDS_INPUT</span></td>
+                <td><span class="pill high"><span class="dot"></span>High</span></td>
+                <td><span class="pill clear"><span class="dot"></span>Clear</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="spnote">Panel score is the weighted 0-5 evaluation; annual price is the submitted, pre-negotiation figure. Helio submitted no price. Reflect-only.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- OPTION B -->
+  <!-- ============================================================ -->
+  <div class="opt">
+    <div class="opt-hd">
+      <div class="opt-tag">B</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Terms Vs The Field Matrix</div>
+        <div class="opt-caption">One combined matrix: rows are the deal terms, columns are every evaluated supplier. Nimbus's terms sit in context of Lakehouse and Helio directly, row by row, instead of living in a separate card the reader has to cross-reference by hand.</div>
+      </div>
+    </div>
+
+    <div class="grp"><span class="gt">Deal Terms &amp; The Field</span><span class="gsub">every submitted term, side by side, recommended supplier highlighted</span></div>
+
+    <div class="card">
+      <div class="b-note">Nimbus Data's column is highlighted as the recommendation. Exit terms are not yet negotiated for any supplier at this stage, per the pricing schedule on file.</div>
+      <div class="mxwrap">
+        <table class="mx" style="width:100%">
+          <thead>
+            <tr>
+              <th style="text-align:left">Term</th>
+              <th class="lead">Nimbus Data<br><span style="font-weight:600;text-transform:none;font-size:8.5px">Recommended</span></th>
+              <th>Lakehouse Co</th>
+              <th>Helio Warehouse</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Panel score</td><td class="lead"><b>4.4 / 5</b></td><td>4.2 / 5</td><td>3.2 / 5</td></tr>
+            <tr><td>Annual price</td><td class="lead"><b>$980,000</b></td><td>$1,060,000</td><td><span class="needs-chip">NEEDS_INPUT</span></td></tr>
+            <tr><td>List price</td><td class="lead">$1,420,000</td><td>$1,180,000</td><td><span class="needs-chip">NEEDS_INPUT</span></td></tr>
+            <tr><td>Volume discount</td><td class="lead">31%</td><td>10.2%</td><td><span class="needs-chip">NEEDS_INPUT</span></td></tr>
+            <tr><td>Est. 3-yr TCO <span style="font-weight:400;color:var(--mut2)">(indicative)</span></td><td class="lead">~$3.1M</td><td>~$3.6M</td><td><span class="needs-chip">NEEDS_INPUT</span></td></tr>
+            <tr><td>Pricing model</td><td class="lead">Per-seat SaaS</td><td>Platform subscription (3-yr)</td><td>Consumption / usage-based</td></tr>
+            <tr><td>Term</td><td class="lead">Annual, prepaid</td><td>3-year term</td><td><span class="needs-chip">NEEDS_INPUT</span></td></tr>
+            <tr><td>Escalator cap</td><td class="lead">Capped 3%/yr</td><td>CPI, capped 4%/yr</td><td><span class="needs-chip">NEEDS_INPUT</span></td></tr>
+            <tr><td>Pricing hold</td><td class="lead">Yes, 90 days</td><td>Yes, 120 days</td><td>No</td></tr>
+            <tr><td>Risk level</td><td class="lead"><span class="pill critical"><span class="dot"></span>Critical</span></td><td><span class="pill medium"><span class="dot"></span>Medium</span></td><td><span class="pill high"><span class="dot"></span>High</span></td></tr>
+            <tr><td>Gate status</td><td class="lead"><span class="pill gate"><span class="dot"></span>Gate risk</span></td><td><span class="pill clear"><span class="dot"></span>Clear</span></td><td><span class="pill clear"><span class="dot"></span>Clear</span></td></tr>
+            <tr><td>Exit terms</td><td class="lead" style="color:var(--mut2);font-weight:500">Not yet negotiated</td><td style="color:var(--mut2)">Not yet negotiated</td><td style="color:var(--mut2)">Not yet negotiated</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="spnote">Panel score is the weighted 0-5 evaluation; price, discount, model, term, escalator and pricing hold are as submitted in the pricing schedule. TCO figures are indicative, pre-award, and reflect the pricing schedule plus quoted implementation fee, not a negotiated projection. Reflect-only.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- OPTION C -->
+  <!-- ============================================================ -->
+  <div class="opt">
+    <div class="opt-hd">
+      <div class="opt-tag">C</div>
+      <div class="opt-titlewrap">
+        <div class="opt-name">Term Sheet + Comparison With Field Deltas</div>
+        <div class="opt-caption">Term sheet left, comparison right as in Option A, but the recommended supplier is called out with an accent border rather than a filled row, and both panels carry an explicit "vs field" delta on price and score, plus the honest counter-read on risk.</div>
+      </div>
+    </div>
+
+    <div class="grp"><span class="gt">Deal Terms &amp; The Field</span><span class="gsub">current terms for Nimbus Data, with its price and score positioned against the field</span></div>
+
+    <div class="c-grid">
+      <div class="card c-card">
+        <div class="secthd"><div class="t">Current Deal Terms</div><div class="cap">Nimbus Data · recommended</div></div>
+        <div class="hstat"><span class="n">$980,000</span><span class="u">/yr</span></div>
+        <div class="hsub"><span class="delta pos">▼ $80,000/yr</span> vs Lakehouse, the runner-up · <b>lowest submitted price</b> in the field</div>
+        <div class="hstat" style="margin-top:9px"><span class="n" style="font-size:18px">4.4 / 5</span></div>
+        <div class="hsub"><span class="delta pos">▲ +0.2</span> vs Lakehouse · <span class="delta pos">▲ +1.2</span> vs Helio · <b>highest panel score</b> in the field</div>
+        <div class="kv" style="margin-top:12px">
+          <div class="k">Pricing model</div><div class="v">Per-seat SaaS subscription</div>
+          <div class="k">Escalator cap</div><div class="v">Capped 3%/yr</div>
+          <div class="k">Pricing hold</div><div class="v">Yes, held 90 days</div>
+          <div class="k">Volume discount</div><div class="v">31%</div>
+          <div class="k">Exit terms</div><div class="v" style="color:var(--mut2);font-weight:500">Not yet negotiated; addressed in the MSA</div>
+        </div>
+        <div class="field-read"><b>The counter-read:</b> Nimbus wins on price and score but is the only supplier carrying a Must-Have gate risk (SOC&nbsp;2 Type&nbsp;II). Lakehouse is $80K/yr more and 0.2 lower on score, but Medium risk and gate-clear.</div>
+      </div>
+
+      <div class="card">
+        <div class="secthd"><div class="t">Supplier Comparison</div><div class="cap">delta vs Nimbus · indicative</div></div>
+        <div class="mxwrap">
+          <table class="mx" style="width:100%">
+            <thead><tr><th style="text-align:left">Supplier</th><th>Score</th><th>Δ Score</th><th>Annual Price</th><th>Δ Price</th><th>Risk</th><th>Gate</th></tr></thead>
+            <tbody>
+              <tr class="recborder">
+                <td>Nimbus Data <span class="pill recommended">Rec.</span></td>
+                <td><b>4.4 / 5</b></td>
+                <td><span class="delta" style="color:var(--mut2)">-</span></td>
+                <td><b>$980,000</b></td>
+                <td><span class="delta" style="color:var(--mut2)">-</span></td>
+                <td><span class="pill critical"><span class="dot"></span>Critical</span></td>
+                <td><span class="pill gate"><span class="dot"></span>Gate risk</span></td>
+              </tr>
+              <tr>
+                <td>Lakehouse Co</td>
+                <td>4.2 / 5</td>
+                <td><span class="delta neg">▼ 0.2</span></td>
+                <td>$1,060,000</td>
+                <td><span class="delta neg">▲ $80,000 (+8.2%)</span></td>
+                <td><span class="pill medium"><span class="dot"></span>Medium</span></td>
+                <td><span class="pill clear"><span class="dot"></span>Clear</span></td>
+              </tr>
+              <tr>
+                <td>Helio Warehouse</td>
+                <td>3.2 / 5</td>
+                <td><span class="delta neg">▼ 1.2</span></td>
+                <td><span class="needs-chip">NEEDS_INPUT</span></td>
+                <td><span class="needs-chip">NEEDS_INPUT</span></td>
+                <td><span class="pill high"><span class="dot"></span>High</span></td>
+                <td><span class="pill clear"><span class="dot"></span>Clear</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="spnote">Delta columns are computed against Nimbus and are indicative, pre-award reads on the submitted figures, not additional facts from the pricing schedule. Helio submitted no price, so its price delta cannot be computed. Reflect-only.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot">
+    Design-exploration mockup for the Business Case "Deal Terms &amp; The Field" section on the RFx dashboard. All figures for Nimbus Data, Lakehouse Co and Helio Warehouse are as submitted in the pricing schedule (seed <span style="font-family:var(--mono)">project-view.js</span>) and reflected by the live <span style="font-family:var(--mono)">rfxBcDealTermsHTML</span> / <span style="font-family:var(--mono)">rfxBcSupplierComparisonHTML</span> renderers in <span style="font-family:var(--mono)">pv-09-rfx.js</span>; TCO and delta figures in Options B and C are indicative, pre-award reads layered on those figures for illustration, not new submitted facts. Missing Helio figures are marked NEEDS_INPUT rather than estimated. Colors follow the MCM palette: plum as primary and for the recommended supplier, teal for gate-clear, burnt orange for high risk, deep rust for critical risk and gate risk, muted blue for medium risk. Not connected to live data and not part of the shipped dashboard.
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RFx Recommendation Tab, Design Options</title>
+<style>
+:root{
+  --plum:#5C2B50; --plum-t:#EDDFE9; --plum-fg:#F3ECF1;
+  --teal:#2F6E6B; --teal-t:#DCEBE9;
+  --emph:#C15E19; --emph-t:#F6DDC9;
+  --rust:#9A3B1F; --rust-t:#F3DFD6;
+  --blue:#2E5E8C; --blue-t:#E4EBF1;
+  --grey:#8A969E; --grey-t:#ECEDEE;
+  --ink:#212121; --mut:#4A443C; --mut2:#6B6459;
+  --line:#E1E0DC; --line2:#CFCDC8;
+  --bg:#E7E4DC; --surface:#FFFFFF; --panel:#F5F2ED; --nested:#EDEAE3;
+  --shadow:0 1px 2px rgba(38,30,20,.07),0 3px 10px rgba(38,30,20,.08);
+  --serif:Georgia,'Times New Roman',Times,serif;
+  --sans:Arial,Helvetica,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --plum:#8A5B80; --plum-t:#33253B;
+    --teal:#5FAFA9; --teal-t:#1E302D;
+    --emph:#E0925A; --emph-t:#33241A;
+    --rust:#D07A5C; --rust-t:#3A241C;
+    --blue:#7CA6E2; --blue-t:#1E2A38;
+    --grey:#A3ADB4; --grey-t:#2B2E31;
+    --ink:#ECECEC; --mut:#B7B2AA; --mut2:#948E85;
+    --line:#3A3833; --line2:#4A4740;
+    --bg:#171614; --surface:#211F1C; --panel:#26241F; --nested:#2B2925;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 30px 90px}
+b{font-weight:700}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+a{color:inherit}
+
+/* ---- page head ---- */
+.page-head{border-bottom:3px solid var(--ink);padding-bottom:22px;margin-bottom:22px}
+.page-head .kicker{font:800 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--plum);margin-bottom:8px}
+.page-head h1{font-size:29px;letter-spacing:-.01em;margin-bottom:10px}
+.page-head .sub{font-size:14px;color:var(--mut);line-height:1.65;max-width:900px}
+.page-head .sub b{color:var(--ink)}
+.datanote{margin-top:14px;padding:11px 14px;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--mut);line-height:1.55;max-width:900px}
+
+/* ---- jump nav ---- */
+.jumpnav{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 40px;padding:14px 16px;background:var(--panel);border:1px solid var(--line2);border-radius:10px}
+.jumpnav .jn-lbl{font:800 10px var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);align-self:center;margin-right:2px}
+.jumpnav a{font-family:var(--sans);font-weight:700;font-size:12px;color:var(--plum);text-decoration:none;padding:6px 13px;border:1.5px solid var(--plum);border-radius:30px;background:var(--surface);white-space:nowrap}
+.jumpnav a:hover{background:var(--plum-t)}
+
+/* ---- panel section ---- */
+.panel{margin-bottom:64px;padding-top:26px;border-top:3px solid var(--ink);scroll-margin-top:16px}
+.panel-num{display:inline-block;font:800 10.5px var(--sans);letter-spacing:.08em;color:#fff;background:var(--ink);padding:3px 10px;border-radius:4px;margin-bottom:12px}
+.panel-head h2{font-size:23px;margin-bottom:9px;color:var(--ink)}
+.panel-head .purpose{font-size:13.5px;color:var(--mut);line-height:1.65;max-width:880px;margin-bottom:22px}
+.panel-head .purpose b{color:var(--ink)}
+
+/* ---- option card shell ---- */
+.opt{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:22px 24px 24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.opt-hd{display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:15px;border-bottom:1px solid var(--line)}
+.opt-tag{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 14px var(--sans);color:#fff}
+.opt[data-opt="a"] .opt-tag{background:var(--plum)}
+.opt[data-opt="b"] .opt-tag{background:var(--teal)}
+.opt[data-opt="c"] .opt-tag{background:var(--emph)}
+.opt-titlewrap{flex:1;min-width:220px}
+.opt-name{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--ink);line-height:1.3}
+.opt-caption{font-size:12.5px;color:var(--mut2);font-style:italic;margin-top:4px;line-height:1.5}
+
+/* ---- shared pills / tones ---- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;border:1.5px solid currentColor;background:transparent;white-space:nowrap}
+.pill.sm{font-size:9px;padding:2px 8px}
+.pill.plum{color:var(--plum)}
+.pill.teal{color:var(--teal)}
+.pill.emph{color:var(--emph)}
+.pill.rust{color:var(--rust)}
+.pill.blue{color:var(--blue)}
+.pill.grey{color:var(--grey)}
+.tx-plum{color:var(--plum)}.tx-teal{color:var(--teal)}.tx-emph{color:var(--emph)}.tx-rust{color:var(--rust)}.tx-blue{color:var(--blue)}.tx-mut{color:var(--mut2)}
+
+/* ---- generic bits ---- */
+.subnote{font-size:12px;color:var(--mut2);margin-top:12px;line-height:1.55}
+.divider{height:1px;background:var(--line);margin:18px 0}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line2);border-radius:10px}
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px}
+table.tbl th{text-align:left;font:800 10px var(--sans);text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);background:var(--panel);padding:9px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
+table.tbl td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table.tbl tbody tr:last-child td{border-bottom:0}
+table.tbl td.n{text-align:center;white-space:nowrap}
+
+.kpirow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--line2);border-radius:9px;padding:11px 13px}
+.kpi .kl{font:800 9px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)}
+.kpi .kn{font-size:20px;font-weight:800;margin-top:4px;line-height:1.1;color:var(--ink)}
+.kpi .ks{font-size:10.5px;color:var(--mut);margin-top:4px;line-height:1.35}
+
+/* ==================== PANEL 1: readiness ==================== */
+.rdy-banner{border-radius:9px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rdy-banner.ready{background:var(--plum-t);border-left:4px solid var(--plum)}
+.rdy-banner.notready{background:var(--rust-t);border-left:4px solid var(--rust)}
+.rdy-banner .rb-verdict{font-weight:800;font-size:14px}
+.rdy-banner.ready .rb-verdict{color:var(--plum)}
+.rdy-banner.notready .rb-verdict{color:var(--rust)}
+.rdy-banner .rb-sub{font-size:12.5px;color:var(--mut)}
+.rdy-row{display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-top:1px solid var(--line)}
+.rdy-row:first-of-type{border-top:0}
+.rdy-row .rdy-label{flex:1 1 190px;min-width:0;font-weight:700;font-size:12.5px}
+.rdy-row .rdy-status{flex:none;width:88px}
+.rdy-row .rdy-detail{flex:2 1 260px;min-width:0;font-size:12px;color:var(--mut);line-height:1.5}
+
+.gauge-wrap{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.gauge{width:126px;height:126px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--rust) 0% 20%, var(--nested) 20% 100%)}
+.gauge-inner{width:94px;height:94px;border-radius:50%;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-inner .gn{font-size:24px;font-weight:800;color:var(--rust);line-height:1}
+.gauge-inner .gs{font-size:10px;color:var(--mut2);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.blocklist{flex:1;min-width:240px}
+.blocklist .bl-item{display:flex;gap:9px;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5}
+.blocklist .bl-item:first-child{border-top:0}
+.blocklist .bl-item .bi{flex:none;color:var(--rust);font-weight:800}
+
+.stripwrap{display:flex;gap:9px;flex-wrap:wrap}
+.strip-tile{flex:1 1 175px;min-width:165px;background:var(--panel);border:1px solid var(--line2);border-radius:9px;padding:10px 12px}
+.strip-tile.blocked{border-left:3px solid var(--rust)}
+.strip-tile.cleared{border-left:3px solid var(--plum)}
+.strip-tile .st-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.strip-tile .st-lbl{font-weight:700;font-size:11.5px;line-height:1.3}
+.strip-tile .st-note{font-size:10.5px;color:var(--mut2);line-height:1.4}
+
+/* ==================== PANEL 2: what happens next ==================== */
+.stepper{display:flex;gap:0;align-items:stretch;flex-wrap:wrap}
+.step{flex:1;min-width:160px;background:var(--panel);border-radius:9px;padding:11px 13px;position:relative}
+.step.done{background:var(--plum-t)}
+.step.active{background:var(--emph-t)}
+.step-hd{display:flex;align-items:center;gap:7px;font-weight:800;font-size:11.5px}
+.step-dot{flex:none;width:17px;height:17px;border-radius:50%;color:#fff;font-size:9.5px;display:flex;align-items:center;justify-content:center}
+.step.done .step-dot{background:var(--plum)}.step.done .step-hd{color:var(--plum)}
+.step.active .step-dot{background:var(--emph)}.step.active .step-hd{color:var(--emph)}
+.step.pending .step-dot{background:var(--grey)}.step.pending .step-hd{color:var(--mut)}
+.step .step-body{font-size:11px;color:var(--mut);margin-top:5px;line-height:1.4}
+.step .step-date{font-size:10px;color:var(--mut2);margin-top:6px;font-weight:700}
+.step-arrow{align-self:center;color:var(--mut2);font-weight:800;padding:0 6px}
+
+.vtl{position:relative;padding-left:6px}
+.vt-item{display:flex;gap:16px;position:relative;padding-bottom:22px}
+.vt-item:last-child{padding-bottom:0}
+.vt-rail{flex:none;width:20px;display:flex;flex-direction:column;align-items:center}
+.vt-dot{width:13px;height:13px;border-radius:50%;flex:none;margin-top:2px}
+.vt-item.done .vt-dot{background:var(--plum)}
+.vt-item.active .vt-dot{background:var(--emph)}
+.vt-item.pending .vt-dot{background:var(--grey)}
+.vt-line{flex:1;width:2px;background:var(--line2);margin-top:3px}
+.vt-body{flex:1;padding-top:0}
+.vt-name{font-weight:800;font-size:13px}
+.vt-item.done .vt-name{color:var(--plum)}
+.vt-item.active .vt-name{color:var(--emph)}
+.vt-item.pending .vt-name{color:var(--mut)}
+.vt-date{font-size:10.5px;color:var(--mut2);font-weight:700;margin-left:8px}
+.vt-desc{font-size:12px;color:var(--mut);line-height:1.5;margin-top:4px}
+.vt-who{font-size:11px;color:var(--mut2);margin-top:3px}
+
+.raci-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:11px;font-size:11px;color:var(--mut2)}
+.raci-legend b{color:var(--ink)}
+
+/* ==================== PANEL 3: the case per supplier ==================== */
+.acc{border:1px solid var(--line2);border-radius:10px;margin-bottom:11px;overflow:hidden}
+.acc summary{cursor:pointer;list-style:none;padding:13px 15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel)}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::before{content:'\25B8';color:var(--mut2);flex:none;transition:transform .15s ease;font-size:12px}
+.acc[open] summary::before{transform:rotate(90deg)}
+.acc-num{flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;background:var(--grey)}
+.acc[data-tier="leader"] .acc-num{background:var(--emph)}
+.acc[data-tier="clean"] .acc-num{background:var(--teal)}
+.acc-name{font-weight:800;font-size:13.5px}
+.acc-oneliner{flex:1 1 260px;min-width:0;font-size:11.5px;color:var(--mut)}
+.acc-body{padding:16px 18px 18px;border-top:1px solid var(--line2)}
+.acc-narr{font-size:12.8px;line-height:1.65;color:var(--ink);margin-bottom:14px}
+.fagrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:640px){.fagrid{grid-template-columns:1fr}}
+.fagrid .fa-title{font:800 9.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.fagrid .for .fa-title{color:var(--plum)}
+.fagrid .against .fa-title{color:var(--rust)}
+.fa-item{display:flex;gap:7px;font-size:12px;line-height:1.5;margin-bottom:6px}
+.fa-item .fi{flex:none;font-weight:800}
+.for .fi{color:var(--plum)}.against .fi{color:var(--rust)}
+
+.cmpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.cmpcard{border:1px solid var(--line2);border-radius:11px;padding:15px 16px;background:var(--panel)}
+.cmpcard.leader{border-top:3px solid var(--emph)}
+.cmpcard.clean{border-top:3px solid var(--teal)}
+.cmpcard.cond{border-top:3px solid var(--grey)}
+.cmp-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.cmp-hd .cn{font-weight:800;font-size:14px}
+.cmp-score{font-size:11px;color:var(--mut2);font-weight:700}
+.cmp-narr{font-size:12px;color:var(--mut);line-height:1.55;margin-bottom:11px}
+.cmp-fa .fa-item{margin-bottom:4px}
+
+.brief-tabs input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
+.brief-tabnav{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.brief-tabnav label{cursor:pointer;font-weight:700;font-size:12.5px;padding:8px 15px;border-radius:8px 8px 0 0;background:var(--panel);border:1px solid var(--line2);border-bottom:none;color:var(--mut)}
+#briefNimbus:checked ~ .brief-tabnav label[for="briefNimbus"],
+#briefLakehouse:checked ~ .brief-tabnav label[for="briefLakehouse"],
+#briefHelio:checked ~ .brief-tabnav label[for="briefHelio"]{background:var(--surface);color:var(--ink);box-shadow:0 -2px 0 var(--plum) inset}
+.brief-panel{display:none;border:1px solid var(--line2);border-radius:0 10px 10px 10px;padding:20px 22px}
+#briefNimbus:checked ~ #briefPanelNimbus,
+#briefLakehouse:checked ~ #briefPanelLakehouse,
+#briefHelio:checked ~ #briefPanelHelio{display:block}
+.brief-lede{font-size:13px;line-height:1.6;margin-bottom:14px}
+.brief-sec-t{font:800 9.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin:16px 0 8px}
+.brief-sec-t:first-of-type{margin-top:0}
+.brief-list li{font-size:12.3px;line-height:1.55;margin-bottom:5px}
+
+/* ==================== PANEL 4: model the decision ==================== */
+.mdA-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:start}
+@media(max-width:820px){.mdA-grid{grid-template-columns:1fr}}
+.slider-row{margin-bottom:11px}
+.slider-label{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:2px}
+.slider-label span:first-child{font-weight:700}
+.slider-pct{font-weight:800;color:var(--plum);font-family:var(--sans)}
+input[type="range"]{width:100%;height:4px;accent-color:var(--plum);margin:2px 0}
+.slider-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px}
+.rank-row{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.rank-n{width:14px;font-weight:800;font-size:11.5px;color:var(--mut2);text-align:center;flex:none}
+.rank-name{width:120px;flex:none;font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bartrack{flex:1;height:13px;border-radius:5px;background:var(--nested);overflow:hidden}
+.barfill{display:block;height:100%}
+.barfill.plum{background:var(--plum)}
+.barfill.grey{background:var(--blue)}
+.barfill.outline-grey{background:var(--grey);opacity:.5}
+.rank-val{width:40px;text-align:right;font-weight:800;font-size:11.5px;flex:none}
+.verdict-box{margin-top:11px;padding:10px 13px;border-radius:8px;background:var(--panel);font-size:12px;line-height:1.55}
+.btn-reset{margin-top:12px;font:700 12px var(--sans);color:var(--plum);background:transparent;border:1.5px solid var(--plum);border-radius:30px;padding:6px 15px;cursor:pointer}
+.btn-reset:hover{background:var(--plum-t)}
+
+.tornado{margin-top:6px}
+.tor-axis{display:flex;justify-content:space-between;font-size:10.5px;color:var(--mut2);font-weight:700;margin-bottom:6px;padding:0 2px}
+.tor-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.tor-label{width:170px;flex:none;font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tor-track{position:relative;flex:1;height:16px;background:var(--nested);border-radius:5px;overflow:visible}
+.tor-zero{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.35}
+.tor-bar{position:absolute;top:0;height:100%;border-radius:3px}
+.tor-bar.pos{background:var(--teal)}
+.tor-bar.neg{background:var(--rust)}
+.tor-val{width:60px;flex:none;text-align:right;font-weight:800;font-size:11.5px}
+
+.alloc-slider{margin:8px 0 18px}
+.alloc-labels{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--mut2);margin-bottom:4px}
+.alloc-current{text-align:center;font-weight:800;font-size:13px;color:var(--plum);margin:6px 0 16px}
+.alloc-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.alloc-note{font-size:12px;color:var(--mut);line-height:1.55;background:var(--panel);border-radius:8px;padding:10px 13px}
+
+/* ==================== PANEL 5: alternatives ==================== */
+.altcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:13px}
+.altcard{border:1px solid var(--line2);border-radius:11px;padding:15px 16px;background:var(--panel)}
+.altcard.zero{border-top:3px solid var(--plum)}
+.altcard.up{border-top:3px solid var(--emph)}
+.altcard.pending{border-top:3px solid var(--grey)}
+.altcard .ac-hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.altcard .ac-title{font-weight:800;font-size:13.5px}
+.altcard .ac-delta{font-weight:800;font-size:12.5px;white-space:nowrap}
+.altcard .ac-pick{font-size:11.5px;color:var(--mut2);margin-bottom:7px}
+.altcard .ac-narr{font-size:12px;color:var(--mut);line-height:1.55}
+
+.dtree-root{background:var(--panel);border:1.5px solid var(--line2);border-radius:9px;padding:12px 15px;font-weight:800;font-size:13.5px;margin-left:0;max-width:520px}
+.dtree-branches{border-left:2px solid var(--line2);margin-left:15px}
+.dtree-branch{position:relative;padding:16px 0 16px 28px}
+.dtree-branch::before{content:'';position:absolute;left:-2px;top:26px;width:24px;height:2px;background:var(--line2)}
+.dtree-node{border:1px solid var(--line2);border-radius:9px;padding:12px 15px;background:var(--surface)}
+.dtree-q{font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:800;color:var(--mut2);margin-bottom:5px}
+.dtree-ans{font-weight:800;font-size:13px;margin-bottom:5px}
+.dtree-ans .dd{font-weight:800;margin-left:6px}
+.dtree-body{font-size:12px;color:var(--mut);line-height:1.55}
+
+/* ---- footer ---- */
+.page-foot{margin-top:40px;padding-top:20px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="kicker">Design exploration, not a change to the live dashboard</div>
+    <h1>RFx Recommendation Tab, Panel Options</h1>
+    <div class="sub">Two to three layout options for each of five panels on the RFx <b>Recommendation</b> subtab, so a preferred direction can be picked before anything gets built. This is a reflect-only mockup: nothing here scores, sends, advances, or awards anything. Every number is drawn from the same illustrative RFx used elsewhere in the product, the <b>Enterprise Data Platform RFP</b>, evaluating <b>Nimbus Data</b>, <b>Lakehouse Co</b>, and <b>Helio Warehouse</b>.</div>
+    <div class="datanote"><b>Reading the data:</b> Nimbus Data is the top panel score (4.4 of 5) and the lowest, most transparent price ($980,000/yr), but it holds a SOC&nbsp;2 Type&nbsp;I report against a Must-Have Type&nbsp;II requirement, an open gate. Lakehouse Co scores second on the panel (4.2 of 5) at $1,060,000/yr but clears every Must-Have, the clean conforming alternative. Helio Warehouse (3.2 of 5) has the field's strongest SAP integration but submitted no price, no MSA, and no implementation plan, an incomplete bid. These facts recur across every option below so the choice between layouts, not the underlying data, is what's being evaluated.</div>
+  </div>
+
+  <div class="jumpnav">
+    <span class="jn-lbl">Jump to</span>
+    <a href="#panel-readiness">1. Evaluation Readiness</a>
+    <a href="#panel-next">2. What Happens Next</a>
+    <a href="#panel-case">3. The Case, Per Supplier</a>
+    <a href="#panel-model">4. Model the Decision</a>
+    <a href="#panel-alt">5. Theo-Modeled Alternatives</a>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PANEL 1: EVALUATION READINESS -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-readiness">
+    <div class="panel-head">
+      <div class="panel-num">Panel 1 of 5</div>
+      <h2>Evaluation Readiness</h2>
+      <div class="purpose">A checklist of the preconditions that should be true before this recommendation is treated as final: bid leveling, complete pricing, resolved gating clarifications, an acknowledged gate conflict, and cleared mandatory reviews. It never gates or advances the RFx itself, it just tells the panel what is and is not settled. In this RFx, only <b>1 of 5</b> items clear today.</div>
+    </div>
+
+    <div class="opt" data-opt="a">
+      <div class="opt-hd">
+        <div class="opt-tag">A</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Gated checklist with a verdict banner</div>
+          <div class="opt-caption">Full audit trail with a clear verdict; best when the panel needs every supporting fact right next to the go/no-go call.</div>
+        </div>
+      </div>
+      <div class="rdy-banner notready">
+        <div class="rb-verdict">NOT READY.</div>
+        <div class="rb-sub">4 of 5 readiness items require action before this recommendation should be treated as final.</div>
+      </div>
+      <div class="rdy-row">
+        <div class="rdy-label">Bid leveling</div>
+        <div class="rdy-status"><span class="pill plum">Cleared</span></div>
+        <div class="rdy-detail">Nimbus Data and Lakehouse Co are both normalized to a common unit on the cross-supplier ZOPA. Helio Warehouse has not priced its bid, so it is not part of this check.</div>
+      </div>
+      <div class="rdy-row">
+        <div class="rdy-label">Pricing complete</div>
+        <div class="rdy-status"><span class="pill rust">Blocked</span></div>
+        <div class="rdy-detail">Helio Warehouse has not submitted a firm annual price. Every field on its pricing schedule reads "Not submitted."</div>
+      </div>
+      <div class="rdy-row">
+        <div class="rdy-label">Gating clarifications resolved</div>
+        <div class="rdy-status"><span class="pill rust">Blocked</span></div>
+        <div class="rdy-detail">1 open GATING item across the field: Nimbus Data's SOC&nbsp;2 Type&nbsp;II certification (Type&nbsp;I on file, Type&nbsp;II required at award).</div>
+      </div>
+      <div class="rdy-row">
+        <div class="rdy-label">Gate-conflict acknowledged</div>
+        <div class="rdy-status"><span class="pill rust">Blocked</span></div>
+        <div class="rdy-detail">Nimbus Data leads the panel score but carries the open SOC&nbsp;2 gap. The panel has not yet recorded a decision to accept that risk or require remediation before award. <span class="tx-mut">[Confirm]</span></div>
+      </div>
+      <div class="rdy-row">
+        <div class="rdy-label">Mandatory reviews cleared</div>
+        <div class="rdy-status"><span class="pill rust">Blocked</span></div>
+        <div class="rdy-detail">TPRM on Nimbus Data (the recommended supplier) is under review, 2 items open.</div>
+      </div>
+      <div class="subnote">Reflect-only, derived from the bid-leveling, pricing, clarification, and TPRM data on file. A field the data model does not track is marked [Confirm], never guessed.</div>
+    </div>
+
+    <div class="opt" data-opt="b">
+      <div class="opt-hd">
+        <div class="opt-tag">B</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Completeness gauge with blockers listed</div>
+          <div class="opt-caption">At-a-glance completeness; best for a fast health check when there is no need to read every line unless something is blocking.</div>
+        </div>
+      </div>
+      <div class="gauge-wrap">
+        <div class="gauge">
+          <div class="gauge-inner">
+            <div class="gn">1/5</div>
+            <div class="gs">Cleared</div>
+          </div>
+        </div>
+        <div class="blocklist">
+          <div class="bl-item"><span class="bi">&#9679;</span><span><b>Pricing incomplete.</b> Helio Warehouse has not submitted a firm annual price.</span></div>
+          <div class="bl-item"><span class="bi">&#9679;</span><span><b>1 open gating item.</b> Nimbus Data's SOC&nbsp;2 Type&nbsp;II certification is not yet in hand.</span></div>
+          <div class="bl-item"><span class="bi">&#9679;</span><span><b>Gate conflict unacknowledged.</b> The panel has not recorded accept-the-risk or require-remediation for Nimbus Data. <span class="tx-mut">[Confirm]</span></span></div>
+          <div class="bl-item"><span class="bi">&#9679;</span><span><b>TPRM open.</b> Nimbus Data's third-party risk review is under review, 2 items outstanding.</span></div>
+        </div>
+      </div>
+      <div class="subnote">The ring shows the share of readiness items cleared, not a quality score. Bid leveling is the one item cleared today; the four blockers beside it are what stand between "advisory" and "ready to finalize."</div>
+    </div>
+
+    <div class="opt" data-opt="c">
+      <div class="opt-hd">
+        <div class="opt-tag">C</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Compact status strip</div>
+          <div class="opt-caption">Minimal footprint; best when readiness needs to live inside a denser page, for example folded under the Final Recommendation banner, without its own full section.</div>
+        </div>
+      </div>
+      <div class="stripwrap">
+        <div class="strip-tile cleared">
+          <div class="st-top"><span class="st-lbl">Bid leveling</span><span class="pill plum sm">OK</span></div>
+          <div class="st-note">Nimbus + Lakehouse normalized</div>
+        </div>
+        <div class="strip-tile blocked">
+          <div class="st-top"><span class="st-lbl">Pricing</span><span class="pill rust sm">Open</span></div>
+          <div class="st-note">Helio: not submitted</div>
+        </div>
+        <div class="strip-tile blocked">
+          <div class="st-top"><span class="st-lbl">Gating items</span><span class="pill rust sm">1 open</span></div>
+          <div class="st-note">Nimbus SOC&nbsp;2 Type&nbsp;II</div>
+        </div>
+        <div class="strip-tile blocked">
+          <div class="st-top"><span class="st-lbl">Gate conflict</span><span class="pill rust sm">Unack.</span></div>
+          <div class="st-note">No panel decision on record</div>
+        </div>
+        <div class="strip-tile blocked">
+          <div class="st-top"><span class="st-lbl">TPRM</span><span class="pill rust sm">2 open</span></div>
+          <div class="st-note">Nimbus Data under review</div>
+        </div>
+      </div>
+      <div class="subnote">Five tiles, one glance. Each tile carries just enough evidence to know whether to click through; the full detail stays on the checklist view (Option A) one level down.</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PANEL 2: WHAT HAPPENS NEXT -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-next">
+    <div class="panel-head">
+      <div class="panel-num">Panel 2 of 5</div>
+      <h2>What Happens Next</h2>
+      <div class="purpose">Shows where the decision sits in the process, because the award is not Theo's call. Theo's advisory pass is done; the panel's scoring, the group's decision, and the award itself are each a separate, later step, and this panel exists so nobody mistakes the recommendation for a done deal.</div>
+    </div>
+
+    <div class="opt" data-opt="a">
+      <div class="opt-hd">
+        <div class="opt-tag">A</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Horizontal stepper with dates</div>
+          <div class="opt-caption">Compact horizontal scan; best as a header strip that everyone reads in seconds.</div>
+        </div>
+      </div>
+      <div class="stepper">
+        <div class="step done">
+          <div class="step-hd"><span class="step-dot">&#10003;</span>Theo advisory</div>
+          <div class="step-body">First-pass response analysis complete</div>
+          <div class="step-date">Done, Jul 14</div>
+        </div>
+        <div class="step-arrow">&#8594;</div>
+        <div class="step active">
+          <div class="step-hd"><span class="step-dot">&hellip;</span>Panel scoring</div>
+          <div class="step-body">50% of the composite matrix scored, 2 of 4 evaluators submitted</div>
+          <div class="step-date">Due Jul 28</div>
+        </div>
+        <div class="step-arrow">&#8594;</div>
+        <div class="step pending">
+          <div class="step-hd"><span class="step-dot">3</span>Group decision</div>
+          <div class="step-body">The award decision is the team's</div>
+          <div class="step-date">Targeted Aug 4</div>
+        </div>
+        <div class="step-arrow">&#8594;</div>
+        <div class="step pending">
+          <div class="step-hd"><span class="step-dot">4</span>Award</div>
+          <div class="step-body">Conditional until the contract executes</div>
+          <div class="step-date">Targeted Aug 15</div>
+        </div>
+      </div>
+      <div class="subnote">Reflect-only, read from the RFx case workflow. Nothing is advanced, scored, or awarded from this strip.</div>
+    </div>
+
+    <div class="opt" data-opt="b">
+      <div class="opt-hd">
+        <div class="opt-tag">B</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Vertical timeline</div>
+          <div class="opt-caption">Room for narrative; best when each stage needs more than a chip can hold, dates, blockers, and a named owner.</div>
+        </div>
+      </div>
+      <div class="vtl">
+        <div class="vt-item done">
+          <div class="vt-rail"><div class="vt-dot"></div><div class="vt-line"></div></div>
+          <div class="vt-body">
+            <span class="vt-name">Theo advisory</span><span class="vt-date">Completed Jul 14</span>
+            <div class="vt-desc">First-pass response analysis complete across all 14 requirements and 3 suppliers; the recommendation and its supporting case are live on this tab.</div>
+          </div>
+        </div>
+        <div class="vt-item active">
+          <div class="vt-rail"><div class="vt-dot"></div><div class="vt-line"></div></div>
+          <div class="vt-body">
+            <span class="vt-name">Panel scoring</span><span class="vt-date">Due Jul 28, at risk</span>
+            <div class="vt-desc">Priya Shah and Aisha Khan have submitted scorecards. James Wright, the security evaluator, has not yet entered security scores, this is the item currently holding the stage open.</div>
+            <div class="vt-who">Owner: James Wright, Security evaluator</div>
+          </div>
+        </div>
+        <div class="vt-item pending">
+          <div class="vt-rail"><div class="vt-dot"></div><div class="vt-line"></div></div>
+          <div class="vt-body">
+            <span class="vt-name">Group decision</span><span class="vt-date">Targeted Aug 4</span>
+            <div class="vt-desc">Once scoring is complete, the panel convenes to decide: proceed with Nimbus Data and accept the SOC&nbsp;2 gate risk, require a dated remediation, or award to the conforming alternative, Lakehouse Co.</div>
+            <div class="vt-who">Owner: Priya Shah, Project owner</div>
+          </div>
+        </div>
+        <div class="vt-item pending">
+          <div class="vt-rail"><div class="vt-dot"></div></div>
+          <div class="vt-body">
+            <span class="vt-name">Award</span><span class="vt-date">Targeted Aug 15</span>
+            <div class="vt-desc">Conditional until the contract executes. Legal begins MSA redline review in parallel once a supplier is confirmed.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="opt" data-opt="c">
+      <div class="opt-hd">
+        <div class="opt-tag">C</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Who does what next</div>
+          <div class="opt-caption">Answers "whose desk is it on"; best when the open question is accountability, not just which stage the case is in.</div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Stage</th><th>Who</th><th>Role</th><th>Status</th><th style="text-align:left">What's next</th></tr></thead>
+          <tbody>
+            <tr><td>Theo advisory</td><td>Theo (AI, first-pass)</td><td class="n"><span class="pill plum sm">R</span></td><td class="n"><span class="pill plum sm">Done</span></td><td style="text-align:left">Delivered; nothing further required.</td></tr>
+            <tr><td>Panel scoring</td><td>James Wright</td><td class="n"><span class="pill emph sm">R</span></td><td class="n"><span class="pill emph sm">Blocking</span></td><td style="text-align:left">Enter security scores; the stage cannot close until this is in.</td></tr>
+            <tr><td>Panel scoring</td><td>Priya Shah, Aisha Khan</td><td class="n"><span class="pill plum sm">R</span></td><td class="n"><span class="pill plum sm">Done</span></td><td style="text-align:left">Scorecards submitted.</td></tr>
+            <tr><td>Group decision</td><td>Priya Shah</td><td class="n"><span class="pill blue sm">A</span></td><td class="n"><span class="pill grey sm">Pending</span></td><td style="text-align:left">Convene the group once scoring closes.</td></tr>
+            <tr><td>Group decision</td><td>Marc Lane</td><td class="n"><span class="pill blue sm">C</span></td><td class="n"><span class="pill grey sm">Pending</span></td><td style="text-align:left">Frame the SOC&nbsp;2 gate business call for the group.</td></tr>
+            <tr><td>Award</td><td>Legal</td><td class="n"><span class="pill grey sm">C</span></td><td class="n"><span class="pill grey sm">Pending</span></td><td style="text-align:left">MSA redline review, runs in parallel once a supplier is confirmed.</td></tr>
+            <tr><td>Award</td><td>Finance</td><td class="n"><span class="pill emph sm">I</span></td><td class="n"><span class="pill emph sm">Blocking</span></td><td style="text-align:left">Confirm Work Order funding, an internal item unrelated to supplier scoring.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="raci-legend"><span><b>R</b> Responsible</span><span><b>A</b> Accountable</span><span><b>C</b> Consulted</span><span><b>I</b> Informed</span></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PANEL 3: THE CASE, PER SUPPLIER -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-case">
+    <div class="panel-head">
+      <div class="panel-num">Panel 3 of 5</div>
+      <h2>The Case, Per Supplier</h2>
+      <div class="purpose">The argument for and against each bidder, in the order the advisory ranking places them, so the panel can see not just the score but the reasoning behind it. Each option below carries the same underlying case, written as real narrative prose rather than bare bullets, just organized differently.</div>
+    </div>
+
+    <div class="opt" data-opt="a">
+      <div class="opt-hd">
+        <div class="opt-tag">A</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Accordion, narrative plus for and against</div>
+          <div class="opt-caption">One open at a time; best for a focused read of the leading case without three arguments competing for attention.</div>
+        </div>
+      </div>
+
+      <details class="acc" data-tier="leader" open>
+        <summary>
+          <span class="acc-num">1</span>
+          <span class="acc-name">Nimbus Data</span>
+          <span class="pill emph sm">Leader, gate risk</span>
+          <span class="acc-oneliner"><b class="tx-plum">For:</b> Top panel score and lowest price in the field &nbsp; <b class="tx-rust">Against:</b> Open SOC&nbsp;2 Type&nbsp;II gate</span>
+        </summary>
+        <div class="acc-body">
+          <div class="acc-narr">Nimbus Data is Theo's advisory recommendation on panel score, the strongest functional and commercial submission in the field. It posts full marks on data modeling, ETL, and self-service analytics, and its price, $980,000 a year, is both the lowest in the field and the most transparent, a 31% cut from list held firm for 90 days. Weighted fit lands at 80 of 100 with 79% of requirements fully met. Set against that is one hard stop: Nimbus holds a SOC&nbsp;2 Type&nbsp;I report, not the Type&nbsp;II the RFP names as a Must-Have, so the award stays barred until a current Type&nbsp;II is in hand or the panel accepts the risk. Behind the gate sit three lesser, non-fatal concerns: an unproven SAP integration path through middleware, a venture-stage balance sheet without audited financials, and no pharmaceutical reference in the set.</div>
+          <div class="fagrid">
+            <div class="for">
+              <div class="fa-title">For</div>
+              <div class="fa-item"><span class="fi">+</span><span>Top panel score in the field, 4.4 of 5, and the lowest, most transparent price.</span></div>
+              <div class="fa-item"><span class="fi">+</span><span>Full marks on data modeling, ETL, and self-service analytics.</span></div>
+              <div class="fa-item"><span class="fi">+</span><span>Weighted fit 80/100, 79% of requirements fully met.</span></div>
+            </div>
+            <div class="against">
+              <div class="fa-title">Against</div>
+              <div class="fa-item"><span class="fi">&minus;</span><span>SOC&nbsp;2 Type&nbsp;II is a Must-Have; only a Type&nbsp;I is on file today.</span></div>
+              <div class="fa-item"><span class="fi">&minus;</span><span>SAP integration runs through unproven middleware, no throughput evidence.</span></div>
+              <div class="fa-item"><span class="fi">&minus;</span><span>Venture-stage vendor, no audited financials, no pharma reference.</span></div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc" data-tier="clean">
+        <summary>
+          <span class="acc-num">2</span>
+          <span class="acc-name">Lakehouse Co</span>
+          <span class="pill teal sm">Clean alternative</span>
+          <span class="acc-oneliner"><b class="tx-plum">For:</b> Clears every Must-Have, highest weighted fit &nbsp; <b class="tx-rust">Against:</b> $80,000/yr above Nimbus</span>
+        </summary>
+        <div class="acc-body">
+          <div class="acc-narr">Lakehouse Co is the clean alternative, the highest-scored bidder that clears every Must-Have. It is field-best on security and compliance, full SOC&nbsp;2 Type&nbsp;II and FedRAMP Moderate, and it carries the strongest regulated-industry reference base plus an existing Lilly relationship, one active MSA on file and $2.4M in trailing spend. Weighted fit is the highest in the field at 88 of 100 with 86% of requirements fully met. The trade-off is commercial: its price, $1,060,000 a year, is $80,000 above Nimbus, and total cost of ownership is its comparatively weakest category. If the panel wants zero gate risk rather than a business call, Lakehouse is the supplier that delivers it today.</div>
+          <div class="fagrid">
+            <div class="for">
+              <div class="fa-title">For</div>
+              <div class="fa-item"><span class="fi">+</span><span>Clean on every Must-Have, no open gate.</span></div>
+              <div class="fa-item"><span class="fi">+</span><span>Highest weighted fit in the field, 88/100, 86% fully met.</span></div>
+              <div class="fa-item"><span class="fi">+</span><span>Strongest regulated-industry reference base; existing Lilly relationship.</span></div>
+            </div>
+            <div class="against">
+              <div class="fa-title">Against</div>
+              <div class="fa-item"><span class="fi">&minus;</span><span>$1,060,000/yr, $80,000 above the lowest bid.</span></div>
+              <div class="fa-item"><span class="fi">&minus;</span><span>Total cost of ownership is its weakest relative category.</span></div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc" data-tier="cond">
+        <summary>
+          <span class="acc-num">3</span>
+          <span class="acc-name">Helio Warehouse</span>
+          <span class="pill grey sm">Incomplete bid</span>
+          <span class="acc-oneliner"><b class="tx-plum">For:</b> Strongest SAP integration &nbsp; <b class="tx-rust">Against:</b> No price, MSA, or plan submitted</span>
+        </summary>
+        <div class="acc-body">
+          <div class="acc-narr">Helio Warehouse brings the field's strongest SAP and S/4HANA integration, native adapters rather than middleware, against the exact backbone Lilly runs, plus the lowest projected run cost through consumption-based pricing. That strength sits inside an incomplete bid: Helio submitted no firm price, no MSA redline, and no implementation plan, and left the AI-roadmap requirement unanswered, leaving coverage at 43%, the lowest in the field. It cannot be scored on cost or ranked against Nimbus and Lakehouse until the missing sections arrive. The right posture today is to request the outstanding items and hold Helio as a strategic third option, not to award to it on the current submission.</div>
+          <div class="fagrid">
+            <div class="for">
+              <div class="fa-title">For</div>
+              <div class="fa-item"><span class="fi">+</span><span>Field-best native SAP/S4HANA integration.</span></div>
+              <div class="fa-item"><span class="fi">+</span><span>Lowest potential run cost via consumption pricing.</span></div>
+            </div>
+            <div class="against">
+              <div class="fa-title">Against</div>
+              <div class="fa-item"><span class="fi">&minus;</span><span>No price, MSA redline, or implementation plan submitted.</span></div>
+              <div class="fa-item"><span class="fi">&minus;</span><span>Lowest coverage in the field, 43%; one requirement unanswered.</span></div>
+            </div>
+          </div>
+        </div>
+      </details>
+      <div class="subnote">Native disclosure control, one supplier open at a time; the recommended supplier opens first. Each collapsed row still shows a one-line for/against so nothing useful is hidden.</div>
+    </div>
+
+    <div class="opt" data-opt="b">
+      <div class="opt-hd">
+        <div class="opt-tag">B</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Side-by-side comparison cards</div>
+          <div class="opt-caption">All three visible at once; best for a direct compare before a meeting, no clicking required.</div>
+        </div>
+      </div>
+      <div class="cmpgrid">
+        <div class="cmpcard leader">
+          <div class="cmp-hd"><span class="cn">Nimbus Data</span><span class="cmp-score">4.4/5 &middot; fit 80/100</span></div>
+          <div class="pill emph sm" style="margin-bottom:9px">Leader, gate risk</div>
+          <div class="cmp-narr">Top panel score and the lowest, most transparent price in the field ($980,000/yr, 31% below list). Blocked by an open SOC&nbsp;2 Type&nbsp;II gate, a Type&nbsp;I is on file, not the required Type&nbsp;II.</div>
+          <div class="cmp-fa">
+            <div class="fa-item for"><span class="fi tx-plum">+</span><span>Top score, lowest price, full marks on functional fit.</span></div>
+            <div class="fa-item against"><span class="fi tx-rust">&minus;</span><span>SOC&nbsp;2 Type&nbsp;II gate open; unproven SAP middleware.</span></div>
+          </div>
+        </div>
+        <div class="cmpcard clean">
+          <div class="cmp-hd"><span class="cn">Lakehouse Co</span><span class="cmp-score">4.2/5 &middot; fit 88/100</span></div>
+          <div class="pill teal sm" style="margin-bottom:9px">Clean alternative</div>
+          <div class="cmp-narr">Highest weighted fit in the field and clean on every Must-Have. Field-best security posture and reference base, at $1,060,000/yr, $80,000 above Nimbus.</div>
+          <div class="cmp-fa">
+            <div class="fa-item for"><span class="fi tx-plum">+</span><span>No open gate; highest fit; strongest references.</span></div>
+            <div class="fa-item against"><span class="fi tx-rust">&minus;</span><span>$80,000/yr above the lowest bid.</span></div>
+          </div>
+        </div>
+        <div class="cmpcard cond">
+          <div class="cmp-hd"><span class="cn">Helio Warehouse</span><span class="cmp-score">3.2/5 &middot; fit 70/100</span></div>
+          <div class="pill grey sm" style="margin-bottom:9px">Incomplete bid</div>
+          <div class="cmp-narr">Field-best native SAP integration and the lowest projected run cost, but no price, MSA, or implementation plan submitted. Coverage trails the field at 43%.</div>
+          <div class="cmp-fa">
+            <div class="fa-item for"><span class="fi tx-plum">+</span><span>Best-in-field SAP integration; lowest run cost.</span></div>
+            <div class="fa-item against"><span class="fi tx-rust">&minus;</span><span>No commercial or legal submission; lowest coverage.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="subnote">Same three cases, laid flat so all three read left to right without opening or closing anything, at the cost of screen space when the narrative runs long.</div>
+    </div>
+
+    <div class="opt" data-opt="c">
+      <div class="opt-hd">
+        <div class="opt-tag">C</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">One-page decision brief per supplier</div>
+          <div class="opt-caption">A single self-contained page per supplier; best when the brief needs to be lifted out and shared on its own, for example ahead of the group decision meeting.</div>
+        </div>
+      </div>
+      <div class="brief-tabs">
+        <input type="radio" name="briefTab" id="briefNimbus" checked>
+        <input type="radio" name="briefTab" id="briefLakehouse">
+        <input type="radio" name="briefTab" id="briefHelio">
+        <div class="brief-tabnav">
+          <label for="briefNimbus">Nimbus Data</label>
+          <label for="briefLakehouse">Lakehouse Co</label>
+          <label for="briefHelio">Helio Warehouse</label>
+        </div>
+
+        <div class="brief-panel" id="briefPanelNimbus">
+          <div class="kpirow">
+            <div class="kpi"><div class="kl">Weighted fit</div><div class="kn">80/100</div><div class="ks">79% fully met</div></div>
+            <div class="kpi"><div class="kl">Panel score</div><div class="kn">4.4/5</div><div class="ks">top of the field</div></div>
+            <div class="kpi"><div class="kl">Annual price</div><div class="kn">$980,000</div><div class="ks">31% below list, held 90 days</div></div>
+            <div class="kpi"><div class="kl">Gate status</div><div class="kn tx-emph">Open</div><div class="ks">SOC&nbsp;2 Type&nbsp;II</div></div>
+          </div>
+          <div class="brief-lede"><b>Theo's advisory recommendation.</b> Nimbus Data is the strongest functional and commercial submission in the field, and it stays #1 on merit even with an open Must-Have gate, the gate is flagged prominently here rather than used to demote it.</div>
+          <div class="brief-sec-t">Why it leads</div>
+          <div class="acc-narr" style="margin-bottom:0">Full marks on data modeling, ETL, and self-service analytics, the deepest architecture response in the set, and the field's lowest, most transparently discounted price. Weighted fit of 80/100 with 79% of requirements fully met.</div>
+          <div class="brief-sec-t">Strengths</div>
+          <ul class="brief-list">
+            <li>Field-best functional fit across data modeling, ETL, and self-service analytics.</li>
+            <li>Lowest price in the field, transparent 31% discount held firm for 90 days.</li>
+            <li>Native Entra SSO and a leadership bench drawn from Snowflake, AWS, and Datadog.</li>
+          </ul>
+          <div class="brief-sec-t">Concerns</div>
+          <ul class="brief-list">
+            <li>SOC&nbsp;2 Type&nbsp;II not met, a Type&nbsp;I report is on file, a Must-Have gate on the award.</li>
+            <li>SAP integration runs through unproven middleware with no throughput evidence.</li>
+            <li>Venture-stage balance sheet, no audited financials, no pharma or GxP reference.</li>
+          </ul>
+          <div class="brief-sec-t">What would need to be true to proceed</div>
+          <ul class="brief-list">
+            <li>A current SOC&nbsp;2 Type&nbsp;II report in hand, or a panel decision to accept the risk with a dated remediation plan.</li>
+            <li>SAP throughput validated against the Lilly backbone in the capability demo.</li>
+          </ul>
+        </div>
+
+        <div class="brief-panel" id="briefPanelLakehouse">
+          <div class="kpirow">
+            <div class="kpi"><div class="kl">Weighted fit</div><div class="kn">88/100</div><div class="ks">86% fully met</div></div>
+            <div class="kpi"><div class="kl">Panel score</div><div class="kn">4.2/5</div><div class="ks">second, close behind</div></div>
+            <div class="kpi"><div class="kl">Annual price</div><div class="kn">$1,060,000</div><div class="ks">10.2% below list, held 120 days</div></div>
+            <div class="kpi"><div class="kl">Gate status</div><div class="kn tx-teal">Clear</div><div class="ks">every Must-Have met</div></div>
+          </div>
+          <div class="brief-lede"><b>The clean conforming alternative.</b> If the panel prefers to avoid the SOC&nbsp;2 gate risk rather than accept it or wait on remediation, Lakehouse Co is the highest-scored bidder that clears every Must-Have today.</div>
+          <div class="brief-sec-t">Why it's the alternative</div>
+          <div class="acc-narr" style="margin-bottom:0">Full SOC&nbsp;2 Type&nbsp;II and FedRAMP Moderate, the strongest regulated-industry reference base in the field, and an existing Lilly relationship (one active MSA, $2.4M trailing spend). Highest requirement-weighted fit in the field at 88/100.</div>
+          <div class="brief-sec-t">Strengths</div>
+          <ul class="brief-list">
+            <li>Clean on every Must-Have, full SOC&nbsp;2 Type&nbsp;II and FedRAMP Moderate.</li>
+            <li>Highest weighted fit in the field, 88/100, 86% of requirements fully met.</li>
+            <li>Existing Lilly relationship: one active MSA, $2.4M trailing 12-month spend.</li>
+          </ul>
+          <div class="brief-sec-t">Concerns</div>
+          <ul class="brief-list">
+            <li>$1,060,000/yr, $80,000 above the lowest bid in the field.</li>
+            <li>Total cost of ownership is its weakest category relative to its own other scores.</li>
+            <li>Legacy/SAP integration runs through a certified partner, not native.</li>
+          </ul>
+          <div class="brief-sec-t">What would need to be true to proceed</div>
+          <ul class="brief-list">
+            <li>The panel accepts the $80,000/yr premium as the cost of zero gate risk.</li>
+            <li>SAP integration via the certified partner is validated against the Lilly stack.</li>
+          </ul>
+        </div>
+
+        <div class="brief-panel" id="briefPanelHelio">
+          <div class="kpirow">
+            <div class="kpi"><div class="kl">Weighted fit</div><div class="kn">70/100</div><div class="ks">43% fully met</div></div>
+            <div class="kpi"><div class="kl">Panel score</div><div class="kn">3.2/5</div><div class="ks">trails the field</div></div>
+            <div class="kpi"><div class="kl">Annual price</div><div class="kn tx-mut">Not submitted</div><div class="ks">cannot be scored on cost</div></div>
+            <div class="kpi"><div class="kl">Gate status</div><div class="kn tx-mut">Incomplete</div><div class="ks">bid not yet contractable</div></div>
+          </div>
+          <div class="brief-lede"><b>Not a contender on today's evidence, worth keeping alive.</b> Helio has the field's best SAP posture and the lowest projected run cost, but the bid is missing the three sections needed to rank it: price, MSA, and implementation plan.</div>
+          <div class="brief-sec-t">Why it's not yet rankable</div>
+          <div class="acc-narr" style="margin-bottom:0">Native SAP/S4HANA adapters against the exact backbone Lilly runs, plus consumption economics that would be the cheapest to operate in a complete bid. But with no price it cannot be compared on cost, with no MSA its contract risk is unknown, and with no implementation plan its delivery cannot be judged.</div>
+          <div class="brief-sec-t">Strengths</div>
+          <ul class="brief-list">
+            <li>Native SAP/S4HANA adapters, the strongest integration posture in the field.</li>
+            <li>Lowest projected run cost via consumption-based economics.</li>
+            <li>Strong query throughput benchmarked at very large scale.</li>
+          </ul>
+          <div class="brief-sec-t">Concerns</div>
+          <ul class="brief-list">
+            <li>No commercial proposal submitted; cannot be scored or compared on cost.</li>
+            <li>No MSA redlines; contract risk cannot be assessed.</li>
+            <li>No implementation plan; delivery cannot be judged. Coverage trails the field at 43%.</li>
+          </ul>
+          <div class="brief-sec-t">What would need to be true to proceed</div>
+          <ul class="brief-list">
+            <li>A commercial proposal, a consumption estimate against a defined workload is acceptable.</li>
+            <li>MSA redlines against Lilly Master Procurement Terms 5.0.</li>
+            <li>A phased implementation plan with a named team and acceptance gates.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="subnote">CSS tab switch, no page reload. Each brief is written to stand alone if copied out, useful when one supplier's case needs to travel to a meeting without the other two.</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PANEL 4: MODEL THE DECISION -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-model">
+    <div class="panel-head">
+      <div class="panel-num">Panel 4 of 5</div>
+      <h2>Model the Decision</h2>
+      <div class="purpose">An interactive award-scenario modeler. Adjust the category weights and watch the ranking recompute live, so the panel can stress-test how sensitive the recommendation is to the weighting scheme before it is locked in. Reflect-only: the panel's real weights and scores never change, this is a what-if sandbox layered on top of them.</div>
+    </div>
+
+    <div class="opt" data-opt="a">
+      <div class="opt-hd">
+        <div class="opt-tag">A</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Category-weight sliders, live re-rank</div>
+          <div class="opt-caption">Full control across all eight categories; best for a thorough what-if session with the panel in the room. The sliders below are live.</div>
+        </div>
+      </div>
+      <div class="mdA-grid">
+        <div>
+          <div class="brief-sec-t" style="margin-top:0">Category weights, normalized to 100%</div>
+          <div class="slider-cols" id="mdaSliders"><!-- built by script --></div>
+          <button class="btn-reset" onclick="mdaReset()">Reset to filed weights</button>
+        </div>
+        <div>
+          <div class="brief-sec-t" style="margin-top:0">Ranking under these weights</div>
+          <div id="mdaRanking"><!-- built by script --></div>
+          <div class="verdict-box" id="mdaVerdict"></div>
+        </div>
+      </div>
+      <div class="subnote">Nimbus Data is excluded from the ranking regardless of the weights, its SOC&nbsp;2 gate is a Must-Have failure, and a Must-Have failure is weight-invariant. It still appears, greyed and flagged, so its raw requirement fit stays visible.</div>
+    </div>
+
+    <div class="opt" data-opt="b">
+      <div class="opt-hd">
+        <div class="opt-tag">B</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Sensitivity tornado</div>
+          <div class="opt-caption">Shows which single lever matters most; best for a two-minute sensitivity check before a meeting, without touching any sliders.</div>
+        </div>
+      </div>
+      <div class="tornado">
+        <div class="tor-axis"><span>&larr; Helio Warehouse leads</span><span>Lakehouse Co leads &rarr;</span></div>
+        <div class="tor-row">
+          <span class="tor-label">Total cost (TCO)</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar neg" style="left:7.3%;width:9.3%"></span>
+          </div>
+          <span class="tor-val tx-rust">&minus;5.6</span>
+        </div>
+        <div class="tor-row">
+          <span class="tor-label">Performance &amp; scalability</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar pos" style="left:16.7%;width:5%"></span>
+          </div>
+          <span class="tor-val">+3.0</span>
+        </div>
+        <div class="tor-row">
+          <span class="tor-label">Integration &amp; architecture</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar pos" style="left:16.7%;width:27.2%"></span>
+          </div>
+          <span class="tor-val">+16.3</span>
+        </div>
+        <div class="tor-row">
+          <span class="tor-label">Functional fit</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar pos" style="left:16.7%;width:37.2%"></span>
+          </div>
+          <span class="tor-val">+22.3</span>
+        </div>
+        <div class="tor-row">
+          <span class="tor-label">Security &amp; compliance</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar pos" style="left:16.7%;width:37.8%"></span>
+          </div>
+          <span class="tor-val">+22.7</span>
+        </div>
+        <div class="tor-row">
+          <span class="tor-label">Operational support</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar pos" style="left:16.7%;width:47.8%"></span>
+          </div>
+          <span class="tor-val">+28.7</span>
+        </div>
+        <div class="tor-row">
+          <span class="tor-label">Risk &amp; stability</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar pos" style="left:16.7%;width:47.8%"></span>
+          </div>
+          <span class="tor-val">+28.7</span>
+        </div>
+        <div class="tor-row">
+          <span class="tor-label">Innovation &amp; roadmap</span>
+          <div class="tor-track">
+            <span class="tor-zero" style="left:16.7%"></span>
+            <span class="tor-bar pos" style="left:16.7%;width:76.5%"></span>
+          </div>
+          <span class="tor-val">+45.9</span>
+        </div>
+      </div>
+      <div class="subnote">Each bar shows the Lakehouse-minus-Helio fit gap if that single category were pushed to its maximum weight, all others held at the panel's filed weights. Only <b class="tx-rust">Total cost (TCO)</b> flips the leader on its own; <b>Performance &amp; scalability</b> is the next-closest lever but does not flip it alone. Nimbus Data is omitted from this chart, its gate makes it weight-invariant regardless of any single lever.</div>
+    </div>
+
+    <div class="opt" data-opt="c">
+      <div class="opt-hd">
+        <div class="opt-tag">C</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Single award versus split allocation</div>
+          <div class="opt-caption">Trades cost against risk on one axis; best when the real choice on the table is a single award versus a dual-source split. Live.</div>
+        </div>
+      </div>
+      <div class="alloc-labels"><span>100% Nimbus Data (lowest cost)</span><span>100% Lakehouse Co (zero gate risk)</span></div>
+      <div class="alloc-slider">
+        <input type="range" id="mdcSlider" min="0" max="100" value="30" step="5" oninput="mdcRecompute()">
+      </div>
+      <div class="alloc-current" id="mdcLabel">70% Nimbus Data / 30% Lakehouse Co</div>
+      <div class="alloc-out">
+        <div class="kpi"><div class="kl">Blended annual cost</div><div class="kn" id="mdcCost">$1,004,000 /yr blended</div></div>
+        <div class="kpi"><div class="kl">Blended panel score</div><div class="kn" id="mdcScore">4.34 / 5 blended panel score</div></div>
+        <div class="kpi"><div class="kl">Gate exposure</div><div class="kn" id="mdcGate">70% of volume still exposed to the open SOC 2 gate</div></div>
+      </div>
+      <div class="alloc-note" id="mdcNote"></div>
+      <div class="subnote">A blended, illustrative view of splitting the award between the top-scoring, cheaper, gated bidder (Nimbus Data) and the clean, more expensive alternative (Lakehouse Co), the same two suppliers behind the Dual-Source Resilience framing on Panel 5. Blended cost moves linearly between $980,000/yr and $1,060,000/yr; gate exposure tracks the share of volume still on Nimbus Data.</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PANEL 5: THEO-MODELED ALTERNATIVES -->
+  <!-- ============================================================ -->
+  <section class="panel" id="panel-alt">
+    <div class="panel-head">
+      <div class="panel-num">Panel 5 of 5</div>
+      <h2>Theo-Modeled Alternatives</h2>
+      <div class="purpose">Alternative award framings Theo generated from the requirements, the responses, and the submitted pricing, each with its dollar delta versus the recommended award. Reflect-only, nothing is selected here; the award stays conditional until signature. Baseline: <b>Nimbus Data</b> at $980,000/yr.</div>
+    </div>
+
+    <div class="opt" data-opt="a">
+      <div class="opt-hd">
+        <div class="opt-tag">A</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Framing cards</div>
+          <div class="opt-caption">Scannable at a glance; best as a standing panel on the Recommendation tab that a reader skims in passing.</div>
+        </div>
+      </div>
+      <div class="altcards">
+        <div class="altcard zero">
+          <div class="ac-hd"><span class="ac-title">Lowest total cost</span><span class="ac-delta tx-plum">&Delta; $0/yr</span></div>
+          <div class="ac-pick">Pick: <b>Nimbus Data</b></div>
+          <div class="ac-narr">Nimbus Data's $980,000/yr is already the lowest submitted annual price in the field; no cheaper option exists without accepting the SOC&nbsp;2 gap you would already be accepting by choosing Nimbus.</div>
+        </div>
+        <div class="altcard up">
+          <div class="ac-hd"><span class="ac-title">Dual-source resilience</span><span class="ac-delta tx-emph">&Delta; +$80,000/yr</span></div>
+          <div class="ac-pick">Pick: <b>Nimbus Data + Lakehouse Co</b></div>
+          <div class="ac-narr">Split the award, Nimbus as primary with Lakehouse as a qualified secondary, to avoid single-vendor lock-in and hold a conforming fallback if the SOC&nbsp;2 gate is not resolved. Adds a second implementation and an indicative $80,000/yr premium if volume shifts to the secondary.</div>
+        </div>
+        <div class="altcard pending">
+          <div class="ac-hd"><span class="ac-title">Diversity / strategic supply base</span><span class="ac-delta tx-mut">&Delta; pending</span></div>
+          <div class="ac-pick">Pick: <b>Helio Warehouse</b> <span class="pill grey sm">Gartner Challenger</span></div>
+          <div class="ac-narr">Favor the challenger, Helio Warehouse, to broaden the supply base and reward the field's strongest SAP integration posture. Run-rate delta is pending; Helio has not submitted commercial pricing.</div>
+        </div>
+      </div>
+      <div class="subnote">Negative delta is a saving versus the recommended award, shown in Bold Plum; positive delta is added cost, in Burnt Orange; a pending delta stays pending, never estimated.</div>
+    </div>
+
+    <div class="opt" data-opt="b">
+      <div class="opt-hd">
+        <div class="opt-tag">B</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Comparison table</div>
+          <div class="opt-caption">Same facts, denser; best for exporting into a briefing document or comparing line by line against the readiness checklist.</div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th style="text-align:left">Framing</th><th style="text-align:left">Pick</th><th>&Delta; vs. recommendation</th><th>Gate exposure</th><th style="text-align:left">Best for</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="text-align:left"><b>Lowest total cost</b></td>
+              <td style="text-align:left">Nimbus Data</td>
+              <td class="n tx-plum"><b>$0/yr</b></td>
+              <td class="n"><span class="pill emph sm">Open</span></td>
+              <td style="text-align:left">Confirming there is no cheaper conforming path than the recommendation itself.</td>
+            </tr>
+            <tr>
+              <td style="text-align:left"><b>Dual-source resilience</b></td>
+              <td style="text-align:left">Nimbus Data + Lakehouse Co</td>
+              <td class="n tx-emph"><b>+$80,000/yr</b></td>
+              <td class="n"><span class="pill grey sm">Partial</span></td>
+              <td style="text-align:left">Hedging single-vendor lock-in with a conforming fallback already qualified.</td>
+            </tr>
+            <tr>
+              <td style="text-align:left"><b>Diversity / strategic supply base</b></td>
+              <td style="text-align:left">Helio Warehouse</td>
+              <td class="n tx-mut"><b>Pending</b></td>
+              <td class="n"><span class="pill grey sm">n/a</span></td>
+              <td style="text-align:left">Broadening the base once Helio completes pricing, MSA, and an implementation plan.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="subnote">The same three framings as Option A, arranged so every column can be scanned down at once, useful when the deltas or gate posture matter more than the narrative reasoning.</div>
+    </div>
+
+    <div class="opt" data-opt="c">
+      <div class="opt-hd">
+        <div class="opt-tag">C</div>
+        <div class="opt-titlewrap">
+          <div class="opt-name">Decision-tree layout</div>
+          <div class="opt-caption">Frames the choice as a question first; best for walking a group through the logic live, in a meeting, rather than reading it cold.</div>
+        </div>
+      </div>
+      <div class="dtree">
+        <div class="dtree-root">What should the award optimize for?</div>
+        <div class="dtree-branches">
+          <div class="dtree-branch">
+            <div class="dtree-node">
+              <div class="dtree-q">If the priority is</div>
+              <div class="dtree-ans">Lowest cost <span class="dd tx-plum">&rarr; Nimbus Data, &Delta; $0/yr</span></div>
+              <div class="dtree-body">Already the lowest submitted price in the field. Choosing it for cost means also choosing to carry the open SOC&nbsp;2 gate.</div>
+            </div>
+          </div>
+          <div class="dtree-branch">
+            <div class="dtree-node">
+              <div class="dtree-q">If the priority is</div>
+              <div class="dtree-ans">Reducing single-vendor risk <span class="dd tx-emph">&rarr; Nimbus + Lakehouse, &Delta; +$80,000/yr</span></div>
+              <div class="dtree-body">Split the award to hold a conforming secondary in reserve. Costs an indicative $80,000/yr premium if volume ever shifts to Lakehouse.</div>
+            </div>
+          </div>
+          <div class="dtree-branch">
+            <div class="dtree-node">
+              <div class="dtree-q">If the priority is</div>
+              <div class="dtree-ans">Broadening the supply base <span class="dd tx-mut">&rarr; Helio Warehouse, &Delta; pending</span></div>
+              <div class="dtree-body">Rewards the field's strongest SAP integration and a genuine challenger. Cannot be priced until Helio completes its commercial submission.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="subnote">Same three outcomes as Options A and B, reached by answering one question first. Reads well when talked through out loud; denser to scan silently than the table.</div>
+    </div>
+  </section>
+
+  <div class="page-foot">
+    Design-exploration mockup, generated for side-by-side review. Not connected to live data and not part of the shipped dashboard. All supplier names, scores, and dollar figures are illustrative, matching the seeded Enterprise Data Platform RFx (Nimbus Data, Lakehouse Co, Helio Warehouse) used across the rest of the product. Colors follow the MCM palette: plum as primary, teal as secondary, burnt orange as the single emphasis accent, deep rust reserved for blocked/critical states, muted blue for neutral information, and bold grey for pending or not-tracked items.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var CATS=['Functional fit','Integration &amp; architecture','Security &amp; compliance','Performance &amp; scalability','Operational support','Total cost (TCO)','Innovation &amp; roadmap','Risk &amp; stability'];
+  var BASE=[23,21,26,8,6,8,4,4];
+  var FIT={
+    nimbus:   [100,82,59,80,80,100,100,40],
+    lakehouse:[80,89,100,80,100,60,80,100],
+    helio:    [55,78,74,100,60,100,0,60]
+  };
+  var CONF={nimbus:false,lakehouse:true,helio:true};
+  var NAME={nimbus:'Nimbus Data',lakehouse:'Lakehouse Co',helio:'Helio Warehouse'};
+  var ORDER=['nimbus','lakehouse','helio'];
+
+  function computeFits(weights){
+    var sum=0; for(var i=0;i<weights.length;i++) sum+=weights[i];
+    if(!sum) sum=1;
+    var out={};
+    ORDER.forEach(function(k){
+      var f=0;
+      FIT[k].forEach(function(v,i){ f+=(weights[i]/sum)*v; });
+      out[k]=f;
+    });
+    return out;
+  }
+  var BASE_FITS=computeFits(BASE);
+  var BASE_LEADER=BASE_FITS.lakehouse>=BASE_FITS.helio?'lakehouse':'helio';
+
+  function mdaBuild(){
+    var wrap=document.getElementById('mdaSliders');
+    if(!wrap) return;
+    var html='';
+    CATS.forEach(function(c,i){
+      html+='<div class="slider-row"><div class="slider-label"><span>'+c+'</span><span class="slider-pct" id="mdaPct'+i+'">'+BASE[i]+'%</span></div>'
+        +'<input type="range" min="0" max="50" value="'+BASE[i]+'" id="mdaW'+i+'" oninput="mdaRecompute()"></div>';
+    });
+    wrap.innerHTML=html;
+  }
+
+  window.mdaRecompute=function(){
+    var raw=CATS.map(function(c,i){ var el=document.getElementById('mdaW'+i); return el?(parseInt(el.value,10)||0):BASE[i]; });
+    var sum=0; raw.forEach(function(v){sum+=v;}); if(!sum) sum=1;
+    raw.forEach(function(v,i){ var lbl=document.getElementById('mdaPct'+i); if(lbl) lbl.textContent=Math.round(v/sum*100)+'%'; });
+
+    var fits=computeFits(raw);
+    var curLeader=fits.lakehouse>=fits.helio?'lakehouse':'helio';
+    var changed=curLeader!==BASE_LEADER;
+    var isAdjusted=raw.some(function(v,i){return v!==BASE[i];});
+
+    var rank=ORDER.slice().sort(function(a,b){
+      if(CONF[a]!==CONF[b]) return CONF[a]?-1:1;
+      return fits[b]-fits[a];
+    });
+    var maxFit=0; ORDER.forEach(function(k){ if(fits[k]>maxFit) maxFit=fits[k]; }); if(!maxFit) maxFit=1;
+
+    var rk=0, html='';
+    rank.forEach(function(k){
+      var w=Math.round(fits[k]/maxFit*100);
+      var barclass, lbl;
+      if(CONF[k]){
+        rk++; lbl=rk;
+        barclass=(k===curLeader)?'barfill plum':'barfill grey';
+      } else {
+        lbl='-';
+        barclass='barfill outline-grey';
+      }
+      html+='<div class="rank-row"><span class="rank-n">'+lbl+'</span><span class="rank-name">'+NAME[k]+(CONF[k]?'':' <span class="pill rust sm">Gated</span>')+'</span>'
+        +'<div class="bartrack"><span class="'+barclass+'" style="width:'+w+'%"></span></div>'
+        +'<span class="rank-val">'+fits[k].toFixed(1)+'</span></div>';
+    });
+    document.getElementById('mdaRanking').innerHTML=html;
+
+    var verdict;
+    if(changed){
+      verdict='<b class="tx-emph">Leader flips to '+NAME[curLeader]+'.</b> The panel&rsquo;s filed weights favor '+NAME[BASE_LEADER]+'; this order is sensitive to the weights just set, confirm before relying on it.';
+    } else if(isAdjusted){
+      verdict='<b class="tx-plum">'+NAME[curLeader]+' still leads</b> under these weights, the ranking is robust to this shift.';
+    } else {
+      verdict='<b class="tx-plum">'+NAME[curLeader]+' leads</b> on the filed requirement-category weights. Drag a slider to test sensitivity. Nimbus Data scores higher on raw requirement fit but is excluded from ranking here, a Must-Have gate is weight-invariant.';
+    }
+    document.getElementById('mdaVerdict').innerHTML=verdict;
+  };
+
+  window.mdaReset=function(){
+    CATS.forEach(function(c,i){ var el=document.getElementById('mdaW'+i); if(el) el.value=BASE[i]; });
+    mdaRecompute();
+  };
+
+  window.mdcRecompute=function(){
+    var el=document.getElementById('mdcSlider'); if(!el) return;
+    var x=parseInt(el.value,10)||0;
+    var cost=980000+80000*(x/100);
+    var score=4.40+(4.19-4.40)*(x/100);
+    var gateExp=100-x;
+    document.getElementById('mdcLabel').textContent=(100-x)+'% Nimbus Data / '+x+'% Lakehouse Co';
+    document.getElementById('mdcCost').textContent='$'+Math.round(cost).toLocaleString('en-US')+' /yr blended';
+    document.getElementById('mdcScore').textContent=score.toFixed(2)+' / 5 blended panel score';
+    document.getElementById('mdcGate').textContent=gateExp+'% of volume still exposed to the open SOC 2 gate';
+    var note;
+    if(x===0){
+      note='100% to Nimbus Data: the lowest blended cost available, and the full open SOC 2 Type II gate applies to all of the spend.';
+    } else if(x===100){
+      note='100% to Lakehouse Co: zero gate exposure, and the $80,000/yr premium applies to the full spend.';
+    } else {
+      note='Routing '+x+'% of volume to Lakehouse Co trims gate exposure to '+gateExp+'% of spend, for an incremental $'+Math.round(80000*(x/100)).toLocaleString('en-US')+'/yr versus a single award to Nimbus Data.';
+    }
+    document.getElementById('mdcNote').textContent=note;
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    mdaBuild();
+    mdaRecompute();
+    mdcRecompute();
+  });
+})();
+</script>
+</body>
+</html>
