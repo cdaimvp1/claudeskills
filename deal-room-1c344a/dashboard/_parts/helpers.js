@@ -434,7 +434,15 @@ const DealUI = {
     // Deep-link from the Playbook Alignment Scorecard / Cross-Doc panel to the EXACT finding
     // row in the Findings Register (Legal & Protection subtab): switch there, expand
     // that row, scroll it into view + flash. Used by [data-gotofinding="ISS-xx"].
-    this.jump('tab:contract/sub:legal');
+    // Marc 2026-07-27: only jump if we are not ALREADY on Terms & Review > Legal & Protection.
+    // showTab() scrolls the window to the top by design (it is a tab switch), so re-jumping to the
+    // tab you are already reading threw the page back to the top on every Navigator click.
+    var onLegal = (function () {
+      var panel = document.querySelector('[data-tabpanel="contract"]');
+      var sub = document.querySelector('[data-subpanel="contract/legal"]');
+      return !!(panel && panel.classList.contains('is-active') && sub && sub.classList.contains('is-active'));
+    })();
+    if (!onLegal) this.jump('tab:contract/sub:legal');
     const open = () => {
       const row = document.querySelector('[data-exprow="' + id + '"]');
       if (!row) return;

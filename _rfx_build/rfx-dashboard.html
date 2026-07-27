@@ -2728,6 +2728,49 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .rfxrpt .rzopa-trackwrap{flex:1 1 auto;min-width:0}
 .rfxrpt .rzopa-read{font-size:11px;color:var(--mut);line-height:1.45;margin-top:2px}
 @media(max-width:640px){.rfxrpt .rzopa-row{flex-wrap:wrap}.rfxrpt .rzopa-title{flex:0 0 100%;width:auto}.rfxrpt .rzopa-trackwrap{flex:1 1 100%;width:100%}}
+
+/* ============================================================================================
+   SHADING + DEPTH SYSTEM (Marc 2026-07-27) - RFx, same scale as Landscape and Deal.
+   Shading was 2-4% and effectively invisible. Three deliberate steps instead:
+     --sh-1 section ground (~6%) · --sh-2 nested band (~11%) · --sh-3 emphasis (~16%)
+   Plus real borders and depth so panels read as objects, and a SOLID burnt-orange rule for the
+   things that matter. Matrices and heatmaps are excluded: their cells carry their own ramp.
+   ============================================================================================ */
+.rfx-tab{
+  --sh-1:#EEEBE6; --sh-2:#E4E0D9; --sh-3:#D9D4CB;
+  --burnt-d:#9A4A13;
+  --depth-1:0 1px 2px rgba(33,25,17,.06), 0 3px 8px -4px rgba(33,25,17,.10);
+  --depth-2:0 1px 2px rgba(33,25,17,.08), 0 8px 18px -8px rgba(33,25,17,.16);
+}
+.rfx-tab .card{border:1px solid var(--line2);box-shadow:var(--depth-1)}
+/* section headers get a ground so sections separate without extra chrome */
+.rfx-tab .sect > .secthd{background:var(--sh-1);border:1px solid var(--line2);border-bottom:none;
+  border-radius:9px 9px 0 0;padding:9px 12px;margin-bottom:0}
+.rfx-tab .sect > .secthd + .card{border-radius:0 0 9px 9px;border-top:1px solid var(--line2)}
+/* group bands read as real dividers */
+.rfxrpt .grp{background:var(--sh-2);border-radius:8px;padding:9px 12px 8px;border-bottom:2px solid var(--plum)}
+/* reads / notes sit on a visible ground instead of floating */
+.rfxrpt .xs-ins{background:var(--sh-1);border-radius:8px;padding:11px 13px;border-left:3px solid var(--plum)}
+.rfxrpt .spnote{background:var(--sh-1);border-radius:8px;padding:10px 12px;border-top:none}
+.rfx-tab .rfxsrcrow{background:var(--sh-2);border-radius:8px;padding:10px 12px}
+/* emphasis = solid burnt orange, never a light wash */
+.rfx-tab .rfxgate.warn{background:var(--sh-2);border:1px solid var(--line2);
+  border-left:4px solid #C15E19;color:var(--ink)}
+.rfx-tab .rfxreg > .rfxreg-sum{background:var(--sh-1)}
+.rfx-tab .rfxreqcat[open] > summary{background:var(--sh-2)}
+.rfx-tab .rfxreqcat > summary:hover{background:var(--sh-1)}
+/* keep the two matrices clean: ramp only, no ground */
+.rfx-tab .schm tbody tr:hover td{background:var(--sh-1)}
+.rfx-tab .schm .hcell,.rfx-tab .mx .hcell{box-shadow:0 1px 2px rgba(33,25,17,.10)}
+
+/* R4: Business Case halves. Same underline language as the main RFx subtab bar. */
+.rfx-tab .bcsubbar{display:flex;gap:4px;border-bottom:1px solid var(--line2);margin:0 0 16px}
+.rfx-tab .bcsub{appearance:none;background:transparent;border:0;border-bottom:2.5px solid transparent;
+  color:var(--mut2);font:700 12.5px var(--sans);padding:9px 14px;cursor:pointer;white-space:nowrap}
+.rfx-tab .bcsub:hover{color:var(--ink)}
+.rfx-tab .bcsub.on{color:var(--ink);border-bottom-color:var(--plum);font-weight:800}
+.rfx-tab .bcpane{display:none}
+.rfx-tab .bcpane.on{display:block}
 </style><style>/* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *
@@ -5581,15 +5624,20 @@ function rfxParticipationHTML(){var R=RFX,p=R.phase||{};
   if(c.answered===0)return rfxGlyph('dash','Not yet responded');
   if(c.answered<c.total)return rfxGlyph('half','Partial ('+c.answered+' of '+c.total+')');
   return rfxGlyph('done','Complete');}
- var head='<tr><th style="text-align:left">Supplier</th><th>Agreed</th><th>CDA</th><th>MSA</th><th>Response</th><th>Demo-set</th><th>Demo-done</th></tr>';
- var rows=R.suppliers.map(function(s,si){
-   return '<tr><td style="text-align:left;font-weight:600">'+rfxSupplierSwatch(si)+escapeHtmlPV(s.n)+'</td>'
-    +'<td>'+rfxGlyph('done','Agreed')+'</td>'
-    +'<td>'+rfxGlyph('nt','Not tracked')+'</td>'
-    +'<td>'+msaGlyph(s)+'</td>'
-    +'<td>'+respGlyph(si)+'</td>'
-    +'<td>'+rfxGlyph('nt','Not tracked')+'</td>'
-    +'<td>'+rfxGlyph('nt','Not tracked')+'</td></tr>';
+ // R7 FLIP: attributes down the left, one column per supplier.
+ var head='<tr><th style="text-align:left">Step</th>'+R.suppliers.map(function(s,si){
+   return '<th>'+rfxSupplierSwatch(si)+escapeHtmlPV(s.n)+'</th>';}).join('')+'</tr>';
+ var partRows=[
+   ['Agreed',      function(s,si){return rfxGlyph('done','Agreed');}],
+   ['CDA',         function(s,si){return rfxGlyph('nt','');}],
+   ['MSA',         function(s,si){return msaGlyph(s);}],
+   ['Response',    function(s,si){return respGlyph(si);}],
+   ['Demo set',    function(s,si){return rfxGlyph('nt','');}],
+   ['Demo done',   function(s,si){return rfxGlyph('nt','');}]
+ ];
+ var rows=partRows.map(function(r){
+   return '<tr><td style="text-align:left;font-weight:600">'+escapeHtmlPV(r[0])+'</td>'
+     +R.suppliers.map(function(s,si){return '<td>'+r[1](s,si)+'</td>';}).join('')+'</tr>';
  }).join('');
  var total=p.suppliersTotal!=null?p.suppliersTotal:R.suppliers.length;
  var awaitTxt=(p.suppliersAwaiting>0)?(p.suppliersAwaiting+' of '+total+' invited supplier(s) still to respond.'):('All '+total+' invited supplier(s) have responded.');
@@ -5601,19 +5649,24 @@ function rfxParticipationHTML(){var R=RFX,p=R.phase||{};
 // existing rfxCoverage / rfxFlags / rfxAwardTier engines (the SAME score ranking that drives the merged
 // ranking above, so the tier column here can never drift from it).
 function rfxCompletenessRiskHTML(){var R=RFX,esc=escapeHtmlPV;var rank=rfxReqRanking();
- var rows=R.suppliers.map(function(s,si){var c=rfxCoverage(si),fl=rfxFlags(si),gating=fl.filter(function(f){return f.priority==='GATING';}).length;
+ var cells=R.suppliers.map(function(s,si){var c=rfxCoverage(si),fl=rfxFlags(si),gating=fl.filter(function(f){return f.priority==='GATING';}).length;
    var rankIdx=rank.indexOf(si);var tier=rfxAwardTier(si,rankIdx);
    var confLabel=c.answered===0?'Pending':(c.conforming?'Y':'N');
    var confCol=c.answered===0?'var(--mut2)':(c.conforming?'var(--plum)':'#C8202E');
    var confBg=c.answered===0?'#EFECE8':(c.conforming?'rgba(92,43,80,.10)':'var(--pink-t,#FBE7E3)');
-   return '<tr><td style="text-align:left;font-weight:600">'+rfxSupplierSwatch(si)+esc(s.n)+'</td>'
-    +'<td class="n">'+rfxChip(confLabel,confCol,confBg)+'</td>'
-    +'<td class="n">'+c.completenessPct+'%</td>'
-    +'<td class="n">'+fl.length+'</td>'
-    +'<td class="n">'+gating+'</td>'
-    +'<td class="n">'+rfxChip(tier.label,tier.col,tier.bg)+'</td></tr>';
+   return {si:si,s:s,conf:rfxChip(confLabel,confCol,confBg),pct:c.completenessPct+'%',
+           flags:String(fl.length),gating:String(gating),tier:rfxChip(tier.label,tier.col,tier.bg)};
+ });
+ // R7 FLIP: measures down the left, one column per supplier.
+ var compHead='<tr><th style="text-align:left">Measure</th>'+cells.map(function(x){
+   return '<th>'+rfxSupplierSwatch(x.si)+esc(x.s.n)+'</th>';}).join('')+'</tr>';
+ var compRows=[['Conforming','conf'],['Completeness','pct'],['Open flags','flags'],
+               ['Gating items','gating'],['Award tier','tier']];
+ var rows=compRows.map(function(r){
+   return '<tr><td style="text-align:left;font-weight:600">'+esc(r[0])+'</td>'
+     +cells.map(function(x){return '<td class="n">'+x[r[1]]+'</td>';}).join('')+'</tr>';
  }).join('');
- return '<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:2px">Completeness &amp; Risk Roll-up</div><div class="spnote" style="margin:0 0 8px">Conforming = the mandatory-requirement check. Red-flags and Gating are response-grounded, from the same analysis behind each supplier&rsquo;s Analysis report. Award tier is the same advisory tier shown across the tab (a gate risk on the leader is flagged there, not a hidden demotion here).</div><div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th style="text-align:left">Supplier</th><th>Conforming</th><th>Completeness</th><th>Red-flags</th><th>Gating</th><th>Award tier</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+ return '<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:2px">Completeness &amp; Risk Roll-up</div><div class="spnote" style="margin:0 0 8px">Conforming = the mandatory-requirement check. Red-flags and Gating are response-grounded, from the same analysis behind each supplier&rsquo;s Analysis report. Award tier is the same advisory tier shown across the tab (a gate risk on the leader is flagged there, not a hidden demotion here).</div><div class="mxwrap"><table class="mx" style="width:100%"><thead>'+compHead+'</thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 // Reusable member ROSTER, avatar · name · role, stacked in N columns (never a comma line).
 // role is real per-project data ({n, role}); reused anywhere we list a project's people.
@@ -7152,6 +7205,45 @@ function rfxBcPathToCloseHTML(recSi){
 // Business Case subtab (5th RFx subtab), Round-5 declutter: see the module header above for the
 // full 6-section composition. Reflect-only throughout; nothing here is submitted, sent, or actioned.
 // ============================================================================
+var RFX_BCSUB='case';   // R4: Business Case half, 'case' | 'ask'
+function rfxBcSub(k){RFX_BCSUB=(k==='ask')?'ask':'case';if(curtab==='rfx')$('#tabbody').innerHTML=rfxHTML();}   // same re-render path as rfxSub
+
+/* R4 (Marc): What Changed Since Recommendation. Everything an approver needs to know has moved
+   between the Recommendation being formed and this approval being sought. Derived, never authored:
+   it compares the recommendation's own inputs against what the response data says now, and where
+   the model carries no change history it SAYS the baseline is this run rather than inventing a diff. */
+function rfxBcWhatChangedHTML(si){var R=RFX,esc=escapeHtmlPV,s=R.suppliers[si]||{};
+ var c=rfxCoverage(si),gate=!rfxGatePass(si),fl=rfxFlags(si);
+ var gating=fl.filter(function(f){return f.priority==='GATING';});
+ var rows=[];
+ rows.push(['Panel score',rfxWeighted(si).toFixed(1)+' / 5','Unchanged since the recommendation was formed in this run.']);
+ rows.push(['Requirement coverage',c.coveragePct+'% fully met ('+c.fully+' of '+c.total+')','Unchanged since the recommendation was formed in this run.']);
+ if(gate){
+   rows.push(['Must-Have gate','OPEN, '+esc((s.mustFail||[]).join(', ')),
+     'Still open. The award cannot execute until it is cleared or the panel formally accepts it.']);
+ } else {
+   rows.push(['Must-Have gate','Clear','No Must-Have is outstanding against this supplier.']);
+ }
+ rows.push(['Open clarifications',gating.length+' gating item(s)',
+   gating.length?'Each is tied to a Must-Have or high-weight requirement; see Analysis.':'None outstanding.']);
+ var pr=s.pricing||{};
+ rows.push(['Commercial basis',pr.annual?esc(pr.annual)+'/yr':'Not submitted',
+   pr.binding?('Pricing hold: '+esc(pr.binding)+'.'):'No pricing hold recorded, so the figure is not guaranteed.']);
+ var body=rows.map(function(r){
+   return '<tr><td style="text-align:left;font-weight:600">'+esc(r[0])+'</td>'
+     +'<td style="text-align:left;font-weight:700;white-space:nowrap">'+r[1]+'</td>'
+     +'<td style="text-align:left;color:var(--mut);font-size:12px;line-height:1.5">'+esc(r[2])+'</td></tr>';
+ }).join('');
+ return '<div class="sect"><div class="secthd"><div class="t">What Changed Since Recommendation</div>'
+  +rfxCap('what an approver needs to re-check before signing')+'</div><div class="card">'
+  +'<div class="mxwrap"><table class="mx" style="width:100%"><thead><tr>'
+  +'<th style="text-align:left">Input</th><th style="text-align:left">Now</th><th style="text-align:left">Change since the recommendation</th>'
+  +'</tr></thead><tbody>'+body+'</tbody></table></div>'
+  +'<div class="spnote" style="margin-top:8px">This RFx carries a single evaluation run, so the baseline for '
+  +'&ldquo;since the recommendation&rdquo; is that run. Where nothing has moved this panel says so rather than '
+  +'manufacturing a difference. Once a second scoring round exists, each row will diff against the prior round.</div>'
+  +'</div></div>';
+}
 function rfxBusinessCaseHTML(){
  var R=RFX,esc=escapeHtmlPV;
  var rank=rfxReqRanking();var recSi=rank[0];var rec=R.suppliers[recSi];
@@ -7174,6 +7266,13 @@ function rfxBusinessCaseHTML(){
  h+='<div class="card" style="border-left:3px solid var(--emph,#C15E19);background:var(--emph-t,#F7E7D8);margin-bottom:16px"><div style="font-size:12.5px;color:var(--ink);line-height:1.5"><b>Pre-award pricing.</b> Every figure in this business case is the supplier&rsquo;s submitted, pre-final-negotiation proposal. Further negotiation is expected post-award; nothing here is a locked or executed price.</div></div>';
 
  // ---- 2: Decision Rationale ----
+ // R4: two halves, a subtab bar above them. "The Case" makes the argument; "The Ask & Approval"
+ // is what an approver acts on. Same tab, same data, one decision point per half.
+ h+='<div class="bcsubbar" role="tablist">'
+   +'<button class="bcsub'+(RFX_BCSUB==='case'?' on':'')+'" role="tab" aria-selected="'+(RFX_BCSUB==='case')+'" onclick="rfxBcSub(\'case\')">The Case</button>'
+   +'<button class="bcsub'+(RFX_BCSUB==='ask'?' on':'')+'" role="tab" aria-selected="'+(RFX_BCSUB==='ask')+'" onclick="rfxBcSub(\'ask\')">The Ask &amp; Approval</button>'
+   +'</div>';
+ h+='<div class="bcpane'+(RFX_BCSUB==='case'?' on':'')+'" id="rfxbc-case">';
  h+='<div class="grp"><span class="gt">Decision Rationale</span><span class="gsub">why '+esc(rec.n)+', grounded in the response analysis</span></div>';
  h+='<div class="sect"><div class="card"><div style="font-size:12.5px;line-height:1.6;color:var(--ink)">'+rfxRecoText(recSi,0)+'</div>'+((rec.report&&rec.report.overall&&rec.report.overall.take)?('<div class="take" style="margin-top:10px">'+rec.report.overall.take+'</div>'):'')+'</div></div>';
 
@@ -7185,12 +7284,19 @@ function rfxBusinessCaseHTML(){
  // pro-forma view; the old standalone Line-item mini-P&L section and the simple Supplier Comparison
  // section were merged/removed here per Marc, so the tab is 6 sections, not 8, no redundancy) ----
  h+=rfxBcDealEconomicsHTML(recSi);
+ h+='</div>';                       // R4: end of "The Case" half
+
+ // ================= R4: "The Ask & Approval" half =================
+ h+='<div class="bcpane'+(RFX_BCSUB==='ask'?' on':'')+'" id="rfxbc-ask">';
 
  // ---- 5: The Ask ----
  h+='<div class="grp"><span class="gt">The Ask</span><span class="gsub">recommendation · value · risk · conditions · approval · committee decision</span></div>';
  h+=rfxBcAskHTML(recSi);
 
- // ---- 6: Path To Close ----
+ // ---- 6: R4 What Changed Since Recommendation (additive) ----
+ h+=rfxBcWhatChangedHTML(recSi);
+
+ // ---- 7: Path To Close ----
  h+=rfxBcPathToCloseHTML(recSi);
 
  h+='</div>';

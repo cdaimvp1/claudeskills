@@ -513,6 +513,35 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 [data-filter-scope].is-focused .lp-reg-wrap.is-scrolling:after{display:none}
 [data-filter-scope].is-focused .lp-reg-scroll{max-height:none}
 
+/* ============================================================================================
+   SHADING + DEPTH SYSTEM (Marc 2026-07-27) - Deal, same scale as Landscape and RFx.
+   Three visible steps in place of the old near-invisible washes, plus border + depth on panels
+   and a solid burnt-orange rule for emphasis. Matrices/heatmaps keep their own ramp.
+   ============================================================================================ */
+:root{
+  --sh-1:#EEEBE6; --sh-2:#E4E0D9; --sh-3:#D9D4CB;
+  --burnt:#C15E19; --burnt-d:#9A4A13;
+  --depth-1:0 1px 2px rgba(33,25,17,.06), 0 3px 8px -4px rgba(33,25,17,.10);
+  --depth-2:0 1px 2px rgba(33,25,17,.08), 0 8px 18px -8px rgba(33,25,17,.16);
+}
+.sa-card{border:1px solid var(--line2);box-shadow:var(--depth-1)}
+.sa-card > .sa-card-hd,.sa-card > .card-hd{background:var(--sh-1);border-bottom:1px solid var(--line2)}
+/* tab intro + section separation */
+.tab-intro{background:var(--sh-1);border:1px solid var(--line2);border-radius:10px;
+  padding:14px 16px;margin-bottom:16px;box-shadow:var(--depth-1)}
+.tab-intro h2{margin-top:0}
+/* reads, insights and notes on a visible ground */
+.insight,.dt-note,.sa-note{background:var(--sh-1);border-radius:8px;padding:11px 13px;
+  border-left:3px solid var(--plum)}
+/* the findings register focus bar is an action surface */
+.lp-focus-bar{background:var(--sh-2)}
+/* emphasis blocks: solid burnt orange rule, medium ground, never a light wash */
+.is-emph,.sa-card.is-emph{background:var(--sh-2);border-left:4px solid var(--burnt)}
+/* tables: visible zebra + hover, but never under a heat cell */
+.dt tbody tr:nth-child(even) td{background:var(--sh-1)}
+.dt tbody tr:hover td{background:var(--sh-2)}
+.dt.heat tbody tr:nth-child(even) td,.dt.heat tbody tr:hover td{background:transparent}
+
 /* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *
@@ -1535,7 +1564,15 @@ const DealUI = {
     // Deep-link from the Playbook Alignment Scorecard / Cross-Doc panel to the EXACT finding
     // row in the Findings Register (Legal & Protection subtab): switch there, expand
     // that row, scroll it into view + flash. Used by [data-gotofinding="ISS-xx"].
-    this.jump('tab:contract/sub:legal');
+    // Marc 2026-07-27: only jump if we are not ALREADY on Terms & Review > Legal & Protection.
+    // showTab() scrolls the window to the top by design (it is a tab switch), so re-jumping to the
+    // tab you are already reading threw the page back to the top on every Navigator click.
+    var onLegal = (function () {
+      var panel = document.querySelector('[data-tabpanel="contract"]');
+      var sub = document.querySelector('[data-subpanel="contract/legal"]');
+      return !!(panel && panel.classList.contains('is-active') && sub && sub.classList.contains('is-active'));
+    })();
+    if (!onLegal) this.jump('tab:contract/sub:legal');
     const open = () => {
       const row = document.querySelector('[data-exprow="' + id + '"]');
       if (!row) return;

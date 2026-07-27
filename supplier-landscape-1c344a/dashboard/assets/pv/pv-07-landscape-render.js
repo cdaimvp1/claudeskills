@@ -452,7 +452,7 @@ function pvLandInput(P){
  pvHydrate(P);
  return {
   category:P.title||'IT sourcing',topN:3,
-  requirements:P.requirements,riskDimensions:P.riskDimensions||[],
+  requirements:P.requirements,riskDimensions:P.riskDimensions||[],uncertainties:P.uncertainties||[],   // Marc 2026-07-27: structured uncertainty register
   segmentation:P.segmentation||{fitHigh:60,riskHigh:2.5},
   suppliers:P.landscape.map(function(s,i){return {
    id:s.id||('c'+i),name:s.n||('Candidate '+(i+1)),
@@ -641,9 +641,7 @@ function pvMarketDecisionBriefHtml(refl, input, shortlist, shortlistIds, elimRow
                 [(L.supplierCount || 0), 'Assessed', 'carried into the scored assessment'],
                 [eligible.length, 'Credible field', 'cleared the eligibility screens'],
                 [slate.length, 'Advance to RFx', 'the recommended slate, Section 2']];
-  var funnelHtml = '<div class="mdb-funnel">' + funnel.map(function (f) {
-    return '<div class="mdb-fstep"><div class="mdb-fv">' + f[0] + '</div><div class="mdb-fl">' + escD(f[1]) + '</div><div class="mdb-fs">' + escD(f[2]) + '</div></div>';
-  }).join('') + '</div>';
+  var funnelHtml = '';   // Marc 2026-07-27: the funnel now leads the tab, it is not repeated here
   var basisTxt = db.note || db.basis || '';
   var s1 = funnelHtml + '<div class="mdb-note">' + pvMdbEvidenceChip(basisTxt ? 'evidenced' : 'estimated') + ' '
     + escD(basisTxt || 'Public filings, product documentation and independent analyst coverage. No vendor briefings and no vendor-supplied pricing in this pass.') + '</div>';
@@ -656,7 +654,14 @@ function pvMarketDecisionBriefHtml(refl, input, shortlist, shortlistIds, elimRow
    * gone; the table is the single place the field is ranked and screened.
    * -------------------------------------------------------------------------------- */
   /* --- 4. uncertainties that could change the slate ------------------------------------- */
-  var unc = [];
+  // Marc 2026-07-27: the landscape model now carries a structured uncertainty register, so this
+  // section reports real open items instead of stating that none are recorded. Registered entries
+  // for ANY vendor still in play are shown, each with what would resolve it.
+  var reg = (input && input.uncertainties) || [];
+  var nameOfId = {}; (L.assessments || []).forEach(function (a) { nameOfId[a.id] = a.name; });
+  var inPlay = {}; slate.forEach(function (a) { inPlay[a.id] = true; });
+  var unc = reg.filter(function (u) { return inPlay[u.vendorId]; })
+               .map(function (u) { return { v: nameOfId[u.vendorId] || u.vendorId, t: u.text, r: u.resolvedBy }; });
   slate.forEach(function (a) {
     (a.softFlags || []).forEach(function (f) {
       var txt = (typeof f === 'string') ? f : (f.detail || f.label || f.reason || '');
@@ -665,7 +670,8 @@ function pvMarketDecisionBriefHtml(refl, input, shortlist, shortlistIds, elimRow
   });
   var s4 = unc.length
     ? '<ul class="mdb-list mdb-unc">' + unc.map(function (u) {
-        return '<li>' + pvMdbEvidenceChip('estimated') + ' <b>' + escD(u.v) + '</b> ' + escD(u.t) + '</li>';
+        return '<li>' + pvMdbEvidenceChip('estimated') + ' <b>' + escD(u.v) + '</b> ' + escD(u.t)
+          + (u.r ? '<span class="mdb-res">Resolved by: ' + escD(u.r) + '</span>' : '') + '</li>';
       }).join('') + '</ul>'
     : '<div class="mdb-none">' + pvMdbEvidenceChip('unknown') + ' The model records no soft flag against any vendor on the slate. That is an absence of recorded signal rather than a clean bill of health: this scan used public sources only. A structured uncertainty register belongs in the landscape data model before this section can say more.</div>';
 
@@ -721,8 +727,12 @@ function pvDecisionLeverage(refl) {
     var wN = (r.weight || 0) / wsum;                       // 0..1
     var dN = Math.max(0, Math.min(1, spread / 5));          // 0..1, scores are 0-5
     var cN = eligible.length ? (sc.length / eligible.length) : 0;   // 0..1 evidence coverage
+    // Marc 2026-07-27: the MUST-HAVE term is now applied. A Must-Have cannot be traded away, so a
+    // spread on one decides the award in a way the same spread on a nice-to-have does not. Weighted
+    // 1.6x rather than a hard gate, so it lifts without swamping the other three terms.
+    var mN = r.mustHave ? 1.6 : 1;
     return { id: r.id, label: r.label, weight: r.weight || 0, wN: wN, spread: spread, dN: dN,
-             cN: cN, scored: sc.length, of: eligible.length, lev: wN * dN * cN };
+             cN: cN, must: !!r.mustHave, scored: sc.length, of: eligible.length, lev: wN * dN * cN * mN };
   });
   var maxLev = rows.reduce(function (m, x) { return Math.max(m, x.lev); }, 0) || 1;
   rows.forEach(function (x) { x.pct = Math.round(x.lev / maxLev * 100); });
@@ -735,7 +745,7 @@ function pvDecisionLeverageHtml(refl) {
   if (!rows.length) return '';
   var top = rows[0], flat = rows.filter(function (r) { return r.spread < 0.5; });
   var body = rows.map(function (r) {
-    return '<tr><td class="dlv-l">' + escD(r.label) + '</td>'
+    return '<tr><td class="dlv-l">' + escD(r.label) + (r.must ? '<span class="dlv-must">Must-have</span>' : '') + '</td>'
       + '<td class="dlv-n">' + r.weight + '</td>'
       + '<td class="dlv-n">' + r.spread.toFixed(2) + '</td>'
       + '<td class="dlv-n">' + r.scored + ' of ' + r.of + '</td>'
@@ -753,10 +763,10 @@ function pvDecisionLeverageHtml(refl) {
     + '<th>Requirement</th><th class="dlv-n">Weight</th><th class="dlv-n">Spread</th>'
     + '<th class="dlv-n">Evidence</th><th>Leverage</th></tr></thead><tbody>' + body + '</tbody></table></div>'
     + '<div class="dlv-read">' + read + '</div>'
-    + '<div class="dlv-note">Leverage = weight &times; differentiation (the vendor-score spread) &times; evidence '
-    + 'coverage, indexed to the highest scorer. <b>The must-have term in the agreed formula is not applied:</b> '
-    + 'the requirement model carries no must-have flag, so including it would mean inventing one. Add a '
-    + '<b>mustHave</b> field to the requirement data and this panel will weight it.</div></div>';
+    + '<div class="dlv-note">Leverage = weight &times; <b>must-have</b> &times; differentiation (the vendor-score '
+    + 'spread) &times; evidence coverage, indexed to the highest scorer. A Must-Have requirement is weighted '
+    + '1.6&times;: it cannot be traded away, so a spread on one decides the award in a way the same spread on a '
+    + 'nice-to-have does not.</div></div>';
 }
 
 /* ================= DECISION COULD TURN ON (Marc 2026-07-27, L10) ============================
@@ -787,6 +797,27 @@ function pvDecisionTurnsOnHtml(A, B, per) {
     + '<span class="dto-cap">where these two actually diverge</span></div>' + body
     + '<div class="dto-note">Only gaps of 0.4 points or more are listed. Anything smaller is inside the noise of a '
     + 'public-source scan and should not decide an award.</div></div>';
+}
+
+/* ---- Field funnel, TOP of Overview (Marc 2026-07-27) -------------------------------------
+   Scanned -> Assessed -> Credible field -> Advance to RFx. Marc wants this first: it is the
+   shape of the field, and everything below it is a read on that shape. Same numbers the brief
+   used to carry lower down; the brief keeps only the evidence/provenance line. */
+function pvFieldFunnelHtml(refl, elimN, slateN) {
+  var L = refl.landscape;
+  var eligible = (L.assessments || []).filter(function (a) { return a.eligible; }).length;
+  var steps = [
+    [(L.supplierCount || 0) + elimN, 'Scanned', 'vendors identified in the category scan'],
+    [(L.supplierCount || 0), 'Assessed', 'carried into the scored assessment'],
+    [eligible, 'Credible field', 'cleared the eligibility screens'],
+    [slateN, 'Advance to RFx', 'the recommended slate']
+  ];
+  return '<div class="pvfunnel">' + steps.map(function (f, i) {
+    return '<div class="pvfn-step' + (i === steps.length - 1 ? ' pvfn-last' : '') + '">'
+      + '<div class="pvfn-v">' + f[0] + '</div>'
+      + '<div class="pvfn-l">' + escD(f[1]) + '</div>'
+      + '<div class="pvfn-s">' + escD(f[2]) + '</div></div>';
+  }).join('') + '</div>';
 }
 /* ---- competitive dynamics + head-to-head ---- */
 function pvH2HTradeoff(A,B,per,leadId,fitDelta,riskDelta){
@@ -1501,7 +1532,11 @@ function pvExecSummaryHtml(refl,input){
    if(leadMustGap)nextTxt+=' Before award, screen '+lead.name+' on '+leadMustGap.label+' ('+leadMustGap.score+'/5).';
    else if(leadLowest)nextTxt+=' Validate '+leadLowest.label+' ('+leadLowest.score+'/5) in the RFx.';
  }
- var nextStepHtml='<div class="subt" style="margin-top:14px">Next step</div><p class="pvlede" style="margin:0">'+escD(nextTxt)+'</p>';
+ // Marc 2026-07-27: the next step is the single most actionable line on the tab, so it gets the
+ // emphasis treatment: a solid burnt-orange rule and a burnt-orange label. Burnt orange is the
+ // action colour, used solid; the ground stays neutral.
+ var nextStepHtml='<div class="pvnext"><div class="pvnext-k">Next step</div>'
+   +'<p class="pvnext-t">'+escD(nextTxt)+'</p></div>';
  var evalHtml='<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">Evaluation Summary</span></div><div class="scc-b"><div class="pvlede" style="margin:0">'+escD(prose)+'</div>'+recNarrHtml+nextStepHtml+evalFindings+'</div></div>';
  // #80 (Marc): make this a real EXECUTIVE SUMMARY of the search, add a scope/coverage strip, a key
  // differentiators & trade-offs read, and an across-the-field read (market structure + gating watch-items +
@@ -1527,6 +1562,8 @@ function pvExecSummaryHtml(refl,input){
  // 6-category model...") stays removed (owner ask, 2026-07: valueless filler prose).
  // DECISION STRIP REMOVED (Marc 2026-07-27, second pass): it duplicated the Market Decision
  // Brief's own funnel below AND the Recommendation table's counts. One set of counts only.
+ // Marc 2026-07-27: the field funnel leads the tab.
+ h+=pvFieldFunnelHtml(refl,elimRowsSrc?elimRowsSrc.length:0,(shortlist||[]).length);
  h+='<div class="execside">'+evalHtml+'<div class="recR">'+recHtml+recAdvNote+'</div></div>';
  // Brief sits BELOW the Evaluation Summary + Recommendation table (Marc: those two are the decision,
  // and he wants them first). What remains of the brief is only what those panels do NOT carry.

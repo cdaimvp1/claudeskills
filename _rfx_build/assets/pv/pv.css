@@ -2138,3 +2138,46 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .rfxrpt .rzopa-trackwrap{flex:1 1 auto;min-width:0}
 .rfxrpt .rzopa-read{font-size:11px;color:var(--mut);line-height:1.45;margin-top:2px}
 @media(max-width:640px){.rfxrpt .rzopa-row{flex-wrap:wrap}.rfxrpt .rzopa-title{flex:0 0 100%;width:auto}.rfxrpt .rzopa-trackwrap{flex:1 1 100%;width:100%}}
+
+/* ============================================================================================
+   SHADING + DEPTH SYSTEM (Marc 2026-07-27) - RFx, same scale as Landscape and Deal.
+   Shading was 2-4% and effectively invisible. Three deliberate steps instead:
+     --sh-1 section ground (~6%) · --sh-2 nested band (~11%) · --sh-3 emphasis (~16%)
+   Plus real borders and depth so panels read as objects, and a SOLID burnt-orange rule for the
+   things that matter. Matrices and heatmaps are excluded: their cells carry their own ramp.
+   ============================================================================================ */
+.rfx-tab{
+  --sh-1:#EEEBE6; --sh-2:#E4E0D9; --sh-3:#D9D4CB;
+  --burnt-d:#9A4A13;
+  --depth-1:0 1px 2px rgba(33,25,17,.06), 0 3px 8px -4px rgba(33,25,17,.10);
+  --depth-2:0 1px 2px rgba(33,25,17,.08), 0 8px 18px -8px rgba(33,25,17,.16);
+}
+.rfx-tab .card{border:1px solid var(--line2);box-shadow:var(--depth-1)}
+/* section headers get a ground so sections separate without extra chrome */
+.rfx-tab .sect > .secthd{background:var(--sh-1);border:1px solid var(--line2);border-bottom:none;
+  border-radius:9px 9px 0 0;padding:9px 12px;margin-bottom:0}
+.rfx-tab .sect > .secthd + .card{border-radius:0 0 9px 9px;border-top:1px solid var(--line2)}
+/* group bands read as real dividers */
+.rfxrpt .grp{background:var(--sh-2);border-radius:8px;padding:9px 12px 8px;border-bottom:2px solid var(--plum)}
+/* reads / notes sit on a visible ground instead of floating */
+.rfxrpt .xs-ins{background:var(--sh-1);border-radius:8px;padding:11px 13px;border-left:3px solid var(--plum)}
+.rfxrpt .spnote{background:var(--sh-1);border-radius:8px;padding:10px 12px;border-top:none}
+.rfx-tab .rfxsrcrow{background:var(--sh-2);border-radius:8px;padding:10px 12px}
+/* emphasis = solid burnt orange, never a light wash */
+.rfx-tab .rfxgate.warn{background:var(--sh-2);border:1px solid var(--line2);
+  border-left:4px solid #C15E19;color:var(--ink)}
+.rfx-tab .rfxreg > .rfxreg-sum{background:var(--sh-1)}
+.rfx-tab .rfxreqcat[open] > summary{background:var(--sh-2)}
+.rfx-tab .rfxreqcat > summary:hover{background:var(--sh-1)}
+/* keep the two matrices clean: ramp only, no ground */
+.rfx-tab .schm tbody tr:hover td{background:var(--sh-1)}
+.rfx-tab .schm .hcell,.rfx-tab .mx .hcell{box-shadow:0 1px 2px rgba(33,25,17,.10)}
+
+/* R4: Business Case halves. Same underline language as the main RFx subtab bar. */
+.rfx-tab .bcsubbar{display:flex;gap:4px;border-bottom:1px solid var(--line2);margin:0 0 16px}
+.rfx-tab .bcsub{appearance:none;background:transparent;border:0;border-bottom:2.5px solid transparent;
+  color:var(--mut2);font:700 12.5px var(--sans);padding:9px 14px;cursor:pointer;white-space:nowrap}
+.rfx-tab .bcsub:hover{color:var(--ink)}
+.rfx-tab .bcsub.on{color:var(--ink);border-bottom-color:var(--plum);font-weight:800}
+.rfx-tab .bcpane{display:none}
+.rfx-tab .bcpane.on{display:block}

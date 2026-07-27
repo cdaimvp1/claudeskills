@@ -2312,3 +2312,102 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
   border-top:1px solid var(--line)}
 .pvsl .pq-dqk{font:700 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
 .pvsl .segL .pq-wrap{padding-left:22px}
+
+/* ============================================================================================
+   SHADING + DEPTH SYSTEM (Marc 2026-07-27), applied dashboard-wide.
+
+   The problem: shading sat at 2-4% opacity, effectively invisible, so sections ran together and
+   nothing signalled what mattered. The fix is a deliberate three-step scale plus outline and
+   depth, rather than one barely-there wash:
+
+     step 1  --sh-1  the section ground        ~6%   quiet but visible
+     step 2  --sh-2  a nested / secondary band ~11%  clearly a level down
+     step 3  --sh-3  the emphasised block      ~16%  medium, reads at a glance
+
+   Matrices and heatmaps are deliberately EXCLUDED: their cells already carry an intensity ramp
+   and a ground under them would fight it.
+
+   Depth: sections get a real border plus a soft shadow, so panels read as objects rather than
+   text on a page. Emphasis blocks additionally get a solid burnt-orange left rule, the action
+   colour. Darker burnt shades are allowed; light burnt / amber is not.
+   ============================================================================================ */
+.pvsl{
+  --sh-1:#EEEBE6;
+  --sh-2:#E4E0D9;
+  --sh-3:#D9D4CB;
+  --sh-plum:rgba(92,43,80,.10);
+  --sh-teal:rgba(47,110,107,.10);
+  --burnt:#C15E19;
+  --burnt-d:#9A4A13;            /* darker burnt is fine; amber is not */
+  --depth-1:0 1px 2px rgba(33,25,17,.06), 0 3px 8px -4px rgba(33,25,17,.10);
+  --depth-2:0 1px 2px rgba(33,25,17,.08), 0 8px 18px -8px rgba(33,25,17,.16);
+}
+
+/* ---- panels read as objects: real border + depth, not a hairline on white ---- */
+.pvsl .sa-card{border:1px solid var(--line2);box-shadow:var(--depth-1)}
+.pvsl .sa-card > .card-hd{
+  background:var(--sh-1);
+  border-bottom:1px solid var(--line2);
+  padding:11px 14px;
+  margin:0 0 14px;
+  border-radius:10px 10px 0 0;
+}
+.pvsl .sa-card > .card-hd .ct{font-weight:800}
+
+/* ---- the field funnel that now leads Overview ---- */
+.pvsl .pvfunnel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 18px;
+  border:1px solid var(--line2);border-radius:10px;overflow:hidden;box-shadow:var(--depth-1);background:var(--surface)}
+.pvsl .pvfn-step{padding:13px 15px;border-right:1px solid var(--line2);background:var(--sh-1)}
+.pvsl .pvfn-step:last-child{border-right:none}
+.pvsl .pvfn-last{background:var(--sh-3);box-shadow:inset 3px 0 0 var(--burnt)}
+.pvsl .pvfn-v{font:800 26px/1.05 var(--sans);color:var(--ink);letter-spacing:-.02em}
+.pvsl .pvfn-last .pvfn-v{color:var(--burnt-d)}
+.pvsl .pvfn-l{font:800 11.5px var(--sans);color:var(--ink);margin-top:5px}
+.pvsl .pvfn-s{font-size:10.5px;color:var(--mut);margin-top:2px;line-height:1.35}
+@media(max-width:760px){.pvsl .pvfunnel{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pvsl .pvfn-step:nth-child(2){border-right:none}}
+
+/* ---- NEXT STEP: the most actionable line on the tab ---- */
+.pvsl .pvnext{margin-top:16px;padding:12px 14px;background:var(--sh-2);
+  border:1px solid var(--line2);border-left:4px solid var(--burnt);border-radius:9px}
+.pvsl .pvnext-k{font:800 9.5px var(--mono);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--burnt-d);margin-bottom:5px}
+.pvsl .pvnext-t{margin:0;font-size:13px;line-height:1.6;color:var(--ink)}
+
+/* ---- section differentiation inside a card ---- */
+.pvsl .mdb-sec{border-top:1px solid var(--line2)}
+.pvsl .mdb-sec:nth-child(even){background:var(--sh-1)}
+.pvsl .mdb-sec{padding:16px 14px;border-radius:0}
+.pvsl .mdb-hd{margin-bottom:12px}
+.pvsl .mdb-n{background:var(--plum);box-shadow:0 1px 2px rgba(33,25,17,.18)}
+.pvsl .mdb-note{background:var(--sh-2);border-radius:8px;padding:10px 12px;color:var(--mut)}
+.pvsl .mdb-none{background:var(--sh-2);border-radius:8px;padding:11px 12px;
+  border-left:3px solid var(--line2)}
+.pvsl .mdb-list li{margin-bottom:7px}
+.pvsl .mdb-qs li::marker{color:var(--burnt-d);font-weight:800}
+
+/* ---- quadrants (Peer Position + Segmentation): visible ground, real depth ---- */
+.pvsl .pq-cell{background:var(--sh-1);box-shadow:var(--depth-1)}
+.pvsl .pq-cell.pq-ss{background:var(--sh-2)}          /* the strong/strong corner reads first */
+.pvsl .pq-cell.pq-has-sel{box-shadow:var(--depth-2),inset 0 0 0 1px var(--ddacc,#5C2B50)}
+.pvsl .pq-v{background:var(--surface)}
+
+/* ---- decision leverage + turns-on ---- */
+.pvsl .dlv-tbl tbody tr:first-child td{background:var(--sh-2)}
+.pvsl .dlv-bar span{background:var(--sh-3)}
+.pvsl .dlv-read{background:var(--sh-1);border-radius:8px;padding:11px 13px;
+  border-left:3px solid var(--plum)}
+.pvsl .dto-list li{padding:10px 12px;background:var(--sh-1);border-radius:8px;
+  border-bottom:none;margin-bottom:6px}
+.pvsl .dto-gap{color:var(--burnt-d)}
+
+/* ---- generic: wells, nested rows and hovers move off invisible ---- */
+.pvsl .well,.pvsl .nested,.pvsl .scc-b .subrow{background:var(--sh-1)}
+.pvsl tbody tr:hover td{background:var(--sh-1)}
+/* matrices + heatmaps keep their own ramp: no ground underneath */
+.pvsl .hm tbody tr:hover td,.pvsl .mxseg tbody tr:hover td{background:transparent}
+
+/* must-have marker in Decision Leverage + what-resolves-it line in the uncertainty register */
+.pvsl .dlv-must{display:inline-block;margin-left:8px;font:800 8.5px var(--mono);letter-spacing:.05em;
+  text-transform:uppercase;color:#9A4A13;border:1px solid #C15E19;border-radius:30px;padding:1px 7px;vertical-align:1px}
+.pvsl .mdb-res{display:block;margin-top:4px;font-size:11.3px;color:var(--mut2);font-style:italic}
