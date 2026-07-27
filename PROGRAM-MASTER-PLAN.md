@@ -38,6 +38,39 @@ dashboard, and hub as the builds proceed - not bolted on later.
 
 ---
 
+## PRIORITY ORDER (phased) — THE sequence  (re-sequenced with Marc 2026-07-26)
+The dashboards gate almost everything, so they go first; a skills-file CLEANUP pass sits between the dashboards
+and the deep skills work (so Claude never weeds through retired content); the ARIA conversion is DEAD LAST.
+
+**PHASE 1 - DASHBOARDS (do before almost anything else):**
+1. **WS0** Finish & lock RFx + build `rfx-hub`.  `[now]`
+2. **WS1** Category Strategy dashboard + hub.
+3. **WS1** Deep Dive dashboard + hub.
+4. **WS1** My Work dashboard + hub.
+5. **WS2** Finish Landscape (bring to fully-locked).
+   -> all five hub dashboards LOCKED before Phase 2.
+
+**PHASE 2 - SKILLS CLEANUP, THEN ENHANCEMENT:**
+6. **WS3a** (NEW) Skills FILE CLEANUP - strip retired/dead/superseded content so the files are lean.
+7. **WS3** Skills review & enhancement (data / output / deterministic Python / works-as-designed) + verify CC1-CC3.
+
+**PHASE 3 - CONVERSATIONAL + ORCHESTRATION (after the skill set is clean & settled):**
+8. **WS4** Theo conversational intake + one routing manifest + the ranked-handoff routing web + journey state.
+9. **WS5** Conversational PCC + the Cowork next-best-action loop.
+10. **WS6** Conversational help guides.
+
+**PHASE 4 - FOUNDATION / RELEASE + DATA-LAYER (as you green-light):**
+11. **WS7** Foundation / shared-shell consistency + release / packaging.
+12. **WS8** Data-layer / kernels (sensitive; per-item go).
+
+**PHASE 5 - ARIA (LAST - the capstone):**
+13. **WS9** Convert to ARIA recipes + build the plugin (BRANCH into a separate Desktop folder, do NOT mutate the
+    Desktop skills; gated by CC1-CC3 + the Phase-0 spike).
+
+CC1-CC3 are woven through EVERY phase (designed into each build; formally verified in Phase 2 / WS3).
+
+---
+
 ## WS0 — Finish & lock RFx  `[now]`
 1. Running build (`wf_5736ada0-554`): merged Business Case tab + flipped/decluttered radar + dashboard-wide supplier colors + direct fixes (Title Case, strip reflect-only boilerplate all tabs, Landscape/Deal footer) + adversarial verify.
 2. Revision pass after it lands: drop B's supplier comparison; Deal Economics right-table -> A's Mini P&L (remove standalone line-item); normalize ALL Business Case headings to mockup A's style.
@@ -59,7 +92,17 @@ Each = locked deterministic build (engine carried in the skill, model authors da
 4. `[Marc]` Resolve contradictions: H2H launcher add (P6) vs remove (OV1); P2 deep-dive "complete" vs "remaining 5 tabs' viz."
 5. `[opt/Marc]` supplier-type-aware deep-dive layout; segmentation quadrant tuning; D&B/Bloomberg enrichment backlog.
 
-## WS3 — Skills review & enhancement (all 31)  `[next]`
+## WS3a — Skills file CLEANUP  `[next]` (Phase 2, BEFORE WS3; prerequisite to WS9)
+Marc 2026-07-26: make every skill file CLEAN so Claude isn't weeding through retired material at runtime, and so
+the ARIA recipes convert from clean sources. Across all 31 skills + shared assets:
+1. Remove retired **reference-JSX** dashboards (the per-skill React examples superseded by the deterministic-dashboard architecture) once each hub carries its locked dashboard.
+2. Remove **dead code** / superseded functions in the vendored `.py` + `assets/` (the documented-as-dead blocks).
+3. Retire orphaned/superseded **static dashboard HTML** (`_dashboards_ORIGINAL/`, `_dashboard_previews/`, the retired PCC HTML, decision-deck dead content) — confirm reference-only + call out anything ambiguous BEFORE deleting.
+4. Prune **stale instructions** (old mode pickers, superseded IA prose, routing lists duplicated once the JSON manifest exists).
+5. **Never-regress:** keep every skill's standalone deliverable + working logic intact — this is decluttering, not feature removal; branch + malicious-scan per the usual rules.
+Output: lean, retired-content-free skill files that parse fast and convert cleanly to ARIA recipes.
+
+## WS3 — Skills review & enhancement (all 31)  `[next]` (Phase 2, after WS3a)
 All 31 rated data-source "clear" and output "clear" — this is enhancement, not repair.
 1. **Deterministic Python where it makes sense** (ranked): (1) **category-strategy** — highest; Pareto/HHI/CAGR/YoY/tail-threshold/anomaly all run unvendored. (2) **negotiation-playbook-learning** — rate/CI/N-gates/0-15->0-100 normalization in-model. (3) **rfp-engine** — light; weight-sum-to-100 + NPV self-checks -> kernel call. (4) **negotiation-simulator** — narrow; `capture%` edge-case helper. (All others already vendor `numeric_kernel.py`/dedicated engines.)
 2. **Data sources** — add staleness/citation-age flags where web-research freshness drives numbers (commercial-negotiation-prep, market-rate-benchmarking, should-cost-builder); propagate process-navigator's connector-check/gap-state pattern to the 6 skills using bespoke Inputs sections (cosmetic consistency).
@@ -125,10 +168,10 @@ dashboards/skills optimization; the Phase-0 native-tool co-orchestration spike i
 2. Landscape P2 deep-dive: "complete" vs "remaining 5 tabs' viz."
 3. Help-desk: sibling skill vs fold into process-navigator.
 
-## Suggested sequence
-CC1-CC3 are woven THROUGHOUT (every build from here designs for them; verified/retrofitted in WS3), then:
-WS0 (RFx) -> WS1 (Category Strategy -> Deep Dive -> My Work + hubs) -> WS2 (finish Landscape) -> WS3 (skills
-review/enhancement incl. deterministic kernels + CC1-CC3 verification) -> WS4 (orchestration web) -> WS5
-(conversational PCC + Cowork NBA loop) + WS6 (help) -> WS7 (foundation/release) -> WS8 (data-layer/kernels, as
-you green-light the sensitive ones) -> **WS9 (ARIA recipes + procurement ARIA plugin, the capstone; gated by
-CC1-CC3 + the Phase-0 native-tool spike).**
+## Sequence
+See **PRIORITY ORDER (phased)** near the top. In brief:
+**Phase 1 dashboards** (WS0 RFx -> WS1 Category Strategy -> Deep Dive -> My Work -> WS2 finish Landscape; all five
+locked) -> **Phase 2 skills** (WS3a cleanup -> WS3 review/enhancement + CC1-CC3) -> **Phase 3 conversational**
+(WS4 orchestration web -> WS5 PCC + Cowork NBA -> WS6 help) -> **Phase 4** (WS7 foundation/release -> WS8
+data-layer/kernels) -> **Phase 5 ARIA LAST** (WS9 recipes + plugin, branched, gated by CC1-CC3 + Phase-0 spike).
+CC1-CC3 woven through every phase.
