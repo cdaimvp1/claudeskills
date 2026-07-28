@@ -215,12 +215,17 @@ function csNarrNote(x) {
    section now gets its own screen under a tab, the same hub pattern as Deal and
    RFx: one screen, one job.
    Supplier Development is intentionally absent.                              */
+/* Order is the argument: what the category IS, what we buy and from whom, what
+   changed and why, what is happening outside and what could go wrong, and
+   therefore what we do. Strategy sits last because it is the conclusion, and
+   Trend & Change sits before Market & Risk because "spend jumped 28.8%" is the
+   question the market panel answers. */
 var CS_NAV = [
   ['overview', 'Overview',          null],
   ['spend',    'Spend & Suppliers', [['pareto', 'Pareto & Tail'], ['suppliers', 'Suppliers'], ['subcats', 'Subcategories']]],
+  ['trend',    'Trend & Change',    [['trend', 'Trend'], ['rational', 'Rationalization'], ['tail', 'Tail & Contracts']]],
   ['market',   'Market & Risk',     [['kraljic', 'Market & Kraljic'], ['porter', 'Porter Five Forces'], ['risk', 'Risk Register']]],
-  ['strategy', 'Strategy & Plays',  [['strategy', 'Strategy'], ['savings', 'Savings & Scorecard']]],
-  ['trend',    'Trend & Change',    [['trend', 'Trend'], ['rational', 'Rationalization'], ['tail', 'Tail & Contracts']]]
+  ['strategy', 'Strategy & Plays',  [['strategy', 'Strategy'], ['savings', 'Savings & Scorecard']]]
 ];
 var CS_SUBSTATE = { spend: 'pareto', market: 'kraljic', strategy: 'strategy', trend: 'trend' };
 
