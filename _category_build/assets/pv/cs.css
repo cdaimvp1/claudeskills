@@ -499,3 +499,28 @@ small,sub,sup{font-size:9px}
 .cs-ps-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
 .cs-ps-v{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--cs-mut)}
 .cs-ps-more{font-size:11px;color:var(--cs-mut);margin-top:8px}
+
+/* ---- platform Strategy blocks --------------------------------------------
+   .pillrow3 / .dk-pillar / .callout-blue / .seqline, carried across with the
+   palette and the locked type scale applied. Platform pillar type is 21/12/11;
+   this scale has no 21 or 12, so it renders 20/13/11.                        */
+.cs-pillrow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:900px){.cs-pillrow3{grid-template-columns:1fr}}
+.cs-pillar3{background:var(--cs-surface);border:1px solid var(--cs-line2);border-top:3px solid var(--cs-mut);
+  border-radius:14px;padding:16px;min-width:0}
+.cs-pillar3-plum{border-top-color:var(--cs-plum)}
+.cs-pillar3-teal{border-top-color:var(--cs-teal)}
+.cs-pillar3-burnt{border-top-color:var(--cs-burnt)}
+.cs-p3-k{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.cs-pillar3-plum .cs-p3-k{color:var(--cs-plum)}
+.cs-pillar3-teal .cs-p3-k{color:var(--cs-teal)}
+.cs-pillar3-burnt .cs-p3-k{color:var(--cs-burnt)}
+.cs-p3-t{font-size:13px;font-weight:700;color:var(--cs-ink);margin-top:4px;line-height:1.35}
+.cs-p3-d{font-size:11px;color:var(--cs-mut);margin-top:5px;line-height:1.5}
+.cs-callout{background:transparent;border:1px solid var(--cs-line2);border-left:4px solid var(--cs-plum);
+  border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.55;margin-bottom:14px;color:var(--cs-ink)}
+.cs-callout>strong:first-child{color:var(--cs-plum)}
+.cs-callout .cs-nr{border-left:0;padding-left:0}
+.cs-seqline{margin:8px 0;font-size:13px;line-height:1.55}
+.cs-seqline strong{color:var(--cs-ink)}
+.cs-pre{white-space:pre-wrap}

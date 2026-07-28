@@ -1237,6 +1237,31 @@ small,sub,sup{font-size:9px}
 .cs-ps-v{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--cs-mut)}
 .cs-ps-more{font-size:11px;color:var(--cs-mut);margin-top:8px}
 
+/* ---- platform Strategy blocks --------------------------------------------
+   .pillrow3 / .dk-pillar / .callout-blue / .seqline, carried across with the
+   palette and the locked type scale applied. Platform pillar type is 21/12/11;
+   this scale has no 21 or 12, so it renders 20/13/11.                        */
+.cs-pillrow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:900px){.cs-pillrow3{grid-template-columns:1fr}}
+.cs-pillar3{background:var(--cs-surface);border:1px solid var(--cs-line2);border-top:3px solid var(--cs-mut);
+  border-radius:14px;padding:16px;min-width:0}
+.cs-pillar3-plum{border-top-color:var(--cs-plum)}
+.cs-pillar3-teal{border-top-color:var(--cs-teal)}
+.cs-pillar3-burnt{border-top-color:var(--cs-burnt)}
+.cs-p3-k{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.cs-pillar3-plum .cs-p3-k{color:var(--cs-plum)}
+.cs-pillar3-teal .cs-p3-k{color:var(--cs-teal)}
+.cs-pillar3-burnt .cs-p3-k{color:var(--cs-burnt)}
+.cs-p3-t{font-size:13px;font-weight:700;color:var(--cs-ink);margin-top:4px;line-height:1.35}
+.cs-p3-d{font-size:11px;color:var(--cs-mut);margin-top:5px;line-height:1.5}
+.cs-callout{background:transparent;border:1px solid var(--cs-line2);border-left:4px solid var(--cs-plum);
+  border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.55;margin-bottom:14px;color:var(--cs-ink)}
+.cs-callout>strong:first-child{color:var(--cs-plum)}
+.cs-callout .cs-nr{border-left:0;padding-left:0}
+.cs-seqline{margin:8px 0;font-size:13px;line-height:1.55}
+.cs-seqline strong{color:var(--cs-ink)}
+.cs-pre{white-space:pre-wrap}
+
 </style>
 </head>
 <body>
@@ -1657,9 +1682,6 @@ function scSuppliers() {
     + csKpi('Prior period', csNum(m.vendorsPrior), 'FY24 active')
     + '</div>';
 
-  h += csCard('Supplier Tiering', csTiering(d),
-      { sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
-
   var sRows = (d.suppliers || []).map(function (s) {
     return '<tr><td class="cs-l"><b>' + csEsc(s.n) + '</b></td>'
       + '<td class="cs-num">' + csUsd(s.tot) + '</td>'
@@ -1780,47 +1802,74 @@ function scRisk() {
 
 /* ===========================================================================
    SCREEN 8 — STRATEGY & PLAYS > STRATEGY
-   Taken from the platform's own Strategy section, block for block:
-     1 Strategy narrative (draft)   2 Recommendation   3 Recommended plays
-   The platform's fourth block, Supplier tiering, is NOT repeated here: it lives
-   on Spend & Suppliers > Suppliers. That is the redundancy strip.
+
+   Taken from the platform's liveStrategy(), block for block and in its order:
+
+     1  DK.card("Strategy narrative (Draft, pending your confirmation)")
+     2  <div class="callout-blue"><strong>Recommendation.</strong> ...
+     3  DK.card("Recommended plays (data-derived; ranges, pending confirmation)")
+        -> .pillrow3, six DK.pillar cards: big KIND, bold title, rationale plus
+           the estimated range and the effort
+     4  DK.card("Supplier tiering")
+        -> .seqline per tier: "<label> (tier n): N suppliers, P% of spend. <approach>"
+
+   Two adaptations, both forced and neither structural: the platform's pillar
+   type sits at 21/12/11 and this dashboard's scale is locked, so it renders
+   20/13/11; and .callout-blue is a blue wash, which the palette does not carry,
+   so the callout takes the plum rule instead.
    =========================================================================== */
+function csPillar(tone, k, t, dsc) {
+  return '<div class="cs-pillar3 cs-pillar3-' + tone + '">'
+    + '<div class="cs-p3-k">' + csEsc(k) + '</div>'
+    + '<div class="cs-p3-t">' + csEsc(t) + '</div>'
+    + '<div class="cs-p3-d">' + csEsc(dsc) + '</div></div>';
+}
 function scStrategy() {
   var d = csData(), n = d.narr || {};
   var h = '';
 
-  h += csCard('Recommendation', n.strategyRec ? '<div class="cs-thesis">' + csNarr(n.strategyRec) + '</div>'
-      : csGap('The recommended posture for this category.', 'narr.strategyRec'),
-      { cls: 'cs-emph', sub: 'the answer first', conf: csConfFor(d, 'narr') });
+  /* 1. Strategy narrative, first, exactly as the platform orders it. */
+  h += csCard('Strategy narrative (Draft, pending your confirmation)',
+      n.passThru ? '<div class="cs-prose cs-pre">' + csNarr(n.passThru) + '</div>'
+                 : csGap('The written articulation of the strategy.', 'narr.passThru'),
+      { conf: csConfFor(d, 'narr') });
 
-  var horizons = [1, 3, 5].map(function (y) {
-    return '<button class="cs-seg' + (CS_HORIZON === y ? ' on' : '') + '" onclick="csSetHorizon(' + y + ')">'
-      + (y === 1 ? 'Year 1' : y + ' years') + '</button>';
-  }).join('');
+  /* 2. Recommendation callout, not a card. */
+  // The callout already says "Recommendation."; the record's own title repeats it.
+  var recRec = n.strategyRec;
+  if (recRec && typeof recRec === 'object' && recRec.title) {
+    recRec = { c: recRec.c, k: recRec.k, lead: recRec.lead, d: recRec.d,
+               title: String(recRec.title).replace(/^recommendation\s*[:.-]\s*/i, '') };
+  }
+  h += n.strategyRec
+    ? '<div class="cs-callout"><strong>Recommendation.</strong> ' + csNarr(recRec) + '</div>'
+    : csCard('Recommendation', csGap('The recommended posture for this category.', 'narr.strategyRec'));
+
+  /* 3. Recommended plays: six pillars, three across. */
+  var TONES = ['plum', 'teal', 'burnt'];
   var plays = (d.savings || []).slice(0, 6).map(function (s, i) {
-    var mult = (CS_HORIZON === 1) ? 1 : (CS_HORIZON === 3 ? 2.4 : 3.6);
-    var lo = s.lo == null ? null : s.lo * mult, hi = s.hi == null ? null : s.hi * mult;
-    var conf = String(s.conf || '').toLowerCase();
-    var tone = /high/.test(conf) ? 'teal' : (/low/.test(conf) ? 'burnt' : 'plum');
-    return '<div class="cs-play">'
-      + '<div class="cs-play-h"><span class="cs-play-i">' + (i + 1) + '</span>'
-      + '<span class="cs-play-n">' + csEsc(s.lever) + '</span>'
-      + '<span class="cs-pill cs-pill-' + tone + '">' + csEsc(s.conf || 'confidence n/a') + '</span></div>'
-      + '<div class="cs-play-v">' + csRange(lo, hi)
-      + '<span class="cs-play-hz"> over ' + (CS_HORIZON === 1 ? 'year 1' : CS_HORIZON + ' years') + '</span></div>'
-      + (s.basis ? '<div class="cs-play-b">' + csEsc(s.basis) + '</div>' : '')
-      + '<div class="cs-play-t">' + csEsc(s.type || '') + '</div></div>';
+    var est = csRange(s.lo, s.hi, '/yr');
+    var dsc = (s.basis ? s.basis + ' ' : '') + 'Est. ' + est.replace(/<[^>]+>/g, '')
+      + (s.conf ? '; ' + String(s.conf).toLowerCase() + ' confidence.' : '.');
+    return csPillar(TONES[i % TONES.length], s.type || 'Lever', s.lever, dsc);
   }).join('');
-  h += csCard('Recommended Plays',
-      '<div class="cs-segbar">' + horizons + '</div>'
-      + (plays ? '<div class="cs-plays">' + plays + '</div>' : csGap('The levers available in this category.', 'savings[]'))
-      + csNote('Ranges are the modelled low and high for each lever, scaled to the selected horizon from its own basis. '
-        + 'They are an <b>estimate</b>, not an approved target: Savings &amp; Scorecard tracks the difference.'),
-      { sub: 'data-derived, pending confirmation', conf: csConfFor(d, 'savings') });
+  h += csCard('Recommended plays (data-derived; ranges, pending confirmation)',
+      plays ? '<div class="cs-pillrow3">' + plays + '</div>'
+            : csGap('The levers available in this category.', 'savings[]'),
+      { conf: csConfFor(d, 'savings') });
 
-  if (n.passThru) h += csCard('Strategy Narrative', csNarr(n.passThru),
-      { cls: 'cs-quiet', sub: 'draft, pending your confirmation', conf: 'Moderate' });
+  /* 4. Supplier tiering. */
+  h += csCard('Supplier tiering', csTieringLines(d), { conf: csConfFor(d, 'suppliers') });
   return h;
+}
+/* The platform renders tiering as prose seqlines, not a table. */
+function csTieringLines(d) {
+  var t = d.supplierTiering || csDeriveTiers(d);
+  if (!t.length) return csGap('Supplier tiering.', 'supplierTiering[] or a tier per supplier');
+  return '<div class="cs-prose">' + t.map(function (x) {
+    return '<div class="cs-seqline"><strong>' + csEsc(x.label) + ' (tier ' + csEsc(x.tier) + '):</strong> '
+      + csNum(x.supplierCount) + ' suppliers, ' + csPct(x.spendShare) + ' of spend. ' + csEsc(x.approach) + '</div>';
+  }).join('') + '</div>';
 }
 
 /* ===========================================================================
@@ -2446,54 +2495,35 @@ function csTailRead(d) {
     + ' of spend. That is the case for a catalogue route rather than a sourcing event.');
 }
 
-/* ---- Suppliers: tiering, the platform block restored ---------------------- */
-function csTiering(d) {
-  if ((d.supplierTiering || []).length) {
-    return csTable(['Tier', 'Suppliers', 'Share of spend', 'How it is managed'],
-      d.supplierTiering.map(function (t) {
-        return '<tr><td class="cs-l"><b>' + csEsc(t.label) + '</b><span class="cs-sub2">tier ' + csEsc(t.tier) + '</span></td>'
-          + '<td class="cs-num">' + csNum(t.supplierCount) + '</td>'
-          + '<td class="cs-num">' + csPct((t.spendShare || 0) * (t.spendShare <= 1 ? 100 : 1)) + '</td>'
-          + '<td class="cs-why">' + csEsc(t.approach) + '</td></tr>';
-      }));
-  }
-  /* Derived from the tier already carried on each supplier record. */
+/* ---- tier derivation, used by the platform's Supplier tiering block -------
+   The seed carries a tier on each supplier record but no tiering summary, so
+   the summary is grouped from those tiers rather than invented.             */
+var CS_TIER_APPROACH = {
+  'Strategic': 'Joint roadmap, executive sponsor and quarterly business review. Competed only at renewal, and only with a credible alternative in hand.',
+  'Preferred': 'Benchmarked every cycle and competed at renewal. The default posture for anything not genuinely unique.',
+  'Under Review': 'Scope and value under active challenge. Renew, reduce or replace within this planning cycle.',
+  'Transactional': 'Catalogue or standing order. No sourcing event unless the spend crosses the threshold.'
+};
+function csDeriveTiers(d) {
   var sup = d.suppliers || [];
-  if (!sup.length) return csGap('Supplier tiering.', 'supplierTiering[] or a tier per supplier');
-  var APPROACH = {
-    'Strategic': 'Joint roadmap, executive sponsor, quarterly business review. Competed only at renewal, and only with a credible alternative in hand.',
-    'Preferred': 'Benchmarked every cycle and competed at renewal. The default posture for anything that is not genuinely unique.',
-    'Under Review': 'Scope and value under active challenge. Renew, reduce or replace within this planning cycle.',
-    'Transactional': 'Catalogue or standing order. No sourcing event unless the spend crosses the threshold.'
-  };
+  if (!sup.length) return [];
   var order = ['Strategic', 'Preferred', 'Under Review', 'Transactional'];
   var groups = {};
   sup.forEach(function (s) { var k = s.tier || 'Untiered'; (groups[k] = groups[k] || []).push(s); });
-  var keys = Object.keys(groups).sort(function (a, b) {
+  var out = Object.keys(groups).sort(function (a, b) {
     var ia = order.indexOf(a), ib = order.indexOf(b);
     return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  }).map(function (k, i) {
+    var g = groups[k];
+    return { label: k, tier: i + 1, supplierCount: g.length,
+             spendShare: g.reduce(function (a, s) { return a + (s.share || 0); }, 0),
+             approach: CS_TIER_APPROACH[k] || 'No posture recorded for this tier.' };
   });
-  var rows = keys.map(function (k) {
-    var g = groups[k], share = g.reduce(function (a, s) { return a + (s.share || 0); }, 0);
-    var spend = g.reduce(function (a, s) { return a + (s.tot || 0); }, 0);
-    return '<tr><td class="cs-l"><b>' + csEsc(k) + '</b></td>'
-      + '<td class="cs-num">' + csNum(g.length) + '</td>'
-      + '<td class="cs-barcell">' + csBar(share, 'plum') + '</td>'
-      + '<td class="cs-num">' + csPct(share) + '</td>'
-      + '<td class="cs-num">' + csUsd(spend) + '</td>'
-      + '<td class="cs-why">' + csEsc(APPROACH[k] || 'No posture recorded for this tier.') + '</td></tr>';
-  });
+  var named = sup.reduce(function (a, s) { return a + (s.share || 0); }, 0);
   var tailN = (d.meta || {}).vendors ? d.meta.vendors - sup.length : 0;
-  if (tailN > 0) {
-    rows.push('<tr><td class="cs-l"><b>Tail</b></td><td class="cs-num">' + csNum(tailN) + '</td>'
-      + '<td class="cs-barcell">' + csBar(100 - sup.reduce(function (a, s) { return a + (s.share || 0); }, 0), 'emph') + '</td>'
-      + '<td class="cs-num">' + csPct(100 - sup.reduce(function (a, s) { return a + (s.share || 0); }, 0)) + '</td>'
-      + '<td class="cs-num">--</td>'
-      + '<td class="cs-why">' + csEsc(APPROACH.Transactional) + '</td></tr>');
-  }
-  return csTable(['Tier', 'Suppliers', '', 'Share of spend', '3-yr spend', 'How it is managed'], rows)
-    + csNote('Tiers are read from the tier already carried on each supplier record. The posture per tier is the '
-      + 'standard category approach, not a per-supplier decision.');
+  if (tailN > 0) out.push({ label: 'Transactional tail', tier: out.length + 1, supplierCount: tailN,
+                            spendShare: 100 - named, approach: CS_TIER_APPROACH.Transactional });
+  return out;
 }
 
 /* ---- Subcategories: fragmentation as spend against vendor count ----------- */
