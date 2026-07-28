@@ -628,9 +628,8 @@ function pvDynamicsHtml(refl){
  if(order.length<2){
    body='<div class="footbound" style="margin-top:14px">A head-to-head needs at least two candidate suppliers.</div>';
  } else {
-   if(PVSL_H2H_A>=order.length||PVSL_H2H_A<0)PVSL_H2H_A=0;
-   if(PVSL_H2H_B>=order.length||PVSL_H2H_B<0)PVSL_H2H_B=Math.min(1,order.length-1);
-   if(PVSL_H2H_B===PVSL_H2H_A)PVSL_H2H_B=(PVSL_H2H_A+1)%order.length;
+   /* Fixed to the top two ranked candidates now that the picker is gone. */
+   PVSL_H2H_A=0; PVSL_H2H_B=Math.min(1,order.length-1);
    var A=order[PVSL_H2H_A],B=order[PVSL_H2H_B];
    var xA=pvAssess(A,pvCandById(A.id),PVSL_INPUT||{}),xB=pvAssess(B,pvCandById(B.id),PVSL_INPUT||{});
    var h2cA=(typeof pvH2HCounts==='function')?pvH2HCounts(xA):{mustGap:0},h2cB=(typeof pvH2HCounts==='function')?pvH2HCounts(xB):{mustGap:0};
@@ -728,7 +727,11 @@ function pvDynamicsHtml(refl){
    var eca=xA.evidenceCoverage||{},ecb=xB.evidenceCoverage||{};
    var evRows=evCats.map(function(c){var va=Math.round(eca[c[1]]||0),vb=Math.round(ecb[c[1]]||0);return spineRow({lLab:va+'%',lc:c[2],lw:va,lbar:c[2],lon:va>0,mid:c[0],sub:'',rw:vb,rbar:c[2],ron:vb>0,rLab:vb+'%',rc:c[2]});}).join('');
    var evSect=sect('Evidence confidence',spineHd+'<div class="cdyn-dvg">'+evRows+'</div>');
-   body=raceLine+picker+h2hBand+h2hSub+cards+cmpHd+dvg+riskSect+commSect+evSect;
+   /* OV1: the COMPARE launcher is removed from Overview. The card keeps its
+      competitive-dynamics read on the top two ranked candidates; choosing an
+      arbitrary pair is what the dedicated Head-to-Head tab is for, and having
+      the control in both places invited the reader to do the same job twice. */
+   body=raceLine+h2hBand+h2hSub+cards+cmpHd+dvg+riskSect+commSect+evSect;
  }
  return '<div class="sa-card">'+
    '<div class="card-hd"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="ct">Competitive Dynamics &amp; Head-to-Head</span></div>'+

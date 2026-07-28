@@ -54,20 +54,18 @@ to `.card-hd`. Marc did not select it.
 
 ## PARKED — needs Marc
 
-### 1. Which Head-to-Head element is "the launcher"
-- **Decided by Marc:** remove it.
-- **Ambiguity:** OV1 says remove the Overview tab's "compare candidates"
-  launcher. There are two candidates in the source:
-  (a) the `Competitive Dynamics & Head-to-Head` card on the Overview tab
-      (`pv-07-landscape-render.js` ~line 604-734), which contains an interactive
-      COMPARE control, and
-  (b) the standalone `Head-to-Head` tab itself (`pvH2HHtml`, `pv-07b-deepdive.js`
-      ~line 880), which is a full tab and is almost certainly NOT what OV1 means.
-- **What I would do:** remove the COMPARE launcher control from (a) and keep the
-  competitive-dynamics content and the (b) tab intact, because OV1 is listed
-  under Overview items and HH1 separately asks to revert the Head-to-Head tab to
-  its old embedded-compare look, which only makes sense if the tab survives.
-- **Status:** PARKED. One line of confirmation unblocks it.
+### 1. Head-to-Head launcher — RESOLVED 2026-07-28
+- **Marc: do what you recommend.** Done as recommended: the COMPARE picker is
+  removed from the Overview card; the card keeps its competitive-dynamics read,
+  now fixed to the top two ranked candidates, and the dedicated Head-to-Head tab
+  is untouched.
+- **Why that reading:** OV1 is filed under Overview items, and HH1 separately
+  asks to revert the Head-to-Head TAB to its old embedded-compare look, which
+  only makes sense if the tab survives. Having the same control in both places
+  invited the reader to do one job twice.
+- **Verified:** no select control and no "Compare" text on Overview, dynamics
+  card content intact, H2H tab renders.
+- **Status:** CLOSED.
 
 ### 2. Deep-dive "complete vs remaining" contradiction — RESOLVED 2026-07-28
 - **Marc's call: it is COMPLETE.** The Landscape Supplier Deep Dive tab (P2) is
