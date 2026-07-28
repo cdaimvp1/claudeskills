@@ -24,12 +24,19 @@ screen). Both must be rebuilt and copied on every change.
 
 ---
 
-## NEXT ACTION: Deal #16
+## NEXT ACTION: Deal #17 — lock, then the docs/skills set
 
-Full-tab verification plus a full-codebase malicious-code sweep, including the
-single-file demo. Required before #17 locks the dashboard.
+Deal #11, #12, #14 and #16 are DONE and verified live. #16 passed both halves;
+the evidence is in `_deal_build/DEAL-16-VERIFICATION.md`. #17 is not blocked.
 
-#11, #12 and #14 are DONE and verified live. See the log below.
+#17 is a decision, not a build: it locks the Deal dashboard. Six judgment calls
+are parked for Marc and none of them block the lock, but he may want to answer
+them first. They are listed under "Parked" below.
+
+After that, the docs/skills set from the agreed overnight scope: D2 shared
+no-green rule (~26 skills, colour tables only), D1 lens-skill canonicals, D3
+formalise the redesigned tabs, D4 encode the shipped 4-tab IA, L3 Landscape
+palette prose.
 
 ---
 
