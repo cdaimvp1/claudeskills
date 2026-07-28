@@ -480,7 +480,7 @@ const DealUI = {
       if (scope) { scope.setAttribute('data-fq', cq.value || ''); this._coApply(scope); }
     });
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-unfocus],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-cofilter],[data-coexpand],[data-pf-view],[data-pf-setdepth]');
+      const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-unfocus],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-cofilter],[data-coexpand],[data-psfilter],[data-pf-view],[data-pf-setdepth]');
       if (!t) return;
 
       if (t.hasAttribute('data-tab')) { this.showTab(t.getAttribute('data-tab')); return; }
@@ -537,6 +537,41 @@ const DealUI = {
           if (bs.slice(0, bi) === kind) b.setAttribute('aria-pressed', bs.slice(bi + 1) === next ? 'true' : 'false');
         });
         this._coApply(scope);
+        return;
+      }
+      /* Positions severity filter. Selecting a severity narrows the master list;
+         if the selected row is filtered out, selection moves to the first row
+         still visible so the detail pane never shows something the list denies. */
+      if (t.hasAttribute('data-psfilter')) {
+        const val = t.getAttribute('data-psfilter');
+        const bar = t.closest('[data-psscope]'); if (!bar) return;
+        const master = bar.parentNode.querySelector('[data-scmaster]'); if (!master) return;
+        const cur = bar.getAttribute('data-fsev') || '';
+        const next = (val === '') ? '' : (cur === val ? '' : val);
+        bar.setAttribute('data-fsev', next);
+        bar.querySelectorAll('[data-psfilter]').forEach((b) => {
+          const bv = b.getAttribute('data-psfilter');
+          b.setAttribute('aria-pressed', (bv === next || (bv === '' && next === '')) ? 'true' : 'false');
+        });
+        let shown = 0, firstVisible = null;
+        master.querySelectorAll('.ps-row').forEach((r) => {
+          const on = !next || r.getAttribute('data-sev') === next;
+          r.hidden = !on;
+          if (on) { shown++; if (!firstVisible) firstVisible = r; }
+        });
+        const c = bar.querySelector('[data-pscount]'); if (c) c.textContent = shown;
+        const sel = master.querySelector('.ps-row.sc-sel');
+        if (firstVisible && (!sel || sel.hidden)) firstVisible.click();
+        let none = master.querySelector('.ps-nohits');
+        if (!shown) {
+          if (!none) {
+            none = document.createElement('div');
+            none.className = 'ps-nohits';
+            (master.querySelector('.ps-list') || master).appendChild(none);
+          }
+          none.textContent = 'No position at that severity.';
+          none.hidden = false;
+        } else if (none) { none.hidden = true; }
         return;
       }
       if (t.hasAttribute('data-coexpand')) {

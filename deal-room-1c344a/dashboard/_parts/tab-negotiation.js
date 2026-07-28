@@ -146,7 +146,8 @@ function renderTab_negotiation(d) {
 
     const listHtml = rows.map((iss, i) => {
       const pkg = pkgOf(iss.id);
-      return '<div class="ps-row' + (i === 0 ? ' sc-sel' : '') + '" role="button" tabindex="0" data-scpick="' + esc(iss.id) + '" title="Show detail">' +
+      return '<div class="ps-row' + (i === 0 ? ' sc-sel' : '') + '" role="button" tabindex="0" data-scpick="'
+        + esc(iss.id) + '" data-sev="' + esc(String(iss.priority || 'medium').toLowerCase()) + '" title="Show detail">' +
         severityPill(iss.priority) +
         '<span class="ps-r-txt"><span class="ps-r-t">' + esc(iss.title) + '</span>' +
         '<span class="ps-r-c">' + esc(iss.id) + ' &middot; ' + esc(iss.category) + '</span></span>' +
@@ -186,7 +187,24 @@ function renderTab_negotiation(d) {
         '<div class="ps-sec-h">Dependencies</div><div class="ps-deps">' + (deps.length ? deps.join('') : '<span class="ps-ladder-note">Standalone term.</span>') + '</div>' +
         '<div class="ps-sec-h">History &middot; this term across the redlines</div>' + hist + '</div>';
     }
-    const md = '<div class="ps-md" data-scmaster><div class="ps-list">' + listHtml + '</div>' +
+    /* Severity filter, per the locked mockup. Counts are shown because a filter
+       that hides rows without saying how many is a filter people distrust. */
+    const sevCount = { 'hard-stop': 0, high: 0, medium: 0, low: 0 };
+    rows.forEach((x) => {
+      const k = String(x.priority || 'medium').toLowerCase();
+      if (sevCount[k] != null) sevCount[k]++;
+    });
+    const SEVL = { 'hard-stop': 'Hard stop', high: 'High', medium: 'Medium', low: 'Low' };
+    const sevBar = '<div class="ps-filters" data-psscope data-fsev="">' +
+      '<span class="ps-fl-lbl">Severity</span>' +
+      Object.keys(SEVL).filter((k) => sevCount[k] > 0).map((k) =>
+        '<button class="ps-fchip ps-sev-' + k + '" data-psfilter="' + k + '" aria-pressed="false">' +
+        SEVL[k] + '<b>' + sevCount[k] + '</b></button>').join('') +
+      '<button class="ps-fchip ps-fclear" data-psfilter="" aria-pressed="true">All<b>' +
+      rows.length + '</b></button>' +
+      '<span class="ps-fl-count"><b data-pscount>' + rows.length + '</b> shown</span></div>';
+
+    const md = sevBar + '<div class="ps-md" data-scmaster><div class="ps-list">' + listHtml + '</div>' +
       '<div class="ps-detailwrap">' + rows.map(detailPanel).join('') + '</div></div>';
 
     return '<div class="grid"><div class="col-12">' +
@@ -726,6 +744,15 @@ function renderTab_negotiation(d) {
     '.neg-tab .ps-dist-i{display:inline-flex;align-items:center;gap:4px}' +
     '.neg-tab .ps-dist-i .sev-ic{width:12px;height:12px}' +
     '.neg-tab .ps-dist-i b{color:var(--ink);font-variant-numeric:tabular-nums}' +
+    '.neg-tab .ps-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}' +
+    '.neg-tab .ps-fl-lbl{font:700 11px var(--mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--mut2)}' +
+    '.neg-tab .ps-fchip{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--sans);color:var(--mut);background:var(--surface);border:1px solid var(--line2);border-radius:30px;padding:5px 12px;cursor:pointer}' +
+    '.neg-tab .ps-fchip b{font-weight:800;color:var(--ink)}' +
+    '.neg-tab .ps-fchip:hover{border-color:var(--mut2)}' +
+    '.neg-tab .ps-fchip[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:#fff}' +
+    '.neg-tab .ps-fchip[aria-pressed="true"] b{color:#fff}' +
+    '.neg-tab .ps-fl-count{margin-left:auto;font:600 11px var(--sans);color:var(--mut)}' +
+    '.neg-tab .ps-nohits{font-size:13px;color:var(--mut);padding:16px 0;text-align:center}' +
     '.neg-tab .ps-md{display:grid;grid-template-columns:300px 1fr;background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden}' +
     '.neg-tab .ps-list{border-right:1px solid var(--line);max-height:660px;overflow:auto}' +
     '.neg-tab .ps-row{display:flex;gap:9px;align-items:flex-start;padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer}' +

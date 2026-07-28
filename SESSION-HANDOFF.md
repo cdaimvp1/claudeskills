@@ -24,19 +24,12 @@ screen). Both must be rebuilt and copied on every change.
 
 ---
 
-## NEXT ACTION: Deal #12
+## NEXT ACTION: Deal #16
 
-Communications filters and Expand-all. Status/category/search need a DealUI
-delegated handler; `_filterTable` is table-only and cannot serve them. The
-summary strip is counts-only today. File: `deal-room-1c344a/dashboard/_parts/`,
-the communications tab renderer.
+Full-tab verification plus a full-codebase malicious-code sweep, including the
+single-file demo. Required before #17 locks the dashboard.
 
-Then, in order:
-- **#11** Positions port to the locked `MOCKUP-negotiation-positions.html`. Live
-  `buildPositions` is still the old design. Largest of the three; do not start it
-  half-way.
-- **#16** full-tab verification plus a full-codebase malicious-code sweep,
-  including the single-file demo. Required before #17 locks the dashboard.
+#11, #12 and #14 are DONE and verified live. See the log below.
 
 ---
 
@@ -81,6 +74,14 @@ Then, in order:
    tool and run them, rather than piping long scripts through bash.
 7. Production Category Strategy opens on category 0 = IT Professional Services.
    Software-only features correctly read "needs data" there. Test on `-DEMO`.
+8. **`DealUI` is an object literal, not a class.** A new method needs a trailing
+   comma. Without it the file parses as far as the NEXT method name and throws
+   "Unexpected identifier" pointing at innocent code several lines below the real
+   error.
+9. **Two tracker entries were stale.** #12 claimed no Communications filters were
+   wired; three of four were. #11 claimed Positions was "still the old design";
+   every block of the locked mockup was already live. Verify against the running
+   dashboard before building from a tracker entry.
 
 ---
 
