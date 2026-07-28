@@ -2811,6 +2811,20 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .schm .schm-w{font:700 11.5px var(--mono);color:var(--mut);text-align:center}
 .schm .hcell.hc-na{background:transparent;color:var(--mut2);font-family:var(--mono);font-weight:700;
   letter-spacing:.06em;cursor:help;border:1px dashed var(--line2)}
+
+/* ===== TYPE SCALE: RFx Overview tab (Marc 2026-07-27) ======================================
+   The tab measured THIRTEEN distinct font sizes. Six steps, each with a job:
+     22 display (KPI figure) · 14 title · 13 body · 12 body-sm · 11 meta · 9 label
+   The inline sizes were mapped in the render functions; these five classes carried the last
+   strays from CSS. Scoped to the classes themselves, which only appear on this tab's panels. */
+.ovav{font-size:11px}          /* was 9.5px  */
+.orr{font-size:11px}           /* was 10.5px */
+.glabhd{font-size:11px}        /* was 10.5px */
+.rfxflag-k{font-size:9px}      /* was 8px    */
+.gate.fail,.gate.ok{font-size:9px}  /* was 8.5px */
+
+.ovrp .ovav{font-size:11px}
+.ovrp .orr{font-size:11px}
 </style><style>/* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *
@@ -5505,8 +5519,8 @@ function rfxAwardTier(si,rankIdx){var c=rfxCoverage(si);
  if(c.answered===0)return {label:'Not Recommended',col:'#C8202E',bg:'var(--pink-t,#FBE7E3)',key:'not'};
  // Ranking policy: the #1 scorer keeps the #1 slot even with an open Must-Have gap, flagged (not demoted).
  if(c.disqualified)return rankIdx===0
-  ?{label:'Merit Leader - Gated',col:'var(--amber-d)',bg:'var(--amber-t,#FBF1DA)',key:'leadergate'}
-  :{label:'Conditional',col:'var(--amber-d)',bg:'var(--amber-t,#FBF1DA)',key:'cond'};
+  ?{label:'Merit Leader - Gated',col:'#C15E19',bg:'#F4F1EC',key:'leadergate'}
+  :{label:'Conditional',col:'#C15E19',bg:'#F4F1EC',key:'cond'};
  if(rankIdx===0)return {label:'Primary',col:'var(--plum)',bg:'rgba(92,43,80,.12)',key:'primary'};
  return (si===rfxConformingLeaderSi())
   ?{label:'Conforming Leader',col:'var(--plum)',bg:'rgba(92,43,80,.12)',key:'confleader'}
@@ -5531,7 +5545,7 @@ function rfxLevelFg(l){return l==='fully'?'#fff':'var(--ink,#1A1A1A)';}
 function rfxKpi(label,value,sub,tone){var col=tone==='good'?'var(--plum)':tone==='warn'?'#C8202E':tone==='amber'?'#8A5A00':'var(--ink,#1A1A1A)';
  return '<div class="card" style="margin:0;padding:12px 13px"><div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2)">'+escapeHtmlPV(label)+'</div><div style="font-size:22px;font-weight:800;line-height:1.1;margin-top:5px;color:'+col+'">'+value+'</div>'+(sub?'<div style="font-size:11px;color:var(--mut2);margin-top:4px;line-height:1.35">'+sub+'</div>':'')+'</div>';}
 function rfxSevPill(sev){var m={critical:['#C8202E','var(--pink-t,#FBE7E3)'],high:['#C8202E','var(--pink-t,#FBE7E3)'],medium:['#8A5A00','var(--amber-t,#FBF1DA)'],low:['#2E5E8C','var(--blue-t,#E4EBF1)'],none:['var(--mut2)','#EFECE8']};var c=m[sev]||m.none;
- return '<span style="display:inline-block;font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+escapeHtmlPV(sev)+'</span>';}
+ return '<span style="display:inline-block;font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+escapeHtmlPV(sev)+'</span>';}
 function rfxPrioPill(p){var m={GATING:['#C8202E','var(--pink-t,#FBE7E3)'],HIGH:['#8A5A00','var(--amber-t,#FBF1DA)'],MEDIUM:['#2E5E8C','var(--blue-t,#E4EBF1)']};var c=m[p]||['var(--mut2)','#EFECE8'];
  return '<span style="display:inline-block;font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+escapeHtmlPV(p)+'</span>';}
 function rfxTprmPill(sc){if(!sc)return '<span style="font-size:11px;color:var(--mut2)">Data not available</span>';
@@ -5647,7 +5661,7 @@ function rfxGlyph(kind,label){var m={done:['✓','var(--plum)'],half:['◐','#2E
  if(kind==='nt')return '<span title="Data not available" style="display:inline-flex;align-items:center;font-family:var(--mono,monospace);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--mut2);cursor:help;white-space:nowrap">--</span>';
  return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink);white-space:nowrap"><span style="font-size:12px;font-weight:700;width:12px;text-align:center;flex:none;color:'+c[1]+'">'+c[0]+'</span>'+escapeHtmlPV(label)+'</span>';}
 // Small pill chip, reused by Completeness & Risk roll-up below.
-function rfxChip(label,col,bg){return '<span style="display:inline-block;font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+col+';background:'+bg+'">'+escapeHtmlPV(label)+'</span>';}
+function rfxChip(label,col,bg){return '<span style="display:inline-block;font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+col+';background:'+bg+'">'+escapeHtmlPV(label)+'</span>';}
 // Participation panel (Overview; ported from the RFx-MOCKUP.html design, bound to real RFX + restyled
 // to pv-09 classes/vars). Supplier x Agreed / CDA / MSA / Response / Demo-set / Demo-done, each a
 // shape+label glyph so state never relies on color alone. Response is the only column derived from a
@@ -5681,7 +5695,7 @@ function rfxParticipationHTML(){var R=RFX,p=R.phase||{};
  }).join('');
  var total=p.suppliersTotal!=null?p.suppliersTotal:R.suppliers.length;
  var awaitTxt=(p.suppliersAwaiting>0)?(p.suppliersAwaiting+' of '+total+' invited supplier(s) still to respond.'):('All '+total+' invited supplier(s) have responded.');
- var key='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:10.5px;color:var(--mut2)"><span>Glyph key:</span>'+rfxGlyph('done','done')+rfxGlyph('half','in progress')+rfxGlyph('flag','blocked / attention')+rfxGlyph('dash','not started')+rfxGlyph('nt','')+'<span style="margin-left:-4px">data not available (hover for detail)</span></div>';
+ var key='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:11px;color:var(--mut2)"><span>Glyph key:</span>'+rfxGlyph('done','done')+rfxGlyph('half','in progress')+rfxGlyph('flag','blocked / attention')+rfxGlyph('dash','not started')+rfxGlyph('nt','')+'<span style="margin-left:-4px">data not available (hover for detail)</span></div>';
  return '<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:2px">Participation</div><div class="spnote" style="margin:0 0 8px">'+escapeHtmlPV(awaitTxt)+' Agreed is inferred from appearing on the invited-bidder list; CDA and demo scheduling carry no data on file in this RFx case, shown as -- (data not available) rather than guessed.</div><div class="mxwrap"><table class="mx" style="width:100%"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>'+key+'</div>';
 }
 // Completeness & Risk roll-up (Overview; ported from the RFx-MOCKUP.html design, bound to real RFX).
@@ -5716,9 +5730,9 @@ function rosterHTML(members,cols){
  var c=cols||2;
  var items=members.map(function(m){var nm=m.n||m.name||'',role=m.role||'';
   return '<div style="display:flex;align-items:center;gap:8px;min-width:0">'
-   +'<span style="flex:none;width:26px;height:26px;border-radius:50%;background:var(--blue-t,#E4EBF1);color:var(--plum);font:700 10px var(--mono,monospace);display:flex;align-items:center;justify-content:center">'+escapeHtmlPV(initialsOf(nm))+'</span>'
-   +'<div style="min-width:0"><div style="font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(nm)+'</div>'
-   +(role?'<div style="font-size:10.5px;color:var(--mut2);line-height:1.2">'+escapeHtmlPV(role)+'</div>':'')+'</div></div>';}).join('');
+   +'<span style="flex:none;width:26px;height:26px;border-radius:50%;background:var(--blue-t,#E4EBF1);color:var(--plum);font:700 11px var(--mono,monospace);display:flex;align-items:center;justify-content:center">'+escapeHtmlPV(initialsOf(nm))+'</span>'
+   +'<div style="min-width:0"><div style="font-size:12px;font-weight:700;color:var(--ink);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(nm)+'</div>'
+   +(role?'<div style="font-size:11px;color:var(--mut2);line-height:1.2">'+escapeHtmlPV(role)+'</div>':'')+'</div></div>';}).join('');
  return '<div style="display:grid;grid-template-columns:repeat('+c+',minmax(0,1fr));gap:8px 14px">'+items+'</div>';
 }
 // Reusable info affordance, an "i"-in-a-circle that reveals reference prose on hover/focus, so
@@ -5741,7 +5755,7 @@ function rfxEventStripHTML(){var R=RFX;var p=R.phase;
  var stage=(wna&&wna.node)||p.name;   // the workflow node/step the project is on
  var nextAct=wna?(escapeHtmlPV(wna.act)+(wna.who?' <span style="color:var(--mut2)">- '+escapeHtmlPV(wna.who)+'</span>':'')):'-';
  var rfxName=(typeof PROJECTS!=='undefined'&&typeof CURPROJ!=='undefined'&&PROJECTS[CURPROJ]&&PROJECTS[CURPROJ].title)||'Enterprise Data Platform RFP';
- var glab='font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin-bottom:3px';
+ var glab='font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin-bottom:3px';
  // Round-2 #3 (Marc) BUG FIX: `wrap` lets a fact value WRAP onto multiple lines instead of the
  // default .ovfacts .val nowrap+ellipsis truncation (was cutting the Next action text off mid-word).
  function fct(label,val,col,wrap){var _t=String(val).replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').trim();return '<div class="ovfact"><div style="'+glab+'">'+escapeHtmlPV(label)+'</div><div class="val" title="'+escapeHtmlPV(_t)+'" style="color:'+(col||'var(--ink)')+(wrap?';white-space:normal;overflow:visible;text-overflow:clip;line-height:1.4':'')+'">'+val+'</div></div>';}
@@ -5809,19 +5823,19 @@ function rfxMergedRankingHTML(){var R=RFX;var rank=rfxReqRanking();
  rank.forEach(function(si,i){var c=rfxCoverage(si),tier=rfxAwardTier(si,i),on=si===sel;
   var wf=c.weightedFit,pc=c.coveragePct,ns=c.answered===0;
   left+='<div onclick="rfxDD('+si+')" style="cursor:pointer;padding:10px 11px;border-radius:9px;margin-bottom:8px;border:1px solid '+(on?'var(--plum)':'var(--line2,#E0DCD5)')+';background:'+(on?'rgba(92,43,80,.05)':'var(--card,#fff)')+'">';
-  left+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:'+tier.col+';background:'+tier.bg+'">'+(i+1)+'</span><span style="font-weight:700;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(R.suppliers[si].n)+'</span><span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+'</span>'+(R.suppliers[si].mustFail&&R.suppliers[si].mustFail.length?' <span class="gate fail" title="Ranked on merit; this Must-Have must be cleared before award, the panel decides">&#9888; Must clear: '+escapeHtmlPV(R.suppliers[si].mustFail.join(', '))+'</span>':'')+'</div>';
-  left+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:78px;font-size:9.5px;color:var(--mut2);font-weight:600">Weighted fit</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+wf+'%;background:'+tier.col+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+tier.col+'">'+wf+'</span></div>';
-  left+='<div style="display:flex;align-items:center;gap:8px"><span style="width:78px;font-size:9.5px;color:var(--mut2);font-weight:600">Coverage</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+pc+'%;background:'+rfxCovCol(pc)+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+(ns?'var(--mut2)':rfxPcCol(pc))+'">'+(ns?'-':pc+'%')+'</span></div>';
+  left+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:'+tier.col+';background:'+tier.bg+'">'+(i+1)+'</span><span style="font-weight:700;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(R.suppliers[si].n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+'</span>'+(R.suppliers[si].mustFail&&R.suppliers[si].mustFail.length?' <span class="gate fail" title="Ranked on merit; this Must-Have must be cleared before award, the panel decides">&#9888; Must clear: '+escapeHtmlPV(R.suppliers[si].mustFail.join(', '))+'</span>':'')+'</div>';
+  left+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:78px;font-size:9px;color:var(--mut2);font-weight:600">Weighted fit</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+wf+'%;background:'+tier.col+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+tier.col+'">'+wf+'</span></div>';
+  left+='<div style="display:flex;align-items:center;gap:8px"><span style="width:78px;font-size:9px;color:var(--mut2);font-weight:600">Coverage</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+pc+'%;background:'+rfxCovCol(pc)+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+(ns?'var(--mut2)':rfxPcCol(pc))+'">'+(ns?'-':pc+'%')+'</span></div>';
   left+='</div>';
  });
  var c=rfxCoverage(sel),tier=rfxAwardTier(sel,selRankIdx),s=R.suppliers[sel];
  var st=rfxStrengths(sel),gp=rfxGaps(sel);
  var right='<div style="padding:12px 13px;border-radius:9px;border:1px solid var(--line2,#E0DCD5);background:var(--bg,#FBFAF9)">';
- right+='<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px"><span style="font-weight:800;font-size:14px">'+escapeHtmlPV(s.n)+'</span><span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+' · rank '+(selRankIdx+1)+'</span></div>';
- right+='<div style="font-size:12.5px;color:var(--ink);line-height:1.55;margin-bottom:9px">'+rfxRecoText(sel,selRankIdx)+'</div>';
+ right+='<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px"><span style="font-weight:800;font-size:14px">'+escapeHtmlPV(s.n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+' · rank '+(selRankIdx+1)+'</span></div>';
+ right+='<div style="font-size:12px;color:var(--ink);line-height:1.55;margin-bottom:9px">'+rfxRecoText(sel,selRankIdx)+'</div>';
  right+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
- right+='<div><div style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--plum);margin-bottom:5px">Strengths</div>'+(st.length?st.slice(0,3).map(function(r){return '<div style="font-size:11.5px;line-height:1.45;margin-bottom:3px;color:var(--mut)">✓ '+escapeHtmlPV(r.text)+'</div>';}).join(''):'<div style="font-size:11.5px;color:var(--mut2)">None recorded.</div>')+'</div>';
- right+='<div><div style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:#C8202E;margin-bottom:5px">Gaps</div>'+(gp.length?gp.slice(0,3).map(function(r){return '<div style="font-size:11.5px;line-height:1.45;margin-bottom:3px;color:var(--mut)">• '+escapeHtmlPV(r.text)+(r.mandatory?' (Must-have)':'')+'</div>';}).join(''):'<div style="font-size:11.5px;color:var(--mut2)">None, meets every requirement.</div>')+'</div>';
+ right+='<div><div style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--plum);margin-bottom:5px">Strengths</div>'+(st.length?st.slice(0,3).map(function(r){return '<div style="font-size:11px;line-height:1.45;margin-bottom:3px;color:var(--mut)">✓ '+escapeHtmlPV(r.text)+'</div>';}).join(''):'<div style="font-size:11px;color:var(--mut2)">None recorded.</div>')+'</div>';
+ right+='<div><div style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:#C8202E;margin-bottom:5px">Gaps</div>'+(gp.length?gp.slice(0,3).map(function(r){return '<div style="font-size:11px;line-height:1.45;margin-bottom:3px;color:var(--mut)">• '+escapeHtmlPV(r.text)+(r.mandatory?' (Must-have)':'')+'</div>';}).join(''):'<div style="font-size:11px;color:var(--mut2)">None, meets every requirement.</div>')+'</div>';
  right+='</div></div>';
  // #4A/#4B (Marc): removed the "weighted fit → coverage % · select a supplier…" caption and the "One merged
  // ranking by merit…" spnote, the bars are self-explanatory and the reflect-only stance lives in the header.
@@ -5834,12 +5848,12 @@ function rfxContactsHTML(){var R=RFX;
  // Email-all / per-supplier email icons removed (rfx_platform_audit.md findings #10-11): both draft
  // into a live CHAT/Outlook flow with no local equivalent. The contact list itself is kept as
  // reflect-only display.
- return '<div class="sect"><div class="secthd"><div class="t">Suppliers &amp; contacts</div></div><div class="card" style="padding:2px 0">'+R.suppliers.map(function(s,si){return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px'+(si>0?';border-top:1px solid var(--line2,#E0DCD5)':'')+'"><div><div style="font-weight:600;font-size:13px">'+escapeHtmlPV(s.n)+((s.mustFail&&s.mustFail.length)?' <span class="gate fail" style="margin-left:6px">Gate fail</span>':'')+'</div><div style="font-size:11.5px;color:var(--mut2)">'+escapeHtmlPV(s.contact)+' · '+escapeHtmlPV(s.email)+'</div></div></div>';}).join('')+'</div></div>';
+ return '<div class="sect"><div class="secthd"><div class="t">Suppliers &amp; contacts</div></div><div class="card" style="padding:2px 0">'+R.suppliers.map(function(s,si){return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px'+(si>0?';border-top:1px solid var(--line2,#E0DCD5)':'')+'"><div><div style="font-weight:600;font-size:13px">'+escapeHtmlPV(s.n)+((s.mustFail&&s.mustFail.length)?' <span class="gate fail" style="margin-left:6px">Gate fail</span>':'')+'</div><div style="font-size:11px;color:var(--mut2)">'+escapeHtmlPV(s.contact)+' · '+escapeHtmlPV(s.email)+'</div></div></div>';}).join('')+'</div></div>';
 }
 // ---- Lilly supplier-context strip (RD.2 fold-in): internal relationship / spend / TPRM / Defender per bidder ----
 function rfxLillyCtxHTML(cur){var R=RFX;
  var rows=R.suppliers.map(function(s,si){var d=s.lilly;
-  var h='<div style="display:flex;flex-wrap:wrap;gap:7px 14px;align-items:center;padding:8px 6px'+(si>0?';border-top:1px solid var(--line,#EEE)':'')+(si===cur?';background:rgba(92,43,80,.03);border-radius:6px':'')+'"><span style="font-weight:700;font-size:12.5px;min-width:120px">'+escapeHtmlPV(s.n)+'</span>';
+  var h='<div style="display:flex;flex-wrap:wrap;gap:7px 14px;align-items:center;padding:8px 6px'+(si>0?';border-top:1px solid var(--line,#EEE)':'')+(si===cur?';background:rgba(92,43,80,.03);border-radius:6px':'')+'"><span style="font-weight:700;font-size:12px;min-width:120px">'+escapeHtmlPV(s.n)+'</span>';
   if(!d)return h+'<span style="font-size:12px;color:var(--mut2)">No internal supplier record found. Data not available.</span></div>';
   h+='<span style="font-size:12px;color:var(--mut)"><b>Relationship:</b> '+escapeHtmlPV(d.relationship||'Data not available')+'</span>';
   h+='<span style="font-size:12px;color:var(--mut)"><b>Spend:</b> '+escapeHtmlPV(d.spend||'Data not available')+'</span>';
@@ -6632,11 +6646,11 @@ function rfxWhatsNextMiniHTML(){var stages=rfxNextStages();
  var current=stages.filter(function(s){return s.st!=='pending';}).pop()||stages[0];
  var doneCount=stages.filter(function(s){return s.st==='done';}).length;
  var h='<details class="card" style="margin:0;padding:0;overflow:hidden">';
- h+='<summary style="cursor:pointer;padding:10px 13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-weight:700;font-size:12.5px">What happens next</span><span style="font-size:11px;color:var(--mut2)">'+doneCount+' of '+stages.length+' stages done · currently: '+escapeHtmlPV(current.k)+'</span></summary>';
+ h+='<summary style="cursor:pointer;padding:10px 13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-weight:700;font-size:12px">What happens next</span><span style="font-size:11px;color:var(--mut2)">'+doneCount+' of '+stages.length+' stages done · currently: '+escapeHtmlPV(current.k)+'</span></summary>';
  h+='<div style="padding:0 13px 12px;border-top:1px solid var(--line2,#CFCDC8)">'+stages.map(function(s,i){
   var done=s.st==='done',active=s.st==='active';
   var col=done?'var(--plum)':active?'var(--emph,#C15E19)':'#8A969E';
-  return '<div style="display:flex;gap:8px;padding:8px 0'+(i>0?';border-top:1px solid var(--line)':'')+'"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:'+col+';color:#fff;font-size:8.5px;display:flex;align-items:center;justify-content:center;margin-top:1px">'+(done?'✓':active?'…':(i+1))+'</span><div><div style="font-weight:700;font-size:11.5px;color:'+col+'">'+escapeHtmlPV(s.k)+'</div><div style="font-size:11px;color:var(--mut);margin-top:2px;line-height:1.4">'+escapeHtmlPV(s.d)+'</div></div></div>';
+  return '<div style="display:flex;gap:8px;padding:8px 0'+(i>0?';border-top:1px solid var(--line)':'')+'"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:'+col+';color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;margin-top:1px">'+(done?'✓':active?'…':(i+1))+'</span><div><div style="font-weight:700;font-size:11px;color:'+col+'">'+escapeHtmlPV(s.k)+'</div><div style="font-size:11px;color:var(--mut);margin-top:2px;line-height:1.4">'+escapeHtmlPV(s.d)+'</div></div></div>';
  }).join('')+'</div></details>';
  return h;
 }

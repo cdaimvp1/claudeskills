@@ -2221,3 +2221,17 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .schm .schm-w{font:700 11.5px var(--mono);color:var(--mut);text-align:center}
 .schm .hcell.hc-na{background:transparent;color:var(--mut2);font-family:var(--mono);font-weight:700;
   letter-spacing:.06em;cursor:help;border:1px dashed var(--line2)}
+
+/* ===== TYPE SCALE: RFx Overview tab (Marc 2026-07-27) ======================================
+   The tab measured THIRTEEN distinct font sizes. Six steps, each with a job:
+     22 display (KPI figure) · 14 title · 13 body · 12 body-sm · 11 meta · 9 label
+   The inline sizes were mapped in the render functions; these five classes carried the last
+   strays from CSS. Scoped to the classes themselves, which only appear on this tab's panels. */
+.ovav{font-size:11px}          /* was 9.5px  */
+.orr{font-size:11px}           /* was 10.5px */
+.glabhd{font-size:11px}        /* was 10.5px */
+.rfxflag-k{font-size:9px}      /* was 8px    */
+.gate.fail,.gate.ok{font-size:9px}  /* was 8.5px */
+
+.ovrp .ovav{font-size:11px}
+.ovrp .orr{font-size:11px}
