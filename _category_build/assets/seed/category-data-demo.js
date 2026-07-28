@@ -311,3 +311,85 @@
     }
   }());
 }());
+
+/* ---------------------------------------------------------------------------
+   Third illustrative block: the renewal decision matrix and the per-subcategory
+   consolidation opportunities. Performance and market attractiveness are
+   judgements, not spend facts, so the production seed carries neither and those
+   panels state the gap. Invented here, like everything else in this file.
+   =========================================================================== */
+(function () {
+  if (typeof CATEGORY_SEED === 'undefined') return;
+  var d = (CATEGORY_SEED.categories || [])[0];
+  if (!d || !d.__demo) return;
+
+  d.renewalMatrix = {
+    'Microsoft': { perf: 4.1, attr: 1.6,
+      read: 'Delivery and quality both trending up, but the market is thin: three enterprise-scale alternatives and a switching cost measured in years. Renew and protect terms rather than threaten a move nobody believes.',
+      blocked: 'Renewal window confirmed; notice date already inside the sourcing cycle.' },
+    'Amazon Web Services': { perf: 3.8, attr: 3.4,
+      read: 'Strong performer in a genuinely contested market. Azure and GCP are credible for a material share of the estate, which is what makes the committed-use renegotiation winnable.' },
+    'Veeva Systems': { perf: 2.9, attr: 1.2,
+      read: 'Adequate performance, almost no alternative mid-migration. Leverage has to come from the migration milestones themselves, not from a competitive threat.' },
+    'SAP America': { perf: 3.2, attr: 2.2,
+      read: 'Steady delivery. RISE terms are negotiable at the margin but the platform decision is effectively made.' },
+    'Adobe': { perf: 3.4, attr: 3.1,
+      read: 'Performs well and faces real substitution at the edges of the estate. The ETLA is the lever: unbundle what is genuinely used from what came with the suite.' },
+    'Salesforce': { perf: 2.4, attr: 3.6,
+      read: 'Under-performing against an attractive market, and 57% seat utilisation makes the case. Compete this one, or right-size it hard at the next order form.' },
+    'ZS Associates': { perf: 1.9, attr: 3.8,
+      read: 'Weakest performer in the portfolio, in the most contested market, on an expired SOW. Replace or re-scope before renewing anything.' }
+  };
+
+  /* Named opportunities inside each subcategory: consolidate consumption onto
+     fewer contracts, or reduce the number of suppliers serving one need. */
+  var OPPS = {
+    'Marketing/Sales SaaS': [
+      { kind: 'supplier', t: 'Collapse four campaign and content tools onto the Adobe ETLA',
+        d: 'Four vendors cover overlapping campaign, asset and content workflows. Three renew within nine months, so the sequencing works.',
+        from: 4, to: 1, vehicle: 'Adobe ETLA', value: 3100000 },
+      { kind: 'volume', t: 'Pool seat purchasing across the three commercial business units',
+        d: 'The same platform is bought three times at three different volume tiers. Pooling to one commit moves the whole category into the top band.',
+        value: 1900000 }
+    ],
+    'IaaS': [
+      { kind: 'volume', t: 'Move reserved and savings-plan coverage from 42% to the 75-85% band',
+        d: 'Coverage is 33 points below best in class on a stable base load. This is consumption consolidation, not a supplier change.',
+        value: 5500000 },
+      { kind: 'supplier', t: 'Consolidate three regional cloud resellers into the direct EDP',
+        d: 'Regional VARs add margin without adding service on workloads already covered by the enterprise agreement.',
+        from: 3, to: 1, vehicle: 'AWS EDP', value: 1200000 }
+    ],
+    'On-Prem SW for IT': [
+      { kind: 'supplier', t: 'Retire duplicate endpoint and identity tooling',
+        d: 'Defender overlaps CrowdStrike on endpoint and Entra overlaps Okta on identity, and both Microsoft components are already paid for inside the EA.',
+        from: 3, to: 1, vehicle: 'Microsoft EA', value: 4200000 }
+    ],
+    'Medicines Development SaaS': [
+      { kind: 'supplier', t: 'Route four research-informatics point tools through one agreement',
+        d: 'Each has a distinct scientific owner, which is why this is high effort. The saving is in contracting and support, not licence price.',
+        from: 4, to: 1, vehicle: 'Research informatics MSA', value: 900000 }
+    ],
+    'Collaboration/Conferencing SaaS': [
+      { kind: 'supplier', t: 'Retire Zoom and Webex; standardise on Teams',
+        d: 'Teams is already licensed inside the EA and carries 94% adoption. Zoom sits at 28% utilisation on 22,000 seats.',
+        from: 4, to: 1, vehicle: 'Microsoft EA', value: 5600000 }
+    ],
+    'Info Security SaaS': [
+      { kind: 'volume', t: 'Consolidate 88 security vendors onto three platform commitments',
+        d: 'Point-tool sprawl is the pattern here: 88 vendors for a capability three platforms cover. Start with the 61 under $250K.',
+        from: 88, to: 3, vehicle: 'Platform commitments', value: 2400000 }
+    ],
+    'Scientific Research SW': [
+      { kind: 'supplier', t: 'Consolidate the 142-vendor scientific tail behind a catalogue route',
+        d: 'The most fragmented subcategory in the portfolio. Most of it is under $50K a vendor and never went through a sourcing event.',
+        from: 142, to: 40, vehicle: 'App catalogue', value: 1800000 }
+    ],
+    'PaaS': [
+      { kind: 'volume', t: 'Fold platform consumption into the IaaS commitment',
+        d: 'PaaS and IaaS run on the same hyperscaler accounts but are committed separately, which splits the volume across two tiers.',
+        value: 800000 }
+    ]
+  };
+  (d.subcats || []).forEach(function (x) { if (OPPS[x.n]) x.opps = OPPS[x.n]; });
+}());

@@ -732,3 +732,88 @@ small,sub,sup{font-size:9px}
 .cs-tdfig b{display:block;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
 .cs-tdfig span{display:block;font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
   color:var(--cs-mut2);margin-top:3px}
+
+/* ---- supplier list: search, filters, sortable, clickable ---- */
+.cs-supctl{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.cs-search{flex:1;min-width:180px;max-width:320px;font:400 13px var(--cs-sans);color:var(--cs-ink);
+  border:1px solid var(--cs-line2);border-radius:30px;padding:7px 14px;background:var(--cs-surface)}
+.cs-search:focus{outline:none;border-color:var(--cs-plum)}
+.cs-filter{font:600 11px var(--cs-sans);color:var(--cs-mut2);border:1px solid var(--cs-line2);
+  border-radius:30px;padding:7px 12px;background:var(--cs-surface);cursor:pointer}
+.cs-filter:focus{outline:none;border-color:var(--cs-plum)}
+.cs-supcount{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-clearb{font:600 11px var(--cs-sans);color:var(--cs-plum);background:transparent;border:0;
+  cursor:pointer;text-decoration:underline;padding:0}
+.cs-empty{font-size:13px;color:var(--cs-mut);padding:18px 0;text-align:center}
+.cs-sortb{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);
+  background:transparent;border:0;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
+.cs-sortb.on{color:var(--cs-plum)}
+.cs-sortb i{font-style:normal;font-size:9px}
+.cs-suplink{font:600 13px var(--cs-sans);color:var(--cs-plum);background:transparent;border:0;
+  padding:0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px}
+.cs-suplink:hover{color:var(--cs-plum-d)}
+.cs-tbl tr.is-open td{background:var(--cs-band)}
+.cs-tbl tr.is-open td:first-child{box-shadow:inset 3px 0 0 var(--cs-plum)}
+.cs-oppn{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;
+  border-radius:30px;background:var(--cs-burnt);color:#fff;font:700 11px var(--cs-sans)}
+
+/* ---- frozen header on the overview supplier list ---- */
+.cs-suphead{position:sticky;top:0;z-index:2;background:var(--cs-surface);
+  border-bottom:1px solid var(--cs-line2);height:26px}
+.cs-suphead span{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-suphb{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+
+/* ---- renewal decision matrix ---- */
+.cs-rmwrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(220px,1fr);gap:18px;align-items:center}
+@media(max-width:900px){.cs-rmwrap{grid-template-columns:1fr}}
+.cs-rm{fill:var(--cs-plum);opacity:.42}
+.cs-rm-on{fill:var(--cs-burnt);opacity:.9}
+.cs-rmq{font-size:16px;font-weight:700;color:var(--cs-plum);margin-top:3px}
+.cs-rmd{font-size:13px;line-height:1.55;color:var(--cs-ink);margin-top:7px}
+.cs-rmblock{font-size:11px;color:var(--cs-mut);border:1px dashed var(--cs-line2);border-radius:6px;
+  padding:6px 10px;margin-top:9px}
+
+/* ---- subcategory split: map left, detail right ---- */
+.cs-screl{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:14px;
+  align-items:stretch;margin-bottom:14px}
+@media(max-width:1050px){.cs-screl{grid-template-columns:1fr}}
+.cs-screl>.cs-card{display:flex;flex-direction:column;margin-bottom:0}
+.cs-screl>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow:auto}
+.cs-fdg{cursor:pointer}
+.cs-fdg circle{transition:r .12s}
+.cs-fdg:hover circle{opacity:1}
+.cs-fdg.on .cs-fdlab{font-weight:700}
+.cs-fdg.on circle{stroke:var(--cs-ink);stroke-width:2}
+.cs-scname{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.cs-scmeta{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:4px}
+.cs-scfig{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-top:12px;
+  border-top:1px solid var(--cs-line);padding-top:11px}
+.cs-scfig b{display:block;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.cs-scfig span{display:block;font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:2px}
+.cs-scopp{border-left:3px solid var(--cs-plum);padding-left:11px;margin-top:12px}
+.cs-scopp-volume{border-left-color:var(--cs-teal)}
+.cs-scopp-h{display:flex;align-items:baseline;gap:10px}
+.cs-scopp-k{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-scopp-volume .cs-scopp-k{color:var(--cs-teal)}
+.cs-scopp-v{margin-left:auto;font-size:13px;font-weight:800;color:var(--cs-burnt);font-variant-numeric:tabular-nums}
+.cs-scopp-t{font-size:13px;font-weight:700;line-height:1.35;margin-top:3px}
+.cs-scopp-d{font-size:11px;color:var(--cs-mut);line-height:1.5;margin-top:4px}
+.cs-scopp-f{font-size:11px;color:var(--cs-mut2);margin-top:5px}
+.cs-scopp-f b{color:var(--cs-ink)}
+
+/* ---- Pareto axes ---- */
+.cs-pgrid{stroke:var(--cs-line);stroke-width:1}
+.cs-pyl{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:end}
+.cs-pyr{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:start}
+.cs-pyt{font:700 9px var(--cs-sans);letter-spacing:.06em;fill:var(--cs-mut2);text-anchor:end;text-transform:uppercase}
+.cs-pyt-r{text-anchor:start}
+
+/* The evidence chip belongs at the far right of the header, past the subtitle. */
+.cs-cardhd{flex-wrap:wrap}
+.cs-cs{margin-left:auto}
+.cs-cov{margin-left:12px;order:3}
+.cs-cardhd .cs-ct{order:1}
+.cs-cardhd .cs-cs{order:2}
+.cs-tailcard .cs-cardhd .cs-cov{margin-left:auto}

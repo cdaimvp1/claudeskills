@@ -30,7 +30,8 @@ var CS_TAB = 'overview';
 var CS_PARETO_CUT = 80;
 var CS_TAIL = 100;     // 50 | 100 | 250
 var CS_HORIZON = 3;    // 1 | 3 | 5
-var CS_FORECAST = false;  // spend-trend forecast overlay, off by default
+var CS_FORECAST = false;
+var CS_KEEPSCROLL = false;  // in-page interactions hold position; tab changes do not  // spend-trend forecast overlay, off by default
 
 function csData() { return (CATEGORY_SEED.categories || [])[CS_CAT] || {}; }
 function csEsc(s) {
@@ -192,10 +193,10 @@ function csNavFor(tab) {
 function csSetCat(i) { CS_CAT = i; csRender(); }
 function csSetTab(k) { CS_TAB = k; csRender(); }
 function csSetSub(k) { CS_SUBSTATE[CS_TAB] = k; csRender(); }
-function csSetCut(v) { CS_PARETO_CUT = parseInt(v, 10); csRender(); }
-function csSetTail(v) { CS_TAIL = parseInt(v, 10); csRender(); }
-function csSetHorizon(v) { CS_HORIZON = parseInt(v, 10); csRender(); }
-function csToggleFc() { CS_FORECAST = !CS_FORECAST; csRender(); }
+function csSetCut(v) { CS_KEEPSCROLL = true; CS_PARETO_CUT = parseInt(v, 10); csRender(); }
+function csSetTail(v) { CS_KEEPSCROLL = true; CS_TAIL = parseInt(v, 10); csRender(); }
+function csSetHorizon(v) { CS_KEEPSCROLL = true; CS_HORIZON = parseInt(v, 10); csRender(); }
+function csToggleFc() { CS_KEEPSCROLL = true; CS_FORECAST = !CS_FORECAST; csRender(); }
 
 function csHeader() {
   var d = csData(), m = d.meta || {};
@@ -295,12 +296,11 @@ function scPareto() {
 }
 
 /* ===========================================================================
-   SCREEN 3 — SPEND & SUPPLIERS > SUPPLIERS
+   SCREEN 3 - SPEND & SUPPLIERS > SUPPLIERS
    =========================================================================== */
 function scSuppliers() {
   var d = csData(), m = d.meta || {};
   var h = '';
-
   var nNew = (d.newVendors || []).length, nOut = (d.exitVendors || []).length;
   h += '<div class="cs-kpirow">'
     + csKpi('Active suppliers', csNum(m.vendors), 'in the FY25 window', 'plum')
@@ -311,58 +311,31 @@ function scSuppliers() {
     + csKpi('Prior period', csNum(m.vendorsPrior), 'FY24 active')
     + '</div>';
 
-  var sRows = (d.suppliers || []).map(function (s) {
-    return '<tr><td class="cs-l"><b>' + csEsc(s.n) + '</b></td>'
-      + '<td class="cs-num">' + csUsd(s.tot) + '</td>'
-      + '<td class="cs-num">' + csPct(s.share) + '</td>'
-      + '<td class="cs-num">' + (s.yoy != null ? '<span class="' + (s.yoy >= 0 ? 'cs-up' : 'cs-down') + '">'
-          + (s.yoy > 0 ? '+' : '') + csPct(s.yoy) + '</span>' : '--') + '</td>'
-      + '<td class="cs-num"><span class="cs-tier">' + csEsc(s.tier || '--') + '</span></td></tr>';
-  });
+  h += csCard('All suppliers', csSupTable(d),
+      { sub: 'click a name for the deep dive', conf: csConfFor(d, 'suppliers') });
+
+  h += csSupDeep(d);
+
   h += csCard('Supplier tiering', csTieringLines(d),
       { sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
 
-  h += csCard('Ranked Suppliers', csTable(['Supplier', '3-yr spend', 'Share', 'YoY', 'Tier'], sRows),
-      { sub: (d.suppliers || []).length + ' with resolved detail', conf: csConfFor(d, 'suppliers') });
+  var nv = (d.newVendors || []).map(function (v) {
+    return '<tr><td class="cs-l">' + csEsc(v.n) + '</td><td class="cs-num">' + csUsd(v.s) + '</td></tr>'; });
+  var xv = (d.exitVendors || []).map(function (v) {
+    return '<tr><td class="cs-l">' + csEsc(v.n) + '</td><td class="cs-num">' + csUsd(v.s) + '</td></tr>'; });
+  h += '<div class="cs-row2">'
+    + csCard('New large vendors', nv.length ? csTable(['Supplier', 'Spend'], nv)
+        : csGap('Suppliers new in the current period.', 'newVendors[]'), { sub: 'entered this period' })
+    + csCard('Exiting vendors', xv.length ? csTable(['Supplier', 'Prior spend'], xv)
+        : csGap('Suppliers that stopped in the current period.', 'exitVendors[]'), { sub: 'no spend this period' })
+    + '</div>';
   return h;
 }
 
 /* ===========================================================================
-   SCREEN 4 — SPEND & SUPPLIERS > SUBCATEGORIES
-   The spend-only table and the fragmentation map read the same subcats[]. Only
-   the fragmentation view survives: it answers a question the table did not.
+   SCREEN 4 - SPEND & SUPPLIERS > SUBCATEGORIES
+   Map on the left, detail pane on the right; both below with csSubcatPane.
    =========================================================================== */
-function scSubcats() {
-  var d = csData(), n = d.narr || {};
-  var sc = d.subcats || [];
-  var h = '';
-  var hasVc = sc.some(function (x) { return x.vc != null; });
-
-  h += csCard('Fragmentation Map', csFragMap(d),
-      { sub: hasVc ? 'spend against vendor count' : 'spend by subcategory', conf: csConfFor(d, 'subcats') });
-
-  var scMax = sc.reduce(function (a, x) { return Math.max(a, x.tot || 0); }, 0) || 1;
-  var vcMax = sc.reduce(function (a, x) { return Math.max(a, x.vc || 0); }, 0) || 1;
-  var rows = sc.slice().sort(function (a, b) {
-    return hasVc ? (b.vc || 0) - (a.vc || 0) : (b.tot || 0) - (a.tot || 0);
-  }).map(function (x) {
-    return '<tr><td class="cs-l">' + csEsc(x.n) + '<span class="cs-sub2">' + csEsc(x.host || '') + '</span></td>'
-      + (hasVc ? '<td class="cs-barcell">' + csBar((x.vc / vcMax) * 100, 'emph') + '</td>'
-                 + '<td class="cs-num">' + csNum(x.vc) + '</td>'
-                 + '<td class="cs-num">' + csUsd(Math.round((x.tot || 0) / (x.vc || 1))) + '</td>' : '')
-      + '<td class="cs-barcell">' + csBar((x.tot / scMax) * 100, 'plum') + '</td>'
-      + '<td class="cs-num">' + csUsd(x.tot) + '</td><td class="cs-num">' + csPct(x.pct) + '</td></tr>';
-  });
-  h += csCard('Consolidation Candidates',
-      csTable(hasVc ? ['Subcategory', '', 'Vendors', 'Avg per vendor', '', 'Spend', 'Share']
-                    : ['Subcategory', '', 'Spend', 'Share'], rows)
-      + csNote(hasVc
-          ? 'Ranked by vendor count, not spend. A large subcategory bought from a handful of suppliers is not fragmented; a small one bought from a hundred is.'
-          : 'Ranked by spend. A true fragmentation ranking needs a <b>vendor count per subcategory</b>, which this data set does not carry.')
-      + csNarrNote(n.subcatLegend) + csNarrNote(n.subcatGap),
-      { sub: sc.length + ' subcategories', conf: hasVc ? 'Moderate' : 'Limited' });
-  return h;
-}
 
 /* ===========================================================================
    SCREEN 5 — MARKET & RISK > MARKET & KRALJIC
@@ -510,15 +483,15 @@ function csSelSet(d) {
   if (!CS_SEL[CS_CAT]) CS_SEL[CS_CAT] = csDefaultSel(d);
   return CS_SEL[CS_CAT];
 }
-function csTogglePlay(i) {
+function csTogglePlay(i) { CS_KEEPSCROLL = true;
   var d = csData(), sel = csSelSet(d), at = sel.indexOf(i);
   if (at >= 0) sel.splice(at, 1); else sel.push(i);
   CS_PLAYMSG = '';
   csRender();
 }
-function csSetHz(h) { CS_HZ = h; csRender(); }
+function csSetHz(h) { CS_KEEPSCROLL = true; CS_HZ = h; csRender(); }
 function csHzYears() { return CS_HZ === 'y1' ? 1 : CS_HZ === '5yr' ? 5 : 3; }
-function csPlayAct(msg) { CS_PLAYMSG = msg; csRender(); }
+function csPlayAct(msg) { CS_KEEPSCROLL = true; CS_PLAYMSG = msg; csRender(); }
 
 function csModel(d) {
   var ps = csPlays(d), sel = csSelSet(d);
@@ -1136,7 +1109,11 @@ function csTopSuppliers(d) {
       + '<span class="cs-supv">' + csUsd(s.tot) + '</span>'
       + '<span class="cs-supp">' + csPct(s.share) + '</span></div>';
   }).join('');
-  return '<div class="cs-suplist cs-scroll10">' + rows + '</div>'
+  var head = '<div class="cs-suprow cs-suphead">'
+    + '<span class="cs-supr">#</span><span class="cs-supn">Supplier</span>'
+    + '<span class="cs-suphb">3-yr spend</span><span class="cs-supv">Total</span>'
+    + '<span class="cs-supp">Share</span></div>';
+  return '<div class="cs-suplist cs-scroll10">' + head + rows + '</div>'
     + csNote('Top ' + sup.length + ' of ' + csNum((d.meta || {}).vendors) + ' active suppliers. Ten shown, scroll for the rest.');
 }
 
@@ -1281,7 +1258,7 @@ function csParetoChart(d) {
   var totalSup = m.vendors || whole.length;
 
   var max = series.reduce(function (a, p) { return Math.max(a, p.value || 0); }, 0) || 1;
-  var W = 960, H = 300, PADL = 52, PADR = 46, PADB = 46, PADT = 14;
+  var W = 960, H = 300, PADL = 66, PADR = 48, PADB = 26, PADT = 16;
   var plotW = W - PADL - PADR, plotH = H - PADT - PADB;
   var bw = plotW / series.length;
 
@@ -1330,19 +1307,28 @@ function csParetoChart(d) {
      bar and every point on the curve carries its name in a tooltip. */
   var labels = '', strip = '';
 
+  /* Two axes: spend on the left, cumulative share on the right. The old build
+     printed the top value as a floating label, which the tallest bar then sat
+     on top of. */
   var axis = '<line x1="' + PADL + '" y1="' + (PADT + plotH) + '" x2="' + (W - PADR) + '" y2="' + (PADT + plotH) + '" class="cs-pax"/>'
+    + '<line x1="' + PADL + '" y1="' + PADT + '" x2="' + PADL + '" y2="' + (PADT + plotH) + '" class="cs-pax"/>'
     + [0, 25, 50, 75, 100].map(function (t) {
         var y = PADT + plotH - (t / 100) * plotH;
-        return '<text x="' + (W - PADR + 6) + '" y="' + (y + 3).toFixed(1) + '" class="cs-pyr">' + t + '%</text>';
+        return (t ? '<line x1="' + PADL + '" y1="' + y.toFixed(1) + '" x2="' + (W - PADR) + '" y2="'
+                  + y.toFixed(1) + '" class="cs-pgrid"/>' : '')
+          + '<text x="' + (W - PADR + 7) + '" y="' + (y + 3).toFixed(1) + '" class="cs-pyr">' + t + '%</text>'
+          + '<text x="' + (PADL - 7) + '" y="' + (y + 3).toFixed(1) + '" class="cs-pyl">'
+          + csUsd(max * (t / 100)) + '</text>';
       }).join('')
-    + '<text x="' + (PADL - 8) + '" y="' + (PADT + 8) + '" class="cs-pyl">' + csUsd(max) + '</text>';
+;   // no axis captions: the $ and % on the ticks already say which is which,
+       // and captions here collide with the topmost tick label
 
   var tailNote = '';
   if (truncated) {
     var tailSpend = whole.slice(window).reduce(function (a, x) { return a + (x.value || 0); }, 0);
-    tailNote = '<text x="' + (W - PADR - 4) + '" y="' + (PADT + plotH - 20) + '" class="cs-ptail">'
+    tailNote = '<text x="' + (W - PADR - 8) + '" y="' + (PADT + plotH - 22) + '" class="cs-ptail">'
       + csNum(truncated) + ' more suppliers in the tail</text>'
-      + '<text x="' + (W - PADR - 4) + '" y="' + (PADT + plotH - 7) + '" class="cs-ptail cs-ptail2">'
+      + '<text x="' + (W - PADR - 8) + '" y="' + (PADT + plotH - 9) + '" class="cs-ptail cs-ptail2">'
       + csUsd(Math.round(tailSpend / truncated)) + ' average each</text>';
   }
 
@@ -1475,22 +1461,24 @@ function csFragMap(d) {
       + csNote('Plotted on spend only. Separating a <b>consolidated</b> subcategory from a <b>fragmented</b> one needs a '
         + 'vendor count per subcategory, which this data set does not carry.');
   }
-  var W = 900, H = 340, PADL = 62, PADB = 48, PADT = 16, PADR = 20;
+  var W = 660, H = 340, PADL = 58, PADB = 48, PADT = 16, PADR = 130;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var maxV = sc.reduce(function (a, x) { return Math.max(a, x.vc || 0); }, 0) || 1;
   var maxS = sc.reduce(function (a, x) { return Math.max(a, x.tot || 0); }, 0) || 1;
   var medV = maxV / 2, medS = maxS / 2;
   var xm = PADL + (medV / maxV) * pw, ym = PADT + ph - (medS / maxS) * ph;
 
-  var dots = sc.map(function (x) {
+  /* The dots are the picker: clicking one drives the detail pane beside the map. */
+  var dots = sc.map(function (x, i) {
     var cx = PADL + ((x.vc || 0) / maxV) * pw;
     var cy = PADT + ph - ((x.tot || 0) / maxS) * ph;
-    var frag = (x.vc || 0) > medV;
-    return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="8" class="'
+    var frag = (x.vc || 0) > medV, on = (i === CS_SC_SEL);
+    return '<g class="cs-fdg' + (on ? ' on' : '') + '" onclick="csScPick(' + i + ')" role="button" tabindex="0">'
+      + '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (on ? 11 : 8) + '" class="'
       + (frag ? 'cs-fd-hot' : 'cs-fd') + '"><title>' + csEsc(x.n + ' · ' + csNum(x.vc) + ' vendors · '
       + csUsd(x.tot) + ' · ' + csUsd(Math.round(x.tot / (x.vc || 1))) + ' average each') + '</title></circle>'
-      + '<text x="' + (cx + 12).toFixed(1) + '" y="' + (cy + 4).toFixed(1) + '" class="cs-fdlab">'
-      + csEsc(String(x.n).slice(0, 22)) + '</text>';
+      + '<text x="' + (cx + 14).toFixed(1) + '" y="' + (cy + 4).toFixed(1) + '" class="cs-fdlab">'
+      + csEsc(String(x.n).slice(0, 20)) + '</text></g>';
   }).join('');
 
   return '<div class="cs-pwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-psvg" role="img" '
@@ -1700,6 +1688,252 @@ function csContractOpps(c) {
 }
 
 /* ===========================================================================
+   SUPPLIERS: searchable list, click a name for the deep dive
+   =========================================================================== */
+var CS_SUP_Q = '';        // search text
+var CS_SUP_TIER = '';     // tier filter
+var CS_SUP_SORT = 'tot';  // tot | n | share | yoy
+var CS_SUP_DIR = -1;      // 1 asc, -1 desc
+var CS_SUP_SEL = null;    // supplier name, or null when the panel is closed
+
+function csSupQ(v) { CS_KEEPSCROLL = true; CS_SUP_Q = v; csRender(); }
+function csSupTier(v) { CS_KEEPSCROLL = true; CS_SUP_TIER = v; csRender(); }
+function csSupSort(k) { CS_KEEPSCROLL = true;
+  if (CS_SUP_SORT === k) CS_SUP_DIR = -CS_SUP_DIR; else { CS_SUP_SORT = k; CS_SUP_DIR = -1; }
+  csRender();
+}
+function csSupPick(n) { CS_KEEPSCROLL = true; CS_SUP_SEL = (CS_SUP_SEL === n) ? null : n; csRender(); }
+
+function csSupRows(d) {
+  var q = CS_SUP_Q.toLowerCase().trim();
+  var out = (d.suppliers || []).filter(function (s) {
+    if (CS_SUP_TIER && (s.tier || '') !== CS_SUP_TIER) return false;
+    if (!q) return true;
+    return String(s.n).toLowerCase().indexOf(q) >= 0 || String(s.tier || '').toLowerCase().indexOf(q) >= 0;
+  });
+  var k = CS_SUP_SORT, dir = CS_SUP_DIR;
+  return out.sort(function (a, b) {
+    if (k === 'n') return String(a.n).localeCompare(String(b.n)) * -dir;
+    return (((a[k] || 0) - (b[k] || 0)) * dir);
+  });
+}
+function csSupTable(d) {
+  var rows = csSupRows(d), all = (d.suppliers || []).length;
+  var tiers = {};
+  (d.suppliers || []).forEach(function (s) { if (s.tier) tiers[s.tier] = 1; });
+  var th = function (k, label, cls) {
+    return '<th' + (cls ? ' class="' + cls + '"' : '') + '><button class="cs-sortb'
+      + (CS_SUP_SORT === k ? ' on' : '') + '" onclick="csSupSort(\'' + k + '\')">' + csEsc(label)
+      + '<i>' + (CS_SUP_SORT === k ? (CS_SUP_DIR < 0 ? '&#9660;' : '&#9650;') : '') + '</i></button></th>';
+  };
+  var controls = '<div class="cs-supctl">'
+    + '<input id="cs-supq" class="cs-search" type="search" placeholder="Search suppliers" value="'
+      + csEsc(CS_SUP_Q) + '" oninput="csSupQ(this.value)" aria-label="Search suppliers">'
+    + '<select class="cs-filter" onchange="csSupTier(this.value)" aria-label="Filter by tier">'
+      + '<option value="">All tiers</option>'
+      + Object.keys(tiers).map(function (t) {
+          return '<option value="' + csEsc(t) + '"' + (CS_SUP_TIER === t ? ' selected' : '') + '>' + csEsc(t) + '</option>';
+        }).join('')
+    + '</select>'
+    + '<span class="cs-supcount">' + rows.length + ' of ' + all + '</span>'
+    + ((CS_SUP_Q || CS_SUP_TIER) ? '<button class="cs-clearb" onclick="csSupQ(\'\');">Clear</button>' : '')
+    + '</div>';
+
+  if (!rows.length) return controls + '<div class="cs-empty">No supplier matches that filter.</div>';
+
+  var body = rows.map(function (s) {
+    var on = CS_SUP_SEL === s.n;
+    return '<tr class="' + (on ? 'is-open' : '') + '">'
+      + '<td class="cs-num">' + csNum(s.r || '') + '</td>'
+      + '<td class="cs-l"><button class="cs-suplink" onclick="csSupPick(\''
+        + csEsc(String(s.n).replace(/'/g, "\\'")) + '\')">' + csEsc(s.n) + '</button></td>'
+      + '<td class="cs-num">' + csUsd(s.tot) + '</td>'
+      + '<td class="cs-num">' + csPct(s.share) + '</td>'
+      + '<td class="cs-num">' + csUsd(s.s3) + '</td>'
+      + '<td class="cs-num">' + csUsd(s.s4) + '</td>'
+      + '<td class="cs-num">' + csUsd(s.s5) + '</td>'
+      + '<td class="cs-num">' + (s.yoy != null ? '<span class="' + (s.yoy >= 20 ? 'cs-down' : s.yoy >= 0 ? 'cs-up' : 'cs-down') + '">'
+          + (s.yoy > 0 ? '+' : '') + csPct(s.yoy) + '</span>' : '--') + '</td>'
+      + '<td class="cs-num"><span class="cs-tier">' + csEsc(s.tier || '--') + '</span></td></tr>';
+  });
+  return controls + csTable(['Rank', 'Supplier', '3-yr total', 'Share', 'FY23', 'FY24', 'FY25', 'YoY', 'Tier'], body, { cls: 'cs-suptbl' })
+    .replace('<th class="cs-l">Rank</th>', th('r', 'Rank', 'cs-l'))
+    .replace('<th>Supplier</th>', th('n', 'Supplier'))
+    .replace('<th>3-yr total</th>', th('tot', '3-yr total'))
+    .replace('<th>Share</th>', th('share', 'Share'))
+    .replace('<th>YoY</th>', th('yoy', 'YoY'));
+}
+
+/* ---- deep dive ------------------------------------------------------------ */
+function csSupDeep(d) {
+  var s = (d.suppliers || []).filter(function (x) { return x.n === CS_SUP_SEL; })[0];
+  if (!s) return '';
+  var years = [['FY2023', s.s3], ['FY2024', s.s4], ['FY2025', s.s5], ['FY2026 YTD', s.s6]]
+    .filter(function (y) { return y[1] != null; });
+  var mx = years.reduce(function (a, y) { return Math.max(a, y[1] || 0); }, 0) || 1;
+  var bars = '<div class="cs-fc">' + years.map(function (y, i) {
+    var ytd = /YTD/.test(y[0]);
+    return '<div class="cs-fc-col ' + (ytd ? 'is-ytd' : 'is-hist') + '" title="' + csEsc(y[0] + ': ' + csUsd(y[1])) + '">'
+      + '<div class="cs-fc-v">' + csUsd(y[1]) + '</div>'
+      + '<div class="cs-fc-plot"><i class="cs-fc-bar" style="height:' + ((y[1] / mx) * 100).toFixed(1) + '%"></i></div>'
+      + '<div class="cs-fc-l">' + csEsc(y[0]) + '</div></div>';
+  }).join('') + '</div>';
+
+  var kpis = '<div class="cs-kpirow">'
+    + csKpi('3-year total', csUsd(s.tot), 'FY23 to FY25', 'plum')
+    + csKpi('FY2025', csUsd(s.s5), 'most recent complete year')
+    + csKpi('Share of category', csPct(s.share), 'of FY25 spend')
+    + csKpi('YoY growth', (s.yoy != null ? (s.yoy > 0 ? '+' : '') + csPct(s.yoy) : '--'), 'FY24 to FY25',
+        (s.yoy != null && s.yoy >= 20) ? 'emph' : 'teal')
+    + '</div>';
+
+  var body = kpis + bars
+    + csNote('Subcategory, business-unit and contract-coverage breakdowns would populate from source data. '
+      + 'Rate-versus-volume decomposition would show whether the YoY change is price or consumption.');
+
+  return csCard('Deep dive: ' + csEsc(s.n), body,
+      { sub: 'click the name again to close', conf: csConfFor(d, 'suppliers') })
+    + csCard('Renewal Decision Matrix', csRenewalMatrix(d, s),
+      { sub: 'performance against market attractiveness',
+        conf: (d.renewalMatrix ? 'Moderate' : 'Limited') });
+}
+
+/* Performance and market attractiveness are judgements, not spend facts. Where
+   the data set does not carry them the panel says so rather than plotting a
+   position it made up. */
+function csRenewalMatrix(d, sel) {
+  var rm = d.renewalMatrix;
+  if (!rm) return csGap('Where each supplier sits on performance against market attractiveness, and what that implies at renewal.',
+      'a performance score and a market-attractiveness score per supplier');
+  var pts = (d.suppliers || []).map(function (s) { return { s: s, m: rm[s.n] }; })
+    .filter(function (p) { return p.m; });
+  if (!pts.length) return csGap('Renewal position for this supplier.', 'renewalMatrix entry for ' + sel.n);
+
+  var W = 560, H = 380, PAD = 56, pw = W - PAD * 2, ph = H - PAD * 2;
+  var mxs = pts.reduce(function (a, p) { return Math.max(a, p.s.tot || 0); }, 0) || 1;
+  var dots = pts.map(function (p) {
+    var cx = PAD + (p.m.perf / 5) * pw;
+    var cy = PAD + ph - (p.m.attr / 5) * ph;
+    var r = 6 + 12 * Math.sqrt((p.s.tot || 0) / mxs);
+    var on = p.s.n === sel.n;
+    return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1)
+      + '" class="' + (on ? 'cs-rm-on' : 'cs-rm') + '"><title>'
+      + csEsc(p.s.n + ' · performance ' + p.m.perf + '/5 · market attractiveness ' + p.m.attr + '/5 · ' + csUsd(p.s.tot))
+      + '</title></circle>';
+  }).join('');
+
+  var me = rm[sel.n];
+  var quad = me ? (me.perf >= 2.5
+      ? (me.attr >= 2.5 ? 'Renew and expand' : 'Renew, protect terms')
+      : (me.attr >= 2.5 ? 'Replace or compete' : 'Exit or remediate')) : null;
+
+  var read = me
+    ? '<div class="cs-rmread"><div class="cs-lab2">Quadrant</div>'
+      + '<div class="cs-rmq">' + csEsc(quad) + '</div>'
+      + '<div class="cs-rmd">' + csEsc(me.read || '') + '</div>'
+      + (me.blocked ? '<div class="cs-rmblock">' + csEsc(me.blocked) + '</div>' : '') + '</div>'
+    : '<div class="cs-rmread">' + csGap('Renewal position for this supplier.', 'renewalMatrix entry for ' + sel.n) + '</div>';
+
+  return '<div class="cs-rmwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-psvg" role="img" '
+    + 'aria-label="Performance against market attractiveness">'
+    + '<line x1="' + (PAD + pw / 2) + '" y1="' + PAD + '" x2="' + (PAD + pw / 2) + '" y2="' + (PAD + ph) + '" class="cs-p80h"/>'
+    + '<line x1="' + PAD + '" y1="' + (PAD + ph / 2) + '" x2="' + (W - PAD) + '" y2="' + (PAD + ph / 2) + '" class="cs-p80h"/>'
+    + '<text x="' + (PAD + 4) + '" y="' + (PAD + 12) + '" class="cs-quadl" text-anchor="start">Replace / compete</text>'
+    + '<text x="' + (W - PAD - 4) + '" y="' + (PAD + 12) + '" class="cs-quadl">Renew &amp; expand</text>'
+    + '<text x="' + (PAD + 4) + '" y="' + (PAD + ph - 6) + '" class="cs-quadl" text-anchor="start">Exit / remediate</text>'
+    + '<text x="' + (W - PAD - 4) + '" y="' + (PAD + ph - 6) + '" class="cs-quadl">Renew, protect terms</text>'
+    + '<line x1="' + PAD + '" y1="' + (PAD + ph) + '" x2="' + (W - PAD) + '" y2="' + (PAD + ph) + '" class="cs-pax"/>'
+    + '<line x1="' + PAD + '" y1="' + PAD + '" x2="' + PAD + '" y2="' + (PAD + ph) + '" class="cs-pax"/>'
+    + '<text x="' + (PAD + pw / 2) + '" y="' + (H - 14) + '" class="cs-axt">performance (1-5) &rarr;</text>'
+    + '<text x="16" y="' + (PAD + ph / 2) + '" class="cs-axt" transform="rotate(-90 16,' + (PAD + ph / 2) + ')">market attractiveness &rarr;</text>'
+    + dots + '</svg>' + read + '</div>';
+}
+
+/* ===========================================================================
+   SUBCATEGORIES: map left, analysis right, opportunities named
+   =========================================================================== */
+var CS_SC_SEL = 0;
+function csScPick(i) { CS_KEEPSCROLL = true; CS_SC_SEL = i; csRender(); }
+
+function csSubcatPane(d) {
+  var sc = d.subcats || [];
+  if (!sc.length) return csGap('Subcategory breakdown.', 'subcats[]');
+  var x = sc[Math.min(CS_SC_SEL, sc.length - 1)];
+  var per = x.vc ? Math.round((x.tot || 0) / x.vc) : null;
+
+  var head = '<div class="cs-scname">' + csEsc(x.n) + '</div>'
+    + '<div class="cs-scmeta">' + csEsc(x.host || '') + '</div>'
+    + '<div class="cs-scfig">'
+      + '<div><b>' + csUsd(x.tot) + '</b><span>spend</span></div>'
+      + '<div><b>' + csPct(x.pct) + '</b><span>of category</span></div>'
+      + (x.vc != null ? '<div><b>' + csNum(x.vc) + '</b><span>vendors</span></div>' : '')
+      + (per != null ? '<div><b>' + csUsd(per) + '</b><span>average each</span></div>' : '')
+    + '</div>';
+
+  var opps = (x.opps || []).map(function (o) {
+    return '<div class="cs-scopp cs-scopp-' + csEsc(o.kind || 'supplier') + '">'
+      + '<div class="cs-scopp-h"><span class="cs-scopp-k">'
+        + csEsc(o.kind === 'volume' ? 'Volume consolidation' : 'Supplier reduction') + '</span>'
+        + '<span class="cs-scopp-v">' + (o.value != null ? csUsd(o.value) : 'not sized') + '</span></div>'
+      + '<div class="cs-scopp-t">' + csEsc(o.t) + '</div>'
+      + '<div class="cs-scopp-d">' + csEsc(o.d) + '</div>'
+      + (o.from ? '<div class="cs-scopp-f"><b>' + csNum(o.from) + ' &rarr; ' + csNum(o.to) + ' suppliers</b>'
+          + (o.vehicle ? ' · ' + csEsc(o.vehicle) : '') + '</div>' : '')
+      + '</div>';
+  }).join('');
+
+  return head + '<div class="cs-lab2" style="margin-top:14px">Consolidation opportunities</div>'
+    + (opps || csGap('Named volume-consolidation and supplier-reduction opportunities inside this subcategory.',
+        'per-subcategory opportunity records (kind, what, vendors from/to, receiving vehicle, value)'));
+}
+
+function scSubcats() {
+  var d = csData(), n = d.narr || {};
+  var sc = d.subcats || [];
+  var hasVc = sc.some(function (x) { return x.vc != null; });
+  var h = '';
+
+  h += '<div class="cs-screl">'
+    + csCard('Fragmentation Map', csFragMap(d),
+        { sub: hasVc ? 'spend against vendor count' : 'spend by subcategory', conf: csConfFor(d, 'subcats') })
+    + csCard('Subcategory Detail', csSubcatPane(d),
+        { cls: 'cs-scpane', sub: 'click a subcategory', conf: csConfFor(d, 'subcats') })
+    + '</div>';
+
+  h += csCard('All Subcategories', csSubcatTable(d),
+      { sub: sc.length + ' subcategories', conf: hasVc ? 'Moderate' : 'Limited' })
+    + csNarrNote(n.subcatLegend) + csNarrNote(n.subcatGap);
+  return h;
+}
+function csSubcatTable(d) {
+  var sc = d.subcats || [];
+  var hasVc = sc.some(function (x) { return x.vc != null; });
+  var scMax = sc.reduce(function (a, x) { return Math.max(a, x.tot || 0); }, 0) || 1;
+  var vcMax = sc.reduce(function (a, x) { return Math.max(a, x.vc || 0); }, 0) || 1;
+  var order = sc.map(function (x, i) { return { x: x, i: i }; }).sort(function (a, b) {
+    return hasVc ? (b.x.vc || 0) - (a.x.vc || 0) : (b.x.tot || 0) - (a.x.tot || 0);
+  });
+  var rows = order.map(function (o) {
+    var x = o.x, nOpp = (x.opps || []).length;
+    return '<tr class="' + (CS_SC_SEL === o.i ? 'is-open' : '') + '">'
+      + '<td class="cs-l"><button class="cs-suplink" onclick="csScPick(' + o.i + ')">' + csEsc(x.n) + '</button>'
+        + '<span class="cs-sub2">' + csEsc(x.host || '') + '</span></td>'
+      + (hasVc ? '<td class="cs-barcell">' + csBar((x.vc / vcMax) * 100, 'emph') + '</td>'
+                 + '<td class="cs-num">' + csNum(x.vc) + '</td>'
+                 + '<td class="cs-num">' + csUsd(Math.round((x.tot || 0) / (x.vc || 1))) + '</td>' : '')
+      + '<td class="cs-barcell">' + csBar((x.tot / scMax) * 100, 'plum') + '</td>'
+      + '<td class="cs-num">' + csUsd(x.tot) + '</td>'
+      + '<td class="cs-num">' + csPct(x.pct) + '</td>'
+      + '<td class="cs-num">' + (nOpp ? '<span class="cs-oppn">' + nOpp + '</span>' : '--') + '</td></tr>';
+  });
+  return csTable(hasVc ? ['Subcategory', '', 'Vendors', 'Avg each', '', 'Spend', 'Share', 'Opps']
+                       : ['Subcategory', '', 'Spend', 'Share', 'Opps'], rows)
+    + csNote(hasVc
+        ? 'Ranked by vendor count, not spend. A large subcategory bought from a handful of suppliers is not fragmented; a small one bought from a hundred is.'
+        : 'Ranked by spend. A true fragmentation ranking needs a <b>vendor count per subcategory</b>, which this data set does not carry.');
+}
+
+/* ===========================================================================
    render loop
    =========================================================================== */
 function csBody() {
@@ -1713,8 +1947,26 @@ function csBody() {
 function csRender() {
   var el = document.getElementById('app');
   if (!el) return;
+  /* Every interaction re-renders the whole screen. Remember the caret and the
+     scroll position first, or typing in the search box loses focus on the first
+     keystroke and every click throws the page back to the top. */
+  var act = document.activeElement;
+  var focusId = act && act.id ? act.id : null;
+  var caret = null;
+  try { if (focusId && act.selectionStart != null) caret = act.selectionStart; } catch (e) {}
+  var y = window.pageYOffset;
+
   el.innerHTML = '<main class="cs-main">' + csHeader() + '<div class="cs-body">' + csBody() + '</div></main>';
-  window.scrollTo({ top: 0, behavior: 'auto' });
+
+  if (focusId) {
+    var back = document.getElementById(focusId);
+    if (back) {
+      back.focus();
+      try { if (caret != null) back.setSelectionRange(caret, caret); } catch (e2) {}
+    }
+  }
+  if (CS_KEEPSCROLL) { window.scrollTo(0, y); CS_KEEPSCROLL = false; }
+  else window.scrollTo({ top: 0, behavior: 'auto' });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', csRender);
 else csRender();
