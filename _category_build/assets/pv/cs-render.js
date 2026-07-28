@@ -318,8 +318,12 @@ function scPareto() {
     + csKpi('Top 5 share', csPct(m.top5Share), 'of category spend', 'plum')
     + csKpi('Top 10 share', csPct(m.top10Share), 'of category spend')
     + csKpi('Suppliers to 80%', csParetoCount(d), 'carry four fifths of spend', 'teal')
-    + csKpi('Tail under $' + CS_TAIL + 'K', csNum(m['tail' + CS_TAIL]) + ' suppliers',
-        csUsd(m['tail' + CS_TAIL + 'Spend']) + ' · ' + csPct(m['tail' + CS_TAIL + 'Pct']) + ' of spend')
+    + (function () {
+        var a = csTailAt(d, CS_TAIL);
+        return csKpi('Tail under ' + csTailLabel(CS_TAIL),
+          a ? csNum(a.n) + ' suppliers' : '--',
+          a ? csUsd(a.spend) + ' · ' + csPct(a.pct) + ' of spend' : 'not held at this threshold');
+      }())
     + '</div>';
 
   h += '<div class="cs-paretorow">'
@@ -349,14 +353,8 @@ function scSuppliers() {
     + csKpi('Prior period', csNum(m.vendorsPrior), 'FY24 active')
     + '</div>';
 
-  h += csCard('All suppliers', csSupTable(d),
-      { icon: 'users', role: 'solid', sub: 'click a name for the deep dive', conf: csConfFor(d, 'suppliers') });
-
-  h += csSupDeep(d);
-
-  h += csCard('Supplier tiering', csTieringLines(d),
-      { icon: 'grid', sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
-
+  /* Movement sits directly under the counts it explains, not at the foot of the
+     page where it reads as an afterthought. */
   var nv = (d.newVendors || []).map(function (v) {
     return '<tr><td class="cs-l">' + csEsc(v.n) + '</td><td class="cs-num">' + csUsd(v.s) + '</td></tr>'; });
   var xv = (d.exitVendors || []).map(function (v) {
@@ -367,6 +365,14 @@ function scSuppliers() {
     + csCard('Exiting vendors', xv.length ? csTable(['Supplier', 'Prior spend'], xv)
         : csGap('Suppliers that stopped in the current period.', 'exitVendors[]'), { icon: 'refresh', sub: 'no spend this period' })
     + '</div>';
+
+  h += csCard('All suppliers', csSupTable(d),
+      { icon: 'users', role: 'solid', sub: 'click a name for the deep dive', conf: csConfFor(d, 'suppliers') });
+
+  h += csSupDeep(d);
+
+  h += csCard('Supplier tiering', csTieringLines(d),
+      { icon: 'grid', sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
   return h;
 }
 
@@ -1487,20 +1493,41 @@ function csParetoRead(d) {
     + 'is ' + csPct(lead.cumPct, 1) + ' of it on its own. At an HHI' + csHelp(CS_HHI_HELP) + ' of '
     + csNum(Math.round(m.hhi || 0)) + ' the category is '
     + conc + ', which means leverage comes from <b>competing the top</b> rather than from breaking a monopoly. '
-    + 'The flat right-hand stretch is the cost problem: ' + csNum(m['tail' + CS_TAIL]) + ' suppliers under $' + CS_TAIL + 'K '
-    + 'account for ' + csPct(m['tail' + CS_TAIL + 'Pct']) + ' of spend but consume the same contracting and vendor-management effort as the top.'
+    + 'The flat right-hand stretch is the cost problem: ' + (function () {
+      var a = csTailAt(d, CS_TAIL);
+      return a ? csNum(a.n) + ' suppliers under ' + csTailLabel(CS_TAIL) + ' account for ' + csPct(a.pct) : 'the tail';
+    }()) + ' of spend but consume the same contracting and vendor-management effort as the top.'
     + '</div></div>';
 }
+var CS_TAIL_STOPS = [50, 100, 250, 500, 1000];
+function csTailLabel(v) { return v >= 1000 ? '$' + (v / 1000) + 'M' : '$' + v + 'K'; }
 function csTailSlider() {
-  var stops = [50, 100, 250], at = stops.indexOf(CS_TAIL);
+  var at = CS_TAIL_STOPS.indexOf(CS_TAIL);
   if (at < 0) at = 1;
   return '<div class="cs-tslider">'
-    + '<input type="range" min="0" max="2" step="1" value="' + at + '" aria-label="Tail threshold" '
-    + 'oninput="csSetTail([50,100,250][+this.value])">'
-    + '<div class="cs-tsticks">' + stops.map(function (v, i) {
-        return '<span class="' + (i === at ? 'on' : '') + '">$' + v + 'K</span>';
+    + '<input type="range" min="0" max="' + (CS_TAIL_STOPS.length - 1) + '" step="1" value="' + at + '" '
+    + 'aria-label="Tail threshold" oninput="csSetTail(CS_TAIL_STOPS[+this.value])">'
+    + '<div class="cs-tsticks">' + CS_TAIL_STOPS.map(function (v, i) {
+        return '<span class="' + (i === at ? 'on' : '') + '">' + csTailLabel(v) + '</span>';
       }).join('') + '</div>'
     + '<div class="cs-tslab">suppliers spending under this each year</div></div>';
+}
+/* The seed carries tail counts at 50/100/250 only. Where a full supplier curve
+   exists the count at any threshold is read off it; where it does not, the two
+   new stops say so rather than showing a number nobody computed. */
+function csTailAt(d, t) {
+  var m = d.meta || {};
+  if (m['tail' + t] != null) {
+    return { n: m['tail' + t], spend: m['tail' + t + 'Spend'], pct: m['tail' + t + 'Pct'], derived: false };
+  }
+  var full = d.paretoFull;
+  if (!full || !full.length) return null;
+  var lim = t * 1000, n = 0, spend = 0, total = 0;
+  full.forEach(function (p) {
+    total += p.value || 0;
+    if ((p.value || 0) < lim) { n++; spend += p.value || 0; }
+  });
+  return { n: n, spend: spend, pct: total ? (spend / total) * 100 : 0, derived: true };
 }
 /* Two concentric rings, because the point is the gap between them: the outer
    ring is how many suppliers the tail is, the inner is how little it buys. */
@@ -1518,8 +1545,11 @@ function csTailDonut(supPct, spendPct) {
 }
 function csTailStats(d) {
   var m = d.meta || {};
-  var t = CS_TAIL, n = m['tail' + t], sp = m['tail' + t + 'Spend'], pc = m['tail' + t + 'Pct'];
-  if (n == null) return csTailSlider() + csGap('Tail distribution.', 'tail counts per threshold');
+  var t = CS_TAIL, at = csTailAt(d, t);
+  if (!at) return csTailSlider()
+    + csGap('How many suppliers sit under ' + csTailLabel(t) + ' a year, and what they cost.',
+            'a tail count at this threshold, or a full supplier curve to read it from');
+  var n = at.n, sp = at.spend, pc = at.pct;
   var supPct = m.vendors ? (n / m.vendors) * 100 : 0;
   return csTailSlider()
     + '<div class="cs-tdwrap">' + csTailDonut(supPct, pc)
@@ -1532,10 +1562,10 @@ function csTailStats(d) {
       + '<div><b>' + csUsd(Math.round(sp / (n || 1))) + '</b><span>average each</span></div></div>';
 }
 function csTailRead(d) {
-  var m = d.meta || {}, t = CS_TAIL;
-  if (m.tailHoursLo == null) return '';
+  var m = d.meta || {}, at = csTailAt(d, CS_TAIL);
+  if (m.tailHoursLo == null || !at) return '';
   return csNote('<b>Effort against value.</b> Managing this tail costs an estimated <b>' + csNum(m.tailHoursLo)
-    + ' to ' + csNum(m.tailHoursHi) + ' hours</b> a year, against ' + csUsd(m['tail' + t + 'Spend'])
+    + ' to ' + csNum(m.tailHoursHi) + ' hours</b> a year, against ' + csUsd(at.spend)
     + ' of spend. That is the case for a catalogue route rather than a sourcing event.');
 }
 
@@ -1946,6 +1976,13 @@ function csSupDeep(d) {
 /* Performance and market attractiveness are judgements, not spend facts. Where
    the data set does not carry them the panel says so rather than plotting a
    position it made up. */
+/* Two-line quadrant labels. One line ran off both edges of the plot. */
+function csQuadLabel(x, y, anchor, lines) {
+  return '<text x="' + x + '" y="' + y + '" class="cs-quadl" text-anchor="' + anchor + '">'
+    + lines.map(function (t, i) {
+        return '<tspan x="' + x + '" dy="' + (i ? '1.15em' : '0') + '">' + csEsc(t) + '</tspan>';
+      }).join('') + '</text>';
+}
 function csRenewalMatrix(d, sel) {
   var rm = d.renewalMatrix;
   if (!rm) return csGap('Where each supplier sits on performance against market attractiveness, and what that implies at renewal.',
@@ -1954,7 +1991,7 @@ function csRenewalMatrix(d, sel) {
     .filter(function (p) { return p.m; });
   if (!pts.length) return csGap('Renewal position for this supplier.', 'renewalMatrix entry for ' + sel.n);
 
-  var W = 620, H = 380, PADL = 84, PADR = 22, PADT = 30, PADB = 52;
+  var W = 620, H = 400, PADL = 84, PADR = 22, PADT = 46, PADB = 58;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var mxs = pts.reduce(function (a, p) { return Math.max(a, p.s.tot || 0); }, 0) || 1;
   var dots = pts.map(function (p) {
@@ -1970,8 +2007,8 @@ function csRenewalMatrix(d, sel) {
 
   var me = rm[sel.n];
   var quad = me ? (me.perf >= 2.5
-      ? (me.attr >= 2.5 ? 'Renew and expand' : 'Renew, protect terms')
-      : (me.attr >= 2.5 ? 'Replace or compete' : 'Exit or remediate')) : null;
+      ? (me.attr >= 2.5 ? 'Renew and Expand' : 'Renew, Protect Terms')
+      : (me.attr >= 2.5 ? 'Replace or Compete' : 'Exit or Remediate')) : null;
 
   var read = me
     ? '<div class="cs-rmread"><div class="cs-lab2">Quadrant</div>'
@@ -1984,10 +2021,10 @@ function csRenewalMatrix(d, sel) {
     + 'aria-label="Performance against market attractiveness" class="cs-rmsvg">'
     + '<line x1="' + (PADL + pw / 2) + '" y1="' + PADT + '" x2="' + (PADL + pw / 2) + '" y2="' + (PADT + ph) + '" class="cs-p80h"/>'
     + '<line x1="' + PADL + '" y1="' + (PADT + ph / 2) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph / 2) + '" class="cs-p80h"/>'
-    + '<text x="' + (PADL + 6) + '" y="' + (PADT - 8) + '" class="cs-quadl" text-anchor="start">Replace / compete</text>'
-    + '<text x="' + (W - PADR - 2) + '" y="' + (PADT - 8) + '" class="cs-quadl">Renew &amp; expand</text>'
-    + '<text x="' + (PADL + 6) + '" y="' + (PADT + ph + 14) + '" class="cs-quadl" text-anchor="start">Exit / remediate</text>'
-    + '<text x="' + (W - PADR - 2) + '" y="' + (PADT + ph + 14) + '" class="cs-quadl">Renew, protect terms</text>'
+    + csQuadLabel(PADL + 6, PADT - 20, 'start', ['Replace', 'or Compete'])
+    + csQuadLabel(W - PADR - 2, PADT - 20, 'end', ['Renew', 'and Expand'])
+    + csQuadLabel(PADL + 6, PADT + ph + 14, 'start', ['Exit', 'or Remediate'])
+    + csQuadLabel(W - PADR - 2, PADT + ph + 14, 'end', ['Renew,', 'Protect Terms'])
     + '<line x1="' + PADL + '" y1="' + (PADT + ph) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
     + '<line x1="' + PADL + '" y1="' + PADT + '" x2="' + PADL + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
     + [1, 2, 3, 4, 5].map(function (t) {
@@ -1996,8 +2033,8 @@ function csRenewalMatrix(d, sel) {
     + [1, 3, 5].map(function (t) {
         return '<text x="' + (PADL - 8) + '" y="' + (PADT + ph - (t / 5) * ph + 3).toFixed(1) + '" class="cs-pyl">' + t + '</text>';
       }).join('')
-    + '<text x="' + (PADL + pw / 2) + '" y="' + (H - 6) + '" class="cs-axt">performance (1-5) &rarr;</text>'
-    + '<text x="14" y="' + (PADT + ph / 2) + '" class="cs-axt" transform="rotate(-90 14,' + (PADT + ph / 2) + ')">market attractiveness &rarr;</text>'
+    + '<text x="' + (PADL + pw / 2) + '" y="' + (H - 6) + '" class="cs-axt">Performance (1 to 5)</text>'
+    + '<text x="14" y="' + (PADT + ph / 2) + '" class="cs-axt" transform="rotate(-90 14,' + (PADT + ph / 2) + ')">Market attractiveness</text>'
     + dots + '</svg>' + read + '</div>';
 }
 
@@ -2005,7 +2042,13 @@ function csRenewalMatrix(d, sel) {
    SUBCATEGORIES: map left, analysis right, opportunities named
    =========================================================================== */
 var CS_SC_SEL = 0;
-function csScPick(i) { CS_KEEPSCROLL = true; CS_SC_SEL = i; csRender(); }
+function csScPick(i) {
+  CS_KEEPSCROLL = true; CS_SC_SEL = i; csRender();
+  /* The detail pane sits above the table, so a click from a row further down
+     changed something the reader could not see. Bring it into view. */
+  var pane = document.querySelector('.cs-scpane');
+  if (pane && pane.scrollIntoView) pane.scrollIntoView({ block: 'nearest' });
+}
 
 function csSubcatPane(d) {
   var sc = d.subcats || [];

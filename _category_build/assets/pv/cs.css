@@ -1075,3 +1075,68 @@ small,sub,sup{font-size:9px}
 .cs-tabs,.cs-subtabs{padding-bottom:1px}
 .cs-tab,.cs-subtab{margin-bottom:0}
 .cs-tabs{border-bottom:1px solid var(--line2)}
+
+
+/* =============================================================================
+   Review 3
+   ============================================================================= */
+
+/* 1. The Pareto panel was left with a block of empty white below the chart. The
+      row is equal-height by design and Tail Analysis is the taller column, so
+      the slack landed under a chart that had no reason to grow. The chart now
+      absorbs it: the body is a column, the plot wrapper takes flex:1 and the
+      SVG stretches to fill. Same row height, no dead space. */
+.cs-paretorow > .cs-card > .cs-cardbd{display:flex;flex-direction:column;overflow:visible}
+.cs-paretorow .cs-pwrap{flex:1;min-height:0;display:flex;align-items:stretch}
+.cs-paretorow .cs-psvg{width:100%;height:100%;max-width:none}
+.cs-paretorow .cs-fc-key{flex:none;margin-top:8px}
+
+/* 4. Marc: text still gets too small across the dashboard. The 9px step is
+      gone. The ladder is 11 / 13 / 20 / 28: eyebrows, table headers, chips and
+      axis labels all move up to 11, which is the chart floor anyway, so nothing
+      on the page is now smaller than anything in a chart. */
+.cs-eyebrow,.cs-lab,.cs-lab2,.cs-kpi-l,.cs-stat-l,.cs-cvbig span,.cs-scmeta,
+.cs-tdfig span,.cs-scfig span,.cs-scard-f,.cs-supr,.cs-suphead span,.cs-supcount,
+.cs-ct,.cs-cs,.cs-cov,.cs-chip,.cs-tier,.cs-pill,.cs-state,.cs-act,.cs-win,.cs-effort,
+.cs-tbl th,.cs-sortb,.cs-oppn,.cs-mi-s,.cs-cite,.cs-road-hd,.cs-pillar-m,.cs-nr-c,
+.cs-trig-t,.cs-scopp-k,.cs-opp-v2,.cs-wf-s,.cs-mrow,.cs-bignum-k,.cs-p3-d,
+.cs-plays-head .pk,.cs-plays-head .reflect,.cs-metric .lab,.cs-modelp .mph .mn,
+.cs-bar3 .bl,.cs-tdk,.cs-tsticks span,.cs-tslab,.cs-ps-more,.cs-rmblock,.cs-tld,
+.cs-secthd .t{
+  font-size:11px;
+}
+.cs-ct{font-size:13px}          /* panel titles stay a step above their labels */
+.cs-secthd .t{font-size:13px}   /* section bands stay above panel titles */
+.cs-plab,.cs-pyl,.cs-pyr,.cs-ptail,.cs-axt,.cs-quadl,.cs-fdlab,.cs-rknum,.cs-p80t{font-size:11px}
+.cs-tbv,.cs-tbl2,.cs-tby{font-size:11px}
+
+/* two-line quadrant labels need room and must not be clipped */
+.cs-quadl{font-weight:600}
+.cs-rmsvg,.cs-psvg,.cs-fragsvg,.cs-rksvg{overflow:visible}
+
+/* 6. Subcategory names are links and do move the detail pane, so they read like
+      links and show which row is live. */
+.cs-suplink{text-decoration-thickness:1px}
+.cs-tbl tr.is-open .cs-suplink{color:var(--plum-dk);font-weight:700}
+
+
+/* The last 9px holdouts: the play-card figure labels (.pcf .k), the timeline
+   month ruler, the leverage-bar end labels, the help marker, the Kraljic axis
+   captions, the read-out eyebrow and the draft badge. Nothing renders below 11
+   anywhere on this dashboard now. */
+.cs-pcard .pcf .k,.cs-tlm,.cs-kaxis,.cs-read-t,.cs-lb-l,.cs-lb-r,
+.cs-draftcard .dch .dbadge,.cs-modelp .mph .mn,.cs-metric .lab,
+.cs-plays-head .pk,.cs-plays-head .reflect,.cs-p3-k+.cs-p3-t,.cs-bar3 .bl,
+.cs-scard-f,.cs-mi-s .cs-cite{font-size:11px}
+.cs-help{width:15px;height:15px;font-size:11px}
+/* inline 9px written by the renderers */
+.cs-main [style*="9px"]{font-size:11px}
+.cs-main [style*="8px var"]{font-size:11px}
+
+
+/* The Pareto SVG now stretches to fill the panel, so its text is scaled down by
+   the viewBox ratio. Declared a step up so it LANDS at 11 rather than starting
+   there and shrinking. */
+.cs-paretorow .cs-p80t,.cs-paretorow .cs-pyl,.cs-paretorow .cs-pyr,
+.cs-paretorow .cs-ptail,.cs-paretorow .cs-plab{font-size:13px}
+.cs-tdmid span,.cs-trig-a b{font-size:11px}
