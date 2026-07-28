@@ -39,6 +39,8 @@ def build(out_path, demo=False):
     seed = read(os.path.join(ASSETS, 'seed', 'category-data.js'))
     # Externally sourced market research. Real and cited, so it loads in BOTH builds.
     seed += '\n' + read(os.path.join(ASSETS, 'seed', 'category-market-intel.js'))
+    # Market structure per consumption unit. Market data, not Lilly data.
+    seed += '\n' + read(os.path.join(ASSETS, 'seed', 'category-line-items.js'))
     if demo:
         # Narrows the seed to Software and adds the structures the real data does
         # not carry, so every panel renders populated. Clearly banner-marked.

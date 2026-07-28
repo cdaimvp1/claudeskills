@@ -2118,6 +2118,14 @@ function csSegments(d) {
    few large relationships the incumbent is hard to replace, and where it is
    spread thin across many small ones it is not. */
 function csSegKraljic(segs) {
+  /* Line-item segments are MARKET segments: placed by market concentration and
+     the share of market value moving through that unit, not by anything in
+     Lilly's ledger. This tab is about the outside world. */
+  if (segs.length && segs[0].market) {
+    return segs.map(function (s) {
+      return { seg: s, x: s.concentration, y: s.impact, perVendor: null };
+    });
+  }
   var maxPct = segs.reduce(function (a, s) { return Math.max(a, s.pct || 0); }, 0) || 1;
   var per = segs.map(function (s) { return s.vc ? (s.tot || 0) / s.vc : 0; });
   var loP = Math.min.apply(null, per.filter(function (v) { return v > 0; }).concat([1e9]));
@@ -2141,7 +2149,7 @@ function csSegToggle(d) {
     + '<div class="cs-seg2">' + modes.map(function (m) {
         var on = CS_SEG_MODE === m[0], gap = !has[m[0]];
         return '<button class="' + (on ? 'on' : '') + (gap ? ' gap' : '') + '" onclick="csSegMode(\'' + m[0] + '\')">'
-          + csEsc(m[1]) + (gap ? ' · needs data' : '') + '</button>';
+          + csEsc(m[1]) + (gap ? ' · needs data' : (m[0] === 'lineitem' ? ' · market' : '')) + '</button>';
       }).join('') + '</div>'
     + '<div class="cs-seg2 cs-seg2-r"><span class="cs-seglab">size by</span>'
       + [['spend', 'Spend'], ['vendors', 'Vendors']].map(function (v) {
@@ -2171,8 +2179,9 @@ function csKraljicPlot(d) {
 
   var dots = pts.map(function (p) {
     var s = p.seg;
-    var v = CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0);
-    var r = 9 + 17 * Math.sqrt(v / maxSize);
+    var v = s.market ? (CS_SEG_SIZE === 'vendors' ? (1 - s.buyerPower) : s.impact)
+                     : (CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0));
+    var r = 9 + 17 * Math.sqrt(Math.max(0, v) / (s.market ? 1 : maxSize));
     var cx = PADL + p.x * pw, cy = PADT + ph - p.y * ph;
     var q = csKraljicQuad(p);
     var tone = q === 'Strategic' ? 'var(--emph)' : q === 'Leverage' ? 'var(--plum)'
@@ -2181,8 +2190,10 @@ function csKraljicPlot(d) {
     return '<g class="cs-kdot' + (on ? ' on' : '') + (dim ? ' dim' : '') + '" onclick="csSegPick(\''
       + csEsc(String(s.key).replace(/'/g, "\\'")) + '\')" role="button" tabindex="0">'
       + '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1)
-      + '" fill="' + tone + '"><title>' + csEsc(s.key + ' · ' + q + ' · ' + csUsd(s.tot)
-      + (s.vc ? ' · ' + csNum(s.vc) + ' vendors · ' + csUsd(Math.round(p.perVendor)) + ' average each' : ''))
+      + '" fill="' + tone + '"><title>' + csEsc(s.market
+          ? s.key + ' · ' + q + ' · ' + s.headline
+          : s.key + ' · ' + q + ' · ' + csUsd(s.tot)
+            + (s.vc ? ' · ' + csNum(s.vc) + ' vendors · ' + csUsd(Math.round(p.perVendor)) + ' average each' : ''))
       + '</title></circle>'
       + '<text x="' + cx.toFixed(1) + '" y="' + (cy + r + 13).toFixed(1) + '" class="cs-kdlab">'
       + csEsc(String(s.key).slice(0, 22)) + '</text></g>';
@@ -2209,6 +2220,22 @@ function csKraljicPlot(d) {
 
 function csKraljicRead(d, pts) {
   var n = d.narr || {};
+  /* In market mode the read is about the market, not the portfolio. */
+  if (CS_SEG_MODE === 'lineitem' && pts.length && pts[0].seg.market) {
+    var lm = d.lineItemsMeta || {};
+    var worst = pts.slice().sort(function (a, b) { return b.seg.concentration - a.seg.concentration; })[0];
+    var best = pts.slice().sort(function (a, b) { return b.seg.buyerPower - a.seg.buyerPower; })[0];
+    return '<div class="cs-read"><div class="cs-read-d">'
+      + 'This plots the <b>market</b>, not the portfolio. '
+      + (worst ? '<b>' + csEsc(worst.seg.key) + '</b> is the hardest market a software buyer faces: '
+          + csEsc(String(worst.seg.headline).toLowerCase()) + '. ' : '')
+      + (best ? '<b>' + csEsc(best.seg.key) + '</b> is the easiest: ' + csEsc(String(best.seg.headline).toLowerCase())
+          + '. ' : '')
+      + 'They sit in the same category and behave nothing alike, which is why one category-level posture '
+      + 'produces the wrong play for at least two units.'
+      + '</div></div>'
+      + csNote(csEsc(lm.basis || ''));
+  }
   var strat = pts.filter(function (p) { return csKraljicQuad(p) === 'Strategic'; });
   var names = strat.map(function (p) { return '<b>' + csEsc(p.seg.key) + '</b>'; });
   var list = names.length <= 1 ? names.join('')
@@ -2236,7 +2263,7 @@ function csKraljicRead(d, pts) {
 /* ---- Porter, per segment, on the same toggle ---- */
 function csForcesBySeg(d) {
   var segs = csSegments(d);
-  var fs = d.forcesBySegment || null;
+  var fs = (CS_SEG_MODE === 'lineitem') ? (d.lineItemForces || null) : (d.forcesBySegment || null);
   if (!fs) {
     return csGap('How the five forces differ between segments, and therefore where competing works.',
       'a five-force read per segment (forcesBySegment)');
@@ -2257,7 +2284,7 @@ function csForcesBySeg(d) {
     };
     var ring = AX.map(function (_, i) { return pt(i, 3.5); }).join(' ');
     var shape = AX.map(function (k, i) { return pt(i, csForceVal(f[k])); }).join(' ');
-    var tone = /high/i.test(f['Supplier power'] || '') ? 'var(--emph)' : 'var(--plum)';
+    var tone = /^high/i.test(f['Supplier power'] || '') ? 'var(--emph)' : 'var(--plum)';
     return '<div class="cs-fcard">'
       + '<svg viewBox="0 0 140 140" class="cs-radar" role="img" aria-label="' + csEsc(s.key + ' five forces') + '">'
       + '<polygon points="' + ring + '" class="cs-rring"/>'
