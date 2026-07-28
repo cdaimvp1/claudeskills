@@ -729,6 +729,36 @@ html:root{ --nested:#EDE8E0; --nested-rule:#DCD5CA; }
 }
 .tabbar>*{justify-content:flex-start}
 
+
+/* =============================================================================
+   #14 pale-fill sweep, completed.
+
+   Most of the ~11 scoped styles had already been converted to transparent
+   backgrounds with outlines. What remained was four TOKEN values, which is why
+   the pale fills kept reappearing wherever those tokens were used:
+
+     --danger    #9A3B1F  a rust red. There is no red in the system; it becomes
+                          the deep burnt orange the palette does carry.
+     --danger-t  #F6E1D5  a wash below the protocol floor -> the emphasis tint.
+     --warn-t    #F7E7D7  the same wash under a different name -> same tint.
+     --surface2  #F7F5F1  a hair off white, so every nested block drawn on it
+                          disappeared against the panel -> the well.
+
+   Fixing the tokens fixes every rule that reads them, which is the reason to do
+   it here rather than chase the call sites.
+   ============================================================================= */
+html:root{
+  --danger:#9A4A13;
+  --danger-t:#ECCFBA;
+  --warn-t:#ECCFBA;
+  --surface2:#F4F1EC;
+  /* The legacy aliases are declared in the original :root as var(--danger), and
+     a var() in a custom-property declaration resolves against the block it was
+     declared in, not against the winning value. So overriding --danger alone
+     left every alias still pointing at the old rust red. They are restated. */
+  --danger-fg:#9A4A13; --danger-bar:#9A4A13; --danger-bg:#ECCFBA;
+}
+
 /* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *
