@@ -2971,6 +2971,40 @@ html:root{
   --well:#F4F1EC; --rule:#E2DCD4; --line2:#CECCC7; --track:#E7E3DC; --tab-idle:#6E6862;
   --shadow-card:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
 }
+
+
+/* =============================================================================
+   Corrections after review
+   ============================================================================= */
+
+/* 1. --nested was #f1efec, which is a hair off white and disappeared on a white
+      panel. Every "None on file" / "To assign" block reads off it, on every
+      dashboard. It now sits on the well, which is the protocol's own value for
+      a nested block, with a rule so it holds an edge on any surface. */
+html:root{ --nested:#EDE8E0; --nested-rule:#DCD5CA; }
+[style*="--nested"],[style*="var(--nested"]{border:1px solid var(--nested-rule)}
+
+/* 2. Section headers were 9px, which is eyebrow size, not header size. A band
+      that groups panels has to out-rank the panel titles under it. 13px, and
+      the spine grows with it. */
+.secthd .t,.sect>.t{
+  font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--plum);padding-left:11px;border-left:3px solid var(--plum);line-height:1.25;
+}
+.secthd{margin-bottom:12px}
+
+/* 3. REGRESSION, mine: the protocol layer put .tabbar in the tab-strip selector
+      list, which handed Deal's sticky top-level bar a flex context it did not
+      have. That centred the tabs and, with overflow-x:auto, produced a vertical
+      scrollbar. Deal's own .tabbar rule is correct; this puts it back and keeps
+      only the label and underline treatment on the buttons. */
+.tabbar{
+  display:block;gap:0;
+  overflow:visible;
+  justify-content:flex-start;
+  border-bottom:1px solid var(--line2);
+}
+.tabbar>*{justify-content:flex-start}
 </style><style>/* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *

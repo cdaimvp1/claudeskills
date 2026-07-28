@@ -85,3 +85,39 @@ Carried from MASTER-REMAINING-WORK, all four still open and all four untouched:
 - Document Family Register: click-to-open the register row?
 - #13 Next-Session Brief: re-home or drop.
 - **Status:** PARKED. #11, #12, #14 and #16 do not depend on any of them.
+
+
+---
+
+## Review fixes 2026-07-28 (done before the overnight run)
+
+- **--nested was #f1efec**, a hair off white, so every "None on file" / "To
+  assign" block vanished on a white panel. Repointed to #EDE8E0 with a rule.
+  Global token: fixes it on every dashboard, every tab, wherever the block
+  appears. Verified live.
+- **Section headers were 9px**, eyebrow size rather than header size. A band that
+  groups panels has to out-rank the panel titles under it. Now 13/800 uppercase
+  in plum with the spine grown to match. Verified on RFx: "Suppliers & contacts"
+  renders 13px / 800 / plum.
+- **REGRESSION, mine.** The protocol layer listed `.tabbar` among the tab strips,
+  which handed Deal's sticky top-level bar a flex context it never had. That
+  centred the tabs and, with overflow-x:auto, produced a vertical scrollbar.
+  Deal's own rule is restored; only the label and underline treatment stays on
+  the buttons. Verified: display block, overflow-y visible, no vertical scroll,
+  tabs left-aligned.
+
+## QUEUED into the overnight Landscape recolour (L1)
+
+Marc's remaining three from the same review. All are Landscape, all are colour or
+nesting, all fold into L1/L2 rather than needing a separate pass:
+
+1. **Plum and teal still too light in places on the Supplier Deep Dive tab.**
+   These are hardcoded hex in `pv-07b-deepdive.js` that bypass the token layer,
+   which is exactly what L1 exists to fix.
+2. **Emphasis drawn in something other than burnt orange**, also on Supplier Deep
+   Dive. Same cause, same fix.
+3. **Ownership & Control: the tree sits in a panel inside a panel.** Source is
+   `pvDD2Card('Ownership & Control', pvDD2OwnershipTree(...), ..., {fill:true,
+   maxBody:400})` in `pv-07b-deepdive.js` line ~273. The inner wrapper has to go
+   so the tree sits directly in the main panel body. Structural, not colour, but
+   it is the same file and the same rebuild.
