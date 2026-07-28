@@ -314,5 +314,5 @@ If the session restarted/compacted, this is where things stand.
 - `[blocked]` Help-desk network-gated harvest — build per-source snapshot files from real page reads on the Lilly network: BuyLilly (onboarding / PO open-close / invoice-status / where-to-start), Playbook stakeholder FAQs, ProtectLilly fallback notes; then the broader `procurement-operating-model.md` corpus. Real content only, never inferred. (TODO-network-gated-harvest; OVERNIGHT-BUILD-TRACKER)
 
 ## Contradictions to resolve with Marc
-1. P2 Deep-Dive completion — one BUILD-TRACKER entry says complete, the next says the same 4 tabs' viz remain.
-2. Head-to-Head launcher — one entry added a compact launcher; a later review (OV1) says remove it entirely.
+1. ~~P2 Deep-Dive completion~~ — RESOLVED 2026-07-28, Marc: **it is complete**. FM4/RR3/RR4/CO4 are not outstanding; the later entry was stale.
+2. ~~Head-to-Head launcher~~ — RESOLVED 2026-07-28, Marc: **remove it**. Which element counts as "the launcher" is the one open detail (see OVERNIGHT-DECISIONS-NEEDED).
