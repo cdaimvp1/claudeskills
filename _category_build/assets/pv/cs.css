@@ -19,8 +19,11 @@
   --cs-band:#F0ECEF;
   --cs-sans:'Libre Franklin',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
 }
-html,body{margin:0;background:var(--cs-bg);color:var(--cs-ink);font-family:var(--cs-sans);font-size:13px;-webkit-font-smoothing:antialiased}
-.cs-main{max-width:1400px;margin:0 auto;padding:24px 36px 64px}
+/* The shell owns the page canvas. Overriding it here is what made this
+   dashboard sit on a different background from Deal, RFx and Landscape. */
+html,body{margin:0;background:var(--bg,#E2E6E1);color:var(--cs-ink);font-family:var(--cs-sans);font-size:13px;-webkit-font-smoothing:antialiased}
+.cs-main{box-sizing:border-box}
+.cs-main{max-width:1320px;margin:0 auto;padding:28px 40px 70px}
 
 /* ---- header ---- */
 .cs-eyebrow{font:700 9px var(--cs-sans);letter-spacing:.09em;text-transform:uppercase;color:var(--cs-mut2);margin-bottom:5px}
@@ -334,7 +337,10 @@ small,sub,sup{font-size:9px}
 .cs-help:hover,.cs-help:focus{border-color:var(--cs-plum);color:var(--cs-plum);outline:none}
 
 /* ---- top suppliers, ten then scroll ---- */
-.cs-scroll10{max-height:322px;overflow-y:auto;padding-right:6px}
+/* Ten rows visible, the eleventh clipped so the scroll is obvious. Row is
+   5+5 padding + 19 line + 1 rule = 30px. */
+.cs-scroll10{max-height:280px;overflow-y:auto;padding-right:8px;scrollbar-gutter:stable}
+.cs-suprow{height:28px;box-sizing:border-box}
 .cs-suprow{display:grid;grid-template-columns:20px minmax(0,1fr) 110px 74px 46px;gap:9px;align-items:center;
   padding:5px 0;border-bottom:1px solid var(--cs-line)}
 .cs-suprow:last-child{border-bottom:none}
@@ -524,3 +530,205 @@ small,sub,sup{font-size:9px}
 .cs-seqline{margin:8px 0;font-size:13px;line-height:1.55}
 .cs-seqline strong{color:var(--cs-ink)}
 .cs-pre{white-space:pre-wrap}
+
+/* =============================================================================
+   STRATEGY & PLAYS: the platform's outer tab
+   Carried across from .metric / .plays-head / .rechead / .pcard / .modelp,
+   with the palette substituted (platform blue -> teal, amber -> plum, red ->
+   burnt) and the locked type scale applied where the platform uses 21/14/12.
+   ============================================================================= */
+.cs-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  background:var(--cs-surface);border:1px solid var(--cs-line2);border-radius:10px;margin-bottom:18px}
+.cs-metric{padding:13px 16px;border-right:1px solid var(--cs-line)}
+.cs-metric:last-child{border-right:none}
+.cs-metric .lab{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-metric .val{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:8px;line-height:1}
+.cs-metric .note{font-size:11px;color:var(--cs-mut);margin-top:6px}
+
+.cs-plays-head{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.cs-plays-head svg{width:18px;height:18px;stroke:var(--cs-plum);fill:none;stroke-width:2}
+.cs-plays-head .pk{font:700 9px var(--cs-sans);letter-spacing:.07em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-plays-head .reflect{font:600 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--cs-burnt);border:1px solid var(--cs-burnt);border-radius:30px;padding:3px 9px;margin-left:auto}
+.cs-rechead{font-size:13px;line-height:1.55;color:var(--cs-mut);margin-bottom:14px;max-width:100ch}
+.cs-rechead b{color:var(--cs-ink);font-weight:700}
+
+.cs-plays-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-bottom:18px;align-items:start}
+@media(max-width:1000px){.cs-plays-wrap{grid-template-columns:1fr}}
+.cs-plays-col{display:flex;flex-direction:column;gap:11px}
+
+.cs-pcard{border:1.5px solid var(--cs-line2);border-radius:13px;background:var(--cs-surface);
+  padding:12px 15px;cursor:pointer;transition:.12s}
+.cs-pcard:hover{border-color:var(--cs-mut2)}
+.cs-pcard.on{border-color:var(--cs-plum);background:linear-gradient(180deg,#EDDFE9,#fff)}
+.cs-pcard .pcrow{display:flex;align-items:center;gap:10px}
+.cs-pcard .pcheck{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--cs-line2);flex:none;
+  display:flex;align-items:center;justify-content:center;color:#fff;background:var(--cs-surface)}
+.cs-pcard.on .pcheck{background:var(--cs-plum);border-color:var(--cs-plum)}
+.cs-pcard .pcheck svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:3;opacity:0}
+.cs-pcard.on .pcheck svg{opacity:1}
+.cs-pcard .pcic{width:30px;height:30px;border-radius:8px;background:var(--cs-bg);border:1px solid var(--cs-line);
+  display:flex;align-items:center;justify-content:center;flex:none}
+.cs-pcard .pcic svg{width:16px;height:16px;stroke:var(--cs-ink);fill:none;stroke-width:2}
+.cs-pcard .pcname{font-size:16px;font-weight:700}
+.cs-pcard .pcsub{font-size:11px;color:var(--cs-mut);margin-top:8px;line-height:1.45}
+.cs-pcard .pcfig{display:flex;gap:20px;margin-top:11px;flex-wrap:wrap}
+.cs-pcard .pcf{display:flex;flex-direction:column}
+.cs-pcard .pcf .v{font-size:13px;font-weight:700;color:var(--cs-plum);font-variant-numeric:tabular-nums}
+.cs-pcard .pcf .k{font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:3px}
+.cs-effort{font:600 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;border-radius:30px;
+  padding:2px 8px;margin-left:auto;border:1px solid}
+.cs-effort.lo{color:var(--cs-teal);border-color:var(--cs-teal)}
+.cs-effort.md{color:var(--cs-plum);border-color:var(--cs-plum)}
+.cs-effort.hi{color:var(--cs-burnt);border-color:var(--cs-burnt)}
+
+.cs-modelp{border:1px solid var(--cs-line);border-radius:14px;background:var(--cs-surface);
+  position:sticky;top:16px;overflow:hidden}
+.cs-modelp .mph{background:var(--cs-ink);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:9px}
+.cs-modelp .mph svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.cs-modelp .mph .mt{font-size:13px;font-weight:700}
+.cs-modelp .mph .mn{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.05em;
+  text-transform:uppercase;color:rgba(255,255,255,.72)}
+.cs-modelp .mpb{padding:14px 16px}
+.cs-horizon{display:inline-flex;background:var(--cs-bg);border:1px solid var(--cs-line);border-radius:30px;
+  padding:3px;gap:2px;margin-bottom:14px}
+.cs-horizon button{border:none;background:transparent;font:600 11px var(--cs-sans);color:var(--cs-mut);
+  padding:5px 12px;border-radius:30px;cursor:pointer}
+.cs-horizon button.on{background:var(--cs-plum);color:#fff}
+.cs-bignum{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--cs-ink);
+  font-variant-numeric:tabular-nums}
+.cs-bignum-k{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:6px}
+.cs-bars3{display:flex;align-items:flex-end;gap:10px;height:78px;margin:16px 0 4px}
+.cs-bar3{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;justify-content:flex-end;height:100%}
+.cs-bar3 i{width:100%;background:var(--cs-teal);border-radius:5px 5px 0 0;min-height:3px;transition:height .35s}
+.cs-bar3 .bl{font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-bar3 .bv{font-size:11px;font-weight:700;color:var(--cs-ink);font-variant-numeric:tabular-nums}
+.cs-miniload{font-size:11px;color:var(--cs-mut);align-self:center;margin:auto}
+.cs-mrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;
+  border-top:1px solid var(--cs-line);font-size:11px}
+.cs-mrow .mk{color:var(--cs-mut)}
+.cs-mrow .mv{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.cs-mrow .mu{color:var(--cs-mut2);font-weight:400}
+.cs-riskbar{height:8px;border-radius:6px;background:var(--cs-line);overflow:hidden;margin-top:7px}
+.cs-riskbar i{display:block;height:100%;border-radius:6px;transition:width .35s}
+.cs-prow{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.cs-pbtn{font:700 11px var(--cs-sans);border-radius:30px;padding:8px 15px;cursor:pointer;
+  border:1.5px solid var(--cs-line2);background:var(--cs-surface);color:var(--cs-ink)}
+.cs-pbtn.primary{background:var(--cs-plum);border-color:var(--cs-plum);color:#fff}
+.cs-pbtn:hover{border-color:var(--cs-mut2)}
+.cs-pbtn.primary:hover{background:var(--cs-plum-d);border-color:var(--cs-plum-d)}
+.cs-playmsg{font-size:11px;line-height:1.5;color:var(--cs-ink);border-left:3px solid var(--cs-burnt);
+  padding-left:10px;margin-top:11px}
+
+.cs-draftcard{border:1px solid var(--cs-plum);background:var(--cs-surface);border-radius:14px;
+  margin:14px 0 4px;overflow:hidden}
+.cs-draftcard .dch{display:flex;align-items:center;gap:9px;padding:12px 15px;
+  border-bottom:1px solid var(--cs-line);background:var(--cs-band)}
+.cs-draftcard .dch .dt{font-size:13px;font-weight:700}
+.cs-draftcard .dch .dbadge{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.04em;
+  text-transform:uppercase;color:var(--cs-plum);background:var(--cs-surface);border:1px solid var(--cs-plum);
+  border-radius:30px;padding:3px 9px}
+.cs-draftcard .dcb{padding:13px 15px;font-size:13px;line-height:1.6;color:var(--cs-ink);
+  max-height:340px;overflow:auto}
+.cs-draftcard .dcb .cs-nr{border-left:0;padding-left:0}
+
+/* ---- stacked current-year forecast ---- */
+.cs-fc-plot{position:relative}
+.cs-fc-add{position:absolute;left:22%;width:56%;border-radius:3px 3px 0 0;display:block;
+  background:repeating-linear-gradient(135deg,var(--cs-teal) 0 5px,#4A8F8B 5px 10px)}
+.cs-fc-col.is-stack .cs-fc-bar{border-radius:0}
+.cs-k-add::before{background:repeating-linear-gradient(135deg,var(--cs-teal) 0 4px,#4A8F8B 4px 8px)!important}
+
+/* ---- key findings as cards ---- */
+.cs-mi-emph{border-top-color:var(--cs-burnt)}
+.cs-mi-teal{border-top-color:var(--cs-teal)}
+.cs-mi-plum{border-top-color:var(--cs-plum)}
+.cs-mi-teal .cs-mi-k{color:var(--cs-teal)}
+.cs-mi-plum .cs-mi-k{color:var(--cs-plum)}
+
+/* ---- spend under contract: one bar, every exposure a segment ---- */
+.cs-cvhead{display:flex;gap:28px;margin-bottom:12px}
+.cs-cvbig b{display:block;font-size:28px;font-weight:800;letter-spacing:-.015em;line-height:1;color:var(--cs-plum)}
+.cs-cvbig span{display:block;font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:5px}
+.cs-cvbig-x b{color:var(--cs-burnt)}
+.cs-cvbar{display:flex;height:26px;border-radius:5px;overflow:hidden;margin-bottom:14px}
+.cs-cvseg{display:block;height:100%}
+.cs-cvseg-ok{background:var(--cs-plum)}
+.cs-cvseg-x0{background:var(--cs-burnt)}
+.cs-cvseg-x1{background:var(--cs-burnt-d)}
+.cs-cvrow{display:grid;grid-template-columns:10px minmax(0,1.1fr) minmax(0,1.4fr) 74px 52px;gap:10px;
+  align-items:center;padding:6px 0;border-bottom:1px solid var(--cs-line)}
+.cs-cvrow:last-child{border-bottom:none}
+.cs-cvsw{width:10px;height:10px;border-radius:2px;background:var(--cs-burnt)}
+.cs-cvrow:nth-child(even) .cs-cvsw{background:var(--cs-burnt-d)}
+.cs-cvn{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-cvw{font-size:11px;color:var(--cs-mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-cvv,.cs-cvp{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.cs-cvp{color:var(--cs-mut)}
+
+/* ---- renewal exposure timeline ---- */
+.cs-timeline{margin-top:4px}
+.cs-tlaxis{position:relative;height:16px;margin-left:auto;margin-bottom:6px;
+  display:block;padding-left:calc(38% + 20px)}
+.cs-tlm{position:absolute;font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--cs-mut2);transform:translateX(-50%)}
+.cs-tlrow{display:grid;grid-template-columns:minmax(0,150px) 74px minmax(0,1fr) 88px;gap:12px;
+  align-items:center;padding:7px 0;border-bottom:1px solid var(--cs-line)}
+.cs-tlrow:last-child{border-bottom:none}
+.cs-tlrow.is-urgent .cs-tln{color:var(--cs-burnt)}
+.cs-tln{font-size:13px;font-weight:600;overflow:hidden}
+.cs-tln small{display:block;font-size:11px;font-weight:400;color:var(--cs-mut);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-tlv{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.cs-tltrack{position:relative;height:14px;background:var(--cs-band);border-radius:4px}
+.cs-tlbar{position:absolute;top:0;height:14px;border-radius:4px;background:var(--cs-teal);display:block}
+.cs-tlbar.is-urgent{background:var(--cs-burnt)}
+.cs-tlbar-none{background:repeating-linear-gradient(135deg,transparent 0 5px,var(--cs-line2) 5px 6px);
+  border:1px dashed var(--cs-line2);box-sizing:border-box}
+.cs-tlpast{position:absolute;top:0;height:14px;border-radius:4px 0 0 4px;display:block;
+  background:repeating-linear-gradient(135deg,transparent 0 4px,var(--cs-burnt) 4px 5px);opacity:.5}
+.cs-tld{font-size:11px;color:var(--cs-mut);text-align:right;white-space:nowrap}
+
+/* ---- Pareto row: chart wide, tail panel vertical beside it ---- */
+.cs-paretorow{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(260px,1fr);gap:14px;
+  align-items:stretch;margin-bottom:14px}
+@media(max-width:1050px){.cs-paretorow{grid-template-columns:1fr}}
+.cs-paretorow>.cs-card{display:flex;flex-direction:column;margin-bottom:0}
+.cs-paretorow>.cs-card>.cs-cardbd{flex:1;min-height:0}
+.cs-ptail2{fill:var(--cs-mut2)}
+.cs-read{margin-top:0}
+.cs-read+.cs-note{margin-top:12px}
+
+/* ---- tail threshold slider ---- */
+.cs-tslider{margin-bottom:16px}
+.cs-tslider input[type=range]{width:100%;accent-color:var(--cs-plum);margin:0}
+.cs-tsticks{display:flex;justify-content:space-between;margin-top:5px}
+.cs-tsticks span{font:600 11px var(--cs-sans);color:var(--cs-mut)}
+.cs-tsticks span.on{color:var(--cs-plum);font-weight:700}
+.cs-tslab{font-size:11px;color:var(--cs-mut);margin-top:5px}
+
+/* ---- concentric tail donuts ---- */
+.cs-tdwrap{position:relative;display:flex;justify-content:center;margin:4px 0 12px}
+.cs-donut{width:140px;height:140px;display:block}
+.cs-donut circle{fill:none;stroke-width:14}
+.cs-dnbg{stroke:var(--cs-band)}
+.cs-dnsup{stroke:var(--cs-burnt);stroke-linecap:butt}
+.cs-dnspend{stroke:var(--cs-teal);stroke-linecap:butt}
+.cs-tdmid{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.cs-tdmid b{display:block;font-size:20px;font-weight:800;line-height:1;letter-spacing:-.01em}
+.cs-tdmid span{display:block;font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:3px}
+.cs-tdkey{border-top:1px solid var(--cs-line)}
+.cs-tdk{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--cs-line);font-size:11px}
+.cs-tdk i{width:10px;height:10px;border-radius:2px;flex:none}
+.cs-tdk i.k-sup{background:var(--cs-burnt)}
+.cs-tdk i.k-spend{background:var(--cs-teal)}
+.cs-tdk span{color:var(--cs-mut2)}
+.cs-tdk b{margin-left:auto;font-size:13px;font-variant-numeric:tabular-nums}
+.cs-tdfig{display:flex;gap:18px;margin-top:11px}
+.cs-tdfig b{display:block;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.cs-tdfig span{display:block;font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:3px}

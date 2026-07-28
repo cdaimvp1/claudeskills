@@ -253,7 +253,7 @@ function scOverview() {
         { sub: 'ranked by 3-yr spend', conf: csConfFor(d, 'suppliers') })
     + '</div>';
 
-  h += csCard('Key Findings', n.findings ? csNarr(n.findings) : csGap('Key data-driven findings', 'narr.findings'),
+  h += csCard('Key Findings', csFindings(d),
       { sub: 'what a sourcing lead needs to know', conf: csConfFor(d, 'narr') });
 
   h += '<div class="cs-row2">'
@@ -283,15 +283,14 @@ function scPareto() {
         csUsd(m['tail' + CS_TAIL + 'Spend']) + ' · ' + csPct(m['tail' + CS_TAIL + 'Pct']) + ' of spend')
     + '</div>';
 
-  h += csCard('Pareto Distribution', csParetoChart(d) + csParetoRead(d),
-      { sub: 'spend by supplier with cumulative share', conf: csConfFor(d, 'pareto') });
+  h += '<div class="cs-paretorow">'
+    + csCard('Pareto Distribution', csParetoChart(d),
+        { sub: 'spend by supplier with cumulative share', conf: csConfFor(d, 'pareto') })
+    + csCard('Tail Analysis', csTailStats(d),
+        { cls: 'cs-tailcard', conf: csConfFor(d, 'subcats') })
+    + '</div>';
 
-  var tails = [50, 100, 250].map(function (t) {
-    return '<button class="cs-seg' + (CS_TAIL === t ? ' on' : '') + '" onclick="csSetTail(' + t + ')">under $' + t + 'K</button>';
-  }).join('');
-  h += csCard('Tail Analysis',
-      '<div class="cs-segbar">' + tails + '</div>' + csTailStats(d) + csTailRead(d),
-      { sub: 'consolidation candidates', conf: csConfFor(d, 'subcats') });
+  h += csCard('What the curve says', csParetoRead(d) + csTailRead(d), { cls: 'cs-emph' });
   return h;
 }
 
@@ -320,6 +319,9 @@ function scSuppliers() {
           + (s.yoy > 0 ? '+' : '') + csPct(s.yoy) + '</span>' : '--') + '</td>'
       + '<td class="cs-num"><span class="cs-tier">' + csEsc(s.tier || '--') + '</span></td></tr>';
   });
+  h += csCard('Supplier tiering', csTieringLines(d),
+      { sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
+
   h += csCard('Ranked Suppliers', csTable(['Supplier', '3-yr spend', 'Share', 'YoY', 'Tier'], sRows),
       { sub: (d.suppliers || []).length + ' with resolved detail', conf: csConfFor(d, 'suppliers') });
   return h;
@@ -433,73 +435,235 @@ function scRisk() {
 /* ===========================================================================
    SCREEN 8 — STRATEGY & PLAYS > STRATEGY
 
-   Taken from the platform's liveStrategy(), block for block and in its order:
+   This is the platform's OUTER Strategy & Plays tab, not the Deep Analysis
+   Strategy section. Reproduced from renderPlays() / model() / modelBars() /
+   horizonBtns():
 
-     1  DK.card("Strategy narrative (Draft, pending your confirmation)")
-     2  <div class="callout-blue"><strong>Recommendation.</strong> ...
-     3  DK.card("Recommended plays (data-derived; ranges, pending confirmation)")
-        -> .pillrow3, six DK.pillar cards: big KIND, bold title, rationale plus
-           the estimated range and the effort
-     4  DK.card("Supplier tiering")
-        -> .seqline per tier: "<label> (tier n): N suppliers, P% of spend. <approach>"
+     metric strip      Annual spend · Suppliers · Contracts · Savings YTD · Avg cycle
+     .plays-head       star icon, "Recommended plays", reflect-only pill right
+     .rechead          the thesis line, then the paragraph, then
+                       "Select plays to model them individually or as a combination."
+     .plays-wrap       1.5fr / 1fr
+       .plays-col      one .pcard per lever: checkbox, icon, name, effort pill,
+                       sub, then four figures (year-1, 3-yr, risk/time, confidence)
+       .modelp         sticky dark-header panel: horizon Yr1/3yr/5yr, big number,
+                       per-year bars, category risk before -> after, effort in
+                       FTE-weeks, time to first value, three actions
+     .draftcard        the generated narrative, once it exists
 
-   Two adaptations, both forced and neither structural: the platform's pillar
-   type sits at 21/12/11 and this dashboard's scale is locked, so it renders
-   20/13/11; and .callout-blue is a blue wash, which the palette does not carry,
-   so the callout takes the plum rule instead.
+   The modelling is the platform's arithmetic, not an approximation of it:
+   Year-1 realisation ramps by effort, stacking plays applies an overlap
+   discount so two plays cannot bank the same pound twice, and category risk
+   moves by a per-kind delta off a derived base.
    =========================================================================== */
-function csPillar(tone, k, t, dsc) {
-  return '<div class="cs-pillar3 cs-pillar3-' + tone + '">'
-    + '<div class="cs-p3-k">' + csEsc(k) + '</div>'
-    + '<div class="cs-p3-t">' + csEsc(t) + '</div>'
-    + '<div class="cs-p3-d">' + csEsc(dsc) + '</div></div>';
+var CS_EFFORT_RAMP = { lo: 0.70, md: 0.50, hi: 0.35 };   // Year-1 realisation by effort
+var CS_EFFORT_TTV  = { lo: 2,    md: 5,    hi: 9    };   // months to first value
+var CS_EFFORT_WK   = { lo: 3,    md: 8,    hi: 16   };   // rough FTE-weeks
+var CS_OVERLAP     = [1, 1, 0.97, 0.92, 0.87, 0.83];     // combined-efficiency by count
+var CS_SEL = {};            // category index -> Set of selected play indices
+var CS_HZ = '3yr';          // 'y1' | '3yr' | '5yr'
+var CS_PLAYMSG = '';        // reflect-only action feedback
+
+/* Risk delta by what the play actually does. Falls back rather than guessing. */
+function csLeverRisk(name) {
+  var s = String(name || '').toLowerCase();
+  if (/consolidat|rationali|tail/.test(s)) return -7;
+  if (/recompet|compet|rfx|tender/.test(s)) return -5;
+  if (/standardi|catalog|govern/.test(s)) return -6;
+  if (/renegotiat|defen|price|commit/.test(s)) return -3;
+  return -4;
 }
-function scStrategy() {
-  var d = csData(), n = d.narr || {};
-  var h = '';
+/* Effort is not carried per lever in the seed. Where it is absent every play is
+   treated as medium and the panel says so, rather than a number appearing from
+   nowhere. */
+function csPlayEffort(s) {
+  if (s.eff) return s.eff;
+  var c = String(s.conf || '').toLowerCase();
+  return /high/.test(c) ? 'lo' : /low/.test(c) ? 'hi' : 'md';
+}
+function csPlays(d) {
+  return (d.savings || []).map(function (s, i) {
+    var eff = csPlayEffort(s);
+    /* Midpoint of the modelled range. A range is what the seed carries; a
+       single figure is what the model needs. */
+    var annual = (s.lo == null && s.hi == null) ? 0 : Math.round(((s.lo || 0) + (s.hi || s.lo || 0)) / 2);
+    return { i: i, k: s.lever, kind: s.type || 'Lever', sub: s.basis || '', eff: eff, annual: annual,
+             quantified: !(s.lo == null && s.hi == null),
+             y1: Math.round(annual * CS_EFFORT_RAMP[eff]),
+             risk: csLeverRisk(s.lever), ttv: CS_EFFORT_TTV[eff], wk: CS_EFFORT_WK[eff] };
+  });
+}
+/* Base category risk, derived from concentration and tail rather than invented:
+   a thin tail and a dominant supplier both raise it. */
+function csBaseRisk(d) {
+  var m = d.meta || {};
+  var tail = m.tail250Pct != null ? m.tail250Pct : (m.tail100Pct || 0);
+  var top = m.topShare || 0;
+  return Math.round(Math.min(85, 30 + tail * 0.7 + top * 0.3));
+}
+function csDefaultSel(d) {
+  var ps = csPlays(d).filter(function (p) { return p.quantified; })
+    .sort(function (a, b) { return b.annual - a.annual; });
+  return ps.slice(0, 2).map(function (p) { return p.i; });
+}
+function csSelSet(d) {
+  if (!CS_SEL[CS_CAT]) CS_SEL[CS_CAT] = csDefaultSel(d);
+  return CS_SEL[CS_CAT];
+}
+function csTogglePlay(i) {
+  var d = csData(), sel = csSelSet(d), at = sel.indexOf(i);
+  if (at >= 0) sel.splice(at, 1); else sel.push(i);
+  CS_PLAYMSG = '';
+  csRender();
+}
+function csSetHz(h) { CS_HZ = h; csRender(); }
+function csHzYears() { return CS_HZ === 'y1' ? 1 : CS_HZ === '5yr' ? 5 : 3; }
+function csPlayAct(msg) { CS_PLAYMSG = msg; csRender(); }
 
-  /* 1. Strategy narrative, first, exactly as the platform orders it. */
-  h += csCard('Strategy narrative (Draft, pending your confirmation)',
-      n.passThru ? '<div class="cs-prose cs-pre">' + csNarr(n.passThru) + '</div>'
-                 : csGap('The written articulation of the strategy.', 'narr.passThru'),
-      { conf: csConfFor(d, 'narr') });
+function csModel(d) {
+  var ps = csPlays(d), sel = csSelSet(d);
+  var chosen = ps.filter(function (p) { return sel.indexOf(p.i) >= 0; });
+  var n = chosen.length;
+  var ovf = CS_OVERLAP[Math.min(n, 5)];
+  if (ovf == null) ovf = 0.83;
+  var annual = Math.round(chosen.reduce(function (a, p) { return a + p.annual; }, 0) * ovf);
+  var y1 = Math.round(chosen.reduce(function (a, p) { return a + p.y1; }, 0) * ovf);
+  var base = csBaseRisk(d);
+  var modeledRisk = Math.max(8, Math.min(95, base + chosen.reduce(function (a, p) { return a + p.risk; }, 0)));
+  return { chosen: chosen, n: n, total: ps.length, annual: annual, y1: y1,
+           threeYr: y1 + annual + annual, fiveYr: y1 + annual * 4, base: base, modeledRisk: modeledRisk,
+           wk: chosen.reduce(function (a, p) { return a + p.wk; }, 0),
+           ttv: n ? Math.max.apply(null, chosen.map(function (p) { return p.ttv; })) : 0,
+           anyUnquantified: chosen.some(function (p) { return !p.quantified; }) };
+}
+function csRiskTone(v) { return v >= 60 ? 'var(--cs-burnt)' : v >= 40 ? 'var(--cs-plum)' : 'var(--cs-teal)'; }
 
-  /* 2. Recommendation callout, not a card. */
-  // The callout already says "Recommendation."; the record's own title repeats it.
-  var recRec = n.strategyRec;
-  if (recRec && typeof recRec === 'object' && recRec.title) {
-    recRec = { c: recRec.c, k: recRec.k, lead: recRec.lead, d: recRec.d,
-               title: String(recRec.title).replace(/^recommendation\s*[:.-]\s*/i, '') };
-  }
-  h += n.strategyRec
-    ? '<div class="cs-callout"><strong>Recommendation.</strong> ' + csNarr(recRec) + '</div>'
-    : csCard('Recommendation', csGap('The recommended posture for this category.', 'narr.strategyRec'));
-
-  /* 3. Recommended plays: six pillars, three across. */
-  var TONES = ['plum', 'teal', 'burnt'];
-  var plays = (d.savings || []).slice(0, 6).map(function (s, i) {
-    var est = csRange(s.lo, s.hi, '/yr');
-    var dsc = (s.basis ? s.basis + ' ' : '') + 'Est. ' + est.replace(/<[^>]+>/g, '')
-      + (s.conf ? '; ' + String(s.conf).toLowerCase() + ' confidence.' : '.');
-    return csPillar(TONES[i % TONES.length], s.type || 'Lever', s.lever, dsc);
+function csHorizonBtns() {
+  return '<div class="cs-horizon">'
+    + [['y1', 'Yr 1'], ['3yr', '3 yr'], ['5yr', '5 yr']].map(function (h) {
+        return '<button class="' + (CS_HZ === h[0] ? 'on' : '') + '" onclick="csSetHz(\'' + h[0] + '\')">' + h[1] + '</button>';
+      }).join('') + '</div>';
+}
+function csModelBars(m) {
+  var n = csHzYears(), arr = [];
+  for (var y = 1; y <= n; y++) arr.push(['Yr ' + y, y === 1 ? m.y1 : m.annual]);
+  var mx = Math.max.apply(null, [1].concat(arr.map(function (b) { return b[1]; })));
+  return arr.map(function (b) {
+    return '<div class="cs-bar3"><span class="bv">' + csUsd(b[1]) + '</span>'
+      + '<i style="height:' + Math.round((b[1] / mx) * 100) + '%"></i>'
+      + '<span class="bl">' + b[0] + '</span></div>';
   }).join('');
-  h += csCard('Recommended plays (data-derived; ranges, pending confirmation)',
-      plays ? '<div class="cs-pillrow3">' + plays + '</div>'
-            : csGap('The levers available in this category.', 'savings[]'),
-      { conf: csConfFor(d, 'savings') });
-
-  /* 4. Supplier tiering. */
-  h += csCard('Supplier tiering', csTieringLines(d), { conf: csConfFor(d, 'suppliers') });
-  return h;
 }
-/* The platform renders tiering as prose seqlines, not a table. */
-function csTieringLines(d) {
-  var t = d.supplierTiering || csDeriveTiers(d);
-  if (!t.length) return csGap('Supplier tiering.', 'supplierTiering[] or a tier per supplier');
-  return '<div class="cs-prose">' + t.map(function (x) {
-    return '<div class="cs-seqline"><strong>' + csEsc(x.label) + ' (tier ' + csEsc(x.tier) + '):</strong> '
-      + csNum(x.supplierCount) + ' suppliers, ' + csPct(x.spendShare) + ' of spend. ' + csEsc(x.approach) + '</div>';
-  }).join('') + '</div>';
+
+var CS_CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
+var CS_KIND_SVG = {
+  consolidate: '<svg viewBox="0 0 24 24"><path d="M4 7h16M8 12h8M11 17h2"/></svg>',
+  recompete:   '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-6.2-8.5"/><path d="M21 4v5h-5"/></svg>',
+  renegotiate: '<svg viewBox="0 0 24 24"><path d="M3 12h12M11 8l4 4-4 4"/><path d="M21 5v14"/></svg>',
+  standardize: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2 4-4"/></svg>'
+};
+function csPlayIcon(name) {
+  var s = String(name || '').toLowerCase();
+  if (/consolidat|rationali|tail/.test(s)) return CS_KIND_SVG.consolidate;
+  if (/recompet|compet|rfx|tender/.test(s)) return CS_KIND_SVG.recompete;
+  if (/standardi|catalog|govern|transparen/.test(s)) return CS_KIND_SVG.standardize;
+  return CS_KIND_SVG.renegotiate;
+}
+
+function scStrategy() {
+  var d = csData(), m = d.meta || {}, n = d.narr || {};
+  var ps = csPlays(d);
+  if (!ps.length) return csCard('Recommended plays', csGap('The levers available in this category.', 'savings[]'));
+  var sel = csSelSet(d), mo = csModel(d);
+
+  /* ---- metric strip ---- */
+  var realised = (d.benefits || []).reduce(function (a, b) { return a + (b.amt || 0); }, 0);
+  var strip = '<div class="cs-metrics">'
+    + csMetric('Annual spend', csUsd(m.s25), 'trailing 12 mo · commodity ' + csEsc(m.commodity || '--'))
+    + csMetric('Suppliers', csNum(m.vendors), 'active in category')
+    + csMetric('Contracts', d.contractCount != null ? csNum(d.contractCount) : '--',
+        d.contractCount != null ? 'active agreements' : 'agreement count not held')
+    + csMetric('Savings YTD', d.benefits ? csUsd(realised) : '--',
+        d.benefits ? 'booked to a lever' : 'realised benefits not held')
+    + csMetric('Avg cycle', d.avgCycleDays != null ? d.avgCycleDays + ' d' : '--',
+        d.avgCycleDays != null ? 'intake to award' : 'cycle time not held')
+    + '</div>';
+
+  /* ---- header + thesis ---- */
+  var star = '<svg viewBox="0 0 24 24"><path d="M12 3l2.4 5 5.6.8-4 3.9 1 5.5L12 16.5 6.4 18.2l1-5.5-4-3.9 5.6-.8z"/></svg>';
+  var rec = n.strategyRec || {};
+  var thesis = (typeof rec === 'string') ? rec : (rec.title || '');
+  var lead = (typeof rec === 'string') ? '' : (rec.lead || rec.d || '');
+  var head = '<div class="cs-plays-head">' + star
+    + '<span class="pk">Recommended plays</span>'
+    + '<span class="reflect">Reflect-only · model is a directional draft</span></div>'
+    + '<div class="cs-rechead"><b>' + csEsc(thesis) + '</b><br>' + csEsc(lead)
+    + ' <b>Select plays to model them individually or as a combination.</b></div>';
+
+  /* ---- play cards ---- */
+  var cards = ps.map(function (p) {
+    var on = sel.indexOf(p.i) >= 0;
+    var rk = (p.risk < 0 ? '−' : '+') + Math.abs(p.risk);
+    var conf = p.eff === 'lo' ? 'High' : p.eff === 'hi' ? 'Low' : 'Medium';
+    return '<div class="cs-pcard' + (on ? ' on' : '') + '" onclick="csTogglePlay(' + p.i + ')" '
+      + 'role="button" tabindex="0" aria-pressed="' + on + '">'
+      + '<div class="pcrow"><span class="pcheck">' + CS_CHECK + '</span>'
+      + '<span class="pcic">' + csPlayIcon(p.k) + '</span>'
+      + '<span class="pcname">' + csEsc(p.k) + '</span>'
+      + '<span class="cs-effort ' + p.eff + '">'
+        + (p.eff === 'lo' ? 'Low effort' : p.eff === 'md' ? 'Med effort' : 'High effort') + '</span></div>'
+      + '<div class="pcsub">' + csEsc(p.sub) + '</div>'
+      + '<div class="pcfig">'
+        + '<span class="pcf"><span class="v">' + (p.quantified ? csUsd(p.y1) : '--') + '</span><span class="k">Year-1 savings</span></span>'
+        + '<span class="pcf"><span class="v">' + (p.quantified ? csUsd(p.annual * 3) : '--') + '</span><span class="k">3-yr savings</span></span>'
+        + '<span class="pcf"><span class="v">' + rk + ' pts</span><span class="k">risk · ' + p.ttv + 'mo to value</span></span>'
+        + '<span class="pcf"><span class="v">' + conf + '</span><span class="k">confidence · est.</span></span>'
+      + '</div></div>';
+  }).join('');
+
+  /* ---- model panel ---- */
+  var headline = CS_HZ === 'y1' ? mo.y1 : CS_HZ === '5yr' ? mo.fiveYr : mo.threeYr;
+  var headK = (CS_HZ === 'y1' ? 'modeled Year-1 savings' : CS_HZ === '5yr' ? 'modeled 5-year savings' : 'modeled 3-year savings')
+    + (mo.n ? '' : ' · select plays');
+  var chart = '<svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>';
+  var panel = '<div class="cs-modelp">'
+    + '<div class="mph">' + chart + '<span class="mt">Model the Impact</span>'
+      + '<span class="mn">' + mo.n + ' of ' + mo.total + ' selected</span></div>'
+    + '<div class="mpb">' + csHorizonBtns()
+      + '<div class="cs-bignum">' + csUsd(headline) + '</div>'
+      + '<div class="cs-bignum-k">' + csEsc(headK) + '</div>'
+      + '<div class="cs-bars3">' + (mo.n ? csModelBars(mo) : '<div class="cs-miniload">Select plays to model.</div>') + '</div>'
+      + '<div class="cs-mrow"><span class="mk">Category risk</span><span class="mv">' + mo.base
+        + ' &rarr; <b style="color:' + csRiskTone(mo.modeledRisk) + '">' + mo.modeledRisk + '</b> <span class="mu">/100</span></span></div>'
+      + '<div class="cs-riskbar"><i style="width:' + mo.modeledRisk + '%;background:' + csRiskTone(mo.modeledRisk) + '"></i></div>'
+      + '<div class="cs-mrow"><span class="mk">Effort to execute</span><span class="mv">~' + mo.wk + ' FTE-weeks</span></div>'
+      + '<div class="cs-mrow"><span class="mk">Time to first value</span><span class="mv">' + (mo.ttv ? mo.ttv + ' mo' : '-') + '</span></div>'
+      + '<div class="cs-prow">'
+        + '<button class="cs-pbtn primary" onclick="csPlayAct(\'A strategy narrative would be drafted from the selected plays for your confirmation. Nothing was initiated.\')">Generate strategy narrative</button>'
+        + '<button class="cs-pbtn" onclick="csPlayAct(\'The modelled value would be surfaced to the savings pipeline as a draft. Finance confirms realisation. Nothing was initiated.\')">Surface to savings</button>'
+        + '<button class="cs-pbtn" onclick="csPlayAct(\'An RFx would be drafted from the selected plays and created in intake. Nothing was initiated.\')">Start RFx</button>'
+      + '</div>'
+      + (CS_PLAYMSG ? '<div class="cs-playmsg">' + csEsc(CS_PLAYMSG) + '</div>' : '')
+      + csNote('Stacking plays applies an overlap discount (' + Math.round(CS_OVERLAP[Math.min(mo.n, 5)] * 100)
+        + '% at ' + mo.n + ' selected) so two plays cannot bank the same pound twice. Year-1 is ramped by effort. '
+        + (mo.anyUnquantified ? 'One or more selected plays carry no modelled range and contribute nothing to the figure. ' : '')
+        + 'Directional draft, not an approved target.')
+    + '</div></div>';
+
+  var draft = n.passThru
+    ? '<div class="cs-draftcard"><div class="dch"><span class="dt">Strategy Narrative</span>'
+      + '<span class="dbadge">Draft, pending your confirmation</span></div>'
+      + '<div class="dcb">' + csNarr(n.passThru) + '</div></div>'
+    : '';
+
+  return strip + head
+    + '<div class="cs-plays-wrap"><div class="cs-plays-col">' + cards + '</div>' + panel + '</div>'
+    + draft;
+}
+function csMetric(lab, val, note) {
+  return '<div class="cs-metric"><div class="lab">' + csEsc(lab) + '</div>'
+    + '<div class="val">' + val + '</div>'
+    + '<div class="note">' + csEsc(note) + '</div></div>';
 }
 
 /* ===========================================================================
@@ -632,44 +796,107 @@ function scTail() {
    These exist so the layout can be reviewed fully populated.
    =========================================================================== */
 
-/* Overview: spend under contract */
+/* Overview: spend under contract.
+   Was two numbers and a table. Now one bar that is the whole story: the covered
+   block, then every uncovered relationship as its own segment of the same bar,
+   so the size of each exposure is read against the category, not against itself. */
 function csCoverage(c) {
-  var rows = (c.off || []).map(function (o) {
-    return '<tr><td class="cs-l">' + csEsc(o.n) + '</td>'
-      + '<td class="cs-num">' + csUsd(o.v) + '</td>'
-      + '<td class="cs-why">' + csEsc(o.why) + '</td></tr>';
-  });
-  return '<div class="cs-split2">'
-      + '<div class="cs-stat"><div class="cs-stat-v">' + csPct(c.pct, 0) + '</div>'
-        + '<div class="cs-stat-l">under contract</div>'
-        + '<div class="cs-stat-s">' + csUsd(c.covered) + '</div></div>'
-      + '<div class="cs-stat cs-stat-emph"><div class="cs-stat-v">' + csPct(100 - c.pct, 0) + '</div>'
-        + '<div class="cs-stat-l">not under contract</div>'
-        + '<div class="cs-stat-s">' + csUsd(c.uncovered) + '</div></div>'
-    + '</div>'
-    + csBar(c.pct, 'plum')
-    + csLabel('Largest off-contract relationships')
-    + csTable(['Relationship', 'FY25 spend', 'Why it is uncovered'], rows)
+  var off = (c.off || []).slice().sort(function (a, b) { return (b.v || 0) - (a.v || 0); });
+  var total = (c.covered || 0) + (c.uncovered || 0);
+  if (!total) return csGap('Contract coverage.', 'contract coverage per supplier');
+  var segs = '<span class="cs-cvseg cs-cvseg-ok" style="width:' + ((c.covered / total) * 100).toFixed(2) + '%" '
+    + 'title="' + csEsc('Under contract: ' + csUsd(c.covered)) + '"></span>'
+    + off.map(function (o, i) {
+        return '<span class="cs-cvseg cs-cvseg-x' + (i % 2) + '" style="width:' + ((o.v / total) * 100).toFixed(2) + '%" '
+          + 'title="' + csEsc(o.n + ': ' + csUsd(o.v) + ' · ' + o.why) + '"></span>';
+      }).join('');
+
+  var rows = off.map(function (o) {
+    return '<div class="cs-cvrow">'
+      + '<span class="cs-cvsw"></span>'
+      + '<span class="cs-cvn">' + csEsc(o.n) + '</span>'
+      + '<span class="cs-cvw">' + csEsc(o.why) + '</span>'
+      + '<span class="cs-cvv">' + csUsd(o.v) + '</span>'
+      + '<span class="cs-cvp">' + csPct((o.v / total) * 100, 1) + '</span></div>';
+  }).join('');
+
+  return '<div class="cs-cvhead">'
+      + '<div class="cs-cvbig"><b>' + csPct(c.pct, 0) + '</b><span>under contract</span></div>'
+      + '<div class="cs-cvbig cs-cvbig-x"><b>' + csUsd(c.uncovered) + '</b><span>exposed</span></div></div>'
+    + '<div class="cs-cvbar">' + segs + '</div>'
+    + '<div class="cs-cvlist">' + rows + '</div>'
     + (c.note ? csNote(csEsc(c.note)) : '');
 }
 
-/* Overview: renewal exposure */
+/* Overview: renewal exposure.
+   Was a table of dates, which makes you do the arithmetic. Now a twelve-month
+   timeline: each agreement sits where its notice deadline actually falls, and
+   the bar runs from the notice date to expiry, which is the window you get. */
+var CS_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function csParseDay(str) {
+  var m = String(str || '').match(/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{4})/);
+  if (!m) return null;
+  var mi = CS_MONTHS.indexOf(m[2].slice(0, 3));
+  if (mi < 0) return null;
+  return { y: +m[3], m: mi, d: +m[1], ord: (+m[3]) * 12 + mi + (+m[1]) / 31 };
+}
+/* The clock starts at the data's own cutoff, not at whatever today happens to be. */
+function csAnchor(d) {
+  var c = String((d.meta || {}).cutoff || '');
+  var ym = c.match(/([A-Za-z]{3})[a-z]*\s+(\d{4})/);
+  if (ym) {
+    var mi = CS_MONTHS.indexOf(ym[1].slice(0, 3));
+    if (mi >= 0) return (+ym[2]) * 12 + mi;
+  }
+  return null;
+}
 function csRenewals(r) {
-  var max = (r.windows || []).reduce(function (a, w) { return Math.max(a, w.v || 0); }, 0) || 1;
-  var rows = (r.windows || []).map(function (w) {
-    return '<tr class="cs-st-' + csEsc(w.state || 'open') + '">'
-      + '<td class="cs-l">' + csEsc(w.n) + (w.vehicle ? '<span class="cs-sub2">' + csEsc(w.vehicle) + '</span>' : '') + '</td>'
-      + '<td class="cs-barcell">' + csBar((w.v / max) * 100, w.state === 'critical' ? 'emph' : 'teal') + '</td>'
-      + '<td class="cs-num">' + csUsd(w.v) + '</td>'
-      + '<td class="cs-num">' + csEsc(w.notice) + '</td>'
-      + '<td class="cs-num">' + csEsc(w.expiry) + '</td></tr>';
-  });
-  return '<div class="cs-split2">'
-      + '<div class="cs-stat"><div class="cs-stat-v">' + csUsd(r.next12m) + '</div>'
-        + '<div class="cs-stat-l">renews within 12 months</div>'
-        + '<div class="cs-stat-s">' + csPct(r.pctOfSpend, 0) + ' of FY25 spend</div></div>'
-    + '</div>'
-    + csTable(['Agreement', '', 'Value', 'Notice by', 'Expires'], rows);
+  var d = csData();
+  var w = (r.windows || []).slice();
+  if (!w.length) return csGap('Renewal windows.', 'renewal + notice dates per agreement');
+  var a0 = csAnchor(d);
+  var dated = w.map(function (x) { return { x: x, n: csParseDay(x.notice), e: csParseDay(x.expiry) }; });
+  var known = dated.filter(function (t) { return t.e; });
+  if (!a0 && known.length) a0 = Math.floor(Math.min.apply(null, known.map(function (t) { return t.e.ord; }))) - 1;
+  var span = 12, a1 = a0 + span;
+
+  var scale = function (ord) { return Math.max(0, Math.min(100, ((ord - a0) / span) * 100)); };
+  var months = [];
+  for (var i = 0; i <= span; i += 3) {
+    var mm = (a0 + i) % 12, yy = Math.floor((a0 + i) / 12);
+    months.push('<span class="cs-tlm" style="left:' + ((i / span) * 100).toFixed(2) + '%">'
+      + CS_MONTHS[mm] + ' ' + String(yy).slice(-2) + '</span>');
+  }
+
+  var rows = dated.sort(function (p, q) {
+    return ((p.e ? p.e.ord : 9e9) - (q.e ? q.e.ord : 9e9));
+  }).map(function (t) {
+    var x = t.x, urgent = x.state === 'critical', none = !t.e;
+    var startOrd = t.n ? t.n.ord : (t.e ? t.e.ord - 0.5 : a0);
+    var l = scale(startOrd), rr = t.e ? scale(t.e.ord) : 100;
+    var wdt = Math.max(1.5, rr - l);
+    var past = t.n && t.n.ord < a0;
+    var bar = none
+      ? '<span class="cs-tlbar cs-tlbar-none" style="left:0;width:100%" title="'
+        + csEsc('Rolling, no notice right') + '"></span>'
+      : '<span class="cs-tlbar' + (urgent ? ' is-urgent' : '') + '" style="left:' + l.toFixed(2)
+        + '%;width:' + wdt.toFixed(2) + '%" title="'
+        + csEsc('Notice by ' + x.notice + ', expires ' + x.expiry) + '"></span>'
+        + (past ? '<span class="cs-tlpast" style="left:0;width:' + l.toFixed(2) + '%" title="'
+            + csEsc('Notice window already open') + '"></span>' : '');
+    return '<div class="cs-tlrow' + (urgent ? ' is-urgent' : '') + '">'
+      + '<span class="cs-tln">' + csEsc(x.n) + '<small>' + csEsc(x.vehicle || '') + '</small></span>'
+      + '<span class="cs-tlv">' + csUsd(x.v) + '</span>'
+      + '<span class="cs-tltrack">' + bar + '</span>'
+      + '<span class="cs-tld">' + csEsc(none ? 'rolling' : x.expiry) + '</span></div>';
+  }).join('');
+
+  return '<div class="cs-cvhead">'
+      + '<div class="cs-cvbig"><b>' + csUsd(r.next12m) + '</b><span>renews within 12 months</span></div>'
+      + '<div class="cs-cvbig"><b>' + csPct(r.pctOfSpend, 0) + '</b><span>of category spend</span></div></div>'
+    + '<div class="cs-timeline"><div class="cs-tlaxis">' + months.join('') + '</div>' + rows + '</div>'
+    + csNote('The bar is the decision window: it opens at the notice deadline and closes at expiry. '
+      + 'A bar that starts at the left edge means the notice window is <b>already open</b>.');
 }
 
 /* Market & Risk: escalation triggers */
@@ -913,40 +1140,74 @@ function csTopSuppliers(d) {
     + csNote('Top ' + sup.length + ' of ' + csNum((d.meta || {}).vendors) + ' active suppliers. Ten shown, scroll for the rest.');
 }
 
-/* ---- Overview / Trend: spend trend with an optional forecast overlay ------ */
+/* ---- Overview / Trend: spend trend with an optional forecast overlay ------
+   The current year is a part year. Toggling the forecast on does NOT redraw it
+   as a whole-year actual: the projected remainder stacks on top of what has
+   actually been spent, so the bar reads "this is banked, that is expected".  */
 function csTrendChart(d) {
   var m = d.meta || {};
   var act = (d.annual || []).filter(function (a) { return a.value; })
-    .map(function (a) { return { y: a.name, v: a.value, ytd: /YTD|partial/i.test(a.name || '') || /26/.test(a.name || '') }; });
+    .map(function (a) { return { y: a.name, v: a.value, ytd: /YTD|partial/i.test(a.name || '') }; });
   if (!act.length) return csGap('Annual spend trend.', 'annual[]');
 
-  /* Current year is a part-year figure. Grossing it to a full year is a
-     projection, so it is drawn as forecast, never as actual. */
-  var proj = [];
+  var ytdIdx = -1;
+  for (var i = 0; i < act.length; i++) if (act[i].ytd) ytdIdx = i;
+
+  /* full-year view of the part year, and the years after it */
+  var ytdFull = null, proj = [];
   if (CS_FORECAST) {
-    if (d.forecast && (d.forecast.years || []).length) {
-      proj = d.forecast.years.map(function (p) { return { y: p.y, v: p.v, lo: p.lo, hi: p.hi }; });
-    } else if (m.cagr2325 != null && act.length >= 3) {
-      var base = act[act.length - 2].v, g = m.cagr2325 / 100;
-      for (var i = 1; i <= 3; i++) {
-        var b = base * Math.pow(1 + g, i);
-        proj.push({ y: 'FY' + (2025 + i), v: b, lo: b * Math.pow(0.97, i), hi: b * Math.pow(1.03, i) });
+    var fy = (d.forecast && d.forecast.years) || [];
+    var ytdYear = ytdIdx >= 0 ? String(act[ytdIdx].y).replace(/[^0-9]/g, '').slice(-4) : null;
+    fy.forEach(function (p) {
+      var yr = String(p.y).replace(/[^0-9]/g, '').slice(-4);
+      if (ytdYear && yr === ytdYear) ytdFull = p;
+      else proj.push({ y: p.y, v: p.v, lo: p.lo, hi: p.hi });
+    });
+    if (!fy.length && m.cagr2325 != null && act.length >= 2) {
+      var g = m.cagr2325 / 100;
+      var lastFull = act[ytdIdx >= 0 ? ytdIdx - 1 : act.length - 1];
+      if (lastFull) {
+        if (ytdIdx >= 0) ytdFull = { y: act[ytdIdx].y, v: lastFull.v * (1 + g) };
+        for (var k = 1; k <= 2; k++) {
+          var b = lastFull.v * Math.pow(1 + g, k + (ytdIdx >= 0 ? 1 : 0));
+          proj.push({ y: 'FY' + (parseInt(String(lastFull.y).replace(/[^0-9]/g, '').slice(-4), 10) + k + (ytdIdx >= 0 ? 1 : 0)),
+                      v: b, lo: b * Math.pow(0.97, k), hi: b * Math.pow(1.03, k) });
+        }
       }
     }
+    /* never project below what is already banked */
+    if (ytdFull && ytdIdx >= 0 && ytdFull.v < act[ytdIdx].v) ytdFull = { y: ytdFull.y, v: act[ytdIdx].v };
   }
-  var all = act.concat(proj);
-  var max = all.reduce(function (a, p) { return Math.max(a, p.hi || p.v || 0); }, 0) || 1;
 
-  var cols = all.map(function (p, i) {
-    var isProj = i >= act.length;
+  var all = act.map(function (a, i) {
+    var o = { y: a.y, v: a.v, ytd: a.ytd, kind: a.ytd ? 'ytd' : 'hist' };
+    if (a.ytd && ytdFull) { o.total = ytdFull.v; o.banked = a.v; o.kind = 'stack'; }
+    return o;
+  }).concat(proj.map(function (p) { return { y: p.y, v: p.v, lo: p.lo, hi: p.hi, kind: 'proj' }; }));
+
+  var max = all.reduce(function (a, p) { return Math.max(a, p.hi || p.total || p.v || 0); }, 0) || 1;
+
+  var cols = all.map(function (p) {
     var band = (p.lo != null && p.hi != null)
       ? '<i class="cs-fc-band" style="bottom:' + ((p.lo / max) * 100).toFixed(1) + '%;height:'
         + (((p.hi - p.lo) / max) * 100).toFixed(1) + '%"></i>' : '';
-    return '<div class="cs-fc-col' + (isProj ? ' is-proj' : (p.ytd ? ' is-ytd' : ' is-hist')) + '"'
-      + ' title="' + csEsc(p.y + ': ' + csUsd(p.v) + (isProj ? ' projected' : p.ytd ? ' year to date' : '')) + '">'
-      + '<div class="cs-fc-v">' + csUsd(p.v) + '</div>'
-      + '<div class="cs-fc-plot">' + band + '<i class="cs-fc-bar" style="height:'
-        + ((p.v / max) * 100).toFixed(1) + '%"></i></div>'
+    var bar, top;
+    if (p.kind === 'stack') {
+      var bankedH = (p.banked / max) * 100, addH = ((p.total - p.banked) / max) * 100;
+      bar = '<i class="cs-fc-bar" style="height:' + bankedH.toFixed(1) + '%"></i>'
+          + '<i class="cs-fc-add" style="bottom:' + bankedH.toFixed(1) + '%;height:' + addH.toFixed(1) + '%"></i>';
+      top = csUsd(p.total);
+    } else {
+      bar = '<i class="cs-fc-bar" style="height:' + ((p.v / max) * 100).toFixed(1) + '%"></i>';
+      top = csUsd(p.v);
+    }
+    var tip = p.kind === 'stack'
+      ? p.y + ': ' + csUsd(p.banked) + ' spent so far, ' + csUsd(p.total - p.banked)
+        + ' projected for the rest of the year, ' + csUsd(p.total) + ' full year'
+      : p.y + ': ' + csUsd(p.v) + (p.kind === 'proj' ? ' projected' : p.kind === 'ytd' ? ' year to date' : '');
+    return '<div class="cs-fc-col is-' + p.kind + '" title="' + csEsc(tip) + '">'
+      + '<div class="cs-fc-v">' + top + '</div>'
+      + '<div class="cs-fc-plot">' + band + bar + '</div>'
       + '<div class="cs-fc-l">' + csEsc(p.y) + '</div></div>';
   }).join('');
 
@@ -955,18 +1216,35 @@ function csTrendChart(d) {
     + '<span class="cs-toggle-t"></span>Forecast</button></div>';
 
   var key = '<div class="cs-fc-key"><span class="cs-k-hist">actual</span>'
-    + '<span class="cs-k-ytd">year to date</span>'
+    + (CS_FORECAST && ytdFull ? '<span class="cs-k-add">rest of year, projected</span>'
+                              : '<span class="cs-k-ytd">year to date</span>')
     + (proj.length ? '<span class="cs-k-proj">projected</span><span class="cs-k-band">range</span>' : '') + '</div>';
 
-  var basis = proj.length
+  var basis = CS_FORECAST
     ? csNote('<b>Forecast basis.</b> ' + (d.forecast && d.forecast.basis
         ? csEsc(d.forecast.basis)
         : 'The observed ' + csPct(m.cagr2325) + ' three-year CAGR carried forward, with a &plusmn;3% a year band. '
           + 'It does <b>not</b> incorporate known renewals or price escalators, because this data set carries no '
-          + 'renewal dates. A trend extrapolation, not a plan.'))
-    : csNote(csEsc(m.ytdNote ? 'FY26 is a part year: ' + m.ytdNote + '.' : 'FY26 is a part year.'));
+          + 'renewal dates. A trend extrapolation, not a plan.')
+        + (ytdFull ? ' The current year shows what is already spent, with the projected remainder stacked on top.' : ''))
+    : csNote(csEsc(m.ytdNote ? 'The current year is a part year: ' + m.ytdNote + '.' : 'The current year is a part year.'));
 
   return toggle + '<div class="cs-fc">' + cols + '</div>' + key + basis;
+}
+
+/* ---- Overview: key findings as cards, not three stacked paragraphs -------- */
+function csFindings(d) {
+  var f = (d.narr || {}).findings;
+  if (!f) return csGap('Key data-driven findings', 'narr.findings');
+  var arr = Array.isArray(f) ? f : [f];
+  if (typeof arr[0] === 'string') return csNarr(f);
+  return '<div class="cs-mis">' + arr.map(function (x) {
+    var tone = csTone(x.c) || 'plum';
+    return '<div class="cs-mi cs-mi-' + tone + '">'
+      + (x.k ? '<div class="cs-mi-k">' + csEsc(x.k) + '</div>' : '')
+      + '<div class="cs-mi-t">' + csEsc(x.t || x.title || '') + '</div>'
+      + '<div class="cs-mi-d">' + csEsc(x.d || '') + '</div></div>';
+  }).join('') + '</div>';
 }
 
 /* ---- Pareto: bars with a cumulative line, the 80/20 rule and a tail band --- */
@@ -1047,21 +1325,10 @@ function csParetoChart(d) {
   rule += '<line x1="' + PADL + '" y1="' + y80.toFixed(1) + '" x2="' + (W - PADR) + '" y2="' + y80.toFixed(1) + '" class="cs-p80h"/>';
 
   /* labels only before the 80/20 line; everything past it is tooltip-only */
-  /* Rotated labels only work when a bar is wide enough to sit under one. Below
-     that they collapse into a smear, so the names move to a ranked strip under
-     the chart and the bars keep their tooltips. */
-  var wideEnough = bw >= 16;
-  var labels = !wideEnough ? '' : series.map(function (p, i) {
-    if (i > labelTo) return '';
-    var x = PADL + i * bw + bw / 2;
-    return '<text x="' + x.toFixed(1) + '" y="' + (H - PADB + 14) + '" class="cs-plab" transform="rotate(-32 '
-      + x.toFixed(1) + ',' + (H - PADB + 14) + ')">' + csEsc(String(p.name).slice(0, 18)) + '</text>';
-  }).join('');
-  var strip = wideEnough ? '' : '<ol class="cs-pstrip">' + series.slice(0, labelTo + 1).map(function (p) {
-      return '<li><span class="cs-ps-n">' + csEsc(p.name) + '</span>'
-        + '<span class="cs-ps-v">' + csUsd(p.value) + '</span></li>';
-    }).join('') + '</ol>'
-    + '<div class="cs-ps-more">Suppliers ' + (labelTo + 2) + ' onward are unlabelled by design. Hover any bar for its name and share.</div>';
+  /* No direct labels at all. A Pareto of a few hundred suppliers cannot carry
+     them, and half-labelling invites the eye to read rank off position. Every
+     bar and every point on the curve carries its name in a tooltip. */
+  var labels = '', strip = '';
 
   var axis = '<line x1="' + PADL + '" y1="' + (PADT + plotH) + '" x2="' + (W - PADR) + '" y2="' + (PADT + plotH) + '" class="cs-pax"/>'
     + [0, 25, 50, 75, 100].map(function (t) {
@@ -1070,9 +1337,14 @@ function csParetoChart(d) {
       }).join('')
     + '<text x="' + (PADL - 8) + '" y="' + (PADT + 8) + '" class="cs-pyl">' + csUsd(max) + '</text>';
 
-  var tailNote = truncated
-    ? '<text x="' + (W - PADR - 4) + '" y="' + (PADT + plotH - 8) + '" class="cs-ptail">+ ' + csNum(truncated)
-      + ' more suppliers, not plotted</text>' : '';
+  var tailNote = '';
+  if (truncated) {
+    var tailSpend = whole.slice(window).reduce(function (a, x) { return a + (x.value || 0); }, 0);
+    tailNote = '<text x="' + (W - PADR - 4) + '" y="' + (PADT + plotH - 20) + '" class="cs-ptail">'
+      + csNum(truncated) + ' more suppliers in the tail</text>'
+      + '<text x="' + (W - PADR - 4) + '" y="' + (PADT + plotH - 7) + '" class="cs-ptail cs-ptail2">'
+      + csUsd(Math.round(tailSpend / truncated)) + ' average each</text>';
+  }
 
   return '<div class="cs-pwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-psvg" role="img" '
     + 'aria-label="Pareto of supplier spend with cumulative share">'
@@ -1092,7 +1364,7 @@ function csParetoRead(d) {
     : 'The 80% point sits beyond the suppliers this data set resolves by name, which is itself the finding: '
       + 'spend is spread thin enough that no small group carries four fifths of it';
   var conc = m.hhi == null ? '' : (m.hhi >= 2500 ? 'concentrated' : m.hhi >= 1500 ? 'moderately concentrated' : 'unconcentrated');
-  return '<div class="cs-read"><div class="cs-read-t">What the curve says</div>'
+  return '<div class="cs-read">'
     + '<div class="cs-read-d">' + line80 + ', and the largest single relationship, <b>' + csEsc(lead.name) + '</b>, '
     + 'is ' + csPct(lead.cumPct, 1) + ' of it on its own. At an HHI of ' + csNum(Math.round(m.hhi || 0)) + ' the category is '
     + conc + ', which means leverage comes from <b>competing the top</b> rather than from breaking a monopoly. '
@@ -1100,22 +1372,45 @@ function csParetoRead(d) {
     + 'account for ' + csPct(m['tail' + CS_TAIL + 'Pct']) + ' of spend but consume the same contracting and vendor-management effort as the top.'
     + '</div></div>';
 }
+function csTailSlider() {
+  var stops = [50, 100, 250], at = stops.indexOf(CS_TAIL);
+  if (at < 0) at = 1;
+  return '<div class="cs-tslider">'
+    + '<input type="range" min="0" max="2" step="1" value="' + at + '" aria-label="Tail threshold" '
+    + 'oninput="csSetTail([50,100,250][+this.value])">'
+    + '<div class="cs-tsticks">' + stops.map(function (v, i) {
+        return '<span class="' + (i === at ? 'on' : '') + '">$' + v + 'K</span>';
+      }).join('') + '</div>'
+    + '<div class="cs-tslab">suppliers spending under this each year</div></div>';
+}
+/* Two concentric rings, because the point is the gap between them: the outer
+   ring is how many suppliers the tail is, the inner is how little it buys. */
+function csTailDonut(supPct, spendPct) {
+  var R1 = 54, R2 = 36, C1 = 2 * Math.PI * R1, C2 = 2 * Math.PI * R2;
+  var ring = function (r, c, pct, cls) {
+    return '<circle cx="70" cy="70" r="' + r + '" class="cs-dnbg"/>'
+      + '<circle cx="70" cy="70" r="' + r + '" class="' + cls + '" '
+      + 'stroke-dasharray="' + ((pct / 100) * c).toFixed(1) + ' ' + c.toFixed(1) + '" '
+      + 'transform="rotate(-90 70 70)"/>';
+  };
+  return '<svg viewBox="0 0 140 140" class="cs-donut" role="img" '
+    + 'aria-label="Share of suppliers against share of spend">'
+    + ring(R1, C1, supPct, 'cs-dnsup') + ring(R2, C2, spendPct, 'cs-dnspend') + '</svg>';
+}
 function csTailStats(d) {
   var m = d.meta || {};
   var t = CS_TAIL, n = m['tail' + t], sp = m['tail' + t + 'Spend'], pc = m['tail' + t + 'Pct'];
-  if (n == null) return csGap('Tail distribution.', 'tail counts per threshold');
-  var shareOfCount = m.vendors ? (n / m.vendors) * 100 : 0;
-  return '<div class="cs-split2">'
-    + '<div class="cs-stat"><div class="cs-stat-v">' + csNum(n) + '</div>'
-      + '<div class="cs-stat-l">suppliers under $' + t + 'K</div>'
-      + '<div class="cs-stat-s">' + csPct(shareOfCount, 0) + ' of every supplier in the category</div></div>'
-    + '<div class="cs-stat cs-stat-emph"><div class="cs-stat-v">' + csPct(pc) + '</div>'
-      + '<div class="cs-stat-l">of category spend</div>'
-      + '<div class="cs-stat-s">' + csUsd(sp) + ' in total</div></div>'
+  if (n == null) return csTailSlider() + csGap('Tail distribution.', 'tail counts per threshold');
+  var supPct = m.vendors ? (n / m.vendors) * 100 : 0;
+  return csTailSlider()
+    + '<div class="cs-tdwrap">' + csTailDonut(supPct, pc)
+      + '<div class="cs-tdmid"><b>' + csNum(n) + '</b><span>suppliers</span></div></div>'
+    + '<div class="cs-tdkey">'
+      + '<div class="cs-tdk"><i class="k-sup"></i><span>Share of suppliers</span><b>' + csPct(supPct, 0) + '</b></div>'
+      + '<div class="cs-tdk"><i class="k-spend"></i><span>Share of spend</span><b>' + csPct(pc) + '</b></div>'
     + '</div>'
-    + '<div class="cs-mismatch"><div class="cs-mm-row"><span>Share of suppliers</span>'
-      + csBar(shareOfCount, 'emph') + '<b>' + csPct(shareOfCount, 0) + '</b></div>'
-    + '<div class="cs-mm-row"><span>Share of spend</span>' + csBar(pc, 'teal') + '<b>' + csPct(pc) + '</b></div></div>';
+    + '<div class="cs-tdfig"><div><b>' + csUsd(sp) + '</b><span>total</span></div>'
+      + '<div><b>' + csUsd(Math.round(sp / (n || 1))) + '</b><span>average each</span></div></div>';
 }
 function csTailRead(d) {
   var m = d.meta || {}, t = CS_TAIL;
@@ -1134,6 +1429,16 @@ var CS_TIER_APPROACH = {
   'Under Review': 'Scope and value under active challenge. Renew, reduce or replace within this planning cycle.',
   'Transactional': 'Catalogue or standing order. No sourcing event unless the spend crosses the threshold.'
 };
+/* The platform renders tiering as prose seqlines, not a table. */
+function csTieringLines(d) {
+  var t = d.supplierTiering || csDeriveTiers(d);
+  if (!t.length) return csGap('Supplier tiering.', 'supplierTiering[] or a tier per supplier');
+  return '<div class="cs-prose">' + t.map(function (x) {
+    return '<div class="cs-seqline"><strong>' + csEsc(x.label) + ' (tier ' + csEsc(x.tier) + '):</strong> '
+      + csNum(x.supplierCount) + ' suppliers, ' + csPct(x.spendShare) + ' of spend. ' + csEsc(x.approach) + '</div>';
+  }).join('') + '</div>';
+}
+
 function csDeriveTiers(d) {
   var sup = d.suppliers || [];
   if (!sup.length) return [];

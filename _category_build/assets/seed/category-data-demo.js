@@ -293,4 +293,21 @@
     { label: 'Transactional tail', tier: 4, supplierCount: 762, spendShare: 58.1,
       approach: 'Catalogue or standing order. No sourcing event unless the spend crosses the threshold.' }
   ];
+
+  /* Top-20 supplier list. The real seed resolves seven by name; the panel is
+     specified as twenty with ten visible, so the demo extends the list from the
+     synthetic Pareto curve. Illustrative, like everything else in this file. */
+  (function () {
+    var have = d.suppliers.length, tot = 792600000;
+    var pool = (d.paretoFull || []).filter(function (p) {
+      return !d.suppliers.some(function (s) { return s.n === p.name; });
+    });
+    for (var i = 0; d.suppliers.length < 20 && i < pool.length; i++) {
+      var p = pool[i];
+      d.suppliers.push({ r: d.suppliers.length + 1, n: p.name, tot: Math.round(p.value * 2.6),
+                         s5: p.value, share: (p.value / tot) * 100,
+                         yoy: Math.round((((i * 37) % 61) - 22) * 10) / 10,
+                         tier: p.value > 8e6 ? 'Preferred' : 'Transactional' });
+    }
+  }());
 }());
