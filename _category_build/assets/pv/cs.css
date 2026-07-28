@@ -817,3 +817,37 @@ small,sub,sup{font-size:9px}
 .cs-cardhd .cs-ct{order:1}
 .cs-cardhd .cs-cs{order:2}
 .cs-tailcard .cs-cardhd .cs-cov{margin-left:auto}
+
+/* ---- charts render 1:1 so their text is the size it declares --------------
+   width:100% on a 620-unit viewBox inside a 900px column magnifies every label
+   in it. max-width pinned to the viewBox width stops that; the charts still
+   shrink on narrow screens, they just never blow up.                        */
+.cs-tsvg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
+.cs-psvg{width:100%;max-width:960px;min-width:0;height:auto;display:block;margin:0 auto}
+.cs-rksvg{width:100%;max-width:620px;height:auto;display:block;margin:0 auto}
+.cs-rmsvg{max-width:620px}
+.cs-fragsvg{max-width:660px}
+.cs-tbv{font:700 11px var(--cs-sans);fill:var(--cs-ink);text-anchor:middle}
+.cs-tbl2{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:middle}
+.cs-tby{font:400 11px var(--cs-sans);fill:var(--cs-mut2);text-anchor:end}
+.cs-tline{stroke-width:2;stroke-dasharray:6 4}
+.cs-tgrid{stroke-width:1}
+.cs-taxis{stroke-width:1}
+
+/* ---- trend chart: HTML bars, SVG overlay for band and line ---- */
+.cs-fc{position:relative;display:flex;align-items:flex-end;gap:14px;height:230px;margin-bottom:10px}
+.cs-fc-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;min-width:0}
+.cs-fc-v{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:5px;white-space:nowrap}
+.cs-fc-plot{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.cs-fc-bar{width:56%;background:var(--cs-plum);border-radius:3px 3px 0 0;display:block}
+.cs-fc-col.is-proj .cs-fc-bar{background:var(--cs-teal)}
+.cs-fc-col.is-ytd .cs-fc-bar{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 5px,#7A3C6B 5px 10px)}
+.cs-fc-add{position:absolute;left:22%;width:56%;border-radius:3px 3px 0 0;display:block;
+  background:repeating-linear-gradient(135deg,var(--cs-teal) 0 5px,#4A8F8B 5px 10px)}
+.cs-fc-l{font-size:11px;color:var(--cs-mut);margin-top:6px;white-space:nowrap}
+/* the overlay covers the plot band only: below the value row, above the labels */
+.cs-tover{position:absolute;left:0;right:0;top:22px;bottom:23px;width:100%;height:calc(100% - 45px);
+  pointer-events:none;overflow:visible}
+.cs-tover .cs-tband{fill:var(--cs-teal);opacity:.16;stroke:none}
+.cs-tover .cs-tline{fill:none;stroke:var(--cs-burnt);stroke-width:2;stroke-dasharray:6 4;
+  vector-effect:non-scaling-stroke}

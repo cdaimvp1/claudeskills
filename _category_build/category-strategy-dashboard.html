@@ -1555,6 +1555,40 @@ small,sub,sup{font-size:9px}
 .cs-cardhd .cs-cs{order:2}
 .cs-tailcard .cs-cardhd .cs-cov{margin-left:auto}
 
+/* ---- charts render 1:1 so their text is the size it declares --------------
+   width:100% on a 620-unit viewBox inside a 900px column magnifies every label
+   in it. max-width pinned to the viewBox width stops that; the charts still
+   shrink on narrow screens, they just never blow up.                        */
+.cs-tsvg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
+.cs-psvg{width:100%;max-width:960px;min-width:0;height:auto;display:block;margin:0 auto}
+.cs-rksvg{width:100%;max-width:620px;height:auto;display:block;margin:0 auto}
+.cs-rmsvg{max-width:620px}
+.cs-fragsvg{max-width:660px}
+.cs-tbv{font:700 11px var(--cs-sans);fill:var(--cs-ink);text-anchor:middle}
+.cs-tbl2{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:middle}
+.cs-tby{font:400 11px var(--cs-sans);fill:var(--cs-mut2);text-anchor:end}
+.cs-tline{stroke-width:2;stroke-dasharray:6 4}
+.cs-tgrid{stroke-width:1}
+.cs-taxis{stroke-width:1}
+
+/* ---- trend chart: HTML bars, SVG overlay for band and line ---- */
+.cs-fc{position:relative;display:flex;align-items:flex-end;gap:14px;height:230px;margin-bottom:10px}
+.cs-fc-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;min-width:0}
+.cs-fc-v{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:5px;white-space:nowrap}
+.cs-fc-plot{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.cs-fc-bar{width:56%;background:var(--cs-plum);border-radius:3px 3px 0 0;display:block}
+.cs-fc-col.is-proj .cs-fc-bar{background:var(--cs-teal)}
+.cs-fc-col.is-ytd .cs-fc-bar{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 5px,#7A3C6B 5px 10px)}
+.cs-fc-add{position:absolute;left:22%;width:56%;border-radius:3px 3px 0 0;display:block;
+  background:repeating-linear-gradient(135deg,var(--cs-teal) 0 5px,#4A8F8B 5px 10px)}
+.cs-fc-l{font-size:11px;color:var(--cs-mut);margin-top:6px;white-space:nowrap}
+/* the overlay covers the plot band only: below the value row, above the labels */
+.cs-tover{position:absolute;left:0;right:0;top:22px;bottom:23px;width:100%;height:calc(100% - 45px);
+  pointer-events:none;overflow:visible}
+.cs-tover .cs-tband{fill:var(--cs-teal);opacity:.16;stroke:none}
+.cs-tover .cs-tline{fill:none;stroke:var(--cs-burnt);stroke-width:2;stroke-dasharray:6 4;
+  vector-effect:non-scaling-stroke}
+
 </style>
 </head>
 <body>
@@ -2780,96 +2814,188 @@ function csTopSuppliers(d) {
     + csNote('Top ' + sup.length + ' of ' + csNum((d.meta || {}).vendors) + ' active suppliers. Ten shown, scroll for the rest.');
 }
 
-/* ---- Overview / Trend: spend trend with an optional forecast overlay ------
-   The current year is a part year. Toggling the forecast on does NOT redraw it
-   as a whole-year actual: the projected remainder stacks on top of what has
-   actually been spent, so the bar reads "this is banked, that is expected".  */
-function csTrendChart(d) {
-  var m = d.meta || {};
-  var act = (d.annual || []).filter(function (a) { return a.value; })
-    .map(function (a) { return { y: a.name, v: a.value, ytd: /YTD|partial/i.test(a.name || '') }; });
-  if (!act.length) return csGap('Annual spend trend.', 'annual[]');
+/* ===========================================================================
+   SHARED SPEND TREND
+   One SVG chart used by the category Overview, Trend & Change, and the supplier
+   deep dive. Carries bars, the stacked current-year projection, a fitted trend
+   line and a confidence band, so the three do not drift apart.
+   =========================================================================== */
 
-  var ytdIdx = -1;
-  for (var i = 0; i < act.length; i++) if (act[i].ytd) ytdIdx = i;
+/* Least-squares fit through the completed years. The trend line is what the
+   history alone implies; the projected bars may differ, and where they do the
+   gap is the point. */
+function csFit(pts) {
+  var n = pts.length;
+  if (n < 2) return null;
+  var sx = 0, sy = 0, sxy = 0, sxx = 0;
+  pts.forEach(function (p, i) { sx += i; sy += p; sxy += i * p; sxx += i * i; });
+  var den = n * sxx - sx * sx;
+  if (!den) return null;
+  var m = (n * sxy - sx * sy) / den;
+  return { m: m, b: (sy - m * sx) / n };
+}
 
-  /* full-year view of the part year, and the years after it */
-  var ytdFull = null, proj = [];
-  if (CS_FORECAST) {
-    var fy = (d.forecast && d.forecast.years) || [];
-    var ytdYear = ytdIdx >= 0 ? String(act[ytdIdx].y).replace(/[^0-9]/g, '').slice(-4) : null;
-    fy.forEach(function (p) {
-      var yr = String(p.y).replace(/[^0-9]/g, '').slice(-4);
-      if (ytdYear && yr === ytdYear) ytdFull = p;
-      else proj.push({ y: p.y, v: p.v, lo: p.lo, hi: p.hi });
-    });
-    if (!fy.length && m.cagr2325 != null && act.length >= 2) {
-      var g = m.cagr2325 / 100;
-      var lastFull = act[ytdIdx >= 0 ? ytdIdx - 1 : act.length - 1];
-      if (lastFull) {
-        if (ytdIdx >= 0) ytdFull = { y: act[ytdIdx].y, v: lastFull.v * (1 + g) };
-        for (var k = 1; k <= 2; k++) {
-          var b = lastFull.v * Math.pow(1 + g, k + (ytdIdx >= 0 ? 1 : 0));
-          proj.push({ y: 'FY' + (parseInt(String(lastFull.y).replace(/[^0-9]/g, '').slice(-4), 10) + k + (ytdIdx >= 0 ? 1 : 0)),
-                      v: b, lo: b * Math.pow(0.97, k), hi: b * Math.pow(1.03, k) });
-        }
-      }
-    }
-    /* never project below what is already banked */
-    if (ytdFull && ytdIdx >= 0 && ytdFull.v < act[ytdIdx].v) ytdFull = { y: ytdFull.y, v: act[ytdIdx].v };
-  }
+/* series: [{y, v, kind:'hist'|'ytd', banked, total, lo, hi}] already ordered */
+function csTrendSvg(series, opts) {
+  var o = opts || {};
+  if (!series.length) return '';
+  var max = series.reduce(function (a, p) { return Math.max(a, p.hi || p.total || p.v || 0); }, 0) || 1;
+  max = max * 1.12;
+  var n = series.length;
+  var pct = function (v) { return (v / max) * 100; };
+  var xAt = function (i) { return ((i + 0.5) / n) * 100; };
 
-  var all = act.map(function (a, i) {
-    var o = { y: a.y, v: a.v, ytd: a.ytd, kind: a.ytd ? 'ytd' : 'hist' };
-    if (a.ytd && ytdFull) { o.total = ytdFull.v; o.banked = a.v; o.kind = 'stack'; }
-    return o;
-  }).concat(proj.map(function (p) { return { y: p.y, v: p.v, lo: p.lo, hi: p.hi, kind: 'proj' }; }));
-
-  var max = all.reduce(function (a, p) { return Math.max(a, p.hi || p.total || p.v || 0); }, 0) || 1;
-
-  var cols = all.map(function (p) {
-    var band = (p.lo != null && p.hi != null)
-      ? '<i class="cs-fc-band" style="bottom:' + ((p.lo / max) * 100).toFixed(1) + '%;height:'
-        + (((p.hi - p.lo) / max) * 100).toFixed(1) + '%"></i>' : '';
-    var bar, top;
-    if (p.kind === 'stack') {
-      var bankedH = (p.banked / max) * 100, addH = ((p.total - p.banked) / max) * 100;
-      bar = '<i class="cs-fc-bar" style="height:' + bankedH.toFixed(1) + '%"></i>'
-          + '<i class="cs-fc-add" style="bottom:' + bankedH.toFixed(1) + '%;height:' + addH.toFixed(1) + '%"></i>';
-      top = csUsd(p.total);
+  /* columns: HTML, so the labels keep the size they are given */
+  var cols = series.map(function (p, i) {
+    var top = p.total != null ? p.total : p.v;
+    var bar;
+    if (p.total != null && p.banked != null) {
+      bar = '<i class="cs-fc-bar" style="height:' + pct(p.banked).toFixed(2) + '%"></i>'
+          + '<i class="cs-fc-add" style="bottom:' + pct(p.banked).toFixed(2) + '%;height:'
+          + pct(p.total - p.banked).toFixed(2) + '%"></i>';
     } else {
-      bar = '<i class="cs-fc-bar" style="height:' + ((p.v / max) * 100).toFixed(1) + '%"></i>';
-      top = csUsd(p.v);
+      bar = '<i class="cs-fc-bar" style="height:' + pct(p.v).toFixed(2) + '%"></i>';
     }
-    var tip = p.kind === 'stack'
+    var tip = p.total != null
       ? p.y + ': ' + csUsd(p.banked) + ' spent so far, ' + csUsd(p.total - p.banked)
         + ' projected for the rest of the year, ' + csUsd(p.total) + ' full year'
       : p.y + ': ' + csUsd(p.v) + (p.kind === 'proj' ? ' projected' : p.kind === 'ytd' ? ' year to date' : '');
     return '<div class="cs-fc-col is-' + p.kind + '" title="' + csEsc(tip) + '">'
-      + '<div class="cs-fc-v">' + top + '</div>'
-      + '<div class="cs-fc-plot">' + band + bar + '</div>'
+      + '<div class="cs-fc-v">' + csUsd(top) + '</div>'
+      + '<div class="cs-fc-plot">' + bar + '</div>'
       + '<div class="cs-fc-l">' + csEsc(p.y) + '</div></div>';
   }).join('');
 
-  var toggle = '<div class="cs-ctrlbar"><button class="cs-toggle' + (CS_FORECAST ? ' on' : '') + '"'
-    + ' onclick="csToggleFc()" aria-pressed="' + (CS_FORECAST ? 'true' : 'false') + '">'
+  /* band + line: SVG stretched over the plot, no text inside it */
+  var layers = '';
+  var withBand = series.map(function (p, i) { return { i: i, p: p }; })
+    .filter(function (x) { return x.p.lo != null && x.p.hi != null; });
+  if (withBand.length > 1) {
+    var up = withBand.map(function (x) { return xAt(x.i).toFixed(2) + ',' + (100 - pct(x.p.hi)).toFixed(2); });
+    var dn = withBand.slice().reverse().map(function (x) { return xAt(x.i).toFixed(2) + ',' + (100 - pct(x.p.lo)).toFixed(2); });
+    layers += '<polygon points="' + up.concat(dn).join(' ') + '" class="cs-tband"/>';
+  }
+  if (o.trend !== false) {
+    var hi = [], hv = [];
+    series.forEach(function (p, i) { if (p.kind === 'hist') { hi.push(i); hv.push(p.v); } });
+    var f = csFit(hv);
+    if (f && hi.length > 1) {
+      var pts = series.map(function (p, i) {
+        var v = Math.max(0, f.b + f.m * (i - hi[0]));
+        return xAt(i).toFixed(2) + ',' + (100 - pct(v)).toFixed(2);
+      });
+      layers += '<polyline points="' + pts.join(' ') + '" class="cs-tline"/>';
+    }
+  }
+  var over = layers
+    ? '<svg class="cs-tover" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'
+      + layers + '</svg>' : '';
+
+  return '<div class="cs-fc">' + over + cols + '</div>';
+}
+
+/* Build the series for a category from annual[] + forecast, or project it. */
+function csTrendSeries(d, showFc) {
+  var m = d.meta || {};
+  var act = (d.annual || []).filter(function (a) { return a.value; })
+    .map(function (a) { return { y: a.name, v: a.value, kind: /YTD|partial/i.test(a.name || '') ? 'ytd' : 'hist' }; });
+  if (!act.length) return [];
+  var ytdIdx = -1;
+  for (var i = 0; i < act.length; i++) if (act[i].kind === 'ytd') ytdIdx = i;
+  if (!showFc) return act;
+
+  var fy = (d.forecast && d.forecast.years) || [];
+  var ytdYear = ytdIdx >= 0 ? String(act[ytdIdx].y).replace(/[^0-9]/g, '').slice(-4) : null;
+  var proj = [];
+  fy.forEach(function (p) {
+    var yr = String(p.y).replace(/[^0-9]/g, '').slice(-4);
+    if (ytdYear && yr === ytdYear) {
+      act[ytdIdx].banked = act[ytdIdx].v;
+      act[ytdIdx].total = Math.max(p.v, act[ytdIdx].v);
+      act[ytdIdx].lo = p.lo; act[ytdIdx].hi = p.hi;
+    } else proj.push({ y: p.y, v: p.v, lo: p.lo, hi: p.hi, kind: 'proj' });
+  });
+  if (!fy.length && m.cagr2325 != null) {
+    var lastFull = act[ytdIdx >= 0 ? ytdIdx - 1 : act.length - 1];
+    if (lastFull) {
+      var g = m.cagr2325 / 100;
+      if (ytdIdx >= 0) {
+        var full = Math.max(lastFull.v * (1 + g), act[ytdIdx].v);
+        act[ytdIdx].banked = act[ytdIdx].v; act[ytdIdx].total = full;
+        act[ytdIdx].lo = full * 0.97; act[ytdIdx].hi = full * 1.03;
+      }
+      var base = parseInt(String(lastFull.y).replace(/[^0-9]/g, '').slice(-4), 10);
+      for (var k = 1; k <= 3; k++) {
+        var step = k + (ytdIdx >= 0 ? 1 : 0);
+        var b = lastFull.v * Math.pow(1 + g, step);
+        proj.push({ y: 'FY' + (base + step), v: b, lo: b * Math.pow(0.97, step), hi: b * Math.pow(1.03, step), kind: 'proj' });
+      }
+    }
+  }
+  return act.concat(proj);
+}
+
+function csTrendKey(showFc, hasProj) {
+  return '<div class="cs-fc-key"><span class="cs-k-hist">actual</span>'
+    + (showFc ? '<span class="cs-k-add">rest of year, projected</span>' : '<span class="cs-k-ytd">year to date</span>')
+    + (showFc && hasProj ? '<span class="cs-k-proj">projected</span><span class="cs-k-band">range</span>' : '')
+    + '<span class="cs-k-trend">trend</span></div>';
+}
+function csFcToggle(fn, on) {
+  return '<div class="cs-ctrlbar"><button class="cs-toggle' + (on ? ' on' : '') + '"'
+    + ' onclick="' + fn + '" aria-pressed="' + (on ? 'true' : 'false') + '">'
     + '<span class="cs-toggle-t"></span>Forecast</button></div>';
+}
 
-  var key = '<div class="cs-fc-key"><span class="cs-k-hist">actual</span>'
-    + (CS_FORECAST && ytdFull ? '<span class="cs-k-add">rest of year, projected</span>'
-                              : '<span class="cs-k-ytd">year to date</span>')
-    + (proj.length ? '<span class="cs-k-proj">projected</span><span class="cs-k-band">range</span>' : '') + '</div>';
-
+function csTrendChart(d) {
+  var m = d.meta || {};
+  var series = csTrendSeries(d, CS_FORECAST);
+  if (!series.length) return csGap('Annual spend trend.', 'annual[]');
+  var hasProj = series.some(function (p) { return p.kind === 'proj'; });
   var basis = CS_FORECAST
     ? csNote('<b>Forecast basis.</b> ' + (d.forecast && d.forecast.basis
         ? csEsc(d.forecast.basis)
         : 'The observed ' + csPct(m.cagr2325) + ' three-year CAGR carried forward, with a &plusmn;3% a year band. '
           + 'It does <b>not</b> incorporate known renewals or price escalators, because this data set carries no '
-          + 'renewal dates. A trend extrapolation, not a plan.')
-        + (ytdFull ? ' The current year shows what is already spent, with the projected remainder stacked on top.' : ''))
+          + 'renewal dates.')
+        + ' The current year shows what is already spent with the projected remainder stacked on top. '
+        + 'The line is a least-squares fit through the completed years only.')
     : csNote(csEsc(m.ytdNote ? 'The current year is a part year: ' + m.ytdNote + '.' : 'The current year is a part year.'));
+  return csFcToggle('csToggleFc()', CS_FORECAST)
+    + '<div class="cs-twrap">' + csTrendSvg(series, {}) + '</div>'
+    + csTrendKey(CS_FORECAST, hasProj) + basis;
+}
 
-  return toggle + '<div class="cs-fc">' + cols + '</div>' + key + basis;
+/* ---- supplier deep dive: the same chart on that supplier's own history ---- */
+var CS_SUP_FC = false;
+function csSupToggleFc() { CS_KEEPSCROLL = true; CS_SUP_FC = !CS_SUP_FC; csRender(); }
+function csSupTrend(s) {
+  var act = [['FY2023', s.s3], ['FY2024', s.s4], ['FY2025', s.s5], ['FY2026 YTD', s.s6]]
+    .filter(function (y) { return y[1] != null; })
+    .map(function (y) { return { y: y[0], v: y[1], kind: /YTD/.test(y[0]) ? 'ytd' : 'hist' }; });
+  if (!act.length) return { series: [], cagr: null };
+
+  var hist = act.filter(function (p) { return p.kind === 'hist'; });
+  var cagr = hist.length >= 2
+    ? (Math.pow(hist[hist.length - 1].v / hist[0].v, 1 / (hist.length - 1)) - 1) : null;
+  if (!CS_SUP_FC || cagr == null) return { series: act, cagr: cagr };
+
+  var g = cagr, last = hist[hist.length - 1];
+  var ytdIdx = -1;
+  for (var i = 0; i < act.length; i++) if (act[i].kind === 'ytd') ytdIdx = i;
+  var base = parseInt(String(last.y).replace(/[^0-9]/g, '').slice(-4), 10);
+  var proj = [];
+  if (ytdIdx >= 0) {
+    var full = Math.max(last.v * (1 + g), act[ytdIdx].v);
+    act[ytdIdx].banked = act[ytdIdx].v; act[ytdIdx].total = full;
+    act[ytdIdx].lo = full * 0.94; act[ytdIdx].hi = full * 1.06;
+  }
+  for (var k = 1; k <= 3; k++) {
+    var step = k + (ytdIdx >= 0 ? 1 : 0);
+    var v = last.v * Math.pow(1 + g, step);
+    proj.push({ y: 'FY' + (base + step), v: v, lo: v * Math.pow(0.94, k), hi: v * Math.pow(1.06, k), kind: 'proj' });
+  }
+  return { series: act.concat(proj), cagr: cagr };
 }
 
 /* ---- Overview: key findings as cards, not three stacked paragraphs -------- */
@@ -3124,7 +3250,7 @@ function csFragMap(d) {
       + csNote('Plotted on spend only. Separating a <b>consolidated</b> subcategory from a <b>fragmented</b> one needs a '
         + 'vendor count per subcategory, which this data set does not carry.');
   }
-  var W = 660, H = 340, PADL = 58, PADB = 48, PADT = 16, PADR = 130;
+  var W = 660, H = 360, PADL = 74, PADB = 54, PADT = 26, PADR = 26;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var maxV = sc.reduce(function (a, x) { return Math.max(a, x.vc || 0); }, 0) || 1;
   var maxS = sc.reduce(function (a, x) { return Math.max(a, x.tot || 0); }, 0) || 1;
@@ -3140,19 +3266,29 @@ function csFragMap(d) {
       + '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (on ? 11 : 8) + '" class="'
       + (frag ? 'cs-fd-hot' : 'cs-fd') + '"><title>' + csEsc(x.n + ' · ' + csNum(x.vc) + ' vendors · '
       + csUsd(x.tot) + ' · ' + csUsd(Math.round(x.tot / (x.vc || 1))) + ' average each') + '</title></circle>'
-      + '<text x="' + (cx + 14).toFixed(1) + '" y="' + (cy + 4).toFixed(1) + '" class="cs-fdlab">'
-      + csEsc(String(x.n).slice(0, 20)) + '</text></g>';
+      + (on ? '<text x="' + (cx < PADL + pw * 0.62 ? cx + 15 : cx - 15).toFixed(1) + '" y="'
+              + (cy + 4).toFixed(1) + '" class="cs-fdlab"'
+              + (cx < PADL + pw * 0.62 ? '' : ' text-anchor="end"') + '>'
+              + csEsc(String(x.n).slice(0, 26)) + '</text>' : '')
+      + '</g>';
   }).join('');
 
-  return '<div class="cs-pwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-psvg" role="img" '
+  return '<div class="cs-pwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-fragsvg" role="img" '
     + 'aria-label="Subcategory spend against vendor count">'
     + '<line x1="' + xm.toFixed(1) + '" y1="' + PADT + '" x2="' + xm.toFixed(1) + '" y2="' + (PADT + ph) + '" class="cs-p80h"/>'
     + '<line x1="' + PADL + '" y1="' + ym.toFixed(1) + '" x2="' + (W - PADR) + '" y2="' + ym.toFixed(1) + '" class="cs-p80h"/>'
-    + '<text x="' + (W - PADR - 4) + '" y="' + (PADT + 14) + '" class="cs-quadl">big and fragmented · consolidate here</text>'
-    + '<text x="' + (PADL + 4) + '" y="' + (PADT + ph - 6) + '" class="cs-quadl">small and consolidated · leave alone</text>'
+    + '<text x="' + (W - PADR - 2) + '" y="' + (PADT - 9) + '" class="cs-quadl">big and fragmented · consolidate here</text>'
     + '<line x1="' + PADL + '" y1="' + (PADT + ph) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
     + '<line x1="' + PADL + '" y1="' + PADT + '" x2="' + PADL + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
-    + '<text x="' + (PADL + pw / 2) + '" y="' + (H - 8) + '" class="cs-axt">vendors in the subcategory &rarr;</text>'
+    + [0, 0.5, 1].map(function (t) {
+        return '<text x="' + (PADL - 8) + '" y="' + (PADT + ph - t * ph + 4).toFixed(1) + '" class="cs-pyl">'
+          + csUsd(maxS * t) + '</text>';
+      }).join('')
+    + [0, 0.5, 1].map(function (t) {
+        return '<text x="' + (PADL + t * pw).toFixed(1) + '" y="' + (PADT + ph + 32) + '" class="cs-pyr" text-anchor="middle">'
+          + csNum(Math.round(maxV * t)) + '</text>';
+      }).join('')
+    + '<text x="' + (PADL + pw / 2) + '" y="' + (H - 6) + '" class="cs-axt">vendors in the subcategory &rarr;</text>'
     + '<text x="14" y="' + (PADT + ph / 2) + '" class="cs-axt" transform="rotate(-90 14,' + (PADT + ph / 2) + ')">spend &rarr;</text>'
     + dots + '</svg></div>'
     + csNote('Top right is where consolidation pays: real money spread across many suppliers. Bottom left is noise, '
@@ -3261,7 +3397,7 @@ function csRiskMatrix(d) {
     var hot = csLI(x.l) >= 2.5 && csLI(x.i) >= 2.5;
     return '<li' + (hot ? ' class="hot"' : '') + '>' + csEsc(x.risk) + '</li>';
   }).join('') + '</ol>';
-  return '<div class="cs-rkwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-psvg" role="img" aria-label="Risk likelihood against impact">'
+  return '<div class="cs-rkwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-rksvg" role="img" aria-label="Risk likelihood against impact">'
     + '<rect x="' + (PAD + pw / 2) + '" y="' + PAD + '" width="' + pw / 2 + '" height="' + ph / 2 + '" class="cs-rkzone"/>'
     + '<line x1="' + PAD + '" y1="' + (PAD + ph) + '" x2="' + (W - PAD) + '" y2="' + (PAD + ph) + '" class="cs-pax"/>'
     + '<line x1="' + PAD + '" y1="' + PAD + '" x2="' + PAD + '" y2="' + (PAD + ph) + '" class="cs-pax"/>'
@@ -3431,16 +3567,11 @@ function csSupTable(d) {
 function csSupDeep(d) {
   var s = (d.suppliers || []).filter(function (x) { return x.n === CS_SUP_SEL; })[0];
   if (!s) return '';
-  var years = [['FY2023', s.s3], ['FY2024', s.s4], ['FY2025', s.s5], ['FY2026 YTD', s.s6]]
-    .filter(function (y) { return y[1] != null; });
-  var mx = years.reduce(function (a, y) { return Math.max(a, y[1] || 0); }, 0) || 1;
-  var bars = '<div class="cs-fc">' + years.map(function (y, i) {
-    var ytd = /YTD/.test(y[0]);
-    return '<div class="cs-fc-col ' + (ytd ? 'is-ytd' : 'is-hist') + '" title="' + csEsc(y[0] + ': ' + csUsd(y[1])) + '">'
-      + '<div class="cs-fc-v">' + csUsd(y[1]) + '</div>'
-      + '<div class="cs-fc-plot"><i class="cs-fc-bar" style="height:' + ((y[1] / mx) * 100).toFixed(1) + '%"></i></div>'
-      + '<div class="cs-fc-l">' + csEsc(y[0]) + '</div></div>';
-  }).join('') + '</div>';
+  var tr = csSupTrend(s);
+  var hasProj = tr.series.some(function (p) { return p.kind === 'proj'; });
+  var bars = csFcToggle('csSupToggleFc()', CS_SUP_FC)
+    + '<div class="cs-twrap">' + csTrendSvg(tr.series, {}) + '</div>'
+    + csTrendKey(CS_SUP_FC, hasProj);
 
   var kpis = '<div class="cs-kpirow">'
     + csKpi('3-year total', csUsd(s.tot), 'FY23 to FY25', 'plum')
@@ -3451,8 +3582,14 @@ function csSupDeep(d) {
     + '</div>';
 
   var body = kpis + bars
-    + csNote('Subcategory, business-unit and contract-coverage breakdowns would populate from source data. '
-      + 'Rate-versus-volume decomposition would show whether the YoY change is price or consumption.');
+    + csNote(CS_SUP_FC
+        ? '<b>Forecast basis.</b> This supplier\'s own '
+          + (tr.cagr != null ? csPct(tr.cagr * 100) + ' compound growth' : 'growth')
+          + ' across its completed years, carried forward three years with a &plusmn;6% a year band. '
+          + 'Wider than the category band because a single relationship moves further than a portfolio does, '
+          + 'and it ignores the renewal calendar entirely. The line is fitted on completed years only.'
+        : 'Subcategory, business-unit and contract-coverage breakdowns would populate from source data. '
+          + 'Rate-versus-volume decomposition would show whether the YoY change is price or consumption.');
 
   return csCard('Deep dive: ' + csEsc(s.n), body,
       { sub: 'click the name again to close', conf: csConfFor(d, 'suppliers') })
@@ -3472,11 +3609,12 @@ function csRenewalMatrix(d, sel) {
     .filter(function (p) { return p.m; });
   if (!pts.length) return csGap('Renewal position for this supplier.', 'renewalMatrix entry for ' + sel.n);
 
-  var W = 560, H = 380, PAD = 56, pw = W - PAD * 2, ph = H - PAD * 2;
+  var W = 620, H = 380, PADL = 84, PADR = 22, PADT = 30, PADB = 52;
+  var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var mxs = pts.reduce(function (a, p) { return Math.max(a, p.s.tot || 0); }, 0) || 1;
   var dots = pts.map(function (p) {
-    var cx = PAD + (p.m.perf / 5) * pw;
-    var cy = PAD + ph - (p.m.attr / 5) * ph;
+    var cx = PADL + (p.m.perf / 5) * pw;
+    var cy = PADT + ph - (p.m.attr / 5) * ph;
     var r = 6 + 12 * Math.sqrt((p.s.tot || 0) / mxs);
     var on = p.s.n === sel.n;
     return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1)
@@ -3497,18 +3635,24 @@ function csRenewalMatrix(d, sel) {
       + (me.blocked ? '<div class="cs-rmblock">' + csEsc(me.blocked) + '</div>' : '') + '</div>'
     : '<div class="cs-rmread">' + csGap('Renewal position for this supplier.', 'renewalMatrix entry for ' + sel.n) + '</div>';
 
-  return '<div class="cs-rmwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-psvg" role="img" '
-    + 'aria-label="Performance against market attractiveness">'
-    + '<line x1="' + (PAD + pw / 2) + '" y1="' + PAD + '" x2="' + (PAD + pw / 2) + '" y2="' + (PAD + ph) + '" class="cs-p80h"/>'
-    + '<line x1="' + PAD + '" y1="' + (PAD + ph / 2) + '" x2="' + (W - PAD) + '" y2="' + (PAD + ph / 2) + '" class="cs-p80h"/>'
-    + '<text x="' + (PAD + 4) + '" y="' + (PAD + 12) + '" class="cs-quadl" text-anchor="start">Replace / compete</text>'
-    + '<text x="' + (W - PAD - 4) + '" y="' + (PAD + 12) + '" class="cs-quadl">Renew &amp; expand</text>'
-    + '<text x="' + (PAD + 4) + '" y="' + (PAD + ph - 6) + '" class="cs-quadl" text-anchor="start">Exit / remediate</text>'
-    + '<text x="' + (W - PAD - 4) + '" y="' + (PAD + ph - 6) + '" class="cs-quadl">Renew, protect terms</text>'
-    + '<line x1="' + PAD + '" y1="' + (PAD + ph) + '" x2="' + (W - PAD) + '" y2="' + (PAD + ph) + '" class="cs-pax"/>'
-    + '<line x1="' + PAD + '" y1="' + PAD + '" x2="' + PAD + '" y2="' + (PAD + ph) + '" class="cs-pax"/>'
-    + '<text x="' + (PAD + pw / 2) + '" y="' + (H - 14) + '" class="cs-axt">performance (1-5) &rarr;</text>'
-    + '<text x="16" y="' + (PAD + ph / 2) + '" class="cs-axt" transform="rotate(-90 16,' + (PAD + ph / 2) + ')">market attractiveness &rarr;</text>'
+  return '<div class="cs-rmwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" '
+    + 'aria-label="Performance against market attractiveness" class="cs-rmsvg">'
+    + '<line x1="' + (PADL + pw / 2) + '" y1="' + PADT + '" x2="' + (PADL + pw / 2) + '" y2="' + (PADT + ph) + '" class="cs-p80h"/>'
+    + '<line x1="' + PADL + '" y1="' + (PADT + ph / 2) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph / 2) + '" class="cs-p80h"/>'
+    + '<text x="' + (PADL + 6) + '" y="' + (PADT - 8) + '" class="cs-quadl" text-anchor="start">Replace / compete</text>'
+    + '<text x="' + (W - PADR - 2) + '" y="' + (PADT - 8) + '" class="cs-quadl">Renew &amp; expand</text>'
+    + '<text x="' + (PADL + 6) + '" y="' + (PADT + ph + 14) + '" class="cs-quadl" text-anchor="start">Exit / remediate</text>'
+    + '<text x="' + (W - PADR - 2) + '" y="' + (PADT + ph + 14) + '" class="cs-quadl">Renew, protect terms</text>'
+    + '<line x1="' + PADL + '" y1="' + (PADT + ph) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
+    + '<line x1="' + PADL + '" y1="' + PADT + '" x2="' + PADL + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
+    + [1, 2, 3, 4, 5].map(function (t) {
+        return '<text x="' + (PADL + (t / 5) * pw).toFixed(1) + '" y="' + (PADT + ph + 30) + '" class="cs-pyr" text-anchor="middle">' + t + '</text>';
+      }).join('')
+    + [1, 3, 5].map(function (t) {
+        return '<text x="' + (PADL - 8) + '" y="' + (PADT + ph - (t / 5) * ph + 3).toFixed(1) + '" class="cs-pyl">' + t + '</text>';
+      }).join('')
+    + '<text x="' + (PADL + pw / 2) + '" y="' + (H - 6) + '" class="cs-axt">performance (1-5) &rarr;</text>'
+    + '<text x="14" y="' + (PADT + ph / 2) + '" class="cs-axt" transform="rotate(-90 14,' + (PADT + ph / 2) + ')">market attractiveness &rarr;</text>'
     + dots + '</svg>' + read + '</div>';
 }
 
