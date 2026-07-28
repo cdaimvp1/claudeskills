@@ -1589,6 +1589,174 @@ small,sub,sup{font-size:9px}
 .cs-tover .cs-tline{fill:none;stroke:var(--cs-burnt);stroke-width:2;stroke-dasharray:6 4;
   vector-effect:non-scaling-stroke}
 
+/* =============================================================================
+   RESTYLE PROTOCOL — theo dashboards restyle protocol.zip, applied to Category
+   Strategy. Appended last so it wins over the rules above without !important.
+
+   Deltas from what this dashboard had:
+     - role tints raised to the new floor (the old ones were ~10% and invisible)
+     - panels get a full-height left spine, not a top border
+     - panel headers get a gradient band, a rule, an icon and a 13/800 uppercase
+       title; 9px was too small to be a title
+     - nested blocks move off white onto the well
+     - tables, chips and bars take the protocol treatment
+     - tabs go black-on-black-underline at every level, idle medium grey
+     - 16px is removed from the ladder: hierarchy is weight and case, not size
+     - figures are Roboto Mono
+   ============================================================================= */
+:root{
+  /* structural hues */
+  --plum:#5C2B50;      --plum-l:#7A3C6B;   --plum-dk:#3E1C36;
+  --teal-d:#2F6E6B;    --teal-l:#4A8F8B;   --teal-deep:#1F4A48;
+  --emph:#C15E19;      --emph-tx:#A2500F;
+
+  /* role tints at the new floor. Never paler than these. */
+  --plum-t:#C6B5C2;    --teal-t:#B6CCCB;   --emph-t:#ECCFBA;
+  --plum-band:#DDCFDA; --teal-band:#CFE0DE; --emph-band:#ECCFBA;
+  --plum-rule:#B99CB0; --teal-rule:#9FBFBC; --emph-rule:#C68A55;
+
+  --well:#F4F1EC;      --rule:#E2DCD4;     --line2:#CECCC7;
+  --pri-fg:#F3ECF1;    --sec-fg:#EAF4F2;
+  --track:#E7E3DC;
+  --tab-idle:#6E6862;
+  --shadow-card:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
+  --mono:'Roboto Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  /* the dashboard's own aliases, re-pointed at the protocol values */
+  --cs-line2:#CECCC7;  --cs-line:#E2DCD4;  --cs-band:#DDCFDA;
+}
+
+/* ---- 3.1 panel: left spine, no top border ---- */
+.cs-card{
+  border:1px solid var(--line2);
+  border-left:3px solid var(--plum);
+  border-radius:8px;
+  box-shadow:var(--shadow-card);
+  display:flex;flex-direction:column;min-width:0;overflow:hidden;
+}
+.cs-card.cs-role-teal{border-left-color:var(--teal-d)}
+.cs-card.cs-role-emph{border-left-color:var(--emph)}
+.cs-card.cs-emph{border-left-color:var(--emph)}
+
+/* ---- 3.2 panel header ---- */
+.cs-cardhd{
+  display:flex;align-items:center;gap:9px;padding:12px 15px;flex:none;flex-wrap:wrap;
+  background:linear-gradient(180deg,var(--plum-band),var(--cs-surface));
+  border-bottom:1px solid var(--plum-rule);
+}
+.cs-ct{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--plum)}
+.cs-cs{margin-left:auto;font-size:11px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--cs-mut)}
+.cs-chic{width:17px;height:17px;flex:none;color:var(--plum);display:block}
+.cs-chic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;display:block}
+
+.cs-card.cs-role-teal .cs-cardhd{
+  background:linear-gradient(180deg,var(--teal-band),var(--cs-surface));
+  border-bottom-color:var(--teal-rule);
+}
+.cs-card.cs-role-teal .cs-ct,.cs-card.cs-role-teal .cs-chic{color:var(--teal-d)}
+
+.cs-card.cs-role-emph .cs-cardhd,.cs-card.cs-emph .cs-cardhd{
+  background:linear-gradient(180deg,var(--emph-band),var(--cs-surface));
+  border-bottom-color:var(--emph-rule);
+}
+.cs-card.cs-role-emph .cs-ct,.cs-card.cs-role-emph .cs-chic,
+.cs-card.cs-emph .cs-ct,.cs-card.cs-emph .cs-chic{color:var(--emph-tx)}
+
+/* 3.4 solid header: plum only, one per screen, on the panel that answers it */
+.cs-card.cs-role-solid .cs-cardhd{background:var(--plum);border-bottom:none}
+.cs-card.cs-role-solid .cs-ct,.cs-card.cs-role-solid .cs-chic{color:var(--pri-fg)}
+.cs-card.cs-role-solid .cs-cs{color:#E2CFDD}
+.cs-card.cs-role-solid .cs-cov{color:#E2CFDD;border-color:rgba(255,255,255,.45)}
+.cs-card.cs-role-solid .cs-cov .cs-dots i{background:#E2CFDD}
+.cs-card.cs-quiet .cs-cardhd{background:linear-gradient(180deg,var(--plum-band),var(--cs-surface))}
+
+/* ---- 3.5 section dividers ---- */
+.cs-sect{margin:24px 0 0}
+.cs-secthd{margin-bottom:10px}
+.cs-secthd .t{
+  font:700 9px var(--mono);letter-spacing:.02em;text-transform:capitalize;color:var(--cs-mut);
+  padding-left:10px;border-left:3px solid var(--plum);line-height:1.15;display:block;
+}
+
+/* ---- 3.6 nested blocks off white ---- */
+.cs-cardbd{padding:13px 15px;flex:1;min-width:0}
+.cs-kpi,.cs-scard,.cs-pillar3,.cs-road-i,.cs-mi,.cs-opp,.cs-metric,
+.cs-kcell,.cs-pcard,.cs-gap,.cs-tdkey{background:var(--well)}
+.cs-kpirow .cs-kpi{border-color:var(--rule)}
+.cs-gap{border-color:var(--rule)}
+.cs-read{background:var(--well);border-radius:0 6px 6px 0;padding:9px 12px}
+.cs-note{color:var(--cs-mut)}
+
+/* ---- 3.7 tables ---- */
+.cs-tbl th{
+  background:var(--plum-t);color:var(--plum-dk);
+  font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.08em;
+  padding:7px 10px;border-bottom:none;
+}
+.cs-card.cs-role-teal .cs-tbl th{background:var(--teal-t);color:var(--teal-deep)}
+.cs-tbl td{padding:8px 10px;border-bottom:1px solid var(--rule);font-size:13px}
+.cs-tbl tbody tr:nth-child(even) td{background:var(--well)}
+.cs-tbl tbody tr:hover td{background:#EFE9EE}
+.cs-tbl td.cs-num{font:700 11px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.cs-sortb{font:700 9px var(--mono);letter-spacing:.08em;color:var(--plum-dk)}
+.cs-sortb.on{color:var(--plum)}
+
+/* ---- 3.8 chips ---- */
+.cs-chip,.cs-tier,.cs-pill,.cs-state,.cs-act,.cs-win,.cs-effort,.cs-cov{
+  font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 9px;border-radius:30px;white-space:nowrap;
+}
+.cs-chip,.cs-tier{background:var(--plum-t);color:var(--plum-dk);border:none}
+.cs-pill-teal,.cs-state{background:var(--teal-t);color:var(--teal-deep);border:none}
+.cs-pill-plum{background:var(--plum-t);color:var(--plum-dk);border:none}
+.cs-pill-burnt{background:var(--emph);color:#fff;border:none}
+.cs-oppn{background:var(--emph);color:#fff;font:700 9px var(--mono)}
+
+/* ---- 3.9 bars ---- */
+.cs-bar{height:9px;border-radius:5px;background:var(--track)}
+.cs-bar i{border-radius:5px}
+.cs-supv,.cs-supp,.cs-wf-v,.cs-tlv,.cs-cvv,.cs-cvp,.cs-fc-v,.cs-tdfig b,.cs-scfig b,
+.cs-mm-row b,.cs-tdk b,.cs-opp-v,.cs-scopp-v,.cs-mrow .mv{
+  font-family:var(--mono);font-variant-numeric:tabular-nums;
+}
+
+/* ---- 3.10 tabs: black label, black underline, at every level ---- */
+.cs-tabs,.cs-subtabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.cs-tab,.cs-subtab{
+  font-family:var(--cs-sans);font-size:13px;font-weight:600;color:var(--tab-idle);
+  background:transparent;border:none;border-bottom:3px solid transparent;
+  padding:9px 12px;margin-bottom:-1px;border-radius:0;
+}
+.cs-tab:hover,.cs-subtab:hover{color:var(--cs-ink);background:transparent}
+.cs-tab.on,.cs-subtab.on{color:var(--cs-ink);font-weight:700;border-bottom-color:var(--cs-ink);background:transparent}
+.cs-subtabs{border-bottom:1px solid var(--line2);gap:4px;margin:-8px 0 18px}
+.cs-tabs{gap:4px}
+.cs-cat.on{background:var(--plum);border-color:var(--plum)}
+
+/* ---- 2. type ladder: 9 / 11 / 13 / 20 / 28. No 16. ---- */
+.cs-nr-t,.cs-force-f,.cs-ovl-c,.cs-opp-n,.cs-pillar-n,.cs-kcell-l,.cs-mi-t,
+.cs-scopp-t,.cs-rmq,.cs-tdfig b,.cs-scfig b,.cs-play-n,.cs-p3-t,.cs-pcard .pcname{
+  font-size:13px;font-weight:700;
+}
+.cs-mi-t,.cs-nr-t{letter-spacing:0}
+.cs-scname,.cs-stat-v,.cs-cvbig b,.cs-kpi-v,.cs-bignum,.cs-tdmid b,.cs-p3-k,.cs-scard-c,
+.cs-verdict-v,.cs-nr-k,.cs-mi-k,.cs-ovl-v,.cs-opp-v{
+  font-family:var(--mono);font-weight:700;
+}
+.cs-kpi-v,.cs-bignum,.cs-p3-k,.cs-scard-c,.cs-verdict-v,.cs-scname{font-size:20px;letter-spacing:-.01em}
+.cs-stat-v,.cs-cvbig b,.cs-h1{font-size:28px}
+.cs-tdmid b,.cs-mi-k,.cs-nr-k,.cs-ovl-v,.cs-opp-v,.cs-tdfig b,.cs-scfig b{font-size:20px}
+.cs-eyebrow,.cs-lab,.cs-lab2,.cs-kpi-l,.cs-stat-l,.cs-cvbig span,.cs-scmeta,
+.cs-tdfig span,.cs-scfig span,.cs-scard-f,.cs-supr,.cs-suphead span,.cs-supcount{
+  font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+}
+
+/* ---- 4.1 / 4.2 equal-height rows, scroll inside the body ---- */
+.cs-row2,.cs-paretorow,.cs-screl{align-items:stretch}
+.cs-row2>.cs-card,.cs-paretorow>.cs-card,.cs-screl>.cs-card{margin-bottom:0}
+.cs-row2>.cs-card>.cs-cardbd,.cs-paretorow>.cs-card>.cs-cardbd,
+.cs-screl>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin}
+
 </style>
 </head>
 <body>
@@ -1746,16 +1914,54 @@ function csUsd(n) {
 function csPct(n, d) { return (n == null || isNaN(n)) ? '--' : n.toFixed(d == null ? 1 : d) + '%'; }
 function csNum(n) { return (n == null || isNaN(n)) ? '--' : n.toLocaleString('en-US'); }
 
+/* ---- panel icons, from the .ch-ic set in the restyle protocol ------------ */
+var CS_ICON = {
+  doc:      'M7 3h7l4 4v14H7z M14 3v4h4 M10 12h6M10 15h6M10 18h3',
+  clock:    '',
+  cal:      '',
+  shield:   'M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z',
+  flag:     'M5 21V4M5 4h11l-2 4 2 4H5',
+  scales:   'M12 2v20M17 6.5c0-1.9-2.2-3-5-3s-5 1.3-5 3.2c0 4.3 10 2.2 10 6.6 0 1.9-2.2 3.2-5 3.2s-5-1.1-5-3',
+  warn:     'M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.4 3.9a2 2 0 00-3.4 0z M12 9v4M12 17h.01',
+  list:     'M4 6h16M4 12h16M4 18h10',
+  balance:  'M12 3v18 M6 7h12 M6 7l-3 6h6z M18 7l-3 6h6z M8 21h8',
+  chart:    'M3 3v18h18 M7 14l4-4 3 3 5-6',
+  bars:     'M4 20V10M10 20V4M16 20v-7M22 20V8',
+  users:    'M9 11a3 3 0 100-6 3 3 0 000 6z M3 20a6 6 0 0112 0 M17 11a3 3 0 100-6',
+  grid:     'M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z',
+  target:   'M12 21a9 9 0 100-18 9 9 0 000 18z M12 16a4 4 0 100-8 4 4 0 000 8z M12 13a1 1 0 100-2 1 1 0 000 2z',
+  star:     'M12 3l2.4 5 5.6.8-4 3.9 1 5.5L12 16.5 6.4 18.2l1-5.5-4-3.9 5.6-.8z',
+  globe:    'M12 21a9 9 0 100-18 9 9 0 000 18z M3 12h18 M12 3a14 14 0 000 18 14 14 0 000-18',
+  refresh:  'M21 12a9 9 0 11-6.2-8.5 M21 4v5h-5',
+  money:    'M12 2v20 M16 7c0-1.7-1.8-2.5-4-2.5S8 5.4 8 7c0 3.6 8 1.8 8 5.5 0 1.6-1.8 2.5-4 2.5s-4-.9-4-2.5'
+};
+CS_ICON.clock = 'M12 21a9 9 0 100-18 9 9 0 000 18z M12 7v5l3 2';
+CS_ICON.cal = 'M3 4h18v14H3z M3 9h18M8 21h8M12 18v3';
+function csIcon(k) {
+  var d = CS_ICON[k];
+  if (!d) return '';
+  return '<span class="cs-chic"><svg viewBox="0 0 24 24" aria-hidden="true">'
+    + d.split(' M').map(function (p, i) { return '<path d="' + (i ? 'M' + p : p) + '"/>'; }).join('')
+    + '</svg></span>';
+}
+
 /* ---- primitives ---------------------------------------------------------- */
 function csCard(title, body, opts) {
   var o = opts || {};
-  // opts.conf renders the 3-dot evidence badge in the header, the same control
-  // Deal and Landscape use. Confidence sits on the panel it qualifies.
-  return '<div class="cs-card' + (o.cls ? ' ' + o.cls : '') + '">'
-    + (title ? '<div class="cs-cardhd"><span class="cs-ct">' + title + '</span>'
+  /* opts.conf renders the 3-dot evidence badge. opts.icon and opts.role come
+     from the restyle protocol: every panel carries an icon and a deliberate
+     role, at most one 'solid' and one 'emph' per screen. */
+  var role = o.role ? ' cs-role-' + o.role : '';
+  return '<div class="cs-card' + role + (o.cls ? ' ' + o.cls : '') + '">'
+    + (title ? '<div class="cs-cardhd">' + (o.icon ? csIcon(o.icon) : '')
+        + '<span class="cs-ct">' + title + '</span>'
         + (o.sub ? '<span class="cs-cs">' + csEsc(o.sub) + '</span>' : '')
         + (o.conf ? csConf(o.conf, o.confWhy) : '') + '</div>' : '')
     + '<div class="cs-cardbd">' + body + '</div></div>';
+}
+/* A named band above a group of panels. Required once a screen carries 4+. */
+function csSect(title) {
+  return '<div class="cs-sect cs-secthd"><span class="t">' + csEsc(title) + '</span></div>';
 }
 function csLabel(t) { return '<div class="cs-lab">' + csEsc(t) + '</div>'; }
 function csNote(t) { return '<div class="cs-note">' + t + '</div>'; }
@@ -1946,22 +2152,22 @@ function scOverview() {
 
   h += '<div class="cs-row2">'
     + csCard('Annual Spend Trend', csTrendChart(d),
-        { sub: 'FY23-FY26 YTD' + (CS_FORECAST ? ' + forecast' : ''), conf: csConfFor(d, 'annual') })
+        { icon: 'chart', sub: 'FY23-FY26 YTD' + (CS_FORECAST ? ' + forecast' : ''), conf: csConfFor(d, 'annual') })
     + csCard('Top Suppliers', csTopSuppliers(d),
-        { sub: 'ranked by 3-yr spend', conf: csConfFor(d, 'suppliers') })
+        { icon: 'users', sub: 'ranked by 3-yr spend', conf: csConfFor(d, 'suppliers') })
     + '</div>';
 
   h += csCard('Key Findings', csFindings(d),
-      { sub: 'what a sourcing lead needs to know', conf: csConfFor(d, 'narr') });
+      { icon: 'star', role: 'solid', sub: 'what a sourcing lead needs to know', conf: csConfFor(d, 'narr') });
 
   h += '<div class="cs-row2">'
     + csCard('Spend Under Contract', d.contractCoverage ? csCoverage(d.contractCoverage)
         : csGap('Coverage of category spend under an active agreement, and the largest off-contract relationships.', 'contract coverage / agreement status per supplier'),
-        { sub: d.contractCoverage ? csPct(d.contractCoverage.pct, 0) + ' of FY25 spend' : '',
+        { icon: 'doc', sub: d.contractCoverage ? csPct(d.contractCoverage.pct, 0) + ' of FY25 spend' : '',
           conf: d.contractCoverage ? 'Moderate' : 'Limited' })
     + csCard('Renewal Exposure', d.renewals ? csRenewals(d.renewals)
         : csGap('Spend renewing in the next 12 months and the largest decision windows.', 'renewal + notice dates per agreement'),
-        { sub: d.renewals ? 'next 12 months' : '', conf: d.renewals ? 'Moderate' : 'Limited' })
+        { icon: 'cal', role: 'emph', sub: d.renewals ? 'next 12 months' : '', conf: d.renewals ? 'Moderate' : 'Limited' })
     + '</div>';
   return h;
 }
@@ -1983,12 +2189,12 @@ function scPareto() {
 
   h += '<div class="cs-paretorow">'
     + csCard('Pareto Distribution', csParetoChart(d),
-        { sub: 'spend by supplier with cumulative share', conf: csConfFor(d, 'pareto') })
+        { icon: 'bars', role: 'solid', sub: 'spend by supplier with cumulative share', conf: csConfFor(d, 'pareto') })
     + csCard('Tail Analysis', csTailStats(d),
-        { cls: 'cs-tailcard', conf: csConfFor(d, 'subcats') })
+        { icon: 'list', cls: 'cs-tailcard', conf: csConfFor(d, 'subcats') })
     + '</div>';
 
-  h += csCard('What the curve says', csParetoRead(d) + csTailRead(d), { cls: 'cs-emph' });
+  h += csCard('What the curve says', csParetoRead(d) + csTailRead(d), { icon: 'warn', role: 'emph' });
   return h;
 }
 
@@ -2009,12 +2215,12 @@ function scSuppliers() {
     + '</div>';
 
   h += csCard('All suppliers', csSupTable(d),
-      { sub: 'click a name for the deep dive', conf: csConfFor(d, 'suppliers') });
+      { icon: 'users', role: 'solid', sub: 'click a name for the deep dive', conf: csConfFor(d, 'suppliers') });
 
   h += csSupDeep(d);
 
   h += csCard('Supplier tiering', csTieringLines(d),
-      { sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
+      { icon: 'grid', sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
 
   var nv = (d.newVendors || []).map(function (v) {
     return '<tr><td class="cs-l">' + csEsc(v.n) + '</td><td class="cs-num">' + csUsd(v.s) + '</td></tr>'; });
@@ -2022,9 +2228,9 @@ function scSuppliers() {
     return '<tr><td class="cs-l">' + csEsc(v.n) + '</td><td class="cs-num">' + csUsd(v.s) + '</td></tr>'; });
   h += '<div class="cs-row2">'
     + csCard('New large vendors', nv.length ? csTable(['Supplier', 'Spend'], nv)
-        : csGap('Suppliers new in the current period.', 'newVendors[]'), { sub: 'entered this period' })
+        : csGap('Suppliers new in the current period.', 'newVendors[]'), { icon: 'refresh', role: 'teal', sub: 'entered this period' })
     + csCard('Exiting vendors', xv.length ? csTable(['Supplier', 'Prior spend'], xv)
-        : csGap('Suppliers that stopped in the current period.', 'exitVendors[]'), { sub: 'no spend this period' })
+        : csGap('Suppliers that stopped in the current period.', 'exitVendors[]'), { icon: 'refresh', sub: 'no spend this period' })
     + '</div>';
   return h;
 }
@@ -2042,15 +2248,15 @@ function scKraljic() {
   var h = '';
 
   h += csCard('Category Positioning', csKraljicGrid(d),
-      { sub: 'Kraljic', conf: csConfFor(d, 'narr') });
+      { icon: 'balance', role: 'solid', sub: 'Kraljic', conf: csConfFor(d, 'narr') });
 
   h += csCard('Market Intelligence', d.market ? csMarketIntel(d.market)
       : csGap('What the supply market is doing, and what it means for this category.', 'market research records with sources'),
-      { sub: d.market ? (d.market.asOf || 'current') : '', conf: d.market ? 'Strong' : 'Limited' });
+      { icon: 'globe', sub: d.market ? (d.market.asOf || 'current') : '', conf: d.market ? 'Strong' : 'Limited' });
 
   h += csCard('Pricing Environment', n.pricing ? csNarr(n.pricing)
       : csGap('Market pricing direction and its implication for this category.', 'narr.pricing'),
-      { sub: 'category read', conf: csConfFor(d, 'narr') });
+      { icon: 'money', sub: 'category read', conf: csConfFor(d, 'narr') });
   return h;
 }
 
@@ -2064,8 +2270,8 @@ function scPorter() {
   if (!(d.forces || []).length) {
     return csCard('Porter Five Forces', csGap('Porter five-forces read for this category.', 'forces[]'));
   }
-  h += csCard('Net Buyer Leverage', csForceVerdict(d), { sub: 'the answer first', cls: 'cs-emph' });
-  h += csCard('Five Forces', csForceChart(d), { sub: 'scored, strongest constraint first', conf: csConfFor(d, 'forces') });
+  h += csCard('Net Buyer Leverage', csForceVerdict(d), { icon: 'scales', role: 'solid', sub: 'the answer first', cls: 'cs-emph' });
+  h += csCard('Five Forces', csForceChart(d), { icon: 'balance', sub: 'scored, strongest constraint first', conf: csConfFor(d, 'forces') });
   return h;
 }
 
@@ -2075,9 +2281,9 @@ function scPorter() {
 function scRisk() {
   var d = csData(), n = d.narr || {};
   var h = '';
-  if (n.riskTop2) h += csCard('What Could Change the Strategy', csNarr(n.riskTop2), { cls: 'cs-emph', sub: 'timing-critical' });
+  if (n.riskTop2) h += csCard('What Could Change the Strategy', csNarr(n.riskTop2), { icon: 'warn', role: 'emph', cls: 'cs-emph', sub: 'timing-critical' });
 
-  h += csCard('Risk Heat Map', csRiskMatrix(d), { sub: 'likelihood against impact', conf: csConfFor(d, 'risks') });
+  h += csCard('Risk Heat Map', csRiskMatrix(d), { icon: 'shield', role: 'solid', sub: 'likelihood against impact', conf: csConfFor(d, 'risks') });
 
   var rRows = (d.risks || []).map(function (r) {
     var hot = /high/i.test(r.l || '') && /high/i.test(r.i || '');
@@ -2089,15 +2295,15 @@ function scRisk() {
   });
   h += csCard('Risk Register', rRows.length ? csTable(['Risk', 'Likelihood', 'Impact', 'Mitigation'], rRows)
       : csGap('Category risk register.', 'risks[]'),
-      { sub: (d.risks || []).length + ' risks', conf: csConfFor(d, 'risks') });
+      { icon: 'flag', sub: (d.risks || []).length + ' risks', conf: csConfFor(d, 'risks') });
 
   h += '<div class="cs-row2">'
     + csCard('Escalation Triggers', d.triggers ? csTriggers(d.triggers)
         : csGap('The conditions that would force a change of strategy, with the threshold for each.', 'trigger threshold per risk (risks[] carries mitigation only)'),
-        { sub: d.triggers ? d.triggers.length + ' triggers' : '', conf: d.triggers ? 'Moderate' : 'Limited' })
+        { icon: 'warn', sub: d.triggers ? d.triggers.length + ' triggers' : '', conf: d.triggers ? 'Moderate' : 'Limited' })
     + csCard('Geographic Concentration', d.geo ? csGeo(d.geo)
         : csGap('Supply exposure by delivery geography.', 'country / region split per supplier'),
-        { sub: d.geo ? 'delivery geography' : '', conf: d.geo ? 'Moderate' : 'Limited' })
+        { icon: 'globe', sub: d.geo ? 'delivery geography' : '', conf: d.geo ? 'Moderate' : 'Limited' })
     + '</div>';
   return h;
 }
@@ -2356,13 +2562,13 @@ function scSavings() {
     + '</div>';
 
   h += csCard('Savings Waterfall', csSavingsWaterfall(d),
-      { sub: 'modelled to realised', conf: csConfFor(d, 'savings') });
+      { icon: 'money', role: 'solid', sub: 'modelled to realised', conf: csConfFor(d, 'savings') });
 
   h += csCard('Category Scorecard', csScorecard(d),
-      { sub: (d.kpis || []).length + ' measures', conf: csConfFor(d, 'kpis') });
+      { icon: 'target', sub: (d.kpis || []).length + ' measures', conf: csConfFor(d, 'kpis') });
 
   if (d.benefits) h += csCard('Play-to-Value Traceability', csBenefits(d.benefits),
-      { sub: 'each saving traced to its lever', conf: 'Moderate' });
+      { icon: 'scales', role: 'teal', sub: 'each saving traced to its lever', conf: 'Moderate' });
   h += csNarrNote(n.savingsNearTerm);
   return h;
 }
@@ -2384,7 +2590,7 @@ function scTrend() {
     + '</div>';
 
   h += csCard('Spend Trend and Forecast', csTrendChart(d),
-      { sub: CS_FORECAST ? 'actual and projected' : 'actual', conf: csConfFor(d, 'annual') });
+      { icon: 'chart', role: 'solid', sub: CS_FORECAST ? 'actual and projected' : 'actual', conf: csConfFor(d, 'annual') });
 
   var sw = (d.swing || []).slice().sort(function (a, b) { return Math.abs(b.delta || 0) - Math.abs(a.delta || 0); });
   var swMax = sw.reduce(function (a, s) { return Math.max(a, Math.abs(s.delta || 0)); }, 0) || 1;
@@ -2400,18 +2606,18 @@ function scTrend() {
   });
   h += csCard('Top Swing Drivers', swRows.length ? csTable(['Supplier', '', 'Change', 'Cause'], swRows)
       : csGap('The suppliers driving the change.', 'swing[]'),
-      { sub: 'FY24 to FY25', conf: csConfFor(d, 'swing') });
+      { icon: 'bars', sub: 'FY24 to FY25', conf: csConfFor(d, 'swing') });
 
   h += '<div class="cs-row2">'
     + csCard('Rate vs Volume', d.rateVolume ? csRateVolume(d.rateVolume)
         : csGap('How much of the change is price and how much is quantity.', 'rate and quantity split (only totals are held)'),
-        { sub: d.rateVolume ? 'change decomposed' : '', conf: d.rateVolume ? 'Moderate' : 'Limited' })
+        { icon: 'scales', sub: d.rateVolume ? 'change decomposed' : '', conf: d.rateVolume ? 'Moderate' : 'Limited' })
     + csCard('What Changed Since Last Strategy', d.sinceLast ? csSinceLast(d.sinceLast)
         : csGap('Movement in spend, suppliers, risk and market since the last approved strategy.', 'a prior approved snapshot to diff against'),
-        { sub: d.sinceLast ? d.sinceLast.asOf : '', conf: d.sinceLast ? 'Moderate' : 'Limited' })
+        { icon: 'clock', sub: d.sinceLast ? d.sinceLast.asOf : '', conf: d.sinceLast ? 'Moderate' : 'Limited' })
     + '</div>';
 
-  if (n.trendDecomp) h += csCard('Change Decomposition', csNarr(n.trendDecomp), { conf: csConfFor(d, 'narr') });
+  if (n.trendDecomp) h += csCard('Change Decomposition', csNarr(n.trendDecomp), { icon: 'chart', conf: csConfFor(d, 'narr') });
   return h;
 }
 
@@ -2426,16 +2632,16 @@ function scRational() {
   h += csCard('Overlap & Consolidation',
       d.overlaps ? csOverlaps(d.overlaps) : (ovl ? csNarr(ovl)
         : csGap('Duplicate or overlapping suppliers and tools.', 'capability tags per supplier')),
-      { sub: d.overlaps ? d.overlaps.length + ' overlapping capabilities' : 'narrative',
+      { icon: 'grid', role: 'solid', sub: d.overlaps ? d.overlaps.length + ' overlapping capabilities' : 'narrative',
         conf: d.overlaps ? 'Moderate' : 'Limited' });
 
   h += csCard('Utilization / Shelfware', d.utilization ? csUtilization(d.utilization)
       : csGap('Licences bought against licences actually used.', 'licence count vs active users'),
-      { sub: d.utilization ? 'licences bought against active' : '', conf: d.utilization ? 'Moderate' : 'Limited' });
+      { icon: 'warn', role: 'emph', sub: d.utilization ? 'licences bought against active' : '', conf: d.utilization ? 'Moderate' : 'Limited' });
 
   h += csCard('Action Matrix', d.actionMatrix ? csActionMatrix(d.actionMatrix)
       : csGap('Retain / renegotiate / consolidate / retire / replace, with value, effort and timing.', 'per-supplier action + renewal window'),
-      { sub: d.actionMatrix ? d.actionMatrix.length + ' suppliers dispositioned' : '',
+      { icon: 'list', sub: d.actionMatrix ? d.actionMatrix.length + ' suppliers dispositioned' : '',
         conf: d.actionMatrix ? 'Moderate' : 'Limited' });
   return h;
 }
@@ -2449,12 +2655,12 @@ function scTail() {
   h += csCard('Tail Consolidation Opportunities', d.tailOpps ? csTailOpps(d.tailOpps)
       : csGap('Groups of tail suppliers that can be consolidated, with the receiving vehicle and the saving.',
               'tail grouping records (group, vendors, combined spend, target vehicle, estimated saving)'),
-      { sub: d.tailOpps ? d.tailOpps.length + ' groups' : '', conf: d.tailOpps ? 'Moderate' : 'Limited' });
+      { icon: 'list', role: 'solid', sub: d.tailOpps ? d.tailOpps.length + ' groups' : '', conf: d.tailOpps ? 'Moderate' : 'Limited' });
 
   h += csCard('Contract Opportunities', d.contractOpps ? csContractOpps(d.contractOpps)
       : csGap('Expiring agreements and off-contract spend, with the action and the window.',
               'agreement records with expiry, notice window and at-risk value'),
-      { sub: d.contractOpps ? d.contractOpps.length + ' at risk' : '', conf: d.contractOpps ? 'Moderate' : 'Limited' });
+      { icon: 'cal', role: 'emph', sub: d.contractOpps ? d.contractOpps.length + ' at risk' : '', conf: d.contractOpps ? 'Moderate' : 'Limited' });
   return h;
 }
 
@@ -3594,7 +3800,7 @@ function csSupDeep(d) {
   return csCard('Deep dive: ' + csEsc(s.n), body,
       { sub: 'click the name again to close', conf: csConfFor(d, 'suppliers') })
     + csCard('Renewal Decision Matrix', csRenewalMatrix(d, s),
-      { sub: 'performance against market attractiveness',
+      { icon: 'target', sub: 'performance against market attractiveness',
         conf: (d.renewalMatrix ? 'Moderate' : 'Limited') });
 }
 
@@ -3702,13 +3908,13 @@ function scSubcats() {
 
   h += '<div class="cs-screl">'
     + csCard('Fragmentation Map', csFragMap(d),
-        { sub: hasVc ? 'spend against vendor count' : 'spend by subcategory', conf: csConfFor(d, 'subcats') })
+        { icon: 'grid', role: 'solid', sub: hasVc ? 'spend against vendor count' : 'spend by subcategory', conf: csConfFor(d, 'subcats') })
     + csCard('Subcategory Detail', csSubcatPane(d),
-        { cls: 'cs-scpane', sub: 'click a subcategory', conf: csConfFor(d, 'subcats') })
+        { icon: 'target', cls: 'cs-scpane', sub: 'click a subcategory', conf: csConfFor(d, 'subcats') })
     + '</div>';
 
   h += csCard('All Subcategories', csSubcatTable(d),
-      { sub: sc.length + ' subcategories', conf: hasVc ? 'Moderate' : 'Limited' })
+      { icon: 'list', sub: sc.length + ' subcategories', conf: hasVc ? 'Moderate' : 'Limited' })
     + csNarrNote(n.subcatLegend) + csNarrNote(n.subcatGap);
   return h;
 }

@@ -49,16 +49,54 @@ function csUsd(n) {
 function csPct(n, d) { return (n == null || isNaN(n)) ? '--' : n.toFixed(d == null ? 1 : d) + '%'; }
 function csNum(n) { return (n == null || isNaN(n)) ? '--' : n.toLocaleString('en-US'); }
 
+/* ---- panel icons, from the .ch-ic set in the restyle protocol ------------ */
+var CS_ICON = {
+  doc:      'M7 3h7l4 4v14H7z M14 3v4h4 M10 12h6M10 15h6M10 18h3',
+  clock:    '',
+  cal:      '',
+  shield:   'M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z',
+  flag:     'M5 21V4M5 4h11l-2 4 2 4H5',
+  scales:   'M12 2v20M17 6.5c0-1.9-2.2-3-5-3s-5 1.3-5 3.2c0 4.3 10 2.2 10 6.6 0 1.9-2.2 3.2-5 3.2s-5-1.1-5-3',
+  warn:     'M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.4 3.9a2 2 0 00-3.4 0z M12 9v4M12 17h.01',
+  list:     'M4 6h16M4 12h16M4 18h10',
+  balance:  'M12 3v18 M6 7h12 M6 7l-3 6h6z M18 7l-3 6h6z M8 21h8',
+  chart:    'M3 3v18h18 M7 14l4-4 3 3 5-6',
+  bars:     'M4 20V10M10 20V4M16 20v-7M22 20V8',
+  users:    'M9 11a3 3 0 100-6 3 3 0 000 6z M3 20a6 6 0 0112 0 M17 11a3 3 0 100-6',
+  grid:     'M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z',
+  target:   'M12 21a9 9 0 100-18 9 9 0 000 18z M12 16a4 4 0 100-8 4 4 0 000 8z M12 13a1 1 0 100-2 1 1 0 000 2z',
+  star:     'M12 3l2.4 5 5.6.8-4 3.9 1 5.5L12 16.5 6.4 18.2l1-5.5-4-3.9 5.6-.8z',
+  globe:    'M12 21a9 9 0 100-18 9 9 0 000 18z M3 12h18 M12 3a14 14 0 000 18 14 14 0 000-18',
+  refresh:  'M21 12a9 9 0 11-6.2-8.5 M21 4v5h-5',
+  money:    'M12 2v20 M16 7c0-1.7-1.8-2.5-4-2.5S8 5.4 8 7c0 3.6 8 1.8 8 5.5 0 1.6-1.8 2.5-4 2.5s-4-.9-4-2.5'
+};
+CS_ICON.clock = 'M12 21a9 9 0 100-18 9 9 0 000 18z M12 7v5l3 2';
+CS_ICON.cal = 'M3 4h18v14H3z M3 9h18M8 21h8M12 18v3';
+function csIcon(k) {
+  var d = CS_ICON[k];
+  if (!d) return '';
+  return '<span class="cs-chic"><svg viewBox="0 0 24 24" aria-hidden="true">'
+    + d.split(' M').map(function (p, i) { return '<path d="' + (i ? 'M' + p : p) + '"/>'; }).join('')
+    + '</svg></span>';
+}
+
 /* ---- primitives ---------------------------------------------------------- */
 function csCard(title, body, opts) {
   var o = opts || {};
-  // opts.conf renders the 3-dot evidence badge in the header, the same control
-  // Deal and Landscape use. Confidence sits on the panel it qualifies.
-  return '<div class="cs-card' + (o.cls ? ' ' + o.cls : '') + '">'
-    + (title ? '<div class="cs-cardhd"><span class="cs-ct">' + title + '</span>'
+  /* opts.conf renders the 3-dot evidence badge. opts.icon and opts.role come
+     from the restyle protocol: every panel carries an icon and a deliberate
+     role, at most one 'solid' and one 'emph' per screen. */
+  var role = o.role ? ' cs-role-' + o.role : '';
+  return '<div class="cs-card' + role + (o.cls ? ' ' + o.cls : '') + '">'
+    + (title ? '<div class="cs-cardhd">' + (o.icon ? csIcon(o.icon) : '')
+        + '<span class="cs-ct">' + title + '</span>'
         + (o.sub ? '<span class="cs-cs">' + csEsc(o.sub) + '</span>' : '')
         + (o.conf ? csConf(o.conf, o.confWhy) : '') + '</div>' : '')
     + '<div class="cs-cardbd">' + body + '</div></div>';
+}
+/* A named band above a group of panels. Required once a screen carries 4+. */
+function csSect(title) {
+  return '<div class="cs-sect cs-secthd"><span class="t">' + csEsc(title) + '</span></div>';
 }
 function csLabel(t) { return '<div class="cs-lab">' + csEsc(t) + '</div>'; }
 function csNote(t) { return '<div class="cs-note">' + t + '</div>'; }
@@ -249,22 +287,22 @@ function scOverview() {
 
   h += '<div class="cs-row2">'
     + csCard('Annual Spend Trend', csTrendChart(d),
-        { sub: 'FY23-FY26 YTD' + (CS_FORECAST ? ' + forecast' : ''), conf: csConfFor(d, 'annual') })
+        { icon: 'chart', sub: 'FY23-FY26 YTD' + (CS_FORECAST ? ' + forecast' : ''), conf: csConfFor(d, 'annual') })
     + csCard('Top Suppliers', csTopSuppliers(d),
-        { sub: 'ranked by 3-yr spend', conf: csConfFor(d, 'suppliers') })
+        { icon: 'users', sub: 'ranked by 3-yr spend', conf: csConfFor(d, 'suppliers') })
     + '</div>';
 
   h += csCard('Key Findings', csFindings(d),
-      { sub: 'what a sourcing lead needs to know', conf: csConfFor(d, 'narr') });
+      { icon: 'star', role: 'solid', sub: 'what a sourcing lead needs to know', conf: csConfFor(d, 'narr') });
 
   h += '<div class="cs-row2">'
     + csCard('Spend Under Contract', d.contractCoverage ? csCoverage(d.contractCoverage)
         : csGap('Coverage of category spend under an active agreement, and the largest off-contract relationships.', 'contract coverage / agreement status per supplier'),
-        { sub: d.contractCoverage ? csPct(d.contractCoverage.pct, 0) + ' of FY25 spend' : '',
+        { icon: 'doc', sub: d.contractCoverage ? csPct(d.contractCoverage.pct, 0) + ' of FY25 spend' : '',
           conf: d.contractCoverage ? 'Moderate' : 'Limited' })
     + csCard('Renewal Exposure', d.renewals ? csRenewals(d.renewals)
         : csGap('Spend renewing in the next 12 months and the largest decision windows.', 'renewal + notice dates per agreement'),
-        { sub: d.renewals ? 'next 12 months' : '', conf: d.renewals ? 'Moderate' : 'Limited' })
+        { icon: 'cal', role: 'emph', sub: d.renewals ? 'next 12 months' : '', conf: d.renewals ? 'Moderate' : 'Limited' })
     + '</div>';
   return h;
 }
@@ -286,12 +324,12 @@ function scPareto() {
 
   h += '<div class="cs-paretorow">'
     + csCard('Pareto Distribution', csParetoChart(d),
-        { sub: 'spend by supplier with cumulative share', conf: csConfFor(d, 'pareto') })
+        { icon: 'bars', role: 'solid', sub: 'spend by supplier with cumulative share', conf: csConfFor(d, 'pareto') })
     + csCard('Tail Analysis', csTailStats(d),
-        { cls: 'cs-tailcard', conf: csConfFor(d, 'subcats') })
+        { icon: 'list', cls: 'cs-tailcard', conf: csConfFor(d, 'subcats') })
     + '</div>';
 
-  h += csCard('What the curve says', csParetoRead(d) + csTailRead(d), { cls: 'cs-emph' });
+  h += csCard('What the curve says', csParetoRead(d) + csTailRead(d), { icon: 'warn', role: 'emph' });
   return h;
 }
 
@@ -312,12 +350,12 @@ function scSuppliers() {
     + '</div>';
 
   h += csCard('All suppliers', csSupTable(d),
-      { sub: 'click a name for the deep dive', conf: csConfFor(d, 'suppliers') });
+      { icon: 'users', role: 'solid', sub: 'click a name for the deep dive', conf: csConfFor(d, 'suppliers') });
 
   h += csSupDeep(d);
 
   h += csCard('Supplier tiering', csTieringLines(d),
-      { sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
+      { icon: 'grid', sub: 'how each tier is managed', conf: csConfFor(d, 'suppliers') });
 
   var nv = (d.newVendors || []).map(function (v) {
     return '<tr><td class="cs-l">' + csEsc(v.n) + '</td><td class="cs-num">' + csUsd(v.s) + '</td></tr>'; });
@@ -325,9 +363,9 @@ function scSuppliers() {
     return '<tr><td class="cs-l">' + csEsc(v.n) + '</td><td class="cs-num">' + csUsd(v.s) + '</td></tr>'; });
   h += '<div class="cs-row2">'
     + csCard('New large vendors', nv.length ? csTable(['Supplier', 'Spend'], nv)
-        : csGap('Suppliers new in the current period.', 'newVendors[]'), { sub: 'entered this period' })
+        : csGap('Suppliers new in the current period.', 'newVendors[]'), { icon: 'refresh', role: 'teal', sub: 'entered this period' })
     + csCard('Exiting vendors', xv.length ? csTable(['Supplier', 'Prior spend'], xv)
-        : csGap('Suppliers that stopped in the current period.', 'exitVendors[]'), { sub: 'no spend this period' })
+        : csGap('Suppliers that stopped in the current period.', 'exitVendors[]'), { icon: 'refresh', sub: 'no spend this period' })
     + '</div>';
   return h;
 }
@@ -345,15 +383,15 @@ function scKraljic() {
   var h = '';
 
   h += csCard('Category Positioning', csKraljicGrid(d),
-      { sub: 'Kraljic', conf: csConfFor(d, 'narr') });
+      { icon: 'balance', role: 'solid', sub: 'Kraljic', conf: csConfFor(d, 'narr') });
 
   h += csCard('Market Intelligence', d.market ? csMarketIntel(d.market)
       : csGap('What the supply market is doing, and what it means for this category.', 'market research records with sources'),
-      { sub: d.market ? (d.market.asOf || 'current') : '', conf: d.market ? 'Strong' : 'Limited' });
+      { icon: 'globe', sub: d.market ? (d.market.asOf || 'current') : '', conf: d.market ? 'Strong' : 'Limited' });
 
   h += csCard('Pricing Environment', n.pricing ? csNarr(n.pricing)
       : csGap('Market pricing direction and its implication for this category.', 'narr.pricing'),
-      { sub: 'category read', conf: csConfFor(d, 'narr') });
+      { icon: 'money', sub: 'category read', conf: csConfFor(d, 'narr') });
   return h;
 }
 
@@ -367,8 +405,8 @@ function scPorter() {
   if (!(d.forces || []).length) {
     return csCard('Porter Five Forces', csGap('Porter five-forces read for this category.', 'forces[]'));
   }
-  h += csCard('Net Buyer Leverage', csForceVerdict(d), { sub: 'the answer first', cls: 'cs-emph' });
-  h += csCard('Five Forces', csForceChart(d), { sub: 'scored, strongest constraint first', conf: csConfFor(d, 'forces') });
+  h += csCard('Net Buyer Leverage', csForceVerdict(d), { icon: 'scales', role: 'solid', sub: 'the answer first', cls: 'cs-emph' });
+  h += csCard('Five Forces', csForceChart(d), { icon: 'balance', sub: 'scored, strongest constraint first', conf: csConfFor(d, 'forces') });
   return h;
 }
 
@@ -378,9 +416,9 @@ function scPorter() {
 function scRisk() {
   var d = csData(), n = d.narr || {};
   var h = '';
-  if (n.riskTop2) h += csCard('What Could Change the Strategy', csNarr(n.riskTop2), { cls: 'cs-emph', sub: 'timing-critical' });
+  if (n.riskTop2) h += csCard('What Could Change the Strategy', csNarr(n.riskTop2), { icon: 'warn', role: 'emph', cls: 'cs-emph', sub: 'timing-critical' });
 
-  h += csCard('Risk Heat Map', csRiskMatrix(d), { sub: 'likelihood against impact', conf: csConfFor(d, 'risks') });
+  h += csCard('Risk Heat Map', csRiskMatrix(d), { icon: 'shield', role: 'solid', sub: 'likelihood against impact', conf: csConfFor(d, 'risks') });
 
   var rRows = (d.risks || []).map(function (r) {
     var hot = /high/i.test(r.l || '') && /high/i.test(r.i || '');
@@ -392,15 +430,15 @@ function scRisk() {
   });
   h += csCard('Risk Register', rRows.length ? csTable(['Risk', 'Likelihood', 'Impact', 'Mitigation'], rRows)
       : csGap('Category risk register.', 'risks[]'),
-      { sub: (d.risks || []).length + ' risks', conf: csConfFor(d, 'risks') });
+      { icon: 'flag', sub: (d.risks || []).length + ' risks', conf: csConfFor(d, 'risks') });
 
   h += '<div class="cs-row2">'
     + csCard('Escalation Triggers', d.triggers ? csTriggers(d.triggers)
         : csGap('The conditions that would force a change of strategy, with the threshold for each.', 'trigger threshold per risk (risks[] carries mitigation only)'),
-        { sub: d.triggers ? d.triggers.length + ' triggers' : '', conf: d.triggers ? 'Moderate' : 'Limited' })
+        { icon: 'warn', sub: d.triggers ? d.triggers.length + ' triggers' : '', conf: d.triggers ? 'Moderate' : 'Limited' })
     + csCard('Geographic Concentration', d.geo ? csGeo(d.geo)
         : csGap('Supply exposure by delivery geography.', 'country / region split per supplier'),
-        { sub: d.geo ? 'delivery geography' : '', conf: d.geo ? 'Moderate' : 'Limited' })
+        { icon: 'globe', sub: d.geo ? 'delivery geography' : '', conf: d.geo ? 'Moderate' : 'Limited' })
     + '</div>';
   return h;
 }
@@ -659,13 +697,13 @@ function scSavings() {
     + '</div>';
 
   h += csCard('Savings Waterfall', csSavingsWaterfall(d),
-      { sub: 'modelled to realised', conf: csConfFor(d, 'savings') });
+      { icon: 'money', role: 'solid', sub: 'modelled to realised', conf: csConfFor(d, 'savings') });
 
   h += csCard('Category Scorecard', csScorecard(d),
-      { sub: (d.kpis || []).length + ' measures', conf: csConfFor(d, 'kpis') });
+      { icon: 'target', sub: (d.kpis || []).length + ' measures', conf: csConfFor(d, 'kpis') });
 
   if (d.benefits) h += csCard('Play-to-Value Traceability', csBenefits(d.benefits),
-      { sub: 'each saving traced to its lever', conf: 'Moderate' });
+      { icon: 'scales', role: 'teal', sub: 'each saving traced to its lever', conf: 'Moderate' });
   h += csNarrNote(n.savingsNearTerm);
   return h;
 }
@@ -687,7 +725,7 @@ function scTrend() {
     + '</div>';
 
   h += csCard('Spend Trend and Forecast', csTrendChart(d),
-      { sub: CS_FORECAST ? 'actual and projected' : 'actual', conf: csConfFor(d, 'annual') });
+      { icon: 'chart', role: 'solid', sub: CS_FORECAST ? 'actual and projected' : 'actual', conf: csConfFor(d, 'annual') });
 
   var sw = (d.swing || []).slice().sort(function (a, b) { return Math.abs(b.delta || 0) - Math.abs(a.delta || 0); });
   var swMax = sw.reduce(function (a, s) { return Math.max(a, Math.abs(s.delta || 0)); }, 0) || 1;
@@ -703,18 +741,18 @@ function scTrend() {
   });
   h += csCard('Top Swing Drivers', swRows.length ? csTable(['Supplier', '', 'Change', 'Cause'], swRows)
       : csGap('The suppliers driving the change.', 'swing[]'),
-      { sub: 'FY24 to FY25', conf: csConfFor(d, 'swing') });
+      { icon: 'bars', sub: 'FY24 to FY25', conf: csConfFor(d, 'swing') });
 
   h += '<div class="cs-row2">'
     + csCard('Rate vs Volume', d.rateVolume ? csRateVolume(d.rateVolume)
         : csGap('How much of the change is price and how much is quantity.', 'rate and quantity split (only totals are held)'),
-        { sub: d.rateVolume ? 'change decomposed' : '', conf: d.rateVolume ? 'Moderate' : 'Limited' })
+        { icon: 'scales', sub: d.rateVolume ? 'change decomposed' : '', conf: d.rateVolume ? 'Moderate' : 'Limited' })
     + csCard('What Changed Since Last Strategy', d.sinceLast ? csSinceLast(d.sinceLast)
         : csGap('Movement in spend, suppliers, risk and market since the last approved strategy.', 'a prior approved snapshot to diff against'),
-        { sub: d.sinceLast ? d.sinceLast.asOf : '', conf: d.sinceLast ? 'Moderate' : 'Limited' })
+        { icon: 'clock', sub: d.sinceLast ? d.sinceLast.asOf : '', conf: d.sinceLast ? 'Moderate' : 'Limited' })
     + '</div>';
 
-  if (n.trendDecomp) h += csCard('Change Decomposition', csNarr(n.trendDecomp), { conf: csConfFor(d, 'narr') });
+  if (n.trendDecomp) h += csCard('Change Decomposition', csNarr(n.trendDecomp), { icon: 'chart', conf: csConfFor(d, 'narr') });
   return h;
 }
 
@@ -729,16 +767,16 @@ function scRational() {
   h += csCard('Overlap & Consolidation',
       d.overlaps ? csOverlaps(d.overlaps) : (ovl ? csNarr(ovl)
         : csGap('Duplicate or overlapping suppliers and tools.', 'capability tags per supplier')),
-      { sub: d.overlaps ? d.overlaps.length + ' overlapping capabilities' : 'narrative',
+      { icon: 'grid', role: 'solid', sub: d.overlaps ? d.overlaps.length + ' overlapping capabilities' : 'narrative',
         conf: d.overlaps ? 'Moderate' : 'Limited' });
 
   h += csCard('Utilization / Shelfware', d.utilization ? csUtilization(d.utilization)
       : csGap('Licences bought against licences actually used.', 'licence count vs active users'),
-      { sub: d.utilization ? 'licences bought against active' : '', conf: d.utilization ? 'Moderate' : 'Limited' });
+      { icon: 'warn', role: 'emph', sub: d.utilization ? 'licences bought against active' : '', conf: d.utilization ? 'Moderate' : 'Limited' });
 
   h += csCard('Action Matrix', d.actionMatrix ? csActionMatrix(d.actionMatrix)
       : csGap('Retain / renegotiate / consolidate / retire / replace, with value, effort and timing.', 'per-supplier action + renewal window'),
-      { sub: d.actionMatrix ? d.actionMatrix.length + ' suppliers dispositioned' : '',
+      { icon: 'list', sub: d.actionMatrix ? d.actionMatrix.length + ' suppliers dispositioned' : '',
         conf: d.actionMatrix ? 'Moderate' : 'Limited' });
   return h;
 }
@@ -752,12 +790,12 @@ function scTail() {
   h += csCard('Tail Consolidation Opportunities', d.tailOpps ? csTailOpps(d.tailOpps)
       : csGap('Groups of tail suppliers that can be consolidated, with the receiving vehicle and the saving.',
               'tail grouping records (group, vendors, combined spend, target vehicle, estimated saving)'),
-      { sub: d.tailOpps ? d.tailOpps.length + ' groups' : '', conf: d.tailOpps ? 'Moderate' : 'Limited' });
+      { icon: 'list', role: 'solid', sub: d.tailOpps ? d.tailOpps.length + ' groups' : '', conf: d.tailOpps ? 'Moderate' : 'Limited' });
 
   h += csCard('Contract Opportunities', d.contractOpps ? csContractOpps(d.contractOpps)
       : csGap('Expiring agreements and off-contract spend, with the action and the window.',
               'agreement records with expiry, notice window and at-risk value'),
-      { sub: d.contractOpps ? d.contractOpps.length + ' at risk' : '', conf: d.contractOpps ? 'Moderate' : 'Limited' });
+      { icon: 'cal', role: 'emph', sub: d.contractOpps ? d.contractOpps.length + ' at risk' : '', conf: d.contractOpps ? 'Moderate' : 'Limited' });
   return h;
 }
 
@@ -1897,7 +1935,7 @@ function csSupDeep(d) {
   return csCard('Deep dive: ' + csEsc(s.n), body,
       { sub: 'click the name again to close', conf: csConfFor(d, 'suppliers') })
     + csCard('Renewal Decision Matrix', csRenewalMatrix(d, s),
-      { sub: 'performance against market attractiveness',
+      { icon: 'target', sub: 'performance against market attractiveness',
         conf: (d.renewalMatrix ? 'Moderate' : 'Limited') });
 }
 
@@ -2005,13 +2043,13 @@ function scSubcats() {
 
   h += '<div class="cs-screl">'
     + csCard('Fragmentation Map', csFragMap(d),
-        { sub: hasVc ? 'spend against vendor count' : 'spend by subcategory', conf: csConfFor(d, 'subcats') })
+        { icon: 'grid', role: 'solid', sub: hasVc ? 'spend against vendor count' : 'spend by subcategory', conf: csConfFor(d, 'subcats') })
     + csCard('Subcategory Detail', csSubcatPane(d),
-        { cls: 'cs-scpane', sub: 'click a subcategory', conf: csConfFor(d, 'subcats') })
+        { icon: 'target', cls: 'cs-scpane', sub: 'click a subcategory', conf: csConfFor(d, 'subcats') })
     + '</div>';
 
   h += csCard('All Subcategories', csSubcatTable(d),
-      { sub: sc.length + ' subcategories', conf: hasVc ? 'Moderate' : 'Limited' })
+      { icon: 'list', sub: sc.length + ' subcategories', conf: hasVc ? 'Moderate' : 'Limited' })
     + csNarrNote(n.subcatLegend) + csNarrNote(n.subcatGap);
   return h;
 }

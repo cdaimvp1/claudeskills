@@ -851,3 +851,171 @@ small,sub,sup{font-size:9px}
 .cs-tover .cs-tband{fill:var(--cs-teal);opacity:.16;stroke:none}
 .cs-tover .cs-tline{fill:none;stroke:var(--cs-burnt);stroke-width:2;stroke-dasharray:6 4;
   vector-effect:non-scaling-stroke}
+
+/* =============================================================================
+   RESTYLE PROTOCOL — theo dashboards restyle protocol.zip, applied to Category
+   Strategy. Appended last so it wins over the rules above without !important.
+
+   Deltas from what this dashboard had:
+     - role tints raised to the new floor (the old ones were ~10% and invisible)
+     - panels get a full-height left spine, not a top border
+     - panel headers get a gradient band, a rule, an icon and a 13/800 uppercase
+       title; 9px was too small to be a title
+     - nested blocks move off white onto the well
+     - tables, chips and bars take the protocol treatment
+     - tabs go black-on-black-underline at every level, idle medium grey
+     - 16px is removed from the ladder: hierarchy is weight and case, not size
+     - figures are Roboto Mono
+   ============================================================================= */
+:root{
+  /* structural hues */
+  --plum:#5C2B50;      --plum-l:#7A3C6B;   --plum-dk:#3E1C36;
+  --teal-d:#2F6E6B;    --teal-l:#4A8F8B;   --teal-deep:#1F4A48;
+  --emph:#C15E19;      --emph-tx:#A2500F;
+
+  /* role tints at the new floor. Never paler than these. */
+  --plum-t:#C6B5C2;    --teal-t:#B6CCCB;   --emph-t:#ECCFBA;
+  --plum-band:#DDCFDA; --teal-band:#CFE0DE; --emph-band:#ECCFBA;
+  --plum-rule:#B99CB0; --teal-rule:#9FBFBC; --emph-rule:#C68A55;
+
+  --well:#F4F1EC;      --rule:#E2DCD4;     --line2:#CECCC7;
+  --pri-fg:#F3ECF1;    --sec-fg:#EAF4F2;
+  --track:#E7E3DC;
+  --tab-idle:#6E6862;
+  --shadow-card:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
+  --mono:'Roboto Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  /* the dashboard's own aliases, re-pointed at the protocol values */
+  --cs-line2:#CECCC7;  --cs-line:#E2DCD4;  --cs-band:#DDCFDA;
+}
+
+/* ---- 3.1 panel: left spine, no top border ---- */
+.cs-card{
+  border:1px solid var(--line2);
+  border-left:3px solid var(--plum);
+  border-radius:8px;
+  box-shadow:var(--shadow-card);
+  display:flex;flex-direction:column;min-width:0;overflow:hidden;
+}
+.cs-card.cs-role-teal{border-left-color:var(--teal-d)}
+.cs-card.cs-role-emph{border-left-color:var(--emph)}
+.cs-card.cs-emph{border-left-color:var(--emph)}
+
+/* ---- 3.2 panel header ---- */
+.cs-cardhd{
+  display:flex;align-items:center;gap:9px;padding:12px 15px;flex:none;flex-wrap:wrap;
+  background:linear-gradient(180deg,var(--plum-band),var(--cs-surface));
+  border-bottom:1px solid var(--plum-rule);
+}
+.cs-ct{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--plum)}
+.cs-cs{margin-left:auto;font-size:11px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--cs-mut)}
+.cs-chic{width:17px;height:17px;flex:none;color:var(--plum);display:block}
+.cs-chic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;display:block}
+
+.cs-card.cs-role-teal .cs-cardhd{
+  background:linear-gradient(180deg,var(--teal-band),var(--cs-surface));
+  border-bottom-color:var(--teal-rule);
+}
+.cs-card.cs-role-teal .cs-ct,.cs-card.cs-role-teal .cs-chic{color:var(--teal-d)}
+
+.cs-card.cs-role-emph .cs-cardhd,.cs-card.cs-emph .cs-cardhd{
+  background:linear-gradient(180deg,var(--emph-band),var(--cs-surface));
+  border-bottom-color:var(--emph-rule);
+}
+.cs-card.cs-role-emph .cs-ct,.cs-card.cs-role-emph .cs-chic,
+.cs-card.cs-emph .cs-ct,.cs-card.cs-emph .cs-chic{color:var(--emph-tx)}
+
+/* 3.4 solid header: plum only, one per screen, on the panel that answers it */
+.cs-card.cs-role-solid .cs-cardhd{background:var(--plum);border-bottom:none}
+.cs-card.cs-role-solid .cs-ct,.cs-card.cs-role-solid .cs-chic{color:var(--pri-fg)}
+.cs-card.cs-role-solid .cs-cs{color:#E2CFDD}
+.cs-card.cs-role-solid .cs-cov{color:#E2CFDD;border-color:rgba(255,255,255,.45)}
+.cs-card.cs-role-solid .cs-cov .cs-dots i{background:#E2CFDD}
+.cs-card.cs-quiet .cs-cardhd{background:linear-gradient(180deg,var(--plum-band),var(--cs-surface))}
+
+/* ---- 3.5 section dividers ---- */
+.cs-sect{margin:24px 0 0}
+.cs-secthd{margin-bottom:10px}
+.cs-secthd .t{
+  font:700 9px var(--mono);letter-spacing:.02em;text-transform:capitalize;color:var(--cs-mut);
+  padding-left:10px;border-left:3px solid var(--plum);line-height:1.15;display:block;
+}
+
+/* ---- 3.6 nested blocks off white ---- */
+.cs-cardbd{padding:13px 15px;flex:1;min-width:0}
+.cs-kpi,.cs-scard,.cs-pillar3,.cs-road-i,.cs-mi,.cs-opp,.cs-metric,
+.cs-kcell,.cs-pcard,.cs-gap,.cs-tdkey{background:var(--well)}
+.cs-kpirow .cs-kpi{border-color:var(--rule)}
+.cs-gap{border-color:var(--rule)}
+.cs-read{background:var(--well);border-radius:0 6px 6px 0;padding:9px 12px}
+.cs-note{color:var(--cs-mut)}
+
+/* ---- 3.7 tables ---- */
+.cs-tbl th{
+  background:var(--plum-t);color:var(--plum-dk);
+  font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.08em;
+  padding:7px 10px;border-bottom:none;
+}
+.cs-card.cs-role-teal .cs-tbl th{background:var(--teal-t);color:var(--teal-deep)}
+.cs-tbl td{padding:8px 10px;border-bottom:1px solid var(--rule);font-size:13px}
+.cs-tbl tbody tr:nth-child(even) td{background:var(--well)}
+.cs-tbl tbody tr:hover td{background:#EFE9EE}
+.cs-tbl td.cs-num{font:700 11px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.cs-sortb{font:700 9px var(--mono);letter-spacing:.08em;color:var(--plum-dk)}
+.cs-sortb.on{color:var(--plum)}
+
+/* ---- 3.8 chips ---- */
+.cs-chip,.cs-tier,.cs-pill,.cs-state,.cs-act,.cs-win,.cs-effort,.cs-cov{
+  font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 9px;border-radius:30px;white-space:nowrap;
+}
+.cs-chip,.cs-tier{background:var(--plum-t);color:var(--plum-dk);border:none}
+.cs-pill-teal,.cs-state{background:var(--teal-t);color:var(--teal-deep);border:none}
+.cs-pill-plum{background:var(--plum-t);color:var(--plum-dk);border:none}
+.cs-pill-burnt{background:var(--emph);color:#fff;border:none}
+.cs-oppn{background:var(--emph);color:#fff;font:700 9px var(--mono)}
+
+/* ---- 3.9 bars ---- */
+.cs-bar{height:9px;border-radius:5px;background:var(--track)}
+.cs-bar i{border-radius:5px}
+.cs-supv,.cs-supp,.cs-wf-v,.cs-tlv,.cs-cvv,.cs-cvp,.cs-fc-v,.cs-tdfig b,.cs-scfig b,
+.cs-mm-row b,.cs-tdk b,.cs-opp-v,.cs-scopp-v,.cs-mrow .mv{
+  font-family:var(--mono);font-variant-numeric:tabular-nums;
+}
+
+/* ---- 3.10 tabs: black label, black underline, at every level ---- */
+.cs-tabs,.cs-subtabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.cs-tab,.cs-subtab{
+  font-family:var(--cs-sans);font-size:13px;font-weight:600;color:var(--tab-idle);
+  background:transparent;border:none;border-bottom:3px solid transparent;
+  padding:9px 12px;margin-bottom:-1px;border-radius:0;
+}
+.cs-tab:hover,.cs-subtab:hover{color:var(--cs-ink);background:transparent}
+.cs-tab.on,.cs-subtab.on{color:var(--cs-ink);font-weight:700;border-bottom-color:var(--cs-ink);background:transparent}
+.cs-subtabs{border-bottom:1px solid var(--line2);gap:4px;margin:-8px 0 18px}
+.cs-tabs{gap:4px}
+.cs-cat.on{background:var(--plum);border-color:var(--plum)}
+
+/* ---- 2. type ladder: 9 / 11 / 13 / 20 / 28. No 16. ---- */
+.cs-nr-t,.cs-force-f,.cs-ovl-c,.cs-opp-n,.cs-pillar-n,.cs-kcell-l,.cs-mi-t,
+.cs-scopp-t,.cs-rmq,.cs-tdfig b,.cs-scfig b,.cs-play-n,.cs-p3-t,.cs-pcard .pcname{
+  font-size:13px;font-weight:700;
+}
+.cs-mi-t,.cs-nr-t{letter-spacing:0}
+.cs-scname,.cs-stat-v,.cs-cvbig b,.cs-kpi-v,.cs-bignum,.cs-tdmid b,.cs-p3-k,.cs-scard-c,
+.cs-verdict-v,.cs-nr-k,.cs-mi-k,.cs-ovl-v,.cs-opp-v{
+  font-family:var(--mono);font-weight:700;
+}
+.cs-kpi-v,.cs-bignum,.cs-p3-k,.cs-scard-c,.cs-verdict-v,.cs-scname{font-size:20px;letter-spacing:-.01em}
+.cs-stat-v,.cs-cvbig b,.cs-h1{font-size:28px}
+.cs-tdmid b,.cs-mi-k,.cs-nr-k,.cs-ovl-v,.cs-opp-v,.cs-tdfig b,.cs-scfig b{font-size:20px}
+.cs-eyebrow,.cs-lab,.cs-lab2,.cs-kpi-l,.cs-stat-l,.cs-cvbig span,.cs-scmeta,
+.cs-tdfig span,.cs-scfig span,.cs-scard-f,.cs-supr,.cs-suphead span,.cs-supcount{
+  font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+}
+
+/* ---- 4.1 / 4.2 equal-height rows, scroll inside the body ---- */
+.cs-row2,.cs-paretorow,.cs-screl{align-items:stretch}
+.cs-row2>.cs-card,.cs-paretorow>.cs-card,.cs-screl>.cs-card{margin-bottom:0}
+.cs-row2>.cs-card>.cs-cardbd,.cs-paretorow>.cs-card>.cs-cardbd,
+.cs-screl>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin}
