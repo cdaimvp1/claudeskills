@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<title>Market &amp; Risk — layout options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --plum:#5C2B50; --plum-dk:#3E1C36; --plum-l:#7A3C6B;
+ --teal:#2F6E6B; --teal-deep:#1F4A48; --emph:#C15E19; --emph-tx:#A2500F;
+ --plum-t:#C6B5C2; --teal-t:#B6CCCB; --emph-t:#ECCFBA;
+ --plum-band:#DDCFDA; --teal-band:#CFE0DE; --emph-band:#ECCFBA;
+ --plum-rule:#B99CB0; --teal-rule:#9FBFBC; --emph-rule:#C68A55;
+ --well:#F4F1EC; --nested:#EDE8E0; --rule:#E2DCD4; --line2:#CECCC7;
+ --ink:#1A1A1A; --mut:#5B534C; --mut2:#4A443C; --surface:#fff; --track:#E7E3DC;
+ --sans:'Libre Franklin',system-ui,sans-serif; --mono:'Roboto Mono',monospace;
+ --shadow:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;background:#E2E6E1;font-family:var(--sans);color:var(--ink);font-size:13px}
+.wrap{max-width:1320px;margin:0 auto;padding:28px 40px 70px}
+h1{font-size:28px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+.sub{font-size:13px;color:var(--mut);margin:0 0 6px;max-width:88ch;line-height:1.55}
+.opt{margin:34px 0 0}
+.opth{display:flex;align-items:baseline;gap:10px;border-left:3px solid var(--plum);padding-left:11px;margin-bottom:6px}
+.opth b{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.opth span{font-size:11px;color:var(--mut)}
+.rec{background:var(--emph);color:#fff;font:700 11px var(--mono);letter-spacing:.06em;
+ text-transform:uppercase;border-radius:30px;padding:2px 9px}
+.why{font-size:13px;color:var(--mut2);line-height:1.6;margin:0 0 12px;max-width:92ch}
+.card{background:var(--surface);border:1px solid var(--line2);border-left:3px solid var(--plum);
+ border-radius:8px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+.card.teal{border-left-color:var(--teal)} .card.emph{border-left-color:var(--emph)}
+.hd{display:flex;align-items:center;gap:9px;padding:12px 15px;
+ background:linear-gradient(180deg,var(--plum-band),var(--surface));border-bottom:1px solid var(--plum-rule)}
+.card.teal .hd{background:linear-gradient(180deg,var(--teal-band),var(--surface));border-bottom-color:var(--teal-rule)}
+.card.emph .hd{background:linear-gradient(180deg,var(--emph-band),var(--surface));border-bottom-color:var(--emph-rule)}
+.hd .ct{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--plum)}
+.card.teal .hd .ct{color:var(--teal)} .card.emph .hd .ct{color:var(--emph-tx)}
+.hd .cs{margin-left:auto;font-size:11px;color:var(--mut)}
+.hd.solid{background:var(--plum);border-bottom:none}
+.hd.solid .ct{color:#F3ECF1} .hd.solid .cs{color:#E2CFDD}
+.bd{padding:13px 15px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:stretch}
+.rowA{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;align-items:stretch}
+.sect{margin:22px 0 10px;border-left:3px solid var(--plum);padding-left:11px}
+.sect b{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.lbl{font:700 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut2)}
+.big{font:700 20px var(--mono);letter-spacing:-.01em}
+.disp{font:700 28px var(--mono);letter-spacing:-.015em}
+.note{font-size:11px;color:var(--mut);line-height:1.5;margin-top:9px}
+/* kraljic */
+.kg{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-width:420px}
+.kc{border:1px solid var(--line2);border-radius:8px;padding:10px 12px;background:var(--well)}
+.kc.on{border:2px solid var(--plum);background:var(--surface)}
+.kc b{display:block;font-size:13px;font-weight:700;color:var(--mut)}
+.kc.on b{color:var(--plum)}
+.kc span{display:block;font-size:11px;color:var(--mut);margin-top:3px;line-height:1.4}
+.kax{display:flex;justify-content:space-between;max-width:420px;margin-top:5px}
+/* forces */
+.f{border-top:1px solid var(--rule);padding:9px 0}.f:first-child{border-top:0;padding-top:0}
+.fh{display:flex;align-items:center;gap:10px}
+.fn{font-size:13px;font-weight:700;min-width:150px}
+.bar{flex:1;max-width:210px;height:9px;border-radius:5px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px}
+.pill{font:700 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;border-radius:30px;padding:2px 9px}
+.p-e{background:var(--emph);color:#fff}.p-p{background:var(--plum-t);color:var(--plum-dk)}.p-t{background:var(--teal-t);color:var(--teal-deep)}
+.fd{font-size:11px;color:var(--mut);line-height:1.5;margin-top:4px}
+/* leverage */
+.lev{position:relative;height:9px;border-radius:5px;margin:12px 0 26px;max-width:440px;
+ background:linear-gradient(90deg,var(--emph),#C9C2B8,var(--teal))}
+.lev i{position:absolute;top:-5px;width:3px;height:19px;background:var(--ink);border-radius:2px}
+.lev s{position:absolute;top:14px;font:700 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);text-decoration:none}
+/* risk */
+.rk{width:100%;max-width:380px;height:auto}
+.rl{list-style:none;margin:8px 0 0;padding:0;font-size:11px;color:var(--mut);columns:2;column-gap:20px}
+.rl li{margin-bottom:3px;break-inside:avoid}.rl li b{color:var(--emph);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--plum-t);color:var(--plum-dk);font:700 11px var(--mono);text-transform:uppercase;
+ letter-spacing:.07em;padding:7px 10px;text-align:left}
+td{padding:8px 10px;border-bottom:1px solid var(--rule)}
+tbody tr:nth-child(even) td{background:var(--well)}
+.mi{border-top:3px solid var(--plum);padding-top:9px}
+.mi b{display:block;font:700 20px var(--mono);color:var(--emph);letter-spacing:-.01em}
+.mi u{display:block;font-size:13px;font-weight:700;text-decoration:none;margin-top:2px;line-height:1.3}
+.mi span{display:block;font-size:11px;color:var(--mut);margin-top:5px;line-height:1.5}
+.cite{display:inline-block;font:700 11px var(--mono);letter-spacing:.03em;text-transform:uppercase;
+ color:var(--teal);border:1px solid var(--teal);border-radius:30px;padding:1px 8px;margin-top:7px}
+.acc{border:1px solid var(--line2);border-radius:8px;margin-bottom:7px;overflow:hidden;background:var(--surface)}
+.acch{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--well);cursor:pointer}
+.acch b{font-size:13px;font-weight:700;flex:1}
+.accb{padding:10px 12px;font-size:13px;line-height:1.55;color:var(--mut2);border-top:1px solid var(--rule)}
+.strip{display:flex;gap:0;border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:var(--surface)}
+.strip div{flex:1;padding:11px 13px;border-right:1px solid var(--rule)}
+.strip div:last-child{border-right:0}
+.tag{font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut2)}
+</style></head><body><div class="wrap">
+
+<h1>Market &amp; Risk — layout options</h1>
+<p class="sub">Options for every panel on <b>Market &amp; Kraljic</b>, <b>Porter Five Forces</b> and
+<b>Risk Register</b>, plus the case for collapsing the three into one. Illustrative content;
+the point is the shape, not the numbers.</p>
+
+<!-- ============================================================ -->
+<div class="sect"><b>The condensation question</b></div>
+<p class="why">Those three screens answer one question: <b>what is the supply market doing to us, and
+what does that mean for how we buy?</b> Kraljic gives the structural position, Porter explains why that
+position exists, and the risk register says what would change it. Split across three tabs, the reader
+holds the Kraljic verdict in their head while reading Porter, then holds both while reading risk.<br><br>
+Merging alone would put <b>10 panels</b> on one screen, which is worse. Two are duplicates:
+<b>Pricing Environment</b> is the unsourced version of <b>Market Intelligence</b>, and
+<b>Net Buyer Leverage</b> is nothing more than the read of the <b>Five Forces</b>. Fold those and it is
+7 panels in three named bands, which is exactly what the section-divider rule is for.</p>
+
+<div class="opt">
+ <div class="opth"><b>Option 1 — one tab, three bands</b><span class="rec">Recommended</span>
+  <span>7 panels · Market &amp; Risk replaces three subtabs</span></div>
+ <p class="why">One screen, read top to bottom as an argument: where we stand, what the market is doing,
+ what would change it. Each band is a question, not a data type.</p>
+
+ <div class="sect"><b>Where we stand</b></div>
+ <div class="rowA">
+  <div class="card"><div class="hd solid"><span class="ct">Category position</span><span class="cs">Kraljic · leverage</span></div>
+   <div class="bd">
+    <div class="kg">
+     <div class="kc on"><b>Leverage</b><span>High spend, many sources. Compete it.</span></div>
+     <div class="kc"><b>Strategic</b><span>High spend, few sources.</span></div>
+     <div class="kc"><b>Routine</b><span>Low spend, many sources.</span></div>
+     <div class="kc"><b>Bottleneck</b><span>Low spend, few sources.</span></div>
+    </div>
+    <div class="kax"><span class="lbl">supply risk</span><span class="lbl">profit impact</span></div>
+    <div class="note"><b>What that means.</b> Competitive pressure and consolidation are the levers,
+    not breaking a monopoly. Benchmark often and time the renewals.</div>
+   </div></div>
+  <div class="card teal"><div class="hd"><span class="ct">Supply-market leverage</span><span class="cs">Porter · merged</span></div>
+   <div class="bd">
+    <div class="big" style="color:var(--teal)">Buyer has room</div>
+    <div class="lev"><i style="left:68%"></i><s style="left:0">supplier holds</s><s style="right:0">buyer has room</s></div>
+    <div class="f"><div class="fh"><span class="fn">Rivalry</span>
+      <span class="bar"><i style="width:86%;background:var(--emph)"></i></span><span class="pill p-e">High</span></div></div>
+    <div class="f"><div class="fh"><span class="fn">Supplier power</span>
+      <span class="bar"><i style="width:71%;background:var(--plum)"></i></span><span class="pill p-p">Med-High</span></div></div>
+    <div class="f"><div class="fh"><span class="fn">Substitutes</span>
+      <span class="bar"><i style="width:57%;background:var(--plum)"></i></span><span class="pill p-p">Medium</span></div></div>
+    <div class="f"><div class="fh"><span class="fn">New entrants</span>
+      <span class="bar"><i style="width:43%;background:var(--teal)"></i></span><span class="pill p-t">Low-Med</span></div></div>
+    <div class="f"><div class="fh"><span class="fn">Buyer power</span>
+      <span class="bar"><i style="width:71%;background:var(--plum)"></i></span><span class="pill p-p">Med-High</span></div></div>
+   </div></div>
+ </div>
+
+ <div class="sect"><b>What the market is doing</b></div>
+ <div class="card"><div class="hd"><span class="ct">Market intelligence</span><span class="cs">read 27 Jul 2026 · sourced</span></div>
+  <div class="bd"><div class="row3">
+   <div class="mi"><b>15%+</b><u>The routine renewal bump is gone</u>
+    <span>What was a 5 to 7 per cent increase is now commonly 15 or more.</span><a class="cite">BayTech</a></div>
+   <div class="mi"><b>78%</b><u>AI charges arrive after signature</u>
+    <span>78% of IT leaders saw unexpected consumption or AI charges last year.</span><a class="cite">Zylo</a></div>
+   <div class="mi"><b>9-33%</b><u>Megavendors fund AI from the base</u>
+    <span>Microsoft raised M365 list 9 to 33 per cent from July 2026.</span><a class="cite">Lynton</a></div>
+  </div>
+  <div class="note"><b>Pricing environment folded in here.</b> The old prose panel said the same thing
+  without a source. Every claim on this panel links to one.</div></div></div>
+
+ <div class="sect"><b>What would change it</b></div>
+ <div class="card emph"><div class="hd"><span class="ct">What could change the strategy</span><span class="cs">timing-critical</span></div>
+  <div class="bd" style="font-size:13px;line-height:1.6">GenAI price inflation and the Microsoft 1 July
+  increase are both high likelihood and high impact, and both are on a clock.</div></div>
+ <div class="row2">
+  <div class="card"><div class="hd"><span class="ct">Risk heat map</span><span class="cs">likelihood × impact</span></div>
+   <div class="bd"><svg class="rk" viewBox="0 0 300 200">
+    <rect x="150" y="10" width="140" height="90" fill="var(--emph)" opacity=".07"/>
+    <line x1="30" y1="180" x2="290" y2="180" stroke="var(--line2)"/><line x1="30" y1="10" x2="30" y2="180" stroke="var(--line2)"/>
+    <circle cx="230" cy="45" r="13" fill="var(--emph)"/><text x="230" y="49" text-anchor="middle" font-size="11" fill="#fff" font-family="Roboto Mono">1</text>
+    <circle cx="195" cy="70" r="13" fill="var(--emph)"/><text x="195" y="74" text-anchor="middle" font-size="11" fill="#fff" font-family="Roboto Mono">2</text>
+    <circle cx="120" cy="105" r="13" fill="var(--plum)"/><text x="120" y="109" text-anchor="middle" font-size="11" fill="#fff" font-family="Roboto Mono">3</text>
+    <circle cx="90" cy="140" r="13" fill="var(--plum)"/><text x="90" y="144" text-anchor="middle" font-size="11" fill="#fff" font-family="Roboto Mono">4</text>
+    <text x="160" y="196" text-anchor="middle" font-size="11" fill="var(--mut2)" font-family="Libre Franklin">Likelihood</text>
+   </svg>
+   <ol class="rl"><li><b>1 GenAI price inflation</b></li><li><b>2 Microsoft 1 Jul increase</b></li>
+    <li>3 AI data-governance</li><li>4 Tail sprawl</li></ol></div></div>
+  <div class="card"><div class="hd"><span class="ct">Escalation triggers</span><span class="cs">4 triggers</span></div>
+   <div class="bd">
+    <div class="strip" style="flex-direction:column">
+     <div><span class="tag">Above 6% uplift</span><div style="margin-top:3px">Escalate to CIO, open the multi-year lock</div></div>
+     <div><span class="tag">Above $8M unbudgeted</span><div style="margin-top:3px">Freeze new AI SKUs</div></div>
+    </div></div></div>
+ </div>
+ <div class="card"><div class="hd"><span class="ct">Risk register</span><span class="cs">7 risks · with mitigation</span></div>
+  <div class="bd"><table><thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+   <tbody><tr><td>GenAI price inflation</td><td><span class="pill p-e">High</span></td><td><span class="pill p-e">High</span></td><td>Cap AI uplift at renewal</td></tr>
+   <tr><td>Tail sprawl</td><td><span class="pill p-p">Medium</span></td><td><span class="pill p-p">Medium</span></td><td>Catalogue funnel</td></tr></tbody></table></div></div>
+</div>
+
+<!-- ============================================================ -->
+<div class="opt">
+ <div class="opth"><b>Option 2 — one tab, verdict strip on top</b><span>7 panels · the answer before the evidence</span></div>
+ <p class="why">Same content, but the three verdicts are pulled out of their panels into one strip at the
+ top, so the whole tab is answered in one line before any chart. Everything below becomes the supporting
+ case. Stronger for an executive read; weaker if someone wants to work through the analysis in order.</p>
+ <div class="strip" style="margin-bottom:12px">
+  <div><span class="tag">Position</span><div class="big" style="color:var(--plum)">Leverage</div>
+   <div class="note" style="margin-top:2px">Compete it, do not break it</div></div>
+  <div><span class="tag">Leverage</span><div class="big" style="color:var(--teal)">Buyer has room</div>
+   <div class="note" style="margin-top:2px">Alternatives exist</div></div>
+  <div><span class="tag">Top risk</span><div class="big" style="color:var(--emph)">2 on a clock</div>
+   <div class="note" style="margin-top:2px">GenAI inflation · 1 Jul increase</div></div>
+ </div>
+ <div class="card"><div class="hd"><span class="ct">Supporting analysis</span><span class="cs">Kraljic · Porter · market · risk, below</span></div>
+  <div class="bd" style="color:var(--mut);font-size:13px">Panels from Option 1 follow in the same three bands.</div></div>
+</div>
+
+<!-- ============================================================ -->
+<div class="opt">
+ <div class="opth"><b>Option 3 — keep three subtabs, restyle only</b><span>10 panels · no merge</span></div>
+ <p class="why">The conservative path: leave the structure alone and fix only the panel layouts below.
+ Costs nothing to reverse, but keeps the duplication (Pricing Environment vs Market Intelligence,
+ Net Buyer Leverage vs Five Forces) and keeps the argument split across three clicks.</p>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect"><b>Per-panel options, if you keep them separate</b></div>
+
+<div class="opt">
+ <div class="opth"><b>Kraljic — A: quadrant grid</b><span class="rec">Current</span></div>
+ <p class="why">Position is shown, not asserted. Reads at a glance; uses vertical space for a 2×2 that
+ carries four short labels.</p>
+ <div class="card"><div class="hd"><span class="ct">Category position</span></div><div class="bd">
+  <div class="kg"><div class="kc on"><b>Leverage</b><span>High spend, many sources</span></div>
+  <div class="kc"><b>Strategic</b><span>High spend, few sources</span></div>
+  <div class="kc"><b>Routine</b><span>Low spend, many sources</span></div>
+  <div class="kc"><b>Bottleneck</b><span>Low spend, few sources</span></div></div></div></div>
+</div>
+
+<div class="opt">
+ <div class="opth"><b>Kraljic — B: position on a plotted axis</b><span>shows how far into the quadrant</span></div>
+ <p class="why">A grid says which box. A plot says <i>where in the box</i>, and how close to tipping into
+ the next one. Useful when the argument is "we are leverage today, but only just".</p>
+ <div class="card"><div class="hd"><span class="ct">Category position</span><span class="cs">plotted</span></div><div class="bd">
+  <svg viewBox="0 0 320 200" style="width:100%;max-width:420px">
+   <line x1="160" y1="10" x2="160" y2="180" stroke="var(--line2)" stroke-dasharray="3 4"/>
+   <line x1="30" y1="95" x2="300" y2="95" stroke="var(--line2)" stroke-dasharray="3 4"/>
+   <text x="34" y="22" font-size="11" fill="var(--mut)" font-family="Libre Franklin">Leverage</text>
+   <text x="296" y="22" font-size="11" fill="var(--mut)" text-anchor="end" font-family="Libre Franklin">Strategic</text>
+   <text x="34" y="174" font-size="11" fill="var(--mut)" font-family="Libre Franklin">Routine</text>
+   <text x="296" y="174" font-size="11" fill="var(--mut)" text-anchor="end" font-family="Libre Franklin">Bottleneck</text>
+   <circle cx="96" cy="46" r="11" fill="var(--plum)"/>
+   <text x="112" y="50" font-size="11" fill="var(--ink)" font-family="Libre Franklin">Software, this category</text>
+   <line x1="30" y1="180" x2="300" y2="180" stroke="var(--line2)"/><line x1="30" y1="10" x2="30" y2="180" stroke="var(--line2)"/>
+  </svg>
+  <div class="note">Close to the vertical divide: supply risk is rising with megavendor bundling. Another
+  cycle of consolidation moves this category toward Strategic, where the play changes.</div></div></div>
+</div>
+
+<div class="opt">
+ <div class="opth"><b>Porter — A: scored rows</b><span class="rec">Current, merged with the verdict</span></div>
+ <p class="why">Bar length is the score, so the strongest constraint is obvious without reading. Sorting
+ strongest-first means the top row is always the thing to negotiate against.</p>
+</div>
+
+<div class="opt">
+ <div class="opth"><b>Porter — B: radar</b><span>shape at a glance, harder to read a value</span></div>
+ <p class="why">A radar shows the <i>shape</i> of the market in one mark, which is good for comparing two
+ categories side by side. It is worse at answering "how strong is supplier power exactly", and five axes
+ on a small chart get cramped. I would use this only if category-to-category comparison becomes a job
+ this dashboard has to do.</p>
+ <div class="card"><div class="hd"><span class="ct">Five forces</span><span class="cs">radar</span></div><div class="bd">
+  <svg viewBox="0 0 240 200" style="width:100%;max-width:300px">
+   <polygon points="120,30 200,90 170,175 70,175 40,90" fill="none" stroke="var(--line2)"/>
+   <polygon points="120,55 178,95 152,158 88,150 66,98" fill="var(--plum)" opacity=".22" stroke="var(--plum)" stroke-width="2"/>
+   <text x="120" y="22" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Rivalry</text>
+   <text x="212" y="92" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Supplier</text>
+   <text x="176" y="190" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Substitutes</text>
+   <text x="64" y="190" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Entrants</text>
+   <text x="28" y="92" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Buyer</text>
+  </svg></div></div>
+</div>
+
+<div class="opt">
+ <div class="opth"><b>Risk — A: heat map plus register</b><span class="rec">Current</span></div>
+ <p class="why">The map answers "which two matter", the table answers "what do we do". Two panels because
+ they are two questions.</p>
+</div>
+
+<div class="opt">
+ <div class="opth"><b>Risk — B: single accordion, ranked</b><span>one panel, no map</span></div>
+ <p class="why">Ranks by likelihood × impact and puts mitigation, trigger and owner inside each row. One
+ panel instead of three, and nothing is hidden — but you lose the at-a-glance read of which risks cluster
+ in the act-now corner.</p>
+ <div class="card"><div class="hd"><span class="ct">Risks, ranked</span><span class="cs">7 · open one for mitigation and trigger</span></div><div class="bd">
+  <div class="acc"><div class="acch"><span class="pill p-e">High · High</span><b>GenAI price inflation in renewals</b>
+   <span class="lbl">IT finance</span></div>
+   <div class="accb"><b>Mitigation.</b> Cap AI uplift at renewal; require an AI-free SKU quote in writing.<br>
+    <b>Trigger.</b> Unbudgeted AI or consumption charges above $8M rolling 12 months.</div></div>
+  <div class="acc"><div class="acch"><span class="pill p-e">High · High</span><b>Microsoft 1 July 2026 increase</b>
+   <span class="lbl">Category lead</span></div></div>
+  <div class="acc"><div class="acch"><span class="pill p-p">Med · High</span><b>AI data-governance and training rights</b>
+   <span class="lbl">Legal</span></div></div>
+ </div></div>
+</div>
+
+<div class="opt">
+ <div class="opth"><b>Risk — C: register with an inline severity spine</b><span>table only, no map, no accordion</span></div>
+ <p class="why">Densest of the three. Severity is a coloured spine on the row rather than two pill columns,
+ which frees the width for mitigation to be readable instead of truncated.</p>
+ <div class="card"><div class="hd"><span class="ct">Risk register</span></div><div class="bd">
+  <table><thead><tr><th>Risk</th><th>Score</th><th>Mitigation</th><th>Trigger</th></tr></thead><tbody>
+   <tr><td style="box-shadow:inset 3px 0 0 var(--emph)"><b>GenAI price inflation</b></td>
+    <td style="font-family:var(--mono);font-weight:700">9</td>
+    <td>Cap AI uplift at renewal</td><td>Above $8M unbudgeted</td></tr>
+   <tr><td style="box-shadow:inset 3px 0 0 var(--emph)"><b>Microsoft 1 Jul increase</b></td>
+    <td style="font-family:var(--mono);font-weight:700">9</td>
+    <td>Lock pre-1 July</td><td>Above 6% effective uplift</td></tr>
+   <tr><td style="box-shadow:inset 3px 0 0 var(--plum)"><b>Tail sprawl</b></td>
+    <td style="font-family:var(--mono);font-weight:700">4</td>
+    <td>Catalogue funnel</td><td>Above 550 vendors</td></tr>
+  </tbody></table></div></div>
+</div>
+
+</div></body></html>
