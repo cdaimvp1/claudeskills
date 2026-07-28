@@ -7,6 +7,22 @@ Consolidated 2026-07-24 (evening) from ALL trackers/build-plans + a skills-updat
 ## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-27)
 If the session restarted/compacted, this is where things stand.
 
+**>>> RESUME 2026-07-28 — READ `SESSION-HANDOFF.md` FIRST <<<**
+
+`SESSION-HANDOFF.md` carries verified state, build commands per dashboard, the
+next action, and seven traps that already cost time once. Do not re-derive them.
+
+NEXT ACTION: **Deal #12** Communications filters + Expand-all. Then #11 Positions
+port, then #16 verification + malicious-code sweep, then #17 lock.
+
+Done and verified 2026-07-28: Category Strategy restructure (5 tabs, Market & Risk
+merged to one segmented screen, market-data line items, restyle protocol, type
+ladder 11/13/20/28); restyle layer on RFx/Deal/Landscape; Landscape L1/L2 recolour
+(194 hex) + ownership tree un-nested + OV1 launcher removed; Deal #14 pale-fill
+sweep complete at the token layer.
+
+Strategy & Plays on Category Strategy is LOCKED. Leave it exactly as built.
+
 **>>> RESUME 2026-07-27 (restart / NEW conversation) — START HERE <<<**
 - **RFx + Deal dashboards LOCKED (light-only, no dark mode); Landscape built (WS2 uplift pending).** All the HTMLs
   are in `C:\Users\marcs\OneDrive\Desktop\dashboards`: the 3 locked hubs (rfx/deal/landscape), the skill
