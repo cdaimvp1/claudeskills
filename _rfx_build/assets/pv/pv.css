@@ -2241,3 +2241,143 @@ button,input,select,textarea{font-family:inherit;font-size:13px}
 
 /* type scale: <small>/<sub>/<sup> must not inherit a fractional em size */
 small,sub,sup{font-size:9px}
+
+/* =============================================================================
+   RESTYLE PROTOCOL LAYER — theo dashboards restyle protocol
+   Appended last so it wins without !important. CSS only; no markup touched.
+
+   Marc's caveat: where a panel already meets the protocol, only its header
+   changes. So this layer is tokens, headers, tabs, type, tables, chips, bars,
+   rows and scroll. It does not restructure panel bodies that already work.
+   ============================================================================= */
+:root{
+  /* structural hues, unchanged */
+  --plum:#5C2B50;      --plum-l:#7A3C6B;    --plum-dk:#3E1C36;
+  --teal-d:#2F6E6B;    --teal-l:#4A8F8B;    --teal-deep:#1F4A48;
+  --emph:#C15E19;      --emph-tx:#A2500F;
+
+  /* ROLE TINTS at the protocol floor. The old values were ~10% over white and
+     disappeared on a projector. Never go paler than these. */
+  --plum-t:#C6B5C2;    --teal-t:#B6CCCB;    --emph-t:#ECCFBA;
+  --plum-band:#DDCFDA; --teal-band:#CFE0DE; --emph-band:#ECCFBA;
+  --plum-rule:#B99CB0; --teal-rule:#9FBFBC; --emph-rule:#C68A55;
+
+  --well:#F4F1EC;      --rule:#E2DCD4;      --line2:#CECCC7;
+  --track:#E7E3DC;     --tab-idle:#6E6862;
+  --pri-fg:#F3ECF1;    --sec-fg:#EAF4F2;
+  --shadow-card:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
+
+  /* supplier identity hues: which supplier, never whether it is good */
+  --sup-1:#7A2436; --sup-2:#123C82; --sup-3:#5A6B33; --sup-4:#8A6A1F; --sup-5:#4A5A6B;
+}
+
+/* ---- 3.1 panel: full-height left spine, never a top border ---- */
+.sa-card,.card,.statusblk,.pvpt-card{
+  border:1px solid var(--line2);
+  border-left:3px solid var(--plum);
+  border-radius:8px;
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+  border-top-width:1px;
+  border-top-color:var(--line2);
+}
+.sa-card.accent-teal,.card.accent-teal{border-left-color:var(--teal-d)}
+.sa-card.accent-emph,.card.accent-emph,.sa-card.accent-warn,.sa-card.accent-danger{border-left-color:var(--emph)}
+
+/* ---- 3.2 panel header. Reaches every header class these three dashboards
+        actually emit: Deal's .card-hd, and RFx/Landscape's .glabhd, .rshd,
+        .ovpart-hd and .pvpt-hd. Panels whose header is an inline-styled div
+        cannot be reached from CSS and need a renderer pass. ---- */
+.card-hd,.pvpt-hd{
+  background:linear-gradient(180deg,var(--plum-band),var(--surface,#fff));
+  border-bottom:1px solid var(--plum-rule);
+  padding:12px 15px;
+}
+.card-hd .ct,.card-hd .t,.pvpt-hd .t,.glabhd,.rshd,.ovpart-hd{
+  font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--plum);
+}
+.card-hd .cs{font-size:11px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut)}
+.card-hd .ch-ic{width:17px;height:17px;flex:none;color:var(--plum)}
+.card-hd .ch-ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+
+.sa-card.accent-teal .card-hd{
+  background:linear-gradient(180deg,var(--teal-band),var(--surface,#fff));
+  border-bottom-color:var(--teal-rule);
+}
+.sa-card.accent-teal .card-hd .ct,.sa-card.accent-teal .card-hd .ch-ic{color:var(--teal-d)}
+.sa-card.accent-emph .card-hd,.sa-card.accent-warn .card-hd,.sa-card.accent-danger .card-hd{
+  background:linear-gradient(180deg,var(--emph-band),var(--surface,#fff));
+  border-bottom-color:var(--emph-rule);
+}
+.sa-card.accent-emph .card-hd .ct,.sa-card.accent-emph .card-hd .ch-ic,
+.sa-card.accent-warn .card-hd .ct,.sa-card.accent-danger .card-hd .ct{color:var(--emph-tx)}
+.card-hd.solid{background:var(--plum);border-bottom:none}
+.card-hd.solid .ct,.card-hd.solid .ch-ic{color:var(--pri-fg)}
+.card-hd.solid .cs{color:#E2CFDD}
+
+/* ---- 3.5 section dividers ---- */
+.secthd .t{
+  font:700 9px var(--mono,ui-monospace);letter-spacing:.02em;text-transform:capitalize;
+  color:var(--mut);padding-left:10px;border-left:3px solid var(--plum);line-height:1.15;
+}
+
+/* ---- 3.6 nested blocks off white ---- */
+.card-bd .kv,.card-bd .ovfact,.card-bd .ovrp,.card-bd .insight,
+.accard,.aqacard,.ptccard,.draftcard{background:var(--well);border-radius:6px}
+
+/* ---- 3.7 tables ---- */
+.tabbody table:not(.pvpt) th,.dt th,.mx th{
+  background:var(--plum-t);color:var(--plum-dk);
+  font:700 9px var(--mono,ui-monospace);text-transform:uppercase;letter-spacing:.08em;
+  padding:7px 10px;text-align:left;
+}
+.sa-card.accent-teal .dt th{background:var(--teal-t);color:var(--teal-deep)}
+.dt td,.mx td{padding:8px 10px;border-bottom:1px solid var(--rule);font-size:13px}
+.zebra tbody tr:nth-child(even){background:var(--well)}
+
+/* ---- 3.8 chips. There is no red in the system: every red/pink chip becomes
+        solid burnt orange. ---- */
+.gate,.tier,.chip{
+  font:700 9px var(--mono,ui-monospace);text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 9px;border-radius:30px;white-space:nowrap;
+}
+.chip.neutral{background:var(--plum-t);color:var(--plum-dk)}
+.chip.good{background:var(--teal-t);color:var(--teal-deep)}
+.chip.attention,.gate.fail{background:var(--emph);color:#fff;border-color:var(--emph)}
+
+/* ---- 3.9 bars: length is the measurement, colour is who ---- */
+.mxbar,.csz-track{background:var(--track)}
+
+/* ---- 3.10 tabs and subtabs: medium grey idle, black label and black underline
+        when active, at every level. overflow-y:hidden is mandatory: overflow-x
+        alone computes overflow-y:auto and a 1px height difference then shows a
+        stray vertical scrollbar. ---- */
+.tabs,.rfxstbar,.tabbar,.pvsubtabs,.ddtabs,.dmodes{
+  display:flex;gap:4px;border-bottom:1px solid var(--line2);
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;
+}
+.tab,.rfxst,.pvsubtab,.ddtab,.tab-btn,.dmode{
+  font-size:13px;font-weight:600;color:var(--tab-idle);background:transparent;border:none;
+  border-bottom:3px solid transparent;padding:9px 12px;cursor:pointer;margin-bottom:-1px;
+  white-space:nowrap;border-radius:0;
+}
+.tab:hover,.rfxst:hover,.pvsubtab:hover,.ddtab:hover,.tab-btn:hover,.dmode:hover{color:var(--ink)}
+.tab.on,.rfxst.on,.pvsubtab.on,.ddtab.on,.dmode.on,
+.tab-btn[aria-selected="true"],.subtab-btn[aria-selected="true"]{
+  color:var(--ink);font-weight:700;border-bottom-color:var(--ink);background:transparent;
+}
+
+/* ---- 4.1 / 4.2 equal-height rows, overflow inside the panel body ---- */
+.row{align-items:stretch}
+.card-bd-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin}
+
+/* The chrome stylesheet is concatenated AFTER this one at build time, so a
+   plain :root block loses to it. html:root outranks :root at equal source
+   order and wins regardless. */
+html:root{
+  --plum-t:#C6B5C2; --teal-t:#B6CCCB; --emph-t:#ECCFBA;
+  --plum-band:#DDCFDA; --teal-band:#CFE0DE; --emph-band:#ECCFBA;
+  --plum-rule:#B99CB0; --teal-rule:#9FBFBC; --emph-rule:#C68A55;
+  --well:#F4F1EC; --rule:#E2DCD4; --line2:#CECCC7; --track:#E7E3DC; --tab-idle:#6E6862;
+  --shadow-card:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
+}
