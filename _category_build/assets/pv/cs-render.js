@@ -224,7 +224,7 @@ var CS_NAV = [
   ['overview', 'Overview',          null],
   ['spend',    'Spend & Suppliers', [['pareto', 'Pareto & Tail'], ['suppliers', 'Suppliers'], ['subcats', 'Subcategories']]],
   ['trend',    'Trend & Change',    [['trend', 'Trend'], ['rational', 'Rationalization'], ['tail', 'Tail & Contracts']]],
-  ['market',   'Market & Risk',     [['kraljic', 'Market & Kraljic'], ['porter', 'Porter Five Forces'], ['risk', 'Risk Register']]],
+  ['market',   'Market & Risk',     null],
   ['strategy', 'Strategy & Plays',  [['strategy', 'Strategy'], ['savings', 'Savings & Scorecard']]]
 ];
 var CS_SUBSTATE = { spend: 'pareto', market: 'kraljic', strategy: 'strategy', trend: 'trend' };
@@ -385,74 +385,6 @@ function scSuppliers() {
    SCREEN 4 - SPEND & SUPPLIERS > SUBCATEGORIES
    Map on the left, detail pane on the right; both below with csSubcatPane.
    =========================================================================== */
-
-/* ===========================================================================
-   SCREEN 5 — MARKET & RISK > MARKET & KRALJIC
-   =========================================================================== */
-function scKraljic() {
-  var d = csData(), n = d.narr || {};
-  var h = '';
-
-  h += csCard('Category Positioning', csKraljicGrid(d),
-      { icon: 'balance', role: 'solid', sub: 'Kraljic', conf: csConfFor(d, 'narr') });
-
-  h += csCard('Market Intelligence', d.market ? csMarketIntel(d.market)
-      : csGap('What the supply market is doing, and what it means for this category.', 'market research records with sources'),
-      { icon: 'globe', sub: d.market ? (d.market.asOf || 'current') : '', conf: d.market ? 'Strong' : 'Limited' });
-
-  h += csCard('Pricing Environment', n.pricing ? csNarr(n.pricing)
-      : csGap('Market pricing direction and its implication for this category.', 'narr.pricing'),
-      { icon: 'money', sub: 'category read', conf: csConfFor(d, 'narr') });
-  return h;
-}
-
-/* ===========================================================================
-   SCREEN 6 — MARKET & RISK > PORTER
-   Five forces as a scored read with a net-leverage verdict, not five paragraphs.
-   =========================================================================== */
-function scPorter() {
-  var d = csData();
-  var h = '';
-  if (!(d.forces || []).length) {
-    return csCard('Porter Five Forces', csGap('Porter five-forces read for this category.', 'forces[]'));
-  }
-  h += csCard('Net Buyer Leverage', csForceVerdict(d), { icon: 'scales', role: 'solid', sub: 'the answer first', cls: 'cs-emph' });
-  h += csCard('Five Forces', csForceChart(d), { icon: 'balance', sub: 'scored, strongest constraint first', conf: csConfFor(d, 'forces') });
-  return h;
-}
-
-/* ===========================================================================
-   SCREEN 7 — MARKET & RISK > RISK REGISTER
-   =========================================================================== */
-function scRisk() {
-  var d = csData(), n = d.narr || {};
-  var h = '';
-  if (n.riskTop2) h += csCard('What Could Change the Strategy', csNarr(n.riskTop2), { icon: 'warn', role: 'emph', cls: 'cs-emph', sub: 'timing-critical' });
-
-  h += csCard('Risk Heat Map', csRiskMatrix(d), { icon: 'shield', role: 'solid', sub: 'likelihood against impact', conf: csConfFor(d, 'risks') });
-
-  var rRows = (d.risks || []).map(function (r) {
-    var hot = /high/i.test(r.l || '') && /high/i.test(r.i || '');
-    return '<tr' + (hot ? ' class="cs-st-critical"' : '') + '><td class="cs-l"><b>' + csEsc(r.risk) + '</b>'
-      + (r.driver ? '<span class="cs-sub2">' + csEsc(r.driver) + '</span>' : '') + '</td>'
-      + '<td class="cs-num"><span class="cs-pill cs-pill-' + (hot ? 'burnt' : 'plum') + '">' + csEsc(r.l) + '</span></td>'
-      + '<td class="cs-num"><span class="cs-pill cs-pill-' + (hot ? 'burnt' : 'plum') + '">' + csEsc(r.i) + '</span></td>'
-      + '<td class="cs-why">' + csEsc(r.mit) + '</td></tr>';
-  });
-  h += csCard('Risk Register', rRows.length ? csTable(['Risk', 'Likelihood', 'Impact', 'Mitigation'], rRows)
-      : csGap('Category risk register.', 'risks[]'),
-      { icon: 'flag', sub: (d.risks || []).length + ' risks', conf: csConfFor(d, 'risks') });
-
-  h += '<div class="cs-row2">'
-    + csCard('Escalation Triggers', d.triggers ? csTriggers(d.triggers)
-        : csGap('The conditions that would force a change of strategy, with the threshold for each.', 'trigger threshold per risk (risks[] carries mitigation only)'),
-        { icon: 'warn', sub: d.triggers ? d.triggers.length + ' triggers' : '', conf: d.triggers ? 'Moderate' : 'Limited' })
-    + csCard('Geographic Concentration', d.geo ? csGeo(d.geo)
-        : csGap('Supply exposure by delivery geography.', 'country / region split per supplier'),
-        { icon: 'globe', sub: d.geo ? 'delivery geography' : '', conf: d.geo ? 'Moderate' : 'Limited' })
-    + '</div>';
-  return h;
-}
 
 /* ===========================================================================
    SCREEN 8 — STRATEGY & PLAYS > STRATEGY
@@ -1759,8 +1691,8 @@ function csMarketIntel(mk) {
 /* ---- Risk heat map -------------------------------------------------------- */
 var CS_LI = { 'low': 1, 'low-medium': 1.5, 'medium-low': 1.5, 'medium': 2, 'medium-high': 2.5, 'high-medium': 2.5, 'high': 3, 'very high': 3.5 };
 function csLI(v) { var k = String(v || '').toLowerCase().trim(); return CS_LI[k] != null ? CS_LI[k] : 2; }
-function csRiskMatrix(d) {
-  var r = d.risks || [];
+function csRiskMatrix(d, rows) {
+  var r = rows || d.risks || [];
   if (!r.length) return csGap('Category risk register.', 'risks[]');
   var W = 620, H = 380, PAD = 56;
   var pw = W - PAD * 2, ph = H - PAD * 2;
@@ -2134,12 +2066,322 @@ function csSubcatTable(d) {
 }
 
 /* ===========================================================================
+   MARKET & RISK — one screen, three bands
+   Replaces the Market & Kraljic / Porter / Risk Register subtabs. Kraljic and
+   Porter share one segmentation toggle, and the selected segment filters the
+   risk band too, so the whole screen answers for one segment at a time.
+   =========================================================================== */
+var CS_SEG_MODE = 'purpose';   // purpose | delivery | lineitem
+var CS_SEG_SEL = null;         // segment key, or null for the whole category
+var CS_SEG_SIZE = 'spend';     // spend | vendors
+
+function csSegMode(m) { CS_KEEPSCROLL = true; CS_SEG_MODE = m; CS_SEG_SEL = null; csRender(); }
+function csSegPick(k) { CS_KEEPSCROLL = true; CS_SEG_SEL = (CS_SEG_SEL === k) ? null : k; csRender(); }
+function csSegSize(v) { CS_KEEPSCROLL = true; CS_SEG_SIZE = v; csRender(); }
+
+/* Business purpose is already carried in the subcategory name; the delivery
+   model is already carried in `host`. Neither needs new data. The line-item
+   view does, and says so rather than inventing one. */
+function csSegments(d) {
+  var sc = d.subcats || [];
+  if (!sc.length) return [];
+  if (CS_SEG_MODE === 'lineitem') return d.lineItems || [];
+
+  var groups = {};
+  sc.forEach(function (x) {
+    var key;
+    if (CS_SEG_MODE === 'delivery') {
+      key = /iaas/i.test(x.n) ? 'IaaS' : /paas/i.test(x.n) ? 'PaaS' : (x.host || 'Unclassified');
+    } else {
+      /* strip the delivery suffix: "Marketing/Sales SaaS" -> "Marketing / Sales" */
+      key = String(x.n).replace(/\s*(SaaS|SW|Software)\b.*$/i, '').trim();
+      if (/^IaaS$|^PaaS$/i.test(x.n)) key = 'Cloud infrastructure';
+      if (/on-prem/i.test(x.n)) key = 'IT operations';
+      key = key.replace(/\//g, ' / ');
+    }
+    var g = groups[key] || (groups[key] = { key: key, tot: 0, vc: 0, pct: 0, parts: [] });
+    g.tot += x.tot || 0; g.vc += x.vc || 0; g.pct += x.pct || 0; g.parts.push(x.n);
+  });
+  return Object.keys(groups).map(function (k) { return groups[k]; })
+    .sort(function (a, b) { return b.tot - a.tot; });
+}
+
+/* Kraljic axes, both derived from held data rather than asserted.
+
+   Profit impact = share of category spend.
+
+   Supply risk = average spend per vendor in the segment, log-scaled. A raw
+   vendor count is the wrong proxy and produced a wrong answer: Scientific
+   Research has the most vendors in the portfolio, which made it look like the
+   SAFEST segment, when 142 niche scientific tools are not 142 alternatives for
+   any one of them. Concentration is the honest read: where the money sits in a
+   few large relationships the incumbent is hard to replace, and where it is
+   spread thin across many small ones it is not. */
+function csSegKraljic(segs) {
+  var maxPct = segs.reduce(function (a, s) { return Math.max(a, s.pct || 0); }, 0) || 1;
+  var per = segs.map(function (s) { return s.vc ? (s.tot || 0) / s.vc : 0; });
+  var loP = Math.min.apply(null, per.filter(function (v) { return v > 0; }).concat([1e9]));
+  var hiP = Math.max.apply(null, per.concat([1]));
+  var span = Math.log(hiP / (loP || 1)) || 1;
+  return segs.map(function (s, i) {
+    var risk = per[i] > 0 ? Math.max(0, Math.min(1, Math.log(per[i] / loP) / span)) : 0.5;
+    return { seg: s, x: risk, y: Math.min(1, (s.pct || 0) / maxPct), perVendor: per[i] };
+  });
+}
+function csKraljicQuad(p) {
+  return p.y >= 0.5
+    ? (p.x >= 0.5 ? 'Strategic' : 'Leverage')
+    : (p.x >= 0.5 ? 'Bottleneck' : 'Routine');
+}
+
+function csSegToggle(d) {
+  var modes = [['purpose', 'Business purpose'], ['delivery', 'Delivery model'], ['lineitem', 'Line item']];
+  var has = { purpose: true, delivery: true, lineitem: !!(d.lineItems && d.lineItems.length) };
+  return '<div class="cs-segrow">'
+    + '<div class="cs-seg2">' + modes.map(function (m) {
+        var on = CS_SEG_MODE === m[0], gap = !has[m[0]];
+        return '<button class="' + (on ? 'on' : '') + (gap ? ' gap' : '') + '" onclick="csSegMode(\'' + m[0] + '\')">'
+          + csEsc(m[1]) + (gap ? ' · needs data' : '') + '</button>';
+      }).join('') + '</div>'
+    + '<div class="cs-seg2 cs-seg2-r"><span class="cs-seglab">size by</span>'
+      + [['spend', 'Spend'], ['vendors', 'Vendors']].map(function (v) {
+          return '<button class="' + (CS_SEG_SIZE === v[0] ? 'on' : '') + '" onclick="csSegSize(\'' + v[0] + '\')">'
+            + v[1] + '</button>';
+        }).join('') + '</div>'
+    + '</div>';
+}
+
+function csKraljicPlot(d) {
+  var segs = csSegments(d);
+  if (!segs.length) {
+    return csSegToggle(d) + csGap('Where each part of the category sits on supply risk against profit impact.',
+      CS_SEG_MODE === 'lineitem'
+        ? 'a unit type and unit count per invoice or rate-card line'
+        : 'subcats[] with a vendor count');
+  }
+  var pts = csSegKraljic(segs);
+  var W = 620, H = 340, PADL = 62, PADR = 26, PADT = 26, PADB = 48;
+  var pw = W - PADL - PADR, ph = H - PADT - PADB;
+  var maxSize = segs.reduce(function (a, s) {
+    return Math.max(a, CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0));
+  }, 0) || 1;
+
+  var avgX = pts.reduce(function (a, p) { return a + p.x; }, 0) / pts.length;
+  var avgY = pts.reduce(function (a, p) { return a + p.y; }, 0) / pts.length;
+
+  var dots = pts.map(function (p) {
+    var s = p.seg;
+    var v = CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0);
+    var r = 9 + 17 * Math.sqrt(v / maxSize);
+    var cx = PADL + p.x * pw, cy = PADT + ph - p.y * ph;
+    var q = csKraljicQuad(p);
+    var tone = q === 'Strategic' ? 'var(--emph)' : q === 'Leverage' ? 'var(--plum)'
+             : q === 'Bottleneck' ? 'var(--emph-tx)' : 'var(--teal)';
+    var on = CS_SEG_SEL === s.key, dim = CS_SEG_SEL && !on;
+    return '<g class="cs-kdot' + (on ? ' on' : '') + (dim ? ' dim' : '') + '" onclick="csSegPick(\''
+      + csEsc(String(s.key).replace(/'/g, "\\'")) + '\')" role="button" tabindex="0">'
+      + '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1)
+      + '" fill="' + tone + '"><title>' + csEsc(s.key + ' · ' + q + ' · ' + csUsd(s.tot)
+      + (s.vc ? ' · ' + csNum(s.vc) + ' vendors · ' + csUsd(Math.round(p.perVendor)) + ' average each' : ''))
+      + '</title></circle>'
+      + '<text x="' + cx.toFixed(1) + '" y="' + (cy + r + 13).toFixed(1) + '" class="cs-kdlab">'
+      + csEsc(String(s.key).slice(0, 22)) + '</text></g>';
+  }).join('');
+
+  return csSegToggle(d)
+    + '<div class="cs-pwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-kplot" role="img" '
+      + 'aria-label="Supply risk against profit impact by segment">'
+    + '<line x1="' + (PADL + pw / 2) + '" y1="' + PADT + '" x2="' + (PADL + pw / 2) + '" y2="' + (PADT + ph) + '" class="cs-p80h"/>'
+    + '<line x1="' + PADL + '" y1="' + (PADT + ph / 2) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph / 2) + '" class="cs-p80h"/>'
+    + csQuadLabel(PADL + 4, PADT - 10, 'start', ['Leverage', 'compete it'])
+    + csQuadLabel(W - PADR - 2, PADT - 10, 'end', ['Strategic', 'partner and protect'])
+    + csQuadLabel(PADL + 4, PADT + ph + 16, 'start', ['Routine', 'automate it'])
+    + csQuadLabel(W - PADR - 2, PADT + ph + 16, 'end', ['Bottleneck', 'secure supply'])
+    + '<circle cx="' + (PADL + avgX * pw).toFixed(1) + '" cy="' + (PADT + ph - avgY * ph).toFixed(1)
+      + '" r="15" class="cs-kavg"><title>Category average</title></circle>'
+    + '<line x1="' + PADL + '" y1="' + (PADT + ph) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
+    + '<line x1="' + PADL + '" y1="' + PADT + '" x2="' + PADL + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
+    + '<text x="' + (PADL + pw / 2) + '" y="' + (H - 6) + '" class="cs-axt">Supply risk · spend concentrated in fewer relationships to the right</text>'
+    + '<text x="14" y="' + (PADT + ph / 2) + '" class="cs-axt" transform="rotate(-90 14,' + (PADT + ph / 2) + ')">Profit impact</text>'
+    + dots + '</svg></div>'
+    + csKraljicRead(d, pts);
+}
+
+function csKraljicRead(d, pts) {
+  var n = d.narr || {};
+  var strat = pts.filter(function (p) { return csKraljicQuad(p) === 'Strategic'; });
+  var names = strat.map(function (p) { return '<b>' + csEsc(p.seg.key) + '</b>'; });
+  var list = names.length <= 1 ? names.join('')
+    : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+  var lead = strat.length
+    ? 'The category average sits in <b>' + csEsc(n.kraljicPos ? String(n.kraljicPos).toLowerCase() : 'leverage')
+      + '</b>, which reads as "compete it". Segmented, ' + list + ' sit in <b>Strategic</b>: they carry the '
+      + 'largest share of spend AND the money is concentrated in relatively few relationships, so switching '
+      + 'costs land on a small number of large contracts rather than spreading across many small ones. '
+      + 'Competing the whole segment is the wrong instrument there; the lever is renewal timing and '
+      + 'governance on the named few. That distinction is invisible at category level.'
+    : 'Every segment sits on the same side of the supply-risk divide as the category average, so the '
+      + 'category-level read holds at this grain.';
+  return '<div class="cs-read"><div class="cs-read-d">' + lead + '</div></div>'
+    + (n.kraljicImpl ? '<div class="cs-implic"><span class="cs-lab2">What that means for how we buy</span>'
+        + csNarr(n.kraljicImpl) + '</div>' : '')
+    + csNote('Profit impact is share of category spend. Supply risk is <b>average spend per vendor</b> in '
+      + 'the segment, log-scaled: where the money sits in a few large relationships the incumbent is hard '
+      + 'to replace, and where it is spread thin across many small ones it is not. A raw vendor count was '
+      + 'the obvious proxy and it was wrong, because it made Scientific Research, which has the most '
+      + 'vendors in the portfolio, look like the safest segment. Both axes are read off held data; neither '
+      + 'is a judgement.');
+}
+
+/* ---- Porter, per segment, on the same toggle ---- */
+function csForcesBySeg(d) {
+  var segs = csSegments(d);
+  var fs = d.forcesBySegment || null;
+  if (!fs) {
+    return csGap('How the five forces differ between segments, and therefore where competing works.',
+      'a five-force read per segment (forcesBySegment)');
+  }
+  var show = CS_SEG_SEL ? segs.filter(function (s) { return s.key === CS_SEG_SEL; })
+                        : segs.slice(0, 3);
+  if (!show.length) show = segs.slice(0, 3);
+  var AX = ['Rivalry', 'Supplier power', 'Substitutes', 'New entrants', 'Buyer power'];
+
+  var cards = show.map(function (s) {
+    var f = fs[s.key];
+    if (!f) return '<div class="cs-fcard"><div class="cs-fcard-t">' + csEsc(s.key) + '</div>'
+      + csGap('Five-force read for this segment.', 'forcesBySegment["' + s.key + '"]') + '</div>';
+    var R = 54, cxy = 70;
+    var pt = function (i, v) {
+      var a = (Math.PI * 2 * i / 5) - Math.PI / 2, r = (v / 3.5) * R;
+      return (cxy + r * Math.cos(a)).toFixed(1) + ',' + (cxy + r * Math.sin(a)).toFixed(1);
+    };
+    var ring = AX.map(function (_, i) { return pt(i, 3.5); }).join(' ');
+    var shape = AX.map(function (k, i) { return pt(i, csForceVal(f[k])); }).join(' ');
+    var tone = /high/i.test(f['Supplier power'] || '') ? 'var(--emph)' : 'var(--plum)';
+    return '<div class="cs-fcard">'
+      + '<svg viewBox="0 0 140 140" class="cs-radar" role="img" aria-label="' + csEsc(s.key + ' five forces') + '">'
+      + '<polygon points="' + ring + '" class="cs-rring"/>'
+      + '<polygon points="' + AX.map(function (_, i) { return pt(i, 1.75); }).join(' ') + '" class="cs-rring"/>'
+      + '<polygon points="' + shape + '" fill="' + tone + '" fill-opacity=".22" stroke="' + tone + '" stroke-width="2"/>'
+      + '</svg>'
+      + '<div class="cs-fcard-t">' + csEsc(s.key) + '</div>'
+      + '<div class="cs-fcard-d">' + csEsc(f.read || '') + '</div></div>';
+  }).join('');
+
+  return '<div class="cs-fcards">' + cards + '</div>'
+    + csNote('Five axes clockwise from the top: rivalry, supplier power, substitutes, new entrants, '
+      + 'buyer power. A larger area toward an axis means that force is stronger. One radar for the whole '
+      + 'category would average a near-monopoly and a commodity market into a market that does not exist.'
+      + (CS_SEG_SEL ? '' : ' Showing the three largest segments; select one to isolate it.'));
+}
+
+/* ---- risk, filtered by the selected segment ---- */
+function csRisksFor(d) {
+  var all = d.risks || [];
+  if (!CS_SEG_SEL) return { rows: all, filtered: false };
+  var hit = all.filter(function (r) {
+    return (r.segments || []).indexOf(CS_SEG_SEL) >= 0;
+  });
+  return { rows: hit.length ? hit : all, filtered: hit.length > 0, missing: !hit.length };
+}
+function csSegBanner(d) {
+  if (!CS_SEG_SEL) return '';
+  var segs = csSegments(d);
+  var s = segs.filter(function (x) { return x.key === CS_SEG_SEL; })[0];
+  return '<div class="cs-segbanner">'
+    + '<span class="cs-segb-k">Filtered to</span>'
+    + '<span class="cs-segb-n">' + csEsc(CS_SEG_SEL) + '</span>'
+    + (s ? '<span class="cs-segb-m">' + csUsd(s.tot) + (s.vc ? ' · ' + csNum(s.vc) + ' vendors' : '') + '</span>' : '')
+    + '<button class="cs-segb-x" onclick="csSegPick(\'' + csEsc(String(CS_SEG_SEL).replace(/'/g, "\\'")) + '\')">'
+    + 'Show whole category</button></div>';
+}
+
+/* ---- the screen ---- */
+function scMarket() {
+  var d = csData(), n = d.narr || {};
+  var h = csSegBanner(d);
+
+  h += csSect('Where we stand');
+  h += '<div class="cs-row2">'
+    + csCard('Category position', csKraljicPlot(d),
+        { icon: 'balance', role: 'solid', sub: 'Kraljic · click a segment', conf: csConfFor(d, 'subcats') })
+    + csCard('Supply-market forces', csForcesBySeg(d),
+        { icon: 'scales', role: 'teal', sub: 'Porter · same segmentation', conf: csConfFor(d, 'forces') })
+    + '</div>';
+
+  h += csSect('What the market is doing');
+  h += csCard('Market intelligence', d.market ? csMarketIntelSplit(d.market)
+      : csGap('What the supply market is doing, and what it means for this category.', 'market research records with sources'),
+      { icon: 'globe', sub: d.market ? (d.market.asOf || 'current') : '', conf: d.market ? 'Strong' : 'Limited' });
+  h += csCard('Pricing environment', n.pricing ? csNarr(n.pricing)
+      : csGap('Market pricing direction and its implication for this category.', 'narr.pricing'),
+      { icon: 'money', sub: 'category read', conf: csConfFor(d, 'narr') });
+
+  h += csSect('What would change it');
+  if (n.riskTop2) h += csCard('What could change the strategy', csNarr(n.riskTop2),
+      { icon: 'warn', role: 'emph', sub: 'timing-critical' });
+
+  var rk = csRisksFor(d);
+  h += '<div class="cs-row2">'
+    + csCard('Risk heat map', csRiskMatrix(d, rk.rows),
+        { icon: 'shield', sub: 'likelihood against impact', conf: csConfFor(d, 'risks') })
+    + csCard('Escalation triggers', d.triggers ? csTriggers(csTriggersFor(d))
+        : csGap('The conditions that would force a change of strategy, with the threshold for each.', 'trigger threshold per risk'),
+        { icon: 'warn', sub: d.triggers ? csTriggersFor(d).length + ' triggers' : '', conf: d.triggers ? 'Moderate' : 'Limited' })
+    + '</div>';
+
+  var rRows = rk.rows.map(function (r) {
+    var hot = /high/i.test(r.l || '') && /high/i.test(r.i || '');
+    return '<tr' + (hot ? ' class="cs-st-critical"' : '') + '><td class="cs-l"><b>' + csEsc(r.risk) + '</b>'
+      + (r.driver ? '<span class="cs-sub2">' + csEsc(r.driver) + '</span>' : '') + '</td>'
+      + '<td class="cs-num"><span class="cs-pill cs-pill-' + (hot ? 'burnt' : 'plum') + '">' + csEsc(r.l) + '</span></td>'
+      + '<td class="cs-num"><span class="cs-pill cs-pill-' + (hot ? 'burnt' : 'plum') + '">' + csEsc(r.i) + '</span></td>'
+      + '<td class="cs-why">' + csEsc(r.mit) + '</td></tr>';
+  });
+  h += csCard('Risk register', rRows.length ? csTable(['Risk', 'Likelihood', 'Impact', 'Mitigation'], rRows)
+      + (CS_SEG_SEL && rk.missing ? csNote('No risk on the register is tagged to <b>' + csEsc(CS_SEG_SEL)
+          + '</b>, so the whole register is shown. Tagging risks by segment would narrow this.') : '')
+      : csGap('Category risk register.', 'risks[]'),
+      { icon: 'flag', sub: rk.rows.length + ' risks' + (rk.filtered ? ' · filtered' : ''), conf: csConfFor(d, 'risks') });
+
+  h += csCard('Geographic concentration', d.geo ? csGeo(d.geo)
+      : csGap('Supply exposure by delivery geography.', 'country / region split per supplier'),
+      { icon: 'globe', sub: d.geo ? 'delivery geography' : '', conf: d.geo ? 'Moderate' : 'Limited' });
+  return h;
+}
+function csTriggersFor(d) {
+  var t = d.triggers || [];
+  if (!CS_SEG_SEL) return t;
+  var hit = t.filter(function (x) { return (x.segments || []).indexOf(CS_SEG_SEL) >= 0; });
+  return hit.length ? hit : t;
+}
+
+/* Market intelligence: the read on one side, the sourced headlines on the other. */
+function csMarketIntelSplit(mk) {
+  var acc = (mk.headlines || []).map(function (x, i) {
+    return '<details class="cs-acc"' + (i === 0 ? ' open' : '') + '>'
+      + '<summary class="cs-acch"><b>' + csEsc(x.k) + '</b><u>' + csEsc(x.t) + '</u></summary>'
+      + '<div class="cs-accb">' + csEsc(x.d)
+      + '<div class="cs-mi-s">' + (x.src || []).map(function (s) {
+          return '<a class="cs-cite" href="' + csEsc(s.u) + '" target="_blank" rel="noopener">' + csEsc(s.n) + '</a>';
+        }).join('') + '</div></div></details>';
+  }).join('');
+  var means = (mk.implications || []).length
+    ? '<div class="cs-means"><div class="cs-lab2">What it means for this category</div><ul class="cs-ul">'
+      + mk.implications.map(function (s) { return '<li>' + csEsc(s) + '</li>'; }).join('') + '</ul></div>'
+    : '';
+  return '<div class="cs-misplit">' + means + '<div class="cs-miacc">' + acc + '</div></div>'
+    + csNote('Externally sourced and dated. Every claim links to its source; nothing here is derived '
+      + 'from Lilly spend data.');
+}
+
+/* ===========================================================================
    render loop
    =========================================================================== */
 function csBody() {
   var sub = CS_SUBSTATE[CS_TAB];
   if (CS_TAB === 'spend')    return sub === 'suppliers' ? scSuppliers() : sub === 'subcats' ? scSubcats() : scPareto();
-  if (CS_TAB === 'market')   return sub === 'porter' ? scPorter() : sub === 'risk' ? scRisk() : scKraljic();
+  if (CS_TAB === 'market')   return scMarket();
   if (CS_TAB === 'strategy') return sub === 'savings' ? scSavings() : scStrategy();
   if (CS_TAB === 'trend')    return sub === 'rational' ? scRational() : sub === 'tail' ? scTail() : scTrend();
   return scOverview();

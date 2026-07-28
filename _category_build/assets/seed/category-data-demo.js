@@ -393,3 +393,88 @@
   };
   (d.subcats || []).forEach(function (x) { if (OPPS[x.n]) x.opps = OPPS[x.n]; });
 }());
+
+/* ---------------------------------------------------------------------------
+   Fourth illustrative block: the per-segment five-force reads and the segment
+   tags that let the risk band follow the Kraljic/Porter selection. A five-force
+   read per segment is a judgement, not a spend fact, so the production seed
+   carries none and those panels state the gap.
+   =========================================================================== */
+(function () {
+  if (typeof CATEGORY_SEED === 'undefined') return;
+  var d = (CATEGORY_SEED.categories || [])[0];
+  if (!d || !d.__demo) return;
+
+  d.forcesBySegment = {
+    'Marketing / Sales': {
+      'Rivalry': 'High', 'Supplier power': 'Medium', 'Substitutes': 'Medium-High',
+      'New entrants': 'Medium', 'Buyer power': 'Medium-High',
+      read: 'Balanced and genuinely contested. This is where running a real competition changes the price, and where the four-tool overlap is worth collapsing.'
+    },
+    'Cloud infrastructure': {
+      'Rivalry': 'High', 'Supplier power': 'Medium-High', 'Substitutes': 'Low-Medium',
+      'New entrants': 'Low', 'Buyer power': 'High',
+      read: 'Three credible hyperscalers, high switching cost per workload. Leverage is real but it comes from committed-use coverage, not from a migration threat nobody believes.'
+    },
+    'IT operations': {
+      'Rivalry': 'Medium', 'Supplier power': 'High', 'Substitutes': 'Low',
+      'New entrants': 'Low', 'Buyer power': 'Medium',
+      read: 'Megavendor-dominated and bundled. The EA is the only lever with any travel in it, and the July list increase is the moment it moves.'
+    },
+    'Medicines Development': {
+      'Rivalry': 'Low', 'Supplier power': 'High', 'Substitutes': 'Low',
+      'New entrants': 'Low', 'Buyer power': 'Low-Medium',
+      read: 'Supplier-dominated and thin on substitutes. Competing this is theatre. Leverage comes from the migration milestones and from validation scope, not from a competitive threat.'
+    },
+    'Collaboration / Conferencing': {
+      'Rivalry': 'High', 'Supplier power': 'Low-Medium', 'Substitutes': 'High',
+      'New entrants': 'Medium', 'Buyer power': 'High',
+      read: 'High rivalry, strong substitutes, and one of them is already paid for inside the EA. This is a retire-and-consolidate market, not a negotiation.'
+    },
+    'Info Security': {
+      'Rivalry': 'High', 'Supplier power': 'Medium', 'Substitutes': 'Medium',
+      'New entrants': 'High', 'Buyer power': 'Medium',
+      read: 'Crowded and still attracting entrants, which keeps pricing honest but produces the 88-vendor sprawl. Consolidation here buys governance more than it buys discount.'
+    },
+    'Scientific Research': {
+      'Rivalry': 'Low', 'Supplier power': 'High', 'Substitutes': 'Low',
+      'New entrants': 'Low-Medium', 'Buyer power': 'Low',
+      read: 'Niche tools with scientific owners and no real alternative. Treat as strategic: the risk is continuity, not price.'
+    },
+    'SaaS': { 'Rivalry': 'High', 'Supplier power': 'Medium-High', 'Substitutes': 'Medium',
+      'New entrants': 'Medium', 'Buyer power': 'Medium-High',
+      read: 'Broad competition at the edges, megavendor bundling at the core.' },
+    'On-Premise': { 'Rivalry': 'Medium', 'Supplier power': 'High', 'Substitutes': 'Low',
+      'New entrants': 'Low', 'Buyer power': 'Medium',
+      read: 'Entrenched estates with high switching cost; maintenance is the negotiable line.' },
+    'IaaS': { 'Rivalry': 'High', 'Supplier power': 'Medium-High', 'Substitutes': 'Low-Medium',
+      'New entrants': 'Low', 'Buyer power': 'High',
+      read: 'Three hyperscalers, commitment-driven pricing.' },
+    'PaaS': { 'Rivalry': 'Medium', 'Supplier power': 'Medium-High', 'Substitutes': 'Low-Medium',
+      'New entrants': 'Medium', 'Buyer power': 'Medium',
+      read: 'Tied to the IaaS decision; rarely competed on its own.' }
+  };
+
+  /* Which segments each risk actually bites in, so the risk band can follow the
+     selection instead of showing everything regardless. */
+  var TAGS = {
+    'AI data-governance / training rights': ['Marketing / Sales', 'Medicines Development', 'Info Security', 'SaaS'],
+    'GenAI price inflation in renewals': ['Marketing / Sales', 'IT operations', 'Cloud infrastructure', 'SaaS', 'IaaS'],
+    'Microsoft Jul 1 2026 increase': ['IT operations', 'Collaboration / Conferencing', 'On-Premise', 'SaaS'],
+    'Reseller pass-through opacity': ['IT operations', 'On-Premise'],
+    'Spend classification gap': ['Marketing / Sales', 'IT operations', 'Scientific Research'],
+    'Tail sprawl': ['Scientific Research', 'Info Security', 'Collaboration / Conferencing'],
+    'Veeva Vault CRM migration': ['Medicines Development']
+  };
+  (d.risks || []).forEach(function (r) { if (TAGS[r.risk]) r.segments = TAGS[r.risk]; });
+
+  var TTAGS = {
+    'Microsoft Jul 1 2026 increase': ['IT operations', 'Collaboration / Conferencing', 'On-Premise'],
+    'GenAI price inflation in renewals': ['Marketing / Sales', 'Cloud infrastructure', 'SaaS', 'IaaS'],
+    'AI data-governance / training rights': ['Marketing / Sales', 'Medicines Development', 'Info Security'],
+    'Veeva Vault CRM migration': ['Medicines Development'],
+    'Tail sprawl': ['Scientific Research', 'Info Security'],
+    'Reseller pass-through opacity': ['IT operations', 'On-Premise']
+  };
+  (d.triggers || []).forEach(function (t) { if (TTAGS[t.risk]) t.segments = TTAGS[t.risk]; });
+}());
