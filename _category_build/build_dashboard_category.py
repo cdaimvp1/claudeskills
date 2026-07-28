@@ -35,8 +35,12 @@ def safe_for_script(text):
     return text.replace('</script>', '<\\/script>')
 
 
-def build(out_path):
+def build(out_path, demo=False):
     seed = read(os.path.join(ASSETS, 'seed', 'category-data.js'))
+    if demo:
+        # Narrows the seed to Software and adds the structures the real data does
+        # not carry, so every panel renders populated. Clearly banner-marked.
+        seed += '\n' + read(os.path.join(ASSETS, 'seed', 'category-data-demo.js'))
     render = read(os.path.join(ASSETS, 'pv', 'cs-render.js'))
     css = read(os.path.join(ASSETS, 'pv', 'cs.css'))
 
@@ -70,7 +74,8 @@ def build(out_path):
         '<!doctype html>\n<html lang="en" data-theme="light">\n<head>\n'
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        '<title>Category Strategy · Lilly Procurement</title>\n'
+        '<title>Category Strategy' + (' (illustrative data)' if demo else '')
+        + ' · Lilly Procurement</title>\n'
         '<style>\n' + fonts + '\n' + theo_color + '\n' + app_shell + '\n'
         + chrome['brand_css'] + chrome['foot_css'] + tdino_css + '\n' + css + '\n</style>\n'
         '</head>\n<body>\n'
@@ -88,7 +93,13 @@ def build(out_path):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('--out', default=os.path.join(BUILD_DIR, 'category-strategy-dashboard.html'))
+    ap.add_argument('--out', default=None)
+    ap.add_argument('--demo', action='store_true',
+                    help='Software only, every panel populated with illustrative data.')
     args = ap.parse_args()
-    n = build(args.out)
-    print('wrote {} ({} bytes, {:.2f} MB)'.format(args.out, n, n / 1048576.0))
+    out = args.out or os.path.join(
+        BUILD_DIR, 'category-strategy-dashboard-DEMO.html' if args.demo
+        else 'category-strategy-dashboard.html')
+    n = build(out, demo=args.demo)
+    print('wrote {} ({} bytes, {:.2f} MB){}'.format(
+        out, n, n / 1048576.0, ' [ILLUSTRATIVE DATA]' if args.demo else ''))

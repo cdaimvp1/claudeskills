@@ -152,3 +152,152 @@ html,body{margin:0;background:var(--cs-bg);color:var(--cs-ink);font-family:var(-
 /* form controls must not fall back to the browser default 13.3333px */
 button,input,select,textarea{font-family:inherit;font-size:13px}
 small,sub,sup{font-size:9px}
+
+/* =============================================================================
+   POPULATED PANELS
+
+   Styles for the panels that render only when the data carries the structure.
+   Same rules as everything above: neutral containers, colour on small marks,
+   burnt orange solid and only where something needs acting on.
+   ============================================================================= */
+
+/* illustrative-data banner */
+.cs-demo{background:var(--cs-burnt-d);color:#fff;font:700 11px var(--cs-sans);
+  letter-spacing:.02em;padding:9px 36px;text-align:center}
+
+/* headline stat pair */
+.cs-split2{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
+.cs-stat{min-width:140px}
+.cs-stat-v{font-size:28px;font-weight:800;line-height:1.05;letter-spacing:-.015em;color:var(--cs-plum)}
+.cs-stat-l{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2);margin-top:4px}
+.cs-stat-s{font-size:13px;color:var(--cs-mut);margin-top:3px}
+.cs-stat-emph .cs-stat-v{color:var(--cs-burnt)}
+
+/* table cell roles */
+.cs-tbl td.cs-num{white-space:nowrap;font-variant-numeric:tabular-nums}
+.cs-tbl td.cs-why{text-align:left;font-size:11px;color:var(--cs-mut);line-height:1.45;max-width:34ch}
+.cs-tbl td.cs-barcell{width:120px}
+.cs-tbl td.cs-was{color:var(--cs-mut)}
+.cs-sub2{display:block;font-size:11px;color:var(--cs-mut);font-weight:400;margin-top:2px}
+.cs-bar-emph i{background:var(--cs-burnt)}
+.cs-bar-plum i{background:var(--cs-plum)}
+
+/* row state: a left rule, never a wash */
+.cs-tbl tr.cs-st-critical td:first-child{box-shadow:inset 3px 0 0 var(--cs-burnt)}
+.cs-tbl tr.cs-st-watch td:first-child{box-shadow:inset 3px 0 0 var(--cs-plum)}
+.cs-tbl tr.cs-st-done td:first-child{box-shadow:inset 3px 0 0 var(--cs-teal)}
+.cs-tbl tr.cs-st-nocontrol td:first-child{box-shadow:inset 3px 0 0 var(--cs-burnt-d)}
+.cs-state{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);
+  border:1px solid var(--cs-line2);border-radius:30px;padding:2px 8px;white-space:nowrap}
+.cs-st-validated .cs-state{color:var(--cs-teal);border-color:var(--cs-teal)}
+.cs-st-pending .cs-state,.cs-st-modelled .cs-state{color:var(--cs-mut)}
+
+/* escalation triggers */
+.cs-trig-row{border-top:1px solid var(--cs-line);padding:11px 0}
+.cs-trig-row:first-child{border-top:0;padding-top:0}
+.cs-trig-hd{display:flex;align-items:baseline;gap:10px}
+.cs-trig-r{font-size:13px;font-weight:700}
+.cs-trig-t{margin-left:auto;font:700 11px var(--cs-sans);color:var(--cs-burnt);white-space:nowrap}
+.cs-trig-c{font-size:11px;color:var(--cs-mut);margin-top:3px}
+.cs-trig-a{font-size:13px;margin-top:5px;display:flex;align-items:baseline;gap:8px}
+.cs-trig-a b{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-trig-o{margin-left:auto;font-size:11px;color:var(--cs-mut);white-space:nowrap}
+
+/* execution pillars */
+.cs-pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.cs-pillar{border-top:3px solid var(--cs-plum);padding-top:10px}
+.cs-pillar-n{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;line-height:1.25}
+.cs-pillar-i{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex:none;
+  border-radius:50%;background:var(--cs-plum);color:#fff;font:800 11px var(--cs-sans)}
+.cs-pillar-o{font-size:13px;color:var(--cs-ink);line-height:1.5;margin-top:7px}
+.cs-pillar-m{display:flex;justify-content:space-between;gap:10px;margin-top:9px;
+  font:600 11px var(--cs-sans);color:var(--cs-mut);border-top:1px solid var(--cs-line);padding-top:7px}
+
+/* action window pill */
+.cs-win{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
+  border-radius:30px;padding:2px 9px;border:1px solid var(--cs-line2);color:var(--cs-mut2)}
+.cs-win-03{border-color:var(--cs-burnt);color:var(--cs-burnt)}
+.cs-win-36{border-color:var(--cs-plum);color:var(--cs-plum)}
+.cs-win-612{border-color:var(--cs-teal);color:var(--cs-teal)}
+
+/* capability overlap */
+.cs-ovl-row{border-top:1px solid var(--cs-line);padding:11px 0}
+.cs-ovl-row:first-child{border-top:0;padding-top:0}
+.cs-ovl-hd{display:flex;align-items:baseline;gap:10px}
+.cs-ovl-c{font-size:16px;font-weight:700}
+.cs-ovl-v{margin-left:auto;font-size:13px;font-weight:700;color:var(--cs-burnt);font-variant-numeric:tabular-nums}
+.cs-ovl-s{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.cs-ovl-r{font-size:11px;color:var(--cs-mut);margin-top:6px;line-height:1.5}
+
+/* disposition */
+.cs-act{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
+  border-radius:4px;padding:3px 8px;border:1px solid var(--cs-line2);color:var(--cs-mut2)}
+.cs-act-retire,.cs-act-replace{border-color:var(--cs-burnt);color:var(--cs-burnt)}
+.cs-act-renegotiate,.cs-act-consolidate{border-color:var(--cs-plum);color:var(--cs-plum)}
+.cs-act-retain{border-color:var(--cs-teal);color:var(--cs-teal)}
+
+/* forecast */
+.cs-fc{display:flex;gap:12px;align-items:flex-end;height:210px;margin-bottom:10px}
+.cs-fc-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+.cs-fc-v{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:5px}
+.cs-fc-plot{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.cs-fc-bar{width:56%;background:var(--cs-plum);border-radius:3px 3px 0 0;display:block}
+.cs-fc-col.is-proj .cs-fc-bar{background:var(--cs-teal)}
+.cs-fc-band{position:absolute;left:22%;width:56%;background:rgba(47,110,107,.20);border-top:1px solid var(--cs-teal);
+  border-bottom:1px solid var(--cs-teal);border-radius:2px}
+.cs-fc-l{font-size:11px;color:var(--cs-mut);margin-top:6px}
+.cs-fc-key,.cs-rv-key{display:flex;gap:16px;font:600 11px var(--cs-sans);color:var(--cs-mut)}
+.cs-fc-key span,.cs-rv-key span{display:flex;align-items:center;gap:6px}
+.cs-fc-key span::before,.cs-rv-key span::before{content:'';width:11px;height:11px;border-radius:2px;background:var(--cs-plum)}
+.cs-k-proj::before{background:var(--cs-teal)!important}
+.cs-k-band::before{background:rgba(47,110,107,.20)!important;border:1px solid var(--cs-teal)}
+.cs-k-vol::before{background:var(--cs-teal)!important}
+
+/* rate vs volume */
+.cs-rv{margin-bottom:12px}
+.cs-rv-bar{display:flex;height:22px;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.cs-rv-rate{background:var(--cs-plum)}
+.cs-rv-vol{background:var(--cs-teal)}
+
+/* movement since last strategy */
+.cs-dir{font-size:11px;line-height:1}
+.cs-dir-up{color:var(--cs-burnt)}
+.cs-dir-down{color:var(--cs-teal)}
+
+/* roadmap */
+.cs-road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:900px){.cs-road{grid-template-columns:1fr}}
+.cs-road-hd{font:800 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum);
+  display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:2px solid var(--cs-plum);margin-bottom:10px}
+.cs-road-hd span{margin-left:auto;color:var(--cs-mut2);font-weight:700}
+.cs-road-i{border:1px solid var(--cs-line2);border-radius:8px;padding:10px 12px;margin-bottom:9px}
+.cs-road-i.cs-st-critical{border-left:3px solid var(--cs-burnt)}
+.cs-road-i.cs-st-watch{border-left:3px solid var(--cs-plum)}
+.cs-road-i.cs-st-done{border-left:3px solid var(--cs-teal)}
+.cs-road-a{font-size:13px;line-height:1.45}
+.cs-road-m{font-size:11px;color:var(--cs-mut);margin-top:6px}
+
+/* ---- narrative records --------------------------------------------------- */
+.cs-nrs{display:flex;flex-direction:column;gap:12px}
+.cs-nr{border-left:3px solid var(--cs-line2);padding-left:12px}
+.cs-nr-emph{border-left-color:var(--cs-burnt)}
+.cs-nr-plum{border-left-color:var(--cs-plum)}
+.cs-nr-teal{border-left-color:var(--cs-teal)}
+.cs-nr-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cs-nr-t{font-size:16px;font-weight:700;line-height:1.3}
+.cs-nr-k{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--cs-plum)}
+.cs-nr-emph .cs-nr-k{color:var(--cs-burnt)}
+.cs-nr-teal .cs-nr-k{color:var(--cs-teal)}
+.cs-nr-c{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut)}
+.cs-nr-d{font-size:13px;line-height:1.55;color:var(--cs-ink);margin-top:5px}
+.cs-nr-kv{font-size:13px;margin-top:3px}
+.cs-nr-kv span{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);margin-right:7px}
+
+/* ---- row height rule -----------------------------------------------------
+   Every column in a side-by-side row ends on the same line. A column may hold
+   one panel or a stack; whichever grew scrolls inside itself rather than
+   pushing its neighbour out of alignment.                                    */
+.cs-row2{align-items:stretch}
+.cs-row2>.cs-card{display:flex;flex-direction:column;margin-bottom:0}
+.cs-row2>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow:auto}
+.cs-unq{font-size:13px;font-weight:600;color:var(--cs-mut)}
