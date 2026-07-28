@@ -131,11 +131,11 @@ function rfxCovFg(p){return p>=70?'#fff':'var(--ink,#1A1A1A)';}
 function rfxLevelCol(l){return l==='fully'?'rgba(92,43,80,.85)':l==='partial'?'rgba(138,90,0,.30)':l==='does-not'?'rgba(200,32,46,.26)':'#F1F4F9';}
 function rfxLevelFg(l){return l==='fully'?'#fff':'var(--ink,#1A1A1A)';}
 function rfxKpi(label,value,sub,tone){var col=tone==='good'?'var(--plum)':tone==='warn'?'#C8202E':tone==='amber'?'#8A5A00':'var(--ink,#1A1A1A)';
- return '<div class="card" style="margin:0;padding:12px 13px"><div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2)">'+escapeHtmlPV(label)+'</div><div style="font-size:22px;font-weight:800;line-height:1.1;margin-top:5px;color:'+col+'">'+value+'</div>'+(sub?'<div style="font-size:11px;color:var(--mut2);margin-top:4px;line-height:1.35">'+sub+'</div>':'')+'</div>';}
+ return '<div class="card" style="margin:0;padding:12px 13px"><div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2)">'+escapeHtmlPV(label)+'</div><div style="font-size:20px;font-weight:800;line-height:1.1;margin-top:5px;color:'+col+'">'+value+'</div>'+(sub?'<div style="font-size:11px;color:var(--mut2);margin-top:4px;line-height:1.35">'+sub+'</div>':'')+'</div>';}
 function rfxSevPill(sev){var m={critical:['#C8202E','var(--pink-t,#FBE7E3)'],high:['#C8202E','var(--pink-t,#FBE7E3)'],medium:['#8A5A00','var(--amber-t,#FBF1DA)'],low:['#2E5E8C','var(--blue-t,#E4EBF1)'],none:['var(--mut2)','#EFECE8']};var c=m[sev]||m.none;
  return '<span style="display:inline-block;font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+escapeHtmlPV(sev)+'</span>';}
 function rfxPrioPill(p){var m={GATING:['#C8202E','var(--pink-t,#FBE7E3)'],HIGH:['#8A5A00','var(--amber-t,#FBF1DA)'],MEDIUM:['#2E5E8C','var(--blue-t,#E4EBF1)']};var c=m[p]||['var(--mut2)','#EFECE8'];
- return '<span style="display:inline-block;font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+escapeHtmlPV(p)+'</span>';}
+ return '<span style="display:inline-block;font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+escapeHtmlPV(p)+'</span>';}
 function rfxTprmPill(sc){if(!sc)return '<span style="font-size:11px;color:var(--mut2)">Data not available</span>';
  var m={approved:['var(--plum)','rgba(92,43,80,.10)'],'under-review':['#8A5A00','var(--amber-t,#FBF1DA)'],'not-started':['var(--mut2)','#EFECE8'],rejected:['#C8202E','var(--pink-t,#FBE7E3)']};
  var c=m[sc.status]||['var(--mut2)','#EFECE8'];var label=String(sc.status||'unknown').replace(/-/g,' ')+(sc.open!=null?' ('+sc.open+' open)':'');
@@ -194,10 +194,10 @@ function rfxPhaseBannerHTML(){var p=RFX.phase;
  var days=p.daysToNext<0?Math.abs(p.daysToNext)+' day(s) overdue':p.daysToNext===0?'due today':'in '+p.daysToNext+' day(s)';
  var pct=Math.min(100,Math.max(0,Math.round((p.phaseIndex+1)/p.phaseCount*100)));
  var items=rfxPhaseItems();
- var open='<div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);margin:12px 0 7px">Outstanding items ('+items.length+')</div>'+items.map(function(it){return '<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:6px"><span style="flex:none;width:7px;height:7px;border-radius:50%;margin-top:5px;background:'+it[0]+'"></span><div style="font-size:12.5px;color:var(--mut);line-height:1.45">'+escapeHtmlPV(it[1])+'</div></div>';}).join('');
+ var open='<div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);margin:12px 0 7px">Outstanding items ('+items.length+')</div>'+items.map(function(it){return '<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:6px"><span style="flex:none;width:7px;height:7px;border-radius:50%;margin-top:5px;background:'+it[0]+'"></span><div style="font-size:13px;color:var(--mut);line-height:1.45">'+escapeHtmlPV(it[1])+'</div></div>';}).join('');
  return '<div class="card" style="border-left:3px solid var(--plum);margin-bottom:16px">'
   +'<div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);margin-bottom:8px">RFx case · phase &amp; open items <span style="color:var(--mut2);font-weight:500;text-transform:none;letter-spacing:0">· reflect-only case read</span></div>'
-  +'<div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap"><span style="font-size:15px;font-weight:800;color:var(--plum)">'+escapeHtmlPV(p.name)+'</span><span style="font-family:var(--mono);font-size:11px;color:var(--mut2)">phase '+(p.phaseIndex+1)+' of '+p.phaseCount+'</span>'+pill+'<span style="font-size:12px;color:var(--mut)">Next milestone: <b style="color:var(--plum)">'+escapeHtmlPV(p.nextMilestone)+'</b> · '+escapeHtmlPV(days)+'</span></div>'
+  +'<div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap"><span style="font-size:16px;font-weight:800;color:var(--plum)">'+escapeHtmlPV(p.name)+'</span><span style="font-family:var(--mono);font-size:11px;color:var(--mut2)">phase '+(p.phaseIndex+1)+' of '+p.phaseCount+'</span>'+pill+'<span style="font-size:13px;color:var(--mut)">Next milestone: <b style="color:var(--plum)">'+escapeHtmlPV(p.nextMilestone)+'</b> · '+escapeHtmlPV(days)+'</span></div>'
   +'<div style="height:7px;border-radius:4px;background:var(--line2,#E0DCD5);margin:10px 0 0;overflow:hidden"><i style="display:block;height:100%;width:'+pct+'%;background:var(--plum)"></i></div>'
   +open
   +'</div>';}
@@ -246,8 +246,8 @@ function rfxOverviewHTML(){var R=RFX;var rank=rfxReqRanking(),top=rank[0];
 // business state. Business-legit states (not yet responded, no MSA on file, not yet scheduled) keep
 // their own glyph and label; only true source-data gaps get the dashes.
 function rfxGlyph(kind,label){var m={done:['✓','var(--plum)'],half:['◐','#2E5E8C'],flag:['⚠','#C8202E'],dash:['○','var(--mut2)'],nt:['–','var(--mut2)']};var c=m[kind]||m.nt;
- if(kind==='nt')return '<span title="Data not available" style="display:inline-flex;align-items:center;font-family:var(--mono,monospace);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--mut2);cursor:help;white-space:nowrap">--</span>';
- return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink);white-space:nowrap"><span style="font-size:12px;font-weight:700;width:12px;text-align:center;flex:none;color:'+c[1]+'">'+c[0]+'</span>'+escapeHtmlPV(label)+'</span>';}
+ if(kind==='nt')return '<span title="Data not available" style="display:inline-flex;align-items:center;font-family:var(--mono,monospace);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--mut2);cursor:help;white-space:nowrap">--</span>';
+ return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink);white-space:nowrap"><span style="font-size:13px;font-weight:700;width:12px;text-align:center;flex:none;color:'+c[1]+'">'+c[0]+'</span>'+escapeHtmlPV(label)+'</span>';}
 // Small pill chip, reused by Completeness & Risk roll-up below.
 function rfxChip(label,col,bg){return '<span style="display:inline-block;font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+col+';background:'+bg+'">'+escapeHtmlPV(label)+'</span>';}
 // Participation panel (Overview; ported from the RFx-MOCKUP.html design, bound to real RFX + restyled
@@ -314,12 +314,12 @@ function rfxCompletenessRiskHTML(){var R=RFX,esc=escapeHtmlPV;var rank=rfxReqRan
 // role is real per-project data ({n, role}); reused anywhere we list a project's people.
 function initialsOf(name){var p=String(name||'').trim().split(/\s+/);return (((p[0]||'')[0]||'')+((p.length>1?p[p.length-1]:'')[0]||'')).toUpperCase();}
 function rosterHTML(members,cols){
- if(!members||!members.length)return '<div style="font-size:12px;color:var(--mut2)">No members assigned</div>';
+ if(!members||!members.length)return '<div style="font-size:13px;color:var(--mut2)">No members assigned</div>';
  var c=cols||2;
  var items=members.map(function(m){var nm=m.n||m.name||'',role=m.role||'';
   return '<div style="display:flex;align-items:center;gap:8px;min-width:0">'
    +'<span style="flex:none;width:26px;height:26px;border-radius:50%;background:var(--blue-t,#E4EBF1);color:var(--plum);font:700 11px var(--mono,monospace);display:flex;align-items:center;justify-content:center">'+escapeHtmlPV(initialsOf(nm))+'</span>'
-   +'<div style="min-width:0"><div style="font-size:12px;font-weight:700;color:var(--ink);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(nm)+'</div>'
+   +'<div style="min-width:0"><div style="font-size:13px;font-weight:700;color:var(--ink);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(nm)+'</div>'
    +(role?'<div style="font-size:11px;color:var(--mut2);line-height:1.2">'+escapeHtmlPV(role)+'</div>':'')+'</div></div>';}).join('');
  return '<div style="display:grid;grid-template-columns:repeat('+c+',minmax(0,1fr));gap:8px 14px">'+items+'</div>';
 }
@@ -411,16 +411,16 @@ function rfxMergedRankingHTML(){var R=RFX;var rank=rfxReqRanking();
  rank.forEach(function(si,i){var c=rfxCoverage(si),tier=rfxAwardTier(si,i),on=si===sel;
   var wf=c.weightedFit,pc=c.coveragePct,ns=c.answered===0;
   left+='<div onclick="rfxDD('+si+')" style="cursor:pointer;padding:10px 11px;border-radius:9px;margin-bottom:8px;border:1px solid '+(on?'var(--plum)':'var(--line2,#E0DCD5)')+';background:'+(on?'rgba(92,43,80,.05)':'var(--card,#fff)')+'">';
-  left+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:'+tier.col+';background:'+tier.bg+'">'+(i+1)+'</span><span style="font-weight:700;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(R.suppliers[si].n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+'</span>'+(R.suppliers[si].mustFail&&R.suppliers[si].mustFail.length?' <span class="gate fail" title="Ranked on merit; this Must-Have must be cleared before award, the panel decides">&#9888; Must clear: '+escapeHtmlPV(R.suppliers[si].mustFail.join(', '))+'</span>':'')+'</div>';
-  left+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:78px;font-size:9px;color:var(--mut2);font-weight:600">Weighted fit</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+wf+'%;background:'+tier.col+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+tier.col+'">'+wf+'</span></div>';
-  left+='<div style="display:flex;align-items:center;gap:8px"><span style="width:78px;font-size:9px;color:var(--mut2);font-weight:600">Coverage</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+pc+'%;background:'+rfxCovCol(pc)+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+(ns?'var(--mut2)':rfxPcCol(pc))+'">'+(ns?'-':pc+'%')+'</span></div>';
+  left+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:'+tier.col+';background:'+tier.bg+'">'+(i+1)+'</span><span style="font-weight:700;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(R.suppliers[si].n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+'</span>'+(R.suppliers[si].mustFail&&R.suppliers[si].mustFail.length?' <span class="gate fail" title="Ranked on merit; this Must-Have must be cleared before award, the panel decides">&#9888; Must clear: '+escapeHtmlPV(R.suppliers[si].mustFail.join(', '))+'</span>':'')+'</div>';
+  left+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:78px;font-size:11px;color:var(--mut2);font-weight:600">Weighted fit</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+wf+'%;background:'+tier.col+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+tier.col+'">'+wf+'</span></div>';
+  left+='<div style="display:flex;align-items:center;gap:8px"><span style="width:78px;font-size:11px;color:var(--mut2);font-weight:600">Coverage</span><div style="flex:1;height:11px;border-radius:4px;background:var(--bg,#F4F1EC);overflow:hidden"><i style="display:block;height:100%;width:'+pc+'%;background:'+rfxCovCol(pc)+'"></i></div><span style="width:34px;text-align:right;font-family:var(--mono);font-weight:700;font-size:11px;color:'+(ns?'var(--mut2)':rfxPcCol(pc))+'">'+(ns?'-':pc+'%')+'</span></div>';
   left+='</div>';
  });
  var c=rfxCoverage(sel),tier=rfxAwardTier(sel,selRankIdx),s=R.suppliers[sel];
  var st=rfxStrengths(sel),gp=rfxGaps(sel);
  var right='<div style="padding:12px 13px;border-radius:9px;border:1px solid var(--line2,#E0DCD5);background:var(--bg,#FBFAF9)">';
- right+='<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px"><span style="font-weight:800;font-size:14px">'+escapeHtmlPV(s.n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+' · rank '+(selRankIdx+1)+'</span></div>';
- right+='<div style="font-size:12px;color:var(--ink);line-height:1.55;margin-bottom:9px">'+rfxRecoText(sel,selRankIdx)+'</div>';
+ right+='<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px"><span style="font-weight:800;font-size:13px">'+escapeHtmlPV(s.n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:30px;color:'+tier.col+';background:'+tier.bg+'">'+escapeHtmlPV(tier.label)+' · rank '+(selRankIdx+1)+'</span></div>';
+ right+='<div style="font-size:13px;color:var(--ink);line-height:1.55;margin-bottom:9px">'+rfxRecoText(sel,selRankIdx)+'</div>';
  right+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
  right+='<div><div style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--plum);margin-bottom:5px">Strengths</div>'+(st.length?st.slice(0,3).map(function(r){return '<div style="font-size:11px;line-height:1.45;margin-bottom:3px;color:var(--mut)">✓ '+escapeHtmlPV(r.text)+'</div>';}).join(''):'<div style="font-size:11px;color:var(--mut2)">None recorded.</div>')+'</div>';
  right+='<div><div style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:#C8202E;margin-bottom:5px">Gaps</div>'+(gp.length?gp.slice(0,3).map(function(r){return '<div style="font-size:11px;line-height:1.45;margin-bottom:3px;color:var(--mut)">• '+escapeHtmlPV(r.text)+(r.mandatory?' (Must-have)':'')+'</div>';}).join(''):'<div style="font-size:11px;color:var(--mut2)">None, meets every requirement.</div>')+'</div>';
@@ -441,12 +441,12 @@ function rfxContactsHTML(){var R=RFX;
 // ---- Lilly supplier-context strip (RD.2 fold-in): internal relationship / spend / TPRM / Defender per bidder ----
 function rfxLillyCtxHTML(cur){var R=RFX;
  var rows=R.suppliers.map(function(s,si){var d=s.lilly;
-  var h='<div style="display:flex;flex-wrap:wrap;gap:7px 14px;align-items:center;padding:8px 6px'+(si>0?';border-top:1px solid var(--line,#EEE)':'')+(si===cur?';background:rgba(92,43,80,.03);border-radius:6px':'')+'"><span style="font-weight:700;font-size:12px;min-width:120px">'+escapeHtmlPV(s.n)+'</span>';
-  if(!d)return h+'<span style="font-size:12px;color:var(--mut2)">No internal supplier record found. Data not available.</span></div>';
-  h+='<span style="font-size:12px;color:var(--mut)"><b>Relationship:</b> '+escapeHtmlPV(d.relationship||'Data not available')+'</span>';
-  h+='<span style="font-size:12px;color:var(--mut)"><b>Spend:</b> '+escapeHtmlPV(d.spend||'Data not available')+'</span>';
-  h+='<span style="font-size:12px;color:var(--mut)"><b>TPRM:</b></span> '+rfxTprmPill(d.tprm);
-  if(d.defender&&d.defender.count>0)h+='<span style="font-size:12px;color:var(--amber-d)"><b>Defender:</b> '+d.defender.count+' finding(s)</span>';
+  var h='<div style="display:flex;flex-wrap:wrap;gap:7px 14px;align-items:center;padding:8px 6px'+(si>0?';border-top:1px solid var(--line,#EEE)':'')+(si===cur?';background:rgba(92,43,80,.03);border-radius:6px':'')+'"><span style="font-weight:700;font-size:13px;min-width:120px">'+escapeHtmlPV(s.n)+'</span>';
+  if(!d)return h+'<span style="font-size:13px;color:var(--mut2)">No internal supplier record found. Data not available.</span></div>';
+  h+='<span style="font-size:13px;color:var(--mut)"><b>Relationship:</b> '+escapeHtmlPV(d.relationship||'Data not available')+'</span>';
+  h+='<span style="font-size:13px;color:var(--mut)"><b>Spend:</b> '+escapeHtmlPV(d.spend||'Data not available')+'</span>';
+  h+='<span style="font-size:13px;color:var(--mut)"><b>TPRM:</b></span> '+rfxTprmPill(d.tprm);
+  if(d.defender&&d.defender.count>0)h+='<span style="font-size:13px;color:var(--amber-d)"><b>Defender:</b> '+d.defender.count+' finding(s)</span>';
   return h+'</div>';}).join('');
  return '<div class="card"><div style="font-weight:700;font-size:13px;margin-bottom:4px">Lilly Supplier Context <span style="font-weight:500;color:var(--mut2);font-size:11px">· internal</span></div><div class="spnote" style="margin:0 0 6px">Internal Lilly context per bidder: existing relationship, trailing-12-month spend, and TPRM posture. Read-only; it does not affect coverage scores or the advisory ranking, and a missing read shows as Data not available, never an estimate.</div>'+rows+'</div>';}
 // ---- ③ Analysis › (i) Individual supplier, dropdown-switched, ONE scrolling page (5 sections) ----
@@ -518,7 +518,7 @@ function rfxRptOverall(ov){var esc=escapeHtmlPV;
  var h='<div class="sect"><div class="secthd"><div class="t">Overall analysis &amp; recommendation</div></div><div class="card">';
  if(ov.take)h+='<div class="take">'+ov.take+'</div>';
  (ov.narr||[]).forEach(function(p){h+='<p class="ovnarr">'+p+'</p>';});
- if(ov.steps){h+='<div class="subh">What has to happen</div><div style="font-size:11.5px;color:var(--mut);margin-bottom:6px">Theo has drafted the clarifications below, in priority order. Nothing is sent on your behalf.</div>';
+ if(ov.steps){h+='<div class="subh">What has to happen</div><div style="font-size:11px;color:var(--mut);margin-bottom:6px">Theo has drafted the clarifications below, in priority order. Nothing is sent on your behalf.</div>';
   ov.steps.forEach(function(st){h+='<div class="clr"><span class="pr '+st.prcls+'">'+esc(st.pr)+'</span><div><span class="ct">'+esc(st.cat)+'</span><span class="q">'+st.q+'</span></div></div>';});}
  if(ov.close)h+='<p class="rbody">'+ov.close+'</p>';
  h+='</div></div>';return h;}
@@ -555,9 +555,9 @@ function rfxRptSectionAccordion(sec,scRow,isOpen){
  // Round-3 rework (Marc item 6): the score sits FIRST, in a fixed-width slot, so every section's
  // score lines up in one scannable left column regardless of title length.
  var summary='<summary style="cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-  +'<span style="flex:0 0 38px;width:38px;text-align:center">'+(score!=null?'<span class="badge '+rfxScoreCls(score)+'" style="font-size:10.5px">'+score+'<small>/10</small></span>':'<span style="color:var(--mut2);font-size:11px">–</span>')+'</span>'
+  +'<span style="flex:0 0 38px;width:38px;text-align:center">'+(score!=null?'<span class="badge '+rfxScoreCls(score)+'" style="font-size:11px">'+score+'<small>/10</small></span>':'<span style="color:var(--mut2);font-size:11px">–</span>')+'</span>'
   +'<span style="font-weight:700;font-size:13px">'+esc(sec.title)+'</span>'
-  +'<span style="flex:1 1 260px;min-width:0;font-size:11.5px;color:var(--mut);line-height:1.4">'+oneLiner+'</span></summary>';
+  +'<span style="flex:1 1 260px;min-width:0;font-size:11px;color:var(--mut);line-height:1.4">'+oneLiner+'</span></summary>';
  return '<details class="card rfxcase-acc" name="rfxresp" style="margin:0 0 10px;padding:0;overflow:hidden"'+(isOpen?' open':'')+'>'+summary+'<div>'+rfxRptSection(sec)+'</div></details>';
 }
 function rfxRptCoverage(si){var esc=escapeHtmlPV,dist=rfxScoreDistByCat(si);
@@ -609,12 +609,12 @@ function rfxAnalysisIndividualLegacyHTML(){var R=RFX;var rank=rfxReqRanking();
  var s=R.suppliers[si],c=rfxCoverage(si),tier=rfxAwardTier(si,rankIdx),rl=rfxRiskLevel(si);
  var h='';
  // Increment 7: the supplier tab IS the selector now; the dropdown is retired. Header keeps the tier/rank line.
- h+='<div class="card" style="margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-weight:800;font-size:15px;color:var(--ink)">'+escapeHtmlPV(s.n)+'</div><span style="font-size:11.5px;color:var(--mut2)">Advisory tier: <b style="color:'+tier.col+'">'+escapeHtmlPV(tier.label)+'</b> · rank '+(rankIdx+1)+' of '+R.suppliers.length+'</span></div>';
+ h+='<div class="card" style="margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-weight:800;font-size:16px;color:var(--ink)">'+escapeHtmlPV(s.n)+'</div><span style="font-size:11px;color:var(--mut2)">Advisory tier: <b style="color:'+tier.col+'">'+escapeHtmlPV(tier.label)+'</b> · rank '+(rankIdx+1)+' of '+R.suppliers.length+'</span></div>';
  // internal-context strip shown ONCE at top
  h+=rfxLillyCtxHTML(si);
  // sticky in-page jump-nav (scrollIntoView; avoids hash-router side effects)
  var nav=[['sum','Response summary & profile'],['fit','Requirements fit'],['sgr','Strengths, gaps & risks'],['com','Commercial & operational'],['clr','Clarifications']];
- h+='<div style="position:sticky;top:0;z-index:4;background:var(--bg,#FBFAF9);border:1px solid var(--line2,#E0DCD5);border-radius:9px;padding:7px 10px;margin:12px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font:700 8px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)">Jump to</span>'+nav.map(function(n){return '<span onclick="var el=document.getElementById(\'rfxi-'+n[0]+'\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})" style="cursor:pointer;font-size:11px;font-weight:600;color:var(--plum);padding:2px 8px;border-radius:30px;background:rgba(92,43,80,.08)">'+escapeHtmlPV(n[1])+'</span>';}).join('')+'</div>';
+ h+='<div style="position:sticky;top:0;z-index:4;background:var(--bg,#FBFAF9);border:1px solid var(--line2,#E0DCD5);border-radius:9px;padding:7px 10px;margin:12px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)">Jump to</span>'+nav.map(function(n){return '<span onclick="var el=document.getElementById(\'rfxi-'+n[0]+'\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})" style="cursor:pointer;font-size:11px;font-weight:600;color:var(--plum);padding:2px 8px;border-radius:30px;background:rgba(92,43,80,.08)">'+escapeHtmlPV(n[1])+'</span>';}).join('')+'</div>';
  // 1) Response summary & profile, 5 metric header + company overview + advisory assessment
  var pr=s.profile||{};
  h+='<div id="rfxi-sum" class="sect"><div class="secthd"><div class="t">Response Summary &amp; Profile</div></div>';
@@ -625,7 +625,7 @@ function rfxAnalysisIndividualLegacyHTML(){var R=RFX;var rank=rfxReqRanking();
  h+=rfxKpi('Completeness',c.completenessPct+'%',c.mandAns+' / '+c.mandTotal+' mandatory answered');
  h+=rfxKpi('Risk level',rl.charAt(0).toUpperCase()+rl.slice(1),c.conforming?'Conforming':'Non-conforming',(rl==='critical'||rl==='high')?'warn':rl==='medium'?'amber':'');
  h+='</div>';
- h+='<div class="card"><div style="font-weight:700;font-size:13px;margin-bottom:8px">Company Overview &amp; Advisory Assessment</div><div class="kv"><div class="k">Headquarters</div><div class="v">'+escapeHtmlPV(pr.hq||'-')+'</div><div class="k">Founded</div><div class="v">'+escapeHtmlPV(pr.founded||'-')+'</div><div class="k">Employees</div><div class="v">'+escapeHtmlPV(pr.employees||'-')+'</div><div class="k">Revenue</div><div class="v">'+escapeHtmlPV(pr.revenue||'-')+'</div><div class="k">Ownership</div><div class="v">'+escapeHtmlPV(pr.ownership||'-')+'</div><div class="k">Analyst</div><div class="v">'+escapeHtmlPV(pr.analyst||'-')+'</div></div><div style="margin-top:11px;padding:10px 12px;border-radius:9px;background:'+tier.bg+';border:1px solid '+tier.col+'30"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:'+tier.col+'">Advisory assessment · '+escapeHtmlPV(tier.label)+'</span><div style="font-size:12.5px;color:var(--ink);line-height:1.5;margin-top:5px">'+rfxRecoText(si,rankIdx)+'</div></div></div></div>';
+ h+='<div class="card"><div style="font-weight:700;font-size:13px;margin-bottom:8px">Company Overview &amp; Advisory Assessment</div><div class="kv"><div class="k">Headquarters</div><div class="v">'+escapeHtmlPV(pr.hq||'-')+'</div><div class="k">Founded</div><div class="v">'+escapeHtmlPV(pr.founded||'-')+'</div><div class="k">Employees</div><div class="v">'+escapeHtmlPV(pr.employees||'-')+'</div><div class="k">Revenue</div><div class="v">'+escapeHtmlPV(pr.revenue||'-')+'</div><div class="k">Ownership</div><div class="v">'+escapeHtmlPV(pr.ownership||'-')+'</div><div class="k">Analyst</div><div class="v">'+escapeHtmlPV(pr.analyst||'-')+'</div></div><div style="margin-top:11px;padding:10px 12px;border-radius:9px;background:'+tier.bg+';border:1px solid '+tier.col+'30"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:'+tier.col+'">Advisory assessment · '+escapeHtmlPV(tier.label)+'</span><div style="font-size:13px;color:var(--ink);line-height:1.5;margin-top:5px">'+rfxRecoText(si,rankIdx)+'</div></div></div></div>';
  // 2) Requirements fit, per-category coverage table (driven by their responses)
  var roll=rfxCatRollup(si);
  h+='<div id="rfxi-fit" class="sect"><div class="secthd"><div class="t">Requirements fit · per category</div></div><div class="mxwrap"><table class="mx" style="width:100%;min-width:640px"><thead><tr><th style="text-align:left">Category</th><th>Requirements</th><th>Fully</th><th>Partial</th><th>Does not</th><th>Not answered</th><th>Coverage %</th></tr></thead><tbody>'+roll.map(function(r){return '<tr><td style="text-align:left;font-weight:600">'+escapeHtmlPV(titleCase(r.cat))+'</td><td>'+r.total+'</td><td>'+r.fully+'</td><td>'+r.partial+'</td><td>'+r.doesNot+'</td><td>'+r.na+'</td><td style="font-weight:700;color:'+(c.answered===0?'var(--mut2)':rfxPcCol(r.coveragePct))+'">'+(c.answered===0?'-':r.coveragePct+'%')+'</td></tr>';}).join('')+'</tbody></table></div></div>';
@@ -633,19 +633,19 @@ function rfxAnalysisIndividualLegacyHTML(){var R=RFX;var rank=rfxReqRanking();
  var st=rfxStrengths(si),gp=rfxGaps(si),fl=rfxRedFlags(si);   // R6: normalized {t,src}; same list, same order
  h+='<div id="rfxi-sgr" class="sect"><div class="secthd"><div class="t">Strengths, gaps &amp; risks</div></div>';
  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:10px">';
- h+='<div class="card" style="margin:0"><div style="font-weight:700;font-size:12.5px;margin-bottom:7px">Strengths</div>'+(st.length?st.map(function(r){return '<div style="font-size:12px;line-height:1.5;margin-bottom:5px;display:flex;gap:7px"><span style="color:var(--plum);font-weight:700">✓</span><span>'+escapeHtmlPV(r.text)+' <span style="color:var(--mut2)">('+escapeHtmlPV(r.category)+')</span></span></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No fully-met requirements recorded.</div>')+'</div>';
- h+='<div class="card" style="margin:0"><div style="font-weight:700;font-size:12.5px;margin-bottom:7px">Gaps</div>'+(gp.length?gp.map(function(r){var lvl=rfxLevel(si,r.id);return '<div style="font-size:12px;line-height:1.5;margin-bottom:6px;display:flex;gap:7px;align-items:baseline"><span style="font:700 8px var(--mono);text-transform:uppercase;padding:2px 6px;border-radius:30px;white-space:nowrap;color:'+(lvl==='na'?'var(--mut2)':'#C8202E')+';background:'+(lvl==='na'?'#EFECE8':'var(--pink-t,#FBE7E3)')+'">'+escapeHtmlPV(rfxLevelLabel(lvl))+'</span><span>'+escapeHtmlPV(r.text)+(r.mandatory?' <b style="color:#C8202E">· Must-have</b>':'')+'</span></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No gaps, fully meets every requirement.</div>')+'</div>';
+ h+='<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:7px">Strengths</div>'+(st.length?st.map(function(r){return '<div style="font-size:13px;line-height:1.5;margin-bottom:5px;display:flex;gap:7px"><span style="color:var(--plum);font-weight:700">✓</span><span>'+escapeHtmlPV(r.text)+' <span style="color:var(--mut2)">('+escapeHtmlPV(r.category)+')</span></span></div>';}).join(''):'<div style="font-size:13px;color:var(--mut2)">No fully-met requirements recorded.</div>')+'</div>';
+ h+='<div class="card" style="margin:0"><div style="font-weight:700;font-size:13px;margin-bottom:7px">Gaps</div>'+(gp.length?gp.map(function(r){var lvl=rfxLevel(si,r.id);return '<div style="font-size:13px;line-height:1.5;margin-bottom:6px;display:flex;gap:7px;align-items:baseline"><span style="font:700 9px var(--mono);text-transform:uppercase;padding:2px 6px;border-radius:30px;white-space:nowrap;color:'+(lvl==='na'?'var(--mut2)':'#C8202E')+';background:'+(lvl==='na'?'#EFECE8':'var(--pink-t,#FBE7E3)')+'">'+escapeHtmlPV(rfxLevelLabel(lvl))+'</span><span>'+escapeHtmlPV(r.text)+(r.mandatory?' <b style="color:#C8202E">· Must-have</b>':'')+'</span></div>';}).join(''):'<div style="font-size:13px;color:var(--mut2)">No gaps, fully meets every requirement.</div>')+'</div>';
  h+='</div>';
  // R6 follow-on (Marc 2026-07-27): this card carried the same false "response-grounded" label the roll-up did.
  // Each flag now shows the source it actually came from, using the same provenance the roll-up counts on.
- h+='<div class="card"><div style="font-weight:700;font-size:12.5px;margin-bottom:7px">Red Flags <span style="font-weight:500;color:var(--mut2);font-size:11px">· each flag labelled by source</span></div>'+(fl.length?fl.map(function(f){var sub=f.src==='submission';return '<div class="obrow high" style="margin-bottom:7px"><div class="obd" style="margin:0">'+escapeHtmlPV(f.t)+' <span class="rfxsk '+(sub?'a':'b')+'" style="margin-left:4px;vertical-align:1px"><span class="dot"></span>'+(sub?'This bid':'Diligence')+'</span></div></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No red flags recorded for this supplier.</div>')+'</div></div>';
+ h+='<div class="card"><div style="font-weight:700;font-size:13px;margin-bottom:7px">Red Flags <span style="font-weight:500;color:var(--mut2);font-size:11px">· each flag labelled by source</span></div>'+(fl.length?fl.map(function(f){var sub=f.src==='submission';return '<div class="obrow high" style="margin-bottom:7px"><div class="obd" style="margin:0">'+escapeHtmlPV(f.t)+' <span class="rfxsk '+(sub?'a':'b')+'" style="margin-left:4px;vertical-align:1px"><span class="dot"></span>'+(sub?'This bid':'Diligence')+'</span></div></div>';}).join(''):'<div style="font-size:13px;color:var(--mut2)">No red flags recorded for this supplier.</div>')+'</div></div>';
  // 4) Commercial & operational, pricing + legal + implementation + integration
  var pc=s.pricing||{},nr=s.narr||{};
- h+='<div id="rfxi-com" class="sect"><div class="secthd"><div class="t">Commercial &amp; operational</div></div><div class="card"><div class="kv"><div class="k">Pricing model</div><div class="v">'+rfxPriceVal(pc.model)+'</div><div class="k">Annual fee</div><div class="v">'+rfxPriceVal(pc.annual)+'</div><div class="k">List price</div><div class="v">'+rfxPriceVal(pc.list)+'</div><div class="k">Discount</div><div class="v">'+rfxPriceVal(pc.discount)+'</div><div class="k">Implementation</div><div class="v">'+rfxPriceVal(pc.impl)+'</div><div class="k">Term</div><div class="v">'+rfxPriceVal(pc.terms)+'</div><div class="k">Escalator</div><div class="v">'+rfxPriceVal(pc.escalator)+'</div><div class="k">Pricing binding</div><div class="v">'+rfxPriceVal(pc.binding)+'</div></div><div style="margin-top:11px;display:grid;gap:9px"><div><span class="dicolh">Legal &amp; contracting</span><div style="font-size:12.5px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.legal||'No legal narrative on file for this supplier.')+'</div></div><div><span class="dicolh">Implementation</span><div style="font-size:12.5px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.impl||'No implementation narrative on file.')+'</div></div><div><span class="dicolh">Integration with the Lilly stack</span><div style="font-size:12.5px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.integ||'No integration narrative on file.')+'</div></div></div></div></div>';
+ h+='<div id="rfxi-com" class="sect"><div class="secthd"><div class="t">Commercial &amp; operational</div></div><div class="card"><div class="kv"><div class="k">Pricing model</div><div class="v">'+rfxPriceVal(pc.model)+'</div><div class="k">Annual fee</div><div class="v">'+rfxPriceVal(pc.annual)+'</div><div class="k">List price</div><div class="v">'+rfxPriceVal(pc.list)+'</div><div class="k">Discount</div><div class="v">'+rfxPriceVal(pc.discount)+'</div><div class="k">Implementation</div><div class="v">'+rfxPriceVal(pc.impl)+'</div><div class="k">Term</div><div class="v">'+rfxPriceVal(pc.terms)+'</div><div class="k">Escalator</div><div class="v">'+rfxPriceVal(pc.escalator)+'</div><div class="k">Pricing binding</div><div class="v">'+rfxPriceVal(pc.binding)+'</div></div><div style="margin-top:11px;display:grid;gap:9px"><div><span class="dicolh">Legal &amp; contracting</span><div style="font-size:13px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.legal||'No legal narrative on file for this supplier.')+'</div></div><div><span class="dicolh">Implementation</span><div style="font-size:13px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.impl||'No implementation narrative on file.')+'</div></div><div><span class="dicolh">Integration with the Lilly stack</span><div style="font-size:13px;color:var(--mut);line-height:1.5">'+escapeHtmlPV(nr.integ||'No integration narrative on file.')+'</div></div></div></div></div>';
  h+=rfxIndivZopaHTML(si);   // #73: this supplier's individual ZOPA (bar format)
  // 5) Clarifications, DRAFT candidates, prioritized (authored here once; rolled up in Cross-supplier)
  var cl=rfxFlags(si).slice().sort(function(a,b){var o={GATING:0,HIGH:1,MEDIUM:2};return o[a.priority]-o[b.priority];});
- h+='<div id="rfxi-clr" class="sect"><div class="secthd"><div class="t">Clarifications</div></div><div class="card"><div class="spnote" style="margin:0 0 9px">DRAFT questions, prioritized by impact. GATING items must be resolved before this supplier can advance. Drafts for your review; nothing is sent on your behalf.</div>'+(cl.length?cl.map(function(f){return '<div class="obrow '+(f.priority==='GATING'?'high':f.priority==='HIGH'?'med':'low')+'" style="margin-bottom:7px"><div class="obhd">'+rfxPrioPill(f.priority)+'<span class="obn" style="font-size:12.5px">'+escapeHtmlPV(f.category)+'</span></div><div class="obd" style="margin:6px 0 0">'+escapeHtmlPV(f.detail)+'</div></div>';}).join(''):'<div style="font-size:12px;color:var(--mut2)">No clarification candidates, fully meets every requirement.</div>')+'</div></div>';
+ h+='<div id="rfxi-clr" class="sect"><div class="secthd"><div class="t">Clarifications</div></div><div class="card"><div class="spnote" style="margin:0 0 9px">DRAFT questions, prioritized by impact. GATING items must be resolved before this supplier can advance. Drafts for your review; nothing is sent on your behalf.</div>'+(cl.length?cl.map(function(f){return '<div class="obrow '+(f.priority==='GATING'?'high':f.priority==='HIGH'?'med':'low')+'" style="margin-bottom:7px"><div class="obhd">'+rfxPrioPill(f.priority)+'<span class="obn" style="font-size:13px">'+escapeHtmlPV(f.category)+'</span></div><div class="obd" style="margin:6px 0 0">'+escapeHtmlPV(f.detail)+'</div></div>';}).join(''):'<div style="font-size:13px;color:var(--mut2)">No clarification candidates, fully meets every requirement.</div>')+'</div></div>';
  return h;
 }
 // Increment 5: shared annual-price parser (used by the value map + the read).
@@ -721,21 +721,21 @@ function rfxValueMapHTML(){var R=RFX,esc=escapeHtmlPV;
  function Y(p){return padT+(p-pLo)/(pHi-pLo)*(plotB-padT);}
  var g='';
  g+='<rect x="'+X(xLo+(xHi-xLo)*0.60).toFixed(0)+'" y="'+padT+'" width="'+(W-padR-X(xLo+(xHi-xLo)*0.60)).toFixed(0)+'" height="'+((plotB-padT)*0.46).toFixed(0)+'" rx="10" style="fill:var(--teal-t)" opacity="0.5"></rect>';
- g+='<text x="'+(W-padR-8)+'" y="'+(padT+15)+'" text-anchor="end" font-family="var(--mono)" font-size="10" font-weight="700" style="fill:var(--teal-d)" opacity="0.85">higher panel score &middot; lower normalized all-in</text>';
+ g+='<text x="'+(W-padR-8)+'" y="'+(padT+15)+'" text-anchor="end" font-family="var(--mono)" font-size="11" font-weight="700" style="fill:var(--teal-d)" opacity="0.85">higher panel score &middot; lower normalized all-in</text>';
  g+='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+plotB+'" style="stroke:var(--line2)" stroke-width="1.2"></line>';
  g+='<line x1="'+padL+'" y1="'+plotB+'" x2="'+(W-padR)+'" y2="'+plotB+'" style="stroke:var(--line2)" stroke-width="1.2"></line>';
- sup.forEach(function(x){g+='<text x="'+X(x.ps).toFixed(1)+'" y="'+(plotB+18)+'" text-anchor="middle" font-family="var(--mono)" font-size="10" style="fill:var(--mut2)">'+x.ps.toFixed(1)+'</text>';});
- g+='<text x="'+((padL+W-padR)/2).toFixed(0)+'" y="'+(plotB+40)+'" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="700" letter-spacing="0.06em" style="fill:var(--mut2)">PANEL SCORE (0&ndash;5) &rarr;</text>';
- if(haveP){priced.forEach(function(x){g+='<text x="'+(padL-8)+'" y="'+(Y(x.price)+3).toFixed(1)+'" text-anchor="end" font-family="var(--mono)" font-size="10" style="fill:var(--mut2)">'+fmtP(x.price)+'</text>';});
-  g+='<text transform="rotate(-90 22 '+((padT+plotB)/2).toFixed(0)+')" x="22" y="'+((padT+plotB)/2).toFixed(0)+'" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="700" letter-spacing="0.06em" style="fill:var(--mut2)">&larr; LOWER NORMALIZED ALL-IN ($/SEAT/YR)</text>';}
+ sup.forEach(function(x){g+='<text x="'+X(x.ps).toFixed(1)+'" y="'+(plotB+18)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" style="fill:var(--mut2)">'+x.ps.toFixed(1)+'</text>';});
+ g+='<text x="'+((padL+W-padR)/2).toFixed(0)+'" y="'+(plotB+40)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" letter-spacing="0.06em" style="fill:var(--mut2)">PANEL SCORE (0&ndash;5) &rarr;</text>';
+ if(haveP){priced.forEach(function(x){g+='<text x="'+(padL-8)+'" y="'+(Y(x.price)+3).toFixed(1)+'" text-anchor="end" font-family="var(--mono)" font-size="11" style="fill:var(--mut2)">'+fmtP(x.price)+'</text>';});
+  g+='<text transform="rotate(-90 22 '+((padT+plotB)/2).toFixed(0)+')" x="22" y="'+((padT+plotB)/2).toFixed(0)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" letter-spacing="0.06em" style="fill:var(--mut2)">&larr; LOWER NORMALIZED ALL-IN ($/SEAT/YR)</text>';}
  priced.forEach(function(x){var cx=X(x.ps),cy=Y(x.price),r=10+(x.cov/100)*11;
   if(x.gate)g+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(r+5).toFixed(1)+'" fill="none" style="stroke:var(--emph,#C15E19)" stroke-width="2" stroke-dasharray="4 3" opacity="0.9"></circle>';
   g+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+x.color+'" fill-opacity="0.88" style="stroke:var(--surface)" stroke-width="2"></circle>';
-  g+='<text x="'+cx.toFixed(1)+'" y="'+(cy-r-6).toFixed(1)+'" text-anchor="middle" font-size="12" font-weight="800" fill="'+x.color+'">'+esc(x.name)+'</text>';
-  if(x.gate)g+='<text x="'+cx.toFixed(1)+'" y="'+(cy+r+13).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" style="fill:var(--emph,#C15E19)">Must-Have gate fail</text>';});
+  g+='<text x="'+cx.toFixed(1)+'" y="'+(cy-r-6).toFixed(1)+'" text-anchor="middle" font-size="13" font-weight="800" fill="'+x.color+'">'+esc(x.name)+'</text>';
+  if(x.gate)g+='<text x="'+cx.toFixed(1)+'" y="'+(cy+r+13).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" style="fill:var(--emph,#C15E19)">Must-Have gate fail</text>';});
  if(unpriced.length){var laneY=plotB+54,laneBoxH=66,cyDot=laneY+40;
   g+='<rect x="'+padL+'" y="'+laneY+'" width="'+(W-padR-padL)+'" height="'+laneBoxH+'" rx="8" style="fill:var(--well,#EEEAE3)" opacity="0.6"></rect>';
-  g+='<text x="'+(padL+10)+'" y="'+(laneY+17)+'" font-family="var(--mono)" font-size="9" font-weight="700" letter-spacing="0.04em" style="fill:var(--mut2)">PRICE NOT SUBMITTED</text>';
+  g+='<text x="'+(padL+10)+'" y="'+(laneY+17)+'" font-family="var(--mono)" font-size="11" font-weight="700" letter-spacing="0.04em" style="fill:var(--mut2)">PRICE NOT SUBMITTED</text>';
   unpriced.forEach(function(x){var cx=X(x.ps);
    g+='<circle cx="'+cx.toFixed(1)+'" cy="'+cyDot.toFixed(1)+'" r="9" fill="none" style="stroke:'+x.color+'" stroke-width="2" stroke-dasharray="3 2"></circle>';
    g+='<text x="'+cx.toFixed(1)+'" y="'+(cyDot+22).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="'+x.color+'">'+esc(x.name)+'</text>';});}
@@ -756,7 +756,7 @@ function rfxCrossRollupHTML(){var R=RFX,esc=escapeHtmlPV;
  var rows=award.map(function(si,i){var s=R.suppliers[si],c=rfxCoverage(si),pn=rfxAnnualNum(si),gate=rfxGatePass(si);
    var price=pn!=null?fmtM(pn):'<span class="pcell em">Not submitted</span>';
    var gcell=gate?'<span class="pcell pos">Pass</span>':'<span class="pcell em">Fail</span>';
-   var badges=(i===0)?' <span class="badge hi" style="font-size:8px;padding:1px 6px;vertical-align:middle">RECOMMENDED</span>'+(!gate?' <span class="badge mid" style="font-size:8px;padding:1px 6px;vertical-align:middle;background:#C8202E;color:#fff">GATED</span>':''):'';
+   var badges=(i===0)?' <span class="badge hi" style="font-size:11px;padding:1px 6px;vertical-align:middle">RECOMMENDED</span>'+(!gate?' <span class="badge mid" style="font-size:11px;padding:1px 6px;vertical-align:middle;background:#C8202E;color:#fff">GATED</span>':''):'';
    var lead=(i===0)?' style="background:var(--pri-t)"':'';
    return '<tr'+lead+'><td style="font-weight:'+(i===0?'800':'600')+'">'+esc(s.n)+badges+'</td><td class="n" style="font-weight:800">'+rfxWeighted(si).toFixed(1)+'</td><td class="n">'+gcell+'</td><td class="n">'+(c.answered===0?'&ndash;':c.coveragePct+'%')+'</td><td class="n">'+c.completenessPct+'%</td><td class="n">'+(c.answered===0?'&ndash;':c.conforming?'<span class="pcell pos">Yes</span>':'<span class="pcell em">No</span>')+'</td><td class="n">'+price+'</td></tr>';
  }).join('');
@@ -897,10 +897,10 @@ function rfxCriterionCardsHTML(){var R=RFX,esc=escapeHtmlPV;
      var winners=maxV!=null?scored.filter(function(x){return x.v===maxV;}).map(function(x){return esc(x.n);}):[];
      var fieldHigh=winners.length?(winners.join(' / ')+(winners.length>1?' (tie)':'')):'<span style="color:var(--mut2)">not scored</span>';
      var cells=R.suppliers.map(function(s,si){var v=rfxRqScore(si,r.id);return '<td>'+(v==null?'<span style="color:var(--mut2)">-</span>':v.toFixed(1))+'</td>';}).join('');
-     return '<tr><td style="text-align:left;white-space:normal">'+rfxMoscowChip(r.moscow)+' '+esc(r.text)+(draft?' <span style="font:700 8px var(--mono);text-transform:uppercase;padding:2px 7px;border-radius:30px;color:#8A5A00;background:var(--amber-t,#FBF1DA)">DRAFT weight</span>':'')+'</td><td>'+inCatPct+'%'+(draft?'*':'')+'</td>'+cells+'<td style="text-align:left;font-size:11.5px;color:var(--mut)">'+fieldHigh+'</td></tr>';
+     return '<tr><td style="text-align:left;white-space:normal">'+rfxMoscowChip(r.moscow)+' '+esc(r.text)+(draft?' <span style="font:700 9px var(--mono);text-transform:uppercase;padding:2px 7px;border-radius:30px;color:#8A5A00;background:var(--amber-t,#FBF1DA)">DRAFT weight</span>':'')+'</td><td>'+inCatPct+'%'+(draft?'*':'')+'</td>'+cells+'<td style="text-align:left;font-size:11px;color:var(--mut)">'+fieldHigh+'</td></tr>';
    }).join('');
    var draftNote=rs.some(function(r){return r.weightConfirmed===false;})?'<div class="spnote" style="margin-top:6px">* in-category weight unconfirmed, DRAFT, confirm with the evaluation team before Group Decision. Never silently normalized.</div>':'';
-   var summary='<summary style="cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-weight:700;font-size:13px">'+esc(titleCase(w.cat))+'</span><span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:var(--plum);background:rgba(92,43,80,.10)">Category weight '+w.pct+'%</span><span style="flex:1 1 auto;min-width:0;text-align:right;font-size:11.5px;color:var(--mut)">'+leadTxt+'</span></summary>';
+   var summary='<summary style="cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-weight:700;font-size:13px">'+esc(titleCase(w.cat))+'</span><span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:var(--plum);background:rgba(92,43,80,.10)">Category weight '+w.pct+'%</span><span style="flex:1 1 auto;min-width:0;text-align:right;font-size:11px;color:var(--mut)">'+leadTxt+'</span></summary>';
    var body='<div style="padding:0 14px 14px"><div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th style="text-align:left">Requirement</th><th>In-cat wt</th>'+supHead+'<th style="text-align:left">Field-high</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+draftNote+'</div>';
    return '<details class="card rfxcase-acc" name="rfxcrit" style="margin:0 0 10px;padding:0;overflow:hidden"'+(wi===0?' open':'')+'>'+summary+body+'</details>';
  }).join('');
@@ -1013,8 +1013,8 @@ function rfxReqMatrixHTML(){var R=RFX;var rank=rfxReqRanking();var rankOf={fully
   var leaders=best>=rankOf.partial?lv.filter(function(x){return rankOf[x.lvl]===best;}).map(function(x){return x.si;}):[];
   var cells=lv.map(function(x){var isLeader=leaders.indexOf(x.si)>=0&&leaders.length<rank.length;
    // Capability #1 (Marc): match the Landscape Requirements-Heatmap, .hcell + pvHmRamp (0-5 blue ramp), ringed leader.
-   return '<td style="text-align:center;padding:6px 8px" title="'+escapeHtmlPV(rfxLevelLabel(x.lvl))+(x.v!=null?' ('+x.v+'/5)':'')+'">'+(x.v==null?'<span class="hcell hc-na" title="Data not available">--</span>':'<span class="hcell'+(isLeader?' lead':'')+'" style="background:'+rfxCovCol((x.v/5)*100)+';color:'+rfxCovFg((x.v/5)*100)+';font-size:10.5px;font-weight:800">'+lvlWord[x.lvl]+'</span>')+'</td>';}).join('');
-  return '<tr><td style="text-align:left;font-weight:600;white-space:normal;max-width:230px">'+escapeHtmlPV(r.text)+'<span style="font-size:10px;color:var(--mut2)"> · conf '+Math.round((r.confidence||0)*100)+'%</span></td><td style="font-size:11px;color:var(--mut2)">'+escapeHtmlPV(titleCase(r.category))+'</td><td>'+rfxMoscowChip(r.moscow)+'</td><td>'+(r.mandatory?rfxMcmPill('Must','rust'):'<span style="color:var(--mut2)">-</span>')+'</td>'+cells+'</tr>';
+   return '<td style="text-align:center;padding:6px 8px" title="'+escapeHtmlPV(rfxLevelLabel(x.lvl))+(x.v!=null?' ('+x.v+'/5)':'')+'">'+(x.v==null?'<span class="hcell hc-na" title="Data not available">--</span>':'<span class="hcell'+(isLeader?' lead':'')+'" style="background:'+rfxCovCol((x.v/5)*100)+';color:'+rfxCovFg((x.v/5)*100)+';font-size:11px;font-weight:800">'+lvlWord[x.lvl]+'</span>')+'</td>';}).join('');
+  return '<tr><td style="text-align:left;font-weight:600;white-space:normal;max-width:230px">'+escapeHtmlPV(r.text)+'<span style="font-size:11px;color:var(--mut2)"> · conf '+Math.round((r.confidence||0)*100)+'%</span></td><td style="font-size:11px;color:var(--mut2)">'+escapeHtmlPV(titleCase(r.category))+'</td><td>'+rfxMoscowChip(r.moscow)+'</td><td>'+(r.mandatory?rfxMcmPill('Must','rust'):'<span style="color:var(--mut2)">-</span>')+'</td>'+cells+'</tr>';
  }).join('');
  return '<div class="sect"><div class="secthd"><div class="t">Requirements Matrix</div>'+rfxCap('cross-supplier · '+R.requirements.length+' requirements')+'</div><div class="spnote" style="margin:0 0 8px">Each cell shows the MoSCoW-aware status (<b>Met</b> / <b>Partial</b> / <b>Gap</b>) on the same plum intensity ramp as the Coverage heatmap (lighter = lower); hover a cell for the underlying 0-5 score. A dashed -- cell means not answered. A leading supplier on a row is <b>ringed</b>. Reflect-only first-pass analysis.</div><div class="mxwrap"><table class="mx" style="width:100%;min-width:720px"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div></div>';
 }
@@ -1052,7 +1052,7 @@ function rfxCommercialComparisonHTML(){
  var pendingNote=anyPending?'<div class="rfxgate warn" style="margin:0 0 9px">One or more suppliers have not submitted pricing in this run. Each cell stays labeled <b>Not submitted</b> until a proposal arrives, prices are never fabricated, and Not submitted is not a zero.</div>':'';
  var h='<div class="sect"><div class="secthd"><div class="t">Commercial comparison</div>'+rfxCap('raw asks · normalized all-in · read')+'</div>';
  h+='<div class="card">';
- h+='<div style="font-weight:700;font-size:12.5px;margin-bottom:2px">Pricing schedule <span style="font-weight:500;color:var(--mut2)">· as submitted, plus Theo&rsquo;s normalized all-in read</span></div>'+pendingNote;
+ h+='<div style="font-weight:700;font-size:13px;margin-bottom:2px">Pricing schedule <span style="font-weight:500;color:var(--mut2)">· as submitted, plus Theo&rsquo;s normalized all-in read</span></div>'+pendingNote;
  var normRowsHTML='',footNote='',belowHTML='';
  if(N.bidders&&N.bidders.length){
   var termM=/([\d,]+)\s*seats?\D+(\d+)-yr/i.exec(N.termNote||'');
@@ -1079,7 +1079,7 @@ function rfxCommercialComparisonHTML(){
   var readCells=rank.map(function(si){var n=normBySi[si];
     if(!n||n.total==null)return '<td><span style="color:var(--mut2)">–</span></td>';
     return '<td>'+rfxChip(n.read,n.col,n.bg)+'</td>';}).join('');
-  normRowsHTML='<tr style="border-top:2px solid var(--line2)"><td style="text-align:left;font-weight:700">Normalized all-in <span style="font-weight:400;color:var(--mut2);font-size:10px">('+esc(N.unit)+')</span></td>'+normCells+'</tr>'
+  normRowsHTML='<tr style="border-top:2px solid var(--line2)"><td style="text-align:left;font-weight:700">Normalized all-in <span style="font-weight:400;color:var(--mut2);font-size:11px">('+esc(N.unit)+')</span></td>'+normCells+'</tr>'
    +'<tr><td style="text-align:left;font-weight:700">Normalize read</td>'+readCells+'</tr>';
   footNote='<div class="spnote" style="margin-top:8px">Normalized all-in is '+esc(N.unit)+' · denominator '+seats+' seats over the '+years+'-yr term · hover a figure for the reconciliation. Reference: '+(refAllIn?('$'+Math.round(refAllIn).toLocaleString('en-US')+'/seat/yr'):'n/a')+', the sum of Theo&rsquo;s per-line negotiation targets, annualized, the only should-cost figure RFX_NORM carries. BELOW / IN_LINE (&plusmn;5%) / ABOVE reads against it.</div>';
   var complete=N.bidders.map(function(b){return {b:b,ok:N.lines.every(function(L){return L.asks[b.id]!=null;})};});
@@ -1088,7 +1088,7 @@ function rfxCommercialComparisonHTML(){
   var gateNote=allOk
     ?'<div class="spnote" style="margin:8px 0 0">All '+N.bidders.length+' priced bidder(s) have every normalized line item priced; the comparison above is apples-to-apples.</div>'
     :'<div class="rfxgate" style="margin:8px 0 0;border:1px solid #E4B4AE;border-left:3px solid #A23A30;background:var(--pink-t,#FBE7E3);color:var(--ink)"><b style="color:var(--riskred)">Gate: blocked.</b> Not every bidder has priced every line item; the comparison above is not yet fully apples-to-apples.</div>';
-  belowHTML='<div style="font-weight:700;font-size:12.5px;margin:18px 0 2px">Bid-leveling gate <span style="font-weight:500;color:var(--mut2)">· every normalized line item priced?</span></div><div style="margin-top:8px">'+gateRow+'</div>'+gateNote;
+  belowHTML='<div style="font-weight:700;font-size:13px;margin:18px 0 2px">Bid-leveling gate <span style="font-weight:500;color:var(--mut2)">· every normalized line item priced?</span></div><div style="margin-top:8px">'+gateRow+'</div>'+gateNote;
   var assumeN=N.bidders.filter(function(b){return b.norm&&!b.norm.clean;}).length;
   var normHow=N.bidders.some(function(b){return b.norm;})?('<details class="normhow"><summary><span class="normhow-t">How Theo normalized the platform-fee line</span>'+(assumeN?'<span class="normhow-flag">'+assumeN+' of '+N.bidders.length+' needed an assumption</span>':'<span class="normhow-ok">all normalized cleanly</span>')+'</summary><div class="normhow-body"><div class="normhow-intro">Each priced bidder&rsquo;s pricing basis is converted to a common unit, <b>'+esc(N.unit)+'</b>'+(N.termNote?' · '+esc(N.termNote):'')+', so the asks compare like-for-like.</div>'+N.bidders.map(function(b){if(!b.norm)return '';var cl=b.norm.clean;return '<div class="normhow-row"><div class="normhow-sup"><span style="color:'+b.col+'">'+esc(b.name)+'</span><span class="normhow-badge '+(cl?'clean':'assume')+'">'+(cl?'clean':'assumption applied')+'</span></div><div class="normhow-m"><span class="k">Basis</span><span>'+esc(b.basis)+' <span class="normhow-arrow">→</span> $'+b.seat.toLocaleString()+'</span></div><div class="normhow-m"><span class="k">Method</span><span>'+esc(b.norm.method)+'</span></div>'+(b.norm.assumption?'<div class="normhow-m"><span class="k">'+(cl?'Note':'Assumption')+'</span><span>'+esc(b.norm.assumption)+'</span></div>':'')+'</div>';}).join('')+'</div></details>'):'';
   belowHTML+=normHow;
@@ -1131,7 +1131,7 @@ function rfxZopaBarHTML(target,walk,asks,fmt){
  var labels=pts.map(function(p,i){var pp=pos(p.v);var lane=(i%2===0)?'bottom:calc(50% + 17px)':'top:calc(50% + 17px)';
   var align=pp<=10?'left:0;transform:none;text-align:left':(pp>=90?'left:100%;transform:translateX(-100%);text-align:right':'left:'+pp.toFixed(1)+'%;transform:translateX(-50%);text-align:center');
   var valCol=p.over?'#C8202E':'var(--ink)';
-  return '<div style="position:absolute;'+lane+';'+align+';line-height:1.2;white-space:nowrap;pointer-events:none"><div style="font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:'+p.tc+'">'+escapeHtmlPV(p.tag)+'</div><div style="font-size:11px;font-weight:700;color:'+valCol+'">'+fmt(p.v)+'</div></div>';}).join('');
+  return '<div style="position:absolute;'+lane+';'+align+';line-height:1.2;white-space:nowrap;pointer-events:none"><div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:'+p.tc+'">'+escapeHtmlPV(p.tag)+'</div><div style="font-size:11px;font-weight:700;color:'+valCol+'">'+fmt(p.v)+'</div></div>';}).join('');
  return '<div style="position:relative;height:82px;margin:18px 0 4px">'+marks+labels+'</div>';
 }
 function rfxZopaFmt(L){return function(v){return L.unit.indexOf('$K')>=0?('$'+v+'K'):('$'+v.toLocaleString('en-US'));};}
@@ -1153,7 +1153,7 @@ function rfxNormZopaHTML(){
    var read=cheapest?('<b>'+esc(cheapest.name)+'</b> is lowest at '+fmt(L.asks[cheapest.id])+'.'):'No priced bidder on this line.';
    if(over.length)read+=' '+over.map(function(b){return '<b>'+esc(b.name)+'</b>';}).join(', ')+' '+(over.length>1?'sit':'sits')+' above the '+fmt(L.walk)+' walk-away.';
    if(unpriced.length)read+=' '+unpriced.map(function(b){return '<b>'+esc(b.name)+'</b>';}).join(', ')+' submitted no price for this line, not plotted.';
-   var track=sorted.length?rfxZopaBarHTML(L.target,L.walk,asks,fmt):'<div style="height:82px;display:flex;align-items:center;justify-content:center;color:var(--mut2);font-size:11.5px">No priced bidder on this line.</div>';
+   var track=sorted.length?rfxZopaBarHTML(L.target,L.walk,asks,fmt):'<div style="height:82px;display:flex;align-items:center;justify-content:center;color:var(--mut2);font-size:11px">No priced bidder on this line.</div>';
    return '<div class="rzopa-line"><div class="rzopa-row"><div class="rzopa-title"><div class="rzopa-nm">'+esc(L.item)+'</div><div class="rzopa-mkt">'+esc(L.unit)+' · market '+fmt(L.lo)+'–'+fmt(L.hi)+'</div></div><div class="rzopa-trackwrap">'+track+'<div class="rzopa-read">'+read+'</div></div></div></div>';
  }).join('');
  var h='<div class="sect"><div class="secthd"><div class="t">Cross-Supplier ZOPA</div>'+rfxCap('every bidder’s ask vs. target & walk-away')+'</div>'
@@ -1185,7 +1185,7 @@ function rfxIndivZopaHTML(si){
 // FIXED: coverage % (fully-meets / total), NOT the raw 0-5 panel average. + Weight column + OVERALL row + leaders line.
 // #78 (Marc): the RFx heatmaps use the SAME visual language as the Landscape heatmap, rounded pill cells
 // (like .hcell), leader-ringed, with a ramp legend, replicated inline since the RFx tab isn't .pvsl-scoped.
-function rfxHmPill(label,bg,fg,lead){return '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:26px;border-radius:7px;background:'+bg+';color:'+fg+';font:700 12.5px var(--sans)'+(lead?';box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.85),0 0 0 2px var(--plum)':'')+'">'+label+'</span>';}
+function rfxHmPill(label,bg,fg,lead){return '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:26px;border-radius:7px;background:'+bg+';color:'+fg+';font:700 13px var(--sans)'+(lead?';box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.85),0 0 0 2px var(--plum)':'')+'">'+label+'</span>';}
 function rfxHmSwatch(bg,lbl){return '<span style="display:inline-flex;align-items:center;gap:6px"><span style="min-width:40px;height:18px;border-radius:4px;background:'+bg+'"></span>'+lbl+'</span>';}
 function rfxHeatmapHTML(){var R=RFX;var cats=rfxCats();var rank=rfxReqRanking();var leaders=rfxCatLeaders();var esc=escapeHtmlPV;
  // Capability #1 (Marc): match the Landscape Requirements-Heatmap style, .hcell + pvHmRamp. Coverage % maps to
@@ -1234,11 +1234,11 @@ function rfxWhatsNextMiniHTML(){var stages=rfxNextStages();
  var current=stages.filter(function(s){return s.st!=='pending';}).pop()||stages[0];
  var doneCount=stages.filter(function(s){return s.st==='done';}).length;
  var h='<details class="card" style="margin:0;padding:0;overflow:hidden">';
- h+='<summary style="cursor:pointer;padding:10px 13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-weight:700;font-size:12px">What happens next</span><span style="font-size:11px;color:var(--mut2)">'+doneCount+' of '+stages.length+' stages done · currently: '+escapeHtmlPV(current.k)+'</span></summary>';
+ h+='<summary style="cursor:pointer;padding:10px 13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-weight:700;font-size:13px">What happens next</span><span style="font-size:11px;color:var(--mut2)">'+doneCount+' of '+stages.length+' stages done · currently: '+escapeHtmlPV(current.k)+'</span></summary>';
  h+='<div style="padding:0 13px 12px;border-top:1px solid var(--line2,#CFCDC8)">'+stages.map(function(s,i){
   var done=s.st==='done',active=s.st==='active';
   var col=done?'var(--plum)':active?'var(--emph,#C15E19)':'#8A969E';
-  return '<div style="display:flex;gap:8px;padding:8px 0'+(i>0?';border-top:1px solid var(--line)':'')+'"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:'+col+';color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;margin-top:1px">'+(done?'✓':active?'…':(i+1))+'</span><div><div style="font-weight:700;font-size:11px;color:'+col+'">'+escapeHtmlPV(s.k)+'</div><div style="font-size:11px;color:var(--mut);margin-top:2px;line-height:1.4">'+escapeHtmlPV(s.d)+'</div></div></div>';
+  return '<div style="display:flex;gap:8px;padding:8px 0'+(i>0?';border-top:1px solid var(--line)':'')+'"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:'+col+';color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;margin-top:1px">'+(done?'✓':active?'…':(i+1))+'</span><div><div style="font-weight:700;font-size:11px;color:'+col+'">'+escapeHtmlPV(s.k)+'</div><div style="font-size:11px;color:var(--mut);margin-top:2px;line-height:1.4">'+escapeHtmlPV(s.d)+'</div></div></div>';
  }).join('')+'</div></details>';
  return h;
 }
@@ -1352,14 +1352,14 @@ function rfxRecommendationHTML(){var R=RFX;var rank=rfxReqRanking();var recSi=ra
  // (badge + business-call note) here, never a reason to drop to the #2 bidder.
  // R1 (Marc 2026-07-27): "Final recommendation" overstated it, this is advisory and pre-award.
  var h='<div class="sect"><div class="secthd"><div class="t">Recommendation to Award</div></div>';
- h+='<div class="card" style="border-left:3px solid '+recTier.col+'"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px"><span style="font-weight:800;font-size:15px;color:'+recTier.col+'">'+escapeHtmlPV(rec.n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:'+recTier.col+';background:'+recTier.bg+'">'+escapeHtmlPV(recTier.label)+' · advisory</span><span style="font-size:12px;color:var(--mut2)">weighted fit '+recC.weightedFit+'/100 · coverage '+recC.coveragePct+'%</span>'+(recGated?' <span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:#C8202E;background:var(--pink-t,#FBE7E3)">&#9888; Must-Have gate: '+escapeHtmlPV(rec.mustFail.join(', '))+'</span>':'')+'</div>';
+ h+='<div class="card" style="border-left:3px solid '+recTier.col+'"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px"><span style="font-weight:800;font-size:16px;color:'+recTier.col+'">'+escapeHtmlPV(rec.n)+'</span><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:'+recTier.col+';background:'+recTier.bg+'">'+escapeHtmlPV(recTier.label)+' · advisory</span><span style="font-size:13px;color:var(--mut2)">weighted fit '+recC.weightedFit+'/100 · coverage '+recC.coveragePct+'%</span>'+(recGated?' <span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:30px;color:#C8202E;background:var(--pink-t,#FBE7E3)">&#9888; Must-Have gate: '+escapeHtmlPV(rec.mustFail.join(', '))+'</span>':'')+'</div>';
  var arg='On the first-pass response analysis, <b>'+escapeHtmlPV(rec.n)+'</b> is the advisory recommendation, the top panel score in the field: '+rfxRecoText(recSi,0)+(sc.recAnnual!=null?(' Recommended commercial baseline: '+rfxFmtUsd(sc.recAnnual)+'/yr.'):' A firm annual price is still required for the commercial case.');
  if(recGated){
    var nextSi=rank[1];
    arg+=(nextSi!=null?(' <b>'+escapeHtmlPV(R.suppliers[nextSi].n)+'</b> is the next-ranked bidder ('+rfxWeighted(nextSi).toFixed(1)+'/5)'+(rfxGatePass(nextSi)?', clean on every Must-Have.':'.')):'')+' <b>Business call:</b> the panel can proceed with '+escapeHtmlPV(rec.n)+' and accept the gate risk, or secure a dated remediation before award; Theo does not substitute a lower-scoring bidder for the gate alone.';
  }
  arg+=(nonConf?(' Note: '+nonConf+' supplier(s) remain non-conforming on a Must-Have and '+gating+' gating clarification(s) are open across the field; resolve these before the panel finalises.'):' No open Must-Have gate across the conforming field.');
- h+='<div style="font-size:12.5px;color:var(--ink);line-height:1.6">'+arg+'</div>';
+ h+='<div style="font-size:13px;color:var(--ink);line-height:1.6">'+arg+'</div>';
  h+='<div class="spnote" style="margin-top:8px">This IS the response-analysis brief, generated live from the submitted responses and internal data. Advisory only: the panel scores, and the award stays conditional until the contract executes.</div></div></div>';
  // The 4 approved Recommendation-subtab panels, in the approved order (2026-07-27 rework). Panel 5,
  // What Happens Next, was REMOVED from this subtab per Marc: its content (the full Advisory & Group
@@ -1411,13 +1411,13 @@ function rfxEvaluationReadinessHTML(){var R=RFX;var rank=rfxReqRanking();var rec
  var gCol=ready?'var(--plum)':'#9A3B1F';
  var gauge='<div style="flex:none;width:108px;height:108px;border-radius:50%;background:conic-gradient('+gCol+' 0% '+pct+'%, #ECEDEE '+pct+'% 100%);display:flex;align-items:center;justify-content:center">'
   +'<div style="width:78px;height:78px;border-radius:50%;background:var(--surface,#fff);display:flex;flex-direction:column;align-items:center;justify-content:center">'
-  +'<div style="font-size:19px;font-weight:800;line-height:1;color:'+gCol+'">'+pct+'%</div>'
+  +'<div style="font-size:20px;font-weight:800;line-height:1;color:'+gCol+'">'+pct+'%</div>'
   +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;color:'+gCol+'">'+(ready?'Ready':'Not ready')+'</div>'
   +'</div></div>';
  var gaugeCol='<div style="flex:none;width:132px;display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:2px">'+gauge+'<div style="font-size:11px;color:var(--mut2);text-align:center;line-height:1.4"><b style="color:var(--ink)">'+clearCount+' of '+items.length+'</b> readiness item(s) cleared</div></div>';
  var checklist='<div style="flex:1;min-width:0;column-count:2;column-gap:22px">'+items.map(function(it){
    var pill=rfxMcmPill(it.ok?'Cleared':'Blocked',it.ok?'plum':'rust');
-   return '<div style="break-inside:avoid;padding:8px 0;border-top:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px"><span style="font-weight:700;font-size:12px">'+esc(it.label)+'</span>'+pill+'</div><div style="font-size:11.2px;color:var(--mut);line-height:1.45">'+it.detail+'</div></div>';
+   return '<div style="break-inside:avoid;padding:8px 0;border-top:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px"><span style="font-weight:700;font-size:13px">'+esc(it.label)+'</span>'+pill+'</div><div style="font-size:11px;color:var(--mut);line-height:1.45">'+it.detail+'</div></div>';
  }).join('')+'</div>';
  return '<div class="sect"><div class="secthd"><div class="t">Evaluation readiness</div>'+rfxCap(clearCount+' of '+items.length+' cleared')+'</div><div class="card"><div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">'+gaugeCol+checklist+'</div><div class="spnote" style="margin-top:11px">Reflect-only checklist derived from the bid-leveling, pricing, clarification and TPRM data on file. It does not gate or advance the RFx; the panel and group decision remain the team&rsquo;s.</div></div></div>';
 }
@@ -1454,7 +1454,7 @@ function rfxBcPct(v){if(v==null)return null;var m=/([\d.]+)\s*%/.exec(String(v))
 // prior hardcoded version for the three named suppliers on file today.
 function rfxBcSupTone(name){return rfxSupplierToneName(name);}
 function rfxBcSwatch(name){var c=RFX_MCM[rfxBcSupTone(name)][0];return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;background:'+c+'"></span>';}
-function rfxBcNeedsChip(label){return '<span style="display:inline-block;font:700 9.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:1px 6px;border-radius:4px;color:var(--emph,#C15E19);background:var(--emph-t,#F7E7D8)">'+escapeHtmlPV(label||'Not submitted')+'</span>';}
+function rfxBcNeedsChip(label){return '<span style="display:inline-block;font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:1px 6px;border-radius:4px;color:var(--emph,#C15E19);background:var(--emph-t,#F7E7D8)">'+escapeHtmlPV(label||'Not submitted')+'</span>';}
 // Left-accent callout box (The Ask / Approval Sought), tone-driven, MCM-only.
 function rfxBcCallout(label,txt,tone){var tk=RFX_MCM[tone]?tone:'plum',c=RFX_MCM[tk];
  // c[0] is the FILL tone, correct for the left-accent border below; the label TEXT sits on this
@@ -1462,16 +1462,16 @@ function rfxBcCallout(label,txt,tone){var tk=RFX_MCM[tone]?tone:'plum',c=RFX_MCM
  // context-aware rfxMcmPillTxt(tone) (dark-safe where the tint itself is theme-aware, e.g. plum/
  // emph; a fixed safe literal otherwise), never the raw c[0] FILL hex.
  var txtCol=rfxMcmPillTxt(tk);
- return '<div class="card" style="border-left:3px solid '+c[0]+';background:'+c[1]+'"><div style="font:800 10.5px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:'+txtCol+';margin-bottom:5px">'+escapeHtmlPV(label)+'</div><div style="font-size:12.8px;line-height:1.6;color:var(--ink)">'+txt+'</div></div>';}
+ return '<div class="card" style="border-left:3px solid '+c[0]+';background:'+c[1]+'"><div style="font:800 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:'+txtCol+';margin-bottom:5px">'+escapeHtmlPV(label)+'</div><div style="font-size:13px;line-height:1.6;color:var(--ink)">'+txt+'</div></div>';}
 // Label/value row for the Value rowset in The Ask.
-function rfxBcLvRow(label,val,isFirst){return '<div style="padding:11px 16px'+(isFirst?'':';border-top:1px solid var(--line)')+';display:flex;gap:18px;flex-wrap:wrap"><div style="flex:0 0 155px;font-weight:700;font-size:11px;color:var(--plum);text-transform:uppercase;letter-spacing:.03em;font-family:var(--mono)">'+escapeHtmlPV(label)+'</div><div style="flex:1 1 260px;min-width:0;font-size:12.6px;line-height:1.6;color:var(--ink)">'+val+'</div></div>';}
+function rfxBcLvRow(label,val,isFirst){return '<div style="padding:11px 16px'+(isFirst?'':';border-top:1px solid var(--line)')+';display:flex;gap:18px;flex-wrap:wrap"><div style="flex:0 0 155px;font-weight:700;font-size:11px;color:var(--plum);text-transform:uppercase;letter-spacing:.03em;font-family:var(--mono)">'+escapeHtmlPV(label)+'</div><div style="flex:1 1 260px;min-width:0;font-size:13px;line-height:1.6;color:var(--ink)">'+val+'</div></div>';}
 // Risk & Mitigation mini-card.
-function rfxBcMiniBox(label,txt,color){return '<div style="flex:1 1 220px;min-width:0;padding:9px 12px;background:var(--panel);border-radius:8px;border:1px solid var(--line2,#CFCDC8)"><div style="font:800 10px var(--sans);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;color:'+color+'">'+escapeHtmlPV(label)+'</div><div style="font-size:11.6px;line-height:1.5;color:var(--ink)">'+txt+'</div></div>';}
+function rfxBcMiniBox(label,txt,color){return '<div style="flex:1 1 220px;min-width:0;padding:9px 12px;background:var(--panel);border-radius:8px;border:1px solid var(--line2,#CFCDC8)"><div style="font:800 11px var(--sans);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;color:'+color+'">'+escapeHtmlPV(label)+'</div><div style="font-size:11px;line-height:1.5;color:var(--ink)">'+txt+'</div></div>';}
 // Committee Decision card.
 function rfxBcDecisionCard(title,tag,txt,trigLabel,trigTxt,tone){var tk=RFX_MCM[tone]?tone:'grey',c=RFX_MCM[tk];
  // border-top stays the FILL tone (c[0]); the title sits on this card's real --surface
  // background, which is theme-aware, so the title uses the dark-safe tone TEXT token.
- return '<div class="card" style="border-top:3px solid '+c[0]+'"><div style="font:800 12.5px var(--sans);letter-spacing:.02em;margin-bottom:3px;color:'+rfxMcmTxt(tk)+'">'+escapeHtmlPV(title)+'</div><div style="font-size:10px;color:var(--mut2);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px">'+escapeHtmlPV(tag)+'</div><div style="font-size:12.2px;line-height:1.55;color:var(--ink)">'+txt+'</div><div style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);margin:9px 0 3px">'+escapeHtmlPV(trigLabel)+'</div><div style="font-size:12.2px;line-height:1.55;color:var(--ink)">'+trigTxt+'</div></div>';}
+ return '<div class="card" style="border-top:3px solid '+c[0]+'"><div style="font:800 13px var(--sans);letter-spacing:.02em;margin-bottom:3px;color:'+rfxMcmTxt(tk)+'">'+escapeHtmlPV(title)+'</div><div style="font-size:11px;color:var(--mut2);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px">'+escapeHtmlPV(tag)+'</div><div style="font-size:13px;line-height:1.55;color:var(--ink)">'+txt+'</div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);margin:9px 0 3px">'+escapeHtmlPV(trigLabel)+'</div><div style="font-size:13px;line-height:1.55;color:var(--ink)">'+trigTxt+'</div></div>';}
 
 // ============================================================================
 // BLOCK 3 (right half): Deal Terms & The Field, term sheet left.
@@ -1493,10 +1493,10 @@ function rfxBcDealTermsHTML(si){
  var gated=!!(s.mustFail&&s.mustFail.length);
  var h='<div class="card" style="border-left:3px solid var(--plum)">';
  h+='<div class="secthd"><div class="t">Current Deal Terms</div><div class="cap">'+esc(s.n)+' · Recommended</div></div>';
- h+='<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font:800 22px var(--sans);color:var(--plum);line-height:1">'+(annual!=null?rfxFmtUsd(annual):'Not submitted')+'</span>'+(annual!=null?'<span style="font-size:11px;color:var(--mut2)">/yr</span>':'')+'</div>';
- h+='<div style="font-size:11.5px;color:var(--mut2);line-height:1.5;margin-top:3px">'+(priceLine||'no comparable priced bidder')+(isLowestPrice?((priceLine?' · ':'')+'<b style="color:var(--ink)">lowest submitted price</b> in the field'):'')+'</div>';
- h+='<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:10px"><span style="font:800 18px var(--sans);color:var(--plum)">'+wt.toFixed(1)+' / 5</span></div>';
- h+='<div style="font-size:11.5px;color:var(--mut2);line-height:1.5;margin-top:3px">'+scoreLine+(isTopScore?' · <b style="color:var(--ink)">highest panel score</b> in the field':'')+'</div>';
+ h+='<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font:800 20px var(--sans);color:var(--plum);line-height:1">'+(annual!=null?rfxFmtUsd(annual):'Not submitted')+'</span>'+(annual!=null?'<span style="font-size:11px;color:var(--mut2)">/yr</span>':'')+'</div>';
+ h+='<div style="font-size:11px;color:var(--mut2);line-height:1.5;margin-top:3px">'+(priceLine||'no comparable priced bidder')+(isLowestPrice?((priceLine?' · ':'')+'<b style="color:var(--ink)">lowest submitted price</b> in the field'):'')+'</div>';
+ h+='<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:10px"><span style="font:800 20px var(--sans);color:var(--plum)">'+wt.toFixed(1)+' / 5</span></div>';
+ h+='<div style="font-size:11px;color:var(--mut2);line-height:1.5;margin-top:3px">'+scoreLine+(isTopScore?' · <b style="color:var(--ink)">highest panel score</b> in the field':'')+'</div>';
  var kv=[['Term',pr.terms],['Pricing Model',pr.model],['Escalator Cap',pr.escalator],['Pricing Hold',pr.binding],['Volume Discount',pr.discount],['Implementation',pr.impl]].filter(function(r){return r[1]!=null&&r[1]!=='';});
  h+='<div class="kv" style="margin-top:13px">'+kv.map(function(r){return '<div class="k">'+esc(r[0])+'</div><div class="v">'+rfxPriceVal(r[1])+'</div>';}).join('')+'<div class="k">Exit Terms</div><div class="v" style="color:var(--mut2);font-weight:500">Not yet negotiated; addressed in the MSA</div></div>';
  if(runner){
@@ -1510,7 +1510,7 @@ function rfxBcTermsMatrixHTML(recSi){
  var R=RFX,esc=escapeHtmlPV;
  var order=[recSi].concat(R.suppliers.map(function(x,i){return i;}).filter(function(i){return i!==recSi;}));
  function tint(i){return i===recSi?' style="background:var(--plum-t,#EDDFE9)"':'';}
- var head=order.map(function(i){var s=R.suppliers[i];return '<th'+tint(i)+'>'+rfxBcSwatch(s.n)+esc(s.n)+(i===recSi?'<br><span style="font-weight:600;text-transform:none;font-size:8.5px">Recommended</span>':'')+'</th>';}).join('');
+ var head=order.map(function(i){var s=R.suppliers[i];return '<th'+tint(i)+'>'+rfxBcSwatch(s.n)+esc(s.n)+(i===recSi?'<br><span style="font-weight:600;text-transform:none;font-size:11px">Recommended</span>':'')+'</th>';}).join('');
  function row(label,fn){return '<tr><td style="text-align:left">'+escapeHtmlPV(label)+'</td>'+order.map(function(i){return '<td'+tint(i)+'>'+fn(i)+'</td>';}).join('')+'</tr>';}
  var body='';
  body+=row('Panel Score',function(i){return '<b>'+rfxWeighted(i).toFixed(1)+' / 5</b>';});
@@ -1552,49 +1552,49 @@ function rfxBcTcvBySupplierSvg(){
   if(v!=null){
    var hgt=Math.max(6,(v/maxV)*(baseY-padT)),y=baseY-hgt;
    g+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+barW+'" height="'+hgt.toFixed(1)+'" rx="3" fill="'+tone+'"></rect>';
-   g+='<text x="'+(x+barW/2).toFixed(1)+'" y="'+(y-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="10" font-weight="700" fill="'+txtTone+'">'+rfxFmtUsd(v)+'</text>';
+   g+='<text x="'+(x+barW/2).toFixed(1)+'" y="'+(y-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" fill="'+txtTone+'">'+rfxFmtUsd(v)+'</text>';
   } else {
    g+='<rect x="'+x.toFixed(1)+'" y="'+(baseY-26).toFixed(1)+'" width="'+barW+'" height="26" rx="3" fill="none" stroke="var(--grey,#8A969E)" stroke-width="1.5" stroke-dasharray="3 3"></rect>';
-   g+='<text x="'+(x+barW/2).toFixed(1)+'" y="'+(baseY-32).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="7.5" font-weight="700" fill="'+rfxMcmTxt('grey')+'">NOT SUBMITTED</text>';
+   g+='<text x="'+(x+barW/2).toFixed(1)+'" y="'+(baseY-32).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" fill="'+rfxMcmTxt('grey')+'">NOT SUBMITTED</text>';
   }
-  g+='<text x="'+(x+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--sans)" font-size="9.5" font-weight="700" fill="var(--ink)">'+esc(s.n.split(' ')[0])+'</text>';
+  g+='<text x="'+(x+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--sans)" font-size="11" font-weight="700" fill="var(--ink)">'+esc(s.n.split(' ')[0])+'</text>';
  });
  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block" role="img" aria-label="3-year TCV comparison across suppliers">'+g+'</svg>';
 }
 function rfxBcWaterfallSvg(si){
  var R=RFX,s=R.suppliers[si],pr=s.pricing||{};
  var annual=rfxAnnualNum(si),list=rfxBcNum(pr.list);
- if(annual==null||list==null||list<=annual)return '<div style="font-size:11.5px;color:var(--mut2);padding:28px 8px;text-align:center">No list price on file to compute a savings waterfall for '+escapeHtmlPV(s.n)+'.</div>';
+ if(annual==null||list==null||list<=annual)return '<div style="font-size:11px;color:var(--mut2);padding:28px 8px;text-align:center">No list price on file to compute a savings waterfall for '+escapeHtmlPV(s.n)+'.</div>';
  var saving=list-annual,pct=Math.round(saving/list*100);
  var W=260,H=150,padT=20,padB=34,barW=54,gap=24,padL=(W-3*barW-2*gap)/2;
  function Y(v){return padT+(1-(v/list))*(H-padT-padB);}
  var x0=padL,x1=padL+barW+gap,x2=padL+2*(barW+gap);
  var g='';
  g+='<rect x="'+x0.toFixed(1)+'" y="'+Y(list).toFixed(1)+'" width="'+barW+'" height="'+(Y(0)-Y(list)).toFixed(1)+'" rx="3" fill="var(--mut2)" opacity="0.5"></rect>';
- g+='<text x="'+(x0+barW/2).toFixed(1)+'" y="'+(Y(list)-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="9.5" font-weight="700" fill="var(--ink)">'+rfxFmtUsd(list)+'</text>';
- g+='<text x="'+(x0+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--mono)" font-size="8.6" fill="var(--mut2)">List</text>';
+ g+='<text x="'+(x0+barW/2).toFixed(1)+'" y="'+(Y(list)-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" fill="var(--ink)">'+rfxFmtUsd(list)+'</text>';
+ g+='<text x="'+(x0+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--mut2)">List</text>';
  g+='<line x1="'+(x0+barW).toFixed(1)+'" y1="'+Y(list).toFixed(1)+'" x2="'+x1.toFixed(1)+'" y2="'+Y(list).toFixed(1)+'" stroke="var(--line2,#CFCDC8)" stroke-dasharray="2 3"></line>';
  g+='<rect x="'+x1.toFixed(1)+'" y="'+Y(list).toFixed(1)+'" width="'+barW+'" height="'+(Y(annual)-Y(list)).toFixed(1)+'" rx="3" fill="var(--emph,#C15E19)" opacity="0.9"></rect>';
- g+='<text x="'+(x1+barW/2).toFixed(1)+'" y="'+(Y(list)-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="9.5" font-weight="700" fill="var(--emph,#C15E19)">-'+rfxFmtUsd(saving)+'</text>';
- g+='<text x="'+(x1+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--mono)" font-size="8.6" fill="var(--mut2)">Saving</text>';
+ g+='<text x="'+(x1+barW/2).toFixed(1)+'" y="'+(Y(list)-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" fill="var(--emph,#C15E19)">-'+rfxFmtUsd(saving)+'</text>';
+ g+='<text x="'+(x1+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--mut2)">Saving</text>';
  g+='<line x1="'+(x1+barW).toFixed(1)+'" y1="'+Y(annual).toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+Y(annual).toFixed(1)+'" stroke="var(--line2,#CFCDC8)" stroke-dasharray="2 3"></line>';
  g+='<rect x="'+x2.toFixed(1)+'" y="'+Y(annual).toFixed(1)+'" width="'+barW+'" height="'+(Y(0)-Y(annual)).toFixed(1)+'" rx="3" fill="var(--plum)"></rect>';
- g+='<text x="'+(x2+barW/2).toFixed(1)+'" y="'+(Y(annual)-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="9.5" font-weight="700" fill="var(--plum)">'+rfxFmtUsd(annual)+'</text>';
- g+='<text x="'+(x2+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--mono)" font-size="8.6" fill="var(--mut2)">Net</text>';
+ g+='<text x="'+(x2+barW/2).toFixed(1)+'" y="'+(Y(annual)-8).toFixed(1)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="700" fill="var(--plum)">'+rfxFmtUsd(annual)+'</text>';
+ g+='<text x="'+(x2+barW/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--mut2)">Net</text>';
  g+='<line x1="'+x0.toFixed(1)+'" y1="'+Y(0).toFixed(1)+'" x2="'+(x2+barW).toFixed(1)+'" y2="'+Y(0).toFixed(1)+'" stroke="var(--line2,#CFCDC8)" stroke-width="1"></line>';
  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block" role="img" aria-label="Savings waterfall from list price to negotiated price">'+g+'</svg>';
 }
 function rfxBcChartToggleHTML(recSi){
  var h='<div class="card" style="padding:12px 13px">';
  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px">';
- h+='<div style="font:800 10.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--ink)" id="rfxBcChartTitle">3-Yr TCV by Supplier</div>';
+ h+='<div style="font:800 11px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--ink)" id="rfxBcChartTitle">3-Yr TCV by Supplier</div>';
  h+='<div style="display:flex;gap:6px" role="tablist" aria-label="Chart selector">';
  h+='<button type="button" id="rfxBcToggleTcv" onclick="rfxBcChartToggle(\'tcv\')" style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:4px 9px;border-radius:20px;border:1.5px solid var(--plum);background:var(--plum);color:#fff;cursor:pointer">TCV</button>';
  h+='<button type="button" id="rfxBcToggleWf" onclick="rfxBcChartToggle(\'wf\')" style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:4px 9px;border-radius:20px;border:1.5px solid var(--line2,#CFCDC8);background:var(--card,var(--surface,#fff));color:var(--mut);cursor:pointer">Waterfall</button>';
  h+='</div></div>';
  h+='<div id="rfxBcChartTcv">'+rfxBcTcvBySupplierSvg()+'</div>';
  h+='<div id="rfxBcChartWf" style="display:none">'+rfxBcWaterfallSvg(recSi)+'</div>';
- h+='<div style="font-size:10.3px;color:var(--mut2);margin-top:6px;line-height:1.45" id="rfxBcChartFoot">Helio submitted no price; shown as a gap-state, not a bar.</div>';
+ h+='<div style="font-size:11px;color:var(--mut2);margin-top:6px;line-height:1.45" id="rfxBcChartFoot">Helio submitted no price; shown as a gap-state, not a bar.</div>';
  h+='</div>';
  return h;
 }
@@ -1624,7 +1624,7 @@ window.rfxBcChartToggle=function(which){
 function rfxBcDealEconomicsHTML(recSi){
  var R=RFX,esc=escapeHtmlPV,s=R.suppliers[recSi],pr=s.pricing||{};
  var annual=rfxAnnualNum(recSi);
- if(annual==null)return '<div class="grp"><span class="gt">Deal Economics</span></div><div class="sect"><div class="card"><div style="font-size:12.5px;color:var(--mut2)">No deal-economics panel could be computed: '+esc(s.n)+'&rsquo;s pricing schedule does not carry a firm annual price.</div></div></div>';
+ if(annual==null)return '<div class="grp"><span class="gt">Deal Economics</span></div><div class="sect"><div class="card"><div style="font-size:13px;color:var(--mut2)">No deal-economics panel could be computed: '+esc(s.n)+'&rsquo;s pricing schedule does not carry a firm annual price.</div></div></div>';
  var impl=rfxBcNum(pr.impl),escPct=rfxBcPct(pr.escalator)||0;
  var years=3,implAmort=impl!=null?Math.round(impl/years):0;
  var cum=0;[1,2,3].forEach(function(y){var sub=Math.round(annual*Math.pow(1+escPct/100,y-1));cum+=sub+implAmort;});
@@ -1670,7 +1670,7 @@ function rfxBcLineItemPnlTableHTML(recSi){
  var annual=rfxAnnualNum(recSi);
  if(annual==null)return '';
  var split=pr.lineItemSplit;
- if(!split)return '<div style="font-size:12.5px;color:var(--mut2);padding:6px 2px">No indicative subscription / support / training split is on file for '+esc(s.n)+'; the line-item mini-P&amp;L cannot be computed without fabricating a split.</div>';
+ if(!split)return '<div style="font-size:13px;color:var(--mut2);padding:6px 2px">No indicative subscription / support / training split is on file for '+esc(s.n)+'; the line-item mini-P&amp;L cannot be computed without fabricating a split.</div>';
  var impl=rfxBcNum(pr.impl),escPct=rfxBcPct(pr.escalator)||0;
  var subPct=split.subscriptionOfAnnualPct/100,supPct=split.supportOfAnnualPct/100;
  var implPct=split.implOfImplPct/100,trainPct=split.trainingOfImplPct/100;
@@ -1684,7 +1684,7 @@ function rfxBcLineItemPnlTableHTML(recSi){
  var annualTotals=[0,1,2].map(function(idx){return subRow[idx]+supRow[idx]+(implRow[idx]||0)+(trainRow[idx]||0);});
  var cum=0,cumRow=annualTotals.map(function(v){cum+=v;return cum;});
  var grand=cumRow[2];
- function tr(label,basis,row,tot){return '<tr><td style="text-align:left">'+esc(label)+'</td><td style="text-align:left;font-size:10.5px;color:var(--mut2);font-weight:500">'+esc(basis)+'</td>'+row.map(function(v){return '<td>'+(v!=null?rfxFmtUsd(v):'-')+'</td>';}).join('')+'<td><b>'+rfxFmtUsd(tot)+'</b></td></tr>';}
+ function tr(label,basis,row,tot){return '<tr><td style="text-align:left">'+esc(label)+'</td><td style="text-align:left;font-size:11px;color:var(--mut2);font-weight:500">'+esc(basis)+'</td>'+row.map(function(v){return '<td>'+(v!=null?rfxFmtUsd(v):'-')+'</td>';}).join('')+'<td><b>'+rfxFmtUsd(tot)+'</b></td></tr>';}
  var body='';
  body+=tr('Subscription / License','Indicative '+split.subscriptionOfAnnualPct+'% of the annual fee',subRow,sum3(subRow));
  body+=tr('Support & Maintenance','Indicative '+split.supportOfAnnualPct+'% of the annual fee',supRow,sum3(supRow));
@@ -1692,7 +1692,7 @@ function rfxBcLineItemPnlTableHTML(recSi){
  body+=tr('Training',impl!=null?('Indicative '+split.trainingOfImplPct+'%, sub-allocated from the implementation fee'):'Not on file',trainRow,sum3(trainRow));
  body+='<tr style="font-weight:800"><td colspan="2" style="text-align:left">Annual Total</td>'+annualTotals.map(function(v){return '<td>'+rfxFmtUsd(v)+'</td>';}).join('')+'<td>'+rfxFmtUsd(grand)+'</td></tr>';
  body+='<tr style="background:var(--nested,var(--panel))"><td colspan="2" style="text-align:left">Cumulative</td>'+cumRow.map(function(v){return '<td>'+rfxFmtUsd(v)+'</td>';}).join('')+'<td>-</td></tr>';
- var h='<div style="font:800 9.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);margin-bottom:8px">Mini P&amp;L · '+esc(s.n)+' (3-Yr) · '+escPct+'% annual escalation on recurring lines only</div>';
+ var h='<div style="font:800 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);margin-bottom:8px">Mini P&amp;L · '+esc(s.n)+' (3-Yr) · '+escPct+'% annual escalation on recurring lines only</div>';
  h+='<div class="mxwrap"><table class="mx" style="width:100%"><thead><tr><th style="text-align:left">Line Item</th><th style="text-align:left">Basis</th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>3-Yr Total</th></tr></thead><tbody>'+body+'</tbody></table></div>';
  // Own footnote removed (Marc, 2026-07-26): merged into the ONE synthesized Deal Economics footnote
  // in rfxBcDealEconomicsHTML (BLOCK 4 above), which already covers this split/escalation ground so
@@ -1722,9 +1722,9 @@ function rfxBcAskHTML(recSi){
 
  var h=rfxBcCallout('The Ask','Award the enterprise data platform contract to <b>'+esc(rec.n)+'</b>'+(gated?(', subject to the '+gateTxt+' condition below and to final contract execution.'):', subject to final contract execution.'),'plum');
 
- h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11.5px">Grounded Rationale</span><span class="gsub">why '+esc(rec.n)+', on the panel&rsquo;s own criteria</span></div>';
+ h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11px">Grounded Rationale</span><span class="gsub">why '+esc(rec.n)+', on the panel&rsquo;s own criteria</span></div>';
  h+='<div class="sect card">';
- h+='<div style="font-size:12.8px;line-height:1.65;color:var(--ink)">'+esc(rec.n)+' returned the highest weighted panel score in the field, <b>'+rfxWeighted(recSi).toFixed(1)+' out of 5</b>, and fully meets <b>'+c.coveragePct+'%</b> of the '+R.requirements.length+' RFx requirements, leading the field on functional fit, commercial offer and self-service usability.'+(gated?(' It does not lead on security &amp; compliance, which is why the '+gateTxt+' gate below stands as a named condition rather than a silent risk.'):' It clears every Must-Have on file.')+' The evaluation policy keeps the top scorer as the advisory recommendation with any gate flagged, not demoted.</div>';
+ h+='<div style="font-size:13px;line-height:1.65;color:var(--ink)">'+esc(rec.n)+' returned the highest weighted panel score in the field, <b>'+rfxWeighted(recSi).toFixed(1)+' out of 5</b>, and fully meets <b>'+c.coveragePct+'%</b> of the '+R.requirements.length+' RFx requirements, leading the field on functional fit, commercial offer and self-service usability.'+(gated?(' It does not lead on security &amp; compliance, which is why the '+gateTxt+' gate below stands as a named condition rather than a silent risk.'):' It clears every Must-Have on file.')+' The evaluation policy keeps the top scorer as the advisory recommendation with any gate flagged, not demoted.</div>';
  h+='<div class="kstrip" style="margin-top:12px">';
  h+='<div class="card kc"><div class="kl">Panel Score</div><div class="kn" style="color:var(--plum)">'+rfxWeighted(recSi).toFixed(1)+' / 5</div><div class="ks">field-leading, all suppliers scored</div></div>';
  h+='<div class="card kc"><div class="kl">Coverage</div><div class="kn">'+c.coveragePct+'%</div><div class="ks">of '+R.requirements.length+' requirements fully met</div></div>';
@@ -1732,7 +1732,7 @@ function rfxBcAskHTML(recSi){
  h+='<div class="card kc'+(gated?' emph':'')+'"><div class="kl">Gate Status</div><div class="kn" style="color:'+(gated?'var(--emph,#C15E19)':'var(--plum)')+'">'+(gated?'1 Open':'Clear')+'</div><div class="ks">'+(gated?(gateTxt+', Must-Have'):'every Must-Have met')+'</div></div>';
  h+='</div></div>';
 
- h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11.5px">Value</span><span class="gsub">indicative, pre-negotiation</span></div>';
+ h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11px">Value</span><span class="gsub">indicative, pre-negotiation</span></div>';
  h+='<div class="sect card" style="padding:0">';
  h+=rfxBcLvRow('Annual Price',(annual!=null?('<b>'+rfxFmtUsd(annual)+'</b>/yr'+(pr.discount&&String(pr.discount)!=='Not submitted'?(', '+esc(pr.discount)+' below the '+(pr.list?esc(pr.list):'list price')+', held firm'+(pr.binding?(' '+esc(pr.binding).toLowerCase().replace(/^yes,\s*/,'')):'')+'.'):'.')):'Not yet submitted.'),true);
  h+=rfxBcLvRow('Implementation',pr.impl?('<b>'+esc(pr.impl)+'</b> (as submitted).'):'Not on file.');
@@ -1740,22 +1740,22 @@ function rfxBcAskHTML(recSi){
  h+=rfxBcLvRow('Indicative 3-Yr TCV',(tco3!=null?('<b>'+rfxFmtUsd(tco3)+'</b> (annual × 3, before implementation and escalators). Illustrative only, not the negotiated contract value.'):'Pending a firm annual price.'));
  h+='</div>';
 
- h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11.5px">Risk &amp; Mitigation</span></div>';
+ h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11px">Risk &amp; Mitigation</span></div>';
  h+='<div class="sect card">';
  if(gated){
-  h+='<div style="font-size:12.8px;line-height:1.65;color:var(--ink)">The open item is <b>'+gateTxt+'</b>, a Must-Have under the requirements register. '+esc(rec.n)+' does not currently satisfy it; per the panel&rsquo;s own clarification process, an in-progress remediation does not satisfy the gate at award. It is the requirement the recommendation carries as an open risk rather than a silent one.</div>';
+  h+='<div style="font-size:13px;line-height:1.65;color:var(--ink)">The open item is <b>'+gateTxt+'</b>, a Must-Have under the requirements register. '+esc(rec.n)+' does not currently satisfy it; per the panel&rsquo;s own clarification process, an in-progress remediation does not satisfy the gate at award. It is the requirement the recommendation carries as an open risk rather than a silent one.</div>';
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:11px">';
   h+=rfxBcMiniBox('Preferred Mitigation','Secure a dated remediation commitment from '+esc(rec.n)+' for the '+gateTxt+' gap; hold contract execution until it is received.','var(--plum)');
   h+=rfxBcMiniBox('Accept-Risk Fallback','Panel documents formal acceptance of the gap and proceeds without remediation; requires explicit sign-off, not a default.','var(--mut2)');
   h+=rfxBcMiniBox('Walk-Away Comparator',next?('<b>'+esc(next.n)+'</b> is clean on every Must-Have today'+(nextAnnual!=null?(' at an indicative '+rfxFmtUsd(nextAnnual)+'/yr'):'')+(annual!=null&&nextAnnual!=null?(', about '+rfxFmtUsd(Math.abs(nextAnnual-annual))+'/yr '+(nextAnnual>=annual?'above':'below')+' '+esc(rec.n)+'.'):'.')):'No conforming alternative is on file today.',rfxMcmTxt('rust'));
   h+='</div>';
  } else {
-  h+='<div style="font-size:12.8px;line-height:1.65;color:var(--ink)">No open Must-Have gap is on file for '+esc(rec.n)+'; residual risk is the standard pre-negotiation commercial and legal exposure carried into the MSA process.</div>';
+  h+='<div style="font-size:13px;line-height:1.65;color:var(--ink)">No open Must-Have gap is on file for '+esc(rec.n)+'; residual risk is the standard pre-negotiation commercial and legal exposure carried into the MSA process.</div>';
  }
  h+='</div>';
 
- h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11.5px">Conditions &amp; Contingencies</span></div>';
- h+='<div class="sect card"><ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.75;color:var(--ink)">';
+ h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11px">Conditions &amp; Contingencies</span></div>';
+ h+='<div class="sect card"><ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.75;color:var(--ink)">';
  if(gated){
   h+='<li>'+esc(rec.n)+' must deliver a dated '+gateTxt+' remediation commitment before contract execution proceeds to signature.</li>';
   h+='<li>Negotiation targets the submitted implementation quote and confirms the escalator cap survives redline.</li>';
@@ -1766,10 +1766,10 @@ function rfxBcAskHTML(recSi){
  }
  h+='</ul></div>';
 
- h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11.5px">Approval Sought</span></div>';
+ h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11px">Approval Sought</span></div>';
  h+='<div class="sect">'+rfxBcCallout('Specific To This Session','Panel confirmation of '+esc(rec.n)+' as the recommended award, and authorization to proceed into contract negotiation. The award itself remains conditional on contract execution'+(gated?(' and on satisfying the '+gateTxt+' condition above'):'')+'; this is not a final award decision.','emph')+'</div>';
 
- h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11.5px">Committee Decision</span><span class="gsub">choose one, each path states what it triggers</span></div>';
+ h+='<div class="grp" style="margin-top:16px"><span class="gt" style="font-size:11px">Committee Decision</span><span class="gsub">choose one, each path states what it triggers</span></div>';
  h+='<div class="sect" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">';
  h+=rfxBcDecisionCard('Approve','Proceed On Current Terms','Negotiation begins immediately.'+(gated?(' The panel accepts the '+gateTxt+' gate as a documented, known risk carried into contract execution.'):' The panel proceeds on the current, gate-clear terms.'),'Triggers','Category team opens negotiation this week'+(gated?'; no remediation condition attached.':'.'),'teal');
  h+=rfxBcDecisionCard('Approve With Conditions','Recommended Path','Negotiation begins, but contract execution is held until '+esc(rec.n)+' delivers'+(gated?(' a dated '+gateTxt+' remediation commitment.'):' any outstanding condition on file.'),'Triggers','Legal and procurement track the condition to close; execution blocked until cleared.','plum');
@@ -1835,15 +1835,15 @@ function rfxBcPathToCloseHTML(recSi){
    +'</div>';
   var acc='<details class="card" style="margin:0 0 14px;padding:0;overflow:hidden;flex:1;min-width:0"'+(i===0?' open':'')+'>';
   acc+='<summary style="cursor:pointer;list-style:none;padding:12px 15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-   +'<span style="font-weight:700;font-size:13.5px;color:var(--ink)">'+st.name+'</span>'
+   +'<span style="font-weight:700;font-size:13px;color:var(--ink)">'+st.name+'</span>'
    +rfxMcmPill(st.status,st.tone)
-   +'<span style="font-size:10.8px;color:var(--mut2);font-family:var(--mono)">'+st.owner+'</span>'
+   +'<span style="font-size:11px;color:var(--mut2);font-family:var(--mono)">'+st.owner+'</span>'
    +'</summary>';
   acc+='<div style="padding:12px 16px 15px;border-top:1px solid var(--line)">';
-  acc+='<div style="font-size:12.3px;line-height:1.6;color:var(--ink);margin-bottom:9px">'+st.desc+'</div>';
-  acc+='<div style="font-size:11.4px;color:var(--mut);line-height:1.55;margin-bottom:9px"><b style="color:var(--ink)">Depends on:</b> '+st.dep+'</div>';
-  if(st.gateNote)acc+='<div style="margin-bottom:9px;padding:8px 11px;border-radius:8px;background:var(--rust-t,#F3DFD6);color:var(--rust,#9A3B1F);font-size:11.4px;line-height:1.5;font-weight:600">'+st.gateNote+'</div>';
-  acc+='<div style="padding:9px 12px;border-radius:8px;background:var(--panel);border-left:3px solid var(--plum);font-size:11.8px;line-height:1.55;color:var(--ink)"><b style="color:var(--plum)">What unblocks it:</b> '+st.unblock+'</div>';
+  acc+='<div style="font-size:13px;line-height:1.6;color:var(--ink);margin-bottom:9px">'+st.desc+'</div>';
+  acc+='<div style="font-size:11px;color:var(--mut);line-height:1.55;margin-bottom:9px"><b style="color:var(--ink)">Depends on:</b> '+st.dep+'</div>';
+  if(st.gateNote)acc+='<div style="margin-bottom:9px;padding:8px 11px;border-radius:8px;background:var(--rust-t,#F3DFD6);color:var(--rust,#9A3B1F);font-size:11px;line-height:1.5;font-weight:600">'+st.gateNote+'</div>';
+  acc+='<div style="padding:9px 12px;border-radius:8px;background:var(--panel);border-left:3px solid var(--plum);font-size:11px;line-height:1.55;color:var(--ink)"><b style="color:var(--plum)">What unblocks it:</b> '+st.unblock+'</div>';
   acc+='</div></details>';
   return '<div style="display:flex;gap:14px;align-items:stretch">'+rail+acc+'</div>';
  }).join('');
@@ -1884,7 +1884,7 @@ function rfxBcWhatChangedHTML(si){var R=RFX,esc=escapeHtmlPV,s=R.suppliers[si]||
  var body=rows.map(function(r){
    return '<tr><td style="text-align:left;font-weight:600">'+esc(r[0])+'</td>'
      +'<td style="text-align:left;font-weight:700;white-space:nowrap">'+r[1]+'</td>'
-     +'<td style="text-align:left;color:var(--mut);font-size:12px;line-height:1.5">'+esc(r[2])+'</td></tr>';
+     +'<td style="text-align:left;color:var(--mut);font-size:13px;line-height:1.5">'+esc(r[2])+'</td></tr>';
  }).join('');
  return '<div class="sect"><div class="secthd"><div class="t">What Changed Since Recommendation</div>'
   +rfxCap('what an approver needs to re-check before signing')+'</div><div class="card">'
@@ -1915,7 +1915,7 @@ function rfxBusinessCaseHTML(){
  h+='<div class="card kc"><div class="kl">3-Yr TCV</div><div class="kn" style="color:var(--plum)">'+(tco3!=null?rfxFmtUsd(tco3):'-')+'</div><div class="ks">annual price × 3, before implementation &amp; escalators</div></div>';
  h+='<div class="card kc'+(gated?' emph':'')+'"><div class="kl">Gate Status</div><div class="kn" style="color:'+(gated?'var(--emph,#C15E19)':'var(--plum)')+'">'+(gated?'Open':'Clear')+'</div><div class="ks">'+(gated?(esc(rec.mustFail.join(', '))+' · Must-Have'):'Every Must-Have met')+'</div></div>';
  h+='</div>';
- h+='<div class="card" style="border-left:3px solid var(--emph,#C15E19);background:var(--emph-t,#F7E7D8);margin-bottom:16px"><div style="font-size:12.5px;color:var(--ink);line-height:1.5"><b>Pre-award pricing.</b> Every figure in this business case is the supplier&rsquo;s submitted, pre-final-negotiation proposal. Further negotiation is expected post-award; nothing here is a locked or executed price.</div></div>';
+ h+='<div class="card" style="border-left:3px solid var(--emph,#C15E19);background:var(--emph-t,#F7E7D8);margin-bottom:16px"><div style="font-size:13px;color:var(--ink);line-height:1.5"><b>Pre-award pricing.</b> Every figure in this business case is the supplier&rsquo;s submitted, pre-final-negotiation proposal. Further negotiation is expected post-award; nothing here is a locked or executed price.</div></div>';
 
  // ---- 2: Decision Rationale ----
  // R4: two halves, a subtab bar above them. "The Case" makes the argument; "The Ask & Approval"
@@ -1926,7 +1926,7 @@ function rfxBusinessCaseHTML(){
    +'</div>';
  h+='<div class="bcpane'+(RFX_BCSUB==='case'?' on':'')+'" id="rfxbc-case">';
  h+='<div class="grp"><span class="gt">Decision Rationale</span><span class="gsub">why '+esc(rec.n)+', grounded in the response analysis</span></div>';
- h+='<div class="sect"><div class="card"><div style="font-size:12.5px;line-height:1.6;color:var(--ink)">'+rfxRecoText(recSi,0)+'</div>'+((rec.report&&rec.report.overall&&rec.report.overall.take)?('<div class="take" style="margin-top:10px">'+rec.report.overall.take+'</div>'):'')+'</div></div>';
+ h+='<div class="sect"><div class="card"><div style="font-size:13px;line-height:1.6;color:var(--ink)">'+rfxRecoText(recSi,0)+'</div>'+((rec.report&&rec.report.overall&&rec.report.overall.take)?('<div class="take" style="margin-top:10px">'+rec.report.overall.take+'</div>'):'')+'</div></div>';
 
  // ---- 3: Deal Terms & The Field ----
  h+='<div class="grp"><span class="gt">Deal Terms &amp; The Field</span><span class="gsub">current terms for '+esc(rec.n)+', and how it compares to the rest of the field</span></div>';
@@ -2001,14 +2001,14 @@ function rfxModelDecisionBaseWeights(){var m={};rfxCategoryWeights().forEach(fun
 function rfxModelDecisionHTML(){
  var cats=rfxCats();var base=rfxModelDecisionBaseWeights();
  var scored=RFX.suppliers.filter(function(s,si){return rfxCoverage(si).answered>0;});
- var capLbl='font:800 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)';
+ var capLbl='font:800 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)';
  var h='<div class="sect"><div class="secthd"><div class="t">Model The Decision</div>'+rfxCap('adjust the weights · live re-rank · reflect-only')+'</div>';
- if(scored.length<2){h+='<div class="card"><div style="font-size:12.5px;color:var(--mut)">Fewer than two scored suppliers, nothing to model yet.</div></div></div>';return h;}
+ if(scored.length<2){h+='<div class="card"><div style="font-size:13px;color:var(--mut)">Fewer than two scored suppliers, nothing to model yet.</div></div></div>';return h;}
  h+='<div class="card"><div style="display:grid;grid-template-columns:220px minmax(400px,460px) minmax(0,1fr);gap:22px;align-items:start">';
  // COL 1 (left): the weight sliders, unchanged.
  h+='<div><div style="'+capLbl+';margin-bottom:8px">Category Weights</div>';
  h+=cats.map(function(c,i){var pct=Math.round(base[c]||0);
-   return '<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:10.6px;margin-bottom:2px"><span style="font-weight:700">'+escapeHtmlPV(titleCase(c))+'</span><span id="rfxMdPct'+i+'" style="font-weight:800;color:var(--plum)">'+pct+'%</span></div><input type="range" min="0" max="50" value="'+pct+'" id="rfxMdW'+i+'" oninput="rfxMdRecompute()" style="width:100%;height:4px;accent-color:var(--plum);margin:2px 0"></div>';
+   return '<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:700">'+escapeHtmlPV(titleCase(c))+'</span><span id="rfxMdPct'+i+'" style="font-weight:800;color:var(--plum)">'+pct+'%</span></div><input type="range" min="0" max="50" value="'+pct+'" id="rfxMdW'+i+'" oninput="rfxMdRecompute()" style="width:100%;height:4px;accent-color:var(--plum);margin:2px 0"></div>';
  }).join('');
  h+='<button type="button" class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="rfxMdReset()">Reset to Filed Weights</button></div>';
  // COL 2 (center): the radar, on its own, no legend riding along beside it any more.
@@ -2018,7 +2018,7 @@ function rfxModelDecisionHTML(){
  // column; matches the flat label/value style used elsewhere on this tab (e.g. rfxBcLvRow).
  h+='<div style="display:flex;flex-direction:column;min-width:0">';
  h+='<div style="padding-bottom:12px"><div style="'+capLbl+';margin-bottom:8px">Ranking Under These Weights</div><div id="rfxMdScores"></div></div>';
- h+='<div style="padding:12px 0;border-top:1px solid var(--line)"><div id="rfxMdExplain" style="font-size:12px;line-height:1.6;color:var(--mut)"></div></div>';
+ h+='<div style="padding:12px 0;border-top:1px solid var(--line)"><div id="rfxMdExplain" style="font-size:13px;line-height:1.6;color:var(--mut)"></div></div>';
  h+='</div>';
  h+='</div></div>';
  h+='</div></div>';
@@ -2046,7 +2046,7 @@ function rfxModelDecisionHTML(){
   var html=order.map(function(si,oi){var s=RFX.suppliers[si],col=rfxSupplierColor(si),ok=conf(si);
    return '<div style="display:flex;align-items:center;gap:9px;padding:'+(oi===0?'0':'5px')+' 0 5px'+(oi===0?'':';border-top:1px solid var(--line)')+(ok?'':';opacity:.75')+'">'
     +'<span style="flex:none;width:9px;height:9px;border-radius:50%;background:'+col+'"></span>'
-    +'<div style="flex:1;min-width:0"><span style="font-weight:700;font-size:12.5px;color:var(--ink)">'+escapeHtmlPV(s.n)+'</span>'
+    +'<div style="flex:1;min-width:0"><span style="font-weight:700;font-size:13px;color:var(--ink)">'+escapeHtmlPV(s.n)+'</span>'
     +(ok?'':' '+rfxMcmPill('Gated','rust'))+'</div>'
     +'<span style="flex:none;font-weight:800;font-size:16px;font-family:var(--mono,monospace);color:'+(ok?'var(--plum)':'var(--mut2)')+'">'+fits[si].toFixed(1)+'</span></div>';
   }).join('');
@@ -2056,7 +2056,7 @@ function rfxModelDecisionHTML(){
  // re-sorted (submission order), just identifying which polygon on the radar is which supplier.
  function renderColorLegend(){
   var html=RFX.suppliers.map(function(s,si){var col=rfxSupplierColor(si);
-   return '<div style="display:flex;align-items:center;gap:8px"><span style="flex:none;width:10px;height:10px;border-radius:3px;background:'+col+'"></span><span style="font-size:12px;color:var(--ink)">'+escapeHtmlPV(s.n)+'</span></div>';
+   return '<div style="display:flex;align-items:center;gap:8px"><span style="flex:none;width:10px;height:10px;border-radius:3px;background:'+col+'"></span><span style="font-size:13px;color:var(--ink)">'+escapeHtmlPV(s.n)+'</span></div>';
   }).join('');
   var el=document.getElementById('rfxMdLegend');if(el)el.innerHTML=html;
  }
@@ -2156,13 +2156,13 @@ function rfxModelDecisionHTML(){
    parts.push('<polygon points="'+pts+'" fill="none" stroke="var(--line2)" stroke-width="1"></polygon>');});
   angles.forEach(function(a){var p=polar(cx,cy,R,a,1);parts.push('<line x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'" stroke="var(--line2)" stroke-width="1"></line>');});
   [1/3,2/3,1].forEach(function(f){var val=100*f;var p=polar(cx,cy,R,-90,f);
-   parts.push('<text x="'+(p[0]+6).toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" font-family="var(--sans,Arial)" font-size="8.5" font-weight="700" fill="var(--mut2)">'+Math.round(val)+'</text>');});
+   parts.push('<text x="'+(p[0]+6).toFixed(1)+'" y="'+(p[1]-2).toFixed(1)+'" font-family="var(--sans,Arial)" font-size="11" font-weight="700" fill="var(--mut2)">'+Math.round(val)+'</text>');});
   angles.forEach(function(a,i){var p=polar(cx,cy,labelR,a,1);var cv=Math.cos(a*Math.PI/180),sv=Math.sin(a*Math.PI/180);
    var anchor=cv>0.25?'start':(cv<-0.25?'end':'middle');
    var lines=axisLines(titleCase(c[i])),lh=11.5,n=lines.length,startY;
    if(sv<-0.3)startY=p[1]-(n-1)*lh;else if(sv>0.3)startY=p[1];else startY=p[1]-((n-1)*lh)/2;
    var tspans=lines.map(function(ln,li){return '<tspan x="'+p[0].toFixed(1)+'" y="'+(startY+li*lh).toFixed(1)+'">'+escapeHtmlPV(ln)+'</tspan>';}).join('');
-   parts.push('<text text-anchor="'+anchor+'" font-family="var(--sans,Arial)" font-size="10" font-weight="700" fill="var(--ink)">'+tspans+'</text>');});
+   parts.push('<text text-anchor="'+anchor+'" font-family="var(--sans,Arial)" font-size="11" font-weight="700" fill="var(--ink)">'+tspans+'</text>');});
   var fm=fitMatrix();
   RFX.suppliers.forEach(function(s,si){var col=rfxSupplierColor(si);
    var pts=c.map(function(cat,i){var frac=Math.max(0,Math.min(1,fm[si][i]/100));var p=polar(cx,cy,R,angles[i],frac);return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
@@ -2269,7 +2269,7 @@ function rfxScenarioData(){var R=RFX;var rank=rfxReqRanking();var recSi=rank[0];
 // is read straight off RFX.suppliers[].report (already-authored per-supplier text), nothing here is
 // invented; only the stat header and the collapsed one-liner are computed. One supplier open at a
 // time (native <details name="rfxcase">), the top-ranked supplier opens first.
-function rfxCaseKpi(label,value,sub){return '<div class="card" style="margin:0;padding:9px 11px"><div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)">'+escapeHtmlPV(label)+'</div><div style="font-size:16px;font-weight:800;margin-top:3px;color:var(--ink)">'+value+'</div>'+(sub?'<div style="font-size:10.5px;color:var(--mut2);margin-top:2px">'+escapeHtmlPV(sub)+'</div>':'')+'</div>';}
+function rfxCaseKpi(label,value,sub){return '<div class="card" style="margin:0;padding:9px 11px"><div style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2)">'+escapeHtmlPV(label)+'</div><div style="font-size:16px;font-weight:800;margin-top:3px;color:var(--ink)">'+value+'</div>'+(sub?'<div style="font-size:11px;color:var(--mut2);margin-top:2px">'+escapeHtmlPV(sub)+'</div>':'')+'</div>';}
 function rfxCaseHTML(){var R=RFX,esc=escapeHtmlPV,rank=rfxReqRanking();
  var toneMap={leadergate:'emph',primary:'plum',sec:'teal',cond:'rust',not:'grey'};
  var h='<div class="sect"><div class="secthd"><div class="t">The case, per supplier</div>'+rfxCap('advisory tier · weighted fit · Theo’s recommendation narrative')+'</div><div style="display:grid;gap:10px">';
@@ -2294,7 +2294,7 @@ function rfxCaseHTML(){var R=RFX,esc=escapeHtmlPV,rank=rfxReqRanking();
     +'<span style="font-weight:700;font-size:13px">'+rfxSupplierSwatch(si)+esc(s.n)+'</span>'
     +rfxMcmPill(tier.label,toneMap[tier.key]||'grey')
     +((gated&&tier.key!=='leadergate')?rfxMcmPill('Gate risk','rust'):'')
-    +'<span style="flex:1 1 260px;min-width:0;font-size:11.5px;color:var(--mut);line-height:1.4">'+oneLine+'</span></summary>';
+    +'<span style="flex:1 1 260px;min-width:0;font-size:11px;color:var(--mut);line-height:1.4">'+oneLine+'</span></summary>';
   h+='<div style="padding:14px;border-top:1px solid #CFCDC8">';
   h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-bottom:13px">';
   h+=rfxCaseKpi('Weighted fit',c.weightedFit+'/100',c.coveragePct+'% fully met');
@@ -2302,18 +2302,18 @@ function rfxCaseHTML(){var R=RFX,esc=escapeHtmlPV,rank=rfxReqRanking();
   h+=rfxCaseKpi('Annual price',annual!=null?rfxFmtUsd(annual):'Not submitted',priceSub);
   h+=rfxCaseKpi('Gate status',gated?'Open':'Clear',gated?s.mustFail.join(', '):'every Must-Have met');
   h+='</div>';
-  if(lede)h+='<div style="font-size:12.8px;line-height:1.65;color:var(--ink);margin-bottom:12px">'+lede+'</div>';
-  if(why){h+='<div style="font:800 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:6px">Why it leads</div>';
-   h+='<div style="font-size:12.5px;line-height:1.6;color:var(--mut);margin-bottom:13px">'+why+'</div>';}
+  if(lede)h+='<div style="font-size:13px;line-height:1.65;color:var(--ink);margin-bottom:12px">'+lede+'</div>';
+  if(why){h+='<div style="font:800 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:6px">Why it leads</div>';
+   h+='<div style="font-size:13px;line-height:1.6;color:var(--mut);margin-bottom:13px">'+why+'</div>';}
   if(strengths.length||concerns.length){
    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:13px">';
-   h+='<div><div style="font:800 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--plum);margin-bottom:7px">Key strengths</div>'+strengths.map(function(x){return '<div style="display:flex;gap:7px;font-size:12px;line-height:1.5;margin-bottom:6px"><span style="flex:none;font-weight:800;color:var(--plum)">+</span><span>'+x+'</span></div>';}).join('')+'</div>';
-   h+='<div><div style="font:800 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:#9A3B1F;margin-bottom:7px">Key concerns</div>'+concerns.map(function(x){return '<div style="display:flex;gap:7px;font-size:12px;line-height:1.5;margin-bottom:6px"><span style="flex:none;font-weight:800;color:#9A3B1F">'+esc(x.i||'!')+'</span><span>'+x.html+'</span></div>';}).join('')+'</div>';
+   h+='<div><div style="font:800 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--plum);margin-bottom:7px">Key strengths</div>'+strengths.map(function(x){return '<div style="display:flex;gap:7px;font-size:13px;line-height:1.5;margin-bottom:6px"><span style="flex:none;font-weight:800;color:var(--plum)">+</span><span>'+x+'</span></div>';}).join('')+'</div>';
+   h+='<div><div style="font:800 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:#9A3B1F;margin-bottom:7px">Key concerns</div>'+concerns.map(function(x){return '<div style="display:flex;gap:7px;font-size:13px;line-height:1.5;margin-bottom:6px"><span style="flex:none;font-weight:800;color:#9A3B1F">'+esc(x.i||'!')+'</span><span>'+x.html+'</span></div>';}).join('')+'</div>';
    h+='</div>';
   }
   if(proceed.length){
-   h+='<div style="font:800 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:7px">What would need to be true to proceed</div>';
-   h+=proceed.map(function(st){return '<div style="display:flex;gap:7px;font-size:12px;line-height:1.5;margin-bottom:6px"><span style="flex:none;font-weight:800;color:var(--mut2)">·</span><span>'+st.q+'</span></div>';}).join('');
+   h+='<div style="font:800 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:7px">What would need to be true to proceed</div>';
+   h+=proceed.map(function(st){return '<div style="display:flex;gap:7px;font-size:13px;line-height:1.5;margin-bottom:6px"><span style="flex:none;font-weight:800;color:var(--mut2)">·</span><span>'+st.q+'</span></div>';}).join('');
   }
   h+='</div></details>';
  });
@@ -2335,15 +2335,15 @@ function rfxScenariosHTML(){var R=RFX;var sc=rfxScenarioData();
   // a "Pick" can name one supplier or a combined award (e.g. a dual-source "X + Y"); render one
   // canonical identity swatch per recognised supplier name in the pick, in order, none fabricated.
   var pickSwatches=String(x.pick).split(' + ').map(function(nm){return RFX.suppliers.some(function(s){return s.n===nm;})?rfxSupplierSwatchByName(nm):'';}).join('');
-  h+='<div class="card" style="margin:0;border-top:3px solid '+dCol+';background:var(--panel,#F5F2ED)"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px"><span style="font-weight:800;font-size:13.5px">'+escapeHtmlPV(x.title)+'</span><span style="font-family:var(--mono);font-weight:800;font-size:12.5px;color:'+dCol+'">'+dTxt+'</span></div>'
-   +'<div style="font-size:11.5px;color:var(--mut2);margin-bottom:7px">Pick: '+pickSwatches+'<b style="color:var(--ink)">'+escapeHtmlPV(x.pick)+'</b>'+(x.gated?' '+rfxMcmPill('Gate risk','rust'):'')+'</div>'
-   +'<div style="font-size:12px;color:var(--mut);line-height:1.55">'+escapeHtmlPV(x.narr)+'</div></div>';});
+  h+='<div class="card" style="margin:0;border-top:3px solid '+dCol+';background:var(--panel,#F5F2ED)"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px"><span style="font-weight:800;font-size:13px">'+escapeHtmlPV(x.title)+'</span><span style="font-family:var(--mono);font-weight:800;font-size:13px;color:'+dCol+'">'+dTxt+'</span></div>'
+   +'<div style="font-size:11px;color:var(--mut2);margin-bottom:7px">Pick: '+pickSwatches+'<b style="color:var(--ink)">'+escapeHtmlPV(x.pick)+'</b>'+(x.gated?' '+rfxMcmPill('Gate risk','rust'):'')+'</div>'
+   +'<div style="font-size:13px;color:var(--mut);line-height:1.55">'+escapeHtmlPV(x.narr)+'</div></div>';});
  h+='</div><div class="spnote">Negative Δ is a saving vs the recommended award (shown in <b style="color:var(--plum)">plum</b>); positive Δ is added cost (<b style="color:var(--emph,#C15E19)">burnt-orange</b>); a gated pick cannot proceed until its Must-Have is resolved. Deltas use submitted annual prices; a missing price stays <b>pending</b>, never estimated.</div></div>';
  return h;
 }
 // ---- Item 37: requirements register (MoSCoW / acceptance / objective / confidence / category_weights) ----
 function rfxMoscowChip(m){var map={must:['var(--plum)','rgba(92,43,80,.12)','Must'],should:['#2E5E8C','var(--blue-t,#E4EBF1)','Should'],could:['var(--mut2)','#EFECE8','Could'],wont:['#8A827C','#EFECE8','Won’t']};var c=map[m]||map.could;
- return '<span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+c[2]+'</span>';}
+ return '<span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:30px;color:'+c[0]+';background:'+c[1]+'">'+c[2]+'</span>';}
 // Round-2 #9 (Marc): this IS the ONE Requirements Register now, a normal always-visible section
 // (no longer a <details> "reference" fold, and no separate reference surface exists elsewhere on
 // the tab to duplicate it), the fuller register: ID / requirement / MoSCoW / acceptance / traces-to
@@ -2369,8 +2369,8 @@ function rfxRequirementsRegisterHTML(){var R=RFX;var cw=rfxCategoryWeights();
  var cwRows=cw.map(function(w){return '<div style="display:grid;grid-template-columns:minmax(0,1fr) 54px 30px;align-items:center;gap:9px">'
    +'<span title="'+escapeHtmlPV(w.cat)+'" style="font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtmlPV(titleCase(w.cat))+'</span>'
    +'<span style="height:6px;border-radius:4px;background:var(--line2,#E0DCD5);overflow:hidden"><i style="display:block;height:100%;border-radius:4px;width:'+Math.max(6,Math.round(w.pct/cwMax*100))+'%;background:var(--plum)"></i></span>'
-   +'<span style="font:700 10.5px var(--mono);color:var(--plum);text-align:right">'+w.pct+'%</span></div>';}).join('');
- h+='<div class="card" style="margin:0 0 12px"><div style="font-weight:700;font-size:12px;margin-bottom:10px">Category Weights <span style="font-weight:500;color:var(--mut2)">· derived · sums to 100%</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px 24px">'+cwRows+'</div></div>';
+   +'<span style="font:700 11px var(--mono);color:var(--plum);text-align:right">'+w.pct+'%</span></div>';}).join('');
+ h+='<div class="card" style="margin:0 0 12px"><div style="font-weight:700;font-size:13px;margin-bottom:10px">Category Weights <span style="font-weight:500;color:var(--mut2)">· derived · sums to 100%</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px 24px">'+cwRows+'</div></div>';
  // Marc: ONE compact row per requirement, banded by category (a shaded blue-tint header row per
  // category with its weight + count), Mandatory shown as a chip (not plain text), Must / mandatory
  // rows carry a subtle left accent.
@@ -2402,13 +2402,13 @@ function rfxRequirementsRegisterHTML(){var R=RFX;var cw=rfxCategoryWeights();
    var inCatPct=Math.round((r.weight||0)/inCatTotal*100);
    h+='<tr>'
     +'<td style="font-family:var(--mono)"><span class="rq-id">'+escapeHtmlPV(rfxDisplayReqId(w.cat,rs.indexOf(r)))+'</span><span class="rq-id-raw" title="Stored requirement id, used for traceability">'+escapeHtmlPV(r.id)+'</span></td>'
-    +'<td style="text-align:left;font-weight:600;white-space:normal'+(isMust?';box-shadow:inset 3px 0 0 var(--plum)':'')+'">'+escapeHtmlPV(r.text)+(r.mandatory?'<div style="margin-top:4px"><span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:30px;color:var(--riskred);background:var(--pink-t,#FBE7E3)">Mandatory</span></div>':'')+'</td>'
+    +'<td style="text-align:left;font-weight:600;white-space:normal'+(isMust?';box-shadow:inset 3px 0 0 var(--plum)':'')+'">'+escapeHtmlPV(r.text)+(r.mandatory?'<div style="margin-top:4px"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:30px;color:var(--riskred);background:var(--pink-t,#FBE7E3)">Mandatory</span></div>':'')+'</td>'
     +'<td>'+rfxMoscowChip(r.moscow)+'</td>'
-    +'<td style="text-align:left;white-space:normal;font-size:11.5px;color:var(--mut);line-height:1.45">'+escapeHtmlPV(r.acceptance||'-')+'</td>'
-    +'<td style="text-align:left;white-space:normal;font-size:11.5px;color:var(--mut);line-height:1.45">'+escapeHtmlPV(r.objective||'-')+'</td>'
+    +'<td style="text-align:left;white-space:normal;font-size:11px;color:var(--mut);line-height:1.45">'+escapeHtmlPV(r.acceptance||'-')+'</td>'
+    +'<td style="text-align:left;white-space:normal;font-size:11px;color:var(--mut);line-height:1.45">'+escapeHtmlPV(r.objective||'-')+'</td>'
     +'<td style="font-family:var(--mono)">'+inCatPct+'%</td>'
     +'<td style="font-family:var(--mono);color:var(--mut2)">'+w.pct+'%</td>'
-    +'<td><div style="display:flex;align-items:center;gap:6px;justify-content:center"><div style="width:42px;height:6px;border-radius:4px;background:var(--nested);overflow:hidden;flex:none"><i style="display:block;height:100%;width:'+conf+'%;background:'+confCol+'"></i></div><span style="font-family:var(--mono);font-size:10.5px;font-weight:700;color:'+confCol+'">'+conf+'%</span></div></td></tr>';
+    +'<td><div style="display:flex;align-items:center;gap:6px;justify-content:center"><div style="width:42px;height:6px;border-radius:4px;background:var(--nested);overflow:hidden;flex:none"><i style="display:block;height:100%;width:'+conf+'%;background:'+confCol+'"></i></div><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:'+confCol+'">'+conf+'%</span></div></td></tr>';
   });
   h+='</tbody></table></div></details>';
  });

@@ -54,7 +54,7 @@
     var conf = String(p.confidence || '').toLowerCase();
     return '<span class="pen-chip pen-' + esc(conf) + '" ' +
       'title="Who currently holds the redline, best-effort read from communications">' +
-      '<span class="pen-k">Pen</span><b>' + esc(p.party || '—') + '</b>' +
+      '<span class="pen-k">Pen</span><b>' + esc(p.party || ', ') + '</b>' +
       (p.basis ? '<span class="pen-basis">' + esc(p.basis) + '</span>' : '') +
       (p.confidence ? '<span class="pen-conf">' + esc(p.confidence) + '</span>' : '') +
     '</span>';

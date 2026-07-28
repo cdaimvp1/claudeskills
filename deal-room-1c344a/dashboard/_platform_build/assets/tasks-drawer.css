@@ -2,25 +2,25 @@
    Relies on host-page tokens: --red,--red-d,--ink,--mut,--mut2,--line,--line2,--bg,
    --ai,--ai-t,--amber-t,--amber-d,--blue-t,--blue-d,--pink-t,--shadow,--shadow-lg,--sans,--mono.
    All classes are mq*-prefixed to avoid collisions with page styles. */
-.mqbtn{position:relative;display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#fff;padding:6px 2px;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:12.5px;opacity:.92}
+.mqbtn{position:relative;display:flex;align-items:center;gap:7px;background:transparent;border:none;color:#fff;padding:6px 2px;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:13px;opacity:.92}
 .mqbtn:hover{background:transparent;opacity:1}
 .mqbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.mqbtn .lbl{font-family:var(--sans);font-size:12.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff;margin:0}  /* override any page .lbl (was rendering TASKS muted-uppercase) */
+.mqbtn .lbl{font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff;margin:0}  /* override any page .lbl (was rendering TASKS muted-uppercase) */
 .mqbadge{background:transparent;color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 1px;margin-left:2px}
 .mqscrim{position:fixed;inset:0;background:rgba(20,18,17,.34);opacity:0;pointer-events:none;transition:.2s;z-index:80}
 .mqscrim.on{opacity:1;pointer-events:auto}
 .mqdrawer{position:fixed;top:0;right:0;height:100vh;width:720px;max-width:94vw;background:var(--bg);border-left:1px solid var(--line);box-shadow:-18px 0 50px rgba(20,18,17,.13);transform:translateX(101%);transition:transform .24s cubic-bezier(.4,0,.2,1);z-index:81;display:flex;flex-direction:column}
 .mqdrawer.on{transform:none}
 .mqhead{position:relative;padding:18px 20px 14px;border-bottom:1px solid var(--line);background:var(--surface);flex:none}
-.mqhead .t{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--ink)}
+.mqhead .t{font-size:16px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--ink)}
 .mqhead .s{font-size:13px;color:var(--mut);margin-top:3px}
 .mqx{position:absolute;top:15px;right:14px;width:30px;height:30px;border-radius:9px;border:none;background:transparent;color:var(--mut);cursor:pointer;font-size:16px}
 .mqx:hover{background:var(--bg)}
 .mqbody{flex:1;overflow-y:auto;padding:14px 0 30px}
-.mqlede{font-size:12.5px;color:var(--mut);line-height:1.5;display:flex;gap:8px;background:var(--ai-t);border:1px solid #D4E2F0;border-radius:11px;padding:9px 11px;margin:0 18px 14px}
+.mqlede{font-size:13px;color:var(--mut);line-height:1.5;display:flex;gap:8px;background:var(--ai-t);border:1px solid #D4E2F0;border-radius:11px;padding:9px 11px;margin:0 18px 14px}
 .mqlede .sp{color:var(--ai);font-weight:800;flex:none}
 /* section header with live count + full-bleed hairline */
-.mqsec{display:flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut2);font-weight:600;padding:0 20px 7px;margin:4px 0 0;border-bottom:1px solid var(--line)}
+.mqsec{display:flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut2);font-weight:600;padding:0 20px 7px;margin:4px 0 0;border-bottom:1px solid var(--line)}
 .mqsec.up{margin-top:18px}
 .mqsec .ct{color:var(--mut)}
 /* ROW, flat, full-bleed, hairline divider, content-left / actions-far-right */
@@ -32,34 +32,34 @@
 .mqic.ai{background:var(--ai-t);color:var(--ai)}.mqic.amber{background:var(--amber-t);color:var(--amber-d)}.mqic.blue{background:var(--blue-t);color:var(--blue-d)}.mqic.red{background:var(--pink-t);color:var(--red)}.mqic.mut{background:var(--bg);color:var(--mut2)}
 .mqcontent{min-width:0}
 .mqndline{display:flex;align-items:baseline;gap:9px;min-width:0;flex-wrap:wrap}
-.mqnd{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3;min-width:0;overflow-wrap:anywhere}  /* full title, wraps, never truncated */
-.mqpj{font-family:var(--mono);font-size:10.5px;color:var(--mut2);margin-top:3px}
+.mqnd{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3;min-width:0;overflow-wrap:anywhere}  /* full title, wraps, never truncated */
+.mqpj{font-family:var(--mono);font-size:11px;color:var(--mut2);margin-top:3px}
 /* quiet inline recommendation, NO tinted box, NOT truncated (readability beats rhythm) */
-.mqrec{display:flex;gap:6px;align-items:baseline;font-size:12px;color:var(--mut);line-height:1.45;margin-top:5px}
+.mqrec{display:flex;gap:6px;align-items:baseline;font-size:13px;color:var(--mut);line-height:1.45;margin-top:5px}
 .mqrec .sp{color:var(--ai);font-weight:800;flex:none;font-size:11px}
 /* NBA reason chips (why this ranked) */
 .mqwhy{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
-.mqwhy span{font-family:var(--mono);font-size:9.5px;font-weight:600;color:var(--mut2);background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:2px 8px}
+.mqwhy span{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--mut2);background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:2px 8px}
 .mqwhy span:first-child{color:var(--ink);border-color:var(--line2)}
 /* work-graph expand */
-.mqexp{display:inline-flex;align-items:center;gap:4px;margin-top:8px;background:none;border:none;padding:0;font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ai);cursor:pointer}
+.mqexp{display:inline-flex;align-items:center;gap:4px;margin-top:8px;background:none;border:none;padding:0;font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ai);cursor:pointer}
 .mqexp .chev{transition:transform .15s}.mqexp.open .chev{transform:rotate(180deg)}
 .mqdetail{display:none;margin-top:9px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:9px 12px}
 .mqdetail.on{display:block}
 .mqdetail .wghd{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);font-weight:700;margin:2px 0 5px}
 .mqdetail .wghd:not(:first-child){margin-top:11px}
-.wgt{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px;color:var(--ink)}
+.wgt{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px;color:var(--ink)}
 .wgt .wgdot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--mut2)}
 .wgt.done .wgdot{background:var(--blue-d)}.wgt.open .wgdot{background:var(--red)}.wgt.wait .wgdot{background:var(--amber-d)}.wgt.blocked .wgdot{background:var(--surface);border:1.5px solid var(--mut2)}
 .wgt.done .wgl{color:var(--mut)}
 .wgt .wgl{flex:1;min-width:0}
-.wgt .wgo{font-family:var(--mono);font-size:9.5px;color:var(--mut2)}
+.wgt .wgo{font-family:var(--mono);font-size:9px;color:var(--mut2)}
 .wgt .wgst{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut2);min-width:60px;text-align:right}
 .wgt.open .wgst{color:var(--red)}
-.wgev{display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:11.5px;color:var(--mut);line-height:1.4}
+.wgev{display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:11px;color:var(--mut);line-height:1.4}
 .wgev .wgsrc{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--mut2);min-width:52px;text-transform:uppercase;flex:none}
 .wgev .wgsum{flex:1;min-width:0}
-.inf{font-family:var(--mono);font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;border-radius:20px;padding:1px 7px;flex:none}
+.inf{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;border-radius:20px;padding:1px 7px;flex:none}
 .inf.auto{background:var(--blue-t);color:var(--blue-d)}.inf.confirm{background:var(--amber-t);color:var(--amber-d)}
 /* status pill on line 1 */
 .mqtag{font-family:var(--mono);font-size:9px;font-weight:700;border-radius:30px;padding:2px 8px;white-space:nowrap;text-transform:uppercase;letter-spacing:.03em;flex:none}
@@ -73,26 +73,26 @@
 /* #E10b "chat about it", red-accented so it reads as the chat affordance, not an M365 hand-off */
 .mqm365 .mqchat{color:var(--red,#E1251B);opacity:.82}
 .mqm365 .mqchat:hover{color:var(--red,#E1251B);background:var(--pink-t,#FBE7E3);border-color:var(--pink-2,#F3C6BD);opacity:1}
-.mqb{font-family:var(--sans);font-weight:700;font-size:12.5px;border-radius:30px;padding:7px 13px;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.mqb{font-family:var(--sans);font-weight:700;font-size:13px;border-radius:30px;padding:7px 13px;cursor:pointer;border:1px solid transparent;white-space:nowrap}
 .mqb.primary{background:var(--red);color:#fff}.mqb.primary:hover{background:var(--red-d)}
 .mqb.ghost{background:var(--surface);border-color:var(--line2);color:var(--ink)}.mqb.ghost:hover{background:var(--bg)}
 .mqover{position:relative}
-.mqkebab{width:30px;height:30px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--mut2);cursor:pointer;font-size:17px;line-height:1;opacity:.55;transition:opacity .12s,background .12s,border-color .12s,color .12s}
+.mqkebab{width:30px;height:30px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--mut2);cursor:pointer;font-size:16px;line-height:1;opacity:.55;transition:opacity .12s,background .12s,border-color .12s,color .12s}
 .mqkebab:hover{background:var(--surface);border-color:var(--line2);color:var(--ink);opacity:1}
 .mqmenu{position:absolute;top:34px;right:0;min-width:188px;background:var(--surface);border:1px solid var(--line2);border-radius:10px;box-shadow:var(--shadow-lg);padding:5px;z-index:5;display:none}
 .mqmenu.on{display:block}
-.mqmenu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;border:none;border-radius:7px;padding:8px 10px;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap}
+.mqmenu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;border:none;border-radius:7px;padding:8px 10px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap}
 .mqmenu button:hover{background:var(--bg)}
 .mqmenu button .g{color:var(--ai);font-weight:800;flex:none}
 .mqmenu .mqmlbl{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);padding:6px 10px 4px;white-space:nowrap}
-.mqmenu .mqmnote{font-size:10.5px;color:var(--mut2);line-height:1.45;padding:7px 10px 4px;margin-top:3px;border-top:1px solid var(--line);white-space:normal}
+.mqmenu .mqmnote{font-size:11px;color:var(--mut2);line-height:1.45;padding:7px 10px 4px;margin-top:3px;border-top:1px solid var(--line);white-space:normal}
 /* COMING UP, same row skeleton, calm, no action cluster */
 .mqrow.up{background:transparent}
 .mqrow.up:hover{background:var(--bg)}
 .mqrow.up .mqnd{font-weight:500;color:var(--mut);white-space:normal}  /* up rows may wrap, no actions to crowd */
 .mqrow.up .mqic{opacity:.7}
 .mqempty{font-size:13px;color:var(--mut2);padding:16px 20px}
-.mqfoot{flex:none;padding:11px 18px;border-top:1px solid var(--line);background:var(--surface);font-size:11.5px;color:var(--mut2);display:flex;gap:8px;align-items:flex-start;line-height:1.45}
+.mqfoot{flex:none;padding:11px 18px;border-top:1px solid var(--line);background:var(--surface);font-size:11px;color:var(--mut2);display:flex;gap:8px;align-items:flex-start;line-height:1.45}
 .mqfoot .sp{color:var(--ai);font-weight:800}
 /* responsive: hide inline M365 icons under 600 (they remain in kebab), tighten gutter */
 @media(max-width:600px){.mqbtn .lbl{display:none}.mqm365{display:none}.mqrow{grid-template-columns:24px 1fr auto;padding:12px 16px}.mqsec,.mqlede,.mqfoot{padding-left:16px;padding-right:16px}}
@@ -109,24 +109,24 @@
 .mqrefresh svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 .mqrefresh.spin svg{animation:mqspin .7s linear}
 @keyframes mqspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.mqrefreshed{font-family:var(--mono);font-size:10px;color:var(--mut2);margin-top:4px}
+.mqrefreshed{font-family:var(--mono);font-size:11px;color:var(--mut2);margin-top:4px}
 /* --- task states: Open / Done & dismissed view toggle (segmented) ---------- */
 .mqtabs{display:flex;flex-wrap:wrap;gap:4px;row-gap:6px;padding:10px 20px 0;background:transparent}
-.mqtab{flex:1 1 130px;min-width:0;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--surface);border:1.5px solid var(--line2);color:var(--mut);font-family:var(--sans);font-weight:700;font-size:12.5px;padding:7px 10px;border-radius:30px;cursor:pointer;transition:background .12s,border-color .12s,color .12s}
+.mqtab{flex:1 1 130px;min-width:0;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--surface);border:1.5px solid var(--line2);color:var(--mut);font-family:var(--sans);font-weight:700;font-size:13px;padding:7px 10px;border-radius:30px;cursor:pointer;transition:background .12s,border-color .12s,color .12s}
 .mqtab:hover{border-color:var(--ink);color:var(--ink)}
 .mqtab.on{background:var(--blue-t);border-color:var(--blue-d);color:var(--blue-d)}  /* positive accent = Bold Blue, never green */
 .mqtab:focus-visible{outline:2px solid var(--blue-d);outline-offset:2px}
-.mqtab .ct{font-family:var(--mono);font-size:10px;font-weight:700;background:var(--bg);color:var(--mut2);border-radius:20px;padding:1px 7px}
+.mqtab .ct{font-family:var(--mono);font-size:11px;font-weight:700;background:var(--bg);color:var(--mut2);border-radius:20px;padding:1px 7px}
 .mqtab.on .ct{background:var(--surface);color:var(--blue-d)}
 /* --- search / filter / sort toolbar ---------------------------------------- */
 .mqtools{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:12px 20px 10px;border-bottom:1px solid var(--line)}
 .mqsearch{position:relative;flex:1 1 200px;min-width:160px;display:flex;align-items:center}
 .mqsearch svg{position:absolute;left:11px;width:15px;height:15px;stroke:var(--mut2);fill:none;stroke-width:2;pointer-events:none}
-.mqsearch input{width:100%;border:1.5px solid var(--line2);border-radius:30px;padding:7px 12px 7px 32px;font-family:var(--sans);font-size:12.5px;color:var(--ink);background:var(--surface)}
+.mqsearch input{width:100%;border:1.5px solid var(--line2);border-radius:30px;padding:7px 12px 7px 32px;font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--surface)}
 .mqsearch input::placeholder{color:var(--mut2)}
 .mqsearch input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 2px var(--pink-t)}
 .mqsel{display:inline-flex;align-items:center}
-.mqsel select{border:1.5px solid var(--line2);border-radius:30px;padding:7px 26px 7px 12px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%237A7570' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;cursor:pointer;-webkit-appearance:none;appearance:none}
+.mqsel select{border:1.5px solid var(--line2);border-radius:30px;padding:7px 26px 7px 12px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%237A7570' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;cursor:pointer;-webkit-appearance:none;appearance:none}
 .mqsel select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 2px var(--pink-t)}
 .vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* --- per-row Dismiss control, compact ✕ icon (quiet, sits by the primary) --- */
@@ -151,7 +151,7 @@
 .mqpa.u-overdue::after{content:"";position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
 /* Ownership rule: pending owner is someone ELSE -> a compact Nudge (draft a chase),
    its ring tinted by the same urgency scheme so an overdue chase still pops red. */
-.mqnudgebtn{flex:none;display:inline-flex;align-items:center;font-family:var(--sans);font-weight:700;font-size:11.5px;color:var(--mut);background:var(--surface);border:1.5px solid var(--line2);border-radius:30px;padding:5px 12px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
+.mqnudgebtn{flex:none;display:inline-flex;align-items:center;font-family:var(--sans);font-weight:700;font-size:11px;color:var(--mut);background:var(--surface);border:1.5px solid var(--line2);border-radius:30px;padding:5px 12px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
 .mqnudgebtn:hover{border-color:var(--ink);color:var(--ink)}
 .mqnudgebtn:focus-visible{outline:2px solid var(--blue-d);outline-offset:2px}
 .mqnudgebtn.u-overdue{color:var(--red);border-color:var(--red);background:var(--pink-t)}
@@ -173,14 +173,14 @@
 .mqwic.block{background:var(--pink-t);color:var(--red)}
 .mqwmid{min-width:0}
 .mqwt{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mqwmeta{font-size:11.5px;color:var(--mut);margin-top:2px}
+.mqwmeta{font-size:11px;color:var(--mut);margin-top:2px}
 .mqwmeta b{color:var(--ink)}
-.mqwmeta .pid{font-family:var(--mono);font-size:10px;color:var(--mut2)}
+.mqwmeta .pid{font-family:var(--mono);font-size:11px;color:var(--mut2)}
 .mqwend{display:flex;align-items:center;gap:12px;justify-self:end}
-.mqwage{font-family:var(--mono);font-size:11.5px;font-weight:700;text-align:right;white-space:nowrap;line-height:1.15}
+.mqwage{font-family:var(--mono);font-size:11px;font-weight:700;text-align:right;white-space:nowrap;line-height:1.15}
 .mqwage.old{color:var(--red)}.mqwage.mid{color:var(--amber-d)}.mqwage.fresh{color:var(--mut2)}
-.mqwage small{display:block;font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);font-weight:600}
-.mqwnudge{flex:none;font-family:var(--sans);font-weight:600;font-size:11.5px;color:var(--mut);background:var(--surface);border:1.5px solid var(--line2);border-radius:30px;padding:5px 13px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
+.mqwage small{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut2);font-weight:600}
+.mqwnudge{flex:none;font-family:var(--sans);font-weight:600;font-size:11px;color:var(--mut);background:var(--surface);border:1.5px solid var(--line2);border-radius:30px;padding:5px 13px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
 .mqwnudge:hover{border-color:var(--ink);color:var(--ink)}
 .mqwnudge:focus-visible{outline:2px solid var(--blue-d);outline-offset:2px}
 /* --- closed (done/dismissed) rows + state label + Recall -------------------- */
@@ -192,10 +192,10 @@
 .mqrecall:focus-visible{outline:2px solid var(--blue-d);outline-offset:2px}
 
 /* #214: cited Total Recall precedent line on a task card (reflect-only annotation) */
-.mqlearn{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:11.5px;line-height:1.4}
-.mqlearn .lk{font-weight:800;color:#5C2B50;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;font-size:10.5px}
+.mqlearn{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:11px;line-height:1.4}
+.mqlearn .lk{font-weight:800;color:#5C2B50;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;font-size:11px}
 .mqlearn .lt{color:var(--mut);font-style:italic;flex:1;min-width:140px}
-.mqlearn .lc{font-weight:700;border-radius:30px;padding:1px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+.mqlearn .lc{font-weight:700;border-radius:30px;padding:1px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
 .mqlc-high{background:var(--ok-t,#E4F1E6);color:var(--ok-d,#2E7D46)}
 .mqlc-medium{background:var(--amber-t,#FBF1DA);color:var(--amber-d,#B45309)}
 .mqlc-low{background:var(--pink-t,#FBE7E3);color:var(--red,#E1251B)}

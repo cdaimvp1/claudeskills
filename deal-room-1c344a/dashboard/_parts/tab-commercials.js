@@ -47,15 +47,15 @@ function npv(cashflows, ratePct) {
 
 function negPill(level) {
   const lvl = String(level || '').toLowerCase();
-  return '<span class="pill ' + (lvl === 'high' ? 'info' : lvl === 'medium' ? 'muted' : 'muted') + '">' + esc(level || '—') + '</span>';
+  return '<span class="pill ' + (lvl === 'high' ? 'info' : lvl === 'medium' ? 'muted' : 'muted') + '">' + esc(level || ', ') + '</span>';
 }
 function confPill(c) {
   const k = String(c || '').toLowerCase();
-  return '<span class="pill ' + (k === 'high' ? 'ok' : k === 'low' ? 'warn' : 'info') + '">' + esc(c || '—') + '</span>';
+  return '<span class="pill ' + (k === 'high' ? 'ok' : k === 'low' ? 'warn' : 'info') + '">' + esc(c || ', ') + '</span>';
 }
 function matPill(m) {
   const k = String(m || '').toLowerCase();
-  return '<span class="pill ' + (k === 'high' ? 'warn' : k === 'low' ? 'muted' : 'info') + '">' + esc(m || '—') + '</span>';
+  return '<span class="pill ' + (k === 'high' ? 'warn' : k === 'low' ? 'muted' : 'info') + '">' + esc(m || ', ') + '</span>';
 }
 
 /* ---------- 1. 3A, DEAL TABLE & ZOPA ------------------------------------- */
@@ -64,7 +64,7 @@ function matPill(m) {
 function benchChip(d, id) {
   const b = benchForLine(d, id);
   return b ? '<span class="jump" data-jump="el:' + esc(b.id) + '" title="' + esc(b.item) + '">' + esc(b.comparability) + '</span>'
-           : '<span class="tiny muted">—</span>';
+           : '<span class="tiny muted">, </span>';
 }
 function renderDealTable(d) {
   const cols = [
@@ -238,7 +238,7 @@ function renderTopline(d) {
     kpi(m.years + '-yr value case', M(m.valueTotal), 'modelled benefit') +
     kpi('Net (' + m.years + '-yr)', signed(m.netTotal), 'value case less cost') +
     kpi('NPV @ WACC', signed(m.npv), 'discounted at ' + Math.round(m.wacc * 100) + '%') +
-    kpi('Payback', (m.payback != null ? m.payback : '—') + ' mo', 'undiscounted') +
+    kpi('Payback', (m.payback != null ? m.payback : ', ') + ' mo', 'undiscounted') +
   '</div>' +
   insight('Internal analysis, not contract terms. Cost is the negotiated target scenario plus a modelled ' + up + '% in-term uplift on the recurring lines; the negotiation target TCV is ' + M(tgt) + ' before uplift (Deal tab). The value case is a modelled assumption, not a booked figure.');
 }
@@ -380,22 +380,22 @@ function renderNpvCurve(d, wacc) {
     ? '<rect x="' + X(band.target).toFixed(1) + '" y="' + padT + '" width="' + (X(band.ceiling) - X(band.target)).toFixed(1) + '" height="' + ph + '" fill="var(--emph-t)" opacity="0.5"></rect>' : '';
   const beMark = (be.rate != null)
     ? '<line x1="' + X(be.rate).toFixed(1) + '" y1="' + padT + '" x2="' + X(be.rate).toFixed(1) + '" y2="' + (padT + ph) + '" stroke="var(--danger-bar)" stroke-width="1.5" stroke-dasharray="2 2"></line>' +
-      '<text x="' + X(be.rate).toFixed(1) + '" y="' + (padT - 3) + '" text-anchor="end" font-size="9" fill="var(--danger)">break-even ' + be.rate + '%</text>' : '';
+      '<text x="' + X(be.rate).toFixed(1) + '" y="' + (padT - 3) + '" text-anchor="end" font-size="11" fill="var(--danger)">break-even ' + be.rate + '%</text>' : '';
   return '<svg viewBox="0 0 ' + W + ' ' + H + '" class="npv-svg" role="img" aria-label="NPV of the value case versus discount rate">' +
     '<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + ph) + '" stroke="var(--line2)"></line>' +
     '<line x1="' + padL + '" y1="' + (padT + ph) + '" x2="' + (padL + pw) + '" y2="' + (padT + ph) + '" stroke="var(--line2)"></line>' +
-    '<text x="' + (padL - 5) + '" y="' + (Y(yMax) + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--mut)">' + M(yMax) + '</text>' +
-    '<text x="' + (padL - 5) + '" y="' + Y(0).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--mut)">$0</text>' +
+    '<text x="' + (padL - 5) + '" y="' + (Y(yMax) + 3).toFixed(1) + '" text-anchor="end" font-size="11" fill="var(--mut)">' + M(yMax) + '</text>' +
+    '<text x="' + (padL - 5) + '" y="' + Y(0).toFixed(1) + '" text-anchor="end" font-size="11" fill="var(--mut)">$0</text>' +
     bandRect +
     '<polygon points="' + area + '" fill="var(--teal-t)" opacity="0.55"></polygon>' +
     '<polyline points="' + line + '" fill="none" stroke="var(--teal-d)" stroke-width="2"></polyline>' +
     beMark +
     '<line x1="' + wx.toFixed(1) + '" y1="' + padT + '" x2="' + wx.toFixed(1) + '" y2="' + (padT + ph) + '" stroke="var(--emph)" stroke-width="1.5" stroke-dasharray="3 2"></line>' +
     '<circle cx="' + wx.toFixed(1) + '" cy="' + wy.toFixed(1) + '" r="3.5" fill="var(--emph)" stroke="var(--surface)" stroke-width="1.5"></circle>' +
-    '<text x="' + clampp(wx, padL + 2, padL + pw - 78).toFixed(1) + '" y="' + (padT + 10) + '" font-size="9" fill="var(--emph-tx)" font-weight="700">WACC ' + wacc + '% · ' + M(wnpv) + '</text>' +
-    '<text x="' + padL + '" y="' + (H - 8) + '" text-anchor="start" font-size="9" fill="var(--mut)">0%</text>' +
-    '<text x="' + (padL + pw).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="end" font-size="9" fill="var(--mut)">' + xMax + '%</text>' +
-    '<text x="' + (padL + pw / 2).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="9" fill="var(--mut)">discount rate →</text>' +
+    '<text x="' + clampp(wx, padL + 2, padL + pw - 78).toFixed(1) + '" y="' + (padT + 10) + '" font-size="11" fill="var(--emph-tx)" font-weight="700">WACC ' + wacc + '% · ' + M(wnpv) + '</text>' +
+    '<text x="' + padL + '" y="' + (H - 8) + '" text-anchor="start" font-size="11" fill="var(--mut)">0%</text>' +
+    '<text x="' + (padL + pw).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="end" font-size="11" fill="var(--mut)">' + xMax + '%</text>' +
+    '<text x="' + (padL + pw / 2).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="var(--mut)">discount rate →</text>' +
   '</svg>';
 }
 /* renderSavingsWaterfall retired: it duplicated the Negotiated Value Ladder (renderScenarioWaterfall),
@@ -515,7 +515,7 @@ function renderTab_commercials(d) {
     '.commercials-tab .kpi-row{display:flex;gap:12px;flex-wrap:wrap}' +
     '.commercials-tab .kpi{flex:1 1 140px;min-width:130px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px}' +
     '.commercials-tab .kpi .k-lbl{font-size:var(--fz-floor);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700}' +
-    '.commercials-tab .kpi .k-val{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:3px;color:var(--ink)}' +
+    '.commercials-tab .kpi .k-val{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:3px;color:var(--ink)}' +
     /* Where-the-Room per-line table: defensible / loaded tags + a share-of-room mini-bar */
     '.commercials-tab .room-tag{font:700 9px/1.4 var(--sans);letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:4px;white-space:nowrap}' +
     '.commercials-tab .room-tag.def{color:var(--sec-tx);background:var(--sec-t)}' +
@@ -538,7 +538,7 @@ function renderTab_commercials(d) {
     '.commercials-tab .scst-gap{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(45deg,var(--line2),var(--line2) 3px,transparent 3px,transparent 7px)}' +
     '.commercials-tab .scst-ask{position:absolute;top:-3px;bottom:-3px;right:0;width:2px;background:var(--ink2)}' +
     '.commercials-tab .scst-lgs{display:flex;flex-wrap:wrap;gap:10px;margin-top:9px;margin-bottom:6px}' +
-    '.commercials-tab .scst-lg{font-size:10.5px;color:var(--mut2);display:inline-flex;align-items:center;gap:4px}' +
+    '.commercials-tab .scst-lg{font-size:11px;color:var(--mut2);display:inline-flex;align-items:center;gap:4px}' +
     '.commercials-tab .scst-lg i{width:9px;height:9px;border-radius:2px;display:inline-block}' +
     '.commercials-tab .scst-lg b{color:var(--ink2)}' +
     '.commercials-tab .rl-item{font-size:var(--fz-sm);line-height:1.45}' +
@@ -555,11 +555,11 @@ function renderTab_commercials(d) {
     '.commercials-tab .pf-scroll{overflow-x:auto}' +
     '.commercials-tab .pf-table{width:100%;border-collapse:collapse;font-size:var(--fz-sm)}' +
     '.commercials-tab .pf-table th,.commercials-tab .pf-table td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}' +
-    '.commercials-tab .pf-table th{font:700 10px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);background:var(--surface2)}' +
+    '.commercials-tab .pf-table th{font:700 11px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut);background:var(--surface2)}' +
     '.commercials-tab .pf-table td.pf-n,.commercials-tab .pf-table th.pf-n{text-align:right;font-variant-numeric:tabular-nums}' +
     '.commercials-tab .pf-table td.pf-rl,.commercials-tab .pf-table th.pf-rl{text-align:left;white-space:normal;min-width:150px;max-width:250px;color:var(--ink2)}' +
     '.commercials-tab .pf-table .pf-tot-col{border-left:1px solid var(--line2);font-weight:700}' +
-    '.commercials-tab .pf-section td{font:800 9.5px/1.3 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);background:var(--surface2);padding-top:9px}' +
+    '.commercials-tab .pf-section td{font:800 9px/1.3 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--mut);background:var(--surface2);padding-top:9px}' +
     '.commercials-tab .pf-subtot td{font-weight:800;color:var(--ink);border-top:1px solid var(--line2)}' +
     '.commercials-tab .pf-net td,.commercials-tab .pf-cum td,.commercials-tab .pf-npvrow td,.commercials-tab .pf-margin td{font-weight:800;color:var(--ink)}' +
     '.commercials-tab .pf-net td{border-top:2px solid var(--plum)}' +
@@ -572,7 +572,7 @@ function renderTab_commercials(d) {
     /* D3: disabled Financial Model subtab + the reason line under the strip */
     '.commercials-tab .subtab-btn.is-disabled{color:var(--mut2);opacity:.55;cursor:not-allowed;pointer-events:none}' +
     '.commercials-tab .subtab-btn.is-disabled svg{opacity:.6}' +
-    '.commercials-tab .subtab-note{font-size:12px;color:var(--mut);padding:8px 0 0;max-width:1320px;margin:0 auto}' +
+    '.commercials-tab .subtab-note{font-size:13px;color:var(--mut);padding:8px 0 0;max-width:1320px;margin:0 auto}' +
   '</style>';
 
   // D3: no credible inputs -> the Financial Model subtab stays in the strip, greyed and NON-EXPANDABLE

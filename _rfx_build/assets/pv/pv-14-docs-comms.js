@@ -176,15 +176,15 @@ function ensureCommCss(){ if(document.getElementById('comm-css'))return; var s=d
  '.cmrow.unres{box-shadow:inset 3px 0 0 var(--amber,#FFC709)}'+
  '.cmmain{flex:1;min-width:0}'+
  '.cmsubj{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3}'+
- '.cmsnip{font-size:12px;color:var(--mut);line-height:1.45;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}'+
+ '.cmsnip{font-size:13px;color:var(--mut);line-height:1.45;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}'+
  '.cmflags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}'+
  '.cmmeta{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right;max-width:230px}'+
- '.cmwho{font:600 10.5px var(--mono,monospace);color:var(--mut);line-height:1.35;word-break:break-word}'+
- '.cmwhen{font:600 10.5px var(--mono,monospace);color:var(--mut2);letter-spacing:.02em}'+
- '.cmchip{font:600 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:20px;background:var(--blue-t,#E4EBF1);color:var(--navy);white-space:nowrap}'+
+ '.cmwho{font:600 11px var(--mono,monospace);color:var(--mut);line-height:1.35;word-break:break-word}'+
+ '.cmwhen{font:600 11px var(--mono,monospace);color:var(--mut2);letter-spacing:.02em}'+
+ '.cmchip{font:600 11px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:20px;background:var(--blue-t,#E4EBF1);color:var(--navy);white-space:nowrap}'+
  '.cmchip.warn{background:var(--amber-t,#FBF1DA);color:var(--amber-d,#8A5A00)}.cmchip.bad{background:var(--pink-t,#FBE7E3);color:var(--red,#C8202E)}'+
  '.cmchip.mut{background:var(--well,#DDDCD8);color:var(--mut2)}'+
- '.cmx{flex:0 0 auto;align-self:center;border:1px solid var(--line2,#CECCC7);background:var(--surface);color:var(--mut2);border-radius:20px;font:600 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.04em;padding:4px 9px;cursor:pointer;opacity:.55;transition:.12s;white-space:nowrap}'+
+ '.cmx{flex:0 0 auto;align-self:center;border:1px solid var(--line2,#CECCC7);background:var(--surface);color:var(--mut2);border-radius:20px;font:600 11px var(--mono,monospace);text-transform:uppercase;letter-spacing:.04em;padding:4px 9px;cursor:pointer;opacity:.55;transition:.12s;white-space:nowrap}'+
  '.cmrow:hover .cmx{opacity:1}.cmx:hover{border-color:var(--red,#C8202E);color:var(--red,#C8202E)}'+
  '.cmrq{display:flex;align-items:flex-start;gap:13px;padding:12px 13px;border-top:1px solid var(--line2,#CECCC7)}'+
  '.cmrq:first-child{border-top:0}'+
@@ -192,9 +192,9 @@ function ensureCommCss(){ if(document.getElementById('comm-css'))return; var s=d
  '.cmask{font:600 11px var(--mono,monospace);color:var(--mut2);margin-top:6px;font-style:italic}'+
  '.cmqacts{flex:0 0 auto;display:flex;gap:7px;align-self:center}.cmqacts .btn-sm{flex:none}'+
  '.cmbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}'+
- '.cmbar select,.cmbar input{border:1px solid var(--line2,#CECCC7);border-radius:8px;padding:7px 10px;font:inherit;font-size:12.5px}'+
- '.cmhidden{font:600 10.5px var(--mono,monospace);color:var(--mut2);margin-top:10px}.cmhidden a{color:var(--navy);cursor:pointer;text-decoration:underline}'+
- '.cmparties{display:flex;gap:5px;flex-wrap:wrap}.cmpp{font:600 10px var(--mono,monospace);color:var(--mut);background:var(--well,#DDDCD8);border-radius:20px;padding:2px 7px}'
+ '.cmbar select,.cmbar input{border:1px solid var(--line2,#CECCC7);border-radius:8px;padding:7px 10px;font:inherit;font-size:13px}'+
+ '.cmhidden{font:600 11px var(--mono,monospace);color:var(--mut2);margin-top:10px}.cmhidden a{color:var(--navy);cursor:pointer;text-decoration:underline}'+
+ '.cmparties{display:flex;gap:5px;flex-wrap:wrap}.cmpp{font:600 11px var(--mono,monospace);color:var(--mut);background:var(--well,#DDDCD8);border-radius:20px;padding:2px 7px}'
  ; document.head.appendChild(s);
 }
 function commChLbl(c){return {email:'Email',meeting:'Meeting',call:'Call',chat:'Chat',teams:'Teams',portal:'Portal'}[c]||c;}
@@ -301,7 +301,7 @@ function commOpen(id){
  var isCand=e.state==='candidate';
  var candBg=e.personal?'var(--pink-t,#FBE7E3)':'var(--amber-t,#FBF1DA)';
  var candBd=e.personal?'var(--red,#C8202E)':'var(--amber-d,#8A5A00)';
- var candNote=isCand?'<div style="margin-top:12px;padding:10px 12px;background:'+candBg+';border-left:3px solid '+candBd+';border-radius:0 8px 8px 0;font-size:12.5px;color:var(--ink);line-height:1.5">'+(e.personal?'<b>Held in the review queue.</b> It reads personal but may pertain to the RFx. Theo did not include it on its own, a human decides.':'<b>Held in the review queue.</b> Theo isn’t sure it pertains to the RFx. A human decides whether it belongs here.')+'</div>'
+ var candNote=isCand?'<div style="margin-top:12px;padding:10px 12px;background:'+candBg+';border-left:3px solid '+candBd+';border-radius:0 8px 8px 0;font-size:13px;color:var(--ink);line-height:1.5">'+(e.personal?'<b>Held in the review queue.</b> It reads personal but may pertain to the RFx. Theo did not include it on its own, a human decides.':'<b>Held in the review queue.</b> Theo isn’t sure it pertains to the RFx. A human decides whether it belongs here.')+'</div>'
   +'<div class="cvacts"><button class="btn btn-ghost btn-sm" onclick="commSkip(\''+e.id+'\');closeDrawer()">Skip</button><button class="btn btn-primary btn-sm" onclick="commAdd(\''+e.id+'\');closeDrawer()">Add to communications</button></div>':'';
  $('#drawer').innerHTML='<div class="dh"><div><h3>'+escD(e.subject||commChLbl(e.channel))+'</h3><div class="dsub">'+escD(e.date+(e.time?' · '+e.time:'')+' · '+commChLbl(e.channel))+'</div></div><div class="dc" onclick="closeDrawer()">×</div></div><div class="db"><div class="kv"><div class="k">Channel</div><div class="v">'+escD(commChLbl(e.channel))+'</div><div class="k">Topic</div><div class="v">'+escD(e.topic||'')+'</div><div class="k">Facing</div><div class="v">'+escD(e.facing==='supplier-facing'?'Supplier-facing':'Internal')+'</div><div class="k">Sentiment</div><div class="v">'+escD(e.sentiment==='neg'?'Negative':e.sentiment==='pos'?'Positive':'Neutral')+'</div><div class="k">In record</div><div class="v">'+escD(isCand?'Candidate, not yet added':(e.state==='removed'?'Removed by you':'Included'))+'</div>'+(e.unresolved?'<div class="k">Status</div><div class="v">Unresolved'+(e.deadline?' · deadline '+escD(e.deadline):'')+'</div>':'')+'</div><div class="sect" style="margin-top:13px"><div class="secthd"><div class="t">Summary</div></div><p class="narr">'+escD(e.detail||e.summary||'')+'</p></div>'+(parties?'<div class="sect"><div class="secthd"><div class="t">Parties</div></div><div class="cmparties">'+parties+'</div></div>':'')+(e.offChannel?'<div class="scope info" style="margin-top:10px"><span class="d"></span><span>Off-channel contact - routed to the rep, the Lead, and Legal. Surface-only; nothing is disqualified.</span></div>':'')+candNote+'<div style="font-size:var(--fz-meta);color:var(--mut2);font-style:italic;margin-top:10px">Reflect-only. Mirrored from the interaction record; Theo does not send, reply, or chase.</div></div>';
  $('#scrim').classList.add('on');$('#drawer').classList.add('on');
@@ -367,7 +367,7 @@ function docArchiveSoR(){var n=docFlatten().filter(function(r){return /executed|
 function docsHTML(){
  return liveDocsHTML()+'<div class="docsbar"><div style="position:relative;flex:1"><svg viewBox="0 0 24 24" style="position:absolute;left:11px;top:9px;width:15px;height:15px;stroke:var(--mut2);fill:none;stroke-width:2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="docsearch" placeholder="Search documents…" oninput="filterDocs(this.value)" style="width:100%;box-sizing:border-box;padding:8px 12px 8px 33px;border:1px solid var(--line2);border-radius:9px;font-size:13px;font-family:var(--sans)"></div><span id="docviewtoggle" class="docvtg"><button class="docvt on" data-v="tree" onclick="docSetView(\'tree\')">Tree</button><button class="docvt" data-v="list" onclick="docSetView(\'list\')">List</button></span><button class="btn btn-ghost btn-sm" onclick="addFolder()" title="Create a folder in the SharePoint library"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M12 11v6M9 14h6"/></svg>Folder</button></div>'
   +'<div id="docviewbody">'+docViewBodyHTML()+'</div>'
-  +'<div class="archnote"><span style="font:700 10px var(--mono);color:var(--navy);background:rgba(15,58,133,.1);border-radius:20px;padding:3px 9px;letter-spacing:.04em">SHAREPOINT-BACKED</span> <span style="color:var(--mut)"><b>SharePoint</b> holds documents being negotiated now plus internal / risk docs. <b>LEAH source</b> documents (executed MSAs, work orders) stay in LEAH as read-only references, accessible for review but never pulled in. On completion, final / fully-executed copies archive to the <b>system of record</b>. </span><a class="dlk" onclick="event.preventDefault();docArchiveSoR();return false;">Archive final copies to the SoR &rarr;</a></div>';
+  +'<div class="archnote"><span style="font:700 11px var(--mono);color:var(--navy);background:rgba(15,58,133,.1);border-radius:20px;padding:3px 9px;letter-spacing:.04em">SHAREPOINT-BACKED</span> <span style="color:var(--mut)"><b>SharePoint</b> holds documents being negotiated now plus internal / risk docs. <b>LEAH source</b> documents (executed MSAs, work orders) stay in LEAH as read-only references, accessible for review but never pulled in. On completion, final / fully-executed copies archive to the <b>system of record</b>. </span><a class="dlk" onclick="event.preventDefault();docArchiveSoR();return false;">Archive final copies to the SoR &rarr;</a></div>';
 }
 function openDetails(){$('#drawer').innerHTML=`<div class="dh"><div><h3>Project details</h3><div class="dsub">P-1042 · Analytics SaaS, Acme AI</div></div><div class="dc" onclick="closeDrawer()">×</div></div><div class="db"><p class="narr">A new engagement to stand up an <b>AI-powered employee-analytics platform</b> from <b>Acme Analytics</b>, a vendor not previously under contract. Because it will <b>process employee PI</b> and involves <b>AI</b>, intake classified it <b>Orange</b> and fanned the work out to Legal, Cyber (ISS), the AI Registry (AIS) and WwTP risk in parallel, with contract authoring in LEAH and supplier enablement. Sourcing was skipped (sole source). It's a 3-year MSA + initial WO, ~$1.8M, currently held at the Reviews gate awaiting WwTP and the Cyber questionnaire.</p><div class="kv"><div class="k">Type</div><div class="v">New supplier engagement</div><div class="k">Supplier</div><div class="v">Acme Analytics (new) · HQ USA</div><div class="k">Contracts</div><div class="v">New MSA (full MPT) + initial Work Order</div><div class="k">Spend</div><div class="v">$1.8M TCO · 3 yrs</div><div class="k">CCI classification</div><div class="v">Orange, employee PI</div><div class="k">Standards</div><div class="v">SPS · ISS · AIS</div><div class="k">Owner</div><div class="v">Priya Shah</div><div class="k">Rep</div><div class="v">Marc Lane</div><div class="k">Started</div><div class="v">2026-06-23</div><div class="k">Target PO</div><div class="v">2026-07-31</div></div></div>`;$('#scrim').classList.add('on');$('#drawer').classList.add('on');}
 const PCOLOR={'Priya Shah':'#7A2436','Marc Lane':'#2F6E6B','Aisha Khan':'#123C82','Dan Reed':'#2E6B47','Sam Patel':'#5C2B50','Jordan Avery':'#A6541C','Lee Davis':'#8A5A00'};
@@ -551,7 +551,7 @@ function pvUnresolvedRender(reqKey){try{
  var bar=document.getElementById('tabs'); if(bar) bar.style.display='none';   // hide, don't wipe (core tabs are static)
  var t=document.querySelector('.ptitle'); if(t) t.textContent='Example project';
  var m=document.querySelector('.pmeta'); if(m) m.innerHTML='<span>'+escapeHtmlPV(reqKey)+'</span><span>·</span><span>detailed view not yet wired</span>';
- var tb=document.getElementById('tabbody'); if(tb) tb.innerHTML='<div class="sect" style="max-width:660px;margin:34px auto"><div class="card" style="text-align:center;padding:40px 26px"><div style="font-size:15px;font-weight:800;color:var(--ink)">This example isn’t wired into the detailed view yet</div><div style="font-size:13px;color:var(--mut);line-height:1.65;margin-top:11px">The demo details <b>11 representative projects</b> spanning every sourcing type, sole-source, competitive RFx, renewal, buy-under-MSA and early scoping. This card (<b>'+escapeHtmlPV(reqKey)+'</b>) is one of the additional example rows on the Projects list; its per-project detail hasn’t been authored. <br><br><a href="projects.html" style="color:var(--blue-d);font-weight:700;text-decoration:none">← Back to Projects</a></div></div></div>';
+ var tb=document.getElementById('tabbody'); if(tb) tb.innerHTML='<div class="sect" style="max-width:660px;margin:34px auto"><div class="card" style="text-align:center;padding:40px 26px"><div style="font-size:16px;font-weight:800;color:var(--ink)">This example isn’t wired into the detailed view yet</div><div style="font-size:13px;color:var(--mut);line-height:1.65;margin-top:11px">The demo details <b>11 representative projects</b> spanning every sourcing type, sole-source, competitive RFx, renewal, buy-under-MSA and early scoping. This card (<b>'+escapeHtmlPV(reqKey)+'</b>) is one of the additional example rows on the Projects list; its per-project detail hasn’t been authored. <br><br><a href="projects.html" style="color:var(--blue-d);font-weight:700;text-decoration:none">← Back to Projects</a></div></div></div>';
 }catch(e){}}
 // Extract the project key the hash is REQUESTING (or '' for a filter token / empty hash).
 function pvReqKey(){try{var rh=(location.hash||'').replace(/^#/,'');var mm=rh.match(/(?:^|[?&])p=([a-z0-9_-]+)/i);var rk=mm?mm[1]:(/^[a-z0-9_-]+$/i.test(rh)?rh:'');
@@ -634,7 +634,7 @@ async function liveOverlay(){
  var drafts=Array.isArray(dr.data)?dr.data:[];
  var nd=drafts.length, ns=Array.isArray(sg.data)?sg.data.length:0;
  var strip=document.getElementById('liveprojstrip');
- if(!strip){var m2=document.querySelector('.pmeta');if(m2&&m2.parentNode){strip=document.createElement('div');strip.id='liveprojstrip';strip.style.cssText='margin:8px 0 0;font:600 12px var(--mono,monospace);color:var(--mut2,#6b6b6b)';m2.parentNode.insertBefore(strip,m2.nextSibling);}}
+ if(!strip){var m2=document.querySelector('.pmeta');if(m2&&m2.parentNode){strip=document.createElement('div');strip.id='liveprojstrip';strip.style.cssText='margin:8px 0 0;font:600 13px var(--mono,monospace);color:var(--mut2,#6b6b6b)';m2.parentNode.insertBefore(strip,m2.nextSibling);}}
  if(strip)strip.textContent='Live platform record · '+nd+' draft'+(nd===1?'':'s')+', '+ns+' suggestion'+(ns===1?'':'s')+' from the kernel.';
  renderLiveDrafts(drafts);
  // B-batch reads for the live project (B9 obligations + B1 contract versions).
@@ -681,7 +681,7 @@ function renderLiveItsm(data){
   '<div style="display:flex;align-items:center;gap:10px;border:1px solid var(--line,#E3E2DF);border-radius:12px;padding:9px 12px;margin:0 0 7px"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+num+'</div><div style="font:11px var(--mono,monospace);color:var(--mut2,#6b6b6b)">status: '+st+(upd?' · updated '+upd:'')+'</div></div></div>';
  if(data.proposal){
   var note=escapeHtmlPV(data.proposal.note||'ServiceNow reports this request cleared. The linked review can advance.');
-  html+='<div style="background:var(--tint-eaf0f9,#EAF0F9);border:1px solid #C6D7EF;border-left:3px solid #0F3A85;border-radius:10px;padding:9px 12px;margin:0 0 7px;font-size:12px;line-height:1.5;color:#1A1A1A"><b style="color:var(--navy)">Suggestion, not applied.</b> '+note+' Advance it in the review workflow when you are ready.</div>';
+  html+='<div style="background:var(--tint-eaf0f9,#EAF0F9);border:1px solid #C6D7EF;border-left:3px solid #0F3A85;border-radius:10px;padding:9px 12px;margin:0 0 7px;font-size:13px;line-height:1.5;color:#1A1A1A"><b style="color:var(--navy)">Suggestion, not applied.</b> '+note+' Advance it in the review workflow when you are ready.</div>';
  }
  host.innerHTML=html;
 }
@@ -761,7 +761,7 @@ function renderLiveObligations(data,tracker){
    var cons=o.consequence||o.consequenceText||t.consequenceText||t.consequence||'';
    var st=(''+(t.status||o.status||'')).toLowerCase();
    var stChip=st?' · <span style="font-weight:700;color:'+obStColor(st)+'">'+escapeHtmlPV(st)+'</span>':'';
-   var consLine=cons?'<div style="font-size:11.5px;color:var(--mut,#4A4540);margin-top:2px">consequence: '+escapeHtmlPV(cons)+'</div>':'';
+   var consLine=cons?'<div style="font-size:11px;color:var(--mut,#4A4540);margin-top:2px">consequence: '+escapeHtmlPV(cons)+'</div>':'';
    return '<div style="display:flex;align-items:center;gap:10px;border:1px solid var(--line,#E3E2DF);border-radius:12px;padding:9px 12px;margin:0 0 7px"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+label+'</div><div style="font:11px var(--mono,monospace);color:var(--mut2,#6b6b6b)">'+(sev?sev+' · ':'')+(due||'no date')+(owner?' · owner: '+escapeHtmlPV(owner):'')+stChip+'</div>'+consLine+'</div></div>';}).join('');
 }
 /* Live B1 contract-version chain. The canned example keeps CVERSIONS (the Deal
@@ -788,10 +788,10 @@ function renderLiveDrafts(drafts){
  if(!host){var anchor=document.getElementById('liveprojstrip')||document.querySelector('.pmeta');if(anchor&&anchor.parentNode){host=document.createElement('div');host.id='livedrafts';host.style.cssText='margin:12px 0 0';anchor.parentNode.insertBefore(host,anchor.nextSibling);}}
  if(!host)return;
  if(!drafts||!drafts.length){host.innerHTML='';return;}
- var primary='font:700 12px var(--sans);border:none;border-radius:30px;padding:6px 13px;cursor:pointer;background:#0F3A85;color:#fff';
- var ghost='font:700 12px var(--sans);border:1.5px solid var(--line2,#DCD8D2);border-radius:30px;padding:6px 13px;cursor:pointer;background:var(--surface);color:var(--ink,#1A1A1A)';
+ var primary='font:700 13px var(--sans);border:none;border-radius:30px;padding:6px 13px;cursor:pointer;background:#0F3A85;color:#fff';
+ var ghost='font:700 13px var(--sans);border:1.5px solid var(--line2,#DCD8D2);border-radius:30px;padding:6px 13px;cursor:pointer;background:var(--surface);color:var(--ink,#1A1A1A)';
  host.innerHTML='<div style="font:600 11px var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--mut2,#6b6b6b);margin:0 0 8px">Drafts awaiting your dispatch</div>'+
-  drafts.map(function(d){return '<div class="ldraft" data-id="'+escapeHtmlPV(d.id)+'" style="display:flex;align-items:center;gap:10px;border:1px solid var(--line,#E3E2DF);border-radius:12px;padding:10px 12px;margin:0 0 8px"><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">'+escapeHtmlPV(d.title||d.kind||'Draft')+'</div><div class="lds" style="font:11px var(--mono,monospace);color:var(--mut2,#6b6b6b)">'+escapeHtmlPV((d.kind||'')+' · '+(d.status||'ready'))+'</div></div><button data-act="dispatch" style="'+primary+'">Dispatch</button><button data-act="discard" style="'+ghost+'">Discard</button></div>';}).join('');
+  drafts.map(function(d){return '<div class="ldraft" data-id="'+escapeHtmlPV(d.id)+'" style="display:flex;align-items:center;gap:10px;border:1px solid var(--line,#E3E2DF);border-radius:12px;padding:10px 12px;margin:0 0 8px"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+escapeHtmlPV(d.title||d.kind||'Draft')+'</div><div class="lds" style="font:11px var(--mono,monospace);color:var(--mut2,#6b6b6b)">'+escapeHtmlPV((d.kind||'')+' · '+(d.status||'ready'))+'</div></div><button data-act="dispatch" style="'+primary+'">Dispatch</button><button data-act="discard" style="'+ghost+'">Discard</button></div>';}).join('');
  host.querySelectorAll('.ldraft').forEach(function(row){
   var did=row.getAttribute('data-id');
   row.querySelector('[data-act="dispatch"]').onclick=function(){draftAction(did,'dispatch',row);};

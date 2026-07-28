@@ -50,7 +50,7 @@
 
     const html = `
       <div class="eyebrow" style="color:var(--pri-tx);font-size:13px;letter-spacing:.03em;margin-bottom:5px">${esc(rec.stance)}</div>
-      <p style="font-weight:700;font-size:14.5px;line-height:1.4;margin:0 0 8px">${esc(rec.headline)}</p>
+      <p style="font-weight:700;font-size:13px;line-height:1.4;margin:0 0 8px">${esc(rec.headline)}</p>
       <p style="font-size:var(--fz-sm);color:var(--ink2);line-height:1.55;margin:0 0 13px">${esc(rec.rationale)}</p>
       <div class="eyebrow" style="margin-bottom:7px">Conditions before signature</div>
       <div class="kv" style="grid-template-columns:1fr;gap:9px;margin-bottom:4px">${conditionsHTML}</div>
@@ -93,8 +93,8 @@
     const pen = d.deal.whoHasPen;
     const sop = d.deal.stateOfPlay;
     const penLine = pen
-      ? esc(pen.party || '—') + ' (' + esc(pen.confidence || '—') + ' confidence, as of ' + esc(pen.asOf || '—') + ')'
-      : '—';
+      ? esc(pen.party || ', ') + ' (' + esc(pen.confidence || ', ') + ' confidence, as of ' + esc(pen.asOf || ', ') + ')'
+      : ', ';
     const html = `
       <dl class="kv" style="grid-template-columns:1fr">
         <dt>Who has the pen</dt>
@@ -127,8 +127,8 @@
         (dt ? '<span class="ov-chip tco">' + M(dt) + ' TCO</span>' : '');
       const issues = (pkg.issueIds || []).map(id => '<span class="ov-iss">' + esc(id) + '</span>').join('');
       const trade = (pkg.give || pkg.get)
-        ? '<div class="ov-step-trade"><span class="ov-give"><b>Give</b> ' + esc(pkg.give || '—') + '</span>' +
-          '<span class="ov-arrow">→</span><span class="ov-get"><b>Get</b> ' + esc(pkg.get || '—') + '</span></div>'
+        ? '<div class="ov-step-trade"><span class="ov-give"><b>Give</b> ' + esc(pkg.give || ', ') + '</span>' +
+          '<span class="ov-arrow">→</span><span class="ov-get"><b>Get</b> ' + esc(pkg.get || ', ') + '</span></div>'
         : '';
       return '<div class="ov-step ' + tone + '">' +
         '<div class="ov-step-hd"><span class="ov-step-n">Step ' + s.step + '</span>' +

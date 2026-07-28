@@ -16,7 +16,7 @@
   --shadow-3:0 4px 6px -2px rgba(38,30,20,.05),0 12px 16px -4px rgba(38,30,20,.12);
   --inset:inset 0 1px 2px rgba(38,30,20,.05);
   --sans:'Libre Franklin',system-ui,Arial,sans-serif;--mono:'Roboto Mono',ui-monospace,monospace;
-  --fz-sm:13px;--fz-meta:12px;--fz-mono:12px;--fz-floor:11px;
+  --fz-sm:13px;--fz-meta:11px;--fz-mono:9px;--fz-floor:11px;
 }
 /* Dark theme, additive override of token VALUES only; light stays byte-identical. */
 html[data-theme="dark"]{color-scheme:dark;--tint-fce4e0:#3B1E19;--tint-e4ebf1:#2C2C2C;
@@ -45,9 +45,9 @@ html[data-theme="dark"]{color-scheme:dark;--tint-fce4e0:#3B1E19;--tint-e4ebf1:#2
 .rail .nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2}
 .rail .nav:hover{background:var(--surface);color:var(--ink)}
 .rail .nav.on{background:var(--pink-t);color:var(--red)}
-.rail .nav .tip{position:absolute;left:48px;top:50%;transform:translateY(-50%) scale(.96);transform-origin:left;background:var(--ink);color:var(--surface);font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:.12s;z-index:30}
+.rail .nav .tip{position:absolute;left:48px;top:50%;transform:translateY(-50%) scale(.96);transform-origin:left;background:var(--ink);color:var(--surface);font-size:13px;font-weight:600;padding:5px 10px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:.12s;z-index:30}
 .rail .nav:hover .tip{opacity:1;transform:translateY(-50%) scale(1)}
 /* content frame, dashboards keep their own inner max-width/background */
 .shell-main{min-width:0}
 /* a contextual breadcrumb strip (the dashboards' "← Back to project") sits flush under the topbar */
-.shell-main > .dash-back{display:block;background:var(--surface);color:var(--red);font:600 12px var(--sans);text-decoration:none;padding:8px 18px;border-bottom:1px solid var(--line)}
+.shell-main > .dash-back{display:block;background:var(--surface);color:var(--red);font:600 13px var(--sans);text-decoration:none;padding:8px 18px;border-bottom:1px solid var(--line)}

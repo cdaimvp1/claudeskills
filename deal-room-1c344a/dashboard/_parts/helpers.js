@@ -33,7 +33,7 @@
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
   ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 const money = (n, opts) => {
-  if (n == null || isNaN(n)) return '—';
+  if (n == null || isNaN(n)) return ', ';
   const o = opts || {};
   if (o.compact && Math.abs(n) >= 1000) {
     const m = n / 1e6;
@@ -42,7 +42,7 @@ const money = (n, opts) => {
   }
   return '$' + Math.round(n).toLocaleString('en-US');
 };
-const pct = (n, d) => (n == null ? '—' : (d ? n.toFixed(d) : Math.round(n)) + '%');
+const pct = (n, d) => (n == null ? ', ' : (d ? n.toFixed(d) : Math.round(n)) + '%');
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const uid = (() => { let i = 0; return (p) => (p || 'u') + '-' + (++i); })();
 
@@ -53,7 +53,7 @@ const uid = (() => { let i = 0; return (p) => (p || 'u') + '-' + (++i); })();
  * copy replaces what were two independently-drifting local definitions. --- */
 const clampp = clamp;                                     // alias: same clamp(), the name the ZOPA/Economics code uses
 // compact money with a clean minus sign (money() alone renders "$-350K")
-const M = (n) => { if (n == null || isNaN(n)) return '—'; return (n < 0 ? '−' : '') + money(Math.abs(n), { compact: true }); };
+const M = (n) => { if (n == null || isNaN(n)) return ', '; return (n < 0 ? '−' : '') + money(Math.abs(n), { compact: true }); };
 function assumVal(d, id, fb) { const a = (d.assumptions || []).find(x => x.id === id); return a ? a.value : fb; }
 // benchmark -> line mapping (BENCH-int is the platform $/emp figure = CL-1;
 // BENCH-svc is the implementation day-rate = CL-2). No line link in the data.

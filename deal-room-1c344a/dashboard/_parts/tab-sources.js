@@ -48,13 +48,13 @@
     var evLabel = { contract: 'Contract fact', internal: 'Internal fact', public: 'Public fact', calculated: 'Calculated', inference: 'Claude inference', assumption: 'User assumption', unavailable: 'Unavailable' };
     var cells = '<div class="hg-lbl"></div>' + areas.map(function (a) { return '<div class="hg-col">' + esc(a) + '</div>'; }).join('');
     d.sources.forEach(function (src) {
-      cells += '<div class="hg-lbl" title="' + esc(src.label + ' — ' + src.detail) + '">' + esc(src.id) + '</div>';
+      cells += '<div class="hg-lbl" title="' + esc(src.label + ', ' + src.detail) + '">' + esc(src.id) + '</div>';
       areas.forEach(function (a) {
         var covers = src.coverage.indexOf(a) !== -1;
         if (!covers) {
           cells += '<span class="heatcell heat-0" title="' + esc(src.label + ' does not cover ' + a) + '">–</span>';
         } else if (src.evidenceType === 'unavailable') {
-          cells += heatCell(0, { label: '?', title: src.label + ' references "' + a + '" but the document was not provided this session — coverage there is unverified.' });
+          cells += heatCell(0, { label: '?', title: src.label + ' references "' + a + '" but the document was not provided this session, coverage there is unverified.' });
         } else {
           var lvl = strength[src.evidenceType] != null ? strength[src.evidenceType] : 2;
           cells += heatCell(lvl, { label: '●', title: src.label + ' → ' + a + ' · ' + (evLabel[src.evidenceType] || src.evidenceType) });
@@ -85,14 +85,14 @@
     var weakest = areaCounts.slice().sort(function (a, b) { return a.n - b.n; })[0];
     var strongestSrc = d.sources.slice().sort(function (a, b) { return b.coverage.length - a.coverage.length; })[0];
 
-    var matrixCard = saCard('Source coverage — by analysis area', buildCoverageMatrix(d), {
+    var matrixCard = saCard('Source Coverage: by Analysis Area', buildCoverageMatrix(d), {
       accent: 'teal', icon: 'sources', id: 'src-matrix',
       sub: d.sources.length + ' sources · ' + d.analysisAreas.length + ' areas'
     });
 
-    var kindCard = saCard('Sources by kind', buildSourceKindBars(d), { icon: 'bench', sub: d.sources.length + ' total' });
+    var kindCard = saCard('Sources by Kind', buildSourceKindBars(d), { icon: 'bench', sub: d.sources.length + ' total' });
 
-    var tableCard = saCard('Source inventory', '' +
+    var tableCard = saCard('Source Inventory', '' +
       '<div class="toolbar" data-filter-scope>' +
         '<input type="search" placeholder="Filter sources…" data-filter-input data-filter-for="tbl-sources">' +
         '<span class="spacer"></span><span class="filter-count"></span>' +
@@ -119,16 +119,16 @@
     ) : '';
 
     var insights = [
-      insight('The weakest-covered analysis area is <strong>' + esc(weakest.area) + '</strong> (' + weakest.n + ' verified source' + (weakest.n === 1 ? '' : 's') + ') — treat conclusions there as directional.', 'warn'),
+      insight('The weakest-covered analysis area is <strong>' + esc(weakest.area) + '</strong> (' + weakest.n + ' verified source' + (weakest.n === 1 ? '' : 's') + '): treat conclusions there as directional.', 'warn'),
       insight('<strong>' + esc(strongestSrc.label) + '</strong> carries the broadest coverage (' + strongestSrc.coverage.length + ' of ' + d.analysisAreas.length + ' areas) and is the primary anchor for this analysis.'),
       insight('Overall evidence coverage for this deal is rated <strong>' + esc(d.deal.evidenceCoverage) + '</strong>' +
-        (missingSrc.length ? ' — strong on terms already in hand, limited wherever ' + missingSrc.map(function (s) { return s.id; }).join(' / ') + ' would otherwise apply.' : '.'))
+        (missingSrc.length ? ', strong on terms already in hand, limited wherever ' + missingSrc.map(function (s) { return s.id; }).join(' / ') + ' would otherwise apply.' : '.'))
     ].join('');
 
     return '<div class="grid">' +
       '<div class="col-12">' + matrixCard + '</div>' +
       '<div class="col-7">' + tableCard + '</div>' +
-      '<div class="col-5">' + kindCard + '<div style="margin-top:16px">' + saCard('Evidence notes', insights + gapNote, { icon: 'info', accent: 'emph' }) + '</div></div>' +
+      '<div class="col-5">' + kindCard + '<div style="margin-top:16px">' + saCard('Evidence Notes', insights + gapNote, { icon: 'info', accent: 'emph' }) + '</div></div>' +
     '</div>';
   }
 
@@ -140,16 +140,16 @@
     });
     var maxReach = Math.max.apply(null, d.assumptions.map(function (a) { return a.usedIn.length; })) || 1;
 
-    var rankCard = saCard('Impact ranking — materiality × downstream reach', ranked.map(function (a) {
+    var rankCard = saCard('Impact Ranking: Materiality × Downstream Reach', ranked.map(function (a) {
       return barRow(a.label + ' (' + a.materiality + ')', a.usedIn.length, maxReach, a.usedIn.length + ' use' + (a.usedIn.length === 1 ? '' : 's'),
         { color: a.materiality === 'high' ? 'emph' : a.materiality === 'medium' ? 'teal' : 'pri' });
     }).join(''), { accent: 'teal', icon: 'target', sub: d.assumptions.length + ' local inputs' });
 
-    var registerCard = saCard('Assumption register (editable — Local)', d.assumptions.map(function (a) { return assumptionSlider(a); }).join(''), {
+    var registerCard = saCard('Assumption Register (editable: Local)', d.assumptions.map(function (a) { return assumptionSlider(a); }).join(''), {
       accent: 'emph', icon: 'assume', sub: 'drag to test scenarios'
     });
 
-    var tableCard = saCard('Assumption detail', dataTable([
+    var tableCard = saCard('Assumption Detail', dataTable([
       { key: 'id', label: 'ID', width: '64px' },
       { key: 'label', label: 'Assumption' },
       { key: 'value', label: 'Value', align: 'num', sortVal: function (a) { return a.value; }, render: function (a) {
@@ -174,15 +174,15 @@
     var insights = [
       insight(nUser + ' of ' + d.assumptions.length + ' inputs are user assumptions (editable, Local) rather than contract or internal facts; ' +
         nContract + ' come straight from the contract and ' + nInternal + ' from internal finance.', nUser ? 'warn' : ''),
-      highs.length ? insight('High-materiality: ' + highs.map(function (a) { return esc(a.label); }).join(', ') + ' — small changes here move the scenario totals the most.') : '',
-      insight('Sliders here are Local — editing one live-updates every dependent total (scenarios, 3-yr TCV) wherever it is used across this artifact.')
+      highs.length ? insight('High-materiality: ' + highs.map(function (a) { return esc(a.label); }).join(', ') + ', small changes here move the scenario totals the most.') : '',
+      insight('Sliders here are Local: editing one live-updates every dependent total (scenarios, 3-yr TCV) wherever it is used across this artifact.')
     ].filter(Boolean).join('');
 
     return '<div class="grid">' +
       '<div class="col-7">' + rankCard + '</div>' +
       '<div class="col-5">' + registerCard + '</div>' +
       '<div class="col-12">' + tableCard + '</div>' +
-      '<div class="col-12">' + saCard('Evidence notes', insights, { icon: 'info', accent: 'emph' }) + '</div>' +
+      '<div class="col-12">' + saCard('Evidence Notes', insights, { icon: 'info', accent: 'emph' }) + '</div>' +
     '</div>';
   }
 
@@ -192,25 +192,25 @@
       return {
         x: g.ease, y: g.decisionImpact, label: g.id.replace('GAP-', ''),
         color: g.priority === 'critical' ? 'danger' : g.priority === 'important' ? 'emph' : 'teal',
-        title: g.input + ' — ' + g.priority + ' · impact ' + g.decisionImpact + '/5, ease ' + g.ease + '/5',
+        title: g.input + ', ' + g.priority + ' · impact ' + g.decisionImpact + '/5, ease ' + g.ease + '/5',
         jump: 'el:' + g.id
       };
     });
-    var matrixCard = saCard('Decision impact vs. ease to obtain', matrixPlot(points, {
+    var matrixCard = saCard('Decision Impact Vs. Ease to Obtain', matrixPlot(points, {
       xLabel: 'Ease to obtain →', yLabel: 'Decision impact →', xMax: 5, yMax: 5,
-      quadrants: ['Hard, high stakes', 'Quick win — get first', 'Low priority', 'Easy, low value']
+      quadrants: ['Hard, high stakes', 'Quick win: get first', 'Low priority', 'Easy, low value']
     }), { accent: 'danger', icon: 'gap', sub: d.gaps.length + ' open inputs' });
 
     var counts = { critical: 0, important: 0, helpful: 0 };
     d.gaps.forEach(function (g) { counts[g.priority] = (counts[g.priority] || 0) + 1; });
     var maxC = Math.max(counts.critical, counts.important, counts.helpful) || 1;
-    var countsCard = saCard('Gaps by priority',
+    var countsCard = saCard('Gaps by Priority',
       barRow('Critical', counts.critical, maxC, String(counts.critical), { color: 'danger' }) +
       barRow('Important', counts.important, maxC, String(counts.important), { color: 'warn' }) +
       barRow('Helpful', counts.helpful, maxC, String(counts.helpful), { color: 'teal' }),
       { icon: 'flag' });
 
-    var tableCard = saCard('Missing-input register', '' +
+    var tableCard = saCard('Missing-input Register', '' +
       '<div class="toolbar" data-filter-scope>' +
         '<input type="search" placeholder="Filter missing inputs…" data-filter-input data-filter-for="tbl-gaps">' +
         '<span class="spacer"></span><span class="filter-count"></span>' +
@@ -233,10 +233,10 @@
       { icon: 'doc' });
 
     var helpful = d.gaps.filter(function (g) { return g.priority === 'helpful'; });
-    var futureCard = helpful.length ? saCard('Future-ready inputs (nice-to-have)',
+    var futureCard = helpful.length ? saCard('Future-ready Inputs (nice-to-have)',
       '<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:9px">' +
         helpful.map(function (g) {
-          return '<li><strong>' + esc(g.input) + '</strong> — ' + esc(g.whyItMatters) +
+          return '<li><strong>' + esc(g.input) + '</strong>, ' + esc(g.whyItMatters) +
             '<div class="tiny muted">Possible source: ' + esc(g.possibleSource) + '</div></li>';
         }).join('') +
       '</ul>',
@@ -248,16 +248,16 @@
     d.gaps.forEach(function (g) { (g.affectedAnalysis || []).forEach(function (x) { affectedSet[x] = 1; }); });
 
     var insights = [
-      critical.length ? insight(critical.length + ' critical gap' + (critical.length === 1 ? '' : 's') + ' — ' +
+      critical.length ? insight(critical.length + ' critical gap' + (critical.length === 1 ? '' : 's') + ', ' +
         critical.map(function (g) { return jumpLink(g.input, 'el:' + g.id); }).join(', ') +
-        ' — sit upstream of a signature condition or the commercial anchor.', 'danger') : '',
-      quickWins.length ? insight('Quick wins (high impact, easy to obtain): ' + quickWins.map(function (g) { return esc(g.input); }).join(', ') + ' — worth chasing before the next draft.') : '',
+        ', sit upstream of a signature condition or the commercial anchor.', 'danger') : '',
+      quickWins.length ? insight('Quick wins (high impact, easy to obtain): ' + quickWins.map(function (g) { return esc(g.input); }).join(', ') + ', worth chasing before the next draft.') : '',
       insight(d.gaps.length + ' inputs are marked unavailable, touching ' + Object.keys(affectedSet).length + ' downstream analyses across the artifact.')
     ].filter(Boolean).join('');
 
     return '<div class="grid">' +
       '<div class="col-7">' + matrixCard + '</div>' +
-      '<div class="col-5">' + countsCard + '<div style="margin-top:16px">' + saCard('Evidence notes', insights, { icon: 'info', accent: 'emph' }) + '</div></div>' +
+      '<div class="col-5">' + countsCard + '<div style="margin-top:16px">' + saCard('Evidence Notes', insights, { icon: 'info', accent: 'emph' }) + '</div></div>' +
       '<div class="col-12">' + tableCard + '</div>' +
       (futureCard ? '<div class="col-12">' + futureCard + '</div>' : '') +
     '</div>';
@@ -276,7 +276,7 @@
         '<div class="tab-intro" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">' +
           '<div>' +
             '<h2>Sources &amp; Gaps</h2>' +
-            '<p class="q">Where every fact, figure, and assumption in this snapshot came from — and what is still missing before signature. This is the evidence layer behind every chip on the other four tabs.</p>' +
+            '<p class="q">Where every fact, figure, and assumption in this snapshot came from, and what is still missing before signature. This is the evidence layer behind every chip on the other four tabs.</p>' +
           '</div>' +
           '<div>' + introRight + '</div>' +
         '</div>' +

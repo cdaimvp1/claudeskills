@@ -69,7 +69,7 @@
 
   --sans:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','Segoe UI Mono','SFMono-Regular',Consolas,'Roboto Mono',monospace;
-  --fz-h:15px; --fz:13.5px; --fz-sm:12.5px; --fz-meta:11.5px; --fz-floor:11px; --fz-title:13px;
+  --fz-h:16px; --fz:13px; --fz-sm:13px; --fz-meta:11px; --fz-floor:11px; --fz-title:16px;
   --r:11px; --r-sm:8px;
   --tab-h:44px;
   color-scheme:light;
@@ -104,7 +104,7 @@ a:hover{text-decoration:underline}
 .deal-head{background:var(--bg); color:var(--ink); border-bottom:1px solid var(--line2)}
 .deal-head .wrap{display:flex; align-items:center; gap:16px; min-height:76px; padding-top:16px; padding-bottom:16px}
 .deal-head .dh-eyebrow{font-size:var(--fz-floor); letter-spacing:.09em; text-transform:uppercase; color:var(--pri-tx); font-weight:800; margin-bottom:4px}
-.deal-head .dh-title{font-size:22px; font-weight:800; letter-spacing:-.01em; line-height:1.2; color:var(--ink)}
+.deal-head .dh-title{font-size:20px; font-weight:800; letter-spacing:-.01em; line-height:1.2; color:var(--ink)}
 .deal-head .dh-sub{font-size:var(--fz-meta); color:var(--mut); margin-top:3px}
 .deal-head .dh-spacer{margin-left:auto}
 .deal-head .dh-btn{display:inline-flex; align-items:center; gap:6px; background:var(--surface); color:var(--ink);
@@ -200,7 +200,7 @@ a:hover{text-decoration:underline}
 .sa-card.accent-emph .card-hd .ch-ic{color:var(--emph-tx)}
 .sa-card.accent-danger .card-hd .ch-ic{color:var(--danger-fg)}
 .card-hd .ch-ic svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:2}
-.card-hd .ct{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--pri-tx)}
+.card-hd .ct{font-size:13px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--pri-tx)}
 .sa-card.accent-teal .card-hd .ct{color:var(--sec-tx)}
 .sa-card.accent-emph .card-hd .ct{color:var(--emph-tx)}
 .sa-card.accent-danger .card-hd .ct{color:var(--danger-fg)}
@@ -228,7 +228,7 @@ a:hover{text-decoration:underline}
 /* D2: the inference MARK (replaces the per-item inference chip) + its single page-level key.
    Deliberately quiet: it should register as a qualifier on the value it follows, never compete
    with it. The dotted ring is the mark; the underline convention rides on the hover target. */
-.ev-inf{display:inline-block; width:1em; text-align:center; color:var(--mut2); font-size:.95em;
+.ev-inf{display:inline-block; width:1em; text-align:center; color:var(--mut2); font-size:13px;
   line-height:1; vertical-align:baseline; cursor:help; border-bottom:1px dotted var(--line2);
   margin-left:3px}
 .ev-inf:hover,.ev-inf:focus-visible{color:var(--plum); border-bottom-color:var(--plum); outline:none}
@@ -278,7 +278,7 @@ table.dt thead th{position:sticky; top:0; background:color-mix(in srgb,var(--pri
   text-transform:uppercase; letter-spacing:.05em; border-bottom:1.5px solid color-mix(in srgb,var(--pri) 26%,var(--line2)); white-space:nowrap; z-index:1}
 table.dt th[data-sort]{cursor:pointer; user-select:none}
 table.dt th[data-sort]:hover{color:var(--ink)}
-table.dt th[data-sort]::after{content:"\2195"; opacity:.35; margin-left:5px; font-size:10px}
+table.dt th[data-sort]::after{content:"\2195"; opacity:.35; margin-left:5px; font-size:11px}
 table.dt th[data-sort][aria-sort="ascending"]::after{content:"\2191"; opacity:1}
 table.dt th[data-sort][aria-sort="descending"]::after{content:"\2193"; opacity:1}
 table.dt.zebra tbody tr:nth-child(even){background:color-mix(in srgb,var(--panel) 55%,transparent)}
@@ -445,9 +445,9 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 /* ---- Overview commercial-headline strip (deal-adaptive KPI cards) ---- */
 .ov-headline{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px}
 .ov-hcard{border:1px solid var(--line2); border-radius:8px; padding:11px 13px; background:var(--surface2)}
-.ov-hcard .ov-hc-lab{font:800 9.5px/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin-bottom:6px}
-.ov-hcard .ov-hc-val{font:800 19px/1.1 var(--sans); color:var(--ink); font-variant-numeric:tabular-nums}
-.ov-hcard .ov-hc-sub{font-size:10.5px; color:var(--mut2); margin-top:5px; display:flex; align-items:center; gap:5px; flex-wrap:wrap}
+.ov-hcard .ov-hc-lab{font:800 9px/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin-bottom:6px}
+.ov-hcard .ov-hc-val{font:800 20px/1.1 var(--sans); color:var(--ink); font-variant-numeric:tabular-nums}
+.ov-hcard .ov-hc-sub{font-size:11px; color:var(--mut2); margin-top:5px; display:flex; align-items:center; gap:5px; flex-wrap:wrap}
 @media(max-width:760px){.ov-headline{grid-template-columns:repeat(2,1fr)}}
 
 /* ---- Overview Next Steps: full-width sequenced step-cards ---- */
@@ -456,20 +456,20 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 .ov-step.pri{border-top-color:var(--plum)}
 .ov-step.emph{border-top-color:var(--emph)}
 .ov-step-hd{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
-.ov-step-n{font:800 10px/1 var(--sans); letter-spacing:.05em; text-transform:uppercase; color:var(--mut)}
+.ov-step-n{font:800 11px/1 var(--sans); letter-spacing:.05em; text-transform:uppercase; color:var(--mut)}
 .ov-step-pkg{font-weight:800; font-size:13px; color:var(--ink)}
-.ov-step-move{font-size:12px; color:var(--ink2); line-height:1.42}
+.ov-step-move{font-size:13px; color:var(--ink2); line-height:1.42}
 .ov-step-trade{font-size:11px; color:var(--ink2); display:flex; align-items:center; gap:6px; flex-wrap:wrap; background:var(--surface2); border-radius:6px; padding:7px 9px}
-.ov-step-trade b{font:800 8.5px/1 var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--mut2); margin-right:3px}
+.ov-step-trade b{font:800 9px/1 var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--mut2); margin-right:3px}
 .ov-arrow{color:var(--mut2)}
 .ov-step-deltas{display:flex; gap:6px; flex-wrap:wrap}
-.ov-chip{font:800 10px/1 var(--sans); padding:4px 8px; border-radius:11px}
+.ov-chip{font:800 11px/1 var(--sans); padding:4px 8px; border-radius:11px}
 .ov-chip.prot{background:var(--sec-t); color:var(--sec-tx)}
 .ov-chip.tco{background:var(--plum-t); color:var(--pri-tx)}
-.ov-step-target{font-size:10.5px; color:var(--ink2); line-height:1.4}
-.ov-step-target .ov-tk{font:800 8.5px/1 var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--mut2); display:block; margin-bottom:2px}
+.ov-step-target{font-size:11px; color:var(--ink2); line-height:1.4}
+.ov-step-target .ov-tk{font:800 9px/1 var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--mut2); display:block; margin-bottom:2px}
 .ov-step-iss{display:flex; gap:5px; flex-wrap:wrap; margin-top:auto; padding-top:4px}
-.ov-iss{font:700 9.5px/1 var(--mono); color:var(--mut); background:var(--nested); border:1px solid var(--line2); border-radius:5px; padding:3px 6px}
+.ov-iss{font:700 9px/1 var(--mono); color:var(--mut); background:var(--nested); border:1px solid var(--line2); border-radius:5px; padding:3px 6px}
 @media(max-width:760px){.ov-steps{grid-template-columns:1fr}}
 
 /* ---- persistent-strip lead cluster: who-has-the-pen chip + coverage pill ---- */
@@ -497,9 +497,9 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
   padding:8px 11px;border:1px solid var(--line2);border-left:3px solid var(--plum);border-radius:8px}
 .lp-focus-bar.is-hidden{display:none}
 .lp-focus-back{appearance:none;border:1px solid var(--line2);background:var(--surface);color:var(--plum);
-  font:700 11.5px var(--sans);padding:5px 11px;border-radius:30px;cursor:pointer}
+  font:700 11px var(--sans);padding:5px 11px;border-radius:30px;cursor:pointer}
 .lp-focus-back:hover{border-color:var(--plum);background:var(--plum);color:#fff}
-.lp-focus-of{font:600 11.5px var(--sans);color:var(--mut)}
+.lp-focus-of{font:600 11px var(--sans);color:var(--mut)}
 .lp-focus-of b{color:var(--ink);font-family:var(--mono);font-size:11px}
 /* in focus mode the register does not need its own scroll cue: one row is showing */
 [data-filter-scope].is-focused .lp-reg-cue{display:none}
@@ -509,7 +509,7 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 /* ---- Components added after the base commit. STRUCTURE ONLY (Marc 2026-07-27 revert). ---- */
 
 /* D2 inference mark + single page key */
-.ev-inf{display:inline-block;width:1em;text-align:center;color:var(--mut2);font-size:.95em;
+.ev-inf{display:inline-block;width:1em;text-align:center;color:var(--mut2);font-size:13px;
   line-height:1;vertical-align:baseline;cursor:help;border-bottom:1px dotted var(--line2);margin-left:3px}
 .ev-inf:hover,.ev-inf:focus-visible{color:var(--plum);border-bottom-color:var(--plum);outline:none}
 .ev-inf-key{display:flex;align-items:center;gap:6px;margin-top:7px;
@@ -519,7 +519,7 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
 /* D3 disabled Financial Model subtab */
 .commercials-tab .subtab-btn.is-disabled{color:var(--mut2);opacity:.55;cursor:not-allowed;pointer-events:none}
 .commercials-tab .subtab-btn.is-disabled svg{opacity:.6}
-.commercials-tab .subtab-note{font-size:12px;color:var(--mut);padding:8px 0 0;max-width:1320px;margin:0 auto}
+.commercials-tab .subtab-note{font-size:13px;color:var(--mut);padding:8px 0 0;max-width:1320px;margin:0 auto}
 
 /* D7 sticky secondary subnav */
 .subtabbar{position:sticky;top:var(--subnav-top, 56px);z-index:24}
@@ -535,9 +535,15 @@ tr.expandable.is-open>td:first-child::before{transform:rotate(90deg)}
   padding:8px 11px;border:1px solid var(--line2);border-left:3px solid var(--plum);border-radius:8px}
 .lp-focus-bar.is-hidden{display:none}
 .lp-focus-back{appearance:none;border:1px solid var(--line2);background:var(--surface);color:var(--plum);
-  font:700 11.5px var(--sans);padding:5px 11px;border-radius:30px;cursor:pointer}
+  font:700 11px var(--sans);padding:5px 11px;border-radius:30px;cursor:pointer}
 .lp-focus-back:hover{border-color:var(--plum);background:var(--plum);color:#fff}
-.lp-focus-of{font:600 11.5px var(--sans);color:var(--mut)}
+.lp-focus-of{font:600 11px var(--sans);color:var(--mut)}
 .lp-focus-of b{color:var(--ink);font-family:var(--mono);font-size:11px}
 [data-filter-scope].is-focused .lp-reg-cue{display:none}
 [data-filter-scope].is-focused .lp-reg-scroll{max-height:none}
+
+/* type scale: form controls must not fall back to the browser default (13.3333px) */
+button,input,select,textarea{font-family:inherit;font-size:13px}
+
+/* type scale: <small>/<sub>/<sup> must not inherit a fractional em size */
+small,sub,sup{font-size:9px}

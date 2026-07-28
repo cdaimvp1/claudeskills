@@ -499,8 +499,8 @@
       '.theo-amb-h{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--header,#E2E6E1);color:var(--ink,#1A1A1A);border-bottom:1px solid var(--line2,#DAD5CE);flex:none}' +
       '.theo-amb-h .di{width:27px;height:27px;flex:none;display:inline-flex;align-items:center}' +
       '.theo-amb-h .di .theo-dinomark{width:27px;height:27px;filter:var(--dino-filter,brightness(0))}' +
-      '.theo-amb-h .tt{font-weight:800;font-size:15px;line-height:1.1}' +
-      '.theo-amb-h .x{margin-left:auto;background:transparent;border:none;color:var(--ink,#1A1A1A);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center}' +
+      '.theo-amb-h .tt{font-weight:800;font-size:16px;line-height:1.1}' +
+      '.theo-amb-h .x{margin-left:auto;background:transparent;border:none;color:var(--ink,#1A1A1A);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:20px;line-height:1;display:inline-flex;align-items:center;justify-content:center}' +
       '.theo-amb-h .x:hover{background:var(--topbar-ctrl-hover,rgba(0,0,0,.06))}' +
       '.theo-amb-h .x:focus-visible{outline:2px solid var(--ink,#1A1A1A);outline-offset:2px}' +
       // --- body / thread ---
@@ -510,9 +510,9 @@
       '.theo-amb-hl .who{width:28px;height:28px;border-radius:50%;flex:none;background:transparent;display:flex;align-items:center;justify-content:center;padding:0}' +
       '.theo-amb-hl .who .theo-dinomark{width:27px;height:27px;filter:var(--dino-filter,brightness(0))}' +
       '.theo-amb-hl .bd{flex:1;min-width:0}' +
-      '.theo-amb-hl .s{display:flex;align-items:center;gap:6px;font:700 9.5px var(--mono,ui-monospace,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut,#6B6360);margin-bottom:4px}' +
+      '.theo-amb-hl .s{display:flex;align-items:center;gap:6px;font:700 9px var(--mono,ui-monospace,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut,#6B6360);margin-bottom:4px}' +
       '.theo-amb-hl .s .demo{color:var(--ai,#2E5E8C);background:var(--ai-t,#E4EBF1);border-radius:20px;padding:1px 6px}' +
-      '.theo-amb-hl .tx{font-size:12.9px;line-height:1.55;color:var(--ink,#1A1A1A)}' +
+      '.theo-amb-hl .tx{font-size:13px;line-height:1.55;color:var(--ink,#1A1A1A)}' +
       '.theo-amb-hl .tx b{font-weight:700}' +
       // demo conversation messages
       '.theo-amb-msgs{display:flex;flex-direction:column;gap:12px;margin-top:14px}' +
@@ -521,11 +521,11 @@
       '.theo-amb-msg.theo .who{background:transparent;padding:0}' +
       '.theo-amb-msg.theo .who .theo-dinomark{width:25px;height:25px;filter:var(--dino-filter,brightness(0))}' +
       '.theo-amb-msg.me{flex-direction:row-reverse}' +
-      '.theo-amb-msg.me .who{background:var(--ai,#2E5E8C);color:#fff;font:700 10px var(--sans,system-ui,sans-serif)}' +
-      '.theo-amb-bub{border-radius:12px;padding:9px 12px;font-size:12.7px;line-height:1.5;border:1px solid var(--line,#E7E4DF);background:var(--surface);color:var(--ink,#1A1A1A)}' +
+      '.theo-amb-msg.me .who{background:var(--ai,#2E5E8C);color:#fff;font:700 11px var(--sans,system-ui,sans-serif)}' +
+      '.theo-amb-bub{border-radius:12px;padding:9px 12px;font-size:13px;line-height:1.5;border:1px solid var(--line,#E7E4DF);background:var(--surface);color:var(--ink,#1A1A1A)}' +
       '.theo-amb-msg.me .theo-amb-bub{background:#423C35;color:#fff;border-color:#423C35}' +
       'html[data-theme="dark"] .theo-amb-msg.me .theo-amb-bub{background:#33302A;color:#E8E4DC;border:1px solid #E8E4DC}' +
-      '.theo-amb-bub .s{display:flex;align-items:center;gap:6px;font:700 9.5px var(--mono,ui-monospace,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut,#6B6360);margin-bottom:4px}' +
+      '.theo-amb-bub .s{display:flex;align-items:center;gap:6px;font:700 9px var(--mono,ui-monospace,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut,#6B6360);margin-bottom:4px}' +
       '.theo-amb-bub .demo{color:var(--ai,#2E5E8C);background:var(--ai-t,#E4EBF1);border-radius:20px;padding:1px 6px}' +
       // --- input region = the real chat pill (scoped so it renders identically sitewide) ---
       '.theo-amb-foot{flex:none;border-top:1px solid var(--line,#E7E4DF);padding:11px 12px 12px;background:var(--card,#fff)}' +
@@ -539,18 +539,18 @@
       '#theo-amb-drawer .prov.on{background:var(--ai-t,#E4EBF1);border-color:#D4E2F0;color:var(--ai,#2E5E8C)}' +
       '#theo-amb-drawer .prov svg{width:17px;height:17px}' +
       '#theo-amb-drawer .prov:focus-visible{outline:2px solid var(--ai,#2E5E8C);outline-offset:1px}' +
-      '#theo-amb-drawer .provmodel{font-family:var(--mono,ui-monospace,monospace);font-size:10.5px;font-weight:600;color:var(--mut,#6B6360);margin-left:4px;white-space:nowrap}' +
+      '#theo-amb-drawer .provmodel{font-family:var(--mono,ui-monospace,monospace);font-size:11px;font-weight:600;color:var(--mut,#6B6360);margin-left:4px;white-space:nowrap}' +
       '#theo-amb-drawer .skicon{position:relative;display:inline-flex;align-items:center;justify-content:center;width:31px;height:31px;border:1px solid var(--line2,#DAD5CE);border-radius:9px;background:var(--surface);color:var(--mut,#6B6360);cursor:pointer}' +
       '#theo-amb-drawer .skicon:hover{border-color:var(--ai,#2E5E8C);color:var(--ai,#2E5E8C)}' +
       '#theo-amb-drawer .skicon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}' +
       '#theo-amb-drawer .skicon:focus-visible{outline:2px solid var(--ai,#2E5E8C);outline-offset:1px}' +
       // actions chip (the red "N actions" flag)
-      '#theo-amb-drawer .pinchip{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans,system-ui,sans-serif);font-weight:700;font-size:11.5px;color:var(--red,#E1251B);background:var(--pink-t,#FDF2F0);border:1.5px solid var(--pink-2,#FBCFC8);border-radius:30px;padding:5px 12px;cursor:pointer}' +
+      '#theo-amb-drawer .pinchip{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans,system-ui,sans-serif);font-weight:700;font-size:11px;color:var(--red,#E1251B);background:var(--pink-t,#FDF2F0);border:1.5px solid var(--pink-2,#FBCFC8);border-radius:30px;padding:5px 12px;cursor:pointer}' +
       '#theo-amb-drawer .pinchip:hover{background:var(--tint-fce4e0,#FCE4E0)}' +
       '#theo-amb-drawer .pinchip:focus-visible{outline:2px solid var(--red,#E1251B);outline-offset:1px}' +
       '#theo-amb-drawer .pinchip .pcz{font-size:13px;line-height:1}' +
-      '#theo-amb-drawer .pinchip .pcc{font-family:var(--mono,ui-monospace,monospace);font-size:9.5px;font-weight:700;background:var(--red,#E1251B);color:#fff;border-radius:30px;padding:1px 7px;line-height:1.5}' +
-      '#theo-amb-drawer .pinchip .pccar{font-size:10px;line-height:1;color:var(--red,#E1251B)}' +
+      '#theo-amb-drawer .pinchip .pcc{font-family:var(--mono,ui-monospace,monospace);font-size:9px;font-weight:700;background:var(--red,#E1251B);color:#fff;border-radius:30px;padding:1px 7px;line-height:1.5}' +
+      '#theo-amb-drawer .pinchip .pccar{font-size:11px;line-height:1;color:var(--red,#E1251B)}' +
       // the pill itself
       '#theo-amb-drawer .pill{display:flex;align-items:flex-end;gap:7px;border:1.6px solid var(--line2,#DAD5CE);background:var(--surface);border-radius:24px;padding:7px 7px 7px 8px;box-shadow:var(--shadow,0 1px 3px rgba(25,20,15,.08));transition:.14s;position:relative}' +
       '#theo-amb-drawer .pill.focus{border-color:var(--red,#E1251B);box-shadow:0 0 0 3px rgba(225,37,27,.10)}' +
@@ -562,7 +562,7 @@
       '#theo-amb-drawer .iconbtn.send:hover{background:var(--red-d,#B41E16)}' +
       '#theo-amb-drawer .iconbtn.send:disabled{background:var(--line2,#DAD5CE);color:#fff;cursor:not-allowed}' +
       '#theo-amb-drawer .iconbtn:focus-visible{outline:2px solid var(--ai,#2E5E8C);outline-offset:1px}' +
-      '#theo-amb-drawer .pill textarea{flex:1;border:none;resize:none;background:transparent;font-family:var(--sans,system-ui,sans-serif);font-size:13.5px;line-height:1.5;padding:8px 4px;max-height:120px;outline:none;color:var(--ink,#1A1A1A)}' +
+      '#theo-amb-drawer .pill textarea{flex:1;border:none;resize:none;background:transparent;font-family:var(--sans,system-ui,sans-serif);font-size:13px;line-height:1.5;padding:8px 4px;max-height:120px;outline:none;color:var(--ink,#1A1A1A)}' +
       '#theo-amb-drawer .pill textarea::placeholder{color:var(--mut2,#8A827B)}';
     document.head.appendChild(s);
   }
@@ -820,7 +820,7 @@
         '.app>.rail,.appbody>.rail,.rail{background:var(--bg)!important}' +
         '.topbar .brand{display:flex;align-items:flex-end}' +
         '.theomark{display:inline-flex;align-items:flex-end;gap:7px;margin-left:13px;padding-left:14px;border-left:1px solid var(--topbar-divider)}' +
-        ".theomark .twm{font-family:'Sacramento',cursive;font-weight:400;font-size:27px;color:var(--topbar-fg);letter-spacing:.4px;line-height:1;position:relative;top:6px}" +
+        ".theomark .twm{font-family:'Sacramento',cursive;font-weight:400;font-size:28px;color:var(--topbar-fg);letter-spacing:.4px;line-height:1;position:relative;top:6px}" +
         '.theomark .ttag{font-family:var(--sans,system-ui,sans-serif);font-size:11px;font-weight:500;color:var(--topbar-fg-mut);white-space:nowrap;letter-spacing:0}' +
         '.theo-dino{display:inline-block;vertical-align:middle}' +
         '.theo-acts{display:inline-flex;align-items:center;gap:11px;margin-left:0}' +
@@ -841,20 +841,20 @@
         '.theo-actpanel{position:absolute;top:calc(100% + 10px);right:0;width:340px;max-width:90vw;background:var(--surface);color:var(--ink,#1A1A1A);border:1px solid var(--line,#E7E4DF);border-radius:13px;box-shadow:0 18px 50px rgba(20,18,17,.18);z-index:120;overflow:hidden;display:none}' +
         '.theo-actpanel.on{display:block}' +
         '.theo-actpanel .ph{display:flex;align-items:center;justify-content:space-between;padding:13px 15px 11px;border-bottom:1px solid var(--line,#E7E4DF)}' +
-        '.theo-actpanel .ph b{font:700 13.5px var(--sans,system-ui,sans-serif);color:var(--ink,#1A1A1A)}' +
-        '.theo-actpanel .ph button{background:none;border:none;color:#0F3A85;font:600 12px var(--sans,system-ui,sans-serif);cursor:pointer;padding:2px 4px}' +
+        '.theo-actpanel .ph b{font:700 13px var(--sans,system-ui,sans-serif);color:var(--ink,#1A1A1A)}' +
+        '.theo-actpanel .ph button{background:none;border:none;color:#0F3A85;font:600 13px var(--sans,system-ui,sans-serif);cursor:pointer;padding:2px 4px}' +
         '.theo-actpanel .ph button:hover{text-decoration:underline}' +
         '.theo-actlist{max-height:340px;overflow-y:auto}' +
         '.theo-actitem{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--line,#F0EEEB);padding:11px 15px;cursor:pointer;text-decoration:none}' +
         '.theo-actitem:hover{background:var(--bg,#F7F5F2)}' +
         '.theo-actitem:last-child{border-bottom:none}' +
-        '.theo-actitem .tx{font:500 12.7px var(--sans,system-ui,sans-serif);color:var(--ink,#1A1A1A);line-height:1.4}' +
+        '.theo-actitem .tx{font:500 13px var(--sans,system-ui,sans-serif);color:var(--ink,#1A1A1A);line-height:1.4}' +
         '.theo-actitem .tx b{font-weight:700}' +
         '.theo-actitem .mt{display:flex;align-items:center;gap:7px;margin-top:4px;font:500 11px var(--sans,system-ui,sans-serif);color:var(--mut,#6B6360)}' +
         '.theo-actitem.unread{position:relative}' +
         '.theo-actitem.unread::before{content:"";position:absolute;left:6px;top:16px;width:6px;height:6px;border-radius:50%;background:#0F3A85}' +
         '.theo-actitem.unread .tx{padding-left:9px}.theo-actitem.unread .mt{padding-left:9px}' +
-        '.theo-actempty{padding:22px 15px;text-align:center;font:500 12.5px var(--sans,system-ui,sans-serif);color:var(--mut,#6B6360)}' +
+        '.theo-actempty{padding:22px 15px;text-align:center;font:500 13px var(--sans,system-ui,sans-serif);color:var(--mut,#6B6360)}' +
         // --- Avatar dropdown (Profile + Sign out) ---
         '.topbar .role .who{position:relative;cursor:pointer}' +
         '.theo-whomenu{position:absolute;top:calc(100% + 10px);right:0;min-width:172px;background:var(--surface);color:var(--ink,#1A1A1A);border:1px solid var(--line,#E7E4DF);border-radius:12px;box-shadow:0 18px 50px rgba(20,18,17,.18);z-index:120;overflow:hidden;display:none;padding:5px}' +
@@ -928,7 +928,7 @@
     // White "Zzz" rising above the sleeping head (the lying dino faces right, head on the right).
     bub.textContent = 'Zzz';
     bub.style.cssText = 'position:absolute;left:64%;bottom:72%;white-space:nowrap;' +
-      'font:600 12px var(--sans,system-ui,sans-serif);color:var(--topbar-fg,#fff);text-shadow:none;' +
+      'font:600 13px var(--sans,system-ui,sans-serif);color:var(--topbar-fg,#fff);text-shadow:none;' +
       'opacity:0;animation:theoZzz 2.1s ease-in-out infinite';
     if (mm && mm.matches) { bub.style.animation = 'none'; bub.style.opacity = '0'; }   // motion-reduced
 
@@ -998,7 +998,7 @@
       '@keyframes theoZzz{0%{transform:translate(-50%,3px);opacity:0}35%{opacity:.9}100%{transform:translate(-50%,-13px);opacity:0}}',
       '@media (prefers-reduced-motion:reduce){.theo-raildino .bub{animation:none!important;opacity:0!important}.app,.appbody>.rail,.theo-railtoggle svg{transition:none!important}}',
       /* thin app-wide footer, PINNED to the bottom of the viewport (not in flow) */
-      '.theo-foot{position:fixed;left:0;right:0;bottom:0;z-index:15;height:32px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;background:var(--bg);border-top:1px solid #E7E4DF;font:500 11.5px "Libre Franklin",system-ui,sans-serif;color:#6B6360;overflow:hidden}html[data-theme="dark"] .theo-foot,html[data-theme="dark"] .theo-foot a,html[data-theme="dark"] .theo-railtoggle{color:var(--mut)}html[data-theme="dark"] .theo-foot,html[data-theme="dark"] .theo-railtoggle{border-color:var(--line2)}',
+      '.theo-foot{position:fixed;left:0;right:0;bottom:0;z-index:15;height:32px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;background:var(--bg);border-top:1px solid #E7E4DF;font:500 11px "Libre Franklin",system-ui,sans-serif;color:#6B6360;overflow:hidden}html[data-theme="dark"] .theo-foot,html[data-theme="dark"] .theo-foot a,html[data-theme="dark"] .theo-railtoggle{color:var(--mut)}html[data-theme="dark"] .theo-foot,html[data-theme="dark"] .theo-railtoggle{border-color:var(--line2)}',
       '.theo-foot .env{display:inline-flex;align-items:center;gap:7px}',
       '.theo-foot .env .dot{width:7px;height:7px;border-radius:50%;background:#0F3A85;flex:none}',
       '.theo-foot nav{display:flex;align-items:center;gap:16px}',

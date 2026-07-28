@@ -389,7 +389,7 @@ function pvAEsc(s){ return (typeof escD === 'function') ? escD(s) : String(s == 
 
 function pvDispBadge(disp) {
   var m = THEO_DISPO[disp] || THEO_DISPO['Screened out'];
-  return '<span style="display:inline-flex;align-items:center;font:700 10px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;padding:4px 11px;border-radius:30px;color:' + m.c + ';background:' + m.bg + '">' + pvAEsc(disp) + '</span>';
+  return '<span style="display:inline-flex;align-items:center;font:700 11px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;padding:4px 11px;border-radius:30px;color:' + m.c + ';background:' + m.bg + '">' + pvAEsc(disp) + '</span>';
 }
 
 function pvConfDots(level) {
@@ -405,12 +405,12 @@ function pvEvidChip(state) {
             m.fill === 'hatch' ? 'background:repeating-linear-gradient(45deg,' + m.c + ' 0 2px,transparent 2px 4px);border:1px solid ' + m.c :
             m.fill === 'outline' ? 'border:1.5px solid ' + m.c :
             'border:1px dashed var(--line2,#CECCC7)';
-  return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut,#4A443C)"><i style="width:10px;height:10px;border-radius:3px;flex:none;' + box + '"></i>' + pvAEsc(state) + '</span>';
+  return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut,#4A443C)"><i style="width:10px;height:10px;border-radius:3px;flex:none;' + box + '"></i>' + pvAEsc(state) + '</span>';
 }
 
 function pvConcernPill(concern, confidence) {
   var m = THEO_CONCERN[concern] || THEO_CONCERN['Insufficient evidence'];
-  return '<span style="display:inline-flex;align-items:center;gap:7px;font:700 10px var(--mono,monospace);letter-spacing:.03em;text-transform:uppercase;padding:3px 9px;border-radius:20px;color:' + m.c + ';background:' + m.bg + '">' + pvAEsc(concern) + (confidence ? ' ' + pvConfDots(confidence) : '') + '</span>';
+  return '<span style="display:inline-flex;align-items:center;gap:7px;font:700 11px var(--mono,monospace);letter-spacing:.03em;text-transform:uppercase;padding:3px 9px;border-radius:20px;color:' + m.c + ';background:' + m.bg + '">' + pvAEsc(concern) + (confidence ? ' ' + pvConfDots(confidence) : '') + '</span>';
 }
 
 /* 8-dimension assessment bars: bar length = favorability, colour = concern,
@@ -425,9 +425,9 @@ function pvAssessBars(dims) {
     var track = pct === 0 ? '<div style="height:9px;border-radius:30px;border:1px dashed var(--line2,#CECCC7)"></div>'
       : '<div style="height:9px;border-radius:30px;background:var(--line,#E1E0DC);overflow:hidden"><i style="display:block;height:100%;width:' + pct + '%;border-radius:30px;' + fill + '"></i></div>';
     return '<div style="display:grid;grid-template-columns:168px 1fr 150px;gap:12px;align-items:center;padding:6px 0">'
-      + '<span style="font-size:12.5px;font-weight:600;color:var(--ink,#1A1A1A)">' + pvAEsc(d.label) + '</span>'
+      + '<span style="font-size:13px;font-weight:600;color:var(--ink,#1A1A1A)">' + pvAEsc(d.label) + '</span>'
       + track
-      + '<span style="display:flex;align-items:center;gap:7px;justify-content:flex-end"><span style="font-size:11.5px;font-weight:700;color:' + m.c + '">' + pvAEsc(d.concern) + '</span>' + pvConfDots(d.confidence) + '</span>'
+      + '<span style="display:flex;align-items:center;gap:7px;justify-content:flex-end"><span style="font-size:11px;font-weight:700;color:' + m.c + '">' + pvAEsc(d.concern) + '</span>' + pvConfDots(d.confidence) + '</span>'
       + '</div>';
   }).join('');
   return '<div>' + rows + '</div>';
@@ -444,7 +444,7 @@ function pvEvidCoverageBar(cov) {
   ];
   var bar = '<div style="display:flex;height:12px;border-radius:30px;overflow:hidden;border:1px solid var(--line,#E1E0DC)">'
     + segs.map(function(s){ return s[1] > 0 ? '<i title="' + pvAEsc(s[0]) + ' ' + s[1] + '%" style="width:' + s[1] + '%;background:' + s[2] + '"></i>' : ''; }).join('') + '</div>';
-  var key = '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11.5px;color:var(--mut,#4A443C)">'
+  var key = '<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11px;color:var(--mut,#4A443C)">'
     + segs.map(function(s){ return '<span style="display:flex;align-items:center;gap:6px"><i style="width:10px;height:9px;border-radius:2px;background:' + s[2] + '"></i>' + pvAEsc(s[0]) + ' <b style="font-family:var(--mono,monospace);color:var(--ink,#1A1A1A)">' + s[1] + '%</b></span>'; }).join('') + '</div>';
   return bar + key;
 }
@@ -455,8 +455,8 @@ function pvReqGroupMini(reqGroups) {
   var bg = function(lbl){ return lbl === 'Strong' ? '#EDDFE9' : lbl === 'Meets' ? '#DCEBE9' : lbl === 'Partial' || lbl === 'Validate' ? '#F1EFEC' : lbl === 'Gap' ? 'var(--ti-red,#F1EFEC)' : 'var(--nested,#f1efec)'; };
   return '<div style="display:flex;flex-direction:column;gap:5px">' + reqGroups.map(function(g){
     return '<div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:7px 11px;border-radius:9px;background:' + bg(g.fitLabel) + '">'
-      + '<span style="font-size:12.5px;font-weight:600;color:var(--ink,#1A1A1A)">' + pvAEsc(g.label) + (g.must ? ' <span style="font:700 8px var(--mono,monospace);color:#C15E19;letter-spacing:.03em">MUST</span>' : '') + '</span>'
-      + '<span style="font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + col(g.fitLabel) + '">' + pvAEsc(g.fitLabel) + (g.fit != null ? ' · ' + g.fit : '') + '</span>'
+      + '<span style="font-size:13px;font-weight:600;color:var(--ink,#1A1A1A)">' + pvAEsc(g.label) + (g.must ? ' <span style="font:700 9px var(--mono,monospace);color:#C15E19;letter-spacing:.03em">MUST</span>' : '') + '</span>'
+      + '<span style="font:700 11px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + col(g.fitLabel) + '">' + pvAEsc(g.fitLabel) + (g.fit != null ? ' · ' + g.fit : '') + '</span>'
       + '</div>';
   }).join('') + '</div>';
 }
@@ -464,8 +464,8 @@ function pvReqGroupMini(reqGroups) {
 /* two side-by-side visual lists: opportunities vs concerns */
 function pvOppConcern(opps, concerns) {
   var list = function(title, items, color, mark){
-    return '<div><div style="font:700 10px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:' + color + ';margin-bottom:8px">' + title + '</div>'
-      + (items && items.length ? items.slice(0, 3).map(function(t){ return '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--line,#E1E0DC);font-size:12.5px;line-height:1.45"><span style="color:' + color + ';font-weight:800;flex:none">' + mark + '</span><span>' + pvAEsc(t) + '</span></div>'; }).join('') : '<div style="font-size:12px;color:var(--mut2,#6a655f)">None on file.</div>') + '</div>';
+    return '<div><div style="font:700 11px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:' + color + ';margin-bottom:8px">' + title + '</div>'
+      + (items && items.length ? items.slice(0, 3).map(function(t){ return '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--line,#E1E0DC);font-size:13px;line-height:1.45"><span style="color:' + color + ';font-weight:800;flex:none">' + mark + '</span><span>' + pvAEsc(t) + '</span></div>'; }).join('') : '<div style="font-size:13px;color:var(--mut2,#6a655f)">None on file.</div>') + '</div>';
   };
   return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">'
     + list('Reasons to advance', opps, '#2F6E6B', '✓')
@@ -475,7 +475,7 @@ function pvOppConcern(opps, concerns) {
 
 /* compact decision-header strip (replaces the two big header bands) */
 function pvDecisionHeaderStrip(x) {
-  var cell = function(lab, val){ return '<div style="min-width:0"><div style="font:600 9.5px var(--mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--mut2,#6a655f);margin-bottom:4px">' + lab + '</div><div style="font-size:13px;font-weight:700;color:var(--ink,#1A1A1A);line-height:1.25">' + val + '</div></div>'; };
+  var cell = function(lab, val){ return '<div style="min-width:0"><div style="font:600 9px var(--mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--mut2,#6a655f);margin-bottom:4px">' + lab + '</div><div style="font-size:13px;font-weight:700;color:var(--ink,#1A1A1A);line-height:1.25">' + val + '</div></div>'; };
   var rl = THEO_RISKBAND[x.risk.level] || THEO_RISKBAND['Unknown'];
   return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px 22px;align-items:start;background:var(--surface,#fff);border:1px solid var(--line,#E1E0DC);border-radius:14px;padding:16px 20px;box-shadow:var(--shadow,0 1px 4px rgba(38,30,20,.08))">'
     + cell('Recommendation', pvDispBadge(x.disposition))
@@ -490,5 +490,5 @@ function pvDecisionHeaderStrip(x) {
 /* semantic risk cell (for the Risk tab heatmap) */
 function pvSemanticRiskCell(level, confidence) {
   var m = THEO_RISKBAND[level] || THEO_RISKBAND['Unknown'];
-  return '<span style="display:inline-flex;align-items:center;gap:7px;font:700 10px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:20px;color:' + m.c + ';background:' + m.bg + '">' + pvAEsc(level) + (confidence ? ' ' + pvConfDots(confidence) : '') + '</span>';
+  return '<span style="display:inline-flex;align-items:center;gap:7px;font:700 11px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:20px;color:' + m.c + ';background:' + m.bg + '">' + pvAEsc(level) + (confidence ? ' ' + pvConfDots(confidence) : '') + '</span>';
 }

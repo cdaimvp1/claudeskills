@@ -50,7 +50,7 @@ var ZOPA_CSS =
   '.zopa-viz .zsum-row{display:flex;align-items:flex-start;gap:8px;flex:0 0 190px;width:190px;min-width:0}' +
   /* line name + per-line leverage badge stacked in the title column */
   '.zopa-viz .zsum-txt{display:flex;flex-direction:column;gap:3px;min-width:0}' +
-  '.zopa-viz .zlev{display:inline-flex;align-items:center;gap:5px;font:700 8.5px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut2)}' +
+  '.zopa-viz .zlev{display:inline-flex;align-items:center;gap:5px;font:700 9px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut2)}' +
   '.zopa-viz .zlev-bar{display:inline-flex;gap:2px}' +
   '.zopa-viz .zlev-bar i{width:8px;height:5px;border-radius:1px;background:var(--line2)}' +
   '.zopa-viz .zlev-high .zlev-bar i{background:var(--emph)}' +
@@ -60,12 +60,12 @@ var ZOPA_CSS =
   /* sensitivity strip (Economics deal tab) */
   '.zopa-viz .zopa-sens{border:1px solid var(--line2);border-radius:9px;padding:12px 14px;margin-bottom:14px;background:var(--surface2)}' +
   '.zopa-viz .zopa-sens-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}' +
-  '.zopa-viz .zss-t{font:700 10px/1.3 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut)}' +
+  '.zopa-viz .zss-t{font:700 11px/1.3 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--mut)}' +
   '.zopa-viz .zss-reset{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:1px solid var(--line2);border-radius:6px;background:var(--surface);color:var(--mut);cursor:pointer;flex:0 0 auto}' +
   '.zopa-viz .zss-reset:hover{color:var(--plum);border-color:var(--plum)}' +
   '.zopa-viz .zss-reset svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}' +
   '.zopa-viz .zopa-sens-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 20px}' +
-  '.zopa-viz .zopa-sens-live{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line2);font-size:12.5px;line-height:1.5;color:var(--ink2)}' +
+  '.zopa-viz .zopa-sens-live{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line2);font-size:13px;line-height:1.5;color:var(--ink2)}' +
   '.zopa-viz .zopa-sens-live b{color:var(--ink);font-variant-numeric:tabular-nums}' +
   '.zopa-viz .zchev{width:7px;height:7px;margin-top:5px;border-right:2px solid var(--mut2);border-bottom:2px solid var(--mut2);transform:rotate(-45deg);transition:transform .15s ease;flex:0 0 auto}' +
   '.zopa-viz .zline[open] .zchev{transform:rotate(45deg)}' +
@@ -89,7 +89,7 @@ var ZOPA_CSS =
   '.zopa-viz .zlab.zlab-r{align-items:flex-end;text-align:right;transform:translateX(-100%)}' +
   '.zopa-viz .zlab.up{bottom:calc(50% + 17px)}' +
   '.zopa-viz .zlab.dn{top:calc(50% + 17px)}' +
-  '.zopa-viz .zltag{font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;font-weight:700;color:var(--mut2)}' +
+  '.zopa-viz .zltag{font-size:9px;letter-spacing:.03em;text-transform:uppercase;font-weight:700;color:var(--mut2)}' +
   '.zopa-viz .zlval{font-size:var(--fz-floor);font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}' +
   '.zopa-viz .zlab.open .zltag{color:var(--emph)}' +
   '.zopa-viz .zlab.tgt .zltag{color:var(--teal-d)}' +
@@ -108,7 +108,7 @@ var ZOPA_CSS =
   '.zopa-viz .zdv b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}' +
   /* per-line ZOPA collapsed section (total-deal band sits above it, always visible) */
   '.zopa-viz .zlines{border-top:1px solid var(--line);margin-top:10px}' +
-  '.zopa-viz .zlines>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 2px;font:800 10.5px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--plum)}' +
+  '.zopa-viz .zlines>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 2px;font:800 11px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--plum)}' +
   '.zopa-viz .zlines>summary::-webkit-details-marker{display:none}' +
   '.zopa-viz .zlines>summary::marker{content:""}' +
   '.zopa-viz .zlines>summary:hover{color:var(--sec)}' +
