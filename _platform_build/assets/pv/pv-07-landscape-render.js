@@ -48,7 +48,7 @@ function ovLandCardHTML(refl){
   parts.push(top.slice(0,3).map(function(s){
    var nm=escD(s.name||s.supplier||s.id||'Candidate');
    var wf=(typeof s.weightedFit==='number')?s.weightedFit:(typeof s.fitScore==='number')?s.fitScore:(typeof s.score==='number')?s.score:null;
-   var dq=s.disqualified?' · <span style="color:#C8202E;font-weight:700">disqualified (hard flag)</span>':'';
+   var dq=s.disqualified?' · <span style="color:#C15E19;font-weight:700">disqualified (hard flag)</span>':'';
    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line,#EEE)"><span style="font-weight:600;font-size:12.5px">'+nm+dq+'</span><span style="font:700 11px var(--mono,monospace);color:var(--navy)">'+(wf!=null?('fit '+escD(Math.round(wf*10)/10)+' / 5'):'Data not available')+'</span></div>';
   }).join(''));
  }
@@ -154,7 +154,7 @@ function markFinal(id){MATSTATE[id].final=true;toast('“'+MATSTATE[id].out+'”
 document.addEventListener('click',function(){closeEdit();});
 // ---- Open-full-dashboard link: the in-tab content is the compact overview;
 // this opens the dedicated full multi-tab dashboard page (RV17). ----
-function openDashBar(href,label){return '<a class="opendash" href="'+href+'" style="display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;font-size:13px;font-weight:600;color:#C8202E;text-decoration:none">'+label+'<span style="font-size:15px;line-height:1">→</span></a>';}
+function openDashBar(href,label){return '<a class="opendash" href="'+href+'" style="display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;font-size:13px;font-weight:600;color:#C15E19;text-decoration:none">'+label+'<span style="font-size:15px;line-height:1">→</span></a>';}
 // ---- Landscape ----
 function fitClass(c){return c;}
 /* ===========================================================================
@@ -293,10 +293,10 @@ const PVSLE=(function(){
 var PVSEG_LBL={leader:'Leader',challenger:'Challenger',niche:'Niche',caution:'Caution',disqualified:'Disqualified'};
 var PVSEG_DESC={leader:'Strong fit, contained risk',challenger:'Strong fit, elevated risk',niche:'Narrower fit, contained risk',caution:'Narrower fit, elevated risk',disqualified:'Hard flag, off the shortlist'};
 var PVSEG_ACTION={leader:'Advance to the RFx slate as a pace-setter; use its strengths to set the bar on price and terms.',challenger:'Strong fit but elevated risk, shortlist with risk conditions attached and validate the flagged items first.',niche:'Fit for a specific scope; hold as a fallback or point solution rather than a primary.',caution:'Elevated risk and narrower fit, keep only as a price lever, not a primary award path.',disqualified:'Off the shortlist on a hard flag; do not carry into the RFx.'};
-var PVSEG_COLOR={leader:'#5C2B50',challenger:'#2F6E6B',niche:'#8A6E86',caution:'#C15E19',disqualified:'#B0A9A2'};
+var PVSEG_COLOR={leader:'#5C2B50',challenger:'#2F6E6B',niche:'#7A3C6B',caution:'#C15E19',disqualified:'#B0A9A2'};
 var PVSEG_ORDER=['leader','challenger','niche','caution','disqualified'];
 // #4: per-supplier identity colours for the Segmentation section (distinct per supplier; no burnt orange, no green).
-var PVSUP_PAL=['#5C2B50','#2F6E6B','#8A6E86','#417C74','#7A4B86','#C15E19','#5F8C86','#9A5A82']; // plum/teal/emph family, all distinct
+var PVSUP_PAL=['#5C2B50','#2F6E6B','#7A3C6B','#417C74','#7A3C6B','#C15E19','#5F8C86','#9A5A82']; // plum/teal/emph family, all distinct
 var PVSUP_CMAP={},PVSUP_CI=0;
 function pvSupColor(a){var id=String((a&&(a.id||a.name))||'');if(!id)return PVSUP_PAL[0];if(PVSUP_CMAP[id]==null){PVSUP_CMAP[id]=PVSUP_PAL[PVSUP_CI%PVSUP_PAL.length];PVSUP_CI++;}return PVSUP_CMAP[id];}
 // #4: light quadrant background shades + matching solid tile-label colours (leader blue · challenger teal · niche plum · caution gold).
@@ -310,13 +310,13 @@ function pvRound(n,dp){dp=dp==null?2:dp;var f=Math.pow(10,dp);return Math.round(
 function pvPct100(x){return pvRound((Number(x)||0)*100,1)+'%';}
 function pvInitials(name){var caps=String(name).replace(/[^A-Z]/g,'');if(caps.length>=2)return caps.slice(0,2);return String(name).replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();}
 function pvFitBg(score){var a=0.10+(Math.max(0,Math.min(5,score))/5)*0.70;return 'background:rgba(92,43,80,'+pvRound(a,3)+');color:'+(score>=3.5?'#fff':'var(--ink)')+';';}
-/* Risk heatmap: single red hue graded by score (higher = worse), interpolated light #FBEAE8 -> deep
+/* Risk heatmap: single red hue graded by score (higher = worse), interpolated light #ECCFBA -> deep
    #9E1710 with t=clamp((v-1)/2.2,0,1), the SAME technique as pvHmRamp so risk swatches read as richly
    graded as the blue fit swatches (not a flat pink wash). Numeral white when t>0.5 else ink. */
 function pvRiskBg(score){var v=Number(score);if(!isFinite(v))v=0;var t=(v-1)/2.2;t=t<0?0:(t>1?1:t);var r=Math.round(251+(158-251)*t),g=Math.round(234+(23-234)*t),b=Math.round(232+(16-232)*t);return 'background:rgb('+r+','+g+','+b+');color:'+(t>0.5?'#fff':'#1A1A1A')+';';}
 /* Pass B: 5-scale fit BAND colouring for the heatmap, navy>=4.25 strong / amber 3.50-4.24 adequate / red<3.50 gap (no green). */
 function pvBandOf(s){s=Number(s)||0;return s>=4.25?'strong':(s>=3.5?'adequate':'gap');}
-function pvBandBg(s){var b=pvBandOf(s);return b==='strong'?'background:#5C2B50;color:#fff':b==='adequate'?'background:#F6DDC9;color:#7A3D0F':'background:#E1251B;color:#fff';}
+function pvBandBg(s){var b=pvBandOf(s);return b==='strong'?'background:#5C2B50;color:#fff':b==='adequate'?'background:#ECCFBA;color:#7A3D0F':'background:#E1251B;color:#fff';}
 /* lighter band tints for sub-requirement + field-average cells (hierarchy) */
 function pvBandBgSub(s){var b=pvBandOf(s);return b==='strong'?'background:rgba(92,43,80,.16);color:var(--blue-d)':b==='adequate'?'background:rgba(193,94,25,.20);color:var(--emph,#C15E19)':'background:rgba(225,37,27,.14);color:var(--red-d)';}
 /* risk sub-factor + field-avg cells share the SAME ramp as main cells (the fit heatmap treats sub/avg
@@ -344,7 +344,7 @@ function pvRecStanding(a){
 function pvSrcTag(kind){
  var b='display:inline-block;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:0 4px;border-radius:3px;vertical-align:middle;line-height:1.55;';
  if(kind==='int')return '<span title="Internal, from Lilly own records: spend, contracts, RFP pricing and relationship history." style="'+b+'background:rgba(92,43,80,.12);color:var(--navy);border:1px solid rgba(92,43,80,.30)">internal</span>';
- if(kind==='ext')return '<span title="External enrichment, firmographics, financials and analyst coverage from credible public sources; not validated." style="'+b+'background:var(--tint-eef0f3,#EEF0F3);color:#5B6472;border:1px solid rgba(0,0,0,.15)">external</span>';
+ if(kind==='ext')return '<span title="External enrichment, firmographics, financials and analyst coverage from credible public sources; not validated." style="'+b+'background:var(--tint-eef0f3,#EDE8E0);color:#5B6472;border:1px solid rgba(0,0,0,.15)">external</span>';
  return '';
 }
 /* Pass 2A: category COVERAGE %, the share of a category's sub-requirements this vendor meets
@@ -392,7 +392,7 @@ var PVSL_RFX_SUGGEST=_PVLA.rfxSuggest||[];
 /* distinct CATEGORICAL palette for the ranking bars where each vendor is coloured (no green,
    no near-identical blues): bold blue (lead) · violet · burnt orange. Segment colouring on the
    plane stays PVSEG_COLOR because there the colour encodes leader/challenger/niche/caution. */
-var PVVENDOR_COLORS=['#5C2B50','#2F6E6B','#C15E19','#7A4B86','#B4560F']; // plum / teal / emph / plum-purple / burnt (A=plum vs B=teal for clear H2H contrast)
+var PVVENDOR_COLORS=['#5C2B50','#2F6E6B','#C15E19','#7A3C6B','#A2500F']; // plum / teal / emph / plum-purple / burnt (A=plum vs B=teal for clear H2H contrast)
 // G12 ESG & regulatory posture, illustrative risk scores (0-5, higher = worse) + short reads per vendor.
 // Injected into the risk model at render so ESG appears as a scored Risk-Assessment dimension.
 var PVSL_ESG=_PVLA.esg||{};
@@ -724,7 +724,7 @@ function pvDynamicsHtml(refl){
    // Evidence confidence, same center-spine so the eye follows the pattern: each evidence category on the
    // middle axis, each vendor's share extends outward, coloured by category (Verified teal / Partial burnt-
    // orange / Supplier input plum / Missing grey).
-   var evCats=[['Verified','verified','var(--teal-d,#2F6E6B)'],['Partial','partial','#B4560F'],['Supplier input','supplier','var(--plum,#5C2B50)'],['Missing','missing','var(--line2,#CECCC7)']];
+   var evCats=[['Verified','verified','var(--teal-d,#2F6E6B)'],['Partial','partial','#A2500F'],['Supplier input','supplier','var(--plum,#5C2B50)'],['Missing','missing','var(--line2,#CECCC7)']];
    var eca=xA.evidenceCoverage||{},ecb=xB.evidenceCoverage||{};
    var evRows=evCats.map(function(c){var va=Math.round(eca[c[1]]||0),vb=Math.round(ecb[c[1]]||0);return spineRow({lLab:va+'%',lc:c[2],lw:va,lbar:c[2],lon:va>0,mid:c[0],sub:'',rw:vb,rbar:c[2],ron:vb>0,rLab:vb+'%',rc:c[2]});}).join('');
    var evSect=sect('Evidence confidence',spineHd+'<div class="cdyn-dvg">'+evRows+'</div>');
@@ -1114,10 +1114,10 @@ function pvDeepDiveHtml(id,refl,input){
  // #87 (Marc): strengths & risks as parallel clean lists (no bubbles); risks keep their real narrative.
  var srrow='display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.5;align-items:baseline';
  var strengths=(dd.strengths||[]).map(function(s){return '<div style="'+srrow+'"><span style="color:var(--navy);font-weight:800;flex:none">&#10003;</span><span>'+escD(s)+'</span></div>';}).join('');
- var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#A23A30':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:15px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
+ var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#C15E19':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:15px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
  // #88 (Marc): risk dimensions as a clean TABLE (not chips)
  var dims=input.riskDimensions||[];var rawRisk=cand.risk||{};
- var dimRows=dims.map(function(dm){var sc=rawRisk[dm.id];var col=sc==null?'var(--mut2)':sc>=3?'#A23A30':sc>=2?'var(--amber-d)':'#5C2B50';var w=sc==null?0:Math.min(100,sc/5*100);return '<tr><td style="text-align:left;font-weight:600">'+escD(dm.label)+'</td><td style="text-align:right;font-weight:700;color:'+col+';white-space:nowrap">'+(sc==null?', ':escD(sc)+' / 5')+'</td><td style="width:130px"><div style="height:7px;border-radius:4px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:'+w+'%;background:'+col+'"></i></div></td></tr>';}).join('');
+ var dimRows=dims.map(function(dm){var sc=rawRisk[dm.id];var col=sc==null?'var(--mut2)':sc>=3?'#C15E19':sc>=2?'var(--amber-d)':'#5C2B50';var w=sc==null?0:Math.min(100,sc/5*100);return '<tr><td style="text-align:left;font-weight:600">'+escD(dm.label)+'</td><td style="text-align:right;font-weight:700;color:'+col+';white-space:nowrap">'+(sc==null?', ':escD(sc)+' / 5')+'</td><td style="width:130px"><div style="height:7px;border-radius:4px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:'+w+'%;background:'+col+'"></i></div></td></tr>';}).join('');
  var reqRows=a.coverage.map(function(c){var nar=(dd.reqNarr&&dd.reqNarr[c.requirementId])?dd.reqNarr[c.requirementId]:'';var w=Math.round(c.score/5*100);return '<tr><td class="v">'+escD(c.label)+'</td><td class="c"><span class="cell" style="'+pvFitBg(c.score)+'">'+escD(c.score)+'</span></td><td style="min-width:90px"><div class="pvbar"><i style="width:'+w+'%"></i></div></td><td style="font-size:12px;color:var(--mut);line-height:1.45">'+escD(nar)+'</td></tr>';}).join('');
  var com=dd.commercial||{};
  var comBlk=[['Contracting','contracting'],['Regulatory / GxP','regulatory'],['Implementation','implementation'],['Integration','integration']].map(function(d){return '<div style="margin-bottom:9px"><div class="subt" style="margin-bottom:3px">'+escD(d[0])+'</div><div style="font-size:12.5px;color:var(--ink);line-height:1.55">'+escD(com[d[1]]||'Data not available')+'</div></div>';}).join('');
@@ -1247,7 +1247,7 @@ function pvExecSummaryHtml(refl,input){
  // gap instead, grounded off the requirements model rather than the RFX.suppliers mock). Left defined,
  // harmless and unused, in case the RFX-scoped gate band is restored.
  var koRec=isCompRFx()?RFX.suppliers.filter(function(s){return s.mustFail&&s.mustFail.length;}):[];
- var recNext=(lead&&koRec.length)?'<p class="rna" style="border-left:3px solid #A23A30;background:var(--pink-t,#FBE7E3)"><span class="nal" style="color:var(--riskred)">Gate to clear</span>'+koRec.map(function(s){return '<b>'+escD(s.n)+' does not meet '+escD(s.mustFail.join(', '))+' (a Must-Have).</b>';}).join(' ')+' If the team advances that supplier, this hard gate must be cleared before award: a Cyber review of whether Lilly can proceed, and confirmation from the supplier of whether they hold the certification (and if not, if/when they will). The gate-passing suppliers clear it today.</p>':'';
+ var recNext=(lead&&koRec.length)?'<p class="rna" style="border-left:3px solid #C15E19;background:var(--pink-t,#ECCFBA)"><span class="nal" style="color:var(--riskred)">Gate to clear</span>'+koRec.map(function(s){return '<b>'+escD(s.n)+' does not meet '+escD(s.mustFail.join(', '))+' (a Must-Have).</b>';}).join(' ')+' If the team advances that supplier, this hard gate must be cleared before award: a Cyber review of whether Lilly can proceed, and confirmation from the supplier of whether they hold the certification (and if not, if/when they will). The gate-passing suppliers clear it today.</p>':'';
  // #4 (Marc): the per-card advisory note is dropped, the page-level REFLECT-ONLY badge + the prose's closing
  // clause carry it now (no 7x repetition).
  var recAdvNote='';
@@ -1767,7 +1767,7 @@ function pvDDSection(ddt,a,cand,refl,input){
    var compKnown=comp.headcount||comp.customers||comp.valuation||comp.funding||comp.founded||comp.footprint||comp.leadership||comp.partners;
    var confMeta=null,confChip='',icBlk='';
    if(idKnown||compKnown||pAttrs.hq||pAttrs.founded||pAttrs.financial||pAttrs.esg){
-     confMeta=idn.confidence==='Confirmed'?{c:'#5C2B50',bg:'var(--ti-blue)'}:(idn.confidence?{c:'#B4560F',bg:'var(--ti-amber)'}:null);
+     confMeta=idn.confidence==='Confirmed'?{c:'#5C2B50',bg:'var(--ti-blue)'}:(idn.confidence?{c:'#A2500F',bg:'var(--ti-amber)'}:null);
      confChip=(idn.confidence&&confMeta)?' <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:20px;color:'+confMeta.c+';background:'+confMeta.bg+';vertical-align:1px">Identity: '+escD(idn.confidence)+'</span>':'';
      // Values read from the enriched fields with light cleaning to split conflated facts (HQ vs footprint,
      // ticker vs ownership prose); nothing invented, a missing field simply drops its row.
@@ -1868,13 +1868,13 @@ function pvDDSection(ddt,a,cand,refl,input){
    var dda=dd.attrs||{},ddc=dd.commercial||{};
    var cmFit=(cand.reqFit&&cand.reqFit.commercial!=null)?cand.reqFit.commercial:null;
    var pricePos=cmFit==null?', ':cmFit>=4.5?'Value / price-led':cmFit>=3.5?'Competitive':'Premium';
-   var pricePosCol=cmFit==null?'var(--mut2)':cmFit>=4.5?'#5C2B50':cmFit>=3.5?'#2F6E6B':'#B4560F';
+   var pricePosCol=cmFit==null?'var(--mut2)':cmFit>=4.5?'#5C2B50':cmFit>=3.5?'#2F6E6B':'#A2500F';
    var lockin=(cand.risk&&cand.risk.lockin!=null)?cand.risk.lockin:null;
    var swLbl=lockin==null?', ':lockin>=3?'High':lockin>=2?'Medium':'Low';
-   var swCol=lockin==null?'var(--mut2)':lockin>=3?'#A23A30':lockin>=2?'var(--amber-d)':'#5C2B50';
+   var swCol=lockin==null?'var(--mut2)':lockin>=3?'#C15E19':lockin>=2?'var(--amber-d)':'#5C2B50';
    // G5 financial-viability grade, safe / watch / distress from the financial-stability risk score.
    var finRisk=(cand.risk&&cand.risk.financial!=null)?cand.risk.financial:null;
-   var viab=finRisk==null?null:(finRisk<1.75?{l:'Safe',c:'#5C2B50',bg:'var(--ti-blue)'}:finRisk<3?{l:'Watch',c:'#B4560F',bg:'var(--ti-amber)'}:{l:'Distress risk',c:'#A23A30',bg:'var(--ti-red)'});
+   var viab=finRisk==null?null:(finRisk<1.75?{l:'Safe',c:'#5C2B50',bg:'var(--ti-blue)'}:finRisk<3?{l:'Watch',c:'#A2500F',bg:'var(--ti-amber)'}:{l:'Distress risk',c:'#C15E19',bg:'var(--ti-red)'});
    var viabBadge=viab?' <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:20px;color:'+viab.c+';background:'+viab.bg+';vertical-align:1px">'+viab.l+'</span>':'';
    var ceRows=[
      ['Indicative pricing',escD(dda.pricing||'Data not available')],
@@ -1917,11 +1917,11 @@ function pvDDSection(ddt,a,cand,refl,input){
    // #87/#88 (Marc): strengths & risks side-by-side as clean lists (no bubbles); risk dimensions as a table.
    var srrow='display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.5;align-items:baseline';
    var strengths=(dd.strengths||[]).map(function(s){return '<div style="'+srrow+'"><span style="color:var(--navy);font-weight:800;flex:none">&#10003;</span><span>'+escD(s)+'</span></div>';}).join('');
-   var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#A23A30':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:15px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
+   var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#C15E19':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:15px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
    var dims=input.riskDimensions||[];var rawRisk=cand.risk||{};var risksN=dd.risksNarr||[];
    // D&B-style risk read: a score band per dimension, and a plain-English gloss, pulled from the matching
    // narrative risk where the dimension label shares a keyword with a risksNarr category, else a band read.
-   var bandOf=function(sc){return sc==null?{l:'Not scored',c:'var(--mut2)'}:sc>=3?{l:'Elevated',c:'#A23A30'}:sc>=2?{l:'Moderate',c:'var(--amber-d)'}:{l:'Low',c:'#5C2B50'};};
+   var bandOf=function(sc){return sc==null?{l:'Not scored',c:'var(--mut2)'}:sc>=3?{l:'Elevated',c:'#C15E19'}:sc>=2?{l:'Moderate',c:'var(--amber-d)'}:{l:'Low',c:'#5C2B50'};};
    var glossFor=function(dm,sc){
      var keys=String(dm.label||'').toLowerCase().split(/[ /]+/).filter(function(w){return w.length>4;});
      var hit=risksN.filter(Boolean).find(function(rk){var c=String(rk.cat||'').toLowerCase();return keys.some(function(w){return c.indexOf(w)>=0;});});
@@ -1935,7 +1935,7 @@ function pvDDSection(ddt,a,cand,refl,input){
    // STAGE DeepDive #2: Strengths & Risks used to be one .sa-card with .subt-labelled sections; each becomes
    // its own accent card. Strengths keeps the existing positive/navy colour, Risks takes the worst severity
    // colour already used per-row below (both existing status tints, nothing new introduced).
-   var sevRank={high:3,med:2,low:1},sevCol={high:'#A23A30',med:'var(--amber-d)',low:'#5C2B50'};
+   var sevRank={high:3,med:2,low:1},sevCol={high:'#C15E19',med:'var(--amber-d)',low:'#5C2B50'};
    var riskWorst=(dd.risksNarr||[]).reduce(function(w,rk){var r=sevRank[rk.sev]||1;return r>w?r:w;},0);
    var riskWorstCol=riskWorst===3?sevCol.high:riskWorst===2?sevCol.med:riskWorst===1?sevCol.low:null;
    var srCards=[];
@@ -1960,11 +1960,11 @@ function pvDDSection(ddt,a,cand,refl,input){
    // scope), a strategic-fit read, and a value-at-risk / next-move note. Reflect-only, illustrative.
    var lf=dd.lillyFit||{};
    var f5=pvRound(a.fitScore/20,1);
-   var capR=a.fitScore>=80?{l:'High',c:'#5C2B50',bg:'var(--ti-blue)'}:a.fitScore>=65?{l:'Medium',c:'#B4560F',bg:'var(--ti-amber)'}:{l:'Low',c:'#A23A30',bg:'var(--ti-red)'};
+   var capR=a.fitScore>=80?{l:'High',c:'#5C2B50',bg:'var(--ti-blue)'}:a.fitScore>=65?{l:'Medium',c:'#A2500F',bg:'var(--ti-amber)'}:{l:'Low',c:'#C15E19',bg:'var(--ti-red)'};
    var rel=lf.relation||((dd.relationship&&/incumbent/i.test(dd.relationship))?'Active incumbent':'Net new');
    var relMeta=rel==='Active incumbent'?{c:'#5C2B50',bg:'var(--ti-blue)'}:rel==='Prior engagement'?{c:'#2F6E6B',bg:'var(--ti-blue)'}:{c:'var(--mut2)',bg:'var(--nested)'};
    var sf=(lf.strategic||'').toLowerCase();
-   var sfMeta=sf==='supports'?{l:'Supports',c:'#5C2B50',bg:'var(--ti-blue)'}:sf==='works-against'?{l:'Works against',c:'#A23A30',bg:'var(--ti-red)'}:sf?{l:'Neutral',c:'#B4560F',bg:'var(--ti-amber)'}:{l:'Data not available',c:'var(--mut2)',bg:'var(--nested)'};
+   var sfMeta=sf==='supports'?{l:'Supports',c:'#5C2B50',bg:'var(--ti-blue)'}:sf==='works-against'?{l:'Works against',c:'#C15E19',bg:'var(--ti-red)'}:sf?{l:'Neutral',c:'#A2500F',bg:'var(--ti-amber)'}:{l:'Data not available',c:'var(--mut2)',bg:'var(--nested)'};
    var lfTile=function(lbl,val,c,bg){return '<div style="flex:1;min-width:150px;border:1px solid var(--line2);border-radius:10px;padding:11px 13px;background:'+(bg||'#fff')+'"><div style="font:600 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:5px">'+lbl+'</div><div style="font:800 15px var(--sans);color:'+(c||'var(--ink)')+';letter-spacing:-.01em">'+val+'</div></div>';};
    var lfPills='<div style="display:flex;gap:11px;flex-wrap:wrap;margin:0 0 14px">'+
      lfTile('Relationship status',escD(rel),relMeta.c,relMeta.bg)+

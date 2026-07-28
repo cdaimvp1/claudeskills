@@ -63,7 +63,7 @@ function pvDD2DimLead(x, id) {
 function pvDD2AssessStrip(x, id) {
   var d = x.dimensions.find(function(v){ return v.id === id; });
   if (!d) return '';
-  return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 14px;padding:9px 13px;background:var(--nested,#f1efec);border-left:3px solid var(--plum,#5C2B50);border-radius:8px">'
+  return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 14px;padding:9px 13px;background:var(--nested,#EDE8E0);border-left:3px solid var(--plum,#5C2B50);border-radius:8px">'
     + '<span style="font:800 11px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink)">' + pvAEsc(d.label) + '</span>'
     + pvConcernPill(d.concern, d.confidence)
     + '<span style="font-size:11.5px;color:var(--mut);line-height:1.4;flex:1;min-width:220px">' + pvAEsc(d.evidence) + '</span></div>';
@@ -121,8 +121,8 @@ function pvDD2Summary(x, a, cand, input) {
   // Evidence coverage panel, rather than sitting in the Recommendation hero.
   var dshort = { 'identity & ownership':'Identity', 'capability & fit':'Capability', 'financial viability':'Financial', 'operational resilience':'Resilience', 'integrity & compliance':'Integrity', 'quality & regulatory':'Quality', 'cyber & privacy':'Cyber', 'responsible sourcing':'Responsible' };
   var dimStrip = '<div style="display:flex;flex-wrap:wrap;gap:8px">' + x.dimensions.map(function(d){
-      var col = /strong|^low$/i.test(d.concern) ? 'var(--teal-d,#2F6E6B)' : /moderate/i.test(d.concern) ? 'var(--emph,#C15E19)' : /high/i.test(d.concern) ? 'var(--emph,#C15E19)' : /critical/i.test(d.concern) ? '#A23A30' : 'var(--mut2,#6a655f)';
-      return '<span title="' + pvAEsc(d.label + ': ' + d.concern) + '" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--ink);background:var(--nested,#EDEAE3);border-radius:20px;padding:4px 11px"><span style="width:8px;height:8px;border-radius:50%;background:' + col + '"></span>' + pvAEsc(dshort[String(d.label).toLowerCase()] || d.label) + '</span>';
+      var col = /strong|^low$/i.test(d.concern) ? 'var(--teal-d,#2F6E6B)' : /moderate/i.test(d.concern) ? 'var(--emph,#C15E19)' : /high/i.test(d.concern) ? 'var(--emph,#C15E19)' : /critical/i.test(d.concern) ? '#C15E19' : 'var(--mut2,#6a655f)';
+      return '<span title="' + pvAEsc(d.label + ': ' + d.concern) + '" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--ink);background:var(--nested,#EDE8E0);border-radius:20px;padding:4px 11px"><span style="width:8px;height:8px;border-radius:50%;background:' + col + '"></span>' + pvAEsc(dshort[String(d.label).toLowerCase()] || d.label) + '</span>';
     }).join('') + '</div>';
   var evidBody = '<div style="font:700 9px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:9px">Assessment across dimensions</div>'
     + dimStrip
@@ -136,7 +136,7 @@ function pvDD2Summary(x, a, cand, input) {
 }
 
 /* ------------------------------------------------ 1. COMPANY & OWNERSHIP */
-function pvDD2OwnTag(t){ return t === 'public' ? 'var(--teal-d,#2F6E6B)' : t === 'entity' ? 'var(--plum,#5C2B50)' : t === 'offering' ? '#2F6E6B' : t === 'infra' ? '#B4560F' : 'var(--mut2,#6a655f)'; }
+function pvDD2OwnTag(t){ return t === 'public' ? 'var(--teal-d,#2F6E6B)' : t === 'entity' ? 'var(--plum,#5C2B50)' : t === 'offering' ? '#2F6E6B' : t === 'infra' ? '#A2500F' : 'var(--mut2,#6a655f)'; }
 
 /* ownership tree: nested + collapsible (native <details>) with connector rails + horizontal scroll,
    so it scales to a wide/deep corporate family instead of "barely fitting". */
@@ -157,7 +157,10 @@ function pvDD2TreeNode(n, depth){
    rails. Uses horizontal space and, capped by the card's maxBody, scrolls instead of growing down. */
 function pvDD2TreeNodeH(n){
   var color = pvDD2OwnTag(n.tag);
-  var box = '<div style="flex:none;background:var(--surface);border:1px solid var(--line);border-left:3px solid ' + color + ';border-radius:9px;padding:7px 11px;min-width:150px;max-width:214px">'
+  /* The node used to be a white bordered card. Inside a white panel that reads
+     as a panel within a panel, which is what it is not. It keeps the coloured
+     left rule as its identity marker and otherwise sits directly on the panel. */
+  var box = '<div style="flex:none;background:transparent;border:0;border-left:3px solid ' + color + ';border-radius:0;padding:5px 11px;min-width:150px;max-width:214px">'
     + '<div style="font:700 8px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(n.label) + '</div>'
     + '<div style="font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.25">' + pvAEsc(n.value) + '</div>'
     + (n.note ? '<div style="font-size:10.5px;color:var(--mut);line-height:1.3;margin-top:2px">' + pvAEsc(n.note) + '</div>' : '') + '</div>';
@@ -197,13 +200,13 @@ function pvDD2GeoMap(locations){
   var grat = '';
   for (var lon = -120; lon <= 120; lon += 60) grat += '<line x1="' + (lon + 180) + '" y1="0" x2="' + (lon + 180) + '" y2="180" stroke="#8FA6AC" stroke-width="0.3" opacity="0.5"/>';
   for (var lat = -60; lat <= 60; lat += 30) grat += '<line x1="0" y1="' + (90 - lat) + '" x2="360" y2="' + (90 - lat) + '" stroke="#8FA6AC" stroke-width="0.3" opacity="0.5"/>';
-  var tcol = function(t){ return /hq|registered/i.test(t) ? 'var(--plum,#5C2B50)' : /hub|operational/i.test(t) ? 'var(--teal-d,#2F6E6B)' : /service|delivery|cloud/i.test(t) ? '#B4560F' : 'var(--mut2,#6a655f)'; };
+  var tcol = function(t){ return /hq|registered/i.test(t) ? 'var(--plum,#5C2B50)' : /hub|operational/i.test(t) ? 'var(--teal-d,#2F6E6B)' : /service|delivery|cloud/i.test(t) ? '#A2500F' : 'var(--mut2,#6a655f)'; };
   var dots = placed.map(function(p){
     var x = px(p.lon), y = py(p.lat), c = tcol(p.type), miss = /missing/i.test(p.conf), lab = p.sub || p.name.split(/[,(]/)[0];
     return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.7" fill="' + c + '" opacity="' + (miss ? 0.45 : 0.98) + '" stroke="#fff" stroke-width="0.8"><title>' + pvAEsc(p.name + ', ' + p.type + (p.region ? ' (' + p.region + ')' : '') + ', ' + p.conf) + '</title></circle>'
       + '<text x="' + (x + 3.8).toFixed(1) + '" y="' + (y + 1.7).toFixed(1) + '" font-size="5" font-family="var(--sans)" font-weight="700" fill="var(--ink)" paint-order="stroke" stroke="#DCE7EC" stroke-width="1.1">' + pvAEsc(lab) + '</text>';
   }).join('');
-  var legend = '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:11px">' + [['Registered HQ', 'var(--plum,#5C2B50)'], ['Operational hub', 'var(--teal-d,#2F6E6B)'], ['Service / cloud region', '#B4560F']].map(function(li){ return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut)"><span style="width:9px;height:9px;border-radius:50%;background:' + li[1] + '"></span>' + li[0] + '</span>'; }).join('') + '</div>';
+  var legend = '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:11px">' + [['Registered HQ', 'var(--plum,#5C2B50)'], ['Operational hub', 'var(--teal-d,#2F6E6B)'], ['Service / cloud region', '#A2500F']].map(function(li){ return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut)"><span style="width:9px;height:9px;border-radius:50%;background:' + li[1] + '"></span>' + li[0] + '</span>'; }).join('') + '</div>';
   return '<div style="overflow:hidden;border-radius:8px;border:1px solid var(--line2);background:#DCE7EC"><svg viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block">' + land + grat + dots + '</svg></div>' + legend;
 }
 function pvDD2LocTable(locations){
@@ -223,7 +226,7 @@ function pvDD2Footprint(locations) {
   if (!locations || !locations.length) return '<div style="font-size:12px;color:var(--mut2)">No delivery-relevant locations on file.</div>';
   return '<div style="overflow-x:auto"><table class="pvdl"><tbody>' + locations.map(function(l){
       return '<tr><td class="dt" style="white-space:nowrap;vertical-align:top">' + pvAEsc(l.name) + '</td>'
-        + '<td class="dd" style="vertical-align:top"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:var(--teal-d,#2F6E6B);background:var(--teal-t,#DCEBE9);border-radius:20px;padding:2px 8px">' + pvAEsc(l.type) + '</span></td>'
+        + '<td class="dd" style="vertical-align:top"><span style="font:700 9px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:var(--teal-d,#2F6E6B);background:var(--teal-t,#B6CCCB);border-radius:20px;padding:2px 8px">' + pvAEsc(l.type) + '</span></td>'
         + '<td class="dd" style="vertical-align:top;color:var(--mut)">' + pvAEsc(l.region) + '</td>'
         + '<td class="dd" style="vertical-align:top">' + pvEvidChip(l.conf) + '</td></tr>';
     }).join('') + '</tbody></table></div>'
@@ -235,8 +238,8 @@ function pvDD2Footprint(locations) {
 function pvDD2Firmographics(rows){
   var chip = function(st){
     if (!st) return '';
-    var c = /verif/i.test(st) ? 'var(--teal-d,#2F6E6B)' : /assert/i.test(st) ? '#B4560F' : 'var(--mut2,#6a655f)';
-    var bg = /verif/i.test(st) ? 'var(--teal-t,#DCEBE9)' : /assert/i.test(st) ? 'var(--ti-amber,#FBF1DA)' : 'var(--nested,#EDEAE3)';
+    var c = /verif/i.test(st) ? 'var(--teal-d,#2F6E6B)' : /assert/i.test(st) ? '#A2500F' : 'var(--mut2,#6a655f)';
+    var bg = /verif/i.test(st) ? 'var(--teal-t,#B6CCCB)' : /assert/i.test(st) ? 'var(--ti-amber,#ECCFBA)' : 'var(--nested,#EDE8E0)';
     return '<span style="font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + c + ';background:' + bg + ';border-radius:20px;padding:2px 8px;white-space:nowrap">' + pvAEsc(st) + '</span>';
   };
   return '<table style="width:100%;border-collapse:collapse;font-size:12.5px">' + rows.filter(function(r){ return r && r.v; }).map(function(r){
@@ -281,10 +284,10 @@ function pvDD2Company(x, a, cand, input) {
 function pvDD2CapCell(s) {
   return s === 'Confirmed' ? {c:'#fff', bg:'var(--teal-d,#2F6E6B)', t:'Confirmed'}
     : s === 'Partially confirmed' ? {c:'#153B37', bg:'#9DC6C0', t:'Partial'}
-    : s === 'Supplier asserted' ? {c:'#fff', bg:'#B4560F', t:'Asserted'}
-    : s === 'Not demonstrated' ? {c:'#fff', bg:'#A23A30', t:'Not dem.'}
-    : s === 'Gap' ? {c:'#fff', bg:'#A23A30', t:'Gap'}
-    : {c:'var(--mut2,#6a655f)', bg:'var(--nested,#EDEAE3)', t:'N/A'};
+    : s === 'Supplier asserted' ? {c:'#fff', bg:'#A2500F', t:'Asserted'}
+    : s === 'Not demonstrated' ? {c:'#fff', bg:'#C15E19', t:'Not dem.'}
+    : s === 'Gap' ? {c:'#fff', bg:'#C15E19', t:'Gap'}
+    : {c:'var(--mut2,#6a655f)', bg:'var(--nested,#EDE8E0)', t:'N/A'};
 }
 /* capability-to-requirement heatmap: solid, high-visibility cells (matches the Requirements Heatmap weight). */
 function pvDD2CapHeatmap(capabilities) {
@@ -295,12 +298,12 @@ function pvDD2CapHeatmap(capabilities) {
       + r.cells.map(function(s){ var m = pvDD2CapCell(s); return '<td style="padding:3px"><div title="' + pvAEsc(s) + '" style="font:700 9.5px var(--mono,monospace);letter-spacing:.02em;text-transform:uppercase;color:' + m.c + ';background:' + m.bg + ';border-radius:5px;padding:10px 4px;text-align:center;line-height:1.1">' + m.t + '</div></td>'; }).join('')
       + '</tr>';
   }).join('');
-  var legend = '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:11px;font-size:11px;color:var(--mut)">' + [['Confirmed', 'var(--teal-d,#2F6E6B)'], ['Partial', '#9DC6C0'], ['Asserted', '#B4560F'], ['Not demonstrated / gap', '#A23A30'], ['N/A', 'var(--nested,#EDEAE3)']].map(function(l){ return '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:10px;border-radius:3px;background:' + l[1] + '"></span>' + l[0] + '</span>'; }).join('') + '</div>';
+  var legend = '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:11px;font-size:11px;color:var(--mut)">' + [['Confirmed', 'var(--teal-d,#2F6E6B)'], ['Partial', '#9DC6C0'], ['Asserted', '#A2500F'], ['Not demonstrated / gap', '#C15E19'], ['N/A', 'var(--nested,#EDE8E0)']].map(function(l){ return '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:10px;border-radius:3px;background:' + l[1] + '"></span>' + l[0] + '</span>'; }).join('') + '</div>';
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>' + legend;
 }
 function pvDD2RefTick(v) {
   return v === true ? '<span style="color:#2F6E6B;font-weight:800">&#10003;</span>'
-    : v === 'partial' ? '<span style="color:#B4560F;font-weight:700">~</span>'
+    : v === 'partial' ? '<span style="color:#A2500F;font-weight:700">~</span>'
     : '<span style="color:var(--mut2,#6a655f)">, </span>';
 }
 function pvDD2RefMatrix(refs) {
@@ -315,7 +318,7 @@ function pvDD2RefMatrix(refs) {
 function pvDD2Readiness(items){
   if (!items || !items.length) return '<div style="font-size:12px;color:var(--mut2)">No delivery-readiness assessment on file.</div>';
   var order = { 'Needed':1, 'Confirmation needed':1, 'Proxy':2, 'Partial':3, 'Partially validated':3, 'Demonstrated':4, 'Complete':5 };
-  var col = function(n){ return n >= 4 ? 'var(--teal-d,#2F6E6B)' : n === 3 ? '#B4560F' : 'var(--mut2,#6a655f)'; };
+  var col = function(n){ return n >= 4 ? 'var(--teal-d,#2F6E6B)' : n === 3 ? '#A2500F' : 'var(--mut2,#6a655f)'; };
   return '<div style="display:flex;flex-direction:column;gap:12px">' + items.map(function(it){
       var n = order[it.state] || 1, c = col(n), segs = '';
       for (var i = 1; i <= 5; i++) segs += '<span style="flex:1;height:7px;border-radius:3px;background:' + (i <= n ? c : 'var(--line,#e5e1db)') + '"></span>';
@@ -367,7 +370,7 @@ function pvDD2PeerScatter(refl, input, selId) {
     var finDim = pv.dimensions.find(function(d){ return d.id === 'financial'; }) || {};
     var fav = (THEO_CONCERN[finDim.concern] || {fav:0.5}).fav;
     var x = sx(fav * 5), y = sy(pv.fit.score5 || 0), sel = av.id === selId;
-    return '<circle cx="' + x + '" cy="' + y + '" r="' + (sel ? 7 : 5) + '" fill="' + (sel ? '#A23A30' : '#5C2B50') + '" opacity="' + (av.eligible ? 0.9 : 0.35) + '"/><text x="' + (x + 8) + '" y="' + (y + 3) + '" font-family="var(--mono,monospace)" font-size="9" fill="' + (sel ? '#A23A30' : 'var(--mut,#4A443C)') + '">' + pvAEsc((av.name || '').split(/[,]/)[0]) + '</text>';
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + (sel ? 7 : 5) + '" fill="' + (sel ? '#C15E19' : '#5C2B50') + '" opacity="' + (av.eligible ? 0.9 : 0.35) + '"/><text x="' + (x + 8) + '" y="' + (y + 3) + '" font-family="var(--mono,monospace)" font-size="9" fill="' + (sel ? '#C15E19' : 'var(--mut,#4A443C)') + '">' + pvAEsc((av.name || '').split(/[,]/)[0]) + '</text>';
   }).join('');
   return '<div style="overflow-x:auto"><svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:' + W + 'px;height:auto">'
     + grid
@@ -377,7 +380,7 @@ function pvDD2PeerScatter(refl, input, selId) {
     + dots + '</svg></div>'
     + pvDD2Foot('Each supplier plotted by financial viability (x) and capability fit (y); the selected supplier is highlighted. Surfaces strong-capability / weak-financial vs. balanced candidates.');
 }
-function pvDD2VarColor(v){ return /high|significant|exposure/i.test(v) ? 'var(--emph,#C15E19)' : /moderate/i.test(v) ? '#B4560F' : 'var(--teal-d,#2F6E6B)'; }
+function pvDD2VarColor(v){ return /high|significant|exposure/i.test(v) ? 'var(--emph,#C15E19)' : /moderate/i.test(v) ? '#A2500F' : 'var(--teal-d,#2F6E6B)'; }
 function pvDD2CommercialDrivers(drivers) {
   if (!drivers || !drivers.length) return '';
   var w = function(v){ return /high|significant/i.test(v) ? 92 : /exposure/i.test(v) ? 68 : /moderate/i.test(v) ? 52 : 28; };
@@ -424,7 +427,7 @@ function pvDD2RevTrend(series){
   series.forEach(function(p, i){
     var x = padL + i * band + (band - bw) / 2, h = Math.max(2, (p.value / niceMax) * plotH), y = padT + plotH - h, isLast = i === n - 1;
     pts.push((x + bw / 2).toFixed(1) + ',' + y.toFixed(1));
-    cols += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (isLast ? 'var(--teal-d,#2F6E6B)' : 'var(--teal-t,#DCEBE9)') + '"' + (isLast ? '' : ' stroke="var(--teal-d,#2F6E6B)" stroke-width="1.1"') + '><title>' + pvAEsc(p.period + ': ' + bfmt(p.value)) + '</title></rect>'
+    cols += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (isLast ? 'var(--teal-d,#2F6E6B)' : 'var(--teal-t,#B6CCCB)') + '"' + (isLast ? '' : ' stroke="var(--teal-d,#2F6E6B)" stroke-width="1.1"') + '><title>' + pvAEsc(p.period + ': ' + bfmt(p.value)) + '</title></rect>'
       + '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 6).toFixed(1) + '" text-anchor="middle" font-size="10" font-family="var(--mono,monospace)" font-weight="700" fill="var(--ink)">' + bfmt(p.value) + '</text>'
       + '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 11) + '" text-anchor="middle" font-size="10" font-family="var(--mono,monospace)" fill="var(--mut2)">' + pvAEsc(p.period) + '</text>';
   });
@@ -439,7 +442,7 @@ function pvDD2FinMetricTable(metrics){
     + metrics.map(function(m){
         var neg = /^\(|^-|loss|^\$\(/.test(String(m.value));
         return '<tr style="border-top:1px solid var(--line)"><td style="padding:6px 0;color:var(--ink)">' + pvAEsc(m.label) + '</td>'
-          + '<td style="padding:6px 0 6px 10px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:' + (neg ? '#B4560F' : 'var(--ink)') + '">' + pvAEsc(m.value) + '</td>'
+          + '<td style="padding:6px 0 6px 10px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:' + (neg ? '#A2500F' : 'var(--ink)') + '">' + pvAEsc(m.value) + '</td>'
           + '<td style="padding:6px 0 6px 10px;text-align:right;color:var(--mut2);white-space:nowrap;font-size:11px">' + pvAEsc(m.period || '') + '</td>'
           + '<td style="padding:6px 0 6px 8px;text-align:right">' + pvDD2FinDots(m.conf || 'High') + '</td></tr>';
       }).join('') + '</tbody></table>';
@@ -450,9 +453,9 @@ function pvDD2FinRatios(ratios){
   return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-top:16px">'
     + ratios.map(function(r){
         var neg = /^-|\(/.test(String(r.value));
-        return '<div style="background:var(--nested,#f1efec);border-radius:9px;padding:8px 11px">'
+        return '<div style="background:var(--nested,#EDE8E0);border-radius:9px;padding:8px 11px">'
           + '<div style="font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(r.label) + '</div>'
-          + '<div style="font-size:17px;font-weight:800;color:' + (neg ? '#B4560F' : 'var(--teal-d,#2F6E6B)') + ';font-variant-numeric:tabular-nums;margin:2px 0 1px">' + pvAEsc(r.value) + '</div>'
+          + '<div style="font-size:17px;font-weight:800;color:' + (neg ? '#A2500F' : 'var(--teal-d,#2F6E6B)') + ';font-variant-numeric:tabular-nums;margin:2px 0 1px">' + pvAEsc(r.value) + '</div>'
           + '<div style="font-size:10px;color:var(--mut);line-height:1.35">' + pvAEsc(r.basis || '') + '</div></div>';
       }).join('') + '</div>'
     + '<div style="font-size:10px;color:var(--mut2);margin-top:7px">Calculated from the figures above, not reported values.</div>';
@@ -468,7 +471,7 @@ function pvDD2FinBridge(fin){
     { k:'Cash generation', band: cashM ? 'good' : 'gap', assess: cashM ? 'Strong' : 'Not in snapshot', ev: cashM ? cashM[0].replace(/^./, function(c){ return c.toUpperCase(); }) : 'Free-cash-flow figure not isolated in the public snapshot.', conf: cashM ? 'High' : 'Low' },
     { k:'Leverage & obligations', band:'gap', assess:'Not in snapshot', ev:'Debt, leverage and balance-sheet detail are not in this public snapshot; precise figures come from filings or an RFx financial pack.', conf:'Low' }
   ];
-  var col = { good:'var(--teal-d,#2F6E6B)', warn:'#B4560F', gap:'var(--mut2,#6a655f)' };
+  var col = { good:'var(--teal-d,#2F6E6B)', warn:'#A2500F', gap:'var(--mut2,#6a655f)' };
   return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px">' + dims.map(function(d){
       return '<div style="border-left:3px solid ' + col[d.band] + ';padding:1px 0 1px 11px">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font:700 9.5px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(d.k) + '</span>' + pvDD2FinDots(d.conf) + '</div>'
@@ -525,7 +528,7 @@ function pvDD2PeerComps(refl, input, selId){
   var th = function(t, i){ return '<th style="text-align:' + (i ? 'right' : 'left') + ';padding:0 0 6px ' + (i ? '10px' : '0') + ';font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + t + '</th>'; };
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + ['Supplier', 'Capability fit', 'Financial risk'].map(th).join('') + '</tr></thead><tbody>'
     + rows.map(function(r){
-        return '<tr style="border-top:1px solid var(--line)' + (r.sel ? ';background:var(--emph-t,#F6DDC9)' : '') + '">'
+        return '<tr style="border-top:1px solid var(--line)' + (r.sel ? ';background:var(--emph-t,#ECCFBA)' : '') + '">'
           + '<td style="padding:7px 0 7px ' + (r.sel ? '6px' : '0') + ';font-weight:' + (r.sel ? '800' : '600') + ';color:var(--ink)">' + pvAEsc(r.name) + '</td>'
           + '<td style="padding:7px 0 7px 10px;text-align:right;color:var(--ink)">' + pvAEsc(r.fit) + '</td>'
           + '<td style="padding:7px 0 7px 10px;text-align:right;color:var(--mut)">' + pvAEsc(r.risk) + '</td></tr>';
@@ -556,7 +559,7 @@ function pvDD2FinEnrich(list){
   var inner = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px">'
     + list.map(function(e){
         return '<div style="border:1px dashed var(--line2,#c9c4bc);border-radius:9px;padding:10px 12px;background:repeating-linear-gradient(135deg,transparent,transparent 7px,rgba(0,0,0,.02) 7px,rgba(0,0,0,.02) 14px)">'
-          + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px"><span style="font-size:12px;font-weight:700;color:var(--ink);line-height:1.3">' + pvAEsc(e.label) + '</span><span style="font:700 8px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--plum,#5C2B50);background:var(--plum-t,#EDDFE9);border-radius:20px;padding:2px 7px;white-space:nowrap;flex:none">' + pvAEsc(e.src) + '</span></div>'
+          + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px"><span style="font-size:12px;font-weight:700;color:var(--ink);line-height:1.3">' + pvAEsc(e.label) + '</span><span style="font:700 8px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--plum,#5C2B50);background:var(--plum-t,#C6B5C2);border-radius:20px;padding:2px 7px;white-space:nowrap;flex:none">' + pvAEsc(e.src) + '</span></div>'
           + '<div style="font-size:11px;color:var(--mut);line-height:1.4">' + pvAEsc(e.note) + '</div>'
           + '<div style="font-size:10px;color:var(--mut2);margin-top:6px;font-style:italic">Awaiting licensed feed</div></div>';
       }).join('') + '</div>'
@@ -603,7 +606,7 @@ function pvDD2FinMkt(x, a, cand, input, refl){
 
 /* ------------------------------------------------ 4. RISK & RESILIENCE */
 var PVDD2_LVL = {Low:1, Medium:2, High:3};
-function pvDD2ImpColor(imp){ return imp === 'High' ? '#A23A30' : imp === 'Medium' ? '#B4560F' : '#5C2B50'; }
+function pvDD2ImpColor(imp){ return imp === 'High' ? '#C15E19' : imp === 'Medium' ? '#A2500F' : '#5C2B50'; }
 
 /* impact x likelihood matrix: 3x3 grid, risks placed in their cell as chips; gate
    risks get a ring, colour = impact, zone tint = combined severity. */
@@ -612,7 +615,7 @@ function pvDD2RiskMatrix(risks) {
   var byCell = {};
   risks.forEach(function(rk){ var k = rk.impact + '|' + rk.likelihood; (byCell[k] = byCell[k] || []).push(rk); });
   var impacts = ['High','Medium','Low'], likes = ['Low','Medium','High'];
-  var zoneBg = function(imp, lk){ var s = (PVDD2_LVL[imp] || 1) + (PVDD2_LVL[lk] || 1); return s >= 5 ? 'var(--ti-red,#FBE7E3)' : s >= 4 ? '#F7E3D3' : 'var(--teal-t,#EFF7F3)'; };
+  var zoneBg = function(imp, lk){ var s = (PVDD2_LVL[imp] || 1) + (PVDD2_LVL[lk] || 1); return s >= 5 ? 'var(--ti-red,#ECCFBA)' : s >= 4 ? '#F7E3D3' : 'var(--teal-t,#EFF7F3)'; };
   var rows = impacts.map(function(imp){
     var cells = likes.map(function(lk){
       var items = (byCell[imp + '|' + lk] || []).map(function(rk){
@@ -630,7 +633,7 @@ function pvDD2RiskMatrix(risks) {
 /* material-events timeline with directness classification */
 function pvDD2EventTimeline(events) {
   if (!events || !events.length) return '';
-  var dcol = function(d){ return /service/i.test(d) ? '#A23A30' : /division/i.test(d) ? '#B4560F' : 'var(--mut2,#6a655f)'; };
+  var dcol = function(d){ return /service/i.test(d) ? '#C15E19' : /division/i.test(d) ? '#A2500F' : 'var(--mut2,#6a655f)'; };
   return '<div style="position:relative;padding-left:6px">'
     + '<div style="position:absolute;left:4px;top:5px;bottom:5px;width:2px;background:var(--line)"></div>'
     + events.map(function(ev){
@@ -645,7 +648,7 @@ function pvDD2EventTimeline(events) {
 
 function pvDD2RiskSeverity(rk){
   var m = { High:3, Medium:2, Low:1 }, s = (m[rk.impact] || 1) + (m[rk.likelihood] || 1);
-  return s >= 6 ? { t:'Critical', c:'#A23A30', bg:'var(--ti-red,#FBE7E3)' } : s >= 5 ? { t:'High', c:'var(--emph,#C15E19)', bg:'var(--emph-t,#F6DDC9)' } : s >= 4 ? { t:'Moderate', c:'#B4560F', bg:'var(--ti-amber,#FBF1DA)' } : { t:'Low', c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#DCEBE9)' };
+  return s >= 6 ? { t:'Critical', c:'#C15E19', bg:'var(--ti-red,#ECCFBA)' } : s >= 5 ? { t:'High', c:'var(--emph,#C15E19)', bg:'var(--emph-t,#ECCFBA)' } : s >= 4 ? { t:'Moderate', c:'#A2500F', bg:'var(--ti-amber,#ECCFBA)' } : { t:'Low', c:'var(--teal-d,#2F6E6B)', bg:'var(--teal-t,#B6CCCB)' };
 }
 /* ranked material-risks register (replaces the thin narrative beside the matrix) */
 function pvDD2RiskRegister(risks){
@@ -656,7 +659,7 @@ function pvDD2RiskRegister(risks){
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + th('Risk') + th('Type') + th('Severity') + th('Conf.', 'right') + '</tr></thead><tbody>'
     + sorted.map(function(rk){
         var sv = pvDD2RiskSeverity(rk);
-        return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + (rk.gate ? ' <span style="font:700 8px var(--mono,monospace);color:var(--emph,#C15E19);background:var(--emph-t,#F6DDC9);border-radius:20px;padding:1px 6px;vertical-align:middle">GATE</span>' : '') + '</td>'
+        return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + (rk.gate ? ' <span style="font:700 8px var(--mono,monospace);color:var(--emph,#C15E19);background:var(--emph-t,#ECCFBA);border-radius:20px;padding:1px 6px;vertical-align:middle">GATE</span>' : '') + '</td>'
           + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top">' + pvAEsc(rk.type) + '</td>'
           + '<td style="padding:8px 10px 8px 0;vertical-align:top"><span style="font:700 9.5px var(--mono,monospace);color:' + sv.c + ';background:' + sv.bg + ';border-radius:20px;padding:2px 9px">' + sv.t.toUpperCase() + '</span></td>'
           + '<td style="padding:8px 0;vertical-align:top;text-align:right">' + pvDD2FinDots(rk.confidence) + '</td></tr>';
@@ -669,7 +672,7 @@ function pvDD2MitigationBoard(risks){
   var th = function(h, al){ return '<th style="text-align:' + (al || 'left') + ';padding:0 10px 6px 0;font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + h + '</th>'; };
   return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' + th('Risk') + th('Treatment') + th('Gate?', 'center') + th('Status') + '</tr></thead><tbody>'
     + risks.map(function(rk){
-        var status = rk.gate ? 'Open' : 'Monitor', sc = rk.gate ? '#B4560F' : 'var(--teal-d,#2F6E6B)';
+        var status = rk.gate ? 'Open' : 'Monitor', sc = rk.gate ? '#A2500F' : 'var(--teal-d,#2F6E6B)';
         return '<tr style="border-top:1px solid var(--line)"><td style="padding:8px 10px 8px 0;font-weight:600;color:var(--ink);vertical-align:top">' + pvAEsc(rk.label) + '</td>'
           + '<td style="padding:8px 10px 8px 0;color:var(--mut);vertical-align:top;line-height:1.45">' + pvAEsc(rk.mitigation) + '</td>'
           + '<td style="padding:8px 10px 8px 0;vertical-align:top;text-align:center">' + (rk.gate ? '<b style="color:var(--emph,#C15E19)">Yes</b>' : '<span style="color:var(--mut2)">No</span>') + '</td>'
@@ -694,7 +697,7 @@ function pvDD2Risk(x, a, cand, input) {
 function pvDD2DiligenceFunnel(stages) {
   if (!stages || !stages.length) return '';
   return '<div style="display:flex;flex-direction:column;gap:7px">' + stages.map(function(s){
-      var c = s.pct >= 75 ? '#2F6E6B' : s.pct >= 40 ? '#2F6E6B' : s.pct > 0 ? '#B4560F' : 'var(--mut2,#6a655f)';
+      var c = s.pct >= 75 ? '#2F6E6B' : s.pct >= 40 ? '#2F6E6B' : s.pct > 0 ? '#A2500F' : 'var(--mut2,#6a655f)';
       return '<div style="display:grid;grid-template-columns:200px 1fr 40px;gap:12px;align-items:center"><span style="font-size:12px;color:var(--ink)">' + pvAEsc(s.stage) + '</span><div style="height:9px;border-radius:30px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:' + s.pct + '%;background:' + c + '"></i></div><span style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:' + c + ';text-align:right">' + s.pct + '%</span></div>';
     }).join('') + '</div>' + pvDD2Foot('Progress toward advancement, not a wall of open questions.');
 }
@@ -702,8 +705,8 @@ function pvDD2ActionBoard(actions) {
   if (!actions || !actions.length) return '';
   var th = function(h, al, w){ return '<th style="text-align:' + (al || 'left') + ';padding:0 8px 7px 0;font:700 8.5px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)' + (w ? ';width:' + w : '') + '">' + h + '</th>'; };
   var rows = actions.map(function(act){
-      var sc = act.status === 'Open' ? '#B4560F' : act.status === 'Not started' ? '#A23A30' : '#2F6E6B';
-      var gate = act.gate ? '<b style="color:#B4560F">Yes</b>' : '<span style="color:var(--mut2)">No</span>';
+      var sc = act.status === 'Open' ? '#A2500F' : act.status === 'Not started' ? '#C15E19' : '#2F6E6B';
+      var gate = act.gate ? '<b style="color:#A2500F">Yes</b>' : '<span style="color:var(--mut2)">No</span>';
       return '<tr style="border-top:1px solid var(--line)">'
         + '<td style="padding:8px 8px 8px 0;font-weight:600;color:var(--ink);vertical-align:top;line-height:1.45">' + pvAEsc(act.action) + '</td>'
         + '<td style="padding:8px 8px 8px 0;vertical-align:top;color:var(--mut2)">' + pvAEsc(act.owner) + '</td>'
@@ -722,7 +725,7 @@ function pvDD2InternalRel(rel){
   var summary = (rel && rel.summary) || 'No prior Lilly contractual or performance history found. Treat as a net-new supplier.';
   var chips = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:13px">' + slots.map(function(s){
       var none = /none|no history|to assign/i.test(s.value);
-      return '<div style="background:var(--nested,#f1efec);border-radius:9px;padding:9px 11px"><div style="font:700 9px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(s.label) + '</div><div style="font-size:12.5px;font-weight:600;color:' + (none ? 'var(--mut2)' : 'var(--ink)') + ';margin-top:3px">' + pvAEsc(s.value) + '</div></div>';
+      return '<div style="background:var(--nested,#EDE8E0);border-radius:9px;padding:9px 11px"><div style="font:700 9px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2)">' + pvAEsc(s.label) + '</div><div style="font-size:12.5px;font-weight:600;color:' + (none ? 'var(--mut2)' : 'var(--ink)') + ';margin-top:3px">' + pvAEsc(s.value) + '</div></div>';
     }).join('') + '</div>';
   var tl = (rel && rel.timeline && rel.timeline.length) ? '<div style="margin-top:15px;border-top:1px solid var(--line);padding-top:12px"><div style="font:700 9px var(--mono,monospace);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);margin-bottom:8px">Relationship timeline</div>' + rel.timeline.map(function(t){ return '<div style="display:flex;gap:12px;font-size:12px;padding:3px 0"><span style="font-family:var(--mono,monospace);color:var(--mut2);white-space:nowrap;min-width:74px">' + pvAEsc(t.date) + '</span><span style="color:var(--ink)">' + pvAEsc(t.event) + '</span></div>'; }).join('') + '</div>' : '';
   return '<div style="font-size:12.5px;line-height:1.55;color:var(--ink)">' + pvAEsc(summary) + '</div>' + chips + tl
@@ -800,9 +803,9 @@ function pvR2Cell(level, confidence) {
   return '<div title="' + pvAEsc(level + ' · confidence ' + (confidence || 'n/a')) + '" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:' + s[0] + ';border:1px solid rgba(0,0,0,.06);border-radius:5px;padding:6px 5px"><span style="font:700 9.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.02em;color:' + s[1] + '">' + pvAEsc(level) + '</span>' + (confidence ? '<span style="display:inline-flex;gap:2px">' + dots + '</span>' : '') + '</div>';
 }
 function pvR2Disposition(x) {
-  if (x.gates.some(function(g){ return g.kind === 'hard'; })) return {l:'Hard stop', c:'#A23A30'};
-  if (x.gates.length) return {l:'Escalate', c:'#B4560F'};
-  if (x.risk.level === 'High' || x.risk.level === 'Critical') return {l:'Mitigate', c:'#B4560F'};
+  if (x.gates.some(function(g){ return g.kind === 'hard'; })) return {l:'Hard stop', c:'#C15E19'};
+  if (x.gates.length) return {l:'Escalate', c:'#A2500F'};
+  if (x.risk.level === 'High' || x.risk.level === 'Critical') return {l:'Mitigate', c:'#A2500F'};
   if (x.risk.level === 'Unknown') return {l:'Evidence required', c:'var(--mut2,#6a655f)'};
   return {l:'Accept / monitor', c:'#2F6E6B'};
 }
@@ -948,12 +951,12 @@ function pvH2HHtml(refl) {
        ['Must-have gaps', ca.mustGap, cb.mustGap],
        ['Evidence confidence', A.x.evidenceConfidence, B.x.evidenceConfidence]
       ].map(function(r){ return '<div style="font-size:12px;color:var(--mut2);padding:6px 0;border-top:1px solid var(--line)">' + r[0] + '</div><div style="font-size:12.5px;font-weight:600;color:var(--ink);text-align:center;padding:6px 0;border-top:1px solid var(--line)">' + pvAEsc(String(r[1])) + '</div><div style="font-size:12.5px;font-weight:600;color:var(--ink);text-align:center;padding:6px 0;border-top:1px solid var(--line)">' + pvAEsc(String(r[2])) + '</div>'; }).join('')
-    + '</div><div style="margin-top:10px;padding:8px 12px;background:var(--nested,#f1efec);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--ink);text-align:center">' + pvAEsc(adv) + '</div>';
+    + '</div><div style="margin-top:10px;padding:8px 12px;background:var(--nested,#EDE8E0);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--ink);text-align:center">' + pvAEsc(adv) + '</div>';
 
   var deltas = (A.x.reqGroups || []).map(function(ga, i){
     var gb = (B.x.reqGroups || [])[i] || {}, va = ga.fit, vb = gb.fit;
     var a2 = (va == null || vb == null) ? 'Not scored' : Math.abs(va - vb) < 0.15 ? 'Tie' : (va > vb ? nm(A.av) : nm(B.av)) + ' +' + Math.abs(va - vb).toFixed(1);
-    return '<div style="display:grid;grid-template-columns:150px 1fr 1fr 120px;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(ga.label) + (ga.must ? ' <span style="font:700 8px var(--mono,monospace);color:#A23A30">MUST</span>' : '') + '</span>' + pvH2HBarCell(va, '#5C2B50') + pvH2HBarCell(vb, '#2F6E6B') + '<span style="font-size:11px;font-weight:600;color:var(--mut)">' + pvAEsc(a2) + '</span></div>';
+    return '<div style="display:grid;grid-template-columns:150px 1fr 1fr 120px;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:12px;font-weight:600;color:var(--ink)">' + pvAEsc(ga.label) + (ga.must ? ' <span style="font:700 8px var(--mono,monospace);color:#C15E19">MUST</span>' : '') + '</span>' + pvH2HBarCell(va, '#5C2B50') + pvH2HBarCell(vb, '#2F6E6B') + '<span style="font-size:11px;font-weight:600;color:var(--mut)">' + pvAEsc(a2) + '</span></div>';
   }).join('');
 
   var riskDiff = PVR2_RISK_DIMS.map(function(rd){
@@ -966,13 +969,13 @@ function pvH2HHtml(refl) {
   var commA = A.x.commercialDrivers, commB = B.x.commercialDrivers;
   var commCard = (commA || commB) ? pvDD2Card('Commercial model', '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div><div style="font-size:12px;font-weight:700;color:#5C2B50;margin-bottom:8px">' + pvAEsc(A.av.name) + '</div>' + (commA ? pvDD2CommercialDrivers(commA) : '<div style="font-size:12px;color:var(--mut2)">Not on file.</div>') + '</div><div><div style="font-size:12px;font-weight:700;color:#2F6E6B;margin-bottom:8px">' + pvAEsc(B.av.name) + '</div>' + (commB ? pvDD2CommercialDrivers(commB) : '<div style="font-size:12px;color:var(--mut2)">Not on file.</div>') + '</div></div>', 'var(--ai,#5C2B50)') : '';
 
-  var chips = (A.x.concerns || []).slice(0, 2).concat((B.x.concerns || []).slice(0, 1)).map(function(c){ return '<span style="display:inline-block;font-size:11.5px;color:var(--mut);background:var(--nested,#f1efec);border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:0 6px 6px 0">' + pvAEsc(c) + '</span>'; }).join('');
+  var chips = (A.x.concerns || []).slice(0, 2).concat((B.x.concerns || []).slice(0, 1)).map(function(c){ return '<span style="display:inline-block;font-size:11.5px;color:var(--mut);background:var(--nested,#EDE8E0);border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:0 6px 6px 0">' + pvAEsc(c) + '</span>'; }).join('');
   var conclusion = '<div style="font-size:12.5px;color:var(--ink);line-height:1.55">' + pvAEsc(nm(A.av)) + ' and ' + pvAEsc(nm(B.av)) + ' are separated mostly by the categories above; ' + pvAEsc(adv.toLowerCase()) + '. The decision most likely turns on the open validation items below.</div><div style="margin-top:12px">' + chips + '</div>';
 
   return pvDD2Card('Head-to-Head', pickers, 'var(--navy,#5C2B50)')
     + pvDD2Card('Comparison summary', strip, 'var(--ai,#5C2B50)')
     + pvDD2Card('Category delta', deltas || '<div style="font-size:12px;color:var(--mut2)">No requirement groups to compare.</div>', 'var(--teal-d,#2F6E6B)')
-    + pvDD2Card('Risk difference', '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="font-size:11px;color:#5C2B50;padding-bottom:6px">' + pvAEsc(nm(A.av)) + '</th><th style="font-size:11px;color:#2F6E6B;padding-bottom:6px">' + pvAEsc(nm(B.av)) + '</th></tr></thead><tbody>' + riskDiff + '</tbody></table></div>', 'var(--amber-d,#B4560F)')
+    + pvDD2Card('Risk difference', '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="font-size:11px;color:#5C2B50;padding-bottom:6px">' + pvAEsc(nm(A.av)) + '</th><th style="font-size:11px;color:#2F6E6B;padding-bottom:6px">' + pvAEsc(nm(B.av)) + '</th></tr></thead><tbody>' + riskDiff + '</tbody></table></div>', 'var(--amber-d,#A2500F)')
     + pvDD2Card('Evidence confidence', cov, 'var(--mut2,#6a655f)')
     + commCard
     + pvDD2Card('Conclusion', conclusion, 'var(--navy,#5C2B50)');
@@ -1066,12 +1069,12 @@ function pvDD2RiskAccordion(dims) {
   }
   var gid = 'pvdra' + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
   var CMAP = {
-    'Low':                   {c: 'var(--teal-d,#2F6E6B)', bg: 'var(--teal-t,#DCEBE9)'},
-    'Strong':                {c: 'var(--teal-d,#2F6E6B)', bg: 'var(--teal-t,#DCEBE9)'},
-    'Moderate':              {c: '#B4560F',               bg: 'var(--ti-amber,#FBF1DA)'},
-    'High':                  {c: 'var(--emph,#C15E19)',   bg: 'var(--emph-t,#F6DDC9)'},
-    'Critical':              {c: '#A23A30',               bg: 'var(--ti-red,#FBE7E3)'},
-    'Insufficient evidence': {c: 'var(--mut2,#6a655f)',   bg: 'var(--nested,#f1efec)'}
+    'Low':                   {c: 'var(--teal-d,#2F6E6B)', bg: 'var(--teal-t,#B6CCCB)'},
+    'Strong':                {c: 'var(--teal-d,#2F6E6B)', bg: 'var(--teal-t,#B6CCCB)'},
+    'Moderate':              {c: '#A2500F',               bg: 'var(--ti-amber,#ECCFBA)'},
+    'High':                  {c: 'var(--emph,#C15E19)',   bg: 'var(--emph-t,#ECCFBA)'},
+    'Critical':              {c: '#C15E19',               bg: 'var(--ti-red,#ECCFBA)'},
+    'Insufficient evidence': {c: 'var(--mut2,#6a655f)',   bg: 'var(--nested,#EDE8E0)'}
   };
   var styleFor = function (concern) { return CMAP[concern] || CMAP['Insufficient evidence']; };
   var dotsFor = function (confidence, color) {
@@ -1101,8 +1104,8 @@ function pvDD2RiskAccordion(dims) {
 
   var css = '<style>'
     + 'details[data-pvdra="' + gid + '"] summary::-webkit-details-marker{display:none}'
-    + 'details[data-pvdra="' + gid + '"] summary:hover{background:var(--nested,#f1efec)}'
-    + 'details[data-pvdra="' + gid + '"][open]>summary{background:var(--nested,#f1efec)}'
+    + 'details[data-pvdra="' + gid + '"] summary:hover{background:var(--nested,#EDE8E0)}'
+    + 'details[data-pvdra="' + gid + '"][open]>summary{background:var(--nested,#EDE8E0)}'
     + 'details[data-pvdra="' + gid + '"][open]>summary .' + gid + '-chev{transform:rotate(90deg)}'
     + '</style>';
 
@@ -1147,7 +1150,7 @@ function pvDD2TypedEvents(events) {
   }
   function dirColor(d) {
     d = String(d || '');
-    return /service/i.test(d) ? 'var(--emph,#C15E19)' : /division/i.test(d) ? '#B4560F' : 'var(--mut2,#6a655f)';
+    return /service/i.test(d) ? 'var(--emph,#C15E19)' : /division/i.test(d) ? '#A2500F' : 'var(--mut2,#6a655f)';
   }
   var rootId = 'dd2te' + Math.random().toString(36).slice(2, 9);
   var tagged = events.map(function (ev) { return {ev: ev, t: typeOf(ev)}; });
@@ -1158,7 +1161,7 @@ function pvDD2TypedEvents(events) {
   var btnStyle = function (on) {
     return 'display:inline-flex;align-items:center;gap:5px;font:700 9.5px var(--mono,monospace);'
       + 'letter-spacing:.04em;text-transform:uppercase;padding:4px 11px;border-radius:20px;cursor:pointer;'
-      + 'background:' + (on ? 'var(--teal-t,#DCEBE9)' : 'transparent') + ';'
+      + 'background:' + (on ? 'var(--teal-t,#B6CCCB)' : 'transparent') + ';'
       + 'border:1.3px solid ' + (on ? 'var(--teal-d,#2F6E6B)' : 'var(--line2,#CECCC7)') + ';'
       + 'color:' + (on ? 'var(--teal-d,#2F6E6B)' : 'var(--mut,#4A443C)');
   };
@@ -1176,7 +1179,7 @@ function pvDD2TypedEvents(events) {
       + '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline">'
       +   '<span style="font-family:var(--mono,monospace);font-size:10px;color:var(--mut2)">' + pvAEsc(ev.date || '') + '</span>'
       +   '<b style="font-size:12.5px;color:var(--ink)">' + pvAEsc(ev.title || '') + '</b>'
-      +   '<span style="font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:var(--mut);background:var(--nested,#f1efec);border:1px solid var(--line);border-radius:20px;padding:1px 8px">' + t.label + '</span>'
+      +   '<span style="font:700 8.5px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:var(--mut);background:var(--nested,#EDE8E0);border:1px solid var(--line);border-radius:20px;padding:1px 8px">' + t.label + '</span>'
       +   '<span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.03em;color:' + dc + ';border:1px solid ' + dc + ';border-radius:20px;padding:1px 7px">' + pvAEsc(ev.directness || 'unknown') + '</span>'
       + '</div>'
       + (ev.detail ? '<div style="font-size:11.5px;color:var(--mut);line-height:1.5;margin-top:3px">' + pvAEsc(ev.detail) + '</div>' : '')
@@ -1202,7 +1205,7 @@ function pvDD2EvtFilter(btn, key, rootId) {
   var btns = bar ? bar.querySelectorAll('[data-dd2te-filter]') : [];
   for (var i = 0; i < btns.length; i++) {
     var on = btns[i].getAttribute('data-dd2te-filter') === key;
-    btns[i].style.background = on ? 'var(--teal-t,#DCEBE9)' : 'transparent';
+    btns[i].style.background = on ? 'var(--teal-t,#B6CCCB)' : 'transparent';
     btns[i].style.borderColor = on ? 'var(--teal-d,#2F6E6B)' : 'var(--line2,#CECCC7)';
     btns[i].style.color = on ? 'var(--teal-d,#2F6E6B)' : 'var(--mut,#4A443C)';
   }
@@ -1264,7 +1267,7 @@ function pvDD2FootprintMap(locations) {
      lands on the label. */
   var CONF = {
     'Verified':          { c: 'var(--teal-d,#2F6E6B)', fill: 'solid' },
-    'Partial':           { c: '#B4560F',              fill: 'hatch' },
+    'Partial':           { c: '#A2500F',              fill: 'hatch' },
     'Supplier asserted': { c: 'var(--plum,#5C2B50)',  fill: 'outline' },
     'Proxy':             { c: 'var(--mut2,#6a655f)',  fill: 'outline' },
     'Missing':           { c: 'var(--mut2,#6a655f)',  fill: 'none' }
@@ -1283,7 +1286,7 @@ function pvDD2FootprintMap(locations) {
     return '<div title="' + pvAEsc(nm + ' · ' + ty) + '" style="display:flex;flex-direction:column;gap:4px;padding:6px 9px;border-radius:8px;background:var(--surface,#fff);border:1px solid var(--line);min-width:0">'
       + '<span style="font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + pvAEsc(nm) + '</span>'
       + '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'
-      +   '<span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.02em;color:var(--teal-d,#2F6E6B);background:var(--teal-t,#DCEBE9);border-radius:20px;padding:2px 7px;white-space:nowrap">' + pvAEsc(ty) + '</span>'
+      +   '<span style="font:700 8px var(--mono,monospace);text-transform:uppercase;letter-spacing:.02em;color:var(--teal-d,#2F6E6B);background:var(--teal-t,#B6CCCB);border-radius:20px;padding:2px 7px;white-space:nowrap">' + pvAEsc(ty) + '</span>'
       +   confChip(l.conf)
       + '</div></div>';
   };
@@ -1291,7 +1294,7 @@ function pvDD2FootprintMap(locations) {
   var blocksHtml = BLOCKS.filter(function (b) { return b.key !== 'other' || buckets.other.length; }).map(function (b) {
     var items = buckets[b.key];
     var list = items.map(pill).join('');
-    return '<div style="background:var(--nested,#f1efec);border:1px solid var(--line);border-left:3px solid ' + b.accent + ';border-radius:9px;padding:10px;min-width:0">'
+    return '<div style="background:var(--nested,#EDE8E0);border:1px solid var(--line);border-left:3px solid ' + b.accent + ';border-radius:9px;padding:10px;min-width:0">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px">'
       +   '<span style="font:800 10.5px var(--mono,monospace);letter-spacing:.06em;text-transform:uppercase;color:var(--ink)">' + pvAEsc(b.label) + '</span>'
       +   '<span style="font-size:10px;font-weight:700;color:var(--mut2)">' + items.length + '</span>'
@@ -1352,7 +1355,7 @@ function pvDD2FinViz(fin) {
     return 0;
   }
 
-  var TEAL = 'var(--teal-d,#2F6E6B)', AMBER = '#B4560F', PLUM = 'var(--plum,#5C2B50)', MUT2 = 'var(--mut2,#6a655f)';
+  var TEAL = 'var(--teal-d,#2F6E6B)', AMBER = '#A2500F', PLUM = 'var(--plum,#5C2B50)', MUT2 = 'var(--mut2,#6a655f)';
 
   var latestRevenue = fin.latestRevenue || fin.revenue || '';
   var marketCap = fin.valuationOrMarketCap || fin.cash || '';
@@ -1364,7 +1367,7 @@ function pvDD2FinViz(fin) {
   // ---- (2) key-metric stat chips ----
   function chip(label, raw, dot) {
     var val = raw ? esc(raw) : '<span style="color:' + MUT2 + ';font-weight:600">Not reported</span>';
-    return '<div style="min-width:0;background:var(--nested,#f1efec);border-left:3px solid ' + dot + ';border-radius:9px;padding:9px 12px 10px;display:flex;flex-direction:column;gap:5px">'
+    return '<div style="min-width:0;background:var(--nested,#EDE8E0);border-left:3px solid ' + dot + ';border-radius:9px;padding:9px 12px 10px;display:flex;flex-direction:column;gap:5px">'
       + '<div style="display:flex;align-items:center;gap:6px;min-width:0">'
       + '<span style="width:7px;height:7px;border-radius:50%;background:' + dot + ';flex:none"></span>'
       + '<span style="font:700 9.5px var(--mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:' + MUT2 + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + label + '</span>'
@@ -1408,7 +1411,7 @@ function pvDD2FinViz(fin) {
         if (p.norm != null) {
           var h = maxAbs > 0 ? Math.max(3, (Math.abs(p.norm) / maxAbs) * plotH) : 3;
           var y = padT + plotH - h;
-          var fill = isLast ? TEAL : 'var(--teal-t,#DCEBE9)';
+          var fill = isLast ? TEAL : 'var(--teal-t,#B6CCCB)';
           var vlab = esc(String(p.raw).split(/[\s(]/)[0]);
           return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + fill + '"' + (isLast ? '' : ' stroke="' + TEAL + '" stroke-width="1.1"') + '><title>' + title + '</title></rect>'
             + (vlab ? '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 5).toFixed(1) + '" text-anchor="middle" font-size="8.5" font-family="var(--mono,monospace)" font-weight="700" fill="var(--ink)">' + vlab + '</text>' : '')

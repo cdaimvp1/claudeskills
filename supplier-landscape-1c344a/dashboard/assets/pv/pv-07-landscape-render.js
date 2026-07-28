@@ -3,7 +3,7 @@ var _PVLA=(_PV07&&typeof Theo!=='undefined'&&!Theo.isDNA(_PV07)&&_PV07.landscape
 function landscapeMiniHTML(){
  var LAND=(PROJECTS[CURPROJ].landscape||[]).slice().sort(function(a,b){return b.fit-a.fit;}).slice(0,3);
  if(!LAND.length) return '<div class="spnote">No supplier landscape yet, it runs automatically during intake, or on request in the chat, to scan the market for fit-scored candidates.</div>';
- return '<div class="card" style="padding:2px 0">'+LAND.map(function(s,i){return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px'+(i>0?';border-top:1px solid var(--line2,#E0DCD5)':'')+'"><div><div style="font-weight:600;font-size:13px">'+s.n+'</div><div style="font-size:11px;color:var(--mut2)">'+s.sub+'</div></div><span class="fit '+s.fitc+'">fit '+s.fit+'</span></div>';}).join('')+'</div><div class="spnote">Top candidates by fit from the on-demand market scan. Open the full Supplier Landscape Search for the complete set, references and risk signals.</div>';
+ return '<div class="card" style="padding:2px 0">'+LAND.map(function(s,i){return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px'+(i>0?';border-top:1px solid var(--line2,#E0DCD5)':'')+'"><div><div style="font-weight:600;font-size:13px">'+s.n+'</div><div style="font-size:11.5px;color:var(--mut2)">'+s.sub+'</div></div><span class="fit '+s.fitc+'">fit '+s.fit+'</span></div>';}).join('')+'</div><div class="spnote">Top candidates by fit from the on-demand market scan. Open the full Supplier Landscape Search for the complete set, references and risk signals.</div>';
 }
 /* ===== SL.2 supplier-landscape LIVE read (ADDITIVE, reflect-only) =====
    Enhances the EXISTING Overview "Supplier landscape" section (the #ovLandLive
@@ -49,15 +49,15 @@ function ovLandCardHTML(refl){
    var nm=escD(s.name||s.supplier||s.id||'Candidate');
    var wf=(typeof s.weightedFit==='number')?s.weightedFit:(typeof s.fitScore==='number')?s.fitScore:(typeof s.score==='number')?s.score:null;
    var dq=s.disqualified?' · <span style="color:#C15E19;font-weight:700">disqualified (hard flag)</span>':'';
-   return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line,#EEE)"><span style="font-weight:600;font-size:13px">'+nm+dq+'</span><span style="font:700 11px var(--mono,monospace);color:var(--navy)">'+(wf!=null?('fit '+escD(Math.round(wf*10)/10)+' / 5'):'Data not available')+'</span></div>';
+   return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line,#EEE)"><span style="font-weight:600;font-size:12.5px">'+nm+dq+'</span><span style="font:700 11px var(--mono,monospace);color:var(--navy)">'+(wf!=null?('fit '+escD(Math.round(wf*10)/10)+' / 5'):'Data not available')+'</span></div>';
   }).join(''));
  }
  var rec=L.recommendation;if(rec&&typeof rec==='object')rec=rec.summary||rec.text||rec.label||'';
- if(typeof rec==='string'&&rec)parts.push('<div style="font-size:13px;color:var(--mut,#4A4540);line-height:1.5;margin-top:7px"><b style="color:var(--navy)">Advisory read.</b> '+escD(rec)+'</div>');
+ if(typeof rec==='string'&&rec)parts.push('<div style="font-size:12px;color:var(--mut,#4A4540);line-height:1.5;margin-top:7px"><b style="color:var(--navy)">Advisory read.</b> '+escD(rec)+'</div>');
  if(!parts.length)return '';   // nothing usable returned -> stay quiet (never invented)
  return '<div style="border:1px solid #C6D7EF;border-left:3px solid #5C2B50;border-radius:10px;padding:9px 12px;margin:9px 0 0">'+
-  '<div style="font:600 11px var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--navy);margin-bottom:2px">Supplier landscape · live read</div>'+parts.join('')+
-  '<div style="font-size:11px;color:var(--mut2,#8A827C);font-style:italic;margin-top:6px">From the platform landscape engine over this project\'s own candidate set. Advisory only: no vendor is selected or contacted.</div></div>';
+  '<div style="font:600 10.5px var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--navy);margin-bottom:2px">Supplier landscape · live read</div>'+parts.join('')+
+  '<div style="font-size:10.5px;color:var(--mut2,#8A827C);font-style:italic;margin-top:6px">From the platform landscape engine over this project\'s own candidate set. Advisory only: no vendor is selected or contacted.</div></div>';
 }
 async function ovLandscapeLoad(){
  if(curtab!=='overview'||!window.LillyAPI)return;
@@ -154,7 +154,7 @@ function markFinal(id){MATSTATE[id].final=true;toast('“'+MATSTATE[id].out+'”
 document.addEventListener('click',function(){closeEdit();});
 // ---- Open-full-dashboard link: the in-tab content is the compact overview;
 // this opens the dedicated full multi-tab dashboard page (RV17). ----
-function openDashBar(href,label){return '<a class="opendash" href="'+href+'" style="display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;font-size:13px;font-weight:600;color:#C15E19;text-decoration:none">'+label+'<span style="font-size:16px;line-height:1">→</span></a>';}
+function openDashBar(href,label){return '<a class="opendash" href="'+href+'" style="display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;font-size:13px;font-weight:600;color:#C15E19;text-decoration:none">'+label+'<span style="font-size:15px;line-height:1">→</span></a>';}
 // ---- Landscape ----
 function fitClass(c){return c;}
 /* ===========================================================================
@@ -293,10 +293,10 @@ const PVSLE=(function(){
 var PVSEG_LBL={leader:'Leader',challenger:'Challenger',niche:'Niche',caution:'Caution',disqualified:'Disqualified'};
 var PVSEG_DESC={leader:'Strong fit, contained risk',challenger:'Strong fit, elevated risk',niche:'Narrower fit, contained risk',caution:'Narrower fit, elevated risk',disqualified:'Hard flag, off the shortlist'};
 var PVSEG_ACTION={leader:'Advance to the RFx slate as a pace-setter; use its strengths to set the bar on price and terms.',challenger:'Strong fit but elevated risk, shortlist with risk conditions attached and validate the flagged items first.',niche:'Fit for a specific scope; hold as a fallback or point solution rather than a primary.',caution:'Elevated risk and narrower fit, keep only as a price lever, not a primary award path.',disqualified:'Off the shortlist on a hard flag; do not carry into the RFx.'};
-var PVSEG_COLOR={leader:'#5C2B50',challenger:'#2F6E6B',niche:'#8A6E86',caution:'#C15E19',disqualified:'#B0A9A2'};
+var PVSEG_COLOR={leader:'#5C2B50',challenger:'#2F6E6B',niche:'#7A3C6B',caution:'#C15E19',disqualified:'#B0A9A2'};
 var PVSEG_ORDER=['leader','challenger','niche','caution','disqualified'];
 // #4: per-supplier identity colours for the Segmentation section (distinct per supplier; no burnt orange, no green).
-var PVSUP_PAL=['#5C2B50','#2F6E6B','#8A6E86','#417C74','#7A4B86','#C15E19','#5F8C86','#9A5A82']; // plum/teal/emph family, all distinct
+var PVSUP_PAL=['#5C2B50','#2F6E6B','#7A3C6B','#417C74','#7A3C6B','#C15E19','#5F8C86','#9A5A82']; // plum/teal/emph family, all distinct
 var PVSUP_CMAP={},PVSUP_CI=0;
 function pvSupColor(a){var id=String((a&&(a.id||a.name))||'');if(!id)return PVSUP_PAL[0];if(PVSUP_CMAP[id]==null){PVSUP_CMAP[id]=PVSUP_PAL[PVSUP_CI%PVSUP_PAL.length];PVSUP_CI++;}return PVSUP_CMAP[id];}
 // #4: light quadrant background shades + matching solid tile-label colours (leader blue · challenger teal · niche plum · caution gold).
@@ -310,13 +310,13 @@ function pvRound(n,dp){dp=dp==null?2:dp;var f=Math.pow(10,dp);return Math.round(
 function pvPct100(x){return pvRound((Number(x)||0)*100,1)+'%';}
 function pvInitials(name){var caps=String(name).replace(/[^A-Z]/g,'');if(caps.length>=2)return caps.slice(0,2);return String(name).replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();}
 function pvFitBg(score){var a=0.10+(Math.max(0,Math.min(5,score))/5)*0.70;return 'background:rgba(92,43,80,'+pvRound(a,3)+');color:'+(score>=3.5?'#fff':'var(--ink)')+';';}
-/* Risk heatmap: single red hue graded by score (higher = worse), interpolated light #FBEAE8 -> deep
+/* Risk heatmap: single red hue graded by score (higher = worse), interpolated light #ECCFBA -> deep
    #9E1710 with t=clamp((v-1)/2.2,0,1), the SAME technique as pvHmRamp so risk swatches read as richly
    graded as the blue fit swatches (not a flat pink wash). Numeral white when t>0.5 else ink. */
 function pvRiskBg(score){var v=Number(score);if(!isFinite(v))v=0;var t=(v-1)/2.2;t=t<0?0:(t>1?1:t);var r=Math.round(251+(158-251)*t),g=Math.round(234+(23-234)*t),b=Math.round(232+(16-232)*t);return 'background:rgb('+r+','+g+','+b+');color:'+(t>0.5?'#fff':'#1A1A1A')+';';}
 /* Pass B: 5-scale fit BAND colouring for the heatmap, navy>=4.25 strong / amber 3.50-4.24 adequate / red<3.50 gap (no green). */
 function pvBandOf(s){s=Number(s)||0;return s>=4.25?'strong':(s>=3.5?'adequate':'gap');}
-function pvBandBg(s){var b=pvBandOf(s);return b==='strong'?'background:#5C2B50;color:#fff':b==='adequate'?'background:#F1EFEC;color:#7A3D0F':'background:#E1251B;color:#fff';}
+function pvBandBg(s){var b=pvBandOf(s);return b==='strong'?'background:#5C2B50;color:#fff':b==='adequate'?'background:#ECCFBA;color:#7A3D0F':'background:#E1251B;color:#fff';}
 /* lighter band tints for sub-requirement + field-average cells (hierarchy) */
 function pvBandBgSub(s){var b=pvBandOf(s);return b==='strong'?'background:rgba(92,43,80,.16);color:var(--blue-d)':b==='adequate'?'background:rgba(193,94,25,.20);color:var(--emph,#C15E19)':'background:rgba(225,37,27,.14);color:var(--red-d)';}
 /* risk sub-factor + field-avg cells share the SAME ramp as main cells (the fit heatmap treats sub/avg
@@ -342,9 +342,9 @@ function pvRecStanding(a){
    analyst coverage enrichment from credible public sources, reflect-only, not validated.
    Inline-styled so no CSS rule is added (Pass 2B owns readability CSS). */
 function pvSrcTag(kind){
- var b='display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:0 4px;border-radius:3px;vertical-align:middle;line-height:1.55;';
+ var b='display:inline-block;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:0 4px;border-radius:3px;vertical-align:middle;line-height:1.55;';
  if(kind==='int')return '<span title="Internal, from Lilly own records: spend, contracts, RFP pricing and relationship history." style="'+b+'background:rgba(92,43,80,.12);color:var(--navy);border:1px solid rgba(92,43,80,.30)">internal</span>';
- if(kind==='ext')return '<span title="External enrichment, firmographics, financials and analyst coverage from credible public sources; not validated." style="'+b+'background:var(--tint-eef0f3,#EEF0F3);color:#5B6472;border:1px solid rgba(0,0,0,.15)">external</span>';
+ if(kind==='ext')return '<span title="External enrichment, firmographics, financials and analyst coverage from credible public sources; not validated." style="'+b+'background:var(--tint-eef0f3,#EDE8E0);color:#5B6472;border:1px solid rgba(0,0,0,.15)">external</span>';
  return '';
 }
 /* Pass 2A: category COVERAGE %, the share of a category's sub-requirements this vendor meets
@@ -392,9 +392,7 @@ var PVSL_RFX_SUGGEST=_PVLA.rfxSuggest||[];
 /* distinct CATEGORICAL palette for the ranking bars where each vendor is coloured (no green,
    no near-identical blues): bold blue (lead) · violet · burnt orange. Segment colouring on the
    plane stays PVSEG_COLOR because there the colour encodes leader/challenger/niche/caution. */
-// Marc 2026-07-27: collapsing the second burnt shade left vendor slots 3 and 5 identical. Slot 5 becomes a
-// DEEPER TEAL so every vendor keeps a distinct identity colour and burnt orange stays the one solid emphasis tone.
-var PVVENDOR_COLORS=['#5C2B50','#2F6E6B','#C15E19','#7A4B86','#1F4E4C']; // plum / teal / emph / plum-purple / burnt (A=plum vs B=teal for clear H2H contrast)
+var PVVENDOR_COLORS=['#5C2B50','#2F6E6B','#C15E19','#7A3C6B','#A2500F']; // plum / teal / emph / plum-purple / burnt (A=plum vs B=teal for clear H2H contrast)
 // G12 ESG & regulatory posture, illustrative risk scores (0-5, higher = worse) + short reads per vendor.
 // Injected into the risk model at render so ESG appears as a scored Risk-Assessment dimension.
 var PVSL_ESG=_PVLA.esg||{};
@@ -452,7 +450,7 @@ function pvLandInput(P){
  pvHydrate(P);
  return {
   category:P.title||'IT sourcing',topN:3,
-  requirements:P.requirements,riskDimensions:P.riskDimensions||[],uncertainties:P.uncertainties||[],   // Marc 2026-07-27: structured uncertainty register
+  requirements:P.requirements,riskDimensions:P.riskDimensions||[],
   segmentation:P.segmentation||{fitHigh:60,riskHigh:2.5},
   suppliers:P.landscape.map(function(s,i){return {
    id:s.id||('c'+i),name:s.n||('Candidate '+(i+1)),
@@ -494,9 +492,9 @@ function pvMetricsHtml(refl){
  return '<div class="metrics">'+
   '<div class="metric"><div class="lab">Vendors evaluated</div><div class="val">'+escD(L.supplierCount)+'</div><div class="note">'+escD(L.category)+'</div></div>'+
   '<div class="metric"><div class="lab">Eligible</div><div class="val">'+escD(L.eligibleCount)+'<small> of '+escD(L.supplierCount)+'</small></div><div class="note">'+escD(ms.disqualifiedCount)+' disqualified · '+escD(ms.incumbentCount)+' incumbent</div></div>'+
-  '<div class="metric"><div class="lab">Recommended lead</div><div class="val" style="font-size:16px">'+escD(lead?lead.name:'None eligible')+'</div><div class="note">'+(lead?('composite '+escD(lead.compositeScore)+' · fit '+escD(lead.fitScore)+'/100 · risk '+escD(lead.riskScore)+'/5'):'every candidate carries a hard flag')+'</div></div>'+
+  '<div class="metric"><div class="lab">Recommended lead</div><div class="val" style="font-size:15px">'+escD(lead?lead.name:'None eligible')+'</div><div class="note">'+(lead?('composite '+escD(lead.compositeScore)+' · fit '+escD(lead.fitScore)+'/100 · risk '+escD(lead.riskScore)+'/5'):'every candidate carries a hard flag')+'</div></div>'+
   '<div class="metric"><div class="lab">Field</div><div class="val"><span class="conf '+fc+'">'+escD(PVFIELD_LBL[cd.fieldType]||cd.fieldType)+'</span></div><div class="note">'+(cd.leaderGap!=null?('leader gap '+escD(cd.leaderGap)):'single eligible')+' · '+escD(PVLEVEL_LBL[ms.level]||ms.level)+' concentration</div></div>'+
-  '<div class="metric"><div class="lab">Next action</div><div class="val" style="font-size:16px;color:var(--blue)">'+escD(((typeof wfNextAction==="function"&&wfNextAction())||{}).act||PVNEXT_LBL[rec.nextAction]||rec.nextAction)+'</div><div class="note">the team&#39;s next step to advance the project</div></div>'+
+  '<div class="metric"><div class="lab">Next action</div><div class="val" style="font-size:15px;color:var(--blue)">'+escD(((typeof wfNextAction==="function"&&wfNextAction())||{}).act||PVNEXT_LBL[rec.nextAction]||rec.nextAction)+'</div><div class="note">the team&#39;s next step to advance the project</div></div>'+
  '</div>';
 }
 
@@ -576,7 +574,7 @@ function pvSegmentationHtml(refl){
    return '<div class="segtile"><div class="sl"><span class="swd" style="background:'+(PVQUAD_SOLID[s]||PVSEG_COLOR[s])+'"></span>'+escD(PVSEG_LBL[s])+'</div><div class="sc">'+escD(sc[s]||0)+'</div><div class="sd">'+escD(PVSEG_DESC[s])+'</div>'+(chips?'<div class="vchips">'+chips+'</div>':'')+'</div>';
  }).join('');
  return '<div class="sa-card">'+
-   '<div class="card-hd"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="ct">Segmentation Board</span><span class="cs">'+escD(L.supplierCount)+' candidates · fit cut '+escD(fitHigh)+'/100 · risk cut '+escD(riskHigh)+'/5</span></div>'+
+   '<div class="card-hd"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="ct">Segmentation board</span><span class="cs">'+escD(L.supplierCount)+' candidates · fit cut '+escD(fitHigh)+'/100 · risk cut '+escD(riskHigh)+'/5</span></div>'+
    '<div class="scc-b">'+
      '<div class="plane"><div class="pdiv-v" style="left:'+vx+'%"></div><div class="pdiv-h" style="top:'+hy+'%"></div>'+
        '<div class="qlab" style="right:10px;top:8px">Leaders</div><div class="qlab" style="left:10px;top:8px">Niche</div><div class="qlab" style="right:10px;bottom:8px">Challengers</div><div class="qlab" style="left:10px;bottom:8px">Caution</div>'+
@@ -595,7 +593,7 @@ function pvMarketStructureHtml(refl){
  var legend=ranked.map(function(a){return '<span class="lg"><span class="sw" style="background:'+PVSEG_COLOR[a.segment]+'"></span>'+escD(a.name)+'</span>';}).join('');
  var levelCls=ms.level==='concentrated'?'high':ms.level==='moderate'?'moderate':'low';
  return '<div class="sa-card">'+
-   '<div class="card-hd"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/></svg><span class="ct">Market Structure</span><span class="cs">'+escD(ms.eligibleCount)+' eligible · HHI '+escD(ms.hhi.toFixed(3))+' <span class="conf '+levelCls+'" style="margin-left:6px">'+escD(PVLEVEL_LBL[ms.level]||ms.level)+'</span></span></div>'+
+   '<div class="card-hd"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 18v-7M10 18V6M15 18v-9M20 18v-4"/></svg><span class="ct">Market structure</span><span class="cs">'+escD(ms.eligibleCount)+' eligible · HHI '+escD(ms.hhi.toFixed(3))+' <span class="conf '+levelCls+'" style="margin-left:6px">'+escD(PVLEVEL_LBL[ms.level]||ms.level)+'</span></span></div>'+
    '<div class="scc-b">'+
      (total>0?('<div class="stack">'+segs+'</div><div class="legend">'+legend+'<span class="lg" style="margin-left:auto;color:var(--mut2)">Segment width = share of eligible composite</span></div>'):'<div class="footbound">No eligible suppliers to chart; every candidate carries a hard disqualifier.</div>')+
      '<div class="basis" style="margin-top:14px"><span class="bchip">Top-1 composite share <b>'+escD(pvPct100(ms.top1Share))+'</b></span><span class="bchip">Top-3 composite share <b>'+escD(pvPct100(ms.top3Share))+'</b></span><span class="bchip">HHI <b>'+escD(ms.hhi.toFixed(4))+'</b></span><span class="bchip">Concentration <b>'+escD(PVLEVEL_LBL[ms.level]||ms.level)+'</b></span><span class="bchip">Eligible <b>'+escD(ms.eligibleCount)+'</b></span><span class="bchip">Disqualified <b>'+escD(ms.disqualifiedCount)+'</b></span></div>'+
@@ -603,279 +601,6 @@ function pvMarketStructureHtml(refl){
    '</div></div>';
 }
 
-
-/* ================= MARKET DECISION BRIEF (Marc 2026-07-27) ==================================
- * Overview reframed as one decisive read: the credible field -> the recommended advance slate and
- * why -> keep-as-leverage / exclude -> uncertainties that could still move the slate -> the
- * questions only the RFx can answer.
- *
- * GENERATED, NOT TRANSCRIBED. The approved mockup carried illustrative prose about Nimbus / Helio /
- * Lakehouse; this project's real field is Snowflake, Databricks, ClickHouse, Redshift, BigQuery,
- * Microsoft Fabric and Firebolt. Porting that prose verbatim would have asserted false facts about
- * real vendors, so every sentence below is composed from the SAME reflected model the panels beside
- * it render (assessments, the shortlist band, the recommendation, dataBasis). Where the model
- * carries no signal, the brief SAYS SO rather than filling the gap.
- * ADDITIVE: nothing existing on Overview changes; this section is added above them.
- * ======================================================================================== */
-function pvMdbSection(n, title, sub, body) {
-  return '<div class="mdb-sec"><div class="mdb-hd"><span class="mdb-n">' + n + '</span><span class="mdb-t">' + escD(title) + '</span>'
-    + (sub ? '<span class="mdb-sub">' + escD(sub) + '</span>' : '') + '</div>' + body + '</div>';
-}
-function pvMdbEvidenceChip(kind) {
-  var m = { evidenced: ['Evidenced', 'mdb-ev-e'], estimated: ['Estimated', 'mdb-ev-s'], unknown: ['Unknown', 'mdb-ev-u'] };
-  var c = m[kind] || m.unknown;
-  return '<span class="mdb-ev ' + c[1] + '">' + c[0] + '</span>';
-}
-function pvMarketDecisionBriefHtml(refl, input, shortlist, shortlistIds, elimRowsSrc) {
-  var L = refl.landscape, rec = L.recommendation || {}, db = L.dataBasis || {};
-  var slate = (shortlist || []).map(function (x) { return x.a; });
-  if (!slate.length && rec.lead) slate = [rec.lead];
-  var slateIds = {}; slate.forEach(function (a) { slateIds[a.id] = true; });
-  var eligible = (L.assessments || []).filter(function (a) { return a.eligible; });
-  var leverage = eligible.filter(function (a) { return !slateIds[a.id]; });
-  var elimN = (elimRowsSrc || []).length;
-
-  /* --- 1. the credible field ----------------------------------------------------------- */
-  var scanned = (L.supplierCount || 0) + elimN;
-  var funnel = [[scanned, 'Scanned', 'vendors identified in the category scan'],
-                [(L.supplierCount || 0), 'Assessed', 'carried into the scored assessment'],
-                [eligible.length, 'Credible field', 'cleared the eligibility screens'],
-                [slate.length, 'Advance to RFx', 'the recommended slate, Section 2']];
-  var funnelHtml = '';   // Marc 2026-07-27: the funnel now leads the tab, it is not repeated here
-  var basisTxt = db.note || db.basis || '';
-  var s1 = funnelHtml + '<div class="mdb-note">' + pvMdbEvidenceChip(basisTxt ? 'evidenced' : 'estimated') + ' '
-    + escD(basisTxt || 'Public filings, product documentation and independent analyst coverage. No vendor briefings and no vendor-supplied pricing in this pass.') + '</div>';
-
-  /* --- sections 2 and 3 REMOVED (Marc 2026-07-27, second pass) ------------------------
-   * "Recommended Advance Slate" restated the Recommendation table's own fit / risk /
-   * composite / rank for the same vendors, and repeated its next-action line. "Keep as
-   * Leverage / Exclude" restated the table's shortlist band and its elimination rows,
-   * re-creating the very card an earlier decision had merged INTO that table. Both are
-   * gone; the table is the single place the field is ranked and screened.
-   * -------------------------------------------------------------------------------- */
-  /* --- 4. uncertainties that could change the slate ------------------------------------- */
-  // Marc 2026-07-27: the landscape model now carries a structured uncertainty register, so this
-  // section reports real open items instead of stating that none are recorded. Registered entries
-  // for ANY vendor still in play are shown, each with what would resolve it.
-  var reg = (input && input.uncertainties) || [];
-  var nameOfId = {}; (L.assessments || []).forEach(function (a) { nameOfId[a.id] = a.name; });
-  var inPlay = {}; slate.forEach(function (a) { inPlay[a.id] = true; });
-  var unc = reg.filter(function (u) { return inPlay[u.vendorId]; })
-               .map(function (u) { return { v: nameOfId[u.vendorId] || u.vendorId, t: u.text, r: u.resolvedBy }; });
-  slate.forEach(function (a) {
-    (a.softFlags || []).forEach(function (f) {
-      var txt = (typeof f === 'string') ? f : (f.detail || f.label || f.reason || '');
-      if (txt) unc.push({ v: a.name, t: txt });
-    });
-  });
-  var s4 = unc.length
-    ? '<ul class="mdb-list mdb-unc">' + unc.map(function (u) {
-        return '<li>' + pvMdbEvidenceChip('estimated') + ' <b>' + escD(u.v) + '</b> ' + escD(u.t)
-          + (u.r ? '<span class="mdb-res">Resolved by: ' + escD(u.r) + '</span>' : '') + '</li>';
-      }).join('') + '</ul>'
-    : '<div class="mdb-none">' + pvMdbEvidenceChip('unknown') + ' The model records no soft flag against any vendor on the slate. That is an absence of recorded signal rather than a clean bill of health: this scan used public sources only. A structured uncertainty register belongs in the landscape data model before this section can say more.</div>';
-
-  /* --- 5. critical RFx questions -------------------------------------------------------- */
-  var qs = [];
-  slate.forEach(function (a) {
-    if ((a.disqualifiers || []).length) qs.push('Clear or formally accept the hard flag(s) recorded against <b>' + escD(a.name) + '</b> before award.');
-  });
-  qs.push('Obtain pricing and commercial terms. This scan carries no vendor-supplied pricing, so nothing here is a cost comparison.');
-  qs.push('Validate the highest-weighted requirement categories in a live demo. Scores here are read from public documentation, not demonstrated to Lilly.');
-  if (leverage.length) qs.push('Decide whether to invite ' + escD(leverage.map(function (a) { return a.name; }).join(', ')) + ' to quote for leverage, or hold them in reserve.');
-  var s5 = '<ol class="mdb-list mdb-qs">' + qs.map(function (q) { return '<li>' + q + '</li>'; }).join('') + '</ol>'
-    + '<div class="mdb-note">These are the questions public research cannot resolve. They carry into the RFx as the first clarification set.</div>';
-
-  return '<div class="sa-card mdb"><div class="card-hd"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg>'
-    + '<span class="ct">What This Scan Cannot Settle</span><span class="mdb-cap">evidence, gaps, and the questions that carry into the RFx</span></div>'
-    + '<div class="mdb-body">'
-    + pvMdbSection(1, 'Evidence & Coverage', 'how the field narrowed, and on what sources', s1)
-    + pvMdbSection(2, 'Uncertainties That Could Change the Slate', 'open items against the recommended vendors', s4)
-    + pvMdbSection(3, 'Critical RFx Questions', 'what public research cannot answer', s5)
-    + '</div></div>';
-}
-
-/* ================= DECISION LEVERAGE (Marc 2026-07-27, L9/L14) ==============================
- * Which requirements actually decide this selection. Marc's formula is
- *   weight x must-have x differentiation x confidence.
- * Three of the four terms are in the model and are used as-is:
- *   weight         = the requirement's own normalised weight
- *   differentiation= the SPREAD of vendor scores on that requirement (max - min). A requirement
- *                    everyone scores the same on cannot separate the field, however heavy it is.
- *   confidence     = evidence coverage, the share of the field actually scored on that requirement.
- * The MUST-HAVE term is deliberately OMITTED, not faked: the requirement model carries id / label /
- * weight / subs and no must-have flag, so any value would be invented. Adding a `mustHave` boolean
- * to the requirement data is what unlocks it, and the note under the panel says exactly that.
- * ADDITIVE: this is a new panel on the Requirements Heatmap tab; the heatmap itself is untouched.
- * ======================================================================================== */
-function pvDecisionLeverage(refl) {
-  var L = refl.landscape, H = L.heatmap || {}, reqs = (PVSL_INPUT && PVSL_INPUT.requirements) || [];
-  var cells = H.cells || [], eligible = (L.assessments || []).filter(function (a) { return a.eligible; });
-  var eligibleIds = {}; eligible.forEach(function (a) { eligibleIds[a.id] = true; });
-  var byReq = {};
-  cells.forEach(function (c) {
-    if (!eligibleIds[c.supplierId]) return;
-    if (typeof c.score !== 'number') return;
-    (byReq[c.requirementId] = byReq[c.requirementId] || []).push(c.score);
-  });
-  var wsum = reqs.reduce(function (t, r) { return t + (r.weight || 0); }, 0) || 1;
-  var rows = reqs.map(function (r) {
-    var sc = byReq[r.id] || [];
-    var max = sc.length ? Math.max.apply(null, sc) : 0;
-    var min = sc.length ? Math.min.apply(null, sc) : 0;
-    var spread = sc.length ? (max - min) : 0;
-    var wN = (r.weight || 0) / wsum;                       // 0..1
-    var dN = Math.max(0, Math.min(1, spread / 5));          // 0..1, scores are 0-5
-    var cN = eligible.length ? (sc.length / eligible.length) : 0;   // 0..1 evidence coverage
-    // Marc 2026-07-27: the MUST-HAVE term is now applied. A Must-Have cannot be traded away, so a
-    // spread on one decides the award in a way the same spread on a nice-to-have does not. Weighted
-    // 1.6x rather than a hard gate, so it lifts without swamping the other three terms.
-    var mN = r.mustHave ? 1.6 : 1;
-    return { id: r.id, label: r.label, weight: r.weight || 0, wN: wN, spread: spread, dN: dN,
-             cN: cN, must: !!r.mustHave, scored: sc.length, of: eligible.length, lev: wN * dN * cN * mN };
-  });
-  var maxLev = rows.reduce(function (m, x) { return Math.max(m, x.lev); }, 0) || 1;
-  rows.forEach(function (x) { x.pct = Math.round(x.lev / maxLev * 100); });
-  rows.sort(function (a, b) { return b.lev - a.lev; });
-  return rows;
-}
-
-function pvDecisionLeverageHtml(refl) {
-  var rows = pvDecisionLeverage(refl);
-  if (!rows.length) return '';
-  var top = rows[0], flat = rows.filter(function (r) { return r.spread < 0.5; });
-  var body = rows.map(function (r) {
-    return '<tr><td class="dlv-l">' + escD(r.label) + (r.must ? '<span class="dlv-must">Must-have</span>' : '') + '</td>'
-      + '<td class="dlv-n">' + r.weight + '</td>'
-      + '<td class="dlv-n">' + r.spread.toFixed(2) + '</td>'
-      + '<td class="dlv-n">' + r.scored + ' of ' + r.of + '</td>'
-      + '<td class="dlv-bar"><span><i style="width:' + r.pct + '%"></i></span><b>' + r.pct + '</b></td></tr>';
-  }).join('');
-  var read = '<b>' + escD(top.label) + '</b> carries the most decision leverage in this field: '
-    + 'weight ' + top.weight + ', a ' + top.spread.toFixed(2) + '-point spread across the credible field, '
-    + 'and ' + top.scored + ' of ' + top.of + ' vendors scored on it.'
-    + (flat.length ? (' ' + flat.map(function (f) { return escD(f.label); }).join(', ')
-        + (flat.length > 1 ? ' separate' : ' separates') + ' the field barely at all, so weight there buys little.') : '');
-  return '<div class="sa-card"><div class="card-hd">'
-    + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">Decision Leverage</span>'
-    + '<span class="dlv-cap">which requirements actually separate this field</span></div>'
-    + '<div class="dlv-wrap"><table class="dlv-tbl"><thead><tr>'
-    + '<th>Requirement</th><th class="dlv-n">Weight</th><th class="dlv-n">Spread</th>'
-    + '<th class="dlv-n">Evidence</th><th>Leverage</th></tr></thead><tbody>' + body + '</tbody></table></div>'
-    + '<div class="dlv-read">' + read + '</div>'
-    + '<div class="dlv-note">Leverage = weight &times; <b>must-have</b> &times; differentiation (the vendor-score '
-    + 'spread) &times; evidence coverage, indexed to the highest scorer. A Must-Have requirement is weighted '
-    + '1.6&times;: it cannot be traded away, so a spread on one decides the award in a way the same spread on a '
-    + 'nice-to-have does not.</div></div>';
-}
-
-/* ================= DECISION COULD TURN ON (Marc 2026-07-27, L10) ============================
- * Head-to-Head addition: the few dimensions where the two compared vendors genuinely diverge,
- * so a reader sees what the choice actually rests on. Derived from the same per-requirement
- * scores the H2H table renders; nothing new is asserted. ADDITIVE, the H2H tab is otherwise
- * left exactly as it is.
- * ======================================================================================== */
-function pvDecisionTurnsOnHtml(A, B, per) {
-  if (!A || !B || !per || !per.length) return '';
-  var input = PVSL_INPUT || {};
-  var reqs = input.requirements || [];
-  var wOf = {}; var wsum = 0;
-  reqs.forEach(function (r) { wOf[r.label] = r.weight || 0; wsum += (r.weight || 0); });
-  var narrOf = function (vendId, label) {
-    var cand = (typeof pvCandById === 'function') ? pvCandById(vendId) : null;
-    var dd = (cand && cand.deepDive) || {};
-    var n = dd.reqNarr || {};
-    // reqNarr is keyed by requirement id; map the label back to an id
-    var hit = null;
-    reqs.forEach(function (r) { if (r.label === label && n[r.id]) hit = n[r.id]; });
-    return hit;
-  };
-  var mat = per.filter(function (d) { return Math.abs(d.delta) >= 0.4; })
-               .sort(function (x, y) { return Math.abs(y.delta) - Math.abs(x.delta); });
-
-  if (!mat.length) {
-    return '<div class="sa-card"><div class="card-hd">'
-      + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg>'
-      + '<span class="ct">The Decision Could Turn On</span><span class="dto-cap">where these two actually diverge</span></div>'
-      + '<div class="dto-none">No requirement separates <b>' + escD(A.name) + '</b> and <b>' + escD(B.name)
-      + '</b> by more than 0.4 of a point on the weighted model. On this evidence the choice does not turn on '
-      + 'capability at all: it turns on commercial terms and risk posture, neither of which a public-source scan '
-      + 'can settle. Take both to the RFx and let price and contract terms decide.</div></div>';
-  }
-
-  // how much of the composite gap these dimensions actually explain
-  var explained = 0;
-  mat.forEach(function (d) { explained += Math.abs(d.delta) * ((wOf[d.label] || 0) / (wsum || 1)); });
-  var totalGap = 0;
-  per.forEach(function (d) { totalGap += Math.abs(d.delta) * ((wOf[d.label] || 0) / (wsum || 1)); });
-  var share = totalGap ? Math.round(explained / totalGap * 100) : 0;
-
-  var rows = mat.slice(0, 5).map(function (d) {
-    var lead = d.delta > 0 ? A : B, lag = d.delta > 0 ? B : A;
-    var w = wOf[d.label] || 0;
-    var wPct = wsum ? Math.round(w / wsum * 100) : 0;
-    var leadScore = d.delta > 0 ? d.scoreA : d.scoreB;
-    var lagScore = d.delta > 0 ? d.scoreB : d.scoreA;
-    var lr = narrOf(lead.id, d.label), gr = narrOf(lag.id, d.label);
-    var decides = wPct >= 15 && Math.abs(d.delta) >= 0.8;
-    return '<div class="dto-row' + (decides ? ' dto-decides' : '') + '">'
-      + '<div class="dto-hd">'
-        + '<span class="dto-req">' + escD(d.label) + '</span>'
-        + '<span class="dto-w">' + wPct + '% of the model</span>'
-        + (decides ? '<span class="dto-flag">Can decide it</span>' : '')
-      + '</div>'
-      + '<div class="dto-scores">'
-        + '<span class="dto-sc dto-win"><b>' + escD(lead.name) + '</b> ' + leadScore + '/5</span>'
-        + '<span class="dto-gapv">+' + Math.abs(d.delta).toFixed(2) + '</span>'
-        + '<span class="dto-sc"><b>' + escD(lag.name) + '</b> ' + lagScore + '/5</span>'
-      + '</div>'
-      + (lr ? '<div class="dto-read"><span class="dto-rk">' + escD(lead.name) + '</span>' + escD(lr) + '</div>' : '')
-      + (gr ? '<div class="dto-read"><span class="dto-rk">' + escD(lag.name) + '</span>' + escD(gr) + '</div>' : '')
-      + '</div>';
-  }).join('');
-
-  var decisive = mat.filter(function (d) {
-    var wPct = wsum ? Math.round((wOf[d.label] || 0) / wsum * 100) : 0;
-    return wPct >= 15 && Math.abs(d.delta) >= 0.8;
-  });
-  var verdict = decisive.length
-    ? 'On this evidence the choice turns on <b>' + decisive.map(function (d) { return escD(d.label); }).join('</b> and <b>')
-      + '</b>: a gap that size on a dimension carrying that much weight is not recoverable through the others.'
-    : 'None of these gaps is individually decisive: each is either small or sits on a lightly-weighted dimension. '
-      + 'Treat them as clarification topics for the RFx, not as grounds to pick now.';
-
-  return '<div class="sa-card"><div class="card-hd">'
-    + '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg>'
-    + '<span class="ct">The Decision Could Turn On</span>'
-    + '<span class="dto-cap">' + escD(A.name) + ' vs ' + escD(B.name) + '</span></div>'
-    + rows
-    + '<div class="dto-verdict">' + verdict + '</div>'
-    + '<div class="dto-note">Only gaps of 0.4 points or more are listed; anything smaller is inside the noise of a '
-    + 'public-source scan. These dimensions account for <b>' + share + '%</b> of the weighted score gap between the '
-    + 'two. Scores are read from public documentation, not demonstrated to Lilly.</div></div>';
-}
-
-
-/* ---- Field funnel, TOP of Overview (Marc 2026-07-27) -------------------------------------
-   Scanned -> Assessed -> Credible field -> Advance to RFx. Marc wants this first: it is the
-   shape of the field, and everything below it is a read on that shape. Same numbers the brief
-   used to carry lower down; the brief keeps only the evidence/provenance line. */
-function pvFieldFunnelHtml(refl, elimN, slateN) {
-  var L = refl.landscape;
-  var eligible = (L.assessments || []).filter(function (a) { return a.eligible; }).length;
-  var steps = [
-    [(L.supplierCount || 0) + elimN, 'Scanned', 'vendors identified in the category scan'],
-    [(L.supplierCount || 0), 'Assessed', 'carried into the scored assessment'],
-    [eligible, 'Credible field', 'cleared the eligibility screens'],
-    [slateN, 'Advance to RFx', 'the recommended slate']
-  ];
-  return '<div class="pvfunnel">' + steps.map(function (f, i) {
-    return '<div class="pvfn-step' + (i === steps.length - 1 ? ' pvfn-last' : '') + '">'
-      + '<div class="pvfn-v">' + f[0] + '</div>'
-      + '<div class="pvfn-l">' + escD(f[1]) + '</div>'
-      + '<div class="pvfn-s">' + escD(f[2]) + '</div></div>';
-  }).join('') + '</div>';
-}
 /* ---- competitive dynamics + head-to-head ---- */
 function pvH2HTradeoff(A,B,per,leadId,fitDelta,riskDelta){
  var parts=[];
@@ -911,7 +636,7 @@ function pvDynamicsHtml(refl){
    var h2cA=(typeof pvH2HCounts==='function')?pvH2HCounts(xA):{mustGap:0},h2cB=(typeof pvH2HCounts==='function')?pvH2HCounts(xB):{mustGap:0};
    var rankLbl=function(a){return (a.eligible&&a.rank!=null)?('#'+a.rank):', ';};
    var optsFor=function(sel){return order.map(function(x,i){return '<option value="'+i+'"'+(i===sel?' selected':'')+'>'+escD(rankLbl(x)+' '+x.name)+'</option>';}).join('');};
-   var selStyle='font:600 13px var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:7px 10px;min-width:200px';
+   var selStyle='font:600 12.5px var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:7px 10px;min-width:200px';
    var accentOf=function(i){return PVVENDOR_COLORS[i%PVVENDOR_COLORS.length];};
    var accentA=accentOf(PVSL_H2H_A),accentB=accentOf(PVSL_H2H_B);
    var fn=function(nm){return String(nm||'').split(' ')[0];};
@@ -976,7 +701,7 @@ function pvDynamicsHtml(refl){
      return '<div style="display:grid;grid-template-columns:104px 1fr 168px 1fr 104px;align-items:center;border-bottom:1px solid var(--line);background:linear-gradient(90deg,'+accentA+'10,transparent 32%,transparent 68%,'+accentB+'10)">'
        +'<div style="text-align:right;padding:7px 10px;font:700 11px var(--mono);line-height:1.25;color:'+o.lc+'">'+o.lLab+'</div>'
        +'<div style="height:13px;display:flex;align-items:center;justify-content:flex-end;padding-right:2px">'+bar(o.lw,o.lbar,o.lon)+'</div>'
-       +'<div style="text-align:center;padding:6px 8px;border-left:1px solid var(--line);border-right:1px solid var(--line)"><div style="font-size:11px;font-weight:600;color:var(--ink);line-height:1.2">'+o.mid+'</div>'+(o.sub?'<div style="font:800 9px var(--mono);margin-top:2px;letter-spacing:.02em;color:'+(o.subc||'var(--mut2)')+'">'+o.sub+'</div>':'')+'</div>'
+       +'<div style="text-align:center;padding:6px 8px;border-left:1px solid var(--line);border-right:1px solid var(--line)"><div style="font-size:11.5px;font-weight:600;color:var(--ink);line-height:1.2">'+o.mid+'</div>'+(o.sub?'<div style="font:800 9.5px var(--mono);margin-top:2px;letter-spacing:.02em;color:'+(o.subc||'var(--mut2)')+'">'+o.sub+'</div>':'')+'</div>'
        +'<div style="height:13px;display:flex;align-items:center;justify-content:flex-start;padding-left:2px">'+bar(o.rw,o.rbar,o.ron)+'</div>'
        +'<div style="text-align:left;padding:7px 10px;font:700 11px var(--mono);line-height:1.25;color:'+o.rc+'">'+o.rLab+'</div>'
        +'</div>';
@@ -999,7 +724,7 @@ function pvDynamicsHtml(refl){
    // Evidence confidence, same center-spine so the eye follows the pattern: each evidence category on the
    // middle axis, each vendor's share extends outward, coloured by category (Verified teal / Partial burnt-
    // orange / Supplier input plum / Missing grey).
-   var evCats=[['Verified','verified','var(--teal-d,#2F6E6B)'],['Partial','partial','#C15E19'],['Supplier input','supplier','var(--plum,#5C2B50)'],['Missing','missing','var(--line2,#CECCC7)']];
+   var evCats=[['Verified','verified','var(--teal-d,#2F6E6B)'],['Partial','partial','#A2500F'],['Supplier input','supplier','var(--plum,#5C2B50)'],['Missing','missing','var(--line2,#CECCC7)']];
    var eca=xA.evidenceCoverage||{},ecb=xB.evidenceCoverage||{};
    var evRows=evCats.map(function(c){var va=Math.round(eca[c[1]]||0),vb=Math.round(ecb[c[1]]||0);return spineRow({lLab:va+'%',lc:c[2],lw:va,lbar:c[2],lon:va>0,mid:c[0],sub:'',rw:vb,rbar:c[2],ron:vb>0,rLab:vb+'%',rc:c[2]});}).join('');
    var evSect=sect('Evidence confidence',spineHd+'<div class="cdyn-dvg">'+evRows+'</div>');
@@ -1008,9 +733,7 @@ function pvDynamicsHtml(refl){
  return '<div class="sa-card">'+
    '<div class="card-hd"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="ct">Competitive Dynamics &amp; Head-to-Head</span></div>'+
    '<div class="scc-b">'+body+
-   '</div></div>'
-   // L10 (Marc 2026-07-27): ADDED below the existing H2H card; that card is unchanged.
-   +pvDecisionTurnsOnHtml(A,B,per);
+   '</div></div>';
 }
 
 /* ---- ③ Requirements heatmap (Pass B): categories (rows) x vendors (cols), collapsible to
@@ -1056,7 +779,7 @@ function pvHeatmapHtml(refl,opts){
        var vals=ordered.filter(function(a){return a.eligible;}).map(function(a){var cand=candOf[a.id];return (cand&&cand.subFit&&cand.subFit[r.id])?cand.subFit[r.id][sub.id]:null;}).filter(function(v){return v!=null;});
        var savg=vals.length?pvRound(vals.reduce(function(s,v){return s+v;},0)/vals.length,2):null;
        var savgcell='<td>'+(savg==null?'<span class="hcell sub" style="background:var(--bg);color:var(--mut2)">&ndash;</span>':'<span class="hcell sub" style="'+pvHmRamp(savg)+'">'+escD(savg)+'</span>')+'</td>';
-       var mustBadge=sub.must?' <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--riskred);background:var(--ti-red);border-radius:20px;padding:1px 6px;vertical-align:1px">Must</span>':'';
+       var mustBadge=sub.must?' <span style="font:700 7.5px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:var(--riskred);background:var(--ti-red);border-radius:20px;padding:1px 6px;vertical-align:1px">Must</span>':'';
        return '<tr class="subrow'+(hide?' hmhide':'')+'" data-search="'+escD(sstr)+'"><td class="cat">'+escD(sub.label)+mustBadge+'</td>'+subCells+savgcell+'</tr>';
      }).join('');
    }
@@ -1097,10 +820,10 @@ function pvHeatmapHtml(refl,opts){
  });});
  subMax.sort(function(a,b){return a.max-b.max;});
  var thin=subMax.slice(0,3),anyGap=thin.some(function(s){return s.max<GAP;});
- var frPill=function(txt,bg,fg){return '<span style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;background:'+bg+';color:'+fg+';margin:0 5px 6px 0;font-weight:600">'+txt+'</span>';};
+ var frPill=function(txt,bg,fg){return '<span style="display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:20px;background:'+bg+';color:'+fg+';margin:0 5px 6px 0;font-weight:600">'+txt+'</span>';};
  var frCol=function(t,body,note){return '<div style="flex:1;min-width:210px"><div style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);margin-bottom:8px">'+t+'</div><div>'+body+'</div><div style="font-size:11px;color:var(--mut2);margin-top:5px;line-height:1.45">'+note+'</div></div>';};
- var frDiff=diffCats.length?diffCats.map(function(c){return frPill(escD(c.label)+' &nbsp;&Delta;'+c.spread,'var(--ti-blue)','#5C2B50');}).join(''):'<span style="font-size:13px;color:var(--mut2)">The field is tightly bunched across every category.</span>';
- var frPar=parityCats.length?parityCats.map(function(c){return frPill(escD(c.label),'var(--nested)','var(--mut)');}).join(''):'<span style="font-size:13px;color:var(--mut2)">No category is fully at parity.</span>';
+ var frDiff=diffCats.length?diffCats.map(function(c){return frPill(escD(c.label)+' &nbsp;&Delta;'+c.spread,'var(--ti-blue)','#5C2B50');}).join(''):'<span style="font-size:12px;color:var(--mut2)">The field is tightly bunched across every category.</span>';
+ var frPar=parityCats.length?parityCats.map(function(c){return frPill(escD(c.label),'var(--nested)','var(--mut)');}).join(''):'<span style="font-size:12px;color:var(--mut2)">No category is fully at parity.</span>';
  var frThin=thin.map(function(s){var g=s.max<GAP;return frPill(escD(s.cat)+' &middot; '+escD(s.label)+' &nbsp;max '+s.max,g?'var(--ti-amber)':'var(--nested)',g?'var(--amber-d)':'var(--mut)');}).join('');
  // G10 must-have watch, any eligible vendor trailing (below adequacy) on a tagged Must-Have requirement is a knockout risk.
  // STAGE Risk+Issues: replaces the old repetitive per-line warning list with a compact KNOCKOUT MATRIX,
@@ -1149,9 +872,7 @@ function pvHeatmapHtml(refl,opts){
  return '<div class="sa-card">'+
    '<div class="card-hd"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="ct">Requirements Heatmap</span>'+titleInfo+'</div>'+
    '<div class="scc-b">'+leadNarr+table+legend+'<div class="recwrap">'+'<div>'+rationale+'</div><div>'+fieldRead+'</div>'+'</div>'+
-   '</div></div>'
-   // L9/L14 (Marc 2026-07-27): Decision Leverage panel ADDED under the heatmap; heatmap untouched.
-   +(inDeep?'':pvDecisionLeverageHtml(refl));
+   '</div></div>';
 }
 /* click-a-vendor rationale for the heatmap, reuses the SAME deepDive.reqNarr as the Deep Dive
    Requirements Analysis (authored once, not duplicated); drills to sub-req scores when expanded. */
@@ -1346,7 +1067,7 @@ function pvRecommendationHtml(refl){
  var L=refl.landscape,rec=L.recommendation,lead=rec.lead;
  var leadCard=lead?('<div class="leadcard"><div class="lh"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg><span class="lt">'+escD(lead.name)+'</span><span class="lbadge">Lead · advisory</span></div>'+
    '<div class="lb"><div class="basis" style="margin-bottom:10px"><span class="bchip"><b>'+escD(PVSEG_LBL[lead.segment])+'</b></span>'+(lead.incumbent?'<span class="flag inc">incumbent</span>':'')+'<span class="bchip">rank <b>#'+escD(lead.rank)+'</b></span></div>'+
-     '<div class="statgrid"><div class="statbox"><div class="sb-l">Fit</div><div class="sb-v">'+escD(lead.fitScore)+'<small style="font-size:13px;color:var(--mut2)">/100</small></div></div><div class="statbox"><div class="sb-l">Risk</div><div class="sb-v">'+escD(lead.riskScore)+'<small style="font-size:13px;color:var(--mut2)">/5</small></div></div><div class="statbox"><div class="sb-l">Composite</div><div class="sb-v" style="color:var(--blue)">'+escD(lead.compositeScore)+'</div></div></div>'+
+     '<div class="statgrid"><div class="statbox"><div class="sb-l">Fit</div><div class="sb-v">'+escD(lead.fitScore)+'<small style="font-size:12px;color:var(--mut2)">/100</small></div></div><div class="statbox"><div class="sb-l">Risk</div><div class="sb-v">'+escD(lead.riskScore)+'<small style="font-size:12px;color:var(--mut2)">/5</small></div></div><div class="statbox"><div class="sb-l">Composite</div><div class="sb-v" style="color:var(--blue)">'+escD(lead.compositeScore)+'</div></div></div>'+
      '<div class="subt">Runners-up</div>'+(rec.runnersUp.length?rec.runnersUp.map(function(r){return '<div class="runner"><span class="rankpill head">'+escD(r.rank)+'</span><span class="rn">'+escD(r.name)+'</span><span class="rv">'+escD(PVSEG_LBL[r.segment])+' · composite '+escD(r.compositeScore)+' · fit '+escD(r.fitScore)+'/100 · risk '+escD(r.riskScore)+'/5</span></div>';}).join(''):'<div class="footbound">No additional eligible suppliers beyond the lead.</div>')+
    '</div></div>'):('<div class="leadcard"><div class="lh"><span class="lt">No eligible lead</span><span class="lbadge">advisory</span></div><div class="lb"><p style="font-size:13px;color:var(--mut);margin:0">Every candidate carries a hard disqualifier. Re-scope the requirements or widen the candidate set before sourcing.</p></div></div>');
  var elimsHtml=rec.eliminations.length?('<div class="subt">Eliminations</div><div class="elim">'+rec.eliminations.map(function(e){return '<div class="elimrow"><span class="ex">&#10005;</span><div><b>'+escD(e.name)+'</b> disqualified'+(e.reasons.length?': '+e.reasons.map(function(r){return escD(r.detail)+' ('+escD(r.code)+')';}).join('; '):'.')+'</div></div>';}).join('')+'</div>'):'<div class="footbound">No vendor was disqualified by a hard flag.</div>';
@@ -1369,7 +1090,7 @@ function pvDataBasisHtml(refl){
  if(db.incumbentCount===0)needs.push('No incumbent is flagged; a competitive RFP with no incumbent is expected here.');
  var needsHtml=needs.length?needs.map(function(n){return '<div class="needs" style="margin-top:8px"><b>NEEDS INPUT</b><span>'+escD(n)+'</span></div>';}).join(''):'<div class="footbound">All supplied scores are fully covered.</div>';
  return '<div class="sa-card">'+
-   '<div class="card-hd"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/></svg><span class="ct">Data Basis</span><span class="cs">'+escD(db.supplierCount)+' suppliers · '+escD(db.requirementCount)+' requirements · '+escD(db.riskDimensionCount)+' risk dimensions</span></div>'+
+   '<div class="card-hd"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/></svg><span class="ct">Data basis</span><span class="cs">'+escD(db.supplierCount)+' suppliers · '+escD(db.requirementCount)+' requirements · '+escD(db.riskDimensionCount)+' risk dimensions</span></div>'+
    '<div class="scc-b"><div class="basis"><span class="bchip">Eligible <b>'+escD(db.eligibleCount)+'</b></span><span class="bchip">Disqualified <b>'+escD(db.disqualifiedCount)+'</b></span><span class="bchip">Incumbents <b>'+escD(db.incumbentCount)+'</b></span><span class="bchip">Flagged suppliers <b>'+escD(db.flaggedSupplierCount)+'</b></span><span class="bchip">Fit coverage <b>'+escD(pvPct100(db.fitCoverageShare))+'</b></span><span class="bchip">Risk coverage <b>'+escD(pvPct100(db.riskCoverageShare))+'</b></span></div>'+needsHtml+
      '<div class="footbound">The data basis tells you what is grounded. The scores are the inputs you supplied; a missing score is reported as a coverage gap, never invented, and the ranking is only as firm as the inputs.</div>'+
    '</div></div>';
@@ -1391,24 +1112,24 @@ function pvDeepDiveHtml(id,refl,input){
  var attrDefs=[['HQ','hq'],['Founded','founded'],['Financial status','financial'],['Gartner','gartner'],['Pricing','pricing'],['Contract flex','contractFlex'],['Integration','integration'],['ESG','esg']];
  var attrs=attrDefs.map(function(d){var val=(dd.attrs&&dd.attrs[d[1]])?dd.attrs[d[1]]:'Data not available';var st=(dd.attrsSrc&&dd.attrsSrc[d[1]])?pvSrcTag(dd.attrsSrc[d[1]]):'';return '<div class="pvattr"><div class="al">'+escD(d[0])+(st?' '+st:'')+'</div><div class="av">'+escD(val)+'</div></div>';}).join('');
  // #87 (Marc): strengths & risks as parallel clean lists (no bubbles); risks keep their real narrative.
- var srrow='display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5;align-items:baseline';
+ var srrow='display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.5;align-items:baseline';
  var strengths=(dd.strengths||[]).map(function(s){return '<div style="'+srrow+'"><span style="color:var(--navy);font-weight:800;flex:none">&#10003;</span><span>'+escD(s)+'</span></div>';}).join('');
- var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#C15E19':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:16px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
+ var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#C15E19':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:15px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
  // #88 (Marc): risk dimensions as a clean TABLE (not chips)
  var dims=input.riskDimensions||[];var rawRisk=cand.risk||{};
  var dimRows=dims.map(function(dm){var sc=rawRisk[dm.id];var col=sc==null?'var(--mut2)':sc>=3?'#C15E19':sc>=2?'var(--amber-d)':'#5C2B50';var w=sc==null?0:Math.min(100,sc/5*100);return '<tr><td style="text-align:left;font-weight:600">'+escD(dm.label)+'</td><td style="text-align:right;font-weight:700;color:'+col+';white-space:nowrap">'+(sc==null?', ':escD(sc)+' / 5')+'</td><td style="width:130px"><div style="height:7px;border-radius:4px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:'+w+'%;background:'+col+'"></i></div></td></tr>';}).join('');
- var reqRows=a.coverage.map(function(c){var nar=(dd.reqNarr&&dd.reqNarr[c.requirementId])?dd.reqNarr[c.requirementId]:'';var w=Math.round(c.score/5*100);return '<tr><td class="v">'+escD(c.label)+'</td><td class="c"><span class="cell" style="'+pvFitBg(c.score)+'">'+escD(c.score)+'</span></td><td style="min-width:90px"><div class="pvbar"><i style="width:'+w+'%"></i></div></td><td style="font-size:13px;color:var(--mut);line-height:1.45">'+escD(nar)+'</td></tr>';}).join('');
+ var reqRows=a.coverage.map(function(c){var nar=(dd.reqNarr&&dd.reqNarr[c.requirementId])?dd.reqNarr[c.requirementId]:'';var w=Math.round(c.score/5*100);return '<tr><td class="v">'+escD(c.label)+'</td><td class="c"><span class="cell" style="'+pvFitBg(c.score)+'">'+escD(c.score)+'</span></td><td style="min-width:90px"><div class="pvbar"><i style="width:'+w+'%"></i></div></td><td style="font-size:12px;color:var(--mut);line-height:1.45">'+escD(nar)+'</td></tr>';}).join('');
  var com=dd.commercial||{};
- var comBlk=[['Contracting','contracting'],['Regulatory / GxP','regulatory'],['Implementation','implementation'],['Integration','integration']].map(function(d){return '<div style="margin-bottom:9px"><div class="subt" style="margin-bottom:3px">'+escD(d[0])+'</div><div style="font-size:13px;color:var(--ink);line-height:1.55">'+escD(com[d[1]]||'Data not available')+'</div></div>';}).join('');
+ var comBlk=[['Contracting','contracting'],['Regulatory / GxP','regulatory'],['Implementation','implementation'],['Integration','integration']].map(function(d){return '<div style="margin-bottom:9px"><div class="subt" style="margin-bottom:3px">'+escD(d[0])+'</div><div style="font-size:12.5px;color:var(--ink);line-height:1.55">'+escD(com[d[1]]||'Data not available')+'</div></div>';}).join('');
  var gating=(dd.gating&&dd.gating.length)?dd.gating.map(function(g){return '<div class="pvgate"><span class="gi">!</span><div><div><b>'+escD(g.item)+'</b></div><div style="margin-top:3px"><span class="flag soft" style="margin:0">'+escD(String(g.status||'').replace(/_/g,' '))+'</span> <span class="gsme">Risk flag, would require a formal screen before award if pursued</span></div></div></div>';}).join(''):'<div class="footbound">No hard gating item; standard pre-award confirmations apply.</div>';
  var conds=(dd.conditions&&dd.conditions.length)?('<div class="pvcond">'+dd.conditions.map(function(c,i){return '<div class="cr"><span class="cd">'+(i+1)+'</span><span>'+escD(c)+'</span></div>';}).join('')+'</div>'):'<div class="footbound">No conditions recorded.</div>';
  var h='';
  h+='<button class="pvback" onclick="pvCloseDeepDive()">&#8592; Back to landscape</button>';
- h+='<div class="pvvstrip '+vm.cls+'"><div><div style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)">Advisory verdict</div><div class="vv">'+escD(vm.lbl)+'</div></div><div class="vr">'+escD(rat)+'</div></div>';
+ h+='<div class="pvvstrip '+vm.cls+'"><div><div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)">Advisory verdict</div><div class="vv">'+escD(vm.lbl)+'</div></div><div class="vr">'+escD(rat)+'</div></div>';
  h+='<div class="sa-card">'+pvDdCardHd('<path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v6l8 4 8-4V7"/>','<span class="ct">'+escD(a.name)+' · profile &amp; fit</span>')+
    '<div class="scc-b"><div class="statgrid" style="grid-template-columns:repeat(5,1fr)">'+
-     '<div class="statbox"><div class="sb-l">Lilly fit</div><div class="sb-v">'+escD(a.fitScore)+'<small style="font-size:13px;color:var(--mut2)">/100</small></div></div>'+
-     '<div class="statbox"><div class="sb-l">Risk</div><div class="sb-v" style="color:'+(elevated?'var(--red)':'var(--blue)')+'">'+escD(a.riskScore)+'<small style="font-size:13px;color:var(--mut2)">/5</small></div></div>'+
+     '<div class="statbox"><div class="sb-l">Lilly fit</div><div class="sb-v">'+escD(a.fitScore)+'<small style="font-size:12px;color:var(--mut2)">/100</small></div></div>'+
+     '<div class="statbox"><div class="sb-l">Risk</div><div class="sb-v" style="color:'+(elevated?'var(--red)':'var(--blue)')+'">'+escD(a.riskScore)+'<small style="font-size:12px;color:var(--mut2)">/5</small></div></div>'+
      '<div class="statbox"><div class="sb-l">Composite</div><div class="sb-v" style="color:var(--blue)">'+escD(a.compositeScore)+'</div></div>'+
      '<div class="statbox"><div class="sb-l">Segment</div><div class="sb-v" style="font-size:13px">'+escD(PVSEG_LBL[a.segment])+'</div></div>'+
      '<div class="statbox"><div class="sb-l">Rank</div><div class="sb-v">'+(a.rank!=null?('#'+escD(a.rank)):', ')+'</div></div>'+
@@ -1416,7 +1137,7 @@ function pvDeepDiveHtml(id,refl,input){
    '<div class="pvlede" style="margin-top:12px">'+escD(dd.overview)+'</div>'+
    '<div class="pvlede"><b style="color:var(--blue)">Why this vendor for Lilly.</b> '+escD(dd.whyLilly)+'</div>'+
    '<div class="subt">Key Attributes</div><div class="pvattrs">'+attrs+'</div></div></div>';
- h+='<div class="sa-card">'+pvDdCardHd('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>','<span class="ct">Solution &amp; Financial Health</span>')+
+ h+='<div class="sa-card">'+pvDdCardHd('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>','<span class="ct">Solution &amp; financial health</span>')+
    '<div class="scc-b"><div class="subt">Solution &amp; architecture</div><div class="pvlede">'+escD(dd.solution)+'</div><div class="subt">Financial health</div><div class="pvlede mut" style="margin:0">'+escD(dd.finHealth)+'</div></div></div>';
  h+='<div class="sa-card">'+pvDdCardHd('<path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/>','<span class="ct">Strengths &amp; Risks</span>')+
    '<div class="scc-b"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">'+
@@ -1428,11 +1149,11 @@ function pvDeepDiveHtml(id,refl,input){
    '<div class="footbound">Narrative risks are advisory; a hard flag disqualifies, a soft flag is recorded for review. Dimension scores roll up from the sub-factors on the Risk Assessment subtab.</div></div></div>';
  h+='<div class="sa-card">'+pvDdCardHd('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>','<span class="ct">Requirements Analysis</span>')+
    '<div class="scc-b" style="overflow-x:auto"><table class="mtable"><thead><tr><th>Requirement</th><th class="c">Fit /5</th><th>Coverage</th><th>Narrative</th></tr></thead><tbody>'+reqRows+'</tbody></table></div></div>';
- h+='<div class="sa-card">'+pvDdCardHd('<path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h4"/>','<span class="ct">Commercial &amp; Operational</span>')+
+ h+='<div class="sa-card">'+pvDdCardHd('<path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h4"/>','<span class="ct">Commercial &amp; operational</span>')+
    '<div class="scc-b">'+comBlk+'<div class="subt" style="margin-top:6px">Clients &amp; ecosystem</div><div class="pvlede mut" style="margin:0">'+escD(dd.clients)+'</div></div></div>';
- h+='<div class="sa-card">'+pvDdCardHd('<path d="M9 11l3 3L20 6"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/>','<span class="ct">Verdict, Gating &amp; Conditions</span>')+
+ h+='<div class="sa-card">'+pvDdCardHd('<path d="M9 11l3 3L20 6"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/>','<span class="ct">Verdict, gating &amp; conditions</span>')+
    '<div class="scc-b"><div class="subt">Risk flags &middot; screens if pursued</div>'+gating+'<div class="subt" style="margin-top:12px">Conditions before commitment</div>'+conds+'</div></div>';
- h+='<div class="sa-card">'+pvDdCardHd('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','<span class="ct">Relationship History</span>')+
+ h+='<div class="sa-card">'+pvDdCardHd('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','<span class="ct">Relationship history</span>')+
    '<div class="scc-b"><div class="pvlede mut" style="margin:0">'+escD(dd.relationship)+'</div></div></div>';
  return h;
 }
@@ -1526,7 +1247,7 @@ function pvExecSummaryHtml(refl,input){
  // gap instead, grounded off the requirements model rather than the RFX.suppliers mock). Left defined,
  // harmless and unused, in case the RFX-scoped gate band is restored.
  var koRec=isCompRFx()?RFX.suppliers.filter(function(s){return s.mustFail&&s.mustFail.length;}):[];
- var recNext=(lead&&koRec.length)?'<p class="rna" style="border-left:3px solid #C15E19;background:var(--pink-t,#F1EFEC)"><span class="nal" style="color:var(--riskred)">Gate to clear</span>'+koRec.map(function(s){return '<b>'+escD(s.n)+' does not meet '+escD(s.mustFail.join(', '))+' (a Must-Have).</b>';}).join(' ')+' If the team advances that supplier, this hard gate must be cleared before award: a Cyber review of whether Lilly can proceed, and confirmation from the supplier of whether they hold the certification (and if not, if/when they will). The gate-passing suppliers clear it today.</p>':'';
+ var recNext=(lead&&koRec.length)?'<p class="rna" style="border-left:3px solid #C15E19;background:var(--pink-t,#ECCFBA)"><span class="nal" style="color:var(--riskred)">Gate to clear</span>'+koRec.map(function(s){return '<b>'+escD(s.n)+' does not meet '+escD(s.mustFail.join(', '))+' (a Must-Have).</b>';}).join(' ')+' If the team advances that supplier, this hard gate must be cleared before award: a Cyber review of whether Lilly can proceed, and confirmation from the supplier of whether they hold the certification (and if not, if/when they will). The gate-passing suppliers clear it today.</p>':'';
  // #4 (Marc): the per-card advisory note is dropped, the page-level REFLECT-ONLY badge + the prose's closing
  // clause carry it now (no 7x repetition).
  var recAdvNote='';
@@ -1589,17 +1310,13 @@ function pvExecSummaryHtml(refl,input){
    if(leadMustGap)nextTxt+=' Before award, screen '+lead.name+' on '+leadMustGap.label+' ('+leadMustGap.score+'/5).';
    else if(leadLowest)nextTxt+=' Validate '+leadLowest.label+' ('+leadLowest.score+'/5) in the RFx.';
  }
- // Marc 2026-07-27: the next step is the single most actionable line on the tab, so it gets the
- // emphasis treatment: a solid burnt-orange rule and a burnt-orange label. Burnt orange is the
- // action colour, used solid; the ground stays neutral.
- var nextStepHtml='<div class="pvnext"><div class="pvnext-k">Next step</div>'
-   +'<p class="pvnext-t">'+escD(nextTxt)+'</p></div>';
+ var nextStepHtml='<div class="subt" style="margin-top:14px">Next step</div><p class="pvlede" style="margin:0">'+escD(nextTxt)+'</p>';
  var evalHtml='<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="ct">Evaluation Summary</span></div><div class="scc-b"><div class="pvlede" style="margin:0">'+escD(prose)+'</div>'+recNarrHtml+nextStepHtml+evalFindings+'</div></div>';
  // #80 (Marc): make this a real EXECUTIVE SUMMARY of the search, add a scope/coverage strip, a key
  // differentiators & trade-offs read, and an across-the-field read (market structure + gating watch-items +
  // next step). Everything is grounded in the landscape data; the existing Eval|Rec + Segmentation stay.
  var db=L.dataBasis||{},ms=L.marketStructure||{},cd=L.competitiveDynamics||{};
- var mtile=function(v,l){return '<div style="flex:1;min-width:120px;background:var(--surface);border:1px solid var(--line2);border-top:3px solid var(--tib-blue);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow-2,0 2px 4px rgba(38,30,20,.06),0 4px 8px -2px rgba(38,30,20,.10))"><div style="font:800 20px var(--sans);color:var(--ink);letter-spacing:-.01em">'+v+'</div><div style="font-size:11px;color:var(--mut2);font-weight:600;margin-top:2px">'+l+'</div></div>';};
+ var mtile=function(v,l){return '<div style="flex:1;min-width:120px;background:var(--surface);border:1px solid var(--line2);border-top:3px solid var(--tib-blue);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow-2,0 2px 4px rgba(38,30,20,.06),0 4px 8px -2px rgba(38,30,20,.10))"><div style="font:800 21px var(--sans);color:var(--ink);letter-spacing:-.01em">'+v+'</div><div style="font-size:11px;color:var(--mut2);font-weight:600;margin-top:2px">'+l+'</div></div>';};
  // Overview (Marc, 2026-07-23): a clear supplier FUNNEL instead of the ambiguous "7 scanned / 7-of-7 eligible +
  // 2 eliminated (reads like 9)" mix. Reviewed = assessed field + pre-shortlist eliminations, then passed /
  // screened out / recommended for RFx. Grounded in supplierCount / eligibleCount / eliminations / shortlist.
@@ -1617,14 +1334,7 @@ function pvExecSummaryHtml(refl,input){
  // open Must-Have gap now lives in the Evaluation Summary's "Recommended next step" (grounded off the
  // requirements model). The compact top-candidate rationale sentence (recrat, "X ranks first on the weighted
  // 6-category model...") stays removed (owner ask, 2026-07: valueless filler prose).
- // DECISION STRIP REMOVED (Marc 2026-07-27, second pass): it duplicated the Market Decision
- // Brief's own funnel below AND the Recommendation table's counts. One set of counts only.
- // Marc 2026-07-27: the field funnel leads the tab.
- h+=pvFieldFunnelHtml(refl,elimRowsSrc?elimRowsSrc.length:0,(shortlist||[]).length);
  h+='<div class="execside">'+evalHtml+'<div class="recR">'+recHtml+recAdvNote+'</div></div>';
- // Brief sits BELOW the Evaluation Summary + Recommendation table (Marc: those two are the decision,
- // and he wants them first). What remains of the brief is only what those panels do NOT carry.
- h+=pvMarketDecisionBriefHtml(refl,input,shortlist,shortlistIds,elimRowsSrc);
  // #92 (owner ask, 2026-07): the methodology/provenance bchip strip ("Requirements basis N categories" /
  // "Field N scanned · N eligible" / "Research as of July 2026") is CUT, owner said it adds no value. The
  // mstrip 4-metric tiles above (Suppliers scanned / Eligible after screen / Requirements scored / Leader gap)
@@ -1632,12 +1342,6 @@ function pvExecSummaryHtml(refl,input){
  // "Eliminated before the shortlist" card removed (owner ask, 2026-07): merged into the Recommendation table
  // above as a divider + name/reason rows (elimReal/elimIllus/elimRowsSrc are computed earlier, alongside P,
  // before recHtml is assembled).
- // Segmentation & Differentiators panel CUT (Marc 2026-07-27, confirmed): a false-precision veneer over
- // inferred data, it placed suppliers on a quadrant to a resolution the underlying evidence does not
- // support. Same treatment as the market-structure cut above: the CALL is removed, pvSegPlaneHtml is
- // retained (now unused) so it can be restored without rebuilding it.
- // RESTORED 2026-07-27 as a CATEGORICAL QUADRANT (see pvSegQuadrantHtml). The plane, its coordinates
- // and its threshold sliders are gone; the differentiators accordion beside it is the original.
  h+=pvSegPlaneHtml(refl,input,shortlistIds);
  // Market structure panel CUT (owner decision, 2026-07): the HHI/composite-share concentration read
  // overclaimed leverage/replaceability and duplicated the Leader-gap; "how close is the race" now lives
@@ -1653,67 +1357,12 @@ function pvRankBarHtml(refl,input){
    var f5=pvRound(a.fitScore/20,1);var w=pvRound(f5/5*100,1);var col=colorOf[a.id]||'#5C2B50';
    return '<div class="rankrow"><div class="rl"><span class="rankpill head">'+escD(a.rank)+'</span><span class="rlnm">'+escD(a.name)+'</span></div><div class="rtrack" title="'+escD(a.name)+' · weighted fit '+escD(f5)+'/5"><div class="rfill" style="width:'+w+'%;background:'+col+'"></div></div><div class="rv">'+escD(f5)+'<small>/5</small></div></div>';
  }).join('');
- return '<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><path d="M3 21h18M6 21V9M12 21V4M18 21v-8"/></svg><span class="ct">All-vendor Ranking</span></div><div class="scc-b"><div class="rankbars">'+rows+'</div></div></div>';
+ return '<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><path d="M3 21h18M6 21V9M12 21V4M18 21v-8"/></svg><span class="ct">All-vendor ranking</span></div><div class="scc-b"><div class="rankbars">'+rows+'</div></div></div>';
 }
 // Merged panel (Marc): the fit×risk plane (LEFT) + a per-supplier differentiator table (RIGHT), 
 // where each ranked vendor leads the field, its own strongest area, and its top watch. The old
 // "Leader · N / Caution · N + advice" insight column is dropped (segment/rank read off the plane),
 // and this absorbs the standalone "Key Differentiators & Trade-offs" table.
-
-/* ---- Segmentation & Differentiators, CATEGORICAL QUADRANT (Marc 2026-07-27) --------------
-   Restored after removal, rebuilt to match the new Peer Position quadrant: same visual read,
-   no false precision. What was wrong with the plane it replaces:
-     * it plotted inferred fit / risk scores as precise x/y coordinates, and
-     * two threshold sliders let the reader move the cut, so a vendor's segment label
-       (leader / challenger / niche / caution) changed with the slider while still reading as
-       an authoritative classification.
-   This version places each vendor in ONE named quadrant using the ENGINE's own segment
-   classification (a.segment, from the project's segmentation config), with no sliders and no
-   coordinates. The differentiators accordion and the overall-assessment text beside it are the
-   original content, unchanged: only the plane is replaced.
-   Reuses the .pq-* classes from Peer Position so the two panels are visually the same object. */
-function pvSegQuadrantHtml(refl, input, shortlistIds) {
-  var L = refl.landscape;
-  shortlistIds = shortlistIds || {};
-  var elig = (L.assessments || []).filter(function (a) { return a.eligible; });
-  var dq = (L.assessments || []).filter(function (a) { return !a.eligible; });
-  var QUADS = [
-    { k: 'challenger', area: 'sw', t: 'Challengers', d: 'strong fit, elevated risk' },
-    { k: 'leader',     area: 'ss', t: 'Leaders',     d: 'strong fit, contained risk' },
-    { k: 'caution',    area: 'ww', t: 'Caution',     d: 'narrower fit, elevated risk' },
-    { k: 'niche',      area: 'ws', t: 'Niche',       d: 'narrower fit, contained risk' }
-  ];
-  var cells = QUADS.map(function (q) {
-    var mem = elig.filter(function (a) { return a.segment === q.k; });
-    var chips = mem.length
-      ? mem.map(function (a) {
-          var sl = shortlistIds[a.id] ? ' pq-sel' : '';
-          return '<span class="pq-v' + sl + '" title="' + escD(a.name) + ', fit ' + Math.round(a.fitScore)
-            + '/100, risk ' + a.riskScore + '/5">' + escD((a.name || '').split(/[,]/)[0])
-            + (a.incumbent ? ' &middot; incumbent' : '') + '</span>';
-        }).join('')
-      : '<span class="pq-empty">none</span>';
-    return '<div class="pq-cell pq-' + q.area + '">'
-      + '<div class="pq-t">' + escD(q.t) + '</div>'
-      + '<div class="pq-d">' + escD(q.d) + '</div>'
-      + '<div class="pq-vs">' + chips + '</div></div>';
-  }).join('');
-  var dqRow = dq.length
-    ? '<div class="pq-dq"><span class="pq-dqk">Screened out</span>'
-      + dq.map(function (a) { return '<span class="pq-v pq-inel">' + escD((a.name || '').split(/[,]/)[0]) + '</span>'; }).join('')
-      + '</div>'
-    : '';
-  return '<div class="pq-wrap">'
-    + '<div class="pq-axl pq-axl-y">Weighted fit &rarr;</div>'
-    + '<div class="pq-grid">' + cells + '</div>'
-    + '<div class="pq-axl pq-axl-x">Contained risk &rarr;</div>'
-    + dqRow
-    + '<div class="pq-note">Placed by SEGMENT, not by coordinate, using the same classifier the rest of the '
-    + 'dashboard reads. The previous version plotted these scores as exact positions and let the reader drag '
-    + 'the fit / risk cut, which changed a vendor&rsquo;s label while still looking definitive. Highlighted '
-    + 'vendors are inside the shortlist band.</div>'
-    + '</div>';
-}
 function pvSegPlaneHtml(refl,input,shortlistIds){
  var L=refl.landscape;
  shortlistIds=shortlistIds||{};
@@ -1756,7 +1405,7 @@ function pvSegPlaneHtml(refl,input,shortlistIds){
  var segsPresent=PVSEG_ORDER.filter(function(s){return effAssessments.some(function(a){return a.segment===s;});});
  var legendKeys=segsPresent.map(function(s){return '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:'+PVSEG_COLOR[s]+';flex:none"></span>'+escD(PVSEG_LBL[s])+'</span>';}).join('');
  var incKey=effAssessments.some(function(a){return a.incumbent;})?'<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:50%;border:1.5px dashed var(--blue);flex:none"></span>Existing Lilly vendor</span>':'';
- var legend='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--mut2)">'+legendKeys+incKey+'</div>';
+ var legend='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--mut2)">'+legendKeys+incKey+'</div>';
  // right, per-supplier differentiators (absorbs the old Key Differentiators & Trade-offs table)
  var hm=L.heatmap||{leaders:{}};var ereqs=input.requirements||[];var ledBy={},reqLabel={};
  ereqs.forEach(function(r){reqLabel[r.id]=r.label;var lid=hm.leaders[r.id];if(lid!=null)(ledBy[lid]=ledBy[lid]||[]).push(r.label);});
@@ -1794,8 +1443,8 @@ function pvSegPlaneHtml(refl,input,shortlistIds){
  var segCounts={};ranked.forEach(function(a){segCounts[a.segment]=(segCounts[a.segment]||0)+1;});
  var statChips=PVSEG_ORDER.filter(function(s){return segCounts[s];}).map(function(s){var pl=((s==='leader'||s==='challenger')&&segCounts[s]>1)?'s':'';return '<span class="segassess-stat">'+segCounts[s]+' '+escD(PVSEG_LBL[s])+pl+'</span>';}).join('')+((fitLo!=null&&fitHi!=null)?'<span class="segassess-stat">fit '+escD(fitLo)+'&ndash;'+escD(fitHi)+'</span>':'');
  var assess='<div class="segassess"><div class="segassess-h">Overall assessment <span class="segassess-tag">stays put</span>'+statChips+'</div><p class="segassess-p">'+escD(pvSegSynthesis(ranked,fitLo,fitHi))+'</p></div>';
- return '<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="ct">Segmentation &amp; Differentiators</span><span class="cs">'+escD(ranked.length)+' ranked · segment, not coordinate</span></div>'+
-   '<div class="scc-b"><div class="execgrid seg-md"><div class="segL">'+pvSegQuadrantHtml(refl,input,shortlistIds)+assess+'</div>'+accHtml+'</div></div></div>';
+ return '<div class="sa-card"><div class="card-hd"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="ct">Segmentation &amp; Differentiators</span><span class="cs">'+escD(ranked.length)+' ranked · fit cut '+escD(fitHigh)+'/100 · risk cut '+escD(riskHigh)+'/5</span></div>'+
+   '<div class="scc-b"><div class="execgrid seg-md"><div class="segL">'+sliderHtml+plane+legend+assess+'</div>'+accHtml+'</div></div></div>';
 }
 // #4 (Marc): grounded, dynamic segmentation synthesis for the "Overall assessment" panel (plain text; escaped
 // at the call site). Composition + fit spread + the recurring watch item, all read off the ranked assessments.
@@ -1888,7 +1537,7 @@ function pvDDVerdictStrip(a,cand,input){
  var riskHigh=(input.segmentation&&input.segmentation.riskHigh!=null)?input.segmentation.riskHigh:2.5;
  var elevated=a.riskScore>=riskHigh;var f5=pvRound(a.fitScore/20,1);
  var rat='Advisory read from this project candidate set: weighted fit '+f5+'/5, risk '+a.riskScore+'/5, '+String(PVSEG_LBL[a.segment]||'').toLowerCase()+'. Not an award; no vendor is selected or contacted.';
- return '<div class="pvvstrip '+vm.cls+'"><div><div style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)">Advisory verdict</div><div class="vv">'+escD(vm.lbl)+'</div></div>'+
+ return '<div class="pvvstrip '+vm.cls+'"><div><div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)">Advisory verdict</div><div class="vv">'+escD(vm.lbl)+'</div></div>'+
    '<div class="basis" style="flex:0 0 auto"><span class="bchip">fit <b>'+escD(f5)+'</b>/5</span><span class="bchip" style="color:'+(elevated?'var(--red-d)':'var(--blue-d)')+'">risk <b>'+escD(a.riskScore)+'</b>/5</span><span class="bchip">'+(a.rank!=null?('rank <b>#'+escD(a.rank)+'</b>'):'<b>disqualified</b>')+'</span><span class="bchip"><b>'+escD(PVSEG_LBL[a.segment])+'</b></span></div>'+
    '<div class="vr">'+escD(rat)+'</div></div>';
 }
@@ -1946,8 +1595,8 @@ function pvRevHistSvg(hist){
    var fill=isLast?'var(--ddacc,#5C2B50)':'var(--ddacc-t,rgba(92,43,80,.16))';
    var vlab=p.mval!=null?String(p.label).split(/[\s(]/)[0]:'';
    return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="3" fill="'+fill+'"'+(isLast?'':' stroke="var(--ddacc,#5C2B50)" stroke-width="1.1"')+'><title>'+escD(p.period+': '+p.label)+'</title></rect>'+
-     (vlab?'<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-5).toFixed(1)+'" text-anchor="middle" font-size="11" font-family="var(--mono)" font-weight="700" fill="var(--ink)">'+escD(vlab)+'</text>':'')+
-     '<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="11" font-family="var(--mono)" fill="var(--mut2)">'+escD(p.period)+'</text>';
+     (vlab?'<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-5).toFixed(1)+'" text-anchor="middle" font-size="8.5" font-family="var(--mono)" font-weight="700" fill="var(--ink)">'+escD(vlab)+'</text>':'')+
+     '<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" font-family="var(--mono)" fill="var(--mut2)">'+escD(p.period)+'</text>';
  }).join('');
  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:460px;height:112px;display:block" role="img" aria-label="Revenue by fiscal period, normalized bar chart">'+bars+'</svg>';
 }
@@ -2118,7 +1767,7 @@ function pvDDSection(ddt,a,cand,refl,input){
    var compKnown=comp.headcount||comp.customers||comp.valuation||comp.funding||comp.founded||comp.footprint||comp.leadership||comp.partners;
    var confMeta=null,confChip='',icBlk='';
    if(idKnown||compKnown||pAttrs.hq||pAttrs.founded||pAttrs.financial||pAttrs.esg){
-     confMeta=idn.confidence==='Confirmed'?{c:'#5C2B50',bg:'var(--ti-blue)'}:(idn.confidence?{c:'#C15E19',bg:'var(--ti-amber)'}:null);
+     confMeta=idn.confidence==='Confirmed'?{c:'#5C2B50',bg:'var(--ti-blue)'}:(idn.confidence?{c:'#A2500F',bg:'var(--ti-amber)'}:null);
      confChip=(idn.confidence&&confMeta)?' <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:20px;color:'+confMeta.c+';background:'+confMeta.bg+';vertical-align:1px">Identity: '+escD(idn.confidence)+'</span>':'';
      // Values read from the enriched fields with light cleaning to split conflated facts (HQ vs footprint,
      // ticker vs ownership prose); nothing invented, a missing field simply drops its row.
@@ -2127,8 +1776,8 @@ function pvDDSection(ddt,a,cand,refl,input){
      var beforeParen=function(v){v=clean(v);return v?v.split('(')[0].trim():'';};
      var stripLeadHQ=function(v){v=clean(v);return v?v.replace(/^Legal HQ[^;]*;\s*/i,'').trim():'';};
      var tickerDisp=(clean(idn.ownership).match(/([A-Z]{2,6}\s*:\s*[A-Z.]{1,6})/)||[])[1]||clean(idn.ticker);
-     var idRow=function(k,v){var val=clean(v);if(!val)return '';return '<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.55"><span style="color:var(--mut2);font-weight:600">'+k+'</span><span style="color:var(--ink)">'+escD(val)+'</span></div>';};
-     var idSub=function(t,first){return '<div style="font:700 11px var(--mono,monospace);letter-spacing:.07em;text-transform:uppercase;color:var(--ddacc,var(--navy));margin:'+(first?'2':'18')+'px 0 7px;padding-bottom:5px;border-bottom:2px solid var(--ddacc,var(--navy))">'+t+'</div>';};
+     var idRow=function(k,v){var val=clean(v);if(!val)return '';return '<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.55"><span style="color:var(--mut2);font-weight:600">'+k+'</span><span style="color:var(--ink)">'+escD(val)+'</span></div>';};
+     var idSub=function(t,first){return '<div style="font:700 10px var(--mono,monospace);letter-spacing:.07em;text-transform:uppercase;color:var(--ddacc,var(--navy));margin:'+(first?'2':'18')+'px 0 7px;padding-bottom:5px;border-bottom:2px solid var(--ddacc,var(--navy))">'+t+'</div>';};
      var corpRows=idRow('Legal entity',idn.legal)+idRow('Ownership / structure',idn.parent||idn.ownership)+idRow('Incorporation',beforeParen(idn.jurisdiction))+idRow('Corporate address',beforeSemi(pAttrs.hq)||beforeSemi(comp.footprint))+idRow('Footprint',stripLeadHQ(comp.footprint))+idRow('Founded',comp.founded||pAttrs.founded)+idRow('Leadership',comp.leadership)+idRow('Headcount',comp.headcount);
      var finRows=idRow('Listing / ticker',tickerDisp)+idRow('Revenue',beforeSemi(finTop.revenue)||finTop.latestRevenue)+idRow('Profitability',finTop.profitability||beforeSemi(finTop.margin))+idRow('Market cap',beforeSemi(finTop.valuationOrMarketCap)||beforeSemi(comp.valuation))+idRow('Funding raised',finTop.funding||comp.funding)+idRow('ESG',pAttrs.esg);
      var partnersLine=comp.partners?'<div class="cosnap-line" style="margin-top:12px"><span class="cosnap-k">Partners &amp; ecosystem</span> '+escD(comp.partners)+'</div>':'';
@@ -2141,9 +1790,9 @@ function pvDDSection(ddt,a,cand,refl,input){
    var roadNarr=(dd.reqSubNarr&&dd.reqSubNarr.functional)?dd.reqSubNarr.functional.fx_road:'';
    var gartnerV=pAttrs.gartner||'';
    var roadBlk=(roadScore!=null||roadNarr||gartnerV)?(
-     (gartnerV?'<div style="font-size:13px;margin-bottom:7px"><b style="color:var(--mut2)">Analyst position &middot;</b> '+escD(gartnerV)+'</div>':'')+
-     (roadScore!=null?'<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="font-size:11px;color:var(--mut2);font-weight:600;width:150px">Roadmap &amp; extensibility fit</span><div style="flex:1;max-width:170px;height:7px;border-radius:4px;background:var(--nested);overflow:hidden"><i style="display:block;height:100%;width:'+(roadScore/5*100)+'%;background:var(--ddacc,#5C2B50)"></i></div><span style="font-family:var(--mono);font-weight:700;font-size:13px;color:var(--ddacc,var(--navy))">'+escD(roadScore)+'/5</span></div>':'')+
-     (roadNarr?'<div style="font-size:13px;color:var(--mut);line-height:1.5">'+escD(roadNarr)+'</div>':'')
+     (gartnerV?'<div style="font-size:12.5px;margin-bottom:7px"><b style="color:var(--mut2)">Analyst position &middot;</b> '+escD(gartnerV)+'</div>':'')+
+     (roadScore!=null?'<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="font-size:11.5px;color:var(--mut2);font-weight:600;width:150px">Roadmap &amp; extensibility fit</span><div style="flex:1;max-width:170px;height:7px;border-radius:4px;background:var(--nested);overflow:hidden"><i style="display:block;height:100%;width:'+(roadScore/5*100)+'%;background:var(--ddacc,#5C2B50)"></i></div><span style="font-family:var(--mono);font-weight:700;font-size:12px;color:var(--ddacc,var(--navy))">'+escD(roadScore)+'/5</span></div>':'')+
+     (roadNarr?'<div style="font-size:12.5px;color:var(--mut);line-height:1.5">'+escD(roadNarr)+'</div>':'')
    ):'';
    // Offering profile (skill Section 2, descriptive), named offerings/modules + delivery model + a one-line
    // capability narrative (reuses the solution prose that now lives here rather than on Market & Financials).
@@ -2159,7 +1808,7 @@ function pvDDSection(ddt,a,cand,refl,input){
        return '<tr><td class="dt">'+escD(o.name||'')+'</td><td class="dd">'+escD(o.note||'')+tieTag+'</td></tr>';
      }).join('');
      offBlk=
-       (idn.delivery?'<div style="font-size:13px;margin-bottom:9px"><b style="color:var(--mut2)">Delivery model &middot;</b> '+escD(idn.delivery)+'</div>':'')+
+       (idn.delivery?'<div style="font-size:12.5px;margin-bottom:9px"><b style="color:var(--mut2)">Delivery model &middot;</b> '+escD(idn.delivery)+'</div>':'')+
        (offRows?'<div style="overflow-x:auto"><table class="pvdl"><tbody>'+offRows+'</tbody></table></div>':'')+
        (dd.solution?'<div class="pvlede" style="margin-top:11px"><b style="color:var(--ddacc,var(--blue))">Capability narrative.</b> '+escD(dd.solution)+'</div>':'');
    }
@@ -2168,7 +1817,7 @@ function pvDDSection(ddt,a,cand,refl,input){
    // #7 (Marc): merge "Reference clients & partners" + "Relationship history" into one 2-row definition list.
    var extIntBlk='';
    if(dd.clients||dd.relationship){
-     var dlR=function(k,v){return '<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div style="font-size:13px;font-weight:600;color:var(--mut2);margin-bottom:3px">'+k+'</div><div style="font-size:13px;color:var(--ink);line-height:1.5">'+v+'</div></div>';};
+     var dlR=function(k,v){return '<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div style="font-size:12px;font-weight:600;color:var(--mut2);margin-bottom:3px">'+k+'</div><div style="font-size:13px;color:var(--ink);line-height:1.5">'+v+'</div></div>';};
      extIntBlk=
        (dd.clients?dlR('Reference clients &amp; partners '+pvSrcTag('ext'),escD(dd.clients)):'')+
        (dd.relationship?dlR('Relationship history '+pvSrcTag('int'),escD(dd.relationship)):'');
@@ -2219,19 +1868,19 @@ function pvDDSection(ddt,a,cand,refl,input){
    var dda=dd.attrs||{},ddc=dd.commercial||{};
    var cmFit=(cand.reqFit&&cand.reqFit.commercial!=null)?cand.reqFit.commercial:null;
    var pricePos=cmFit==null?', ':cmFit>=4.5?'Value / price-led':cmFit>=3.5?'Competitive':'Premium';
-   var pricePosCol=cmFit==null?'var(--mut2)':cmFit>=4.5?'#5C2B50':cmFit>=3.5?'#2F6E6B':'#C15E19';
+   var pricePosCol=cmFit==null?'var(--mut2)':cmFit>=4.5?'#5C2B50':cmFit>=3.5?'#2F6E6B':'#A2500F';
    var lockin=(cand.risk&&cand.risk.lockin!=null)?cand.risk.lockin:null;
    var swLbl=lockin==null?', ':lockin>=3?'High':lockin>=2?'Medium':'Low';
    var swCol=lockin==null?'var(--mut2)':lockin>=3?'#C15E19':lockin>=2?'var(--amber-d)':'#5C2B50';
    // G5 financial-viability grade, safe / watch / distress from the financial-stability risk score.
    var finRisk=(cand.risk&&cand.risk.financial!=null)?cand.risk.financial:null;
-   var viab=finRisk==null?null:(finRisk<1.75?{l:'Safe',c:'#5C2B50',bg:'var(--ti-blue)'}:finRisk<3?{l:'Watch',c:'#C15E19',bg:'var(--ti-amber)'}:{l:'Distress risk',c:'#C15E19',bg:'var(--ti-red)'});
+   var viab=finRisk==null?null:(finRisk<1.75?{l:'Safe',c:'#5C2B50',bg:'var(--ti-blue)'}:finRisk<3?{l:'Watch',c:'#A2500F',bg:'var(--ti-amber)'}:{l:'Distress risk',c:'#C15E19',bg:'var(--ti-red)'});
    var viabBadge=viab?' <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:2px 9px;border-radius:20px;color:'+viab.c+';background:'+viab.bg+';vertical-align:1px">'+viab.l+'</span>':'';
    var ceRows=[
      ['Indicative pricing',escD(dda.pricing||'Data not available')],
      ['Price position','<b style="color:'+pricePosCol+'">'+pricePos+'</b>'+(cmFit!=null?' <span style="color:var(--mut2)">(commercial fit '+escD(cmFit)+'/5)</span>':'')],
      ['Implementation / ramp',escD(ddc.implementation||'Data not available')],
-     ['Switching / exit cost','<b style="color:'+swCol+'">'+swLbl+'</b>'+(lockin!=null?' <span style="color:var(--mut2)">(lock-in risk '+escD(lockin)+'/5)</span>':'')+(ddc.contracting?'<div style="font-size:11px;color:var(--mut);margin-top:3px;line-height:1.45">'+escD(ddc.contracting)+'</div>':'')]
+     ['Switching / exit cost','<b style="color:'+swCol+'">'+swLbl+'</b>'+(lockin!=null?' <span style="color:var(--mut2)">(lock-in risk '+escD(lockin)+'/5)</span>':'')+(ddc.contracting?'<div style="font-size:11.5px;color:var(--mut);margin-top:3px;line-height:1.45">'+escD(ddc.contracting)+'</div>':'')]
    ].map(function(r){return '<tr><td class="dt">'+r[0]+'</td><td class="dd">'+r[1]+'</td></tr>';}).join('');
    // Market & Financials (skill Section 3), keeps the rich financial stack and ADDS a market-position line
    // (analyst position) + a recent-news table. The solution/offering prose now lives on the Profile tab.
@@ -2239,7 +1888,7 @@ function pvDDSection(ddt,a,cand,refl,input){
    var mpBlk=mpGartner?('<div class="pvlede" style="margin:0 0 4px"><b style="color:var(--mut2)">Analyst position &middot;</b> '+escD(mpGartner)+'</div>'):'';
    var solPtr='<p class="footbound" style="margin-top:0">Solution &amp; offering profile now lives on the <b>Profile</b> tab (named offerings, delivery model, capability narrative).</p>';
    var news=dd.news||[];
-   var newsRows=news.map(function(nw){return '<tr><td class="dt">'+escD(nw.date||'')+'</td><td class="dd">'+escD(nw.headline||'')+(nw.note?'<div style="font-size:11px;color:var(--mut);font-weight:400;margin-top:3px;line-height:1.45">'+escD(nw.note)+'</div>':'')+'</td></tr>';}).join('');
+   var newsRows=news.map(function(nw){return '<tr><td class="dt">'+escD(nw.date||'')+'</td><td class="dd">'+escD(nw.headline||'')+(nw.note?'<div style="font-size:11.5px;color:var(--mut);font-weight:400;margin-top:3px;line-height:1.45">'+escD(nw.note)+'</div>':'')+'</td></tr>';}).join('');
    // STAGE DeepDive #2/#3: Market & Financials used to be one .sa-card with .subt-labelled sections; each
    // becomes its own accent card. Financial Position leads with the real headline scale (was thin/absent),
    // Revenue History is a new bar sparkline over financials.revenueHistory[].
@@ -2266,9 +1915,9 @@ function pvDDSection(ddt,a,cand,refl,input){
  }
  if(ddt==='strisk'){
    // #87/#88 (Marc): strengths & risks side-by-side as clean lists (no bubbles); risk dimensions as a table.
-   var srrow='display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5;align-items:baseline';
+   var srrow='display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.5;align-items:baseline';
    var strengths=(dd.strengths||[]).map(function(s){return '<div style="'+srrow+'"><span style="color:var(--navy);font-weight:800;flex:none">&#10003;</span><span>'+escD(s)+'</span></div>';}).join('');
-   var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#C15E19':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:16px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
+   var risks=(dd.risksNarr||[]).map(function(rk){var col=rk.sev==='high'?'#C15E19':rk.sev==='med'?'var(--amber-d)':'#5C2B50';var sl=rk.sev==='high'?'High':rk.sev==='med'?'Medium':'Low';return '<div style="'+srrow+'"><span style="color:'+col+';flex:none;font-size:15px;line-height:1">&#9679;</span><span><b>'+escD(rk.cat)+'</b> <span style="font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.03em;color:'+col+'">'+sl+'</span><div style="color:var(--mut);margin-top:2px">'+escD(rk.detail)+'</div></span></div>';}).join('');
    var dims=input.riskDimensions||[];var rawRisk=cand.risk||{};var risksN=dd.risksNarr||[];
    // D&B-style risk read: a score band per dimension, and a plain-English gloss, pulled from the matching
    // narrative risk where the dimension label shares a keyword with a risksNarr category, else a band read.
@@ -2279,7 +1928,7 @@ function pvDDSection(ddt,a,cand,refl,input){
      if(hit){var t=String(hit.detail||'');var dot=t.indexOf('. ');return dot>0?t.slice(0,dot+1):t;}
      var b=bandOf(sc);return sc==null?'Not scored on the public signal.':b.l==='Low'?'Contained; no material concern on the public signal.':b.l==='Moderate'?'Watch item; confirm in the RFP before relying on it.':'Elevated; a hard concern to clear before award.';
    };
-   var dimRows=dims.map(function(dm){var sc=rawRisk[dm.id];var b=bandOf(sc);var col=b.c;var w=sc==null?0:Math.min(100,sc/5*100);return '<tr><td style="text-align:left;font-weight:600;vertical-align:top;white-space:nowrap">'+escD(dm.label)+'</td><td style="text-align:right;font-weight:700;color:'+col+';white-space:nowrap;vertical-align:top">'+(sc==null?', ':escD(sc)+' / 5')+'</td><td style="width:80px;vertical-align:top"><div style="height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px"><i style="display:block;height:100%;width:'+w+'%;background:'+col+'"></i></div></td><td style="font-size:11px;color:var(--mut);line-height:1.45;vertical-align:top;padding-left:10px">'+escD(glossFor(dm,sc))+'</td></tr>';}).join('');
+   var dimRows=dims.map(function(dm){var sc=rawRisk[dm.id];var b=bandOf(sc);var col=b.c;var w=sc==null?0:Math.min(100,sc/5*100);return '<tr><td style="text-align:left;font-weight:600;vertical-align:top;white-space:nowrap">'+escD(dm.label)+'</td><td style="text-align:right;font-weight:700;color:'+col+';white-space:nowrap;vertical-align:top">'+(sc==null?', ':escD(sc)+' / 5')+'</td><td style="width:80px;vertical-align:top"><div style="height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px"><i style="display:block;height:100%;width:'+w+'%;background:'+col+'"></i></div></td><td style="font-size:11.5px;color:var(--mut);line-height:1.45;vertical-align:top;padding-left:10px">'+escD(glossFor(dm,sc))+'</td></tr>';}).join('');
    var com=dd.commercial||{};
    var contractBlk=com.contracting?('<div class="pvlede" style="margin:0 0 10px"><b style="color:var(--mut2)">Contracting flexibility &middot;</b> '+escD(com.contracting)+'</div>'):'';
    var regBlk=com.regulatory?('<div class="pvlede" style="margin:0"><b style="color:var(--mut2)">Regulatory / GxP &middot;</b> '+escD(com.regulatory)+'</div>'):'';
@@ -2290,8 +1939,8 @@ function pvDDSection(ddt,a,cand,refl,input){
    var riskWorst=(dd.risksNarr||[]).reduce(function(w,rk){var r=sevRank[rk.sev]||1;return r>w?r:w;},0);
    var riskWorstCol=riskWorst===3?sevCol.high:riskWorst===2?sevCol.med:riskWorst===1?sevCol.low:null;
    var srCards=[];
-   srCards.push(pvCard('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>','Strengths',strengths||'<div style="font-size:13px;color:var(--mut2)">No strengths on file.</div>','var(--navy)'));
-   srCards.push(pvCard('<path d="M12 2l10 18H2z"/><path d="M12 9v5M12 17h.01"/>','Risks',risks||'<div style="font-size:13px;color:var(--mut2)">No risks on file.</div>',riskWorstCol));
+   srCards.push(pvCard('<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>','Strengths',strengths||'<div style="font-size:12.5px;color:var(--mut2)">No strengths on file.</div>','var(--navy)'));
+   srCards.push(pvCard('<path d="M12 2l10 18H2z"/><path d="M12 9v5M12 17h.01"/>','Risks',risks||'<div style="font-size:12.5px;color:var(--mut2)">No risks on file.</div>',riskWorstCol));
    if(contractBlk||regBlk)srCards.push(pvCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16"/>','Contracting &amp; Regulatory',contractBlk+regBlk));
    srCards.push(pvCard('<path d="M3 21h18M6 21V9M12 21V4M18 21v-8"/>','Risk Dimensions <span style="font-weight:500;color:var(--mut2);font-size:11px;text-transform:none;letter-spacing:0">&middot; 0&ndash;5, higher is worse</span>','<div class="mxwrap"><table class="mx" style="width:100%"><tbody>'+dimRows+'</tbody></table></div><div class="footbound">Narrative risks are advisory; a hard flag disqualifies, a soft flag is recorded for review. Dimension scores roll up from the sub-factors on the Risk Assessment subtab.</div>'));
    // D&B-style risk-assessment redesign (Marc, 2026-07-23): a risk-posture summary line leads (overall band +
@@ -2311,12 +1960,12 @@ function pvDDSection(ddt,a,cand,refl,input){
    // scope), a strategic-fit read, and a value-at-risk / next-move note. Reflect-only, illustrative.
    var lf=dd.lillyFit||{};
    var f5=pvRound(a.fitScore/20,1);
-   var capR=a.fitScore>=80?{l:'High',c:'#5C2B50',bg:'var(--ti-blue)'}:a.fitScore>=65?{l:'Medium',c:'#C15E19',bg:'var(--ti-amber)'}:{l:'Low',c:'#C15E19',bg:'var(--ti-red)'};
+   var capR=a.fitScore>=80?{l:'High',c:'#5C2B50',bg:'var(--ti-blue)'}:a.fitScore>=65?{l:'Medium',c:'#A2500F',bg:'var(--ti-amber)'}:{l:'Low',c:'#C15E19',bg:'var(--ti-red)'};
    var rel=lf.relation||((dd.relationship&&/incumbent/i.test(dd.relationship))?'Active incumbent':'Net new');
    var relMeta=rel==='Active incumbent'?{c:'#5C2B50',bg:'var(--ti-blue)'}:rel==='Prior engagement'?{c:'#2F6E6B',bg:'var(--ti-blue)'}:{c:'var(--mut2)',bg:'var(--nested)'};
    var sf=(lf.strategic||'').toLowerCase();
-   var sfMeta=sf==='supports'?{l:'Supports',c:'#5C2B50',bg:'var(--ti-blue)'}:sf==='works-against'?{l:'Works against',c:'#C15E19',bg:'var(--ti-red)'}:sf?{l:'Neutral',c:'#C15E19',bg:'var(--ti-amber)'}:{l:'Data not available',c:'var(--mut2)',bg:'var(--nested)'};
-   var lfTile=function(lbl,val,c,bg){return '<div style="flex:1;min-width:150px;border:1px solid var(--line2);border-radius:10px;padding:11px 13px;background:'+(bg||'#fff')+'"><div style="font:600 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:5px">'+lbl+'</div><div style="font:800 16px var(--sans);color:'+(c||'var(--ink)')+';letter-spacing:-.01em">'+val+'</div></div>';};
+   var sfMeta=sf==='supports'?{l:'Supports',c:'#5C2B50',bg:'var(--ti-blue)'}:sf==='works-against'?{l:'Works against',c:'#C15E19',bg:'var(--ti-red)'}:sf?{l:'Neutral',c:'#A2500F',bg:'var(--ti-amber)'}:{l:'Data not available',c:'var(--mut2)',bg:'var(--nested)'};
+   var lfTile=function(lbl,val,c,bg){return '<div style="flex:1;min-width:150px;border:1px solid var(--line2);border-radius:10px;padding:11px 13px;background:'+(bg||'#fff')+'"><div style="font:600 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);margin-bottom:5px">'+lbl+'</div><div style="font:800 15px var(--sans);color:'+(c||'var(--ink)')+';letter-spacing:-.01em">'+val+'</div></div>';};
    var lfPills='<div style="display:flex;gap:11px;flex-wrap:wrap;margin:0 0 14px">'+
      lfTile('Relationship status',escD(rel),relMeta.c,relMeta.bg)+
      lfTile('Capability-fit rating',escD(capR.l)+' <span style="font:600 11px var(--mono);color:var(--mut2)">('+escD(f5)+'/5)</span>',capR.c,capR.bg)+
@@ -2400,9 +2049,9 @@ function pvCompPositionHtml(a,cand,refl,input){
  var standing=a.rank!=null?('#'+a.rank):', ';
  var standSub=escD(PVSEG_LBL[a.segment]||a.segment)+(a.rank!=null?(' · of '+L.eligibleCount+' eligible'):'');
  var shortCat=function(s){return String(s).split(/\s*[&·]\s*/)[0].trim();};
- var leadsHtml=leads.length?leads.slice(0,3).map(function(l){return '<span class="ddcp-mgc" style="color:'+acc+';border-color:'+acc+'66">'+escD(shortCat(l.label))+' +'+escD(l.margin)+'</span>';}).join(''):'<span style="font-size:11px;color:var(--mut2)">, leads no single category</span>';
+ var leadsHtml=leads.length?leads.slice(0,3).map(function(l){return '<span class="ddcp-mgc" style="color:'+acc+';border-color:'+acc+'66">'+escD(shortCat(l.label))+' +'+escD(l.margin)+'</span>';}).join(''):'<span style="font-size:11.5px;color:var(--mut2)">, leads no single category</span>';
  var strongHtml=best?(escD(reqLabel[best.requirementId]||best.requirementId)+' '+escD(pvRound(best.score,2))):', ';
- var watchHtml=w?('<span style="font-weight:700;color:var(--amber-d)">'+escD(w.cat)+'</span> <span class="ddcp-sev '+(w.sev==='high'?'high':'med')+'">'+(w.sev==='high'?'high':w.sev==='med'?'med':'low')+'</span>'):'<span style="font-size:11px;color:var(--mut2)">no material watch-item</span>';
+ var watchHtml=w?('<span style="font-weight:700;color:var(--amber-d)">'+escD(w.cat)+'</span> <span class="ddcp-sev '+(w.sev==='high'?'high':'med')+'">'+(w.sev==='high'?'high':w.sev==='med'?'med':'low')+'</span>'):'<span style="font-size:11.5px;color:var(--mut2)">no material watch-item</span>';
  return '<div class="ddcp">'+
    '<div class="ddcp-mast">'+
      '<div class="ddcp-badge" style="background:'+acc+'"><span class="vv">'+standing+'</span><span class="rr">'+standSub+'</span></div>'+
