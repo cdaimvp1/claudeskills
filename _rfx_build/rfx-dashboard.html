@@ -1730,10 +1730,10 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 /* opt-in row zebra for non-.pvsl .mx tables (Deal-RFx panels), mirrors the .pvsl .mx zebra */
 .mx.mxz tbody tr:nth-child(even) td,.mx.mxz tbody tr:nth-child(even) td:first-child{background:var(--nested)}
 /* flipped weighted-scoring: leader column tint + emphasized footer rows (darkened, Marc: was too light to see) */
-.mx td.lead,.mx th.lead{background:var(--sh-1,#E9E2E7) !important}
-.mx thead th.lead{color:var(--ink);border-bottom:2px solid var(--plum,#5C2B50)}
+.mx td.lead,.mx th.lead{background:var(--tint-c6d8ee,#C6D8EE) !important}
+.mx thead th.lead{color:var(--navy);border-bottom:2px solid #6E9BCE}
 .mx tfoot .wtotrow td{background:var(--tint-c6d8ee,#C6D8EE);font-weight:800;border-top:2px solid #6E9BCE;font-family:var(--mono)}
-.mx tfoot .wtotrow td.lead{background:var(--sh-3,#CDBFC9) !important}
+.mx tfoot .wtotrow td.lead{background:var(--tint-a4c2e6,#A4C2E6) !important}
 .mx tfoot .gaterow td{background:var(--tint-e1e3e7,#E1E3E7)}
 .mx tfoot td:first-child{text-align:left;font-weight:700}
 .mxbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}
@@ -2729,41 +2729,72 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .rfxrpt .rzopa-read{font-size:11px;color:var(--mut);line-height:1.45;margin-top:2px}
 @media(max-width:640px){.rfxrpt .rzopa-row{flex-wrap:wrap}.rfxrpt .rzopa-title{flex:0 0 100%;width:auto}.rfxrpt .rzopa-trackwrap{flex:1 1 100%;width:100%}}
 
-/* ============================================================================================
-   SHADING + DEPTH SYSTEM (Marc 2026-07-27) - RFx, same scale as Landscape and Deal.
-   Shading was 2-4% and effectively invisible. Three deliberate steps instead:
-     --sh-1 section ground (~6%) · --sh-2 nested band (~11%) · --sh-3 emphasis (~16%)
-   Plus real borders and depth so panels read as objects, and a SOLID burnt-orange rule for the
-   things that matter. Matrices and heatmaps are excluded: their cells carry their own ramp.
-   ============================================================================================ */
-.rfx-tab{
-  --sh-1:#EEEBE6; --sh-2:#E4E0D9; --sh-3:#D9D4CB;
-  --burnt-d:#9A4A13;
-  --depth-1:0 1px 2px rgba(33,25,17,.06), 0 3px 8px -4px rgba(33,25,17,.10);
-  --depth-2:0 1px 2px rgba(33,25,17,.08), 0 8px 18px -8px rgba(33,25,17,.16);
-}
-.rfx-tab .card{border:1px solid var(--line2);box-shadow:var(--depth-1)}
-/* section headers get a ground so sections separate without extra chrome */
-.rfx-tab .sect > .secthd{background:var(--sh-1);border:1px solid var(--line2);border-bottom:none;
-  border-radius:9px 9px 0 0;padding:9px 12px;margin-bottom:0}
-.rfx-tab .sect > .secthd + .card{border-radius:0 0 9px 9px;border-top:1px solid var(--line2)}
-/* group bands read as real dividers */
-.rfxrpt .grp{background:var(--sh-2);border-radius:8px;padding:9px 12px 8px;border-bottom:2px solid var(--plum)}
-/* reads / notes sit on a visible ground instead of floating */
-.rfxrpt .xs-ins{background:var(--sh-1);border-radius:8px;padding:11px 13px;border-left:3px solid var(--plum)}
-.rfxrpt .spnote{background:var(--sh-1);border-radius:8px;padding:10px 12px;border-top:none}
-.rfx-tab .rfxsrcrow{background:var(--sh-2);border-radius:8px;padding:10px 12px}
-/* emphasis = solid burnt orange, never a light wash */
-.rfx-tab .rfxgate.warn{background:var(--sh-2);border:1px solid var(--line2);
-  border-left:4px solid #C15E19;color:var(--ink)}
-.rfx-tab .rfxreg > .rfxreg-sum{background:var(--sh-1)}
-.rfx-tab .rfxreqcat[open] > summary{background:var(--sh-2)}
-.rfx-tab .rfxreqcat > summary:hover{background:var(--sh-1)}
-/* keep the two matrices clean: ramp only, no ground */
-.rfx-tab .schm tbody tr:hover td{background:var(--sh-1)}
-.rfx-tab .schm .hcell,.rfx-tab .mx .hcell{box-shadow:0 1px 2px rgba(33,25,17,.10)}
+/* ---- Components added after the base commit. STRUCTURE ONLY (Marc 2026-07-27 revert). ---- */
 
-/* R4: Business Case halves. Same underline language as the main RFx subtab bar. */
+/* R6 provenance grouping in the Risk roll-up */
+.rfxrpt .rfxprovhd th{font:700 8.4px var(--mono);letter-spacing:.05em;text-transform:uppercase;padding-bottom:3px;border-bottom:2px solid var(--line2,#BDBAB3)}
+.rfxrpt .rfxprovhd th.rfxprova{color:var(--pri-tx,#5C2B50);border-bottom-color:var(--pri-tx,#5C2B50)}
+.rfxrpt .rfxprovhd th.rfxprovb{color:#2E5E8C;border-bottom-color:#2E5E8C}
+.rfxrpt .mx th.rfxprovb,.rfxrpt .mx td.rfxprovb{border-left:1px solid var(--line2,#BDBAB3)}
+.rfxrpt .rfxsrcrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;font-size:10.5px;color:var(--mut2);line-height:1.5}
+.rfxrpt .rfxsrcrow>div{flex:1 1 210px}
+.rfxrpt .rfxsk{display:inline-flex;align-items:center;gap:5px;font:700 8.6px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+.rfxrpt .rfxsk .dot{width:6px;height:6px;border-radius:50%}
+.rfxrpt .rfxsk.a{color:var(--pri-tx,#5C2B50)} .rfxrpt .rfxsk.a .dot{background:var(--pri-tx,#5C2B50)}
+.rfxrpt .rfxsk.b{color:#2E5E8C} .rfxrpt .rfxsk.b .dot{background:#2E5E8C}
+
+/* equal-height pair + internal scroll (Risk roll-up / Coverage heatmap) */
+.rfxrpt .xs2col-hm{align-items:stretch}
+.rfxrpt .xs2col-hm>div{display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-hm>div>.sect{display:flex;flex-direction:column;flex:1;min-height:0}
+.rfxrpt .xs2col-hm>div>.sect>.card{flex:1;display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-hm>div>.sect>.secthd{min-height:20px;align-items:center}
+.rfxrpt .rfxpairscroll{overflow-y:auto;min-height:0;max-height:46vh;scrollbar-width:thin}
+.rfxrpt .rfxpairscroll thead th{position:sticky;top:0;z-index:1;background:var(--canvas,#F7F6F3)}
+
+/* row rule: side-by-side rows finish level */
+.rfxrow2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.rfxrow2>div{min-width:0;display:flex;flex-direction:column}
+.rfxrow2>div>.card{flex:1;display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-comm{align-items:stretch}
+.rfxrpt .xs2col-comm>div{display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-comm>div>.sect{display:flex;flex-direction:column;flex:1;min-height:0}
+.rfxrpt .xs2col-comm>div>.sect>.card{flex:1;display:flex;flex-direction:column;min-height:0}
+.rfxrpt .xs2col-comm>div>.card.xs-read{flex:0 0 auto}
+.rfxrpt .xs2col-comm .mxwrap{overflow-y:auto;min-height:0;max-height:52vh;scrollbar-width:thin}
+.rfxrpt .xs2col-comm .mxwrap thead th{position:sticky;top:0;z-index:1;background:var(--canvas,#F7F6F3)}
+.rfxrpt .rfxterms{margin-top:10px}
+
+/* N5 requirements register accordion */
+.rfxreg{border:1px solid var(--line2,#BDBAB3);border-radius:10px;overflow:hidden}
+.rfxreg>.rfxreg-sum{list-style:none;cursor:pointer;padding:11px 14px;font:700 11px var(--mono);
+  letter-spacing:.03em;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:8px}
+.rfxreg>.rfxreg-sum::-webkit-details-marker{display:none}
+.rfxreg>.rfxreg-sum:before{content:"\25B8";font-size:10px;color:var(--plum);transition:transform .12s}
+.rfxreg[open]>.rfxreg-sum:before{transform:rotate(90deg)}
+.rfxreg[open]>.rfxreg-sum{border-bottom:1px solid var(--line)}
+.rfxreqcat{border-bottom:1px solid var(--line)}
+.rfxreqcat:last-child{border-bottom:none}
+.rfxreqcat>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px}
+.rfxreqcat>summary::-webkit-details-marker{display:none}
+.rfxreqcat[open]>summary{border-bottom:1px solid var(--line);box-shadow:inset 3px 0 0 var(--plum)}
+.rfxreqcat .rc-caret{font-size:9px;color:var(--plum);transition:transform .12s;display:inline-block;width:10px}
+.rfxreqcat[open] .rc-caret{transform:rotate(90deg)}
+.rfxreqcat .rc-name{font-weight:700;font-size:12.8px;color:var(--ink)}
+.rfxreqcat .rc-pre{font:700 9px var(--mono);letter-spacing:.06em;color:var(--mut2);border:1px solid var(--line2);border-radius:30px;padding:1px 7px}
+.rfxreqcat .rc-meta{font:600 10.5px var(--mono);color:var(--mut2)}
+.rfxreqcat .rc-mand{color:var(--plum)}
+.rfxreqcat .rc-wt{margin-left:auto;font:800 11.5px var(--mono);color:var(--plum)}
+.rq-id{display:block;font-weight:800;font-size:11px;color:var(--ink);letter-spacing:.03em}
+.rq-id-raw{display:block;font-size:9.5px;color:var(--mut2);margin-top:1px}
+
+/* N8 company-profile fact grid */
+.ovfacts.ovfacts-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 22px}
+.ovfacts.ovfacts-3 .ovfact{min-width:0;padding-bottom:2px}
+.ovfacts.ovfacts-3 .ovfact .val{font-size:12.8px;line-height:1.45;color:var(--ink);word-break:break-word}
+@media(max-width:760px){.ovfacts.ovfacts-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* R4 business case halves */
 .rfx-tab .bcsubbar{display:flex;gap:4px;border-bottom:1px solid var(--line2);margin:0 0 16px}
 .rfx-tab .bcsub{appearance:none;background:transparent;border:0;border-bottom:2.5px solid transparent;
   color:var(--mut2);font:700 12.5px var(--sans);padding:9px 14px;cursor:pointer;white-space:nowrap}
@@ -2772,118 +2803,14 @@ html:not([data-theme="dark"]) .tabbody.rfx-tab{--mut2:#4A443C;--mut:#332F29}
 .rfx-tab .bcpane{display:none}
 .rfx-tab .bcpane.on{display:block}
 
-/* ===== SHADING v2 + COLOUR REBALANCE (Marc 2026-07-27) - RFx ============================== */
-.rfx-tab{
-  --sh-1:#E9E2E7;      /* plum ~10% */
-  --sh-2:#DCD1DA;      /* plum ~17% */
-  --sh-3:#CDBFC9;      /* plum ~24% */
-  --sh-t1:#DEE9E8;     /* teal ~10% */
-  --sh-t2:#CBDCDA;     /* teal ~17% */
-  --burnt:#C15E19;
-  --burnt-d:#9A4A13;
-  --depth-1:0 1px 2px rgba(33,25,17,.07), 0 3px 8px -4px rgba(33,25,17,.12);
-  --depth-2:0 1px 3px rgba(33,25,17,.10), 0 10px 20px -8px rgba(33,25,17,.20);
-}
-.rfx-tab .sect > .secthd{background:var(--sh-1)}
-.rfxrpt .grp{background:var(--sh-2)}
-.rfxrpt .xs-ins{background:var(--sh-1);border-left:3px solid var(--plum)}
-.rfxrpt .spnote{background:var(--sh-1)}
-.rfx-tab .rfxsrcrow{background:var(--sh-t1)}
-.rfx-tab .rfxreg > .rfxreg-sum{background:var(--sh-1)}
-.rfx-tab .rfxreqcat[open] > summary{background:var(--sh-2)}
-.rfx-tab .rfxreqcat > summary:hover{background:var(--sh-1)}
-.rfx-tab .schm tbody tr:hover td{background:var(--sh-1)}
-.rfx-tab .bcsubbar{border-bottom-color:var(--line2)}
-/* burnt orange stays ONLY on an open gate, which is a real alert */
-.rfx-tab .rfxgate.warn{background:var(--sh-2);border-left:4px solid var(--burnt)}
-
-/* ===== Scoring matrix, second visual pass (Marc 2026-07-27: "still looks ugly") =============
-   The first pass fixed the ramp and the vocabulary but left it reading as a plain grid. What was
-   actually wrong: every row carried equal visual weight, the leader column was marked only by a
-   hairline, the category column had no hierarchy against the numbers, and the total/gate footer
-   floated. Now: a banded header, a category column that reads as a label column, a leader column
-   with a real plum ground, generous row rhythm, and a footer that is clearly a summary. */
-.schm{border-collapse:separate;border-spacing:0;width:100%}
-.schm thead th{background:var(--sh-2);padding:11px 10px;font:800 9px var(--mono);
-  letter-spacing:.05em;text-transform:uppercase;color:var(--ink);border-bottom:2px solid var(--plum)}
-.schm thead th:first-child{text-align:left;border-radius:8px 0 0 0}
-.schm thead th:last-child{border-radius:0 8px 0 0}
-.schm tbody td{padding:11px 10px;border-bottom:1px solid var(--line)}
-.schm tbody td:first-child{background:var(--sh-1);font-weight:700;color:var(--ink);
-  border-right:1px solid var(--line2)}
-.schm tbody tr:hover td{background:var(--sh-2)}
-.schm tbody tr:hover td:first-child{background:var(--sh-2)}
-/* the leader column gets a real ground, not a hairline */
-.schm td.lead,.schm th.lead{background:var(--sh-1);
-  box-shadow:inset 2px 0 0 var(--plum),inset -2px 0 0 var(--plum)}
-.schm thead th.lead{background:var(--sh-3)}
-/* score cells sit ON the row rather than in it */
-.schm .hcell{min-width:52px;height:28px;border-radius:8px;font:800 13px var(--sans);
-  box-shadow:0 1px 2px rgba(33,25,17,.14)}
-/* weight chip reads as metadata, not data */
-.schm-wchip{background:var(--surface);border:1px solid var(--line2);color:var(--mut)}
-/* footer = summary, visibly separated */
-.schm tfoot td{background:var(--sh-2);border-top:2px solid var(--plum);border-bottom:none;
-  padding:12px 10px}
-.schm tfoot .wtotrow td{font:800 14px var(--sans);color:var(--ink)}
-.schm tfoot .wtotrow td:first-child{background:var(--sh-2)}
-.schm tfoot .gaterow td{padding-top:0;background:var(--sh-2)}
-.schm tfoot .gaterow td:first-child{background:var(--sh-2);font-weight:700}
-
-/* The shading tokens must exist OUTSIDE .rfx-tab too: the Scoring subtab and the individual
-   supplier report render outside that scope, so scoped tokens resolved to nothing there and old
-   BLUE leader tints showed through. Defined at :root, with the stray blues overridden. */
-:root{
-  --sh-1:#E9E2E7; --sh-2:#DCD1DA; --sh-3:#CDBFC9;
-  --sh-t1:#DEE9E8; --sh-t2:#CBDCDA;
-  --burnt:#C15E19; --burnt-d:#9A4A13;
-}
-.schm thead th{background:var(--sh-2)}
-.schm thead th.lead{background:var(--sh-3)}
-.schm tbody td:first-child{background:var(--sh-1)}
-.schm tbody td.lead,.schm th.lead{background:var(--sh-1)}
-.schm tfoot td,.schm tfoot .wtotrow td:first-child,.schm tfoot .gaterow td,
-.schm tfoot .gaterow td:first-child{background:var(--sh-2);border-top-color:var(--plum)}
-.schm tbody tr:hover td,.schm tbody tr:hover td:first-child{background:var(--sh-2)}
-
-.schm thead th:first-child{background:var(--sh-2)}
-.schm thead th.lead{background:var(--sh-3)}
-
-/* ===== PANEL: RFx > Scoring > Scoring Matrix (Marc 2026-07-27, 3rd pass) ====================
-   Treated as ONE panel, not via global tokens. Verified against the rendered table.
-   Bubbles removed: a score is a bold number with a thin proportional bar beneath. Weight is a
-   plain figure. Shading is a real step darker so the label column, the leader column and the
-   footer separate without borders doing all the work. */
-.schm{border-collapse:separate;border-spacing:0}
-.schm thead th,.schm thead th:first-child{background:#D3C4CE;color:#2A1F27;
-  border-bottom:2px solid #5C2B50;padding:11px 10px;font:800 9px var(--mono);letter-spacing:.05em}
-.schm thead th.lead{background:#C0ACBA}
-.schm tbody td{padding:12px 10px;border-bottom:1px solid #CFC6CB;background:#FBF9FA}
-.schm tbody td:first-child{background:#EFE7EC;font-weight:700;color:#241A21;border-right:1px solid #C9BCC4}
-.schm tbody td.lead{background:#F1E7EE;box-shadow:inset 2px 0 0 #5C2B50,inset -2px 0 0 #5C2B50}
-.schm tbody tr:hover td{background:#F4EEF1}
-.schm tbody tr:hover td:first-child{background:#E7DCE4}
-.schm .schm-w{font:700 11.5px var(--mono);color:#5A5058;text-align:center;background:#F6F2F4}
-/* the score cell: number + bar, no shape around it */
+/* scoring matrix: number + bar, no bubbles (structure only) */
 .schm .scv{display:inline-block;min-width:46px;text-align:center;line-height:1.15}
-.schm .scv b{display:block;font:800 15px var(--sans);color:#241A21;letter-spacing:-.01em}
-.schm .scv i{display:block;height:3px;border-radius:2px;background:#5C2B50;margin:4px auto 0;opacity:.85}
-.schm td.lead .scv i{background:#5C2B50;opacity:1;height:4px}
-.schm .scv-na{color:#8C8189;font:700 12px var(--mono);letter-spacing:.06em}
-/* footer reads as the summary */
-.schm tfoot td{background:#D3C4CE;border-top:2px solid #5C2B50;border-bottom:none;padding:12px 10px}
-.schm tfoot .wtotrow td{font:800 15px var(--sans);color:#241A21}
-.schm tfoot .wtotrow td.lead{background:#C0ACBA}
-.schm tfoot .gaterow td{padding-top:0;background:#D3C4CE}
-
-/* The two rules at pv.css:1143/1146 carry !important (they predate this work), so the matrix
-   panel has to answer in kind for exactly those cells. Scoped to .schm only. */
-.schm tbody td.lead{background:#F1E7EE !important}
-.schm thead th.lead{background:#C0ACBA !important}
-.schm tfoot .wtotrow td.lead{background:#C0ACBA !important}
-.schm tbody td{background:#FBF9FA}
-.schm tbody td:first-child{background:#EFE7EC}
-.schm tfoot td,.schm tfoot .gaterow td{background:#D3C4CE}
+.schm .scv b{display:block;font:800 15px var(--sans);color:var(--ink);letter-spacing:-.01em}
+.schm .scv i{display:block;height:3px;border-radius:2px;background:var(--plum);margin:4px auto 0}
+.schm .scv-na{color:var(--mut2);font:700 12px var(--mono);letter-spacing:.06em}
+.schm .schm-w{font:700 11.5px var(--mono);color:var(--mut);text-align:center}
+.schm .hcell.hc-na{background:transparent;color:var(--mut2);font-family:var(--mono);font-weight:700;
+  letter-spacing:.06em;cursor:help;border:1px dashed var(--line2)}
 </style><style>/* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *

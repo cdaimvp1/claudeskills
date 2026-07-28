@@ -2313,148 +2313,113 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 .pvsl .pq-dqk{font:700 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
 .pvsl .segL .pq-wrap{padding-left:22px}
 
-/* ============================================================================================
-   SHADING + DEPTH SYSTEM (Marc 2026-07-27), applied dashboard-wide.
+/* ---- Components added after the base commit. STRUCTURE ONLY (Marc 2026-07-27 revert):
+   layout, spacing and borders using the existing palette variables. No shading system. ---- */
 
-   The problem: shading sat at 2-4% opacity, effectively invisible, so sections ran together and
-   nothing signalled what mattered. The fix is a deliberate three-step scale plus outline and
-   depth, rather than one barely-there wash:
-
-     step 1  --sh-1  the section ground        ~6%   quiet but visible
-     step 2  --sh-2  a nested / secondary band ~11%  clearly a level down
-     step 3  --sh-3  the emphasised block      ~16%  medium, reads at a glance
-
-   Matrices and heatmaps are deliberately EXCLUDED: their cells already carry an intensity ramp
-   and a ground under them would fight it.
-
-   Depth: sections get a real border plus a soft shadow, so panels read as objects rather than
-   text on a page. Emphasis blocks additionally get a solid burnt-orange left rule, the action
-   colour. Darker burnt shades are allowed; light burnt / amber is not.
-   ============================================================================================ */
-.pvsl{
-  --sh-1:#EEEBE6;
-  --sh-2:#E4E0D9;
-  --sh-3:#D9D4CB;
-  --sh-plum:rgba(92,43,80,.10);
-  --sh-teal:rgba(47,110,107,.10);
-  --burnt:#C15E19;
-  --burnt-d:#9A4A13;            /* darker burnt is fine; amber is not */
-  --depth-1:0 1px 2px rgba(33,25,17,.06), 0 3px 8px -4px rgba(33,25,17,.10);
-  --depth-2:0 1px 2px rgba(33,25,17,.08), 0 8px 18px -8px rgba(33,25,17,.16);
-}
-
-/* ---- panels read as objects: real border + depth, not a hairline on white ---- */
-.pvsl .sa-card{border:1px solid var(--line2);box-shadow:var(--depth-1)}
-.pvsl .sa-card > .card-hd{
-  background:var(--sh-1);
-  border-bottom:1px solid var(--line2);
-  padding:11px 14px;
-  margin:0 0 14px;
-  border-radius:10px 10px 0 0;
-}
-.pvsl .sa-card > .card-hd .ct{font-weight:800}
-
-/* ---- the field funnel that now leads Overview ---- */
+/* field funnel (Overview) */
 .pvsl .pvfunnel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 18px;
-  border:1px solid var(--line2);border-radius:10px;overflow:hidden;box-shadow:var(--depth-1);background:var(--surface)}
-.pvsl .pvfn-step{padding:13px 15px;border-right:1px solid var(--line2);background:var(--sh-1)}
+  border:1px solid var(--line2);border-radius:10px;overflow:hidden;background:var(--surface)}
+.pvsl .pvfn-step{padding:13px 15px;border-right:1px solid var(--line2)}
 .pvsl .pvfn-step:last-child{border-right:none}
-.pvsl .pvfn-last{background:var(--sh-3);box-shadow:inset 3px 0 0 var(--burnt)}
 .pvsl .pvfn-v{font:800 26px/1.05 var(--sans);color:var(--ink);letter-spacing:-.02em}
-.pvsl .pvfn-last .pvfn-v{color:var(--burnt-d)}
 .pvsl .pvfn-l{font:800 11.5px var(--sans);color:var(--ink);margin-top:5px}
 .pvsl .pvfn-s{font-size:10.5px;color:var(--mut);margin-top:2px;line-height:1.35}
 @media(max-width:760px){.pvsl .pvfunnel{grid-template-columns:repeat(2,minmax(0,1fr))}
   .pvsl .pvfn-step:nth-child(2){border-right:none}}
 
-/* ---- NEXT STEP: the most actionable line on the tab ---- */
-.pvsl .pvnext{margin-top:16px;padding:12px 14px;background:var(--sh-2);
-  border:1px solid var(--line2);border-left:4px solid var(--burnt);border-radius:9px}
-.pvsl .pvnext-k{font:800 9.5px var(--mono);letter-spacing:.09em;text-transform:uppercase;
-  color:var(--burnt-d);margin-bottom:5px}
+/* next step (Evaluation Summary) */
+.pvsl .pvnext{margin-top:16px;padding:12px 14px;border:1px solid var(--line2);border-radius:9px}
+.pvsl .pvnext-k{font:800 9.5px var(--mono);letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
 .pvsl .pvnext-t{margin:0;font-size:13px;line-height:1.6;color:var(--ink)}
 
-/* ---- section differentiation inside a card ---- */
-.pvsl .mdb-sec{border-top:1px solid var(--line2)}
-.pvsl .mdb-sec:nth-child(even){background:var(--sh-1)}
-.pvsl .mdb-sec{padding:16px 14px;border-radius:0}
-.pvsl .mdb-hd{margin-bottom:12px}
-.pvsl .mdb-n{background:var(--plum);box-shadow:0 1px 2px rgba(33,25,17,.18)}
-.pvsl .mdb-note{background:var(--sh-2);border-radius:8px;padding:10px 12px;color:var(--mut)}
-.pvsl .mdb-none{background:var(--sh-2);border-radius:8px;padding:11px 12px;
-  border-left:3px solid var(--line2)}
-.pvsl .mdb-list li{margin-bottom:7px}
-.pvsl .mdb-qs li::marker{color:var(--burnt-d);font-weight:800}
-
-/* ---- quadrants (Peer Position + Segmentation): visible ground, real depth ---- */
-.pvsl .pq-cell{background:var(--sh-1);box-shadow:var(--depth-1)}
-.pvsl .pq-cell.pq-ss{background:var(--sh-2)}          /* the strong/strong corner reads first */
-.pvsl .pq-cell.pq-has-sel{box-shadow:var(--depth-2),inset 0 0 0 1px var(--ddacc,#5C2B50)}
-.pvsl .pq-v{background:var(--surface)}
-
-/* ---- decision leverage + turns-on ---- */
-.pvsl .dlv-tbl tbody tr:first-child td{background:var(--sh-2)}
-.pvsl .dlv-bar span{background:var(--sh-3)}
-.pvsl .dlv-read{background:var(--sh-1);border-radius:8px;padding:11px 13px;
-  border-left:3px solid var(--plum)}
-.pvsl .dto-list li{padding:10px 12px;background:var(--sh-1);border-radius:8px;
-  border-bottom:none;margin-bottom:6px}
-.pvsl .dto-gap{color:var(--burnt-d)}
-
-/* ---- generic: wells, nested rows and hovers move off invisible ---- */
-.pvsl .well,.pvsl .nested,.pvsl .scc-b .subrow{background:var(--sh-1)}
-.pvsl tbody tr:hover td{background:var(--sh-1)}
-/* matrices + heatmaps keep their own ramp: no ground underneath */
-.pvsl .hm tbody tr:hover td,.pvsl .mxseg tbody tr:hover td{background:transparent}
-
-/* must-have marker in Decision Leverage + what-resolves-it line in the uncertainty register */
-.pvsl .dlv-must{display:inline-block;margin-left:8px;font:800 8.5px var(--mono);letter-spacing:.05em;
-  text-transform:uppercase;color:#9A4A13;border:1px solid #C15E19;border-radius:30px;padding:1px 7px;vertical-align:1px}
+/* Market Decision Brief */
+.pvsl .mdb .mdb-cap{margin-left:auto;font:600 11px var(--mono);color:var(--mut2)}
+.pvsl .mdb-body{padding:2px 0 0}
+.pvsl .mdb-sec{padding:16px 0;border-top:1px solid var(--line)}
+.pvsl .mdb-sec:first-child{border-top:none;padding-top:8px}
+.pvsl .mdb-hd{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+.pvsl .mdb-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+  border-radius:50%;background:var(--plum);color:#fff;font:800 11px var(--mono);flex:none}
+.pvsl .mdb-t{font-size:14.5px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+.pvsl .mdb-sub{font-size:11.5px;color:var(--mut2)}
+.pvsl .mdb-note{font-size:11.8px;line-height:1.55;color:var(--mut);margin-top:10px}
+.pvsl .mdb-none{font-size:12.2px;line-height:1.55;color:var(--mut);padding:2px 0}
+.pvsl .mdb-mut{color:var(--mut2);font-size:11.5px}
+.pvsl .mdb-list{margin:0;padding-left:17px;font-size:12.3px;line-height:1.6;color:var(--ink)}
+.pvsl .mdb-list li{margin-bottom:5px}
 .pvsl .mdb-res{display:block;margin-top:4px;font-size:11.3px;color:var(--mut2);font-style:italic}
+.pvsl .mdb-ev{display:inline-block;font:700 8.5px var(--mono);text-transform:uppercase;letter-spacing:.04em;
+  padding:2px 8px;border-radius:30px;margin-right:5px;border:1px solid currentColor}
+.pvsl .mdb-ev-e{color:var(--teal-d,#2F6E6B)} .pvsl .mdb-ev-s{color:#C15E19} .pvsl .mdb-ev-u{color:var(--mut2)}
 
-/* ===== SHADING v2 + COLOUR REBALANCE (Marc 2026-07-27) - Landscape ========================
-   Shading up a full step and tinted plum/teal (primary/secondary). Burnt orange pulled back to
-   emphasis only: the next-step block and open gates. See the block comment in shading_v2. */
-.pvsl{
-  --sh-1:#E9E2E7;      /* plum ~10% */
-  --sh-2:#DCD1DA;      /* plum ~17% */
-  --sh-3:#CDBFC9;      /* plum ~24% */
-  --sh-t1:#DEE9E8;     /* teal ~10% */
-  --sh-t2:#CBDCDA;     /* teal ~17% */
-  --burnt:#C15E19;
-  --burnt-d:#9A4A13;
-  --depth-1:0 1px 2px rgba(33,25,17,.07), 0 3px 8px -4px rgba(33,25,17,.12);
-  --depth-2:0 1px 3px rgba(33,25,17,.10), 0 10px 20px -8px rgba(33,25,17,.20);
-}
-/* section grounds, now visible */
-.pvsl .sa-card > .card-hd{background:var(--sh-1);border-bottom:1px solid var(--line2)}
-.pvsl .mdb-sec:nth-child(even){background:var(--sh-1)}
-.pvsl .mdb-note{background:var(--sh-2)}
-.pvsl .mdb-none{background:var(--sh-2)}
-.pvsl .well,.pvsl .nested,.pvsl .scc-b .subrow{background:var(--sh-1)}
-.pvsl tbody tr:hover td{background:var(--sh-1)}
-/* funnel: plum is the primary, so the funnel reads plum. The LAST step is the outcome, which
-   earns weight through a deeper plum ground, NOT through the emphasis colour. */
-.pvsl .pvfn-step{background:var(--sh-1)}
-.pvsl .pvfn-last{background:var(--sh-3);box-shadow:inset 3px 0 0 var(--plum)}
-.pvsl .pvfn-last .pvfn-v{color:var(--plum)}
-/* the ONE burnt-orange block on the tab: the action to take next */
-.pvsl .pvnext{background:var(--sh-2);border-left:4px solid var(--burnt)}
-.pvsl .pvnext-k{color:var(--burnt-d)}
-/* quadrants: teal for the secondary surface, plum for the selected corner */
-.pvsl .pq-cell{background:var(--sh-t1)}
-.pvsl .pq-cell.pq-ss{background:var(--sh-2)}
-/* these were burnt orange and should not have been: they are notable, not actions */
-.pvsl .dto-gap{color:var(--plum)}
-.pvsl .dlv-must{color:var(--plum);border-color:var(--plum)}
-.pvsl .mdb-qs li::marker{color:var(--plum)}
-.pvsl .dlv-read{background:var(--sh-1);border-left:3px solid var(--plum)}
-.pvsl .dlv-tbl tbody tr:first-child td{background:var(--sh-2)}
-.pvsl .dlv-bar span{background:var(--sh-3)}
-.pvsl .dlv-bar i{background:var(--plum)}
-.pvsl .dto-list li{background:var(--sh-t1)}
+/* quadrants (Peer Position + Segmentation) */
+.pvsl .pq-wrap{position:relative;padding:0 0 0 20px}
+.pvsl .pq-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"sw ss" "ww ws";gap:10px}
+.pvsl .pq-cell{border:1px solid var(--line2);border-radius:10px;padding:11px 12px;min-height:96px}
+.pvsl .pq-sw{grid-area:sw} .pvsl .pq-ss{grid-area:ss}
+.pvsl .pq-ww{grid-area:ww} .pvsl .pq-ws{grid-area:ws}
+.pvsl .pq-strong-weak{grid-area:sw} .pvsl .pq-strong-strong{grid-area:ss}
+.pvsl .pq-weak-weak{grid-area:ww}   .pvsl .pq-weak-strong{grid-area:ws}
+.pvsl .pq-cell.pq-has-sel{border-color:var(--ddacc,#5C2B50)}
+.pvsl .pq-t{font-size:12.4px;font-weight:800;color:var(--ink);line-height:1.3}
+.pvsl .pq-d{font-size:10.8px;color:var(--mut2);margin-top:3px;line-height:1.4}
+.pvsl .pq-vs{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.pvsl .pq-v{font:600 11px var(--sans);color:var(--ink);border:1px solid var(--line2);
+  border-radius:30px;padding:2px 9px;white-space:nowrap}
+.pvsl .pq-v.pq-sel{background:var(--ddacc,#5C2B50);border-color:var(--ddacc,#5C2B50);color:#fff;font-weight:700}
+.pvsl .pq-v.pq-inel{color:var(--mut2);border-style:dashed}
+.pvsl .pq-empty{font-size:11px;color:var(--mut2);font-style:italic}
+.pvsl .pq-axl{font:700 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
+.pvsl .pq-axl-x{margin-top:8px;text-align:right}
+.pvsl .pq-axl-y{position:absolute;left:0;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left center;white-space:nowrap}
+.pvsl .pq-note{font-size:11.2px;line-height:1.55;color:var(--mut2);margin-top:10px;padding-top:9px;border-top:1px dashed var(--line2)}
+.pvsl .pq-dq{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.pvsl .pq-dqk{font:700 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--mut2)}
+.pvsl .segL .pq-wrap{padding-left:22px}
 
-/* ---- Ownership & Control: horizontal tree, scroll + zoom (Marc 2026-07-27) --------------- */
+/* decision leverage (Requirements Heatmap) */
+.pvsl .dlv-cap,.pvsl .dto-cap{margin-left:auto;font:600 11px var(--mono);color:var(--mut2)}
+.pvsl .dlv-wrap{overflow-x:auto}
+.pvsl .dlv-tbl{width:100%;border-collapse:collapse;font-size:12.3px}
+.pvsl .dlv-tbl th{text-align:left;font:700 9px var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--mut2);padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.pvsl .dlv-tbl td{padding:9px 10px;border-bottom:1px solid var(--line)}
+.pvsl .dlv-tbl tr:last-child td{border-bottom:none}
+.pvsl .dlv-l{font-weight:600;color:var(--ink)}
+.pvsl .dlv-n,.pvsl th.dlv-n{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--mut2);white-space:nowrap}
+.pvsl .dlv-bar{width:190px}
+.pvsl .dlv-bar span{display:inline-block;width:140px;height:8px;border-radius:5px;background:var(--line2);overflow:hidden;vertical-align:middle}
+.pvsl .dlv-bar i{display:block;height:100%;border-radius:5px;background:var(--plum)}
+.pvsl .dlv-bar b{margin-left:8px;font:800 11.5px var(--mono);color:var(--ink)}
+.pvsl .dlv-read{font-size:12.3px;line-height:1.6;color:var(--mut);margin-top:12px}
+.pvsl .dlv-read b{color:var(--ink)}
+.pvsl .dlv-note,.pvsl .dto-note{font-size:11.4px;line-height:1.55;color:var(--mut2);margin-top:11px;padding-top:9px;border-top:1px dashed var(--line2)}
+.pvsl .dlv-must{display:inline-block;margin-left:8px;font:800 8.5px var(--mono);letter-spacing:.05em;
+  text-transform:uppercase;color:var(--plum);border:1px solid var(--plum);border-radius:30px;padding:1px 7px;vertical-align:1px}
+
+/* head-to-head: the decision could turn on */
+.pvsl .dto-row{padding:13px 14px;border:1px solid var(--line2);border-radius:10px;margin-bottom:10px}
+.pvsl .dto-row.dto-decides{border-color:var(--plum)}
+.pvsl .dto-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.pvsl .dto-req{font-size:13.5px;font-weight:800;color:var(--ink)}
+.pvsl .dto-w{font:700 10px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mut2);
+  border:1px solid var(--line2);border-radius:30px;padding:2px 9px}
+.pvsl .dto-flag{margin-left:auto;font:800 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  color:#C15E19;border:1px solid #C15E19;border-radius:30px;padding:2px 9px}
+.pvsl .dto-scores{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:9px}
+.pvsl .dto-sc{font-size:12.5px;color:var(--mut)}
+.pvsl .dto-sc b{color:var(--ink)}
+.pvsl .dto-win b{color:var(--plum)}
+.pvsl .dto-gapv{font:800 13px var(--mono);color:var(--plum);border:1px solid var(--line2);border-radius:30px;padding:2px 10px}
+.pvsl .dto-read{font-size:12.2px;line-height:1.55;color:var(--mut);padding:7px 0 0;border-top:1px solid var(--line);margin-top:7px}
+.pvsl .dto-rk{display:inline-block;font:800 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--plum);margin-right:7px}
+.pvsl .dto-verdict{font-size:12.8px;line-height:1.6;color:var(--ink);border-left:3px solid var(--plum);padding:12px 14px;margin-top:4px}
+.pvsl .dto-list{list-style:none;margin:0;padding:0}
+.pvsl .dto-list li{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.pvsl .dto-list li:last-child{border-bottom:none}
+.pvsl .dto-none{font-size:12.3px;line-height:1.6;color:var(--mut)}
+
+/* ownership tree: scroll + zoom */
 .pvsl .owntree-ctrl{display:flex;align-items:center;gap:7px;margin:0 0 10px}
 .pvsl .owntree-btn{appearance:none;min-width:28px;height:26px;padding:0 9px;border:1px solid var(--line2);
   background:var(--surface);color:var(--plum);font:800 13px var(--sans);border-radius:7px;cursor:pointer;line-height:1}
@@ -2462,69 +2427,10 @@ html[data-theme="dark"] .mav.theo img{filter:brightness(0) invert(.92)}
 .pvsl .owntree-btn.owntree-reset{font:700 10.5px var(--sans)}
 .pvsl .owntree-lvl{font:800 11px var(--mono);color:var(--ink);min-width:42px;text-align:center}
 .pvsl .owntree-hint{margin-left:auto;font:600 10.5px var(--mono);color:var(--mut2)}
-.pvsl .owntree-scroll{overflow-x:auto;overflow-y:hidden;padding:4px 2px 10px;
-  border:1px solid var(--line2);border-radius:9px;background:var(--sh-t1);
-  scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
-.pvsl .owntree-scroll::-webkit-scrollbar{height:10px}
-.pvsl .owntree-scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:30px;border:2px solid var(--sh-t1)}
+.pvsl .owntree-scroll{overflow-x:auto;overflow-y:auto;max-height:520px;padding:4px 2px 10px;
+  border:1px solid var(--line2);border-radius:9px;scrollbar-width:thin}
 .pvsl .owntree-canvas{display:inline-block;padding:6px;transition:transform .12s ease}
 
-/* ===== PANEL: Landscape > Head-to-Head > The Decision Could Turn On ========================
-   Rebuilt panel (scores + weight + per-vendor read + verdict). Shading is set explicitly here,
-   not inherited from a global token, so this panel is predictable on its own. */
-.pvsl .dto-row{padding:13px 14px;border:1px solid #C9BCC4;border-radius:10px;margin-bottom:10px;background:#F4EFF2}
-.pvsl .dto-row.dto-decides{background:#EADFE6;border-color:#5C2B50;box-shadow:inset 3px 0 0 #5C2B50}
-.pvsl .dto-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
-.pvsl .dto-req{font-size:13.5px;font-weight:800;color:#241A21}
-.pvsl .dto-w{font:700 10px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:#5A5058;
-  background:#FFF;border:1px solid #C9BCC4;border-radius:30px;padding:2px 9px}
-.pvsl .dto-flag{margin-left:auto;font:800 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;
-  color:#9A4A13;border:1px solid #C15E19;border-radius:30px;padding:2px 9px}
-.pvsl .dto-scores{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:9px}
-.pvsl .dto-sc{font-size:12.5px;color:#3A323A}
-.pvsl .dto-sc b{color:#241A21}
-.pvsl .dto-win b{color:#5C2B50}
-.pvsl .dto-gapv{font:800 13px var(--mono);color:#5C2B50;background:#FFF;border:1px solid #C9BCC4;
-  border-radius:30px;padding:2px 10px}
-.pvsl .dto-read{font-size:12.2px;line-height:1.55;color:#3A323A;padding:7px 0 0;border-top:1px solid #DDD3D9;margin-top:7px}
-.pvsl .dto-rk{display:inline-block;font:800 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;
-  color:#5C2B50;margin-right:7px}
-.pvsl .dto-verdict{font-size:12.8px;line-height:1.6;color:#241A21;background:#E4D9E1;
-  border-left:4px solid #5C2B50;border-radius:9px;padding:12px 14px;margin-top:4px}
-.pvsl .dto-note{font-size:11.4px;line-height:1.55;color:#5A5058;margin-top:11px;padding-top:9px;
-  border-top:1px dashed #C9BCC4}
-
-/* ===== SURGICAL SHADING: Landscape > Overview tab ONLY (Marc 2026-07-27) ====================
-   Panel-by-panel, explicit values, no tokens. Each selector below is a panel Marc has reviewed
-   on the Overview tab. Nothing structural changes: background only.
-   Measured before -> set after:
-     funnel step        #E9E2E7 -> #DCCFD8   plum, medium
-     funnel last step   #CDBFC9 -> #BFACBA   plum, one step deeper (it is the outcome)
-     card header        #E9E2E7 -> #D9CBD4   plum, medium
-     next step block    #DCD1DA -> #D3C4CE   plum, medium (burnt rule unchanged)
-     recommendation row #EDDFE9 -> #DFCFDA   plum, medium
-     brief alt section  #E9E2E7 -> #DFD4DB   plum, medium
-     brief note         #DCD1DA -> #D0C2CB   plum, medium-deep
-     quadrant cell      #DEE9E8 -> #CBDCDA   teal, medium (secondary surface)
-     quadrant lead cell #DCD1DA -> #C6D5D3   teal, medium-deep
-   ========================================================================================= */
-.pvsl .pvfn-step{background:#DCCFD8}
-.pvsl .pvfn-last{background:#BFACBA}
-.pvsl .sa-card > .card-hd{background:#D9CBD4}
-.pvsl .pvnext{background:#D3C4CE}
-/* Recommendation table, row by row. The generic .rgrid rule was aimed at the wrong element (the
-   first .rgrid is the HEADER, styled by .pvsl .pvrec .rhead at higher specificity), and the
-   shortlist band was rendering BLUE (#D2E1F2), which is off-palette. Set per row type:
-     header       -> plum medium
-     leader row   -> plum, deepest (it is the recommendation)
-     shortlisted  -> teal medium (secondary emphasis, was blue)
-     plain row    -> near-white base so the shaded rows read against it */
-.pvsl .pvrec .rhead{background:#D3C4CE}
-.pvsl .pvrec .rgrid.lead{background:#CFBCC9}
-.pvsl .pvrec .rgrid.run.shortlisted{background:#CBDCDA}
-.pvsl .pvrec .rgrid.run{background:#F6F2F4}
-.pvsl .mdb-sec:nth-child(even){background:#DFD4DB}
-.pvsl .mdb-note{background:#D0C2CB}
-.pvsl .mdb-none{background:#D0C2CB}
-.pvsl .pq-cell{background:#CBDCDA}
-.pvsl .pq-cell.pq-ss{background:#C6D5D3}
+/* deep-dive data coverage (renderer retained, tab retired) */
+.pvsl .ddcov-cap{margin-left:auto;font:600 11px var(--mono);color:var(--mut2)}
+.pvsl .ddcov-tbl{width:100%;border-collapse:collapse;font-size:12px}
