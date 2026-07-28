@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<title>Kraljic &amp; Porter — segmentation options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--plum:#5C2B50;--plum-dk:#3E1C36;--teal:#2F6E6B;--teal-deep:#1F4A48;--emph:#C15E19;--emph-tx:#A2500F;
+--plum-t:#C6B5C2;--teal-t:#B6CCCB;--emph-t:#ECCFBA;--plum-band:#DDCFDA;--teal-band:#CFE0DE;--emph-band:#ECCFBA;
+--plum-rule:#B99CB0;--teal-rule:#9FBFBC;--emph-rule:#C68A55;--well:#F4F1EC;--nested:#EDE8E0;--rule:#E2DCD4;
+--line2:#CECCC7;--ink:#1A1A1A;--mut:#5B534C;--mut2:#4A443C;--surface:#fff;--track:#E7E3DC;
+--sans:'Libre Franklin',system-ui,sans-serif;--mono:'Roboto Mono',monospace;
+--shadow:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);}
+*{box-sizing:border-box}
+body{margin:0;background:#E2E6E1;font-family:var(--sans);color:var(--ink);font-size:13px}
+.wrap{max-width:1320px;margin:0 auto;padding:28px 40px 70px}
+h1{font-size:28px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+.sub{font-size:13px;color:var(--mut);margin:0 0 20px;max-width:92ch;line-height:1.6}
+.sect{margin:26px 0 10px;border-left:3px solid var(--plum);padding-left:11px}
+.sect b{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.why{font-size:13px;color:var(--mut2);line-height:1.6;margin:0 0 12px;max-width:96ch}
+.card{background:var(--surface);border:1px solid var(--line2);border-left:3px solid var(--plum);
+border-radius:8px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+.card.teal{border-left-color:var(--teal)}.card.emph{border-left-color:var(--emph)}
+.hd{display:flex;align-items:center;gap:9px;padding:12px 15px;flex-wrap:wrap;
+background:linear-gradient(180deg,var(--plum-band),var(--surface));border-bottom:1px solid var(--plum-rule)}
+.card.teal .hd{background:linear-gradient(180deg,var(--teal-band),var(--surface));border-bottom-color:var(--teal-rule)}
+.hd .ct{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--plum)}
+.card.teal .hd .ct{color:var(--teal)}
+.hd .cs{margin-left:auto;font-size:11px;color:var(--mut)}
+.bd{padding:13px 15px}
+.seg{display:inline-flex;background:var(--well);border:1px solid var(--line2);border-radius:30px;padding:3px;gap:2px;margin-bottom:14px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;font:600 11px var(--sans);color:var(--mut);padding:6px 13px;border-radius:30px;cursor:pointer}
+.seg button.on{background:var(--plum);color:#fff;font-weight:700}
+.seg button.gap{color:var(--emph-tx)}
+.split{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start}
+@media(max-width:1000px){.split{grid-template-columns:1fr}}
+.lbl{font:700 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut2)}
+.note{font-size:11px;color:var(--mut);line-height:1.55;margin-top:10px}
+.gapbox{border:1px dashed var(--line2);border-left:3px solid var(--emph);border-radius:8px;padding:11px 13px;background:var(--well)}
+.gapbox b{display:block;font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--emph-tx)}
+.gapbox span{display:block;font-size:13px;margin-top:4px;line-height:1.5}
+.gapbox i{display:block;font-size:11px;color:var(--mut);margin-top:6px;font-style:normal}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--plum-t);color:var(--plum-dk);font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.07em;padding:7px 10px;text-align:left}
+td{padding:7px 10px;border-bottom:1px solid var(--rule)}
+tbody tr:nth-child(even) td{background:var(--well)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.acc{border:1px solid var(--line2);border-radius:8px;margin-bottom:6px;overflow:hidden;background:var(--surface)}
+.acch{display:flex;align-items:center;gap:9px;padding:9px 12px;background:var(--well);cursor:pointer}
+.acch b{font:700 20px var(--mono);color:var(--emph);letter-spacing:-.01em;min-width:70px}
+.acch u{font-size:13px;font-weight:700;text-decoration:none;flex:1;line-height:1.3}
+.accb{padding:10px 12px;font-size:13px;line-height:1.55;color:var(--mut2);border-top:1px solid var(--rule)}
+.cite{display:inline-block;font:700 11px var(--mono);letter-spacing:.03em;text-transform:uppercase;
+color:var(--teal);border:1px solid var(--teal);border-radius:30px;padding:1px 8px;margin-top:7px}
+.means{background:var(--well);border-radius:8px;padding:13px 15px}
+.means h4{font:700 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--plum);margin:0 0 8px}
+.means ul{margin:0;padding-left:17px;font-size:13px;line-height:1.65}
+.means li{margin-bottom:7px}
+svg{display:block;width:100%;height:auto}
+.f{border-top:1px solid var(--rule);padding:8px 0}.f:first-child{border-top:0;padding-top:0}
+.fh{display:flex;align-items:center;gap:9px}
+.fn{font-size:13px;font-weight:700;min-width:132px}
+.bar{flex:1;max-width:170px;height:9px;border-radius:5px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px}
+.pill{font:700 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;border-radius:30px;padding:2px 9px}
+.p-e{background:var(--emph);color:#fff}.p-p{background:var(--plum-t);color:var(--plum-dk)}.p-t{background:var(--teal-t);color:var(--teal-deep)}
+</style></head><body><div class="wrap">
+
+<h1>Kraljic &amp; Porter — segmentation</h1>
+<p class="sub">You are right that one dot and one radar for "Software" say nothing. Both frameworks only
+earn their keep when the things inside a category land in <b>different</b> places and get
+<b>different</b> plays. The question is what to segment by, and the answer depends on what the data can
+actually carry.</p>
+
+<div class="sect"><b>What the data supports today, and what it does not</b></div>
+<p class="why">Two of the three segmentations you described already exist in the seed, hiding in the
+subcategory names. The third is the one worth asking IT Finance for, and it is the one that matters most
+for AI cost control.</p>
+<table>
+ <thead><tr><th>Segmentation</th><th>Where it comes from</th><th>Status</th><th>What it answers</th></tr></thead>
+ <tbody>
+  <tr><td><b>Business purpose</b><br><span style="font-size:11px;color:var(--mut)">Marketing/Sales · Medicines Development · Collaboration · Info Security · Scientific Research · IT operations</span></td>
+   <td>Already in the subcategory names, strip the delivery suffix</td>
+   <td><span class="pill p-t">Real today</span></td>
+   <td>Which business function is exposed, and who owns the fix</td></tr>
+  <tr><td><b>Delivery model</b><br><span style="font-size:11px;color:var(--mut)">SaaS · IaaS · PaaS · On-premise</span></td>
+   <td>The <code>host</code> field on every subcategory</td>
+   <td><span class="pill p-t">Real today</span></td>
+   <td>Whether the lever is a licence negotiation or a consumption commitment</td></tr>
+  <tr><td><b>Consumption line item</b><br><span style="font-size:11px;color:var(--mut)">AI tokens · compute · storage · API calls · seats · maintenance · support</span></td>
+   <td>Not held. Needs a unit tag on the invoice or rate-card line</td>
+   <td><span class="pill p-e">Needs data</span></td>
+   <td>What you are actually buying, which is the only view where AI cost is visible</td></tr>
+ </tbody></table>
+<p class="note"><b>On goods versus services.</b> Software is both, and the line-item dimension splits
+accordingly. The goods-like part prices as <b>unit × rate</b> (seats, GB, tokens, API calls) and belongs on
+a consumption tag. The service-like part prices as <b>role × rate × hours</b> (implementation, managed
+service, support) and belongs on a rate card. A single "line item" toggle has to carry both, which is why
+the field to ask for is a <b>unit type</b> plus a <b>unit count</b>, not a free-text description.</p>
+
+<!-- ===================================================================== -->
+<div class="sect"><b>Kraljic, segmented, with a toggle</b></div>
+<p class="why">Each dot is a segment, sized by spend. The toggle changes what a dot means without changing
+the frame, so the quadrants keep their meaning and only the grain changes. The category average stays on
+as a hollow ring so you can see how far each segment sits from it.</p>
+
+<div class="card"><div class="hd"><span class="ct">Category position</span><span class="cs">Kraljic · by business purpose</span></div>
+<div class="bd">
+ <div class="seg"><button class="on">Business purpose</button><button>Delivery model</button><button class="gap">Line item · needs data</button></div>
+ <svg viewBox="0 0 620 330">
+  <line x1="310" y1="18" x2="310" y2="290" stroke="var(--line2)" stroke-dasharray="3 4"/>
+  <line x1="60" y1="154" x2="600" y2="154" stroke="var(--line2)" stroke-dasharray="3 4"/>
+  <text x="66" y="32" font-size="11" fill="var(--mut)" font-family="Libre Franklin">Leverage · compete it</text>
+  <text x="594" y="32" font-size="11" fill="var(--mut)" text-anchor="end" font-family="Libre Franklin">Strategic · partner and protect</text>
+  <text x="66" y="284" font-size="11" fill="var(--mut)" font-family="Libre Franklin">Routine · automate it</text>
+  <text x="594" y="284" font-size="11" fill="var(--mut)" text-anchor="end" font-family="Libre Franklin">Bottleneck · secure supply</text>
+  <line x1="60" y1="290" x2="600" y2="290" stroke="var(--line2)"/><line x1="60" y1="18" x2="60" y2="290" stroke="var(--line2)"/>
+  <text x="330" y="318" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Supply risk</text>
+  <text x="16" y="154" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin" transform="rotate(-90 16,154)">Profit impact</text>
+  <!-- category average -->
+  <circle cx="240" cy="112" r="16" fill="none" stroke="var(--mut2)" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="240" y="92" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">category average</text>
+  <!-- segments -->
+  <circle cx="150" cy="72" r="24" fill="var(--plum)" opacity=".75"/><text x="150" y="76" font-size="11" text-anchor="middle" fill="#fff" font-family="Libre Franklin">Mktg</text>
+  <circle cx="205" cy="120" r="22" fill="var(--plum)" opacity=".62"/><text x="205" y="124" font-size="11" text-anchor="middle" fill="#fff" font-family="Libre Franklin">IT ops</text>
+  <circle cx="420" cy="86" r="20" fill="var(--emph)" opacity=".85"/><text x="420" y="90" font-size="11" text-anchor="middle" fill="#fff" font-family="Libre Franklin">Med Dev</text>
+  <circle cx="466" cy="196" r="14" fill="var(--emph)" opacity=".8"/><text x="466" y="200" font-size="11" text-anchor="middle" fill="#fff" font-family="Libre Franklin">Sci</text>
+  <circle cx="176" cy="212" r="16" fill="var(--teal)" opacity=".7"/><text x="176" y="216" font-size="11" text-anchor="middle" fill="#fff" font-family="Libre Franklin">Collab</text>
+  <circle cx="356" cy="168" r="15" fill="var(--plum)" opacity=".62"/><text x="356" y="172" font-size="11" text-anchor="middle" fill="#fff" font-family="Libre Franklin">Security</text>
+ </svg>
+ <div class="note"><b>Why this is worth the change.</b> The category average sits in Leverage, so the
+ one-dot version said "compete it". Segmented, two of the six are in <b>Strategic</b>: Medicines
+ Development and Scientific Research have few credible alternatives and high switching cost, and
+ competing them is the wrong play. That distinction is invisible at category level and it is the single
+ most consequential thing on this screen.</div>
+</div></div>
+
+<!-- ===================================================================== -->
+<div class="sect"><b>Porter, per segment, sharing the same toggle</b></div>
+<p class="why">You are right that one radar is boring — because it is an average, and the average of a
+monopoly and a commodity market is a market that does not exist. Per segment, the shape changes hard, and
+the shape IS the finding. Same toggle as Kraljic, so the two panels always agree on what a segment is.</p>
+
+<div class="card teal"><div class="hd"><span class="ct">Supply-market forces</span><span class="cs">Porter · by business purpose</span></div>
+<div class="bd">
+ <div class="seg"><button class="on">Business purpose</button><button>Delivery model</button><button class="gap">Line item · needs data</button></div>
+ <div class="split">
+  <div>
+   <svg viewBox="0 0 560 220">
+    <g transform="translate(95,110)">
+     <polygon points="0,-72 68,-22 42,58 -42,58 -68,-22" fill="none" stroke="var(--line2)"/>
+     <polygon points="0,-58 55,-18 26,36 -30,32 -46,-14" fill="var(--emph)" opacity=".22" stroke="var(--emph)" stroke-width="2"/>
+     <text x="0" y="-80" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Rivalry</text>
+    </g>
+    <text x="95" y="205" font-size="13" font-weight="700" text-anchor="middle" font-family="Libre Franklin">Medicines Development</text>
+    <g transform="translate(280,110)">
+     <polygon points="0,-72 68,-22 42,58 -42,58 -68,-22" fill="none" stroke="var(--line2)"/>
+     <polygon points="0,-40 34,-14 30,42 -34,40 -52,-16" fill="var(--plum)" opacity=".22" stroke="var(--plum)" stroke-width="2"/>
+    </g>
+    <text x="280" y="205" font-size="13" font-weight="700" text-anchor="middle" font-family="Libre Franklin">Marketing / Sales</text>
+    <g transform="translate(465,110)">
+     <polygon points="0,-72 68,-22 42,58 -42,58 -68,-22" fill="none" stroke="var(--line2)"/>
+     <polygon points="0,-66 30,-18 38,50 -40,48 -30,-12" fill="var(--teal)" opacity=".22" stroke="var(--teal)" stroke-width="2"/>
+    </g>
+    <text x="465" y="205" font-size="13" font-weight="700" text-anchor="middle" font-family="Libre Franklin">Collaboration</text>
+   </svg>
+   <div class="note">Five axes, clockwise from top: rivalry, supplier power, substitutes, new entrants,
+   buyer power. Larger area toward an axis means that force is stronger.</div>
+  </div>
+  <div class="means">
+   <h4>What the shapes say</h4>
+   <ul>
+    <li><b>Medicines Development</b> is supplier-dominated and thin on substitutes. Competing it is
+     theatre. Leverage comes from the migration milestones, not a threat.</li>
+    <li><b>Marketing / Sales</b> is balanced and contested. This is where a real competition changes
+     the price.</li>
+    <li><b>Collaboration</b> has high rivalry and strong substitutes, and you already pay for one of
+     them inside the Microsoft EA. This is a retire-and-consolidate market, not a negotiation.</li>
+   </ul>
+  </div>
+ </div>
+ <div class="note"><b>Selecting a segment</b> filters the Kraljic dot, the force profile and the risk
+ register together, so the whole band answers for one segment at a time.</div>
+</div></div>
+
+<!-- ===================================================================== -->
+<div class="sect"><b>Market intelligence — split layout</b></div>
+<p class="why">Your layout, built: the read on the left as a standing panel, the sourced headlines on the
+right as an accordion so six or twelve fit the same height. Pricing Environment stays as its own panel,
+as you asked, rather than being folded in.</p>
+
+<div class="card"><div class="hd"><span class="ct">Market intelligence</span><span class="cs">read 27 Jul 2026 · 6 sources</span></div>
+<div class="bd"><div class="split">
+ <div class="means">
+  <h4>What it means for this category</h4>
+  <ul>
+   <li>Model renewals at <b>15%</b>, not at inflation. A budget built on 5% will be wrong on the largest
+    agreements in the portfolio.</li>
+   <li>Price the AI clause set <b>before</b> the commercial terms. They gate the deal and take longer to
+    land than the discount does.</li>
+   <li>Ask what the AI-free SKU costs, in writing, even with no intention of buying it. A documented
+    refusal is leverage at the next renewal.</li>
+   <li>Consolidate deliberately. Removing the last credible alternative converts leverage into
+    dependency, and the price follows a cycle later.</li>
+  </ul>
+ </div>
+ <div>
+  <div class="acc"><div class="acch"><b>15%+</b><u>The routine renewal bump is gone</u></div>
+   <div class="accb">What was a 5 to 7 per cent renewal increase is now commonly 15 or more. Average SaaS
+    rises run 8.7%, aggressive vendors take 15 to 25%, and with migration fees the effective increase
+    lands at 20 to 30%.<br><a class="cite">BayTech</a> <a class="cite">Lynton</a></div></div>
+  <div class="acc"><div class="acch"><b>78%</b><u>AI charges arrive after signature</u></div></div>
+  <div class="acc"><div class="acch"><b>9-33%</b><u>Megavendors fund AI from the installed base</u></div></div>
+  <div class="acc"><div class="acch"><b>€35M</b><u>AI regulation now lands in the contract</u></div></div>
+  <div class="acc"><div class="acch"><b>Sole</b><u>The insurance gap makes indemnity the only backstop</u></div></div>
+  <div class="acc"><div class="acch"><b>68%</b><u>Everyone is consolidating, which cuts both ways</u></div></div>
+ </div>
+</div></div></div>
+
+<div class="sect"><b>The band, as it would ship</b></div>
+<p class="why">Option 1 with your amendments: Pricing Environment kept, What Could Change The Strategy
+kept, risk panels unchanged. Eight panels in three bands.</p>
+<table><thead><tr><th>Band</th><th>Panels</th></tr></thead><tbody>
+ <tr><td><b>Where we stand</b></td><td>Category position (Kraljic, segmented) · Supply-market forces (Porter, segmented)</td></tr>
+ <tr><td><b>What the market is doing</b></td><td>Market intelligence (split layout) · Pricing environment</td></tr>
+ <tr><td><b>What would change it</b></td><td>What could change the strategy · Risk heat map · Risk register · Escalation triggers · Geographic concentration</td></tr>
+</tbody></table>
+
+<div class="sect"><b>What I would ask IT Finance for</b></div>
+<div class="gapbox"><b>One field, two columns</b>
+ <span>A <b>unit type</b> and a <b>unit count</b> on each invoice or rate-card line: seats, GB, tokens,
+ API calls, instance-hours, support hours, role-days.</span>
+ <i>That one addition turns on the line-item toggle for both panels, makes AI spend separable from
+ licence spend for the first time, and is the only view in which "AI is driving up cost" stops being a
+ market claim and becomes a Lilly number. Without it the third toggle stays gap-stated.</i></div>
+
+</div></body></html>
