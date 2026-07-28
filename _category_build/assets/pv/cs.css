@@ -1,0 +1,154 @@
+/* =============================================================================
+   Category Strategy dashboard — stylesheet.
+
+   Type scale (locked, same as the other three dashboards):
+     9 label · 11 meta · 13 body · 16 title · 20 heading · 28 display
+   Nothing below 9. Nothing off the scale.
+
+   Colour: plum #5C2B50 primary, teal #2F6E6B secondary, burnt orange #C15E19
+   for EMPHASIS ONLY and always solid — a rule or a mark, never a pale wash.
+   Containers stay neutral; colour marks meaning on small objects. That is the
+   pattern the platform itself follows.
+   ============================================================================= */
+:root{
+  --cs-ink:#1A1A1A; --cs-mut:#564F48; --cs-mut2:#4A443C;
+  --cs-line:#E1E0DC; --cs-line2:#D3CDC3;
+  --cs-bg:#F4F1EC; --cs-surface:#FFFFFF;
+  --cs-plum:#5C2B50; --cs-plum-d:#43203B;
+  --cs-teal:#2F6E6B; --cs-burnt:#C15E19; --cs-burnt-d:#9A4A13;
+  --cs-band:#F0ECEF;
+  --cs-sans:'Libre Franklin',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+}
+html,body{margin:0;background:var(--cs-bg);color:var(--cs-ink);font-family:var(--cs-sans);font-size:13px;-webkit-font-smoothing:antialiased}
+.cs-main{max-width:1400px;margin:0 auto;padding:24px 36px 64px}
+
+/* ---- header ---- */
+.cs-eyebrow{font:700 9px var(--cs-sans);letter-spacing:.09em;text-transform:uppercase;color:var(--cs-mut2);margin-bottom:5px}
+.cs-h1{font-size:28px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--cs-ink)}
+.cs-sub{font-size:11px;color:var(--cs-mut);margin-top:5px}
+.cs-cats{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}
+.cs-cat{appearance:none;border:1px solid var(--cs-line2);background:var(--cs-surface);color:var(--cs-mut);
+  font:600 11px var(--cs-sans);padding:6px 12px;border-radius:30px;cursor:pointer}
+.cs-cat:hover{border-color:var(--cs-plum);color:var(--cs-plum)}
+.cs-cat.on{background:var(--cs-plum);border-color:var(--cs-plum);color:#fff;font-weight:700}
+.cs-tabs{display:flex;gap:2px;border-bottom:1px solid var(--cs-line2);margin:18px 0 18px;overflow-x:auto}
+.cs-tab{appearance:none;background:transparent;border:0;border-bottom:2.5px solid transparent;
+  color:var(--cs-mut);font:600 13px var(--cs-sans);padding:9px 13px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.cs-tab:hover{color:var(--cs-ink)}
+.cs-tab.on{color:var(--cs-ink);font-weight:800;border-bottom-color:var(--cs-plum)}
+
+/* ---- cards ---- */
+.cs-card{background:var(--cs-surface);border:1px solid var(--cs-line2);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.cs-cardhd{display:flex;align-items:baseline;gap:10px;background:var(--cs-band);
+  padding:10px 15px;border-bottom:1px solid var(--cs-line2)}
+.cs-ct{font:800 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-cs{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-cardbd{padding:14px 15px}
+.cs-card.cs-emph{border-left:4px solid var(--cs-burnt)}
+.cs-card.cs-quiet .cs-cardhd{background:var(--cs-surface)}
+.cs-row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.cs-row2{grid-template-columns:1fr}}
+
+/* ---- KPIs ---- */
+.cs-kpirow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
+.cs-kpi{background:var(--cs-surface);border:1px solid var(--cs-line2);border-radius:10px;padding:12px 14px}
+.cs-kpi-l{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-kpi-v{font-size:20px;font-weight:800;line-height:1.15;margin-top:5px;color:var(--cs-ink);letter-spacing:-.01em}
+.cs-kpi-plum .cs-kpi-v{color:var(--cs-plum)}
+.cs-kpi-teal .cs-kpi-v{color:var(--cs-teal)}
+.cs-kpi-s{font-size:11px;color:var(--cs-mut);margin-top:4px;line-height:1.4}
+
+/* ---- tables ---- */
+.cs-tblwrap{overflow-x:auto;border:1px solid var(--cs-line);border-radius:9px}
+.cs-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.cs-tbl th{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);
+  text-align:center;padding:9px 11px;background:var(--cs-band);border-bottom:1px solid var(--cs-line2);white-space:nowrap}
+.cs-tbl td{padding:10px 11px;border-bottom:1px solid var(--cs-line);text-align:center;vertical-align:top}
+.cs-tbl tr:last-child td{border-bottom:none}
+.cs-tbl th.cs-l,.cs-tbl td.cs-l{text-align:left}
+.cs-tbl tbody tr:hover td{background:#FBF9FA}
+.cs-sub2{display:block;font-size:11px;color:var(--cs-mut);font-weight:400;margin-top:2px;line-height:1.4}
+.cs-mit{font-size:11px;color:var(--cs-mut);line-height:1.45;max-width:360px;white-space:normal}
+.cs-inline{margin-left:8px;font-size:11px;color:var(--cs-mut)}
+.cs-up{color:var(--cs-teal);font-weight:700}
+.cs-down{color:var(--cs-burnt-d);font-weight:700}
+.cs-tier{font:700 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--cs-plum);
+  border:1px solid var(--cs-plum);border-radius:30px;padding:2px 9px;white-space:nowrap}
+.cs-needs{font-size:11px;color:var(--cs-burnt-d)}
+
+/* ---- bars, bands, pills ---- */
+.cs-bar{display:inline-block;width:110px;height:8px;border-radius:5px;background:#E6E1DA;overflow:hidden;vertical-align:middle}
+.cs-bar i{display:block;height:100%;border-radius:5px;background:var(--cs-plum)}
+.cs-bar-teal i{background:var(--cs-teal)}
+.cs-band{display:inline-block;font:800 9px var(--cs-sans);letter-spacing:.05em;width:20px;height:20px;line-height:20px;
+  border-radius:50%;color:#fff;background:var(--cs-plum)}
+.cs-band-B{background:var(--cs-teal)}
+.cs-band-C{background:#8A8179}
+.cs-pill{display:inline-block;font:700 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;
+  padding:2px 9px;border-radius:30px;border:1px solid currentColor;white-space:nowrap}
+.cs-pill-plum{color:var(--cs-plum)} .cs-pill-teal{color:var(--cs-teal)} .cs-pill-burnt{color:var(--cs-burnt-d)}
+
+/* ---- controls ---- */
+.cs-ctrl{display:flex;align-items:center;gap:11px;margin-bottom:12px;flex-wrap:wrap}
+.cs-ctrl-l{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-ctrl input[type=range]{flex:1;min-width:160px;max-width:280px;accent-color:var(--cs-plum)}
+.cs-ctrl-v{font:700 11px var(--cs-sans);color:var(--cs-plum)}
+.cs-segbar{display:inline-flex;border:1px solid var(--cs-line2);border-radius:30px;overflow:hidden;margin-bottom:12px}
+.cs-seg{appearance:none;background:transparent;border:0;font:700 11px var(--cs-sans);color:var(--cs-mut);
+  padding:6px 14px;cursor:pointer}
+.cs-seg.on{background:var(--cs-plum);color:#fff}
+
+/* ---- trend + lists ---- */
+.cs-trend{display:flex;align-items:flex-end;gap:14px;height:150px;padding:6px 0 0}
+.cs-trend-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+.cs-trend-v{font:700 11px var(--cs-sans);color:var(--cs-ink);margin-bottom:5px}
+.cs-trend-bar{flex:1;width:100%;max-width:56px;display:flex;align-items:flex-end;background:#F1EDEA;border-radius:6px 6px 0 0}
+.cs-trend-bar i{display:block;width:100%;background:var(--cs-plum);border-radius:6px 6px 0 0;min-height:3px}
+.cs-trend-l{font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);margin-top:6px}
+.cs-suplist,.cs-frag{display:flex;flex-direction:column;gap:8px}
+.cs-suprow,.cs-frag-row{display:flex;align-items:center;gap:10px}
+.cs-supn,.cs-frag-n{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-supv,.cs-frag-v{font:700 11px var(--cs-sans);color:var(--cs-ink);width:64px;text-align:right}
+.cs-supp{font-size:11px;color:var(--cs-mut);width:48px;text-align:right}
+
+/* ---- prose, notes, gaps ---- */
+.cs-prose,.cs-find,.cs-thesis{font-size:13px;line-height:1.6;color:var(--cs-ink)}
+.cs-thesis{font-size:13px;font-weight:600}
+.cs-note{font-size:11px;line-height:1.55;color:var(--cs-mut);margin-top:10px}
+.cs-note b{color:var(--cs-ink)}
+.cs-lab2{display:block;font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-plum);margin-bottom:4px}
+.cs-implic{margin-top:10px;padding-top:10px;border-top:1px solid var(--cs-line)}
+.cs-dq{display:flex;gap:8px;flex-wrap:wrap}
+.cs-chip{font:600 11px var(--cs-sans);color:var(--cs-mut);border:1px solid var(--cs-line2);border-radius:30px;padding:3px 10px}
+.cs-src{display:inline-block;font:700 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--cs-teal);border-bottom:1px dotted var(--cs-teal);cursor:help;margin-left:6px}
+
+/* a gap is stated plainly: burnt rule, neutral ground, and the field named */
+.cs-gap{border:1px dashed var(--cs-line2);border-left:3px solid var(--cs-burnt);border-radius:8px;padding:12px 14px}
+.cs-gap-k{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-burnt-d);margin-bottom:5px}
+.cs-gap-t{font-size:13px;color:var(--cs-ink);line-height:1.5}
+.cs-gap-f{font-size:11px;color:var(--cs-mut);margin-top:6px}
+.cs-gap-f b{color:var(--cs-ink);font-family:var(--cs-sans)}
+
+/* ---- forces, plays, posture ---- */
+.cs-force{padding:10px 0;border-bottom:1px solid var(--cs-line)}
+.cs-force:last-child{border-bottom:none}
+.cs-force-h{display:flex;align-items:center;gap:10px}
+.cs-force-f{font-size:13px;font-weight:700;flex:1}
+.cs-force-d{font-size:11px;color:var(--cs-mut);line-height:1.5;margin-top:4px}
+.cs-plays{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.cs-play{border:1px solid var(--cs-line2);border-radius:9px;padding:12px 13px;border-left:3px solid var(--cs-plum)}
+.cs-play-h{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.cs-play-n{font-size:13px;font-weight:700;flex:1}
+.cs-play-v{font-size:16px;font-weight:800;color:var(--cs-plum)}
+.cs-play-hz{font-size:11px;font-weight:600;color:var(--cs-mut)}
+.cs-play-b{font-size:11px;color:var(--cs-mut);line-height:1.5;margin-top:6px}
+.cs-play-t{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);margin-top:8px}
+.cs-posture{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px;
+  font-size:11px;color:var(--cs-mut)}
+.cs-posture b{color:var(--cs-plum);margin-right:5px}
+.cs-kraljic-pos{font-size:16px;font-weight:800;color:var(--cs-plum);margin-bottom:8px}
+
+/* form controls must not fall back to the browser default 13.3333px */
+button,input,select,textarea{font-family:inherit;font-size:13px}
+small,sub,sup{font-size:9px}
