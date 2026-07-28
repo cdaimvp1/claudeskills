@@ -1757,6 +1757,62 @@ small,sub,sup{font-size:9px}
 .cs-row2>.cs-card>.cs-cardbd,.cs-paretorow>.cs-card>.cs-cardbd,
 .cs-screl>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin}
 
+
+/* =============================================================================
+   Legend, band visibility, and the stray tab scrollbar
+   ============================================================================= */
+
+/* 1. overflow-x:auto alone computes overflow-y:auto, and a 1px height
+      difference between the strip and its buttons then shows a vertical
+      scrollbar. Both axes have to be declared, on every strip and its wrapper. */
+.cs-tabs,.cs-subtabs,.cs-cats,.cs-segbar,.cs-supctl{
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;
+}
+.cs-tabs::-webkit-scrollbar,.cs-subtabs::-webkit-scrollbar{height:6px}
+.cs-tabs::-webkit-scrollbar-thumb,.cs-subtabs::-webkit-scrollbar-thumb{
+  background:var(--line2);border-radius:3px}
+
+/* 3. the confidence band was 16% teal over an off-white card, which is
+      invisible. It now carries a readable fill and its own dashed edge. */
+.cs-tover .cs-tband{fill:var(--cs-teal);opacity:.30;stroke:var(--cs-teal);
+  stroke-width:1.5;stroke-dasharray:5 4;vector-effect:non-scaling-stroke}
+
+/* 4. legend swatches drew plum for everything because the base rule set a plum
+      background and the per-key overrides were not all present. Each key now
+      states its own swatch, and they match what the chart actually draws. */
+.cs-fc-key span::before,.cs-rv-key span::before{
+  content:'';width:14px;height:11px;border-radius:2px;background:var(--cs-plum);flex:none}
+.cs-k-hist::before{background:var(--cs-plum)}
+.cs-k-ytd::before{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 4px,#7A3C6B 4px 8px)}
+.cs-k-add::before{background:repeating-linear-gradient(135deg,var(--cs-teal) 0 4px,#4A8F8B 4px 8px)}
+.cs-k-proj::before{background:var(--cs-teal)}
+.cs-k-band::before{background:rgba(47,110,107,.30);border:1.5px dashed var(--cs-teal);
+  box-sizing:border-box;border-radius:2px}
+.cs-k-trend::before{background:transparent;border-radius:0;height:0;
+  border-top:3px dashed var(--cs-burnt)}
+.cs-k-a::before{background:var(--cs-plum)}
+.cs-k-b::before{background:#C9C2B8}
+.cs-k-line::before{background:var(--cs-burnt);height:3px;border-radius:2px}
+.cs-k-rate::before{background:var(--cs-plum)}
+.cs-k-vol::before{background:var(--cs-teal)}
+.cs-fc-key,.cs-rv-key{align-items:center}
+
+
+/* The first legend block used !important, so the corrected swatches above lost.
+   Same specificity, stated last, and marked so the intent is unambiguous. */
+.cs-k-hist::before{background:var(--cs-plum)!important;border:0!important;height:11px!important}
+.cs-k-ytd::before{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 4px,#7A3C6B 4px 8px)!important}
+.cs-k-add::before{background:repeating-linear-gradient(135deg,var(--cs-teal) 0 4px,#4A8F8B 4px 8px)!important}
+.cs-k-proj::before{background:var(--cs-teal)!important;border:0!important;height:11px!important}
+.cs-k-band::before{background:rgba(47,110,107,.30)!important;border:1.5px dashed var(--cs-teal)!important;
+  height:11px!important;border-radius:2px!important;box-sizing:border-box}
+.cs-k-trend::before{background:transparent!important;border:0!important;border-top:3px dashed var(--cs-burnt)!important;
+  height:0!important;border-radius:0!important;width:16px!important}
+/* the strip is 1px taller than its buttons, which is what produced the bar */
+.cs-tabs,.cs-subtabs{padding-bottom:1px}
+.cs-tab,.cs-subtab{margin-bottom:0}
+.cs-tabs{border-bottom:1px solid var(--line2)}
+
 </style>
 </head>
 <body>
@@ -3212,8 +3268,10 @@ function csFindings(d) {
   if (typeof arr[0] === 'string') return csNarr(f);
   return '<div class="cs-mis">' + arr.map(function (x) {
     var tone = csTone(x.c) || 'plum';
+    var k = x.k || '';
     return '<div class="cs-mi cs-mi-' + tone + '">'
-      + (x.k ? '<div class="cs-mi-k">' + csEsc(x.k) + '</div>' : '')
+      + (k ? '<div class="cs-mi-k">' + csEsc(k)
+             + (/hhi/i.test(k) ? csHelp(CS_HHI_HELP) : '') + '</div>' : '')
       + '<div class="cs-mi-t">' + csEsc(x.t || x.title || '') + '</div>'
       + '<div class="cs-mi-d">' + csEsc(x.d || '') + '</div></div>';
   }).join('') + '</div>';
@@ -3347,7 +3405,8 @@ function csParetoRead(d) {
   var conc = m.hhi == null ? '' : (m.hhi >= 2500 ? 'concentrated' : m.hhi >= 1500 ? 'moderately concentrated' : 'unconcentrated');
   return '<div class="cs-read">'
     + '<div class="cs-read-d">' + line80 + ', and the largest single relationship, <b>' + csEsc(lead.name) + '</b>, '
-    + 'is ' + csPct(lead.cumPct, 1) + ' of it on its own. At an HHI of ' + csNum(Math.round(m.hhi || 0)) + ' the category is '
+    + 'is ' + csPct(lead.cumPct, 1) + ' of it on its own. At an HHI' + csHelp(CS_HHI_HELP) + ' of '
+    + csNum(Math.round(m.hhi || 0)) + ' the category is '
     + conc + ', which means leverage comes from <b>competing the top</b> rather than from breaking a monopoly. '
     + 'The flat right-hand stretch is the cost problem: ' + csNum(m['tail' + CS_TAIL]) + ' suppliers under $' + CS_TAIL + 'K '
     + 'account for ' + csPct(m['tail' + CS_TAIL + 'Pct']) + ' of spend but consume the same contracting and vendor-management effort as the top.'
@@ -3657,7 +3716,8 @@ function csScorecard(d) {
           }).join(' ') + '"/></svg>';
     }
     return '<div class="cs-scard' + (need ? ' is-need' : '') + '">'
-      + '<div class="cs-scard-k">' + csEsc(x.kpi) + '</div>'
+      + '<div class="cs-scard-k">' + csEsc(x.kpi)
+        + (/hhi/i.test(x.kpi || '') ? csHelp(CS_HHI_HELP) : '') + '</div>'
       + '<div class="cs-scard-r"><span class="cs-scard-c">' + csEsc(need ? 'not measured' : x.cur) + '</span>'
       + '<span class="cs-scard-a">&rarr;</span><span class="cs-scard-t">' + csEsc(x.tgt || '--') + '</span></div>'
       + spark

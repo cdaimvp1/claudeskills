@@ -1347,8 +1347,10 @@ function csFindings(d) {
   if (typeof arr[0] === 'string') return csNarr(f);
   return '<div class="cs-mis">' + arr.map(function (x) {
     var tone = csTone(x.c) || 'plum';
+    var k = x.k || '';
     return '<div class="cs-mi cs-mi-' + tone + '">'
-      + (x.k ? '<div class="cs-mi-k">' + csEsc(x.k) + '</div>' : '')
+      + (k ? '<div class="cs-mi-k">' + csEsc(k)
+             + (/hhi/i.test(k) ? csHelp(CS_HHI_HELP) : '') + '</div>' : '')
       + '<div class="cs-mi-t">' + csEsc(x.t || x.title || '') + '</div>'
       + '<div class="cs-mi-d">' + csEsc(x.d || '') + '</div></div>';
   }).join('') + '</div>';
@@ -1482,7 +1484,8 @@ function csParetoRead(d) {
   var conc = m.hhi == null ? '' : (m.hhi >= 2500 ? 'concentrated' : m.hhi >= 1500 ? 'moderately concentrated' : 'unconcentrated');
   return '<div class="cs-read">'
     + '<div class="cs-read-d">' + line80 + ', and the largest single relationship, <b>' + csEsc(lead.name) + '</b>, '
-    + 'is ' + csPct(lead.cumPct, 1) + ' of it on its own. At an HHI of ' + csNum(Math.round(m.hhi || 0)) + ' the category is '
+    + 'is ' + csPct(lead.cumPct, 1) + ' of it on its own. At an HHI' + csHelp(CS_HHI_HELP) + ' of '
+    + csNum(Math.round(m.hhi || 0)) + ' the category is '
     + conc + ', which means leverage comes from <b>competing the top</b> rather than from breaking a monopoly. '
     + 'The flat right-hand stretch is the cost problem: ' + csNum(m['tail' + CS_TAIL]) + ' suppliers under $' + CS_TAIL + 'K '
     + 'account for ' + csPct(m['tail' + CS_TAIL + 'Pct']) + ' of spend but consume the same contracting and vendor-management effort as the top.'
@@ -1792,7 +1795,8 @@ function csScorecard(d) {
           }).join(' ') + '"/></svg>';
     }
     return '<div class="cs-scard' + (need ? ' is-need' : '') + '">'
-      + '<div class="cs-scard-k">' + csEsc(x.kpi) + '</div>'
+      + '<div class="cs-scard-k">' + csEsc(x.kpi)
+        + (/hhi/i.test(x.kpi || '') ? csHelp(CS_HHI_HELP) : '') + '</div>'
       + '<div class="cs-scard-r"><span class="cs-scard-c">' + csEsc(need ? 'not measured' : x.cur) + '</span>'
       + '<span class="cs-scard-a">&rarr;</span><span class="cs-scard-t">' + csEsc(x.tgt || '--') + '</span></div>'
       + spark
