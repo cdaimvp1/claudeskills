@@ -473,6 +473,12 @@ const DealUI = {
     (global.dashboardData.assumptions || []).forEach(a => { assumptionOriginals[a.id] = a.value; });
 
     // one delegated click handler for the whole document
+    document.addEventListener('input', (e) => {
+      const cq = e.target.closest && e.target.closest('[data-cosearch]');
+      if (!cq) return;
+      const scope = cq.closest('[data-coscope]');
+      if (scope) { scope.setAttribute('data-fq', cq.value || ''); this._coApply(scope); }
+    });
     document.addEventListener('click', (e) => {
       const t = e.target.closest('[data-tab],[data-subtab],[data-jump],[data-gotofinding],[data-unfocus],[data-copy],[data-copy-text],[data-print],[data-reset-assumptions],[data-exprow],tr.expandable,[data-filterchip],[data-lpview],[data-lpclear],[data-scpick],[data-cofilter],[data-coexpand],[data-pf-view],[data-pf-setdepth]');
       if (!t) return;
@@ -530,13 +536,7 @@ const DealUI = {
           const bs = b.getAttribute('data-cofilter'); const bi = bs.indexOf(':');
           if (bs.slice(0, bi) === kind) b.setAttribute('aria-pressed', bs.slice(bi + 1) === next ? 'true' : 'false');
         });
-        const fs = scope.getAttribute('data-fstatus') || '', fc = scope.getAttribute('data-fcat') || '';
-        let shown = 0;
-        scope.querySelectorAll('.co-item').forEach(it => {
-          const ok = (!fs || it.getAttribute('data-status') === fs) && (!fc || it.getAttribute('data-cat') === fc);
-          it.hidden = !ok; if (ok) shown++;
-        });
-        const c = scope.querySelector('[data-cocount]'); if (c) c.textContent = shown;
+        this._coApply(scope);
         return;
       }
       if (t.hasAttribute('data-coexpand')) {
@@ -677,6 +677,40 @@ const DealUI = {
     const box = scope.querySelector('[data-filter-input]');
     this._filterTable(table, ((box && box.value) || '').toLowerCase(), scope);
   },
+  /* Communications alignment map: status, category and search compose. One
+     function decides visibility so a later filter cannot undo an earlier one.
+     These are <details> cards, so _filterTable does not apply. */
+  _coApply(scope) {
+    if (!scope) return 0;
+    const fs = scope.getAttribute('data-fstatus') || '';
+    const fc = scope.getAttribute('data-fcat') || '';
+    const fq = (scope.getAttribute('data-fq') || '').toLowerCase().trim();
+    let shown = 0;
+    scope.querySelectorAll('.co-item').forEach((it) => {
+      const okS = !fs || it.getAttribute('data-status') === fs;
+      const okC = !fc || it.getAttribute('data-cat') === fc;
+      const okQ = !fq || (it.textContent || '').toLowerCase().indexOf(fq) !== -1;
+      const on = okS && okC && okQ;
+      it.hidden = !on;
+      if (on) shown++;
+    });
+    const c = scope.querySelector('[data-cocount]');
+    if (c) c.textContent = shown;
+    let none = scope.querySelector('.co-nohits');
+    if (!shown) {
+      if (!none) {
+        none = document.createElement('div');
+        none.className = 'co-nohits';
+        (scope.querySelector('.co-list') || scope).appendChild(none);
+      }
+      none.textContent = 'No contested item matches that filter.';
+      none.hidden = false;
+    } else if (none) {
+      none.hidden = true;
+    }
+    return shown;
+  },
+
   _filterTable(table, q, scope) {
     const chips = Array.from(scope.querySelectorAll('[data-filterchip][aria-pressed="true"]'))
       .map(c => c.getAttribute('data-filterchip').toLowerCase());

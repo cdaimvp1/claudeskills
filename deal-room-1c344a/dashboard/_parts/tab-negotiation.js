@@ -338,8 +338,10 @@ function renderTab_negotiation(d) {
    * cited messages=comms.events (by issueId + direction), the redline quote=
    * issue.sourceExcerpt, next move=recommendedResponse. Status + category come from
    * neg.tradePlan. Reflect-only: expand only, no send / route.
-   * NOTE: interactive filters (status / category / search + expand-all) are not yet
-   * wired (they need a delegated handler in DealUI); see the build tracker. */
+   * Filters: status cards, category buttons, free-text search and expand-all are
+   * all delegated through DealUI (data-cofilter / data-cosearch / data-coexpand,
+   * scoped by data-coscope). Search cannot use the shared _filterTable helper:
+   * these are <details> cards, not table rows. */
   function buildComms() {
     const tp = neg.tradePlan || {};
     const readOf = (id) => (tp.read && tp.read[id]) || {};
@@ -448,13 +450,16 @@ function renderTab_negotiation(d) {
       ? '<div class="co-catfilter"><button class="co-cf" data-cofilter="cat:" aria-pressed="true">All</button>' +
         cats.map((c) => '<button class="co-cf" data-cofilter="cat:' + esc(c) + '" aria-pressed="false">' + esc(c) + '</button>').join('') + '</div>'
       : '';
-    const listctl = '<div class="co-listctl"><span class="co-lc-count"><b data-cocount>' + items.length + '</b> contested items</span>' +
+    const listctl = '<div class="co-listctl">' +
+      '<input class="co-lc-search" type="search" data-cosearch placeholder="Search terms, positions and quotes" ' +
+      'aria-label="Search contested items">' +
+      '<span class="co-lc-count"><b data-cocount>' + items.length + '</b> contested items</span>' +
       '<button class="co-lc-btn" data-coexpand>Expand all</button></div>';
     const evNote = events.length
       ? insight('Every contested term below shows both sides and the exact messages and quotes that got them there, cited to the M365 thread. ' + coverageBadge(d.deal.evidenceCoverage))
       : insight('No in-session email/Teams thread was available; positions below are mapped from the redline only.', 'warn');
     const list = '<div class="co-list">' + items.map(itemRow).join('') + '</div>';
-    const body = '<div data-coscope data-fstatus="" data-fcat="">' + summary + catFilter + evNote + listctl + list + '</div>';
+    const body = '<div data-coscope data-fstatus="" data-fcat="" data-fq="">' + summary + catFilter + evNote + listctl + list + '</div>';
 
     return '<div class="grid"><div class="col-12">' +
       saCard('Alignment Map · Contested Terms', body,
@@ -464,6 +469,10 @@ function renderTab_negotiation(d) {
 
   /* ================================ SHELL ================================== */
   const scopedStyle = '<style>' +
+    '.neg-tab .co-lc-search{flex:1;min-width:170px;max-width:320px;font:400 13px var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:30px;padding:7px 14px}' +
+    '.neg-tab .co-lc-search:focus{outline:none;border-color:var(--pri)}' +
+    '.neg-tab .co-listctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}' +
+    '.neg-tab .co-nohits{font-size:13px;color:var(--mut);padding:16px 0;text-align:center}' +
     '.neg-tab .section-lead{margin:2px 0 2px}' +
     '.neg-tab .obj-row{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line)}' +
     '.neg-tab .obj-row:first-child{border-top:0}' +
