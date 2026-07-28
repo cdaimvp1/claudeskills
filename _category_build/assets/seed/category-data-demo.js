@@ -195,3 +195,102 @@
     ]
   };
 }());
+
+/* ---------------------------------------------------------------------------
+   Second illustrative block, added with the 5-tab restructure. Same rule as
+   above: every figure here is invented so the new screens can be judged full.
+   =========================================================================== */
+(function () {
+  if (typeof CATEGORY_SEED === 'undefined') return;
+  var d = (CATEGORY_SEED.categories || [])[0];
+  if (!d || !d.__demo) return;
+
+  /* A full Pareto curve. The real seed resolves seven megavendors by name and
+     describes the other ~762 in aggregate, so there is no curve to draw. This
+     synthesises one that lands on the real totals: 769 vendors, $792.6M FY25. */
+  var named = [
+    ['Microsoft', 91300000], ['Amazon Web Services', 74300000], ['Veeva Systems', 64300000],
+    ['Adobe', 32300000], ['SAP America', 32100000], ['Salesforce', 22100000], ['ZS Associates', 15400000]
+  ];
+  var rest = [
+    ['World Wide Technology', 14200000], ['SHI International', 12800000], ['Oracle America', 11900000],
+    ['SAS Institute', 10400000], ['ServiceNow', 9600000], ['Workday', 8900000], ['Snowflake', 8100000],
+    ['Databricks', 7400000], ['Atlassian', 6900000], ['Anthropic', 6800000], ['Palo Alto Networks', 6200000],
+    ['CrowdStrike', 5800000], ['Okta', 5300000], ['Zoom', 4900000], ['Box', 4400000],
+    ['DocuSign', 4100000], ['Smartsheet', 3800000], ['Tableau', 3500000], ['Qlik', 3200000],
+    ['Tamarind Bio', 3100000], ['Communications Professionals', 2900000], ['Dassault Systemes', 2700000],
+    ['MathWorks', 2500000], ['PTC', 2300000], ['Ansys', 2100000], ['Certara', 1900000],
+    ['Dotmatics', 1750000], ['Benchling', 1600000], ['Schrodinger', 1480000], ['Chemaxon', 1360000],
+    ['Elsevier', 1250000], ['Clarivate', 1150000], ['IQVIA', 1060000], ['Medidata', 980000],
+    ['Oracle Health', 900000], ['Sparta Systems', 830000], ['MasterControl', 760000], ['Veracode', 700000],
+    ['Snyk', 640000], ['GitLab', 590000], ['JFrog', 540000], ['HashiCorp', 500000],
+    ['Datadog', 460000], ['New Relic', 420000], ['PagerDuty', 390000], ['Grafana Labs', 355000],
+    ['Confluent', 325000], ['MongoDB', 300000], ['Redis', 275000], ['Elastic', 250000],
+    ['Twilio', 230000], ['SendGrid', 210000], ['Segment', 195000], ['Amplitude', 180000],
+    ['Mixpanel', 165000], ['Figma', 150000], ['Miro', 138000], ['Notion', 126000],
+    ['Airtable', 115000], ['Asana', 105000]
+  ];
+  var all = named.concat(rest);
+  var plotted = all.reduce(function (a, r) { return a + r[1]; }, 0);
+  /* Everything not named is folded into a synthetic long tail that closes the
+     gap to the real FY25 total across the remaining vendor count. */
+  var remainingN = 769 - all.length;
+  var remainingV = 792600000 - plotted;
+  /* A real long tail decays, it does not step down linearly, so the synthetic
+     remainder follows a power law and the curve keeps its Pareto shape. */
+  var w = [], sum = 0;
+  for (var i = 1; i <= remainingN; i++) { var v = Math.pow(i, -0.85); w.push(v); sum += v; }
+  for (var j = 0; j < remainingN; j++) all.push(['Supplier ' + (all.length + 1), Math.max(1200, remainingV * w[j] / sum)]);
+
+  /* A Pareto is sorted by definition. Without this the synthetic tail starts
+     above the smallest named supplier and the curve steps back up. */
+  all.sort(function (a, b) { return b[1] - a[1]; });
+  var total = all.reduce(function (a, r) { return a + r[1]; }, 0);
+  var cum = 0;
+  d.paretoFull = all.map(function (r) {
+    cum += r[1];
+    return { name: r[0], value: r[1], cumPct: (cum / total) * 100 };
+  });
+
+  /* Tail consolidation groups */
+  d.tailOpps = [
+    { group: 'Project and work management', effort: 'Low', combined: 4900000, saving: 1400000,
+      vendors: ['Smartsheet', 'Asana', 'Airtable', 'Notion', 'Miro'],
+      action: 'Standardise on Planner and Jira, both already licensed inside existing agreements. Cancel the rest at renewal.' },
+    { group: 'Observability and monitoring', effort: 'Medium', combined: 1625000, saving: 480000,
+      vendors: ['Datadog', 'New Relic', 'Grafana Labs', 'PagerDuty'],
+      action: 'Consolidate to one platform under an enterprise commit; the other three renew inside 9 months.' },
+    { group: 'Scientific point tools', effort: 'High', combined: 8090000, saving: 900000,
+      vendors: ['Chemaxon', 'Dotmatics', 'Benchling', 'Schrodinger'],
+      action: 'Route through a single research-informatics agreement. High effort: each has a distinct scientific owner.' },
+    { group: 'Long tail under $50K', effort: 'Low', combined: 5600000, saving: 1100000,
+      vendors: ['342 suppliers'],
+      action: 'Close the funnel: no new PO under $50K without a catalogue route. Existing spend migrates at renewal.' }
+  ];
+
+  /* Contract exposure */
+  d.contractOpps = [
+    { n: 'Microsoft', kind: 'Expiring, notice window open', days: 62, atRisk: 91300000,
+      action: 'Lock before the 1 July list increase. The notice window closes before a full sourcing cycle would finish.' },
+    { n: 'Long tail and named off-contract', kind: 'Off-contract', days: null, atRisk: 226700000,
+      action: 'Route through the preferred-supplier catalogue or execute SOWs against existing master agreements.' },
+    { n: 'Salesforce', kind: 'No master agreement', days: null, atRisk: 22100000,
+      action: 'Order forms only, rolling renewal, no notice right. Put an MSA in place before the next order form.' },
+    { n: 'Amazon Web Services', kind: 'EDP renewal', days: 138, atRisk: 74300000,
+      action: 'Open the renegotiation against the committed-use coverage baseline, not against list.' },
+    { n: 'ZS Associates', kind: 'Expired, work continuing', days: 0, atRisk: 15400000,
+      action: 'Work is proceeding on an expired SOW. Reconcile scope, then renew or exit.' }
+  ];
+
+  /* The platform's own tiering shape, so the derived path is not the only one shown */
+  d.supplierTiering = [
+    { label: 'Strategic', tier: 1, supplierCount: 3, spendShare: 29.4,
+      approach: 'Joint roadmap and executive sponsorship. Competed only at renewal, and only with a credible alternative in hand.' },
+    { label: 'Preferred', tier: 2, supplierCount: 3, spendShare: 10.6,
+      approach: 'Benchmarked every cycle and competed at renewal. The default posture for anything not genuinely unique.' },
+    { label: 'Under review', tier: 3, supplierCount: 1, spendShare: 1.9,
+      approach: 'Scope and value under active challenge. Renew, reduce or replace within this planning cycle.' },
+    { label: 'Transactional tail', tier: 4, supplierCount: 762, spendShare: 58.1,
+      approach: 'Catalogue or standing order. No sourcing event unless the spend crosses the threshold.' }
+  ];
+}());
