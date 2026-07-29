@@ -46,7 +46,7 @@ Update this table as you go. It is the fastest way to resume.
 
 | Item | Status | Commit | Notes |
 |---|---|---|---|
-| O1 coverage matrix output-mode re-audit | NOT STARTED | | do first, gate misreports itself |
+| O1 coverage matrix output-mode re-audit | PART DONE | `2720f66` | merge done, 307 rows not 342. Output-mode column + Part 3 coverage sweep still owed |
 | O2 build `deduction_score()` | NOT STARTED | | kernel skill only, do NOT wire |
 | O3 C3 Bid Leveling kernel | NOT STARTED | | gates an audited ranking |
 | O4 C2 playbook-learning Difficulty Score | NOT STARTED | | proven bug in its own changelog |
@@ -62,3 +62,41 @@ Update this table as you go. It is the fastest way to resume.
 
 (Append blocks below. Newest at the bottom. Do not rewrite history; if you were
 wrong earlier, append a correction rather than editing the original entry.)
+
+### O1 PART DONE, 2026-07-29
+
+Merged the three parts into `_audit/F1-COVERAGE-MATRIX.md`. Commit `2720f66`.
+
+**Verification, actual output not a summary of it.** Every line of all three part files
+was checked for presence in the merged file:
+
+```
+F1-COVERAGE-MATRIX-PART1-mechanical.md: source_lines=170 missing_from_merge=0
+F1-COVERAGE-MATRIX-PART2-judgment.md:   source_lines=280 missing_from_merge=0
+F1-COVERAGE-MATRIX-PART3-outputs-rules.md: source_lines=200 missing_from_merge=0
+```
+
+Data rows counted from the tables themselves, per source file:
+
+```
+Part 1: definition-tracing 15, arithmetic-verification 16, dpa-review 49,
+        risk-scoring 9, contract-stack-map 30            = 119  (claims 118)
+Part 2: playbook 34, vendor-tactics 19,
+        commercial-analysis 23, pharma-requirements 14   =  90  (claims  89)
+Part 3: dashboard rescue 23, review-summary-design 23, pass-artifacts 10,
+        sme-matrix 15, lilly-templates 5, ai-standard 10,
+        the 12 Rules 12                                  =  98  (claims 135)
+TOTAL 307, not 342.
+```
+
+**What changed:** merged file created with new front matter consolidating the
+output-mode hole, the three decided rescues and their corrected destinations, the Rule
+12 text edit, the two calibration assertions, the shared-implementation list, and the
+seven pre-existing ambiguities. Part 3 coverage marked UNKNOWN rather than complete.
+
+**What I deliberately did not do:** did not add the output-mode column, did not sweep
+Part 3's source files, did not renumber or reword a single row. The rows are verbatim.
+Nothing under `lilly-contract-review` was written to. `dashboard-canonical.md` untouched.
+
+**O1 is NOT complete.** Remaining: the output-mode column, the row-count reconciliation,
+and the Part 3 coverage sweep. See the revised O1 in the queue.

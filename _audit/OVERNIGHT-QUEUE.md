@@ -31,12 +31,31 @@ Everything else is fair game.
 
 ## Tier 1: do first, highest value
 
-**O1. Coverage matrix output-mode re-audit.** Merge the three parts into
-`_audit/F1-COVERAGE-MATRIX.md`, add a "which output modes does this reach" column,
-re-audit all 342 rows against the test: *if the user requests ONLY the redlined
-track-changes .docx, does this check still run and does its result reach them?* The
-matrix currently misreports itself as complete. A gate that says PASS wrongly is
-worse than one that fails.
+**O1. Coverage matrix output-mode re-audit.** The merge is DONE (`2720f66`),
+`_audit/F1-COVERAGE-MATRIX.md` exists. Three things remain, and O1 is not complete
+until all three are:
+
+1. **Add the "which output modes does this reach" column** and re-audit every row
+   against the test: *if the user requests ONLY the redlined track-changes .docx, does
+   this check still run and does its result reach them?* Suspects first: any row mapped
+   to `review-summary-design.md` or the Review Summary generator.
+2. **Reconcile the row count.** The merge found 307 rows, not 342. Parts 1 and 2 are off
+   by one each and that is noise. **Part 3 reports 135 and contains 98.** Either the
+   figure was estimated and never reconciled, or 37 rows were scoped and never written.
+   Until this is settled, Part 3's coverage is UNKNOWN.
+3. **Coverage sweep of Part 3's six source files** to settle (2): walk
+   `review-summary-design.md`, `pass-artifacts.md`, `sme-matrix.md`, `lilly-templates.md`,
+   `ai-standard.md` and the retired `dashboard-canonical.md` section by section, confirm
+   every substantive item has a row, and ADD rows for anything missing. Sweep Parts 1
+   and 2 the same way while the re-audit is open, since it costs little once the
+   machinery is running.
+
+A gate that says PASS wrongly is worse than one that fails. Both defects make this gate
+say PASS wrongly.
+
+**Read-only on the skill.** This item reads `lilly-contract-review` files to check
+coverage but writes only to `_audit/`. That does not breach the HOLD, which is on
+changing the skill.
 
 **O2. Build `deduction_score()`** in `lilly-procurement-kernels`. Deduction model,
 starts at 100, four coverage columns, Hard Stops always -15 never reduced. NOT
