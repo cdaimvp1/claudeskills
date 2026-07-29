@@ -24,7 +24,24 @@ screen). Both must be rebuilt and copied on every change.
 
 ---
 
-## NEXT ACTION: D0 (Marc's decision), then D1 and D3
+## NEXT ACTION: D2, when Marc lifts the deferral. Otherwise the Deal thread is done.
+
+Deal LOCKED (#17). D0, D1, D3, D4, L3 all DONE. **D2 is the only item left in the
+agreed scope and Marc deferred it.**
+
+D2 is the shared no-green rule in `lilly-brand-assets-1c344a/references/`
+(`brand-colors.md` + `dashboard-components.md`), which still says "no green or
+teal". Teal is now the primary settled/ok token, so the rule contradicts the
+system. Blast radius ~26 skills; scope strictly to the colour tables and the
+no-green prose. The lens skills' own palette lines were deliberately left alone
+during D1 for exactly this reason.
+
+ONE LOOSE END: `deal-room-1c344a/dashboard/` could not be deleted after the D0
+move (a local HTTP server held a handle). It carries a SUPERSEDED marker. Delete
+it when no process holds it; nothing references it.
+
+--- (superseded below) ---
+## Was: D0, then D1 and D3
 
 Deal is **LOCKED** (#17, 2026-07-29). D4 and L3 are **DONE**. D2 is deferred by
 Marc. D1 and D3 remain and are blocked on D0.

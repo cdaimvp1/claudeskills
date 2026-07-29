@@ -127,3 +127,131 @@ same pattern commercial-negotiation-prep uses for its own confidence badges.
    NPV curve) is paired with an adjacent narrative analysis panel.
 
 ---
+
+
+---
+
+# Deal-tab contribution (D1 / D3, added 2026-07-29)
+
+> **Nothing above this line changed.** This skill's standalone outputs are
+> unaffected: same structure, same palette, same generators. This section only
+> describes what this skill contributes when a Deal tab is being built.
+
+## The converged target
+
+The Deal tab is built by **`deal-tab-1c344a`**, not by this skill. It is one
+static, self-contained HTML artifact on the platform chrome, with a LOCKED
+four-tab structure:
+
+| Tab | Subtabs |
+|---|---|
+| **Overview** | none |
+| **Terms & Review** | Documents & Conflicts · Legal & Protection · Scope & Performance · Sources & Evidence |
+| **Economics** | Deal Table & ZOPA · Financial Model |
+| **Negotiation** | Positions · Trade Plan · Communications |
+
+Locked 2026-07-29. The six-tab version in `DEAL-TAB-REDESIGN-PROPOSAL.md` is
+superseded and marked as such.
+
+**This skill does not build that dashboard and must not emit its own version of
+it.** It contributes a slice of the data object and stops there. Three skills
+feed one artifact; if each built its own, the deal would have three
+disagreeing dashboards.
+
+## The slice this skill owns
+
+| Key | What it carries |
+|---|---|
+| `commercialLines[]` | Each priced line: ask, target, fallback, walk-away, and the basis for each |
+| `scenarios[]` | Modelled cases with their assumptions made explicit |
+| `assumptions[]` | Every assumption, with its original value retained so a reset is possible |
+| `proforma{}` | The pro-forma, P&L and cash-flow views |
+| `benchmarks[]` | External comparators with source and date |
+
+## Where each lands
+
+- `commercialLines[]` and `benchmarks[]` drive **Economics > Deal Table & ZOPA**,
+  including the ask-to-negotiated value ladder and the sensitivity band.
+- `scenarios[]`, `assumptions[]` and `proforma{}` drive
+  **Economics > Financial Model**.
+- Assumptions are user-adjustable in the artifact and must carry their original
+  value, because the panel offers a reset.
+
+## An honesty rule that bites here
+
+A modelled figure must say it is modelled. Identified and modelled savings are
+never presented in the same column as validated or approved ones; the Deal tab
+keeps those stages visually separate on purpose. Blurring an estimate into a
+target is how savings numbers stop being believed.
+
+## Preserved, unchanged by D1/D3
+
+`pro_forma_generator.py` and `numeric_kernel.py` and the `.xlsx` workbook path
+are untouched. Do not route workbook generation through the dashboard.
+
+
+---
+
+# D3: the redesigned panels, as specification
+
+Four panels were designed against mockups and built, but existed only as code.
+They are recorded here so the next build reproduces them rather than reinventing
+them. Full implementations live in `deal-tab-1c344a/dashboard/_parts/`.
+
+## Legal & Protection: accordion scorecard + register
+
+A segmented navigator, **Protections N / Obligations N**, each a single-open
+accordion (native `<details name>`, no JavaScript). The counts on the segments
+are the summary; there is no separate count panel.
+
+The register **starts collapsed** (2026-07-29). It previously auto-expanded the
+first category containing a hard stop, which pushed the rest of the page off the
+first screen and chose a first item for the reader with no reason to prefer one.
+
+Group bands are kept rather than per-row tags: protections and obligations are
+read at different moments, and a flat tagged list makes both audiences filter
+visually every time.
+
+## Positions: master-detail with severity filter
+
+Left, the ranked list of contested terms. Right, the selected term in full: the
+position ladder (as-drafted, target, fallback, walk-away), why it matters, the
+exchange with expected pushback and our rebuttal, dependencies, and the history
+of that term across redlines.
+
+Above it, a posture header carrying the signature gates as Now/Need pairs and the
+protection trajectory.
+
+A severity filter bar sits above the list: **Hard stop / High / Medium / Low /
+All**, each with its count, plus a live count of what is shown. Counts are on the
+chips deliberately, because a filter that hides rows without saying how many is a
+filter people stop trusting. If the selected row is filtered out, selection moves
+to the first row still visible, so the detail pane never shows a position the
+list is denying.
+
+## Communications: item-driven alignment map
+
+Organised by what is being negotiated, not by message. For each contested term:
+where each side stands, mapped to the specific messages and quotes that got them
+there, how it evolved, and the next move.
+
+Content is **looked up, never re-typed**: `gapUs` = recommendedPosition,
+`gapThem` = supplierPosition, cited messages = `comms.events` matched by issueId
+and direction, the redline quote = `issue.sourceExcerpt`, next move =
+recommendedResponse.
+
+Three filters compose through one function: status, category and free-text
+search, ANDed together so a later filter cannot undo an earlier one. Plus
+expand-all, which relabels itself to collapse-all. An empty result states itself
+rather than showing a blank panel.
+
+## Scope & Performance: master-detail reconciliation
+
+Readiness verdict first (verify-complete, verify-sound, verify-allocated), then
+the reconciliation ledger, timeline and RACI. Undefined acceptance gates are
+counted and stated, never omitted.
+
+## The rule under all four
+
+Reflect-only. These panels draft, surface and organise. They do not send, route,
+write to any system, or initiate anything on the user's behalf.

@@ -218,3 +218,136 @@ External web searches: at least 5. Internal searches: at least 2 (when tools ava
 6. No analytical-only output (every dashboard MUST have negotiation positions, concession sequencing, and counter-proposals)
 
 ---
+
+---
+
+# Deal-tab contribution (D1 / D3, added 2026-07-29)
+
+> **Nothing above this line changed.** This skill's standalone outputs are
+> unaffected: same structure, same palette, same generators. This section only
+> describes what this skill contributes when a Deal tab is being built.
+
+## The converged target
+
+The Deal tab is built by **`deal-tab-1c344a`**, not by this skill. It is one
+static, self-contained HTML artifact on the platform chrome, with a LOCKED
+four-tab structure:
+
+| Tab | Subtabs |
+|---|---|
+| **Overview** | none |
+| **Terms & Review** | Documents & Conflicts · Legal & Protection · Scope & Performance · Sources & Evidence |
+| **Economics** | Deal Table & ZOPA · Financial Model |
+| **Negotiation** | Positions · Trade Plan · Communications |
+
+Locked 2026-07-29. The six-tab version in `DEAL-TAB-REDESIGN-PROPOSAL.md` is
+superseded and marked as such.
+
+**This skill does not build that dashboard and must not emit its own version of
+it.** It contributes a slice of the data object and stops there. Three skills
+feed one artifact; if each built its own, the deal would have three
+disagreeing dashboards.
+
+## The slice this skill owns
+
+| Key | What it carries |
+|---|---|
+| `issues[]` | Every contested term: id, title, category, priority (`hard-stop` \| `high` \| `medium` \| `low`), clause reference, source excerpt, recommended position, supplier position, recommended response |
+| `documentConflicts[]` | Trigger (`Conflict` \| `Gap`), term/clause, the documents involved, what is unresolved, and the linked finding id |
+| `protection{}` | The protection score, its deductions, and the category grouping that drives the waterfall |
+| `obligations[]` | What we have committed to do, with owner and trigger |
+| `tacticFlag` | Supplier tactics observed in the redline |
+
+## Where each lands
+
+- `issues[]` drives **Terms & Review > Legal & Protection** (the navigator and
+  register), and its `priority` drives the severity filter on
+  **Negotiation > Positions**.
+- `documentConflicts[]` drives **Terms & Review > Documents & Conflicts**. Keep
+  `Conflict` and `Gap` distinct: a conflict between two documents we hold is a
+  different problem from a gap where a document is absent, and the panel title
+  says so.
+- `protection{}` drives the Protection Scorecard. The scorecard groups its
+  deductions into the **8 issue categories** and those categories must match
+  `issues[].category` exactly, because the scorecard and the register are the
+  same object seen twice. Confirmed 2026-07-29; the 26-row literal union was
+  considered and rejected.
+- `obligations[]` drives the Obligations band of the L&P navigator.
+
+## Held, do not touch
+
+The Protection-Score **deduction kernel is HELD (#114)**. Document around it.
+Changing how a deduction is calculated is not a documentation task.
+
+## Preserved, unchanged by D1/D3
+
+All five output modes remain: the redline `.docx`, the Review Summary `.docx`,
+the Stack Map, the standalone Dashboard specified above, and the clause/playbook
+engine. None of them is affected by contributing a slice to the Deal tab.
+
+
+---
+
+# D3: the redesigned panels, as specification
+
+Four panels were designed against mockups and built, but existed only as code.
+They are recorded here so the next build reproduces them rather than reinventing
+them. Full implementations live in `deal-tab-1c344a/dashboard/_parts/`.
+
+## Legal & Protection: accordion scorecard + register
+
+A segmented navigator, **Protections N / Obligations N**, each a single-open
+accordion (native `<details name>`, no JavaScript). The counts on the segments
+are the summary; there is no separate count panel.
+
+The register **starts collapsed** (2026-07-29). It previously auto-expanded the
+first category containing a hard stop, which pushed the rest of the page off the
+first screen and chose a first item for the reader with no reason to prefer one.
+
+Group bands are kept rather than per-row tags: protections and obligations are
+read at different moments, and a flat tagged list makes both audiences filter
+visually every time.
+
+## Positions: master-detail with severity filter
+
+Left, the ranked list of contested terms. Right, the selected term in full: the
+position ladder (as-drafted, target, fallback, walk-away), why it matters, the
+exchange with expected pushback and our rebuttal, dependencies, and the history
+of that term across redlines.
+
+Above it, a posture header carrying the signature gates as Now/Need pairs and the
+protection trajectory.
+
+A severity filter bar sits above the list: **Hard stop / High / Medium / Low /
+All**, each with its count, plus a live count of what is shown. Counts are on the
+chips deliberately, because a filter that hides rows without saying how many is a
+filter people stop trusting. If the selected row is filtered out, selection moves
+to the first row still visible, so the detail pane never shows a position the
+list is denying.
+
+## Communications: item-driven alignment map
+
+Organised by what is being negotiated, not by message. For each contested term:
+where each side stands, mapped to the specific messages and quotes that got them
+there, how it evolved, and the next move.
+
+Content is **looked up, never re-typed**: `gapUs` = recommendedPosition,
+`gapThem` = supplierPosition, cited messages = `comms.events` matched by issueId
+and direction, the redline quote = `issue.sourceExcerpt`, next move =
+recommendedResponse.
+
+Three filters compose through one function: status, category and free-text
+search, ANDed together so a later filter cannot undo an earlier one. Plus
+expand-all, which relabels itself to collapse-all. An empty result states itself
+rather than showing a blank panel.
+
+## Scope & Performance: master-detail reconciliation
+
+Readiness verdict first (verify-complete, verify-sound, verify-allocated), then
+the reconciliation ledger, timeline and RACI. Undefined acceptance gates are
+counted and stated, never omitted.
+
+## The rule under all four
+
+Reflect-only. These panels draft, surface and organise. They do not send, route,
+write to any system, or initiate anything on the user's behalf.

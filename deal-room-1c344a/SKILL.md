@@ -8,7 +8,9 @@ description: >
   conditional trades, value of movement, open issues, approvals needed, and next counter. At
   close, emits a structured handoff to negotiation-playbook-learning-1c344a. REFLECT-ONLY:
   drafts, never sends or writes to any system. Single-user, single Project. Triggers: "deal
-  room", "log this round", "what happened in the meeting", "our next counter". BOUNDARY:
+  room", "log this round", "what happened in the meeting", "our next counter". BOUNDARY: the static Deal-tab dashboard is NOT this skill (it moved to
+  deal-tab-1c344a on 2026-07-29; the stale copy under dashboard/ is marked superseded and
+  awaiting deletion);
   commercial/legal-negotiation-prep-1c344a give ONE-TIME pre-talks prep and can seed this
   skill (the former's dashboard is also named "Deal Room" but is static); negotiation-
   playbook-learning-1c344a analyzes patterns across CLOSED deals and is fed by this skill at
