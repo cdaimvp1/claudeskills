@@ -53,9 +53,29 @@ external context, then the decision.
   Consolidation Opportunities both ended in the same move and were merged.
   Contract Opportunities was SPLIT: the one consolidation item stayed, the four
   exposure items went to Overview.
-- **Type ladder is 11 / 13 / 20 / 28.** No 9px anywhere.
+- **Type ladder is 11 / 13 / 20 / 28.** No 9px anywhere. Verified by a live
+  census of rendered size, not declared size: 4 distinct sizes, 0 off-ladder.
+  Declared size is not sufficient evidence here, because SVG text scales with its
+  container and two charts sit in columns narrower than their viewBox. The
+  priority plot renders at 0.965 and the risk heatmap at 0.839, so both carry a
+  measured compensation on their declared size. Re-measure after any layout change
+  that alters those column widths.
+- **Porter is one overlaid pentagon, not three small radars.** Every axis is
+  named on the frame. There is no legend: each read card carries a colour bar in
+  its segment's colour, so the card is the legend. Segment colour is plum / teal /
+  burnt orange in order, and it is load-bearing rather than decorative because it
+  is the only thing binding a shape to its read.
+- **Market intelligence rows are subject-only when shut.** The figure and its
+  headline both live in the opened card. A bare figure on a shut row is a number
+  with no denominator and reads as emphasis rather than information.
 - **Demo data is illustrative and banner-marked.** The production build reads
   only the real seed and keeps its gap panels.
+
+**Verified at lock, against the running DEMO artifact:** all 5 tabs and 7 subtabs
+render, 0 JS errors, no horizontal scroll, banner present on every screen, all
+three segmentation modes drive Kraljic, Porter and the risk filter together, and
+Strategy & Plays carries its metric strip, six play cards and Model the Impact
+panel.
 
 ---
 
