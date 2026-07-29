@@ -1328,3 +1328,54 @@ single-folder install.** That is the Desktop condition and the assertion that ma
 SKILL.md, so it is skipped by the default sweep. That may be correct, since every consumer
 vendors a verbatim copy and it may not need to install at all, but nothing in the repo says
 whether that is design or oversight.
+
+### Kernel ruling + ship manifest, 2026-07-29. Answers Marc's two questions.
+
+**QUESTION 1: is `lilly-procurement-kernels-1c344a` having no SKILL.md design or oversight?**
+
+**RULING: it is NOT an installable skill and must NOT ship.** Recorded in that directory's
+MAINTENANCE.md. The evidence is unanimous:
+
+1. **No SKILL.md** means Claude cannot discover or invoke it. Shipping it delivers inert
+   bytes to every user.
+2. **Zero references** to `/mnt/skills/user/lilly-procurement-kernels-1c344a/` across every
+   SKILL.md and reference file in the suite. Nothing expects it installed.
+3. **The distribution model is VENDORING.** Consumers carry a byte-identical copy, which is
+   what lets a skill install standalone. `ARIA-PROCUREMENT-PLUGIN-RESEARCH.md:17` says the
+   same: "already vendored byte-identical into 10 skills" (15 now).
+4. **Every other non-shipping tree is `_`-prefixed or `docs/`.** This is the sole exception,
+   and that naming is the entire reason it looks shippable.
+
+**The `-1c344a` suffix is the defect, not the missing SKILL.md.** Explicitly recorded: do
+NOT "fix" this by adding a SKILL.md, which would make it genuinely installable and give
+users a skill whose only job is to hold a library every other skill already carries.
+
+**QUESTION 2: what ships, what gets stripped, without deleting anything yet?**
+
+Built `_audit/ship_manifest.py`. It classifies and measures. **It deletes nothing and
+cannot.** Marc: keep the old files until the new skills prove themselves in real use.
+
+```
+SHIPS ....................... 32 skills, 46,185 KB as-is
+REPO-ONLY ................... 11 trees (_audit, _deal_build, _platform_build,
+                              _canonical_originals, _dashboards_ORIGINAL, docs, ...)
+ANOMALY ..................... lilly-procurement-kernels-1c344a, 255 KB
+                              a '*-1c344a' glob WOULD ship it
+DEAD WEIGHT IN SHIPPING SKILLS  8,624 KB across 13 paths  (18% of the package)
+package after stripping ..... 37,561 KB
+```
+
+**The dead weight, largest first:**
+- `deal-tab/dashboard/_platform_build` ~4.0 MB and
+  `category-strategy/dashboard/_platform_build` ~2.8 MB. These are build trees that GENERATE
+  the dashboard. The shipped artifact is the built HTML; the builder is not needed to use
+  the skill. **This is also where both hardcoded-local-path files live**, including
+  `build_my_work.py`, so stripping build trees at packaging resolves that finding as a side
+  effect rather than needing a code edit.
+- `deal-tab/dashboard/_parts` 548 KB, pre-assembly fragments.
+- `__pycache__` across 8 skills, ~1.2 MB, regenerated on demand and never read by a user.
+- `lilly-contract-review/references/isolated` 226 KB, isolation test scratch.
+
+**Nothing was deleted and no packaging step was run.** Stripping is a deliberate reviewed
+step taken against this manifest at packaging time (K1). Recorded here so the assessment
+exists when that moment comes, rather than being improvised then.

@@ -1,5 +1,38 @@
 # MAINTENANCE.md - numeric_kernel.py
 
+## RULING: this directory is NOT an installable skill and must NOT ship (2026-07-29)
+
+It carries the `-1c344a` suffix, which everywhere else in this repo means "installable
+skill". That naming is misleading and it is the only thing that makes this directory look
+shippable. The evidence says otherwise, and it is unanimous:
+
+1. **There is no `SKILL.md`.** Claude discovers and invokes a skill through its `SKILL.md`.
+   A folder without one cannot be discovered, cannot be invoked, and does nothing. Shipping
+   it delivers inert bytes to every user.
+2. **Nothing expects it installed.** A search for `/mnt/skills/user/lilly-procurement-kernels-1c344a/`
+   across every SKILL.md and reference file in the suite returns **zero** hits. No skill
+   reads from it at runtime.
+3. **The distribution model is vendoring, not installation.** Consuming skills carry a
+   byte-identical copy of `numeric_kernel.py` in their own directory, which is exactly what
+   lets a skill install standalone. `ARIA-PROCUREMENT-PLUGIN-RESEARCH.md:17` describes it
+   the same way: "already vendored byte-identical into 10 skills" (15 as of 2026-07-29).
+4. **Every other non-shipping tree in the repo is `_`-prefixed** (`_audit`, `_deal_build`,
+   `_platform_build`, and so on) or is `docs/`. This directory is the sole exception to that
+   convention, which is why it reads as shippable when it is not.
+
+**So: this is a repo source-of-truth library, not a product.** It stays in the repo. It is
+excluded from the shipped package. `_audit/ship_manifest.py` reports it as an ANOMALY for
+exactly this reason, so a packaging step that globs `*-1c344a` cannot ship it by accident.
+
+**Do NOT "fix" this by adding a SKILL.md.** That would make it genuinely installable and
+give users a skill whose only function is to hold a library that every other skill already
+carries a copy of. The vendoring model is deliberate and it is what makes standalone
+installation work.
+
+If the naming is ever changed to match the `_` convention, `kernel_manifest.py`'s
+`SOURCE_SKILL` constant and every path reference in this file change with it. That is the
+only reason it has not been renamed already.
+
 ## What this kernel is the source of truth for
 
 `numeric_kernel.py` is the single, shared implementation of the arithmetic
