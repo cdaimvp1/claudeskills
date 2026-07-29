@@ -2958,3 +2958,65 @@ Writing the test corrected an assumption of mine: `binding=True` covers the whol
 DETERMINISTIC path (source `playbook` or `msa`), not just Tier 1 RED LINE. I had assumed
 only Tier 1 was binding, and the test failed until I checked the kernel instead of guessing.
 The non-binding negative control now has to be constructed by removing a required input.
+
+---
+
+## F9 build 5 of 5 — supplier-landscape report + CSVs (DONE). #36 COMPLETE.
+
+`landscape_report_generator.py` + self-test, **40/40**.
+
+F9 called this the highest-value build and genuinely large. It replaces the three-pass
+open/append/save instruction at the old `SKILL.md:627-634`, the same pattern F2 removed from
+rfp-response-analysis and deferred here by name.
+
+**Not fixed the way F2 was, deliberately.** Collapsing three appends into one model-authored
+write is the truncation failure G10 warns about: a long document silently comes out short
+and looks finished. Because the generator ASSEMBLES the document rather than writing it,
+length stops being a generation-time risk at all, whatever the supplier count.
+
+**All five CSVs come from the same call as the report** (the F6 lesson). Emitting them
+separately is how a report and its own appendix disagree, and a reader who notices cannot
+tell which is wrong. `check_artifact_consistency` refuses when a supplier appears in one
+artifact and not another.
+
+**The two scoring systems are enforced apart**, per SKILL.md:381: requirements-fit
+(requirement-count-weighted, 0-10) feeds the dashboard headline and lives in
+`requirements_fit_matrix.csv`; the 8-pillar percentage-weighted matrix is a report table
+only. Writing one into the other's artifact yields a figure that is individually correct and
+completely wrong in context.
+
+### Two bugs found by READING, before the shell came back
+
+The shell was unavailable for a stretch, so I reviewed the code instead of waiting. That
+found the more serious of the two:
+
+1. **`weighted_score()` refuses any weight set not summing to 1.0**, and the 8 pillars are
+   stated as PERCENTAGES summing to 100. `compute_pillar_matrix` would have raised on every
+   valid input, the base case rather than an edge case. Worse, test T20 ("refuses weights
+   summing to 95") would have PASSED FOR THE WRONG REASON and masked it.
+
+   Fixed by validating the percentage set on its own scale with
+   `assert_weight_sum(expected=100.0)`, which names the over- or under-allocation, then
+   converting to fractions for scoring. Both steps are needed: raw percentages raise on
+   everything valid, and converting without validating would silently score a 95-point set
+   as though it footed.
+
+2. A dead `weights` variable in `compute_requirements_fit`, unused because partial evidence
+   requires per-supplier reweighting. Same class as B5 and the unused `FOOTING_FAILURE_CAP`.
+
+Then 40/40 on the first execution. Worth noting what that does and does not show: reading
+caught a convention error and dead code, which is what reading is good for. It would not
+have caught an execution-order or state bug, and those are what the other four builds
+actually failed on.
+
+### Absence is stated, not left blank
+
+- a supplier with no evidence scores `Information Not Provided`, never `0.0`, because a zero
+  ranks them last on merit when nothing was measured
+- a PARTIAL gap reweights across what IS evidenced rather than scoring the gap as zero
+- an empty exclusion list still writes a "none excluded" row, because an empty file is
+  indistinguishable from a step that never ran, and that file exists to make the shortlist
+  defensible
+- a blank `evidence_source` on a risk row is refused; "Not Determined" is the honest answer
+
+**#36 is complete: all five F9 builds are done.**

@@ -624,14 +624,59 @@ This report uses the suite **Magazine Report** house style. Do not restate the s
 
 Full locked spec + data contract: "## INLINED: references/dashboard-canonical.md" below.
 
-### Multi-Pass Generation
+### Report and CSV Generation (single pass, code-assembled)
 
-For reports covering 5+ suppliers, the DOCX may exceed what can be generated in a single pass. Use sequential passes:
-1. **Pass 1:** Title page, executive summary, market context, first 3 supplier profiles. Save.
-2. **Pass 2:** Open saved document, append remaining supplier profiles. Save.
-3. **Pass 3:** Open saved document, append cross-vendor comparison, requirements fit matrix, risk matrix, recommendation. Save.
+```bash
+python landscape_report_generator.py <landscape.json> <outdir>
+python landscape_report_selftest.py                            # run after any edit
+```
 
-Every section must maintain full depth regardless of which pass generates it.
+The report and ALL FIVE CSVs are emitted by one call, from one data object. Your job is the
+data object and the narrative for each section; the generator assembles the document.
+
+**This REPLACES the old three-pass open/append/save instruction.** That pattern told you to
+write a partial document, reopen it, append and save, three times. F2 removed exactly that
+from rfp-response-analysis.
+
+**Do not "fix" it by writing the whole report in one model pass instead.** That is the
+truncation failure G10 warns about: a long document silently comes out short and looks
+finished. Because the generator ASSEMBLES the document rather than writing it, length stops
+being a generation-time risk at all, however many suppliers are in scope.
+
+**The CSVs come from the same call as the report, on purpose.** Emitting them separately is
+how a report and its own appendix end up disagreeing, and a reader who notices cannot tell
+which one is wrong. The generator refuses when a supplier appears in one artifact and not
+another.
+
+**The two scoring systems stay separate, and the generator enforces it.**
+
+| system | scale | artifact | feeds |
+|---|---|---|---|
+| requirements-fit, requirement-count-weighted | 0-10 | `requirements_fit_matrix.csv` | the dashboard headline score |
+| 8-pillar, percentage-weighted | 0-10 against weights summing to 100 | `weighted_scoring_matrix.csv` | a report table ONLY |
+
+Writing one into the other's artifact produces a figure that is individually correct and
+completely wrong in context. Both go through `weighted_score()` in the vendored kernel (G11).
+
+**It refuses rather than emitting a plausible artifact set:**
+
+| refusal | why |
+|---|---|
+| pillar weights not summing to 100 | the kernel's `WeightSumError` |
+| a fit score outside 0-10 | a score off its own scale is a unit error, and it ranks this supplier against others measured differently |
+| a stated `overall_fit` contradicting its own score | the band is derived; a disagreement means one of the two was hand-edited, and this value feeds the rfp-engine handoff |
+| a supplier in one artifact and missing from another | artifacts from one run must describe one supplier set |
+| a score written into `supplier_registry.csv` | the registry is profile data only; a duplicated score will eventually disagree with the original |
+| a blank pillar cell | it silently reweights every other pillar for that supplier |
+| a blank `evidence_source` on a risk row | "Not Determined" is the honest answer; blank reads as evidence never looked for |
+
+**Absence is stated, never left blank.** A supplier with no evidence on a requirement scores
+`Information Not Provided`, not `0.0`, because a zero ranks them last on merit when nothing
+was measured. An empty exclusion list still writes a row reading "none excluded", because an
+empty file is indistinguishable from a step that never ran, and this file exists to make the
+shortlist defensible.
+
+Every section maintains full depth regardless of supplier count.
 
 ## Requirements Fit Scoring (10-Point Scale)
 
