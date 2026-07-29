@@ -142,8 +142,17 @@ Build `deduction_score()` in `lilly-procurement-kernels` (item C1). Not
 coverage-column deductions, Hard Stops always -15 and never reduced.
 
 The function computes the score, enforces the invariants, and **raises** on the
-Rule 12 calibration check (zero Hard Stops plus 10+ covered categories should not
-exceed 30 points of deduction) rather than leaving it as an instruction. Model
+Rule 12 calibration checks rather than leaving them as instructions. There are
+**TWO**, in opposite directions, and the spec originally named only one (found by
+the Part 1 coverage matrix, 2026-07-29):
+
+1. **Too harsh:** zero Hard Stops plus 10+ covered categories should not exceed 30
+   points of deduction.
+2. **Too generous:** a standalone document with 5+ findings should not come in
+   under 25 points of deduction.
+
+Both must assert. A score that is too generous is the more dangerous failure,
+because it understates risk to Lilly and nobody questions a good number. Model
 still supplies severity and coverage status per finding; the kernel does arithmetic
 and validation only.
 
