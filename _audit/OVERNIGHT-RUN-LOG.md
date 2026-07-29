@@ -1257,3 +1257,74 @@ libraries (docx and pptx) and it discusses absence least.
 `kernel_manifest.py` flagged in the report so a later reader does not file it as a defect:
 it walks the suite directory and cannot run standalone BY DESIGN, is referenced by no
 SKILL.md, and exits cleanly with a clear message outside the suite.
+
+### Tasks #5 and #6 DONE, 2026-07-29. G8 defined, G9 run, one real breakage fixed.
+
+`_audit/skill_smoke_test.py` and `_audit/G8-G9-SMOKE-TEST-FINDINGS.md`.
+
+**G8's design decision: every assertion runs against a COPY of the skill in an empty temp
+directory.** No siblings, no suite root, no repo. Testing in place silently passes code
+that only works because a sibling was one directory up, which is precisely what a Desktop
+install exposes and a repo checkout hides. Eight assertions: SKILL.md present, .py parse,
+.py IMPORT in a flat install, shipped self-tests PASS in isolation, no unguarded
+third-party import, no relative import, self-referencing paths resolve, cross-skill paths
+have a stated fallback.
+
+A7 and A8 are deliberately separate. A7 is the skill's own bug; A8 is suite composition,
+and on Desktop a cross-skill path is EXPECTED not to resolve, so the assertion is the
+fallback rather than the path.
+
+**Two false positives I introduced and fixed before trusting any result**, recorded because
+a smoke test that cries wolf gets ignored and then stops catching real failures:
+`unpack.py` is a PLATFORM tool, not a skill file (allowlisted); and `analysis_summary.docx`
+/ `pro_forma_model.xlsx` are artifacts the skill PRODUCES, so asserting a skill ships its
+own output is backwards (A7 narrowed to .py/.js/.css).
+
+**RESULT: 32 skills, 4 failed assertions, 3 after the fix.**
+
+**The one real breakage, which no text audit could have found.**
+`deal-tab-1c344a/dashboard/_platform_build/apply_deal_chrome.py` ran file I/O at MODULE
+level against `C:\Users\marcs\Downloads\...\_deal_build\deal-dashboard.html`. Merely
+IMPORTING it raised FileNotFoundError. Hardcoded absolute path, containing a specific
+user's name, pointing at something the file's own header says no longer exists, shipping
+inside an installable skill.
+
+**The fix respects a documented decision instead of reversing it.**
+`_deal_build/SOURCE-OF-TRUTH.md:50` records: "Left in place, headed as superseded, not
+deleted." Deleting was the obvious fix and would have reversed that. Instead the execution
+moved behind `if __name__ == '__main__':`. Nothing removed, the file stays exactly as
+documented, and it is now inert on import, which is what "kept for reference" already
+meant. Both copies fixed, both import cleanly, deal-tab passes all eight.
+
+**Three A7 failures remain, all documentation pointers, none breaking a run:** deal-room
+cites deal-tab's files, lilly-brand-assets documents three kernels it does not ship, and
+rfp-engine points into rfx-hub's dashboard assets. Same family and same disposition as the
+G1-G7 headline: prune the pointers, do not create the files. B7.
+
+**Reported and deliberately NOT fixed:** `build_my_work.py` hardcodes two absolute paths
+into a DIFFERENT project ("lilly IT intake and orchestration tool"). It does not crash on
+import so nothing fails, and it also cannot work on any machine but one. Left alone because
+it is a build-tree script that pending My Work dashboard work may depend on, and rewriting
+it would overstep a read-and-report boundary. The honest disposition is that
+`_platform_build/` probably should not ship inside an installable skill at all, which is a
+packaging question (K1).
+
+**Scan worth recording:** every .py in every skill checked for hardcoded local paths.
+Exactly TWO files, both in `deal-tab-1c344a/dashboard/_platform_build/`. The rest of the
+suite is clean.
+
+**Suite state after G9:**
+```
+A1 SKILL.md present ........... 32/32     A5 no unguarded 3rd-party .... 32/32
+A2 .py parse .................. 32/32     A6 no relative import ........ 32/32
+A3 .py import flat ............ 32/32     A7 self-refs resolve ......... 29/32
+A4 self-tests pass ............ 32/32     A8 cross-skill fallback ...... 32/32
+   (A3 was 31/32 before the fix)
+```
+**Every skill imports and every shipped self-test passes in a flat, sibling-free,
+single-folder install.** That is the Desktop condition and the assertion that matters most.
+
+**Flagged for a ruling before packaging:** `lilly-procurement-kernels-1c344a` has NO
+SKILL.md, so it is skipped by the default sweep. That may be correct, since every consumer
+vendors a verbatim copy and it may not need to install at all, but nothing in the repo says
+whether that is design or oversight.
