@@ -1247,3 +1247,26 @@ small,sub,sup{font-size:9px}
   font-size:11px;color:var(--cs-mut2);margin-bottom:7px}
 .cs-ck-row b{text-align:right;font-size:13px;color:var(--cs-ink);font-variant-numeric:tabular-nums}
 .cs-ck-row .cs-bar{width:100%}
+
+
+/* Bubble labels must survive being drawn over a translucent bubble. A soft halo
+   in the panel colour separates the glyphs from whatever sits behind them
+   without adding a box. */
+.cs-kdlab{paint-order:stroke fill;stroke:var(--cs-surface);stroke-width:3.5px;
+  stroke-linejoin:round;font-weight:600}
+.cs-kdot.on circle{fill-opacity:.62}
+.cs-kdot:hover circle{fill-opacity:.62}
+
+
+/* Every chart pinned to its own viewBox width, so it renders 1:1 in a column
+   wide enough for it and only ever scales DOWN, never up. Combined with sizing
+   each viewBox to the column it lives in, declared text sizes are the sizes that
+   actually render. This is the third time SVG scaling has moved the type ladder;
+   it is now closed at the source. */
+.cs-kplot{max-width:600px}
+.cs-rksvg{max-width:520px}
+.cs-rmsvg{max-width:600px}
+.cs-fragsvg{max-width:600px}
+.cs-radar{max-width:140px}
+/* chart text one step up so it survives any residual scale-down */
+.cs-kdlab,.cs-quadl,.cs-rknum,.cs-fdlab,.cs-axt,.cs-pyl,.cs-pyr,.cs-p80t,.cs-ptail{font-size:13px}

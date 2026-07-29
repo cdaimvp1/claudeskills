@@ -1985,6 +1985,29 @@ small,sub,sup{font-size:9px}
 .cs-ck-row b{text-align:right;font-size:13px;color:var(--cs-ink);font-variant-numeric:tabular-nums}
 .cs-ck-row .cs-bar{width:100%}
 
+
+/* Bubble labels must survive being drawn over a translucent bubble. A soft halo
+   in the panel colour separates the glyphs from whatever sits behind them
+   without adding a box. */
+.cs-kdlab{paint-order:stroke fill;stroke:var(--cs-surface);stroke-width:3.5px;
+  stroke-linejoin:round;font-weight:600}
+.cs-kdot.on circle{fill-opacity:.62}
+.cs-kdot:hover circle{fill-opacity:.62}
+
+
+/* Every chart pinned to its own viewBox width, so it renders 1:1 in a column
+   wide enough for it and only ever scales DOWN, never up. Combined with sizing
+   each viewBox to the column it lives in, declared text sizes are the sizes that
+   actually render. This is the third time SVG scaling has moved the type ladder;
+   it is now closed at the source. */
+.cs-kplot{max-width:600px}
+.cs-rksvg{max-width:520px}
+.cs-rmsvg{max-width:600px}
+.cs-fragsvg{max-width:600px}
+.cs-radar{max-width:140px}
+/* chart text one step up so it survives any residual scale-down */
+.cs-kdlab,.cs-quadl,.cs-rknum,.cs-fdlab,.cs-axt,.cs-pyl,.cs-pyr,.cs-p80t,.cs-ptail{font-size:13px}
+
 </style>
 </head>
 <body>
@@ -4307,7 +4330,7 @@ function csFragMap(d) {
       + csNote('Plotted on spend only. Separating a <b>consolidated</b> subcategory from a <b>fragmented</b> one needs a '
         + 'vendor count per subcategory, which this data set does not carry.');
   }
-  var W = 660, H = 360, PADL = 74, PADB = 54, PADT = 26, PADR = 26;
+  var W = 600, H = 340, PADL = 70, PADB = 50, PADT = 24, PADR = 24;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var maxV = sc.reduce(function (a, x) { return Math.max(a, x.vc || 0); }, 0) || 1;
   var maxS = sc.reduce(function (a, x) { return Math.max(a, x.tot || 0); }, 0) || 1;
@@ -4680,7 +4703,7 @@ function csRenewalMatrix(d, sel) {
     .filter(function (p) { return p.m; });
   if (!pts.length) return csGap('Renewal position for this supplier.', 'renewalMatrix entry for ' + sel.n);
 
-  var W = 620, H = 400, PADL = 84, PADR = 22, PADT = 46, PADB = 58;
+  var W = 600, H = 380, PADL = 78, PADR = 22, PADT = 44, PADB = 56;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var mxs = pts.reduce(function (a, p) { return Math.max(a, p.s.tot || 0); }, 0) || 1;
   var dots = pts.map(function (p) {
@@ -4940,7 +4963,7 @@ function csKraljicPlot(d) {
         : 'subcats[] with a vendor count');
   }
   var pts = csSegKraljic(segs);
-  var W = 760, H = 360, PADL = 96, PADR = 116, PADT = 30, PADB = 52;
+  var W = 600, H = 340, PADL = 74, PADR = 92, PADT = 28, PADB = 48;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var maxSize = segs.reduce(function (a, s) {
     return Math.max(a, CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0));
@@ -4960,7 +4983,11 @@ function csKraljicPlot(d) {
     var v = s.market ? (CS_SEG_SIZE === 'vendors' ? (1 - s.buyerPower) : s.impact)
                      : (CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0));
     var r = csBubbleR(Math.max(0, v) / (s.market ? 1 : maxSize));
-    var cx = PADL + p.x * pw, cy = PADT + ph - p.y * ph;
+    /* Clamp the centre by the radius so a bubble at the extreme of either axis
+       is not sliced by the plot edge. The position still reads correctly: the
+       clamp only bites where a circle would otherwise hang outside the frame. */
+    var cx = Math.max(PADL + r, Math.min(PADL + pw - r, PADL + p.x * pw));
+    var cy = Math.max(PADT + r, Math.min(PADT + ph - r, PADT + ph - p.y * ph));
     var right = p.x < 0.58;                       // lean away from the far edge
     return { p: p, s: s, r: r, cx: cx, cy: cy, right: right,
              lx: right ? cx + r + 13 : cx - r - 13, y: cy + 4 };
@@ -4979,7 +5006,8 @@ function csKraljicPlot(d) {
       + csEsc(String(s.key).replace(/'/g, "\\'")) + '\')" role="button" tabindex="0">'
       + leader
       + '<circle cx="' + o.cx.toFixed(1) + '" cy="' + o.cy.toFixed(1) + '" r="' + o.r.toFixed(1)
-      + '" fill="' + tone + '"><title>' + csEsc(s.market
+      + '" fill="' + tone + '" fill-opacity="0.42" stroke="' + tone + '" stroke-width="1.5">'
+      + '<title>' + csEsc(s.market
           ? s.key + ' · ' + q + ' · ' + s.headline
           : s.key + ' · ' + q + ' · ' + csUsd(s.tot)
             + (s.vc ? ' · ' + csNum(s.vc) + ' vendors · ' + csUsd(Math.round(p.perVendor)) + ' average each' : ''))
@@ -5293,15 +5321,16 @@ var CS_KIND = {
 function csConsolScatter(d) {
   var ops = csConsolidationOpps(d).filter(function (o) { return o.value != null; });
   if (!ops.length) return csGap('Where to start: value against effort.', 'opportunity records with a value and an effort');
-  var W = 760, H = 340, PADL = 74, PADR = 30, PADT = 30, PADB = 54;
+  var W = 600, H = 320, PADL = 66, PADR = 26, PADT = 28, PADB = 50;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var maxV = ops.reduce(function (a, o) { return Math.max(a, o.value || 0); }, 0) || 1;
   var maxR = ops.reduce(function (a, o) { return Math.max(a, o.removed || 0); }, 0) || 1;
 
   var placed = ops.map(function (o) {
-    var cx = PADL + (CS_EFFORT_X[o.effort] != null ? CS_EFFORT_X[o.effort] : 0.5) * pw;
-    var cy = PADT + ph - ((o.value || 0) / maxV) * ph;
     var r = csBubbleR((o.removed || 0) / maxR);
+    var cx = Math.max(PADL + r, Math.min(PADL + pw - r,
+      PADL + (CS_EFFORT_X[o.effort] != null ? CS_EFFORT_X[o.effort] : 0.5) * pw));
+    var cy = Math.max(PADT + r, Math.min(PADT + ph - r, PADT + ph - ((o.value || 0) / maxV) * ph));
     var right = cx < PADL + pw * 0.55;
     return { o: o, cx: cx, cy: cy, r: r, right: right,
              lx: right ? cx + r + 13 : cx - r - 13, y: cy + 4 };
@@ -5315,7 +5344,7 @@ function csConsolScatter(d) {
         + '" x2="' + p.lx.toFixed(1) + '" y2="' + (p.y - 4).toFixed(1) + '" class="cs-kdlead"/>' : '';
     return '<g class="cs-kdot">' + leader
       + '<circle cx="' + p.cx.toFixed(1) + '" cy="' + p.cy.toFixed(1) + '" r="' + p.r.toFixed(1)
-      + '" fill="' + k.tone + '" opacity=".82"><title>' + csEsc(p.o.title + ' · ' + k.label + ' · '
+      + '" fill="' + k.tone + '" fill-opacity="0.42" stroke="' + k.tone + '" stroke-width="1.5"><title>' + csEsc(p.o.title + ' · ' + k.label + ' · '
       + csUsd(p.o.value) + ' · ' + p.o.effort + ' effort'
       + (p.o.removed ? ' · ' + csNum(p.o.removed) + ' suppliers removed' : '')) + '</title></circle>'
       + '<text x="' + p.lx.toFixed(1) + '" y="' + p.y.toFixed(1) + '" class="cs-kdlab"'
