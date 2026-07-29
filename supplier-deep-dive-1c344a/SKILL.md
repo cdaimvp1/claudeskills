@@ -26,7 +26,7 @@ python check_provenance.py <data.json>
 ```
 
 `provenance.py` is the vendored shared validator. This skill carries provenance in the
-ROW form: each of its risk dimensions IS a fact and carries its own source columns (`source`).
+ROW form: each risk dimension IS a fact carrying `source` AND `as_of` (G13b).
 Same rules as the field-keyed sidecar; only the container differs.
 
 **Known schema gap, surfaced rather than hidden.** G13b requires a source AND a usable

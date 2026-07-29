@@ -27,7 +27,7 @@ python check_provenance.py <data.json>
 ```
 
 `provenance.py` is the vendored shared validator. This skill carries provenance in the
-ROW form: each of its risk_matrix rows IS a fact and carries its own source columns (`evidence_source`).
+ROW form: each risk_matrix row IS a fact carrying `evidence_source` AND `evidence_as_of`.
 Same rules as the field-keyed sidecar; only the container differs.
 
 **Known schema gap, surfaced rather than hidden.** G13b requires a source AND a usable
@@ -1020,7 +1020,7 @@ If no requirements provided, use inferred capability themes and label column hea
 ### risk_matrix.csv
 
 ```csv
-supplier_name,risk_category,risk_description,severity,evidence_source
+supplier_name,risk_category,risk_description,severity,evidence_source,evidence_as_of
 ```
 
 Risk categories: `Legal`, `Cybersecurity`, `Operational`, `Geopolitical`, `Financial` (matches Risk Categories Required in Every Profile; the dashboard's Risk Assessment heatmap adds an ESG column separately, sourced from each vendor's existing ESG & Sustainability rating, not from a row in this CSV)
@@ -1028,6 +1028,12 @@ Risk categories: `Legal`, `Cybersecurity`, `Operational`, `Geopolitical`, `Finan
 Severity values: `Low`, `Medium`, `High`
 
 Evidence source: URL, document name, or `"Not Determined"`
+
+`evidence_as_of` is the capture date for that source (G13b), REQUIRED whenever a real
+source is named and not required for `Not Determined`, since there is no evidence to date.
+Added because a source without a date is not provenance: a risk citation from 2019 and one
+from last week were previously indistinguishable, and a stale risk read is the kind that
+gets a supplier approved.
 
 ### excluded_vendors.csv
 

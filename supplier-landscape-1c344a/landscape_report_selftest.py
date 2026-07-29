@@ -207,6 +207,35 @@ def run():
         generate_all(dd, tempfile.mkdtemp())
     raises("T22 refuses a risk category outside the schema", LandscapeError, bad_risk_cat)
 
+    # --- the evidence_as_of schema addition (G13b) ---------------------------------------
+    def sourced_no_date():
+        dd = data()
+        dd["risks"][0]["evidence_source"] = "OFAC SDN list"      # a REAL source
+        dd["risks"][0].pop("evidence_as_of", None)                # with no date
+        generate_all(dd, tempfile.mkdtemp())
+    raises("T23a refuses a NAMED source with no evidence_as_of", LandscapeError,
+           sourced_no_date)
+
+    def sourced_placeholder_date():
+        dd = data()
+        dd["risks"][0]["evidence_source"] = "OFAC SDN list"
+        dd["risks"][0]["evidence_as_of"] = "TBD"
+        generate_all(dd, tempfile.mkdtemp())
+    raises("T23b refuses a placeholder evidence_as_of", LandscapeError,
+           sourced_placeholder_date)
+
+    dd_ok = data()
+    dd_ok["risks"][0]["evidence_source"] = "OFAC SDN list"
+    dd_ok["risks"][0]["evidence_as_of"] = "2026-05-02"
+    r_ok = generate_all(dd_ok, tempfile.mkdtemp(prefix="f9_land_asof_"))
+    ok("T23c a named source WITH a capture date passes",
+       os.path.isfile(r_ok["written"]["risk_matrix.csv"]))
+    hdr = read_csv(r_ok["written"]["risk_matrix.csv"])[0]
+    ok("T23d evidence_as_of is a real column in the emitted CSV", "evidence_as_of" in hdr,
+       repr(list(hdr)))
+    ok("T23e NEGATIVE CONTROL: 'Not Determined' still passes with NO date",
+       generate_all(data(), tempfile.mkdtemp())["written"]["risk_matrix.csv"] is not None)
+
     def blank_evidence():
         dd = data(); dd["risks"][0]["evidence_source"] = "  "
         generate_all(dd, tempfile.mkdtemp())

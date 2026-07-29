@@ -3512,3 +3512,45 @@ the shared module was inconsistent almost immediately. Caught by hashing the cop
 `numeric_kernel.py`, deliberately in a separate code path so the kernel's HELD exception
 cannot accidentally excuse another module. Tamper-tested: 5 of 5 match, and a one-line edit
 is caught and named.
+
+---
+
+## The as-of schema change: both gaps closed. H4 is now complete at 5 of 5 applicable.
+
+`supplier-landscape` risk rows gain **`evidence_as_of`**; `supplier-deep-dive` risk
+dimensions gain **`as_of`**. Both are now validated rather than reported as a gap.
+
+**Why it mattered.** A source without a date is not provenance. A risk citation from 2019
+and one from last week were indistinguishable, and a stale supplier-risk read is exactly the
+kind that gets a supplier approved.
+
+**Required when a real source is named, NOT required for an abstention.** `Not Determined`
+and `Not Publicly Disclosed` pass without a date, because there is no evidence to date.
+Demanding one there would push a caller toward inventing a date to satisfy a column, which
+is the failure the field exists to prevent.
+
+Enforced in three places per skill so it cannot be satisfied in one and skipped in another:
+the generator/validator, the `check_provenance` row check, and the SKILL.md schema.
+
+### What the change surfaced about the old shape
+
+`supplier-deep-dive`'s fixtures carried the date INSIDE the source string: `"10-K,
+2026-02-11"`. That reads fine to a human and is invisible to every check, because a date
+embedded in free text cannot be parsed, compared or aged. Splitting it into `source: "10-K"`
+and `as_of: "2026-02-11"` is the entire point of the field.
+
+Fourteen of that skill's twenty assertions failed the moment the rule went in, which is the
+schema change doing its job: the fixtures were carrying provenance the old shape could not
+check.
+
+Landscape self-test 40 -> **45** (five new assertions: a named source with no date is
+refused, a placeholder date is refused, a dated source passes, the column is really in the
+emitted CSV, and `Not Determined` still passes with no date). Deep-dive **20/20** after
+migrating its fixtures.
+
+**H4 final: 5 of 5 applicable skills wired and validating, 3 not applicable** (they emit
+documents and answers, not data objects). No remaining schema gaps.
+
+`#31 / H5 proper` is now fully unblocked: every skill that emits data carries per-fact
+provenance WITH a capture date, so a resolve check can verify both that a source exists and
+that it is current.

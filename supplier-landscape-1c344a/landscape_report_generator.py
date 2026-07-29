@@ -50,6 +50,7 @@ import csv
 import json
 import os
 import sys
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -65,6 +66,33 @@ except ImportError:                                             # pragma: no cov
 # From SKILL.md:955. Bands are inclusive at the lower bound.
 FIT_BANDS = [(8.5, "Strong"), (7.0, "Partial"), (0.0, "Weak")]
 NO_EVIDENCE = "Information Not Provided"
+
+# Sources that honestly say "no evidence" rather than naming one. These need no capture
+# date, because there is nothing to date.
+EVIDENCE_ABSTENTIONS = ("Not Determined", "Not determined", "not determined")
+
+# Accepted capture-date formats. Same rule and same reasoning as the research-table
+# generators (#32): named months are unambiguous and accepted, slash formats are not.
+_DATE_PLACEHOLDERS = frozenset({"", "tbd", "tba", "n/a", "na", "none", "null",
+                                "unknown", "recent", "current", "various", "-", "?"})
+_DATE_FORMATS = ("%Y-%m-%d", "%Y-%m", "%Y", "%b %d, %Y", "%B %d, %Y",
+                 "%b %Y", "%B %Y", "%d %b %Y", "%d %B %Y")
+
+
+def _valid_as_of(value):
+    if not isinstance(value, str):
+        return False
+    raw = value.strip()
+    if raw.lower() in _DATE_PLACEHOLDERS:
+        return False
+    for fmt in _DATE_FORMATS:
+        try:
+            parsed = datetime.strptime(raw, fmt)
+        except ValueError:
+            continue
+        return 1990 <= parsed.year <= 2100
+    return False
+
 
 RISK_CATEGORIES = ("Legal", "Cybersecurity", "Operational", "Geopolitical", "Financial")
 SEVERITIES = ("Low", "Medium", "High")
@@ -306,7 +334,18 @@ def write_registry_csv(registry, path):
 
 
 def write_risk_csv(risks, path):
-    cols = ["supplier_name", "risk_category", "risk_description", "severity", "evidence_source"]
+    """risk_matrix.csv. Carries a per-row capture date as of the G13b schema change.
+
+    `evidence_as_of` was added because a source without a date is not provenance: a risk
+    citation from 2019 and one from last week were previously indistinguishable, and a
+    stale risk read is the kind that gets a supplier approved.
+
+    Required WHENEVER a real source is named. NOT required for `Not Determined`, because
+    there is no evidence to date, and demanding one there would push a caller toward
+    inventing a date to satisfy the column.
+    """
+    cols = ["supplier_name", "risk_category", "risk_description", "severity",
+            "evidence_source", "evidence_as_of"]
     for i, r in enumerate(risks or []):
         if r.get("risk_category") not in RISK_CATEGORIES:
             raise LandscapeError(
@@ -316,11 +355,19 @@ def write_risk_csv(risks, path):
             raise LandscapeError(
                 "risk_matrix[%d] severity %r is outside %s"
                 % (i, r.get("severity"), list(SEVERITIES)))
-        if not (r.get("evidence_source") or "").strip():
+        source = (r.get("evidence_source") or "").strip()
+        if not source:
             raise LandscapeError(
                 "risk_matrix[%d] has no evidence_source. The schema requires a URL, a "
                 "document name, or the literal 'Not Determined'. Blank is not one of them: "
                 "it reads as evidence that was never looked for." % i)
+        if source not in EVIDENCE_ABSTENTIONS and not _valid_as_of(r.get("evidence_as_of")):
+            raise LandscapeError(
+                "risk_matrix[%d] cites %r but has evidence_as_of=%r, which is not a usable "
+                "capture date. A source with no date cannot be aged or re-verified, so a "
+                "2019 risk read and a current one look identical. Use 'Not Determined' as "
+                "the source if there is genuinely no evidence."
+                % (i, source, r.get("evidence_as_of")))
     return _write_csv(path, cols, risks or [])
 
 

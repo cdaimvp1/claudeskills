@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import datetime
 import sys
 
 # G12's third prohibition, the statuses that may never be asserted uncited.
@@ -72,6 +73,30 @@ class DilutedFindingError(DossierError):
 
 class SchemaError(DossierError):
     pass
+
+
+# Accepted capture-date formats (G13b). Same rule as the research-table generators:
+# named months are unambiguous and accepted; slash formats are not, since 03/04 is
+# March 4 or 4 March depending on the reader.
+_DATE_PLACEHOLDERS = frozenset({"", "tbd", "n/a", "na", "none", "unknown",
+                                "recent", "current", "various", "-", "?"})
+_DATE_FORMATS = ("%Y-%m-%d", "%Y-%m", "%Y", "%b %d, %Y", "%B %d, %Y",
+                 "%b %Y", "%B %Y", "%d %b %Y", "%d %B %Y")
+
+
+def _valid_as_of(value):
+    if not isinstance(value, str):
+        return False
+    raw = value.strip()
+    if raw.lower() in _DATE_PLACEHOLDERS:
+        return False
+    for fmt in _DATE_FORMATS:
+        try:
+            parsed = datetime.strptime(raw, fmt)
+        except ValueError:
+            continue
+        return 1990 <= parsed.year <= 2100
+    return False
 
 
 def _txt(v):
@@ -133,6 +158,15 @@ def validate_dossier(d):
                 "SKILL.md:87 is explicit: never assert a debarment, sanctions, breach or "
                 "financial-distress status without one." % (name, note[:90])
             )
+        # G13b: a source without a capture date is not provenance. A cited dimension must
+        # say WHEN, or a 2019 read and a current one are indistinguishable, and a stale
+        # supplier-risk read is exactly the kind that gets a supplier approved.
+        if src and not _valid_as_of(dim.get("as_of")):
+            raise UncitedClaimError(
+                "risk dimension %r cites %r but has as_of=%r, which is not a usable "
+                "capture date. Cite when you read it, or state the abstention instead."
+                % (name, src[:60], dim.get("as_of")))
+
         if note and not src and not _abstains(note):
             raise UncitedClaimError(
                 "risk dimension %r asserts %r with no source. SKILL.md:277 requires name + "

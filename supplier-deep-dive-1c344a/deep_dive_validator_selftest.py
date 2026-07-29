@@ -59,7 +59,7 @@ def clean():
             "dimensions": [
                 {"dimension": "financial", "level": "Low",
                  "note": "Revenue grew 18% FY25.", "confidence": "Medium",
-                 "source": "10-K, 2026-02-11"},
+                 "source": "10-K", "as_of": "2026-02-11"},
                 {"dimension": "cyber", "level": "Medium",
                  "note": "Not publicly disclosed.", "confidence": "Low"},
             ],
@@ -142,7 +142,7 @@ def run():
     d = clean()
     d["risk"]["dimensions"][1] = {"dimension": "regulatory", "level": "High",
                                   "note": "Listed on the SDN list.", "confidence": "High",
-                                  "source": "OFAC SDN, 2026-05-02"}
+                                  "source": "OFAC SDN", "as_of": "2026-05-02"}
     passes("T9  a CITED sanctions finding passes (the gate is on citation, not on topic)", d)
 
     # --- gating items may not be adjudicated ------------------------------------------
