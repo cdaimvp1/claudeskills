@@ -2598,3 +2598,79 @@ right moment. That is the strongest thing checkable statically, and it should no
 mistaken for proof of runtime behaviour.
 
 Suite now 32 skills, 0 failed assertions, across 9 assertions each.
+
+---
+
+## #30 — THE BLIND BASELINE EXISTS. It is red, and that is the point.
+
+Two independent blind agents, one per mode, each given only a verified quarantine (six
+documents + the skill, no answer key, banners stripped) and told not to search outside it.
+Neither had seen the key. Runs recorded in `_audit/golden-fixture/runs/`.
+
+**Both runs FAIL the fixture.** That is a real result, not a setup error: the fixture was
+built to catch specific failures and it caught them.
+
+### What the skill got right
+
+- **All 5 planted Hard Stops found by BOTH runs** (HS-1 8.1, HS-2 7.1, HS-3 9.1,
+  HS-5 6.5, HS-6 12.1). Detection of the headline violations is genuinely working.
+- **The HS-4 trap was avoided by both.** Neither raised "no adverse-event clause" as a Hard
+  Stop. The full-review agent explicitly reasoned it out: the MSA already covers it. That is
+  the Rule 9 defect the fixture was built to catch, and the skill did not fall for it.
+- **Full review produced Protection Score 0, Critical band, with the Rule 12 calculation
+  table present.** Exactly as the key requires.
+
+### Defect 1: the output-mode defect is CONFIRMED, blind
+
+Redline-only produced **no Protection Score, no band, and no Rule 12 calculation table.**
+The agent read the mode-emission matrix and reported plainly that the mode emits only the
+marked-up document, then recorded nulls rather than computing a score to fill the field.
+
+This is the F1 defect, confirmed by an actor who did not know it was being looked for, in
+the mode that is the DEFAULT. Rule 12 says a score without its calculation table is invalid;
+redline-only gives neither. Item #19 is no longer a suspicion.
+
+### Defect 2: absence detection is broken in BOTH modes
+
+**Neither run produced an adverse-event finding at all.** The key's failure mode 1: "No AE
+finding at all means absence detection is broken."
+
+The full-review agent's own words are the diagnosis: it dropped AE reporting "which the MSA
+already covers per Rule 5/9". It treated governed-and-covered as a reason to say NOTHING,
+when the required behaviour is a LOW finding in the Governed:Covered column. The skill
+avoided the false-positive trap by falling into the silent-omission one beside it.
+
+That is a subtle and valuable find. Avoiding HS-4 and reporting AE-ABSENT as LOW/covered are
+not alternatives; the fixture demands both.
+
+### Defect 3: Hard Stop over-escalation, both modes
+
+Expected 5, got 7 in both. Both escalated **D-6** (WO 6.4, human-authored notes reclassified
+as Usage Data) to Hard Stop; it is planted as a DATA-PROTECTION finding. Both also escalated
+**P-2** (WO 4.4, 50% advance payment) to Hard Stop; it is planted as a PLAYBOOK position.
+
+Both are real findings, correctly located and correctly reasoned. The defect is severity
+calibration, not detection: inflating the Hard Stop count changes the escalation path and
+the Protection Score, so it is not cosmetic.
+
+The full-review agent also contradicted itself, reporting 6 Hard Stops in its summary while
+its own JSON carried 7.
+
+### Defect 4: arithmetic coverage is half of the minimum
+
+Both runs mapped to **4 arithmetic findings against a required minimum of 8.** Both caught
+the headline "the fee table does not foot" and the rate-card overcharge, and both missed
+A-4, A-5 and A-6, the ones needing a cross-reference to the rate card rather than a
+column sum. Redline additionally missed A-3.
+
+Note what this means for F4/F5's per-line batching: the failure is not the arithmetic, it is
+that a per-line sweep never happened for several lines.
+
+### Honest limits of this baseline
+
+- Mapping run findings onto answer-key IDs is judgment, and I did it having read the key.
+  The protocol permits a reviewing agent to do the bookkeeping; mapping cannot invent a
+  finding, but a stricter or looser mapper would move the counts by one or two.
+- Both runs were Sonnet subagents, not Claude Desktop. Same skill files, different harness.
+- `S-1`, `S-2`, `V-2` and the `N-*` missing-document rows were not mapped confidently and
+  are recorded as not-found, which may understate the runs.
