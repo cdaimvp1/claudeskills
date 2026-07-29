@@ -445,3 +445,62 @@ are just computed the same way.
 **Malicious-code review: SAFE.** Vendored copy diffs identical to the reviewed
 source; no new code was written this increment. SKILL.md change is prose plus a
 fenced example.
+
+### O6 DONE, 2026-07-29. C5 category-strategy: Pareto, HHI, CAGR, YoY, tail, anomaly.
+
+Built a CONCENTRATION face in the kernel (`hhi`, `hhi_band`, `pareto_segments`,
+`cagr`, `yoy`, `tail_at_threshold`), vendored into `category-strategy-1c344a`
+(which had none), and wired three sites in `references/analysis-methodology.md`.
+
+**Verification, actual output:**
+```
+SUMMARY: 78/78 passed, 0/78 failed
+GOLDEN hhi(50/30/20) = 3800.0  (source states 3,800 "High")   PASS
+monopoly hhi([100])  = 10000                                   PASS
+HHI bands exact at 1500 and 2500                               PASS
+cagr(100 -> 121, 2y) = 10.0% exactly                           PASS
+yoy(88M -> 95M)      = 7.95%  (skill's own example: 8.0)       PASS
+tail < $50K: 3 vendors, $80,000, 5.063%, 24-36 hours           PASS
+```
+
+The HHI case is a TRUE golden: analysis-methodology.md:153-156 publishes the
+arithmetic ("50^2 + 30^2 + 20^2 = 2500 + 900 + 400 = 3,800").
+
+**A real ambiguity found and resolved in the open.** analysis-methodology.md
+defines segment A as "top suppliers up to 80% cumulative" (:109) and Pareto
+Efficiency as "number of suppliers covering 80% of spend" (:118). Those two
+readings disagree about the supplier whose spend straddles the line. I resolved
+in favour of the second, so the straddler is counted and `p80_count` is the
+smallest N that actually reaches 80%. On a 50/25/25 split that is 3, not 2,
+because two suppliers reach only 75%. The alternative reports a p80 that does not
+reach 80%, which is worse. Both readings are pinned by tests, and the resolution
+is documented in the source file and MAINTENANCE.md rather than chosen quietly.
+
+**Also caught while testing: my own expectation was wrong first, not the code.**
+I asserted p80=3 for a 50/30/12/5/2/1 split; the correct answer is 2, because
+A+B lands exactly on 80.0 and no third supplier is needed. Recorded because the
+boundary case is the whole point of the ambiguity above.
+
+**Three refusals worth naming:**
+- `hhi()` refuses an all-zero or empty distribution rather than returning 0,
+  which would read as perfect competition.
+- `cagr()` and `yoy()` refuse a zero or negative base. Growth off zero is
+  undefined, not large. Returning a number would manufacture the phantom ">50%
+  CAGR rapid growth vendor" that this skill's own Phase 1.7 anomaly check
+  (SKILL.md:367) exists to surface honestly. A vendor with no prior-year spend
+  is NEW, and the skill now says so.
+- `pareto_segments()` breaks ties by name so ranking is input-order independent.
+  The skill's determinism guarantee requires it; a stable sort alone does not.
+
+`tail_at_threshold()` returns the effort-to-value hours as the skill's stated
+8-12 hour RANGE rather than a midpoint, because the skill reports a range and
+collapsing it would claim precision the source declined to claim.
+
+**Kernel-copy hygiene:** all four consuming copies (rfp-response-analysis,
+negotiation-playbook-learning, supplier-landscape, category-strategy) refreshed
+to the current source in this increment and all four diff IDENTICAL. Held skill
+untouched.
+
+**Malicious-code review: SAFE.** Kernel imports unchanged; grep for os/sys/
+subprocess/socket/urllib/`__import__`/eval/exec/pickle/base64 returns 0. Kernel
+diff is additive with ZERO deletions. The methodology-file changes are prose.

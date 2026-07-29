@@ -102,6 +102,23 @@ Unknown:           Contract reference field is blank (could be either)
 3. Calculate cumulative share
 4. Identify the Pareto break point (80% cumulative threshold)
 
+**HARD RULE, kernel usage (per Execution Guardrails G11).** Steps 1-4, the A/B/C/D
+segment assignment, the p80/p95/p99 counts and the Pareto Efficiency ratio are all
+produced by calling `pareto_segments()` in the vendored `numeric_kernel.py`, not by
+model arithmetic over the spend cube. This is the largest-N input this skill handles,
+and a single mis-summed cumulative silently reorders supplier tiers.
+
+`pareto_segments()` also resolves an ambiguity this document contains. Segment A is
+defined here as "top suppliers up to 80% cumulative", while Pareto Efficiency below
+is defined using "number of suppliers covering 80% of spend". Those two readings
+differ for the one supplier whose spend straddles the line. The kernel resolves it in
+favour of the second: a straddling supplier IS counted, so `p80_count` is the smallest
+N whose cumulative actually reaches 80%. On a 50/25/25 split that gives p80 = 3, not
+2, because two suppliers reach only 75%. Where suppliers land exactly on 80.0, no
+extra supplier is added. Supplier ranking is also made order-independent (ties broken
+by name) so two runs of the same data rank identically, per the skill's determinism
+guarantee.
+
 ### Pareto Segments
 
 | Segment | Definition | Typical Characteristic |
@@ -143,6 +160,13 @@ Show top 20-30 suppliers in the chart. Aggregate the remainder as "All Others."
 HHI = Σ(market_share_i²) for all suppliers
 
 Where market_share_i = supplier_i_spend / total_spend (as a percentage, 0-100)
+
+HARD RULE, kernel usage (per Execution Guardrails G11): do NOT compute this by
+hand. Call hhi() and hhi_band() in the vendored numeric_kernel.py. Shares are
+PERCENTAGES, not fractions, which is what puts a monopoly at 10,000 rather than
+1.0; the kernel pins that with a test because getting it wrong is a silent
+factor-of-10,000 error. hhi() refuses an all-zero or empty spend distribution
+rather than reporting 0, which would read as perfect competition.
 
 Interpretation:
   HHI < 1,500:    Low concentration - competitive/diversified
@@ -337,6 +361,15 @@ If quantity data is unavailable, use transaction count as a proxy:
 ```
 Simple Growth:           (P2 - P1) / P1 × 100
 CAGR (multi-year):       (P_end / P_start)^(1/years) - 1
+                         HARD RULE: call cagr() in numeric_kernel.py. It REFUSES
+                         a zero or negative start value rather than returning a
+                         huge number. Growth off a zero base is undefined, not
+                         large, and reporting it would manufacture exactly the
+                         phantom ">50% CAGR rapid growth vendor" the Phase 1.7
+                         anomaly check exists to surface honestly. A vendor with
+                         no prior-year spend is NEW; say so.
+YoY (most recent pair):  (current - prior) / prior
+                         HARD RULE: call yoy(). Same zero-base refusal.
 Annualized Run Rate:     Last 3 months spend × 4 (quarterly annualization)
 Rolling 12-Month:        Sum of most recent 12 months
 ```

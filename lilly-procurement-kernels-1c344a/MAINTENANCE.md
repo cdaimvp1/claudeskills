@@ -15,6 +15,10 @@ that multiple Lilly Procurement Skills each describe independently in prose:
 | `weighted_score` | market-rate-benchmarking (Composite Contract Quality Score) AND evaluation-engine (Effective_Weight_Frac / Score Validation Checks) - both skills independently require weights to foot to 1.0; this is one shared guard instead of two divergent ones |
 | `npv` | pro-forma-builder (Financial Methodology, end-of-year Year-1 discounting) |
 | `quadrature_rollup` | should-cost-builder (Aggregation Method: quadrature + >15% LOW-confidence widening) |
+| `hhi` / `hhi_band` | category-strategy (`references/analysis-methodology.md`, HHI and its concentration bands) |
+| `pareto_segments` | category-strategy (Pareto methodology, A/B/C/D segments, p80/p95/p99, efficiency ratio) |
+| `cagr` / `yoy` | category-strategy (growth metrics, and the >50% CAGR rapid-growth anomaly check) |
+| `tail_at_threshold` | category-strategy (tail spend framework and the effort-to-value hours band) |
 | `outcome_partition` | negotiation-playbook-learning (`references/outcome-schema.md`, the win/loss partition and the sum-to-1.0 integrity check) |
 | `difficulty_score` | negotiation-playbook-learning (the 0-100 Negotiation Difficulty Score, its bands, and the v2.1 scaling fix) |
 | `level_bid` | rfp-response-analysis (`references/bid-leveling.md`, the three normalization formulas and the escalation rule at SKILL.md:1704) |
@@ -168,6 +172,31 @@ skills themselves draw a hard line. Specifically:
   combined component (summing their spreads linearly) before calling this
   function, per should-cost-builder's own text, until a grouping-aware
   version is added here.
+- **`hhi` treats market shares as PERCENTAGES (0-100), not fractions.** That is
+  what the source specifies and what puts a monopoly at 10,000 rather than 1.0.
+  Using fractions would understate every index by a factor of 10,000 and band
+  every portfolio as Low concentration. Pinned by the monopoly test.
+- **`pareto_segments` resolves an ambiguity in its own source.** The document
+  defines segment A as "top suppliers up to 80% cumulative" but defines Pareto
+  Efficiency using "number of suppliers covering 80% of spend". These differ for
+  the supplier straddling the line. The kernel counts the straddler, so
+  `p80_count` is the smallest N actually reaching 80%. The alternative reading
+  reports a p80 that does not reach 80%, which is worse. Flagged rather than
+  silently chosen.
+- **`pareto_segments` sorts ties by name so ranking is input-order
+  independent.** category-strategy's determinism guarantee requires two runs of
+  the same data to produce the same supplier order, and Python's sort is stable
+  with respect to input order, which is not the same thing.
+- **`cagr` and `yoy` refuse a zero or negative base rather than returning a huge
+  number.** Growth off a zero base is undefined, not large. Returning a number
+  there would manufacture the phantom ">50% CAGR rapid growth vendor" that
+  category-strategy's Phase 1.7 anomaly check is meant to surface honestly. A
+  vendor with no prior-year spend is new, and the skill should say so.
+- **`tail_at_threshold` returns the effort-to-value hours as a RANGE, not a
+  midpoint.** The source states 8-12 hours per tail vendor and reports it as a
+  range; collapsing it would present a false precision the source declined to
+  claim. Contrast the tail COST model, which does state midpoints ($3,500
+  management, $200 transaction) and is not implemented here.
 - **`difficulty_score` returns None rather than 0 when no positions are
   applicable.** negotiation-playbook-learning's own text says "if applicable ==
   0, difficulty is NEEDS_INPUT". A score of 0 means "every position held", which

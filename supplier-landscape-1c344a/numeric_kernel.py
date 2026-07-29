@@ -389,6 +389,250 @@ def quadrature_rollup(component_bases: Sequence[float],
 
 
 # ===========================================================================
+# CONCENTRATION face
+# ===========================================================================
+#
+# Source: category-strategy-1c344a/references/analysis-methodology.md
+#   Pareto methodology and segments  :96-125
+#   HHI and its bands                :140-157
+#   Growth metrics (CAGR)            :339
+#   Tail spend framework             :253-290
+#
+# category-strategy had no kernel and no kernel calls. Every figure below was
+# model arithmetic over a spend cube, which is the largest-N input this skill
+# handles and the one where a single mis-summed cumulative silently reorders
+# supplier tiers.
+
+
+class ConcentrationError(KernelError):
+    """Raised when a spend distribution cannot support the requested metric."""
+
+
+# analysis-methodology.md:148-151.
+_HHI_BANDS = ((1500, "Low"), (2500, "Moderate"), (10000, "High"))
+
+# analysis-methodology.md:107-112. Upper cumulative bound per segment, in
+# percent, and the label. A supplier belongs to the segment its cumulative
+# share crosses INTO, counted from the share BEFORE it (see pareto_segments).
+_PARETO_SEGMENTS = ((80.0, "A"), (95.0, "B"), (99.0, "C"), (100.0, "D"))
+
+# analysis-methodology.md:118-123.
+_PARETO_EFFICIENCY_BANDS = (
+    (10.0, "Highly concentrated"),
+    (20.0, "Typical"),
+    (30.0, "Moderately fragmented"),
+    (float("inf"), "Highly fragmented"),
+)
+
+
+@dataclass
+class ParetoRow:
+    """One supplier's position in the ranked spend distribution."""
+
+    name: str
+    spend: float
+    share_pct: float
+    cumulative_pct: float
+    segment: str
+
+
+@dataclass
+class ParetoResult:
+    rows: List[ParetoRow] = field(default_factory=list)
+    total_spend: float = 0.0
+    supplier_count: int = 0
+    p80_count: int = 0
+    p95_count: int = 0
+    p99_count: int = 0
+    pareto_efficiency_pct: float = 0.0
+    pareto_efficiency_band: str = ""
+
+
+def hhi(spends: Sequence[float]) -> float:
+    """Herfindahl-Hirschman Index over a spend distribution, 0 to 10,000.
+
+    Source: analysis-methodology.md:143-146, "HHI = sum(market_share_i^2) for
+    all suppliers, where market_share_i = supplier_i_spend / total_spend (as a
+    percentage, 0-100)".
+
+    Shares are percentages, not fractions, which is what puts a monopoly at
+    10,000 rather than 1.0. Getting that wrong by a factor of 10,000 is the
+    obvious failure mode, so the worked example at :155 is a golden test.
+    """
+    if not spends:
+        raise ConcentrationError("cannot compute HHI over an empty spend list")
+    if any(s < 0 for s in spends):
+        raise InvalidInputError("spend values must be non-negative")
+    total = sum(spends)
+    if total <= 0:
+        raise ConcentrationError(
+            "total spend is zero, so no supplier has a market share and HHI is "
+            "undefined. Label this NEEDS_INPUT rather than reporting 0"
+        )
+    return sum((s / total * 100.0) ** 2 for s in spends)
+
+
+def hhi_band(index: float) -> str:
+    """Map an HHI to its concentration label (analysis-methodology.md:148-151)."""
+    if index < 0 or index > 10000 + 1e-6:
+        raise InvalidInputError(f"HHI {index} is outside the 0-10,000 scale")
+    for ceiling, label in _HHI_BANDS:
+        if index < ceiling:
+            return label
+    return "High"
+
+
+def pareto_segments(suppliers: Sequence[tuple]) -> ParetoResult:
+    """Rank suppliers by spend and assign Pareto segments A/B/C/D.
+
+    `suppliers` is a sequence of (name, spend) pairs, in any order.
+
+    Source: analysis-methodology.md:96-125.
+
+    RESOLVED AMBIGUITY, disclosed. The source defines segment A as "top
+    suppliers up to 80% cumulative" and separately defines Pareto Efficiency
+    using "number of suppliers covering 80% of spend". Those two readings differ
+    for the one supplier whose spend straddles the line. This function resolves
+    it so that the straddling supplier is INCLUDED in A, i.e. segment is decided
+    by the cumulative share BEFORE that supplier is added. That makes p80_count
+    the smallest N whose cumulative reaches 80%, which is what "covering 80% of
+    spend" means and what the dashboard's `p80` field reports. The alternative
+    reading would report a p80 that does not actually reach 80%.
+    """
+    if not suppliers:
+        raise ConcentrationError("cannot compute a Pareto distribution over no suppliers")
+    for item in suppliers:
+        if len(item) != 2:
+            raise InvalidInputError(f"expected (name, spend) pairs, got {item!r}")
+        if item[1] < 0:
+            raise InvalidInputError(f"spend for {item[0]!r} is negative")
+    total = sum(s for _, s in suppliers)
+    if total <= 0:
+        raise ConcentrationError(
+            "total spend is zero, so there is no distribution to rank. Label "
+            "NEEDS_INPUT rather than emitting an all-zero Pareto"
+        )
+
+    # Descending spend, then name, so two runs of the same data rank identically
+    # (the skill's determinism guarantee applies to supplier ordering).
+    ranked = sorted(suppliers, key=lambda p: (-p[1], p[0]))
+
+    rows: List[ParetoRow] = []
+    cumulative_before = 0.0
+    for name, spend in ranked:
+        share = spend / total * 100.0
+        segment = _PARETO_SEGMENTS[-1][1]
+        for ceiling, label in _PARETO_SEGMENTS:
+            if cumulative_before < ceiling:
+                segment = label
+                break
+        cumulative_before += share
+        rows.append(ParetoRow(name=name, spend=float(spend), share_pct=share,
+                              cumulative_pct=cumulative_before, segment=segment))
+
+    p80 = sum(1 for r in rows if r.segment == "A")
+    p95 = p80 + sum(1 for r in rows if r.segment == "B")
+    p99 = p95 + sum(1 for r in rows if r.segment == "C")
+    efficiency = p80 / len(rows) * 100.0
+    band = _PARETO_EFFICIENCY_BANDS[-1][1]
+    for ceiling, label in _PARETO_EFFICIENCY_BANDS:
+        if efficiency < ceiling:
+            band = label
+            break
+
+    return ParetoResult(rows=rows, total_spend=total, supplier_count=len(rows),
+                        p80_count=p80, p95_count=p95, p99_count=p99,
+                        pareto_efficiency_pct=efficiency,
+                        pareto_efficiency_band=band)
+
+
+def cagr(start_value: float, end_value: float, years: float) -> float:
+    """Compound annual growth rate as a fraction (0.08 = 8 percent).
+
+    Source: analysis-methodology.md:339, "CAGR (multi-year): (P_end / P_start)
+    ^(1/years) - 1".
+
+    Refuses a non-positive start value. A CAGR off a zero or negative base is
+    undefined, not infinite, and reporting a large number there would create
+    exactly the kind of phantom "rapid growth vendor" the anomaly check at
+    SKILL.md:367 is meant to surface honestly.
+    """
+    if years <= 0:
+        raise InvalidInputError(f"years must be positive, got {years}")
+    if start_value <= 0:
+        raise ConcentrationError(
+            f"CAGR is undefined from a start value of {start_value}. A growth "
+            "rate off a zero or negative base is not a large number, it is "
+            "meaningless; report the vendor as new rather than fabricating a rate"
+        )
+    if end_value < 0:
+        raise InvalidInputError(f"end_value must be non-negative, got {end_value}")
+    return (end_value / start_value) ** (1.0 / years) - 1.0
+
+
+def yoy(prior_value: float, current_value: float) -> float:
+    """Year-over-year change as a fraction (0.08 = 8 percent growth).
+
+    Source: category-strategy SKILL.md:715, "Show CAGR across the full period
+    and YoY for the most recent year-pair."
+
+    Refuses a zero prior value for the same reason cagr() does.
+    """
+    if prior_value == 0:
+        raise ConcentrationError(
+            "year-over-year change is undefined against a prior value of zero. "
+            "Report the category or vendor as new rather than as infinite growth"
+        )
+    if prior_value < 0:
+        raise InvalidInputError("prior_value must be positive for a YoY rate")
+    return (current_value - prior_value) / prior_value
+
+
+@dataclass
+class TailResult:
+    threshold: float
+    vendor_count: int
+    tail_spend: float
+    tail_spend_pct: float
+    hours_low: float
+    hours_high: float
+
+
+def tail_at_threshold(spends: Sequence[float], threshold: float,
+                      hours_per_vendor_low: float = 8.0,
+                      hours_per_vendor_high: float = 12.0) -> TailResult:
+    """Tail analysis at a spend threshold (Method 2 of the tail framework).
+
+    Source: analysis-methodology.md:261 (threshold method) and category-strategy
+    SKILL.md:378-379, which require tail analysis at $50K / $100K / $250K with
+    "vendor count, total spend, and percentage", plus the effort-to-value line
+    "tail vendor count x 8-12 hours = estimated annual contracting hours".
+
+    The 8-to-12 hour band is the skill's own stated range and is returned as a
+    range, not collapsed to a midpoint, because the skill reports it as a range.
+    """
+    if threshold <= 0:
+        raise InvalidInputError(f"threshold must be positive, got {threshold}")
+    if any(s < 0 for s in spends):
+        raise InvalidInputError("spend values must be non-negative")
+    total = sum(spends)
+    if total <= 0:
+        raise ConcentrationError(
+            "total spend is zero, so a tail percentage is undefined"
+        )
+    tail = [s for s in spends if s < threshold]
+    tail_spend = sum(tail)
+    return TailResult(
+        threshold=float(threshold),
+        vendor_count=len(tail),
+        tail_spend=tail_spend,
+        tail_spend_pct=tail_spend / total * 100.0,
+        hours_low=len(tail) * hours_per_vendor_low,
+        hours_high=len(tail) * hours_per_vendor_high,
+    )
+
+
+# ===========================================================================
 # OUTCOME face
 # ===========================================================================
 #
@@ -1362,6 +1606,82 @@ if __name__ == "__main__":
         f"base={qr_widened.total_base}, low={qr_widened.total_low}, high={qr_widened.total_high}",
     )
 
+    # --- Golden: analysis-methodology.md HHI worked example ----------------
+    # Source: category-strategy-1c344a/references/analysis-methodology.md:153-156,
+    # "If 3 suppliers split spend 50/30/20: HHI = 50^2 + 30^2 + 20^2 = 2500 +
+    # 900 + 400 = 3,800 (High)". A true golden: the source did the arithmetic.
+    _hhi_golden = hhi([50, 30, 20])
+    _check(
+        "hhi: analysis-methodology.md worked example, 3 suppliers at 50/30/20 "
+        "gives exactly 3,800 and bands as High",
+        abs(_hhi_golden - 3800.0) < 1e-6 and hhi_band(_hhi_golden) == "High",
+        f"got {_hhi_golden}, band {hhi_band(_hhi_golden)}",
+    )
+    _check(
+        "hhi: a monopoly is 10,000, confirming shares are percentages not "
+        "fractions (the factor-of-10,000 failure mode)",
+        abs(hhi([100]) - 10000.0) < 1e-6,
+        f"got {hhi([100])}",
+    )
+    _check(
+        "hhi_band: exact boundaries per analysis-methodology.md:148-151 "
+        "(1499 Low / 1500 Moderate, 2499 Moderate / 2500 High)",
+        hhi_band(1499) == "Low" and hhi_band(1500) == "Moderate"
+        and hhi_band(2499) == "Moderate" and hhi_band(2500) == "High",
+    )
+
+    # Pareto: the two readings of "up to 80% cumulative" differ only for the
+    # supplier straddling the line. Both cases are pinned.
+    _p_exact = pareto_segments([("A", 50), ("B", 30), ("C", 12), ("D", 5),
+                                ("E", 2), ("F", 1)])
+    _p_straddle = pareto_segments([("A", 50), ("B", 25), ("C", 25)])
+    _check(
+        "pareto_segments: when suppliers land exactly ON 80.0 cumulative, "
+        "p80 counts only those needed to reach it (A+B = 80 exactly -> p80=2)",
+        _p_exact.p80_count == 2 and _p_exact.p95_count == 4
+        and _p_exact.p99_count == 5,
+        f"got p80={_p_exact.p80_count}, p95={_p_exact.p95_count}, "
+        f"p99={_p_exact.p99_count}",
+    )
+    _check(
+        "pareto_segments: when the 80% line is crossed mid-supplier, that "
+        "supplier IS counted, so p80 is the smallest N actually covering 80% "
+        "(50/25/25 -> p80=3, cumulative 100 not 75)",
+        _p_straddle.p80_count == 3,
+        f"got p80={_p_straddle.p80_count}",
+    )
+    _p_a = pareto_segments([("v%d" % i, float(100 - i)) for i in range(20)])
+    _p_b = pareto_segments([("v%d" % i, float(100 - i)) for i in reversed(range(20))])
+    _check(
+        "pareto_segments: ranking is input-order independent and deterministic, "
+        "which the skill's own determinism guarantee requires of supplier order",
+        [r.name for r in _p_a.rows] == [r.name for r in _p_b.rows],
+    )
+
+    _check(
+        "cagr: (P_end/P_start)^(1/years)-1 per analysis-methodology.md:339; "
+        "100 to 121 over 2 years is exactly 10%",
+        abs(cagr(100, 121, 2) - 0.10) < 1e-9,
+        f"got {cagr(100, 121, 2)}",
+    )
+    _check(
+        "yoy: 88M to 95M is 7.95%, which the skill's own dashboard example "
+        "carries as yoy2324 = 8.0 after rounding",
+        abs(yoy(88_000_000, 95_000_000) * 100 - 7.95) < 0.01,
+        f"got {yoy(88_000_000, 95_000_000) * 100}",
+    )
+
+    _tail = tail_at_threshold([1e6, 500_000, 40_000, 30_000, 10_000], 50_000)
+    _check(
+        "tail_at_threshold: 3 vendors below $50K totalling $80,000, and the "
+        "effort-to-value band is returned as the skill's stated 8-12 hour "
+        "RANGE (24-36 hours) rather than collapsed to a midpoint",
+        _tail.vendor_count == 3 and _tail.tail_spend == 80_000
+        and _tail.hours_low == 24 and _tail.hours_high == 36,
+        f"got {_tail.vendor_count} vendors, {_tail.tail_spend}, "
+        f"{_tail.hours_low}-{_tail.hours_high}h",
+    )
+
     # --- Golden: negotiation-playbook-learning band verification -----------
     # Source: negotiation-playbook-learning-1c344a/SKILL.md:641, "Band
     # verification (single-position negotiations)", which states every one of
@@ -1666,6 +1986,41 @@ if __name__ == "__main__":
 
 
 
+
+    # --- concentration face refusals ---------------------------------------
+    _check_raises(
+        "cagr: refuses a zero or negative start value. A growth rate off a zero "
+        "base is meaningless, not large, and reporting one would manufacture "
+        "the phantom 'rapid growth vendor' the anomaly check exists to find",
+        lambda: cagr(0, 100, 3),
+        ConcentrationError,
+    )
+    _check_raises(
+        "yoy: refuses a zero prior value, same reasoning",
+        lambda: yoy(0, 100),
+        ConcentrationError,
+    )
+    _check_raises(
+        "hhi: refuses an all-zero spend distribution rather than reporting 0, "
+        "which would read as perfect competition",
+        lambda: hhi([0, 0]),
+        ConcentrationError,
+    )
+    _check_raises(
+        "hhi: refuses an empty supplier list",
+        lambda: hhi([]),
+        ConcentrationError,
+    )
+    _check_raises(
+        "hhi: refuses negative spend",
+        lambda: hhi([10, -5]),
+        InvalidInputError,
+    )
+    _check_raises(
+        "pareto_segments: refuses an empty supplier set",
+        lambda: pareto_segments([]),
+        ConcentrationError,
+    )
     # --- outcome face refusals ---------------------------------------------
     _check_raises(
         "outcome_partition: refuses an outcome code outside the eleven the "

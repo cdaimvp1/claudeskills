@@ -1,5 +1,5 @@
 # Vendored verbatim from lilly-procurement-kernels-1c344a/numeric_kernel.py on 2026-07-29; source of truth is lilly-procurement-kernels-1c344a/numeric_kernel.py. Do not hand-edit here; edit the source and re-vendor.
-# negotiation-playbook-learning-1c344a calls: outcome_partition() (the win/loss partition and strict acceptance rate, with the sum-to-1.0 integrity check) and difficulty_score() (the 0-100 Negotiation Difficulty Score and its band). The remaining functions are vendored for completeness (this is a verbatim copy of the shared kernel) but not called by this skill's own workflow.
+# category-strategy-1c344a calls: hhi() and hhi_band() (concentration metrics), pareto_segments() (the A/B/C/D distribution, p80/p95/p99 counts and the Pareto efficiency ratio), cagr() and yoy() (growth metrics and the >50% CAGR rapid-growth anomaly check), and tail_at_threshold() (the mandatory 50K/100K/250K tail analysis and its effort-to-value hours). The remaining functions are vendored for completeness (this is a verbatim copy of the shared kernel) but not called by this skill's own workflow.
 """
 numeric_kernel.py
 Lilly Procurement Skills - Shared Numeric Kernel
