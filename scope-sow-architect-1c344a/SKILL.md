@@ -165,7 +165,7 @@ more), never IT alone.
   do NOT fail: proceed using the rule summary inlined below, tell the user you are running without
   the shared references (so styling/depth may be reduced), and ask them to confirm
   lilly-brand-assets v10.0+ is installed and current.
-- Summary of the guardrails (G1-G12):
+- Summary of the guardrails (G1-G13):
   - **G1 (Tool Selection):** When tracked changes, comments, or document authorship are part of the
     input (a draft SOW under negotiation), read the .docx XML with `unpack.py`. Use `extract-text`
     ONLY for content-only extraction where change history is irrelevant (a clean draft, an email, a
@@ -309,7 +309,7 @@ skill reflects into and never replaces.
     (`references/dashboard-canonical.md`, reference implementation
     `examples/scope_sow_architect_canonical_dashboard.jsx`) built entirely from the documented
     shared component library in `dashboard-components.md`, no bespoke components.
-  - **Suite-wide guardrails note (not a per-skill version):** Execution guardrails G1-G12 are defined
+  - **Suite-wide guardrails note (not a per-skill version):** Execution guardrails G1-G13 are defined
     suite-wide in lilly-brand-assets. This skill inherits them; see GLOBAL OPERATING RULES above.
 
 # Scope & SOW Architect

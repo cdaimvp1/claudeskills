@@ -2,7 +2,7 @@
 name: lilly-brand-assets-1c344a
 description: >
   Shared FOUNDATION for the Lilly procurement skill suite: brand logos, the canonical color palette,
-  execution guardrails (G1-G12), the dashboard component library, the DOCX design system, and the
+  execution guardrails (G1-G13), the dashboard component library, the DOCX design system, and the
   user manual (troubleshooting, model selection, per-skill usage). Triggers on "Lilly branding",
   "Lilly colors", "brand colors", "how do I use this skill", "help with skills", "skill not working",
   "dashboard error", "dashboard crashed", "which model", "Opus or Sonnet", "troubleshoot", "not rendering",
@@ -43,7 +43,7 @@ human-facing reference material rather than something every skill run needs in c
 `user-manual.md` is SharePoint-primary with a local companion-file fallback; see "Reading
 the user manual" below for the read order.
 
-- **execution-guardrails.md** (inlined below): Mandatory guardrails (G1-G12) referenced by every skill; G11 (Kernel-Backed Computation) applies only to the subset of skills that vendor a numeric/decision kernel.
+- **execution-guardrails.md** (inlined below): Mandatory guardrails (G1-G13) referenced by every skill; G11 (Kernel-Backed Computation) applies only to the subset of skills that vendor a numeric/decision kernel.
 - **dashboard-components.md** (inlined below): Shared React component library for all dashboards.
 - **brand-colors.md** (inlined below): Lilly brand color palette with hex codes and usage rules, including the canonical status palette and the single documented green/teal exception.
 - **scoring-scales.md** (inlined below): The one canonical suite-wide evaluation scale (0.0-5.0) and its 5-tier requirements mapping.
@@ -1067,6 +1067,31 @@ Skills that include external research phases must meet minimum search thresholds
 - **If minimums are not met, label the output.** "RESEARCH PENDING: [N] of [minimum] searches completed. Results may be incomplete."
 - **Never present thin research as complete.** If you found one data point, say "single source, LOW confidence," not "market rate is $X."
 
+**When the floor CANNOT be met because search is unavailable (H9).** The rules above cover
+thin research. They did not cover the case where the sources simply are not reachable, and
+no rule said what happens then, which left three bad options available by default: lower the
+floor quietly, refuse the entire run, or produce the figure anyway.
+
+None of those. The rule is:
+
+1. **Produce the deliverable.** A run that cannot search still has the provided documents,
+   the governing policy and the structural analysis. Refusing everything because one input
+   is missing throws away work the user can use.
+2. **Suppress the affected band, do not estimate it.** A percentile band, a market rate, a
+   benchmark range: if the research floor behind it was not met, the band does not render.
+   `percentile_gate()` in the vendored kernel already does exactly this for percentiles and
+   is the precedent to follow, not a special case.
+3. **Label the section as below the research floor**, stating the minimum and what was
+   actually achieved: "below the research floor: 1 of 5 searches, external search
+   unavailable this run."
+4. **Never lower the floor silently.** Redefining "minimum 5" as "5 if convenient" turns a
+   guardrail into a preference, and nothing in the output would show it happened.
+
+**This is G13 rung 5 applied to a band rather than a fact.** The band abstains; the rest of
+the deliverable proceeds at whatever rung its own sources support. A suppressed band with a
+stated reason is more useful than an estimated one, because the reader knows to go and get
+the number rather than trusting it.
+
 **Skills with research phases:** supplier-landscape (has minimums), category-strategy (has minimums), market-rate-benchmarking (has minimums), commercial-negotiation-prep (add minimums), lilly-contract-review Order Form / governing-agreement benchmarking (add minimums).
 
 ## G8: Pass Artifact Enforcement (HARD RULE for Multi-Pass Skills)
@@ -1127,6 +1152,92 @@ Hard prohibitions:
 Confidence: when a claim is cited but the inference is soft, label it (a High / Moderate / Low band or an `Estimate` tag with the basis on hover or expand), never a bare "confidence: 73%."
 
 **The anti-collapse signal:** if a deliverable contains a finding, number, status, or recommendation with no cited source and no abstain marker, the claim-gate was skipped. Stop, attach the citation, convert the claim to an abstain marker, or drop it.
+
+## G13: The Source Ladder (HARD RULE, suite-wide)
+
+**Every fact in every deliverable carries which rung it came from.** One ladder, five rungs,
+same labels everywhere.
+
+| # | Rung | Label it carries |
+|---|---|---|
+| 1 | **Live authoritative source**, read this run | cited, with the as-of date |
+| 2 | **Vendored snapshot** of that source | snapshot, as-of date, and "verify against live" |
+| 3 | **User-provided document** | user-supplied, with the document name and date |
+| 4 | **General principle, not Lilly-verified** | labelled explicitly as such |
+| 5 | **Abstain** | name the field AND the source that would resolve it |
+
+**Rung 5 is an answer, not a failure.** "I could not establish this, and here is what would"
+is a usable result. An invented rung-4 answer dressed as rung 1 is not.
+
+**Why one ladder rather than each skill wording its own.** Three different ladders existed
+before this guardrail: help-desk's "general principles, labeled not Lilly-verified",
+process-navigator's retry-once-then-fallback, evaluation-engine's "if the foundation cannot
+be read, follow the Rule 9 inlined summary". Each was individually sensible. Together they
+meant a reader could not learn the convention once and trust it, which is the entire purpose
+of a ladder. Thirty independently-worded ladders can disagree about what "degraded" means.
+
+**Rules of use:**
+
+1. **Never silently promote a rung.** A snapshot is not a live read; a general principle is
+   not a Lilly position. Promoting a rung is the specific dishonesty this guardrail exists
+   to prevent, because the reader's trust is calibrated to the label.
+2. **Descend, and say you descended.** When rung 1 is unavailable, fall to rung 2 and label
+   it rung 2. The descent itself is information: it tells the reader what the run could see.
+3. **Mixed deliverables are normal.** Most real outputs carry facts from several rungs. Label
+   per fact, not per document, so a rung-1 figure beside a rung-4 one is distinguishable.
+4. **Do not lower the floor to avoid rung 5.** If the honest answer is abstain, abstain.
+   Reaching for a weaker source to produce *something* is how a deliverable ends up
+   confidently wrong.
+
+**Interaction with G12.** G12 decides whether a claim may be made at all (cite or abstain).
+G13 decides how a claim that IS made must be labelled. A cited claim still needs its rung: a
+citation to a vendored snapshot and a citation to a live read are both "cited", and they are
+not equally strong.
+
+**Interaction with G7.** Where a research floor cannot be met because the sources it needs
+are unavailable, see G7's own rule on suppression: the deliverable is produced with the
+affected band suppressed and the section labelled as below the floor. The floor is never
+lowered silently.
+
+### G13a: Source-availability detection, the canonical step (H1)
+
+**This is the step that decides which rung of G13 a run can reach.** It belongs here rather
+than in each skill, for a reason found while canonicalising it: three skills
+(`meeting-prep-brief`, `sole-source-challenge`, `workflow-map`) carry the short form
+*"S0 / S1 / S2 / S3 / S4 / S5 as per the shared suite protocol"* while **no shared
+definition existed anywhere in this foundation skill.** They pointed at something undefined,
+which is the same dangling-pointer class as the brand-assets references B7 fixed. This
+section is what those pointers now resolve to.
+
+**S1, canonical text.** Before searching for or ingesting source documents (governing
+contracts, prior strategies, spend extracts, supplier records, case files), ask ONCE how to
+source them:
+
+- **I'll provide them** (the user uploads or points to attachments)
+- **Search M365 for them** (SharePoint / OneDrive / Outlook / Teams via the connector)
+- **Both** (the user provides some AND you search)
+- **No additional inputs** (proceed with what is already in context)
+
+**Do NOT auto-search before asking.** The M365 connector can only see what lives in M365; it
+CANNOT see Ariba, LEAH, an ERP/AP system or any other external system. Say that plainly
+rather than letting a user believe an absent result means the data does not exist. **If M365
+is not connected, proceed on provided and uploaded documents and label the gap** at the
+appropriate G13 rung.
+
+**When the user chooses "I'll provide them" or "Both": STOP and WAIT.** End the turn after
+asking. Do not produce analysis in the same turn on assumptions.
+
+**Detection feeds the ladder.** The answer to S1 determines the HIGHEST rung available to
+this run, and every fact is then labelled at the rung it actually came from, never at the
+best rung that was theoretically available. A run with the connector live can still contain
+rung-4 facts, and must say so.
+
+**Exemptions, recorded rather than assumed.** Skills that execute no task and ingest no
+source documents do not run this step: `deal-tab`, `rfx-hub` (both build a dashboard
+artifact from a supplied data object), `lilly-brand-assets` and
+`lilly-procurement-kernels` (both are foundation content, not runnable skills). `rfx-hub`
+is on this list because it was created after the original exemption list was written and
+would otherwise read as an oversight.
 
 ---
 

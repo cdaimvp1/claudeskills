@@ -3271,3 +3271,73 @@ and bundling it with them would hide that.
 
 Unlike the A11 dependency audit, where 10 of 19 citations proved spurious, WS H did not
 dissolve. Most of it is real.
+
+---
+
+## H2, H1, H9 — done, in that order
+
+Note on sequencing: the plan says **H2 depends on H1**; my triage argued the reverse, that a
+detection step reporting into thirty bespoke ladders is half a mechanism. Both landed in one
+pass so the disagreement is moot, but the plan's order was the other way and I should not
+pretend otherwise.
+
+### H2 — G13, The Source Ladder
+
+Five rungs, one wording, inlined where the other guardrails live:
+live authoritative read -> vendored snapshot -> user-provided document -> general principle
+(not Lilly-verified) -> abstain. Every fact carries its rung.
+
+Four rules of use, each aimed at a specific failure: never silently PROMOTE a rung (the
+reader's trust is calibrated to the label); descend and SAY you descended (the descent is
+itself information about what the run could see); label per FACT not per document (so a
+rung-1 figure beside a rung-4 one stays distinguishable); and never lower the floor to avoid
+rung 5.
+
+The rationale is recorded because it is the whole point: three sensible ladders already
+existed (help-desk, process-navigator, evaluation-engine). Individually fine, together they
+meant a reader could not learn the convention once and trust it.
+
+G13 is explicitly separated from G12: **G12 decides whether a claim may be made at all,
+G13 decides how a claim that IS made must be labelled.** A citation to a snapshot and a
+citation to a live read are both "cited" and are not equally strong.
+
+### H9 — the G7 floor rule, which had no answer at all
+
+G7 covered THIN research ("RESEARCH PENDING: N of minimum"). It said nothing about search
+being UNAVAILABLE, which left three bad defaults available: lower the floor quietly, refuse
+the whole run, or produce the figure anyway.
+
+Now stated: produce the deliverable, SUPPRESS the affected band rather than estimating it,
+label the section as below the floor with the actual counts, and never lower the floor
+silently. `percentile_gate()` in the kernel already does exactly this for percentiles and is
+named as the precedent rather than treated as a special case.
+
+Framed as **G13 rung 5 applied to a band rather than a fact**: the band abstains while the
+rest of the deliverable proceeds at whatever rung its own sources support.
+
+### H1 — and the finding underneath it
+
+My triage said 17 of 32. That was the wrong metric, measured by searching for words rather
+than the mechanism, which is now the fourth time this repo has made that exact error. On
+H1's own metric it is 29 of 32.
+
+Three skills (`meeting-prep-brief`, `sole-source-challenge`, `workflow-map`) carry the SHORT
+FORM: *"S0 / S1 / S2 / S3 / S4 / S5 as per the shared suite protocol."* They are not missing
+the rule, they reference it, which is better than duplicating it.
+
+**Except the thing they reference did not exist.** No canonical definition of the shared
+suite protocol lived anywhere in the foundation skill. Three skills pointed at nothing, the
+same dangling-pointer class as the 145 dead brand-assets references B7 fixed.
+
+Fixed: **G13a** now carries the canonical S1 text, including the M365 rule ("the connector
+CANNOT see Ariba, LEAH, an ERP/AP system"; say so plainly rather than letting an absent
+result read as absent data), the stop-and-wait rule, and the link from detection to ladder:
+the S1 answer sets the HIGHEST rung available, and every fact is still labelled at the rung
+it actually came from, never the best rung theoretically available.
+
+**Exemptions are now recorded rather than assumed**, and one had gone stale: H1's original
+list named deal-tab, brand-assets and kernels. `rfx-hub` was created later by A1 and would
+have read as an oversight rather than an exemption. It is on the list now, with the reason.
+
+Guardrail range bumped **G1-G12 -> G1-G13** across 48 live references in 26 files, and G13
+and G13a both verified present so the range is truthful rather than aspirational.
