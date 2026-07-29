@@ -3341,3 +3341,54 @@ have read as an oversight rather than an exemption. It is on the list now, with 
 
 Guardrail range bumped **G1-G12 -> G1-G13** across 48 live references in 26 files, and G13
 and G13a both verified present so the range is truthful rather than aspirational.
+
+---
+
+## H10 done. H6 and H7 CONFIRMED COMPLETE, with a finding about my own measuring.
+
+### H10 — applied to exactly two skills, not thirty
+
+Narrower than even my triage said. The canonical document names deal-room (already wired),
+the two negotiation-prep skills, and rfx-hub marked **"(future)"**. The plan adds: "Do not
+widen further without evidence it fits." So: **two** skills.
+
+Applied to `commercial-negotiation-prep` and `legal-negotiation-prep`, scoped to the one
+surface the canonical document names: **predicted supplier pushback**. That surface is the
+easiest place in either skill to fabricate, because a plausible supplier objection reads
+exactly like a remembered one.
+
+The five steps, with the load-bearing one third: pushback grounded in real correspondence
+carries its evidence badge; pushback that is not is labelled an **INFERENCE, in those
+words**, never a fabricated quote and never a paraphrase that reads like one. Cited and
+inferred objections must be visually distinguishable rather than sitting in one list looking
+alike. A contradiction between supplier statements is flagged, never silently resolved.
+
+Not widened to rfx-hub: its own source document defers it.
+
+### H6 and H7 — ZERO real gaps. My triage numbers were both undercounts.
+
+The triage said H6 29/32 and H7 30/32 and recommended confirming the stragglers. Confirming
+them showed there are none:
+
+| apparent gap | reality |
+|---|---|
+| `procurement-help-desk` (H6) | has ABSTAIN and "say so plainly rather than answering from memory" |
+| `workflow-map` (H6) | marks unknowns `[OWNER?]` |
+| `process-navigator` (H6) | Rule 2: **"Not specified in policy" is the answer** |
+| `lilly-procurement-kernels` (H6, H7) | has no SKILL.md at all; not a skill |
+| `deal-tab`, `rfx-hub` (H7) | exactly the exempt set recorded in G13a |
+
+**This is the sixth time in this programme that a pattern list under-reported**, and the
+count is the point rather than the anecdote. Every one had the same shape: a skill expressed
+the mechanism in words the pattern did not anticipate, and the tool reported absence. The
+H3 audit did it four times, my WS H triage did it twice more.
+
+**H2 is the structural fix for exactly this.** One canonical ladder means one wording, so a
+future audit can match a mechanism instead of guessing at its synonyms. That was not why G13
+was written, but it is the strongest argument for it.
+
+**No changes made to H6 or H7.** Both are complete. Rebuilding either would have been
+re-doing work already there, on the strength of a measurement that was wrong six times over.
+
+WS H now: H1, H2, H6, H7, H8, H9, H10 closed. **H4 alone remains**, and it is a decision
+about whether the suite adopts per-fact provenance, not a scheduling question.
