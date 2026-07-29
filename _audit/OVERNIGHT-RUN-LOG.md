@@ -2805,3 +2805,43 @@ cannot invent evidence requirements.
 
 Verification in flight: a fresh blind agent against a rebuilt quarantine, asked for a
 compliance evidence register alongside the findings.
+
+### Both fixes VERIFIED blind. One problem left in the whole fixture.
+
+A fresh blind agent against a rebuilt quarantine, scored under `--require-evidence`, so
+every claimed ID carries the run's own text.
+
+**S-2 is fixed.** The run produced a Compliance Evidence Register and recorded
+**SOC 2 Type II | SPS §9.2 | Awaiting**. `compliance_evidence 1/1`.
+
+It also discriminated rather than flagging everything, which is the behaviour that makes the
+rule useful instead of noisy: two other artifacts were marked **Not required** with reasons
+(deletion certification, "no cessation yet"; PI return/destruction, "pre-termination"). A
+register that marks everything Awaiting would be as useless as no register.
+
+Scorecard, all groups green except one:
+
+```
+MAPPING PROVENANCE  claimed 35, with evidence 35, without 0
+hard_stops 5/5   absence_detection 1/1   arithmetic 8/8   playbook 9/9
+data_protection 6/6   compliance_evidence 1/1   missing_documents 1/1
+HS-4 correctly NOT raised   AE present LOW/covered   score 0 Critical   Rule 12 table present
+VERDICT: FAIL, 1 problem  ->  vendor_tactics: V-5 not found
+```
+
+From 15 problems at baseline to **1**.
+
+**The evidence requirement immediately caught a bug in my own mapping.** My extraction
+regex for A-6 was `per-?day`, and the run's text says "per day" with a space, so it did not
+match. Because the mechanism forces a claim to carry evidence, I could not quietly assert
+A-6; I had to look, and looking showed the run HAD found it. Under the old bare-ID method I
+would have either dropped it silently (another manufactured failure) or claimed it on
+recollection. A one-character regex gap, surfaced in a single check.
+
+That is the point of the mechanism, and it is worth being precise about what it did: it did
+not detect the error, it made the error impossible to skip.
+
+**V-5 is the one genuine remaining miss**: retroactive commencement, work starting 19 days
+before signature. The full review drops it, having judged it did not survive
+citation-checking. The redline-only run catches it. So it is not a capability gap, it is a
+mode-dependent judgment call, and it is the only thing between this fixture and green.

@@ -1,0 +1,166 @@
+{
+  "run_id": "2026-07-29-full-review-RULE9B",
+  "mode": "Full review",
+  "found": [
+    {
+      "id": "HS-1",
+      "evidence": "WO-10 \u00a78.1 (Trade Sanctions) :: Supplier will screen personnel 'where commercially reasonable to do so,' dropping the unconditional screening obligation and the subcontractor-screeni"
+    },
+    {
+      "id": "HS-2",
+      "evidence": "WO-10 \u00a77.1 (Debarment) :: Supplier certifies only that it has not 'knowingly' engaged a debarred person. The MSA's own debarment certification (\u00a724.1) is unqualified. Adding 'k"
+    },
+    {
+      "id": "HS-3",
+      "evidence": "WO-10 \u00a79.1 (Taxes) :: WO bars Lilly from disclosing the Work Order or its pricing to any taxing authority without Supplier's prior written consent, directly reversing Lilly"
+    },
+    {
+      "id": "HS-5",
+      "evidence": "WO-10 \u00a76.5 (Data Protection) :: WO declares the AI model provider behind Meridian Insight 'a technology vendor of Supplier and not a Subcontractor or Sub-processor for the purposes o"
+    },
+    {
+      "id": "HS-6",
+      "evidence": "WO-10 \u00a712.1 (Indemnification) :: WO states Supplier's indemnification obligations are Supplier's 'sole and exclusive remedy' and folds indemnified claims inside the WO's own liability"
+    },
+    {
+      "id": "AE-ABSENT",
+      "evidence": "WO-10 (silent) vs MSA \u00a723 :: WO does not restate an adverse event reporting clause."
+    },
+    {
+      "id": "P-1",
+      "evidence": "WO-10 \u00a73.1 (Term and Renewal) :: WO renews automatically for successive 12-month terms unless either party gives 90 days' non-renewal notice - an automatic renewal mechanism, not Lill"
+    },
+    {
+      "id": "P-2",
+      "evidence": "WO-10 \u00a74.4 vs MSA \u00a73.3 :: WO requires Lilly to pay 50% of the Subtotal on signature of the Work Order, i.e. before any Services are performed - an advance payment."
+    },
+    {
+      "id": "P-3",
+      "evidence": "WO-10 \u00a75.1 vs MSA \u00a74.2 :: WO limits confidentiality survival to 2 years post-expiry/termination, against the MSA's 5-year survival period and below the playbook's 3-year minimu"
+    },
+    {
+      "id": "P-4",
+      "evidence": "WO-10 \u00a710.1 vs MSA \u00a714.1 (no Clinical Trial Liability line) :: Given clinical trial data in scope, pharma-specific Clinical Trial Liability coverage ($5M per occurrence) is required, but this coverage category is "
+    },
+    {
+      "id": "P-5",
+      "evidence": "WO-10 \u00a76.1 vs MSA \u00a79.2 / SPS \u00a76.1 :: WO sets a 96-hour security-incident notification window, exceeding both the MSA's 72-hour requirement (\u00a79.2) and the SPS's 72-hour requirement (\u00a76.1)."
+    },
+    {
+      "id": "P-6",
+      "evidence": "WO-10 \u00a712.1 (Indemnification) :: WO states Supplier's indemnification obligations are Supplier's 'sole and exclusive remedy' and folds indemnified claims inside the WO's own liability"
+    },
+    {
+      "id": "P-7",
+      "evidence": "WO-10 \u00a714.1-14.2 vs MSA \u00a726-27 :: WO selects Texas governing law and mandatory binding arbitration in Dallas with an express waiver of the right to litigate, against the MSA's Indiana "
+    },
+    {
+      "id": "P-8",
+      "evidence": "WO-10 \u00a714.1-14.2 vs MSA \u00a726-27 :: WO selects Texas governing law and mandatory binding arbitration in Dallas with an express waiver of the right to litigate, against the MSA's Indiana "
+    },
+    {
+      "id": "P-9",
+      "evidence": "WO-10 \u00a715.1 vs Exhibit B \u00a71.1-1.2 :: WO commits only to 99.0% availability measured quarterly with no service-credit mechanism, against Exhibit B's 99.9% measured monthly with a 5%-per-0."
+    },
+    {
+      "id": "D-1",
+      "evidence": "WO-10 \u00a76.1 vs MSA \u00a79.2 / SPS \u00a76.1 :: WO sets a 96-hour security-incident notification window, exceeding both the MSA's 72-hour requirement (\u00a79.2) and the SPS's 72-hour requirement (\u00a76.1)."
+    },
+    {
+      "id": "D-2",
+      "evidence": "WO-10 \u00a76.2 vs SPS \u00a75.1 :: WO permits encryption in transit at 'TLS 1.0 or higher,' a deprecated and vulnerable protocol version, against the SPS floor of TLS 1.2."
+    },
+    {
+      "id": "D-3",
+      "evidence": "WO-10 \u00a76.5 (Data Protection) :: WO declares the AI model provider behind Meridian Insight 'a technology vendor of Supplier and not a Subcontractor or Sub-processor for the purposes o"
+    },
+    {
+      "id": "D-4",
+      "evidence": "WO-10 \u00a76.4 vs Exhibit A \u00a73-4 / SPS \u00a71.1, 3.1-3.2 :: WO classifies 'free-text notes entered by Lilly personnel' as Usage Data and states Supplier is the Controller of that data, free to use it for servic"
+    },
+    {
+      "id": "D-5",
+      "evidence": "WO-10 \u00a76.4 vs Exhibit A \u00a73-4 / SPS \u00a71.1, 3.1-3.2 :: WO classifies 'free-text notes entered by Lilly personnel' as Usage Data and states Supplier is the Controller of that data, free to use it for servic"
+    },
+    {
+      "id": "D-6",
+      "evidence": "WO-10 \u00a76.4 vs Exhibit A \u00a73-4 / SPS \u00a71.1, 3.1-3.2 :: WO classifies 'free-text notes entered by Lilly personnel' as Usage Data and states Supplier is the Controller of that data, free to use it for servic"
+    },
+    {
+      "id": "V-1",
+      "evidence": "WO-10 \u00a71.2 deliverable D-4 (Exhibit E) :: Deliverable D-4, migration execution, is defined entirely 'Per Exhibit E (Data Migration Plan),' but Exhibit E was not provided among the documents re"
+    },
+    {
+      "id": "V-2",
+      "evidence": "WO-10 \u00a72.4 :: If Lilly does not provide any Section 2 item (cleansed data, architecture documentation, or SME time) within 5 business days of request, Supplier may "
+    },
+    {
+      "id": "V-3",
+      "evidence": "WO-10 \u00a72.4 :: If Lilly does not provide any Section 2 item (cleansed data, architecture documentation, or SME time) within 5 business days of request, Supplier may "
+    },
+    {
+      "id": "V-4",
+      "evidence": "WO-10 \u00a79.1 (Taxes) :: WO bars Lilly from disclosing the Work Order or its pricing to any taxing authority without Supplier's prior written consent, directly reversing Lilly"
+    },
+    {
+      "id": "A-1",
+      "evidence": "WO-10 \u00a74.1 rate table (Data Engineer, Project Manager rows) :: Data Engineer: 165.00/hr x 1,200 hrs = $198,000.00, but the WO states $198,500.00 (overstated by $500). Project Manager: 145.00/hr x 400 hrs = $58,000"
+    },
+    {
+      "id": "A-2",
+      "evidence": "WO-10 \u00a74.1 rate table (Data Engineer, Project Manager rows) :: Data Engineer: 165.00/hr x 1,200 hrs = $198,000.00, but the WO states $198,500.00 (overstated by $500). Project Manager: 145.00/hr x 400 hrs = $58,000"
+    },
+    {
+      "id": "A-3",
+      "evidence": "WO-10 \u00a74.4 vs MSA \u00a73.3 :: WO requires Lilly to pay 50% of the Subtotal on signature of the Work Order, i.e. before any Services are performed - an advance payment."
+    },
+    {
+      "id": "A-4",
+      "evidence": "WO-10 \u00a76.4 vs Exhibit A \u00a73-4 / SPS \u00a71.1, 3.1-3.2 :: WO classifies 'free-text notes entered by Lilly personnel' as Usage Data and states Supplier is the Controller of that data, free to use it for servic"
+    },
+    {
+      "id": "A-5",
+      "evidence": "WO-10 \u00a74.1 rate table vs Exhibit B \u00a73 :: Senior Data Engineer is billed at $235.00/hour in the WO, against the Exhibit B rate card figure of $210.00/hour, with no written amendment to Exhibit"
+    },
+    {
+      "id": "A-7",
+      "evidence": "WO-10 \u00a74.1 Total vs \u00a74.1 Subtotal + Estimated Expenses :: The stated Total of $685,000.00 does not equal the stated Subtotal ($644,900.00) plus stated estimated expenses ($35,000.00), which sum to $679,900.00"
+    },
+    {
+      "id": "A-8",
+      "evidence": "WO-10 \u00a74.1 Total vs \u00a74.1 Subtotal + Estimated Expenses :: The stated Total of $685,000.00 does not equal the stated Subtotal ($644,900.00) plus stated estimated expenses ($35,000.00), which sum to $679,900.00"
+    },
+    {
+      "id": "S-1",
+      "evidence": "WO-10 \u00a71.2 deliverable D-4 (Exhibit E) :: Deliverable D-4, migration execution, is defined entirely 'Per Exhibit E (Data Migration Plan),' but Exhibit E was not provided among the documents re"
+    },
+    {
+      "id": "S-2",
+      "evidence": "SPS \u00a79.2 (SOC 2 Type II) :: SPS \u00a79.2 obligates Supplier to provide its current SOC 2 Type II report annually. No SOC 2 report is present in the document set reviewed."
+    },
+    {
+      "id": "A-6",
+      "evidence": "WO-10 4.1 rate table :: Analytics Consultant is billed at $1,400.00 per day, but Exhibit B quotes this role only per hour ($175.00/hr)"
+    }
+  ],
+  "extra": [
+    {
+      "topic": "no BAA despite patient-support/clinical data",
+      "severity": "HIGH",
+      "where": "WO-10"
+    },
+    {
+      "topic": "no Quality Agreement / Part 11 for GxP-adjacent scope",
+      "severity": "HIGH",
+      "where": "WO-10"
+    }
+  ],
+  "aggregates": {
+    "hard_stop_count": 5,
+    "protection_score": 0,
+    "protection_score_band": "Critical",
+    "rule12_calculation_table_present": true,
+    "ae_finding_severity": "LOW",
+    "ae_finding_coverage_column": "covered"
+  }
+}
