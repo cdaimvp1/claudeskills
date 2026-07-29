@@ -7,7 +7,24 @@ Consolidated 2026-07-24 (evening) from ALL trackers/build-plans + a skills-updat
 ## CURRENT STATE — READ FIRST ON RESUME (updated 2026-07-27)
 If the session restarted/compacted, this is where things stand.
 
-**>>> RESUME 2026-07-28 — READ `SESSION-HANDOFF.md` FIRST <<<**
+**>>> RESUME 2026-07-29 <<<**
+
+**FOUR dashboards are now LOCKED: Deal, RFx, Landscape, Category Strategy.**
+Category Strategy locked 2026-07-29 (tag `category-strategy-locked-2026-07-29`),
+verified live: 5 tabs / 7 subtabs render, 0 JS errors, type ladder 4 distinct
+sizes and 0 off-ladder measured on RENDERED size.
+
+Closed since this doc was written: Deal #11/#12/#14/#16/#17 · D0 (new
+`deal-tab-1c344a` skill) · D1 · D3 · D4 · L3 · Landscape L1/L2 recolour + OV1 ·
+restyle protocol across RFx/Deal/Landscape · Category Strategy restructure,
+Porter overlay, market-intel accordion, type ladder.
+
+**NEXT UP = the two biggest open builds: `rfx-hub` skill, and the Deep Dive and
+My Work dashboards.** Everything else is small or waiting on Marc. Section 9
+below is the live remaining list; sections 1-8 are kept for their detail but
+several of their items are now closed.
+
+**>>> superseded: RESUME 2026-07-28 — `SESSION-HANDOFF.md` <<<**
 
 `SESSION-HANDOFF.md` carries verified state, build commands per dashboard, the
 next action, and seven traps that already cost time once. Do not re-derive them.
@@ -332,3 +349,88 @@ Strategy & Plays on Category Strategy is LOCKED. Leave it exactly as built.
 ## Contradictions to resolve with Marc
 1. ~~P2 Deep-Dive completion~~ — RESOLVED 2026-07-28, Marc: **it is complete**. FM4/RR3/RR4/CO4 are not outstanding; the later entry was stale.
 2. ~~Head-to-Head launcher~~ — RESOLVED 2026-07-28, Marc: **remove it**. Which element counts as "the launcher" is the one open detail (see OVERNIGHT-DECISIONS-NEEDED).
+
+---
+
+# 9. LIVE REMAINING LIST (reconciled 2026-07-29)
+
+Sections 1-8 above are kept for their detail, but several items in them are now
+closed. This section is the current truth. Verified against shipped artifacts,
+not carried forward from trackers.
+
+## 9A. Needs Marc before anyone can build
+
+| # | Item | Note |
+|---|---|---|
+| M1 | **D2 no-green rule** (~26 skills) | Deferred by Marc. `lilly-brand-assets` still says "no green or teal" while teal is the settled token. Blast radius is why it is parked. |
+| M2 | **R4** split RFx Business Case into subtabs | "The Case" / "The Ask & Approval" |
+| M3 | **R6** RFx Risk-Roll-Up provenance split | build or skip |
+| M4 | **R7** flip RFx Participation + Completeness | mock first to confirm it fits better |
+| M5 | **Deal #13** Next-Session Brief | re-home or drop |
+| M6 | Deal Cross-Doc "Open Document Risks" reframe | adopt the approved mockup live? |
+| M7 | Deal Document Family Register | click-to-open the register row? |
+| M8 | Deal L&P 2 judgment calls | group bands vs per-row tag; boot auto-expand |
+| M9 | Deal Protection-Scorecard spine | 8 issue-categories vs 26-row literal union |
+| M10 | Landscape segmentation quadrant thresholds | 6 of 7 land in "Leader" |
+| M11 | Landscape #15 residuals | leader-row pale-orange fill; dead dark CSS |
+| M12 | Landscape CO4 footprint | region schematic vs region list |
+| M13 | Roster cut B1 | delete decision-deck + procurement-options-analysis, strip ~14 cross-refs |
+| M14 | Visual sign-off on the Landscape exemplar | gates the family-by-family rollout |
+| M15 | 4 doc generators' demo data | spot-check vs each skill's intent |
+| M16 | 3 non-numeric decision kernels | recommend, do not build without sign-off |
+| M17 | help-desk | new skill vs extend process-navigator |
+| M18 | #32 dashboard-as-code generators | large, deferred |
+
+## 9B. Buildable now, no decision needed
+
+**Big:**
+1. **`rfx-hub` skill** — carry the locked RFx dashboard; model authors data only.
+2. **RFx to Deal handoff emitter** — the contract is written; the emitter side was
+   deferred until rfx-hub exists.
+3. **Deep Dive dashboard** — hub home still TBD.
+4. **My Work dashboard** — deterministic port of the platform My Work page.
+   (PCC dashboard is RETIRED; PCC becomes conversation-led.)
+
+**Medium:**
+5. **RFx type ladder** — 198 instances of 9px and 26 of 16px remain, in inline
+   `font:` shorthand inside `pv-*.js`. Needs a renderer pass over the call sites,
+   not a stylesheet edit.
+6. **RFx + Landscape panel headers** — still inline-styled divs rather than
+   `.card-hd`, so the restyle protocol only reaches them partially.
+7. **Landscape R2 deep-dive batch** — G1 reskin, G2 Title Case, G3, G4 narrative
+   panels, plus the per-tab items (SS1, CO3, CAP2-5, FM1-4, RR1-5, LF1, HH1, RA1).
+8. **Landscape Overview / TOP1** — supplier-count funnel, one visible score scale.
+9. **Landscape seed bugs** — score-scale drift to a single `pvAssess` source;
+   7-vs-9 supplier count; ESG shown as a scored dash.
+10. **Landscape dead code** — remove `pvRequestDataCard`, `pvDDSection`,
+    `pvVerdictHeaderHtml`, `pvCompPositionHtml`.
+11. **Deep-dive compose-by-traits layout** — public / private / hyperscaler-product.
+12. **Exec-Summary/Overview batch** — merge eliminated-before-shortlist into the
+    Recommendation table, remove Start-an-RFx, row shading, drop weighted-score
+    column, make segmentation sliders actually move the axes.
+
+**Small:**
+13. **Delete `deal-room-1c344a/dashboard/`** — stale duplicate, carries a
+    SUPERSEDED marker, could not be removed because a local server held a handle.
+14. **Repackage the installable `.skill` zip** (#68/#87). A 44MB staging tree was
+    built at `%TEMP%\claude\pkg_lilly_2026-07-29\` and never written to Downloads.
+15. **Pre-packaging integrity sweep** across all 26 skills.
+16. **Refresh the Desktop delivery folder.**
+17. **Dummy-data render per skill** for Artifacts review.
+18. **Doc/deck HTML previews** for the 4 non-dashboard skills.
+19. **Procurement-launcher smoke test** — current verification is static only.
+
+## 9C. Blocked
+
+- **Help-desk network harvest** — needs the Lilly network. Real page reads only,
+  never inferred.
+
+## 9D. On hold
+
+`#44` handover brief · `#80` contract-review hybrid clause pipeline · `#86`
+invoice-rate-card-auditor · `#91` ARIA (Phase-0 exit gate) · `#102` cross-cut
+scoring · `#108/109/110` Theo intake/handoff/routing · `#111/112/115` remaining
+hubs · `#113` playbook-learning re-vendor · `#114` deduction kernel · re-paper-SOW
+gap · Landscape narrative reconciliation (~250 sub-narratives) · numeric_kernel
+gaps (ROI/payback/waterfall, sensitivity, correlated drivers) · launcher
+cross-session journey state · Landscape D&B/Bloomberg enrichment backlog.
