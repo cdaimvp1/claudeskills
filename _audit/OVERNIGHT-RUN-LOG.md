@@ -693,3 +693,56 @@ someone removes the exception without re-vendoring.
 (`kernel_manifest.json`, only under `--write`). No network, no subprocess, no
 eval/exec, no deletion, no writes outside the kernel skill directory. `os.listdir`
 and `os.path` are used for traversal only.
+
+### F2 VERIFIED COMPLETE, 2026-07-29. My earlier "1 reopen remaining" was a misread.
+
+Marc asked me to finish F2's last reopen. There isn't one. Correcting my own status
+report rather than inventing work to match it.
+
+**What "2 of 3" actually meant.** Commit `d5f3c46` says "2 of 3 whole-document reopens
+eliminated". `_audit/F2-IMPLEMENTATION.md:10-24` classifies all three passes: Pass 1 was
+a document CREATE ("Save the document"), Passes 2 and 3 were REOPENS ("Open the saved
+document and append"). All three assembly cycles were removed; only two of them were
+literally reopens. The same file states the outcome plainly at :61-64: "What was
+removed: 3 document open/append/save cycles, replaced by 1 generator call."
+
+**Verified now, not taken on trust:**
+```
+grep -c "Open the saved document|Save the document"  rfp-response-analysis SKILL.md  ->  0
+python rfp_analysis_report_generator.py            ->  SUMMARY: 52/52 passed, 0 failed
+```
+`SKILL.md:550` now reads "No document is created or opened" for Pass 1, and :556 "There
+is no Pass 4 'open and append' step". The three content-authoring passes survive intact,
+which was the accuracy requirement.
+
+**F2's dependency is also now satisfied.** `UPGRADE-PLAN.md` lists F2 as "Depends on: C3".
+C3 landed tonight as O3. So F2 is complete AND unblocked in the plan's own terms.
+
+### The real remainder, scoped rather than faked: supplier-landscape's DOCX passes
+
+`d5f3c46` deferred one thing by name: "supplier-landscape's analogous three DOCX passes,
+because its generator does not yet cover the full document." That is still true and I am
+NOT closing it silently.
+
+`supplier-landscape-1c344a/SKILL.md:626-631` carries the identical pattern:
+```
+1. Pass 1: Title page, executive summary, market context, first 3 supplier profiles. Save.
+2. Pass 2: Open saved document, append remaining supplier profiles. Save.
+3. Pass 3: Open saved document, append cross-vendor comparison, ... Save.
+```
+
+**Why I did NOT fix it the way F2 was fixed.** F2 worked because
+`rfp_analysis_report_generator.py` already existed (2,935 lines, kernel-backed ground
+truth, already wired). supplier-landscape's `dashboard/build_dashboard.py` builds the
+DASHBOARD, not the DOCX. There is no DOCX generator to call.
+
+Collapsing the three passes without one would replace three appends with a single
+oversized write, which is exactly the truncation failure `SKILL.md:19` (guardrail G10)
+warns about. That trades a transcription risk for a truncation risk and is a
+degradation, not a fix. Under the priority order, a redesign that cannot hold accuracy
+does not ship.
+
+**Correct scoping: this is a BUILD, and it belongs to F9** (generator coverage sweep for
+every remaining model-assembled deliverable), queued as O26. Recorded there as a named,
+sized item rather than left as a footnote in a commit message. It is not small: the
+comparable generator is ~2,900 lines.
