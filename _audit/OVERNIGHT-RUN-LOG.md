@@ -1450,3 +1450,44 @@ capture-date requirement in whichever generator emits a benchmark or research ta
 citation without one raises rather than renders. Same ledger-boundary pattern as the
 contract-review fix pack, and it needs no new provenance model, only a required field on an
 existing structure.
+
+### Task #8 DONE, 2026-07-29. "Only deal-tab has a slice contract" was wrong. Corrected.
+
+Re-checked every skill and corrected the stale claim in both places it was recorded:
+`_audit/SYNTHESIS.md:52` and `_audit/UPGRADE-PLAN.md:455`.
+
+**The original finding:** "`deal-tab-1c344a` is the only skill in the suite with an
+output-slice contract. **Confirmed across all six groups.**"
+
+**It was wrong when it was written.** `lilly-contract-review` already had one. Not missing,
+**buried**, at `references/dashboard-canonical.md:224-353`, inside the very file scheduled
+for retirement. A search that looks only at `SKILL.md` cannot find it.
+
+**"Confirmed across all six groups" is how a shared blind spot gets recorded as a verified
+fact.** Six independent reviewers all searched the same wrong place and their agreement was
+mistaken for evidence. That is worth more than the correction itself, so it is written into
+SYNTHESIS.md rather than just fixed.
+
+**Verified current state, 7 of 32 carry one:**
+```
+deal-tab              YES  hub's own table (pre-existing)
+rfx-hub               YES  hub table, rewritten under D4 tonight
+lilly-contract-review YES  BURIED in dashboard-canonical.md:224 -> must be RELOCATED to
+                           references/deal-tab-contribution.md BEFORE that file is deleted
+rfp-engine            YES  authored under D4 tonight
+rfp-case-manager      YES  authored under D4 tonight
+rfp-response-analysis YES  authored under D4 tonight
+evaluation-engine     YES  authored under D4 tonight
+scope-sow-architect   NO   = D2, blocked
+pro-forma-builder     NO   = D3, blocked
+deal-room             NO   = D5, blocked
+```
+
+**The genuine gap is THREE skills, not thirty-one**, and all three are already tracked as
+D2, D3 and D5 behind the A11 and B4 gates. The workstream is far smaller than the audit
+implied.
+
+**Lesson recorded in SYNTHESIS.md:** absence was asserted from a search that could not have
+found the thing it was looking for. Before recording "no skill has X", state where X would
+live if it existed, and search there. The original claim is kept alongside the correction
+rather than deleted, because how it was wrong matters more than that it was wrong.

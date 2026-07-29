@@ -461,6 +461,8 @@ Verify: deal-tab renders from the slice with no field it does not own.
 Effort: M. Marc decision: tagged `[Marc, after D0-D2]`; D0 is now closed (deal-tab exists),
 D2 is deferred (M1). See decision 3. Depends on: A11, B4.
 
+**CORRECTION 2026-07-29 (task #8):** the "only skill" claim is wrong. `lilly-contract-review` already HAS a slice contract, buried at `references/dashboard-canonical.md:224-353` inside the file being retired, which is why a SKILL.md-only search missed it. Seven skills now carry one (deal-tab, rfx-hub, contract-review, and the four RFx feeders authored under D4). The real gap is three skills: D2 scope-sow, D3 pro-forma, D5 deal-room. See `_audit/SYNTHESIS.md` section 3.
+
 **D2. Author the Deal slice contract into scope-sow-architect.**
 Fields: `scope{}` plus scope `issues[]` (`MASTER-REMAINING-WORK.md:320`). Preserve
 `Rewritten_SOW.docx` and the four-pass workflow (`:316`). Effort: S. Depends on: D1.

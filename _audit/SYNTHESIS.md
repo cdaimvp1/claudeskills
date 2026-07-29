@@ -49,10 +49,39 @@ exists and works; it was never applied to the two siblings.
 
 **Cheapest large win in the audit.** No new code. Wire what is already built.
 
-## 3. Slice contracts: 1 of 31
+## 3. Slice contracts: 7 of 32 (CORRECTED 2026-07-29)
 
-`deal-tab-1c344a` is the only skill in the suite with an output-slice contract (a
-field-ownership table). Confirmed across all six groups.
+**The original finding, "`deal-tab-1c344a` is the only skill in the suite with an
+output-slice contract ... Confirmed across all six groups", was WRONG.** It is retained
+here struck through rather than deleted, because the way it was wrong is instructive.
+
+`lilly-contract-review-1c344a` already had one when that claim was written. It was not
+missing, it was **buried**, at `references/dashboard-canonical.md:224-353`, inside the very
+file scheduled for retirement. A search for a skill's own slice contract that looks only at
+`SKILL.md` misses it, and "confirmed across all six groups" is how a shared blind spot gets
+recorded as a verified fact.
+
+Re-checked exhaustively 2026-07-29 (task #8). Current state:
+
+| Skill | Slice contract |
+|---|---|
+| `deal-tab-1c344a` | YES, the hub's own field-ownership table (pre-existing) |
+| `rfx-hub-1c344a` | YES, hub table, rewritten under D4 |
+| `lilly-contract-review-1c344a` | YES, **buried** in `references/dashboard-canonical.md:224`. Must be RELOCATED to `references/deal-tab-contribution.md` before that file is deleted |
+| `rfp-engine-1c344a` | YES, authored under D4 |
+| `rfp-case-manager-1c344a` | YES, authored under D4 |
+| `rfp-response-analysis-1c344a` | YES, authored under D4 |
+| `evaluation-engine-1c344a` | YES, authored under D4 |
+| `scope-sow-architect-1c344a` | NO. This is D2, blocked |
+| `pro-forma-builder-1c344a` | NO. This is D3, blocked |
+| `deal-room-1c344a` | NO. This is D5, blocked |
+
+So the genuine gap is **three skills, not thirty-one**, and all three are already tracked
+as D2, D3 and D5 behind the A11 and B4 gates.
+
+**The lesson worth keeping:** absence was asserted from a search that could not have found
+the thing it was looking for. Before recording "no skill has X", state where X would live
+if it existed, and search there.
 
 Closest precedents to build on: process-navigator's structured answer block (built
 for machine ingestion by callers) and workflow-map's optional JSON sidecar.
