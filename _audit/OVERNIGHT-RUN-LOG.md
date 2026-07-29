@@ -3080,3 +3080,44 @@ VERDICT: FAIL, 2 problems  ->  P-9 not found, D-4 not found
 mechanisms: P-9 (SLA degraded to 99.0% quarterly) and D-4 (supplier asserting Controller
 status, which this run folded into its Usage Data finding rather than raising separately).
 V-5 is now found, which is what this run was built to verify.
+
+---
+
+## K1 — pre-packaging integrity sweep and the `.skill` set (DONE)
+
+`_audit/package_skills.py`. **32 packages, every one verified.**
+
+**The sweep is a GATE, not a report.** Nothing is packaged unless all 13 checks pass first:
+the smoke test (A1-A9), the kernel drift manifest, the citation resolver, and every
+`*selftest.py` in the tree. A package built over a failing check is worse than no package,
+because it ships the defect AND the impression that it was checked. `--force` only shows
+what would be built; it still refuses to write.
+
+All 13 passed on the first run, which is what the last several days of work was for.
+
+**Each package is verified by EXTRACT-AND-RETEST**, which is K1's own verify clause
+("install from the produced package and re-run one smoke test per skill family"). Testing
+the repo tree proves the repo is sound and says nothing about the artifact a user receives.
+The two differ precisely because packaging STRIPS files, so a strip rule that removes one
+file too many produces a package that passes every repo-side check and fails on the user's
+machine. Each `.skill` is therefore extracted into an EMPTY directory and the smoke test is
+run against the extraction, mirroring the Desktop install model: one skill folder, no
+siblings, no suite root, no repo.
+
+Result: 32 of 32 extracted and passed.
+
+```
+32 package(s), 21,098 KB total, 23 file(s)/dir(s) stripped
+```
+
+`lilly-procurement-kernels-1c344a` is correctly NOT packaged: it has no SKILL.md and is not
+installable. That ruling was made earlier in this programme and the packager enforces it
+rather than restating it.
+
+The superseded-artifact strip stays pinned to its exact sha256, so a rebuilt file ships
+rather than being removed on a stale pin.
+
+Combined deliverable written to Downloads, as item 14 asked:
+`Lilly_Procurement_Skills_2026-07-29.zip`, 21,095 KB, sha256 5570b5b5...
+
+`_package/` is gitignored: build artifacts, reproducible from the script, not source.
