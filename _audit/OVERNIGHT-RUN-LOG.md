@@ -2534,3 +2534,37 @@ refuses. The clamp is visible: `score_as_submitted` sits beside the effective sc
 
 This also put `FOOTING_FAILURE_CAP = 2.4` to work. I had defined it from the scoring doc
 and then never used it, which is its own small lesson about constants that look implemented.
+
+---
+
+## F9 build 2 of 5 — negotiation-playbook-learning outcome JSON (DONE)
+
+`outcome_dataset_generator.py` + self-test, **29/29**.
+
+F9 called this "serialization plus assertion, not arithmetic", and that held: the generator
+reimplements nothing. `outcome_partition()` and `difficulty_score()` already compute and
+validate every figure, including the sum-to-1.0 check, so this counts codes, calls the
+kernel and serializes the schema (G11).
+
+`outcome_summary.md` stays prose, per F9.
+
+Refusals: an outcome code outside the eleven, two records sharing a `dedup_key`, a stated
+`outcome_distribution` that contradicts its own rows, and the kernel's `PartitionError`.
+
+The dedup refusal matters more than it looks. The schema's own rule is that a repeat capture
+is an UPDATE, not a second outcome, "so the same negotiation is never double-counted in any
+rate, partition, or difficulty rollup". A duplicate does not corrupt one record, it biases
+every acceptance rate the dataset exists to produce.
+
+**The kernel told me the right behaviour for the empty case.** All-NOT_APPLICABLE made
+`outcome_partition()` raise, and its message reads: "label this NEEDS_INPUT rather than
+reporting zero rates." So both the partition and the difficulty are emitted as NEEDS_INPUT
+with the reason stated, never as zeros. Rates of 0.0 would read as "Lilly prevailed on
+nothing" and a difficulty of 0 as "this negotiation was easy", when nothing was measured at
+all. The catch is narrow: any other `InvalidInputError` still propagates, so this cannot
+become a general swallow.
+
+Worth noting what the tests target. The arithmetic is the kernel's and is tested there, so
+these 29 assert what a SERIALIZER gets wrong: the wrong enum, a stated total contradicting
+its detail rows, a double-counted negotiation, and the zero case. Plus negative controls,
+an empty dataset and a correct stated distribution both being legitimate.
