@@ -220,3 +220,106 @@ Everything else in the SAFE list below is unchanged and still safe.
 documented HOLD at `PLATFORM-CONSOLIDATION-TRACKER.md:172`. Relocating the D1
 section is additive and low risk, but it is still a held file. **Get Marc's
 explicit go before touching it.**
+
+---
+
+# CORRECTION: obligations, and the output-mode gap it exposes (Marc, 2026-07-29)
+
+## The decision
+
+**Obligations analysis SURVIVES the dashboard retirement. Decided by Marc.**
+
+His reasoning: obligations matter in a standalone contract review even when the
+ONLY requested output is the redlined, commented, track-changes .docx. A missing,
+one-sided or unbalanced obligation is precisely the kind of thing a reviewer raises
+as a comment in the document.
+
+So this is no longer an open question. It is required work.
+
+## But Part 3's proposed destination is WRONG
+
+Part 3 mapped the Obligations sub-tab content into `review-summary-design.md`. That
+does not solve the problem Marc raised.
+
+**If the only requested output is the redline, the Review Summary is never
+produced.** Content mapped only into the Review Summary is still lost on a
+redline-only run. The loss just moves from visible (a deleted file) to invisible (a
+section that never renders).
+
+### Correct destination
+
+Obligations must reach the REDLINE path:
+
+1. **The analysis runs in a pass regardless of output mode.** It is not conditional
+   on which deliverable was requested. Extraction, imbalance analysis and
+   missing-obligation detection happen every run.
+2. **Findings surface as COMMENTS in the redline .docx**, anchored to the clause
+   that creates or omits the obligation. That is the deliverable a redline-only user
+   actually receives.
+3. **And in the Review Summary** when that IS requested, in the fuller register
+   form Part 3 described.
+4. **And in the deal-tab slice** when a Deal build is running.
+
+One analysis, three surfaces, none of them conditional on the others.
+
+## The structural gap this exposes, which is bigger than obligations
+
+Part 3 assigned destinations without checking WHICH OUTPUT MODES each destination
+reaches. That is a systematic hole in the coverage matrix, not a one-off error.
+
+**A row mapped to "the Review Summary generator" is silently lost on every run that
+does not produce a Review Summary.** The same applies to any row mapped to a
+deliverable the user did not request.
+
+### Required fix to the coverage matrix
+
+Add a column: **"Which output modes does this reach?"**
+
+Then re-audit every mapped row in all three parts against it. For each row ask: if
+the user requests ONLY the redline, does this check still run, and does its result
+still reach the user? If the answer is no and the check matters standalone, the
+destination is wrong.
+
+The redline-only run is the strictest case and should be the test. It is also
+plausibly the most common real-world use of this skill, which makes it the worst
+one to have quietly degraded.
+
+### Suspects to check first
+
+Any row Part 3 mapped to `review-summary-design.md` or to the Review Summary
+generator.
+
+## The Compliance Evidence Checklist: same decision, same reasoning
+
+**Marc, 2026-07-29: it survives too.** Also crucial to a standalone contract review
+whose only output is the redlined, commented, track-changes .docx.
+
+That is the right call and arguably more clear-cut than obligations. The checklist
+tracks whether W-9, SOC 2 and the rest are Filed, Draft, Pending or Awaiting.
+Missing evidence is a reason to comment on the document and a reason not to sign
+it. A reviewer who receives only a redline and is not told the SOC 2 report is
+outstanding has been given an incomplete review, whatever the redline says about
+the clauses.
+
+Same destination correction applies: it runs every run, surfaces as comments or a
+front-matter note in the redline, appears in fuller register form in the Review
+Summary when requested, and feeds the deal-tab slice when a Deal build is running.
+Its deterministic parts (fixed document list, four-state status) map to Stage 1 as
+Part 3 proposed; what changes is only WHERE the result has to reach.
+
+## Status change
+
+Both rescues are now DECIDED and required. Neither is an open question.
+
+- **Obligations: DECIDED, required.** Destination corrected to the redline comment
+  path plus the Review Summary plus the slice.
+- **Compliance Evidence Checklist: DECIDED, required.** Same three surfaces.
+- **D1 slice contract relocation:** was never a judgment call, still mandatory.
+- **Coverage matrix: needs an output-mode column and a re-audit** before it can be
+  called complete. It is not the finished gate it appeared to be an hour ago.
+
+Both decisions point the same way, which is worth stating as a principle rather
+than two one-off rulings: **a check that affects whether the contract should be
+signed must reach the user in whatever single deliverable they asked for.** The
+redline is the minimum deliverable, so it is the floor every such check has to
+clear. Use that test on the remaining rows rather than re-litigating each one.
