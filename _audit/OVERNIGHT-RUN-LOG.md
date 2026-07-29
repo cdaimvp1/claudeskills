@@ -1625,3 +1625,64 @@ fallback IS the drift being removed.
 
 **Malicious-code review: SAFE.** Imports `json`, `sys`, `typing` plus the vendored generator.
 No network, subprocess, eval, exec, pickle or base64. Writes nothing.
+
+### DEPENDENCY AUDIT, 2026-07-29. Settled definitively rather than flagged.
+
+I had reported "three spurious dependencies in a row, worth a look". That was pushing a
+question back that I could answer. Answered it.
+
+**A11 is cited by 19 of the plan's 78 items.** A quarter of the programme gated on one
+sign-off.
+
+**A11's own text says what it is:** "This is the gate, and it is the reason nothing in WS B
+through WS H starts earlier." And `PROGRAM-MASTER-PLAN.md` gives the phase-order rationale:
+cleanup sits between the dashboards and the deep skills work "so Claude never weeds through
+retired content".
+
+**So `Depends on: A11` means "this is Phase 2". It is a SEQUENCING CONVENTION, not a
+statement that the item technically needs locked hubs.** The two were never distinguished
+and the column reads as though they were the same thing.
+
+**THE EMPIRICAL TEST. Eight items citing `Depends on: A11` were completed tonight without
+A11:** C1, C2, C3, C4, C6, C7, C8 and F6. Kernel self-test 96/96, adapter 6/6, suite smoke
+test unchanged. Nothing broke. None of them touches dashboard content; they touch
+arithmetic, schemas and data contracts.
+
+**The rule that separates real from spurious:** A11 is a real dependency **if and only if
+the item OPERATES ON content that locking or retirement will change.**
+
+```
+REAL (7)      B1 B4 B6 B7 D1 F1 J1
+              each either IS a retirement, or cannot know what is stale until
+              retirement settles. D1 is the sharpest: contract-review's slice
+              contract is BURIED inside the file being retired.
+
+SPURIOUS (10) C1 C2 C3 C4 C6 C7 C8 F6 E4 I1
+              seven kernel items and F6 PROVEN by completion tonight.
+              E4 builds a WORKBOOK, not a hub dashboard. I1 is a Marc decision
+              about skill boundaries that A11 has no bearing on.
+
+PARTIAL (2)   B5  dead code in vendored .py is not gated; dead code in dashboard
+                  BUILD TREES is. Split by location.
+              F9  the findings sweep can run now; any BUILD it recommends is gated
+                  on knowing which deliverables survive.
+```
+
+**VERDICT: of 19 A11 dependencies, 7 real, 10 spurious, 2 partial.** The column is not
+wrong so much as OVERLOADED: it carries both "needs this built first" and "comes after this
+in the agreed sequence" with no way to tell which. The practical cost is real, roughly 10
+items sat in a blocked column while technically ready, and this session completed 8 of them
+without incident.
+
+**ACTED, not just reported.** Inserted the audit at the top of `_audit/UPGRADE-PLAN.md` and
+annotated all 12 affected entries inline as `A11 (SEQUENCING ONLY, not a technical gate)` or
+`(PARTIAL)`. The 7 REAL ones are deliberately left untouched.
+
+**Explicitly preserved:** the phase order itself is unchanged and remains Marc's to relax.
+An item marked SEQUENCING ONLY is technically ready, NOT automatically approved to jump the
+queue. That distinction is written into the audit so a later reader cannot mistake one for
+the other.
+
+**Flagged for the same treatment:** `B1` is cited by 3 items and likely carries the same
+overloading. `C9`, `D1`, `H1` and `H4` were spot-checked and appear to be genuine
+build-order dependencies.

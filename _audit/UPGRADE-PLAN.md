@@ -55,6 +55,99 @@ contradicts a locked decision. WS J follows the locked decision. See section 5, 
 Format per item: what · skills touched · why (accuracy first) · concrete change ·
 verification · effort · Marc decision · dependencies.
 
+---
+
+# DEPENDENCY AUDIT: what "Depends on: A11" actually means (2026-07-29)
+
+**A11 is cited as a dependency by 19 of the plan's 78 items.** That is a quarter of the
+programme gated on one sign-off, which is worth understanding before treating it as fact.
+
+## A11 is the phase order, not a technical dependency
+
+A11's own text says so:
+
+> "This is the gate, and it is the reason nothing in WS B through WS H starts earlier."
+
+And `PROGRAM-MASTER-PLAN.md` gives the reason for the phase order itself: a cleanup pass
+sits between the dashboards and the deep skills work **"so Claude never weeds through
+retired content."**
+
+So `Depends on: A11` has been used to mean *"this is Phase 2"*. It is a **sequencing
+convention**, not a statement that the item technically requires locked hubs. The two were
+never distinguished, and the column reads as though they were the same thing.
+
+## The empirical test
+
+**Eight items citing `Depends on: A11` were completed on 2026-07-29 without A11 being done:**
+
+| Item | What it was | Result |
+|---|---|---|
+| C1 | `deduction_score()` in the kernel | kernel self-test 96/96 |
+| C2 | playbook-learning difficulty and partition | 96/96 |
+| C3 | Bid Leveling normalization | 96/96 |
+| C4 | supplier-landscape weighted scoring | 96/96 |
+| C6 | negotiation-simulator debrief metrics | 96/96 |
+| C7 | rfp-engine weight-sum check | 96/96 |
+| C8 | commercial-negotiation-prep rollup | 96/96 |
+| F6 | pro-forma dashboard adapter | adapter 6/6 |
+
+Nothing broke. The suite smoke test is unchanged. **A11 was not needed by any of them**,
+and the reason is that none of them touches dashboard content: they touch arithmetic,
+schemas and data contracts.
+
+## The rule that separates real from spurious
+
+**A11 is a real dependency if and only if the item OPERATES ON content that locking or
+retirement will change.** Everything else is the phase-order convention.
+
+### REAL. Leave these gated on A11.
+
+| Item | Why the gate is genuine |
+|---|---|
+| **B1** | It IS the retirement of category-strategy's reference-JSX spec |
+| **B4** | Sweeps reference-JSX out of lens skills, i.e. operates on the retiring content |
+| **B6** | Retires orphaned static dashboard HTML |
+| **B7** | Cannot know what prose is stale until retirement is settled. This is precisely the "never weeds through retired content" case |
+| **D1** | contract-review's slice contract is BURIED inside `dashboard-canonical.md`, the file being retired. Order matters absolutely here |
+| **F1** | The dashboard retirement is part of the redesign |
+| **J1** | Depends on the routing and dashboard surface existing in final form |
+
+### SPURIOUS. These were never technically gated.
+
+| Item | Why | Evidence |
+|---|---|---|
+| **C1, C2, C3, C4, C6, C7, C8** | Kernel arithmetic. A locked dashboard has no bearing on whether a formula is correct | **PROVEN: all seven completed, 96/96** |
+| **F6** | Emits FIGURES, not layout, so the D1 IA rewrite changes the tabs and not their numbers | **PROVEN: completed, 6/6** |
+| **E4** | An XLSX generator for `requirements_matrix.xlsx`, a workbook. Not a hub dashboard | by inspection |
+| **I1** | A Marc decision about skill boundaries. A11 has no bearing on it at all | by inspection |
+
+### PARTIAL. Split them rather than gate them wholesale.
+
+| Item | Assessment |
+|---|---|
+| **B5** | Removing dead code from vendored `.py` is not gated. Removing dead code from dashboard BUILD TREES is, since those trees are what locking settles. Split by location |
+| **F9** | The findings sweep is not gated and can run now. Any BUILD it recommends is gated on knowing which deliverables survive |
+
+## Verdict
+
+**Of 19 A11 dependencies: 7 are real, 10 are spurious, 2 are partial.**
+
+The dependency column is not wrong so much as **overloaded**: it carries both "needs this
+built first" and "comes after this in the agreed sequence", with no way to tell which. The
+practical cost is real, because roughly 10 items have been sitting in a blocked column while
+being technically ready, and this session completed 8 of them without incident.
+
+## What changed as a result
+
+The individual item entries below now say `Depends on: A11 (SEQUENCING ONLY)` where the
+audit found the gate spurious, so a reader can tell the two apart. **The phase order itself
+is unchanged and is still Marc's to relax**: an item marked SEQUENCING ONLY is technically
+ready, not automatically approved to jump the queue.
+
+The same overloading likely affects `B1` (cited 3 times) and should be checked the same way
+before those items are treated as blocked. `C9`, `D1`, `H1` and `H4` were spot-checked and
+appear to be genuine build-order dependencies.
+
 ## WS A: Dashboard skill homes (Phase 1)
 
 **A1. Build the `rfx-hub` skill.**
@@ -246,7 +339,7 @@ Change: delete only blocks documented as dead; call out anything ambiguous befor
 Verify: full self-test of each touched generator still passes (each ships one: 23 checks
 in `should_cost_generator.py`, 24 in `market_rate_generator.py`, 76 in
 `executive_summary_generator.py`).
-Effort: M. Marc decision: no. Depends on: A11.
+Effort: M. Marc decision: no. Depends on: A11 (PARTIAL, see DEPENDENCY AUDIT above: split by whether the work touches retiring content).
 
 **B6. Retire orphaned static dashboard HTML.**
 Skills: repo-level `_dashboards_ORIGINAL/`, `_dashboard_previews/`, retired PCC HTML,
@@ -326,7 +419,7 @@ Verify: golden cases traced to quoted SKILL.md sentences, matching the kernel's 
 docstring discipline; negative tests that the function refuses rather than clamps silently.
 Effort: M. Marc decision: GREEN LIT as #114 but `[held]`, sensitive, explicit go required
 (`PROGRAM-MASTER-PLAN.md:148`). Also evaluate deterministic vs semantic vs heuristic per
-`PROGRAM-MASTER-PLAN.md:173`. Depends on: A11.
+`PROGRAM-MASTER-PLAN.md:173`. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **C2. Kernel the negotiation-playbook-learning Difficulty Score and partition rates.**
 Skills: negotiation-playbook-learning.
@@ -340,7 +433,7 @@ prose instruction the model can skip.
 Verify: reproduce the v2.1 overshoot input and assert the kernel refuses; partition rates
 sum to 1.0 within tolerance or raise.
 Effort: M. Marc decision: GREEN LIT as #113 (`PROGRAM-MASTER-PLAN.md:146,175`), sequenced
-to WS8 Phase 4. See section 4 for the sequencing note. Depends on: A11.
+to WS8 Phase 4. See section 4 for the sequencing note. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **C3. Kernel the rfp-response-analysis Bid Leveling normalization.**
 Skills: rfp-response-analysis.
@@ -357,7 +450,7 @@ Verify: the normalization arithmetic the skill already requires to be shown
 (`SKILL.md:328`) must equal the kernel return; a golden multi-supplier, multi-scenario set
 with a deliberate unit mismatch must change the ranking and be caught.
 Effort: M. Marc decision: no, but it is new work not in the corpus, so flag on landing.
-Depends on: A11.
+Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **C4. Kernel supplier-landscape's Weighted Scoring Matrix.**
 Skills: supplier-landscape.
@@ -369,7 +462,7 @@ Change: vendor `numeric_kernel.py`; replace the prose instruction with a `weight
 call; the DOCX table and dashboard both read the same value.
 Verify: assert DOCX weighted score equals dashboard `os` for the same data object.
 Effort: S. Marc decision: no. Ranked #1 for deterministic Python at
-`PROGRAM-MASTER-PLAN.md:108`. Depends on: A11.
+`PROGRAM-MASTER-PLAN.md:108`. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **C5. Kernel category-strategy's Pareto / HHI / CAGR / YoY / tail-threshold / anomaly.**
 Skills: category-strategy.
@@ -392,7 +485,7 @@ Change: the prose already specifies every formula and every edge case, so the ke
 be written by mechanical transcription. Add `reciprocity_ratio()` and
 `anchor_capture_pct()` with typed degenerate-case returns.
 Verify: one test per named edge case.
-Effort: S. Marc decision: no. Ranked #4 at `PROGRAM-MASTER-PLAN.md:108`. Depends on: A11.
+Effort: S. Marc decision: no. Ranked #4 at `PROGRAM-MASTER-PLAN.md:108`. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **C7. Kernel rfp-engine's weight-sum check.**
 Skills: rfp-engine.
@@ -402,7 +495,7 @@ failure. Low-stakes but silently driftable on a large requirements matrix
 Change: vendor the kernel; `weighted_score()`'s `WeightSumError` already encodes this
 refusal.
 Verify: a matrix summing to 99% must produce the DRAFT label deterministically.
-Effort: S. Marc decision: no. Ranked #3 at `PROGRAM-MASTER-PLAN.md:108`. Depends on: A11.
+Effort: S. Marc decision: no. Ranked #3 at `PROGRAM-MASTER-PLAN.md:108`. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **C8. Close the commercial-negotiation-prep rollup gap.**
 Skills: commercial-negotiation-prep.
@@ -414,7 +507,7 @@ Change: a `commercial_negotiation_generator.py` computing these from the validat
 register and writing `rate_comparison.xlsx` / `counter_offer.xlsx` via openpyxl
 (`_audit/GROUP-2-commercial-pricing.md:19`). Overlaps F9.
 Verify: generator self-test with reconciliation assertions on the exposure total.
-Effort: L. Marc decision: no. Depends on: A11.
+Effort: L. Marc decision: no. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **C9. Kernel-copy verification manifest.**
 Skills: `lilly-procurement-kernels` plus all 11 vendoring skills.
@@ -562,7 +655,7 @@ them, so nothing guarantees the validation dropdowns exist
 Change: an openpyxl generator, matching the pro-forma wiring pattern.
 Verify: open the generated workbook and assert data validations and conditional formats
 are present.
-Effort: M. Marc decision: no. Depends on: A11. Also serves F9.
+Effort: M. Marc decision: no. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above). Also serves F9.
 
 **E5. Add the JSON-sidecar ownership table to category-strategy.**
 Why: `category-strategy-1c344a/SKILL.md:2138` describes the sidecar only as "additive...
@@ -657,7 +750,7 @@ than from `compute_ground_truth()`, so the workbook and dashboard can drift
 (`_audit/GROUP-2-commercial-pricing.md:33`).
 Change: a small data-adapter emitting the dashboard data object from `compute_ground_truth()`.
 Verify: assert dashboard NPV equals workbook NPV cell.
-Effort: S. Depends on: A11.
+Effort: S. Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **F7. Leave category-strategy's per-category research uncached across categories.**
 Why: `category-strategy-1c344a/SKILL.md:287,391-403` requires 14-21 searches per category
@@ -697,7 +790,7 @@ model owns narrative).
 Verify: a table in the release notes listing every deliverable, its builder, or its
 recorded reason for having none.
 Effort: L. Marc decision: `#32 dashboard-as-code generators (full generator-ify)` is
-tagged large and deferred (M18). See decision 8. Depends on: A11.
+tagged large and deferred (M18). See decision 8. Depends on: A11 (PARTIAL, see DEPENDENCY AUDIT above: split by whether the work touches retiring content).
 
 ## WS G: Claude Desktop runtime feasibility (Phase 2, with a gate in Phase 1)
 
@@ -1005,7 +1098,7 @@ Why: `procurement-help-desk-1c344a/SKILL.md:319` carries the fork explicitly. Ma
 recorded lean is MERGE (`PROGRAM-MASTER-PLAN.md:172`, A3: "Lean MERGE into
 `process-navigator` (one skill)... NO up-front mode picker... Leave help-desk AS-IS for
 now; finalize at Phase 3/WS6 on the efficiency criterion").
-Effort: S (decision), M (execution). Marc decision: yes (decision 5). Depends on: A11.
+Effort: S (decision), M (execution). Marc decision: yes (decision 5). Depends on: A11 (SEQUENCING ONLY, not a technical gate. See DEPENDENCY AUDIT above).
 
 **I2. Run the six network-gated harvest steps.**
 Why: `procurement-help-desk-1c344a/references/TODO-network-gated-harvest.md:1-3`: "STATUS:
