@@ -2172,3 +2172,33 @@ Ship manifest now: 46,508 KB as-is, 10,705 KB dead weight, **35,803 KB after str
 
 Gates after B6+B8: smoke 32 skills / 0 failures, kernel manifest 15 of 16 + 1 held,
 kernel self-test 96/96, fixture check_run 11/11.
+
+## B5 — dead code
+
+Closed with **no deletions**. Full write-up: `_audit/B5-DEAD-CODE-FINDINGS.md`.
+Reusable detector added: `_audit/dead_code_sweep.py`.
+
+On B5's actual scope (code the repo marks dead) there was nothing to do: the rfx
+functions were already removed and only tombstone comments remain, the `isolated/`
+copy is already classified strippable, and the unused vendored kernel functions
+**must stay** because trimming them would break the byte-identity `kernel_manifest.py`
+enforces.
+
+Sweeping properly turned up **110 shipped-runtime dead JS functions** (plus 37 in build
+trees) across category-strategy, deal-tab, rfx-hub and supplier-landscape.
+
+I did not trust that number at first, and was right not to: two earlier versions of the
+sweep were wrong in opposite directions, one inflating the count by regex-stripping
+`//` comments (which also ate everything after `https://`), one deflating it by reading
+tombstone comments as call sites. The premise was then verified directly rather than
+assumed. `pvDeepDiveHtml` appears exactly once in the built HTML too, and there is no
+dynamic dispatch anywhere in these dashboards, so the sweep's textual test is sound
+here. The tool aborts loudly if `window[...]`, `eval(` or `new Function` ever appears.
+
+Nothing was deleted. Removing 110 functions across four UI-bearing dashboards is a batch
+UI change and would require regenerating the built HTML, so it is a reviewable change
+rather than sweep cleanup. It is dead weight, not a correctness bug.
+
+**Correction to A10 (task #16):** `pvRequestDataCard` no longer exists anywhere in code.
+All six repo-wide hits are planning docs still instructing its removal. The other three
+named functions are real and still present.
