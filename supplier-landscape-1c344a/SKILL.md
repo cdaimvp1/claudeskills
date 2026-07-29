@@ -355,7 +355,25 @@ When producing a Full report, include a formal weighted scoring matrix in additi
 | Industry/Regulatory Experience | 5% | Pharma, life sciences, regulated industry track record |
 | Integration Fit | 5% | SAP, M365, Ariba, Veeva, Workday compatibility |
 
-**Scoring:** Rate each supplier 0-10 per category. Multiply by weight. Sum for final weighted score. Include 1-sentence rationale per score.
+**Scoring:** Rate each supplier 0-10 per category. Include 1-sentence rationale per score.
+
+**HARD RULE, kernel usage (per Execution Guardrails G11).** The weighted sum is NOT computed by model arithmetic. Call `weighted_score()` in the vendored `numeric_kernel.py`, once per supplier, and write the returned figure into both the report table and `weighted_scoring_matrix.csv`.
+
+```
+from numeric_kernel import weighted_score
+
+WEIGHTS = {
+    "alignment_to_business_need": 0.30, "technical_operational": 0.15,
+    "risk_profile": 0.15, "pricing_model": 0.15, "contract_flexibility": 0.10,
+    "lilly_vendor_status": 0.05, "industry_regulatory_experience": 0.05,
+    "integration_fit": 0.05,
+}
+total = weighted_score(supplier_scores_0_to_10, WEIGHTS)
+```
+
+The eight default weights above sum to exactly 1.00. If the user customizes them, `weighted_score()` refuses with `WeightSumError` when the customized set does not foot to 1.0 within 0.001, rather than scoring against un-footed weights. That is the same guard that catches the market-rate-benchmarking v2.1 defect (weights summing to 1.05), and a customized weight set is exactly where that defect would recur here. Do not renormalize to work around a refusal: fix the weights with the user and re-call, because silently rescaling changes the ranking the user asked for.
+
+The same rule applies to the separate requirement-count-weighted score in `requirements_fit_matrix.csv`. Both are weighted sums and both go through the kernel; they remain two distinct scoring systems per the note below, computed the same way.
 
 **Output:** Include the scored matrix as a table in the report and as its own artifact, `weighted_scoring_matrix.csv` (the 8-pillar percentage-weighted category matrix). Do NOT write it to `requirements_fit_matrix.csv`, which is reserved for the per-requirement, requirement-count-weighted scores (see CSV Schemas). `supplier_registry.csv` carries supplier profile data only, not scores.
 

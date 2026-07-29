@@ -49,7 +49,7 @@ Update this table as you go. It is the fastest way to resume.
 | O1 coverage matrix output-mode re-audit | **DONE** | `2720f66` `19afc3f` +sweep | 307 rows. 5 at-risk clusters. Part 3 sweep found 4 items with no home = 4th rescue candidate, undecided |
 | O2 build `deduction_score()` | **DONE** | `18b955b` | 43/43 self-test. Golden -36/64 exact. Both calibrations raise. NOT wired, per brief |
 | O3 C3 Bid Leveling kernel | **DONE** | `32e3cbd` | 54/54. level_bid() built AND wired. Kernel-drift finding for O11 |
-| O4 C2 playbook-learning Difficulty Score | NOT STARTED | | proven bug in its own changelog |
+| O4 C2 playbook-learning Difficulty Score | **DONE** | `640ce4b` | 63/63. 6 source goldens exact. Kernel vendored (had none) + wired |
 | O5-O10 C4,C5,C6,C7,C8,C10 kernel adoption | NOT STARTED | | non-held skills |
 | O11 C9 kernel hash manifest | NOT STARTED | | |
 | O12-O17 D2-D7 slice contracts | NOT STARTED | | design already approved |
@@ -410,3 +410,38 @@ detection belongs. `lilly-contract-review` is NOT re-vendored, deliberately: HEL
 `__import__`/eval/exec/pickle/base64 returns 0 across the kernel. Kernel diff is
 310 insertions and ZERO deletions. The two SKILL.md changes are prose plus fenced
 examples, no executable content.
+
+### O5 DONE, 2026-07-29. C4 supplier-landscape Weighted Scoring Matrix.
+
+Vendored the kernel into `supplier-landscape-1c344a` (it had none, and made no
+kernel calls) and wired the 8-pillar Weighted Scoring Matrix at SKILL.md:341-362
+to `weighted_score()`.
+
+**No new kernel function was needed.** `weighted_score()` already implements this
+exact shape. NOT NEEDED is a valid outcome and manufacturing a landscape-specific
+variant would have been the wrong call.
+
+**Verification, actual output:**
+```
+SUMMARY: 63/63 passed, 0/63 failed     (vendored copy, diffs identical to source)
+8 pillars sum to 1.0                   (30+15+15+15+10+5+5+5)
+all-8s      -> 8.0
+mixed       -> 8.0    hand-checked:  8.0
+un-footed weights refuse: OK
+```
+
+**Why the wiring matters here specifically.** SKILL.md:345 says "user may
+customize" the weights. A customized weight set is exactly where the
+market-rate-benchmarking v2.1 defect (weights summing to 1.05) would recur, and
+until now nothing checked it. The wired text tells the reader not to renormalize
+around a `WeightSumError`, because silently rescaling changes the ranking the
+user asked for.
+
+Both of that skill's two distinct scoring systems (the 8-pillar percentage-
+weighted matrix and the requirement-count-weighted requirements-fit score) now
+route through the kernel. They stay two systems, per the skill's own note; they
+are just computed the same way.
+
+**Malicious-code review: SAFE.** Vendored copy diffs identical to the reviewed
+source; no new code was written this increment. SKILL.md change is prose plus a
+fenced example.
