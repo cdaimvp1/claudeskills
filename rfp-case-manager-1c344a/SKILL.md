@@ -601,6 +601,37 @@ The seven references named in the Reference Files index are reproduced in full b
 
 ---
 
+## Building and validating case state
+
+```bash
+python case_state_generator.py <_case_file.json>   # validate; exits 2 and names the violation
+python case_state_selftest.py                      # 32 assertions
+```
+
+`_case_file.json`, `team_binding.json`, `rfx_project_acknowledged.json` and
+`meeting_log.csv` are BUILT and VALIDATED by code, never hand-assembled. Meeting drafts,
+comms and status snapshots stay prose: they are communication.
+
+**Why this one is code and not care.** This skill is the suite's state owner. Every other
+skill reads what it writes, so a malformed case file does not fail here, it fails later as
+another skill's wrong answer. That is the worst possible place for hand-assembly.
+
+| refusal | why |
+|---|---|
+| a `status` or `current_phase` outside the enum | an unrecognised value is not a new state, it is a typo every downstream reader mishandles |
+| a `schema_version` this generator does not implement | a silently up- or downgraded case file turns one skill's assumption into another's wrong answer |
+| a duplicate `supplier_id` or `event_id` | any lookup returns the first, so the second silently never applies |
+| a Closed case still in an active phase | one of the two fields was updated and the other was not |
+| **a case_id that CHANGES on handoff ingest** | see below |
+| a binding file for an UNBOUND case, or an acknowledgement file recording non-acknowledgement | their PRESENCE is the signal; a file saying false skips the very step it was meant to gate |
+
+**The case_id rule.** A case_id is generated here OR preserved as-is from an inbound
+`case_handoff.json`, including when it arrives in rfp-engine's different format.
+Regenerating it on ingest forks one sourcing event into two records, and every skill keyed
+to the discarded id then points at a case that stops accumulating history. It is data loss
+that looks like a successful import, so the generator refuses to choose between a
+conflicting pair rather than picking one. Re-ingesting the SAME handoff is idempotent.
+
 ## Reference: Case File Schema
 
 Schema for `_case_file.json`, the single source of truth for a case. Stored in Claude Project knowledge (or carried by the user as JSON when running outside a Project). All workflows read this; Initialize, Schedule, Ingest, and Refresh write it; Status appends only to `comms_log[]` and updates `last_refresh`.

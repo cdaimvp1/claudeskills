@@ -2845,3 +2845,56 @@ not detect the error, it made the error impossible to skip.
 before signature. The full review drops it, having judged it did not survive
 citation-checking. The redline-only run catches it. So it is not a capability gap, it is a
 mode-dependent judgment call, and it is the only thing between this fixture and green.
+
+---
+
+## V-5 — the rule existed, its SCOPE did not reach
+
+The full review dropped retroactive commencement as "not surviving citation-checking", and
+it was right to. `vendor-tactics.md` Category 11 opened with *"Some CHANGE ORDERS attempt to
+bypass or circumvent formal procurement governance"*, and every bullet under it said change
+order. WO-10 is a Work Order. A strict reviewer looked for a citable rule, found one that
+did not reach the document in front of it, and declined to stretch it.
+
+That is a scope gap in the rule, not a model failure, and it is worth separating the two:
+the redline-only run DID flag it, which means the difference between the modes was
+willingness to extend a rule past its stated scope. Rewarding that would be rewarding the
+looser reviewer.
+
+Category 11 now opens with an explicit scope line covering any instrument requiring a Lilly
+signature (Work Orders, SOWs, order forms, amendments, change orders), and the
+work-started-before-approval bullet instructs a direct date comparison on every instrument,
+quoting both dates and the gap in days. Verification in flight.
+
+## F9 build 3 of 5 — rfp-case-manager state schemas (DONE)
+
+`case_state_generator.py` + self-test, **32/32**.
+
+F9's reason for building this one is the strongest of the five: this skill is the suite's
+STATE OWNER. Every other skill reads what it writes, so a malformed case file does not fail
+here, it fails later as another skill's wrong answer. That is the worst possible place for
+hand-assembly.
+
+Built: `_case_file.json`, `team_binding.json`, `rfx_project_acknowledged.json`,
+`meeting_log.csv`. Meeting drafts, comms and status snapshots stay prose per F9.
+
+**The case_id preservation rule is the one that earns the build.** SKILL.md says a case_id
+is generated here OR preserved as-is from an inbound handoff, including when it arrives in
+rfp-engine's different format. Regenerating it on ingest forks one sourcing event into two
+records, and every skill keyed to the discarded id then points at a case that stops
+accumulating history. **It is data loss that looks like a successful import.** The generator
+refuses to choose between a conflicting pair rather than silently picking one, and
+re-ingesting the SAME handoff is idempotent rather than a conflict.
+
+Two refusals worth noting because they are about ABSENCE carrying meaning:
+- it refuses to write `team_binding.json` for an unbound case
+- it refuses to write `rfx_project_acknowledged.json` recording a non-acknowledgement
+
+In both, the file's PRESENCE is the signal. SKILL.md skips Step 0a on any run where the
+acknowledgement file is FOUND, so a file saying `false` would skip the very step it was
+meant to gate. A present-but-false file reads as a decision made; an absent file reads as a
+decision still open.
+
+Also refuses: enum violations on status / current_phase / role / meeting status, an
+unimplemented schema_version, duplicate supplier or event ids, and a Closed case still in an
+active phase.
