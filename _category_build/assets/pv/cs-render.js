@@ -2504,11 +2504,16 @@ function csMarketIntelSplit(mk) {
      payoff and appears when the row opens. */
   var acc = (mk.headlines || []).map(function (x, i) {
     var shut = x.subject || csSubjectOf(x);
+    /* Closed, a row is only a subject. A bare figure on a shut row is a number
+       with nothing to divide it by: "78%" of what is unanswerable until the row
+       is open, so it reads as emphasis rather than as information. The figure and
+       the headline it belongs to both live in the opened card, together. */
     return '<details class="cs-acc"' + (i === 0 ? ' open' : '') + '>'
-      + '<summary class="cs-acch"><b>' + csEsc(x.k) + '</b>'
-      + '<u class="cs-acc-shut">' + csEsc(shut) + '</u>'
-      + '<u class="cs-acc-open">' + csEsc(x.t) + '</u></summary>'
-      + '<div class="cs-accb">' + csEsc(x.d)
+      + '<summary class="cs-acch"><u>' + csEsc(shut) + '</u></summary>'
+      + '<div class="cs-accb">'
+      + '<div class="cs-accfig"><b>' + csEsc(x.k) + '</b>'
+      + '<span>' + csEsc(x.t) + '</span></div>'
+      + csEsc(x.d)
       + '<div class="cs-mi-s">' + (x.src || []).map(function (s) {
           return '<a class="cs-cite" href="' + csEsc(s.u) + '" target="_blank" rel="noopener">' + csEsc(s.n) + '</a>';
         }).join('') + '</div></div></details>';

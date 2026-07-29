@@ -2025,6 +2025,28 @@ small,sub,sup{font-size:9px}
 .cs-fcard-t{text-align:left}
 .cs-fcard-d{margin-top:3px}
 
+/* --- Market intelligence rows: figure moves into the opened card ----------- */
+/* A shut row is a subject only. The figure and its headline appear together in
+   the body, where the sentence that gives the number a denominator is also
+   visible. */
+.cs-acch b{display:none}
+.cs-accfig{display:flex;align-items:baseline;gap:11px;margin-bottom:7px}
+.cs-accfig b{display:block;font:700 20px var(--mono);color:var(--emph);
+  letter-spacing:-.01em;white-space:nowrap;flex:none}
+.cs-accfig span{font-size:13px;font-weight:700;color:var(--cs-ink,#1A1A1A);line-height:1.3}
+
+/* --- type ladder: the last three off-ladder cases -------------------------- */
+/* The sort caret was the only 9px left in the dashboard. */
+.cs-sortb i{font-size:11px;font-style:normal}
+/* SVG text scales with its container, so a chart whose column is narrower than
+   its viewBox renders its labels BELOW the declared size. These two do: the
+   priority plot at 0.965 and the risk heatmap at 0.839. Declared size is
+   compensated so the RENDERED size lands on 13px. Measured, not guessed. */
+.cs-kplot .cs-kdlab,.cs-kplot .cs-quadl,.cs-kplot .cs-axt,
+.cs-kplot .cs-pyl,.cs-kplot .cs-pyr,.cs-kplot text{font-size:13.5px}
+.cs-rksvg .cs-rknum,.cs-rksvg .cs-quadl,.cs-rksvg .cs-axt,
+.cs-rksvg .cs-rklab,.cs-rksvg text{font-size:15.5px}
+
 </style>
 </head>
 <body>
@@ -5295,11 +5317,16 @@ function csMarketIntelSplit(mk) {
      payoff and appears when the row opens. */
   var acc = (mk.headlines || []).map(function (x, i) {
     var shut = x.subject || csSubjectOf(x);
+    /* Closed, a row is only a subject. A bare figure on a shut row is a number
+       with nothing to divide it by: "78%" of what is unanswerable until the row
+       is open, so it reads as emphasis rather than as information. The figure and
+       the headline it belongs to both live in the opened card, together. */
     return '<details class="cs-acc"' + (i === 0 ? ' open' : '') + '>'
-      + '<summary class="cs-acch"><b>' + csEsc(x.k) + '</b>'
-      + '<u class="cs-acc-shut">' + csEsc(shut) + '</u>'
-      + '<u class="cs-acc-open">' + csEsc(x.t) + '</u></summary>'
-      + '<div class="cs-accb">' + csEsc(x.d)
+      + '<summary class="cs-acch"><u>' + csEsc(shut) + '</u></summary>'
+      + '<div class="cs-accb">'
+      + '<div class="cs-accfig"><b>' + csEsc(x.k) + '</b>'
+      + '<span>' + csEsc(x.t) + '</span></div>'
+      + csEsc(x.d)
       + '<div class="cs-mi-s">' + (x.src || []).map(function (s) {
           return '<a class="cs-cite" href="' + csEsc(s.u) + '" target="_blank" rel="noopener">' + csEsc(s.n) + '</a>';
         }).join('') + '</div></div></details>';
