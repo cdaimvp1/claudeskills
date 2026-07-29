@@ -1796,3 +1796,58 @@ it would be wrong, and now for a positive reason rather than an absence of one.
 both savings and reportCard; the 2 smoke-test failures across the four touched skills are
 the pre-existing G9 doc-pointer failures in rfp-engine and lilly-brand-assets, unchanged and
 unrelated.
+
+### Task #12 DONE, 2026-07-29. F9 generator coverage sweep.
+
+`_audit/F9-GENERATOR-COVERAGE-SWEEP.md`. Decisions with written reasons, per F9's own
+requirement. Findings, not builds.
+
+**The decision rule is the suite's own precedent**, from GROUP-6's split for
+executive-summary-package: **code owns validation, arithmetic, assembly and invariants; the
+model owns narrative.** Prose is the RIGHT answer for genuinely narrative content, and a
+generator authoring argument produces worse output than a model. The failure this item
+catches is the opposite one: a STRUCTURED artifact assembled by hand.
+
+**Current coverage:** 13 skills ship a `.py`; 8 are real document or data generators, the
+rest are decision kernels. Two of the 8 landed tonight (`invoice_audit_engine`,
+`dashboard_adapter`), which materially changes the cost of two rows below.
+
+**Priority order, with the reason each earns its rank:**
+
+1. **scope-sow-architect, BUILD.** Four structured artifacts
+   (`rate_card_and_payment_schedule.xlsx`, `raci_matrix.csv`,
+   `change_control_log_template.xlsx`, `scope_findings.json`) and ZERO generators. Verified:
+   the skill ships only `numeric_kernel.py`. Effort M rather than L, because the arithmetic
+   is already available via `verify_line_math()` and `assert_reconciles()`. `Rewritten_SOW.docx`
+   stays PROSE and is preserved explicitly at MASTER-REMAINING-WORK:316.
+2. **rfp-engine E4.** A documented claim (validation dropdowns, conditional formatting) that
+   no code implements. A correctness gap, not a cost one. A11 dependency already resolved
+   spurious.
+3. **negotiation-playbook-learning, and it is now CHEAP.** `outcome_partition()` and
+   `difficulty_score()` (O4 tonight) already compute and validate every figure its JSON
+   artifacts carry, including the sum-to-1.0 check. The generator is serialization plus
+   assertion, not arithmetic. Effort S. Verified both functions import.
+4. **rfp-case-manager schemas.** It is the suite's STATE owner, so hand-assembled state is
+   the worst possible place for drift. Meeting and comms drafts stay PROSE.
+5. **legal-negotiation-prep, SPLIT.** `tier_kernel.py` exists and computes the tiering;
+   nothing assembles the briefing from it. Skeleton and tier tables BUILD, the negotiation
+   argument stays PROSE. Verified: tier_kernel is the only .py.
+6. **supplier-landscape DOCX, BUILD but genuinely large.** Still carries the three-pass
+   open/append/save pattern F2 removed from rfp-response-analysis (verified, 2 occurrences
+   remain). Deferred by name in F2's own commit because its generator builds the DASHBOARD,
+   not the DOCX. Must NOT be fixed the F2 way: collapsing three appends into one write is
+   the truncation failure G10 warns about. Effort L, ~2,900 lines comparable.
+
+   Its CSVs should be emitted by the SAME generator so the report and the CSVs cannot
+   disagree, which is the F6 lesson applied.
+
+**DEFERRED with reasons, not skipped:** supplier-deep-dive's dossier dashboard follows A5
+(blocked on Marc's hub-home decision), and building against an IA about to change would be
+waste. scope-sow's dashboard defers to D1 for the same reason.
+
+**Accepted as PROSE deliberately**, with the test stated: a reader would be worse off if a
+template wrote it. That covers `Rewritten_SOW.docx`, negotiation argument, meeting and comms
+drafts, `outcome_summary.md`, dossier narrative, and contract-review's redline wording.
+
+**Excluded:** `lilly-contract-review`, HELD. Its generator question is F1's and the coverage
+matrix already answers it.
