@@ -504,3 +504,45 @@ untouched.
 **Malicious-code review: SAFE.** Kernel imports unchanged; grep for os/sys/
 subprocess/socket/urllib/`__import__`/eval/exec/pickle/base64 returns 0. Kernel
 diff is additive with ZERO deletions. The methodology-file changes are prose.
+
+### O7 DONE, 2026-07-29. C6 negotiation-simulator reciprocity and anchor capture.
+
+Built a NEGOTIATION-METRICS face (`reciprocity`, `anchor_capture`), vendored into
+`negotiation-simulator-1c344a` (which had none), wired SKILL.md:464.
+
+**Verification, actual output:**
+```
+SUMMARY: 86/86 passed, 0/86 failed
+GOLDEN reciprocity(3,2) -> index 0.7, UNFAVORABLE   (SKILL.md:468 states both)
+reciprocity(0,0) NOT_APPLICABLE / (2,0) POOR / (0,2) STRONG / (2,2) BALANCED
+anchor 10->15 target 20        = 50%   CAPTURED
+anchor 100->80 target 60       = 50%   CAPTURED   (downward price target)
+anchor 10->23 target 20        raw 130% -> displayed 100%, beyond_amount 3
+anchor opening==target         NOT_APPLICABLE, no divide-by-zero
+anchor 10->5 target 20         display 0%, raw -50% kept for coaching
+```
+
+The 130% case is the source's own named defect: SKILL.md:473 says the cap exists
+because "This prevents a 130%-style artifact". The test reproduces it exactly.
+
+**Why these two were worth kerneling even though the arithmetic is trivial.**
+They are almost entirely edge cases, and that skill's v2.3 changelog (SKILL.md:149)
+records having to define every one of them after the fact: divide-by-zero, bare
+"N:0", the 130% artifact, zero range, wrong direction, non-numeric. In prose,
+each degenerate case depends on the model remembering a rule at the moment it is
+writing a debrief. Both functions now return a STATE, and return `None` for the
+number in exactly the cases the source forbids printing one. A None cannot be
+formatted into a misleading "0.0"; a 0.0 can. That is the whole design.
+
+`anchor_capture()` refuses non-numeric input rather than coercing it, because the
+source explicitly prohibits fabricating a numeric capture for a non-numeric issue
+such as an audit-scope clause.
+
+Direction is handled by the arithmetic rather than a branch: a downward price
+target computes identically to an upward term target because the sign is carried
+by (Y - Z). Both are pinned by tests.
+
+**All five consuming kernel copies refreshed and verified identical to source.**
+
+**Malicious-code review: SAFE.** Imports unchanged, no dangerous constructs,
+additive only. SKILL.md change is prose plus a fenced example.

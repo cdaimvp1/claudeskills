@@ -461,6 +461,16 @@ The debrief is produced at the end of Practice and Observe modes, and as a drill
 ### Structured metrics
 Calculate and present alongside the narrative:
 
+**HARD RULE, kernel usage (per Execution Guardrails G11).** Both metrics below are computed by calling the vendored `numeric_kernel.py`, not by hand. `reciprocity(given, received)` and `anchor_capture(opening, final, target)` each return a STATE alongside the number, and the number is `None` in exactly the cases the text below forbids printing one. Render from the state, never from a bare figure: that is what makes the degenerate cases impossible to get wrong rather than merely documented. For a non-numeric issue do not call `anchor_capture()` at all, per the non-numeric bullet below.
+
+```
+from numeric_kernel import reciprocity, anchor_capture
+
+rec = reciprocity(given=3, received=2)     # index 0.7, state UNFAVORABLE
+cap = anchor_capture(opening=10, final=23, target=20)
+# display_pct 100.0, raw_pct 130.0, state BEYOND_TARGET, beyond_amount 3
+```
+
 **Reciprocity ratio:** Count the concessions the user made (`N`) and the concessions they received in return (`M`). Define a "concession" consistently for both sides: a substantive move off a previously stated position on a tracked issue (a price/term/scope give), not a clarifying question or a restatement. Always present both raw counts first, then a labeled interpretation, and handle the degenerate cases explicitly rather than printing a divide-by-zero or a bare "N:0":
   - **Both zero (`N = 0, M = 0`):** "No concessions were traded by either side. Reciprocity: NOT APPLICABLE (no give-and-take to measure)." This is common in a short Drill or an early-stage Practice.
   - **You gave, got nothing (`N > 0, M = 0`):** Do NOT print a ratio with a zero denominator. Report "You made [N] concession(s) and received 0 in return. Reciprocity: POOR (one-sided giving)." Flag each unreciprocated concession with the exchange where it happened.

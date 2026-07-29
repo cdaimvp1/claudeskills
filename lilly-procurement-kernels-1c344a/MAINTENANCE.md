@@ -15,6 +15,7 @@ that multiple Lilly Procurement Skills each describe independently in prose:
 | `weighted_score` | market-rate-benchmarking (Composite Contract Quality Score) AND evaluation-engine (Effective_Weight_Frac / Score Validation Checks) - both skills independently require weights to foot to 1.0; this is one shared guard instead of two divergent ones |
 | `npv` | pro-forma-builder (Financial Methodology, end-of-year Year-1 discounting) |
 | `quadrature_rollup` | should-cost-builder (Aggregation Method: quadrature + >15% LOW-confidence widening) |
+| `reciprocity` / `anchor_capture` | negotiation-simulator (the two Structured Debrief metrics and every degenerate case its v2.3 changelog records defining) |
 | `hhi` / `hhi_band` | category-strategy (`references/analysis-methodology.md`, HHI and its concentration bands) |
 | `pareto_segments` | category-strategy (Pareto methodology, A/B/C/D segments, p80/p95/p99, efficiency ratio) |
 | `cagr` / `yoy` | category-strategy (growth metrics, and the >50% CAGR rapid-growth anomaly check) |
@@ -172,6 +173,23 @@ skills themselves draw a hard line. Specifically:
   combined component (summing their spreads linearly) before calling this
   function, per should-cost-builder's own text, until a grouping-aware
   version is added here.
+- **`reciprocity` and `anchor_capture` return a STATE, and return None for the
+  number in every case where their source forbids printing one.** These two
+  metrics are almost entirely edge cases, and negotiation-simulator's v2.3
+  changelog records having to define all of them after the fact (divide-by-zero,
+  bare "N:0", the 130%-style capture artifact, zero range, wrong direction).
+  Returning None rather than 0.0 is the point: a None cannot be formatted into a
+  misleading "0.0", whereas a 0.0 can. Callers must render from `state`.
+- **`anchor_capture` caps the displayed capture at 100 but preserves `raw_pct`.**
+  The source requires the cap (to prevent "a 130%-style artifact") AND requires
+  the overshoot be reported separately, so both are returned. Same for the
+  wrong-direction case: display 0, raw negative, because the source forbids
+  showing a negative capture as a positive percentage but wants the real value
+  in the coaching note.
+- **`anchor_capture` refuses non-numeric input rather than coercing it.**
+  negotiation-simulator explicitly prohibits fabricating a numeric capture for a
+  non-numeric issue such as an audit-scope clause; those carry a qualitative read
+  with `state: NON_NUMERIC` instead and must not call this function.
 - **`hhi` treats market shares as PERCENTAGES (0-100), not fractions.** That is
   what the source specifies and what puts a monopoly at 10,000 rather than 1.0.
   Using fractions would understate every index by a factor of 10,000 and band

@@ -1,3 +1,5 @@
+# Vendored verbatim from lilly-procurement-kernels-1c344a/numeric_kernel.py on 2026-07-29; source of truth is lilly-procurement-kernels-1c344a/numeric_kernel.py. Do not hand-edit here; edit the source and re-vendor.
+# negotiation-simulator-1c344a calls: reciprocity() and anchor_capture() (the two Structured Debrief metrics, including every degenerate case the v2.3 changelog records defining). The remaining functions are vendored for completeness (this is a verbatim copy of the shared kernel) but not called by this skill's own workflow.
 """
 numeric_kernel.py
 Lilly Procurement Skills - Shared Numeric Kernel

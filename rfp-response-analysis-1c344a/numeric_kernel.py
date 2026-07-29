@@ -389,6 +389,134 @@ def quadrature_rollup(component_bases: Sequence[float],
 
 
 # ===========================================================================
+# NEGOTIATION-METRICS face
+# ===========================================================================
+#
+# Source: negotiation-simulator-1c344a/SKILL.md:464-476, the Structured Debrief
+# metrics (reciprocity ratio and anchor effectiveness).
+#
+# These two metrics are almost entirely edge cases. That skill's v2.3 changelog
+# (SKILL.md:149) records having to fix exactly that: "Defined the reciprocity
+# ratio for zero/degenerate cases (give-nothing, get-nothing, one-sided) instead
+# of printing a divide-by-zero or bare 'N:0'. Capped anchor effectiveness at 100%
+# (with a separate 'beyond target' note) and defined the zero-range,
+# wrong-direction, and non-numeric cases."
+#
+# All of that lives in prose today, which means every degenerate case depends on
+# the model remembering a rule at the moment it is generating a debrief. Both
+# functions below return a STATE rather than a bare number, so the caller cannot
+# accidentally print a ratio in a case where the source forbids one.
+
+
+@dataclass
+class Reciprocity:
+    """Reciprocity outcome. `index` is None in every case where the source
+    forbids printing a ratio, so a None index is a hard signal not to render
+    one rather than a value to coerce."""
+
+    given: int
+    received: int
+    index: Optional[float]
+    state: str
+
+
+@dataclass
+class AnchorCapture:
+    """Anchor effectiveness. `display_pct` is what may be shown; `raw_pct` is
+    the uncapped value, kept for the coaching note the source requires."""
+
+    display_pct: Optional[float]
+    raw_pct: Optional[float]
+    state: str
+    beyond_target: bool = False
+    beyond_amount: float = 0.0
+
+
+def reciprocity(given: int, received: int) -> Reciprocity:
+    """Reciprocity ratio and state, per negotiation-simulator SKILL.md:464-470.
+
+    `given` is N, the concessions the user made. `received` is M, those they got
+    back. The four cases the source enumerates map to four states:
+
+      N=0, M=0   NOT_APPLICABLE   no give-and-take to measure
+      N>0, M=0   POOR             one-sided giving. NO ratio is produced,
+                                  because the source says explicitly "Do NOT
+                                  print a ratio with a zero denominator"
+      N=0, M>0   STRONG           captured value without giving
+      N>0, M>0   BALANCED if M/N >= 1.0, else UNFAVORABLE
+
+    The index is M/N, "received per concession given", rounded to one decimal as
+    the source specifies. It is None in the first three cases. That is
+    deliberate: a None index cannot be formatted into a misleading "0.0" or
+    "N:0" string, which is the defect the v2.3 changelog records fixing.
+    """
+    for label, v in (("given", given), ("received", received)):
+        if not isinstance(v, int) or isinstance(v, bool) or v < 0:
+            raise InvalidInputError(
+                f"{label} must be a non-negative integer count of concessions, "
+                f"got {v!r}"
+            )
+    if given == 0 and received == 0:
+        return Reciprocity(given, received, None, "NOT_APPLICABLE")
+    if given > 0 and received == 0:
+        return Reciprocity(given, received, None, "POOR")
+    if given == 0 and received > 0:
+        return Reciprocity(given, received, None, "STRONG")
+    index = round(received / given, 1)
+    return Reciprocity(given, received, index,
+                       "BALANCED" if index >= 1.0 else "UNFAVORABLE")
+
+
+def anchor_capture(opening: float, final: float, target: float) -> AnchorCapture:
+    """Anchor effectiveness, per negotiation-simulator SKILL.md:472-476.
+
+    "capture% = (W - Z) / (Y - Z) * 100", where Z is the opening, W the final
+    position and Y the playbook target. Direction is handled by the arithmetic
+    itself: (Y - Z) carries the sign of the direction that favours Lilly, so a
+    price target below the opening works the same as a term target above it.
+
+    Four states, matching the four cases the source enumerates:
+
+      NOT_APPLICABLE  opening equals target, so there is no range to capture.
+                      The source requires this instead of dividing by zero
+      BEYOND_TARGET   final closed past the target. display_pct is CAPPED at
+                      100 and `beyond_amount` carries the overshoot. The source
+                      calls the uncapped figure "a 130%-style artifact" and
+                      forbids printing it as a percentage of a range
+      MOVED_AWAY      final moved away from the target. display_pct is 0 and
+                      raw_pct keeps the negative value for the coaching note.
+                      The source forbids showing this as a positive percentage
+      CAPTURED        the ordinary case, 0 to 100
+
+    For a non-numeric issue, do not call this function at all. The source
+    requires a qualitative read carried in a `qualitative` field with
+    `state: NON_NUMERIC`, and fabricating a numeric capture is exactly what it
+    prohibits.
+    """
+    for label, v in (("opening", opening), ("final", final), ("target", target)):
+        if v is None or isinstance(v, bool) or not isinstance(v, (int, float)):
+            raise InvalidInputError(
+                f"{label} must be numeric, got {v!r}. For a non-numeric issue do "
+                "not call anchor_capture at all: carry a qualitative read with "
+                "state NON_NUMERIC, per SKILL.md:476"
+            )
+    if target == opening:
+        return AnchorCapture(display_pct=None, raw_pct=None,
+                             state="NOT_APPLICABLE")
+
+    raw = (final - opening) / (target - opening) * 100.0
+
+    if raw > 100.0:
+        # The overshoot is expressed in the direction of travel, so it is
+        # positive regardless of whether the target sits above or below.
+        return AnchorCapture(display_pct=100.0, raw_pct=raw, state="BEYOND_TARGET",
+                             beyond_target=True, beyond_amount=abs(final - target))
+    if raw < 0.0:
+        return AnchorCapture(display_pct=0.0, raw_pct=raw, state="MOVED_AWAY")
+    return AnchorCapture(display_pct=raw, raw_pct=raw, state="CAPTURED")
+
+
+# ===========================================================================
 # CONCENTRATION face
 # ===========================================================================
 #
@@ -1606,6 +1734,64 @@ if __name__ == "__main__":
         f"base={qr_widened.total_base}, low={qr_widened.total_low}, high={qr_widened.total_high}",
     )
 
+    # --- Golden: negotiation-simulator reciprocity worked example ----------
+    # Source: negotiation-simulator-1c344a/SKILL.md:468, "Example: gave 3,
+    # received 2 -> '3 given : 2 received, reciprocity index 0.7, state
+    # UNFAVORABLE'". A true golden.
+    _rec = reciprocity(3, 2)
+    _check(
+        "reciprocity: SKILL.md:468 worked example, gave 3 received 2 gives "
+        "index 0.7 and state UNFAVORABLE",
+        _rec.index == 0.7 and _rec.state == "UNFAVORABLE",
+        f"got index={_rec.index}, state={_rec.state}",
+    )
+    _rec_states = [(reciprocity(g, r).state, reciprocity(g, r).index)
+                   for g, r in ((0, 0), (2, 0), (0, 2), (2, 2))]
+    _check(
+        "reciprocity: all four degenerate cases the v2.3 changelog names return "
+        "index=None where the source forbids a ratio, so it cannot be formatted "
+        "into a misleading '0.0' or bare 'N:0'",
+        _rec_states == [("NOT_APPLICABLE", None), ("POOR", None),
+                        ("STRONG", None), ("BALANCED", 1.0)],
+        f"got {_rec_states}",
+    )
+
+    # Anchor effectiveness, SKILL.md:472-475.
+    _anc = anchor_capture(opening=10, final=15, target=20)
+    _anc_price = anchor_capture(opening=100, final=80, target=60)
+    _check(
+        "anchor_capture: (W-Z)/(Y-Z)*100 gives 50% closed, and a DOWNWARD price "
+        "target computes identically to an upward term target because the "
+        "direction is carried by the sign of (Y-Z)",
+        _anc.display_pct == 50.0 and _anc_price.display_pct == 50.0,
+        f"got term={_anc.display_pct}, price={_anc_price.display_pct}",
+    )
+    _beyond = anchor_capture(opening=10, final=23, target=20)
+    _check(
+        "anchor_capture: the source's own named '130%-style artifact' is "
+        "prevented. Raw 130% is capped to a displayed 100% with the overshoot "
+        "carried separately as beyond_amount=3",
+        _beyond.display_pct == 100.0 and round(_beyond.raw_pct) == 130
+        and _beyond.beyond_target and _beyond.beyond_amount == 3,
+        f"got display={_beyond.display_pct}, raw={_beyond.raw_pct}, "
+        f"beyond={_beyond.beyond_amount}",
+    )
+    _zero_range = anchor_capture(opening=20, final=25, target=20)
+    _check(
+        "anchor_capture: opening == target returns NOT_APPLICABLE with no "
+        "percentage, instead of dividing by zero (SKILL.md:474)",
+        _zero_range.state == "NOT_APPLICABLE" and _zero_range.display_pct is None,
+    )
+    _away = anchor_capture(opening=10, final=5, target=20)
+    _check(
+        "anchor_capture: moving away from target displays 0% but preserves the "
+        "negative raw value for the coaching note, never showing it as a "
+        "positive percentage (SKILL.md:475)",
+        _away.display_pct == 0.0 and _away.raw_pct == -50.0
+        and _away.state == "MOVED_AWAY",
+        f"got display={_away.display_pct}, raw={_away.raw_pct}",
+    )
+
     # --- Golden: analysis-methodology.md HHI worked example ----------------
     # Source: category-strategy-1c344a/references/analysis-methodology.md:153-156,
     # "If 3 suppliers split spend 50/30/20: HHI = 50^2 + 30^2 + 20^2 = 2500 +
@@ -1987,6 +2173,19 @@ if __name__ == "__main__":
 
 
 
+
+    # --- negotiation-metrics refusals --------------------------------------
+    _check_raises(
+        "reciprocity: refuses a negative concession count",
+        lambda: reciprocity(-1, 0),
+        InvalidInputError,
+    )
+    _check_raises(
+        "anchor_capture: refuses a non-numeric issue rather than fabricating a "
+        "capture percentage for it, which SKILL.md:476 explicitly prohibits",
+        lambda: anchor_capture(opening="audit scope", final=1, target=2),
+        InvalidInputError,
+    )
     # --- concentration face refusals ---------------------------------------
     _check_raises(
         "cagr: refuses a zero or negative start value. A growth rate off a zero "
