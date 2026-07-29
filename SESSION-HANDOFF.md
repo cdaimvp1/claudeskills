@@ -94,10 +94,21 @@ palette prose.
 
 ## Parked, needs Marc
 
-- Deal judgment calls, all still open and none blocking #11/#12/#14/#16: L&P group
-  bands vs per-row tag; boot auto-expand; Protection-Scorecard 8-category spine vs
-  26-row union; Cross-Doc "Open Document Risks" reframe; Document Family Register
-  click-to-open; #13 Next-Session Brief re-home or drop.
+- Deal judgment calls, ANSWERED by Marc 2026-07-29:
+  1. Protection-Scorecard spine: **keep the 8 categories.** No change.
+  2. L&P group bands vs per-row tag: **keep the bands.** No change.
+  3. Boot auto-expand: **start collapsed.** DONE, verified 0 of 11 open on load.
+  4. Cross-Doc "Open Document Risks" reframe: **Marc needs to see the mockup**
+     before deciding. It is `_deal_build/_mockups/cross-doc-risks-alt.html`,
+     copied to the Desktop mockups folder. STILL OPEN.
+  5. Document Family Register click-to-open: **no, for now.** Marc's reason: most
+     readers will come through Claude Code and a click-through to a document has
+     nowhere reliable to go. Agreed, and it is the right call: these artifacts are
+     self-contained single files with no file-system access, so the link would be
+     a promise the page cannot keep. If it is wanted later, expand-in-place with
+     the excerpt and source is the honest version.
+  6. #13 Next-Session Brief: **drop.** Confirmed already absent from live source;
+     recoverable from git history if ever wanted.
 - Market & Risk mockup options 2 and 3 not taken; Marc chose option 1.
 
 ## Closed this session

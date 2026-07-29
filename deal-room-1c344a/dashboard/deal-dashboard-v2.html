@@ -4485,7 +4485,12 @@ function lpNavProtections(d) {
   const cats = lpCats(d);
   // open the category that holds the top hard-stop finding on load (data-driven, not a
   // static index) so the navigator lands on the lead risk rather than always the first row.
-  const openIdx = Math.max(0, cats.findIndex(c => (c.issues || []).some(iss => iss.priority === 'hard-stop')));
+  /* #3, Marc: start collapsed. Auto-expanding pushed everything below the
+     register off the first screen, and since the accordion is single-open it was
+     also choosing a first item on the reader's behalf with no reason to prefer
+     one. The band counts still state the size of the problem while closed.
+     -1 matches no index, so nothing carries the open attribute. */
+  const openIdx = -1;
   return cats.map((c, i) => {
     const finds = c.issues.map(iss =>
       '<div class="lp-acc-find" role="button" tabindex="0" data-gotofinding="' + esc(iss.id) + '" title="Open ' + esc(iss.id) + ' in the register">' +
