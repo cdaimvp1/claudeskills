@@ -1,121 +1,168 @@
-# Overnight autonomous queue
+# Overnight autonomous queue (REVISED, much larger)
 
-Prepared 2026-07-29 for an unattended run. Read
-`_audit/SESSION-HANDOFF-2026-07-29.md` and `_audit/OPTIMIZATION-PRINCIPLES.md`
-first.
+Prepared 2026-07-29. Read `_audit/SESSION-HANDOFF-2026-07-29.md` and
+`_audit/OPTIMIZATION-PRINCIPLES.md` first. Progress goes in
+`_audit/OVERNIGHT-RUN-LOG.md`, which is the resume point.
 
-**Standing rule for the whole run: when blocked, STOP AND LOG IT.** Do not guess,
-do not work around, do not touch anything in the DO NOT TOUCH list to unblock
-yourself. Commit after each item. Malicious-code review is mandatory per increment.
+**The first version of this queue had 8 items. That was too conservative.** It
+applied the locked phase order strictly and treated unattended editing as riskier
+than it is for well-specified mechanical changes. The genuinely blocked set is
+small. This revision covers roughly 45 of the 78 plan items.
 
----
-
-## Tier 1: highest value, fully autonomous
-
-### O1. Re-audit the coverage matrix for output-mode coverage
-**Why it is first:** the matrix currently reports 342 rows and zero blockers, and it
-is NOT actually complete. Part 3 assigned destinations without checking which output
-modes each destination reaches, so any row mapped to a deliverable the user did not
-request is silently lost. Marc found this via obligations; it is systematic.
-
-**Do:** merge the three parts into `_audit/F1-COVERAGE-MATRIX.md`, add a column
-"which output modes does this reach", and re-audit all 342 rows against this test:
-*if the user requests ONLY the redlined track-changes .docx, does this check still
-run, and does its result still reach them?*
-
-A check that affects whether the contract should be SIGNED must clear that floor.
-Report every row that fails. Do not fix the skill; produce the corrected matrix.
-
-**Verify:** every row has an output-mode value; failures are listed separately with
-a proposed destination.
-
-### O2. Build `deduction_score()` in the kernel
-**Safe because** it lives in `lilly-procurement-kernels-1c344a`, NOT in the held
-contract-review. Nothing calls it until wired, so it cannot change any skill's
-behaviour tonight.
-
-**Do:** deduction model. Starts at 100. Subtracts per-finding deductions weighted by
-the four coverage columns (Standalone / Governed: Covered / Governed: Confirm /
-Governed: Gap). Hard Stops always -15, never reduced. NOT `weighted_score()`, which
-is the wrong shape.
-
-**TWO calibration assertions, both must raise:**
-1. too harsh: zero Hard Stops plus 10+ covered categories must not exceed 30 points
-2. too generous: a standalone document with 5+ findings must not come in under 25
-
-**Verify:** unit-test against the worked example in
-`lilly-contract-review-1c344a/references/risk-scoring.md` (deductions -36, score 64).
-Stdlib only, matching the existing kernel functions. Add a self-test block like the
-other generators have. Do NOT wire it into contract-review.
-
-### O3. Audit G12 claim-gate implementation versus mention (item H3)
-**Why it matters:** G12 is the suite-wide anti-fabrication rule and appears in only
-2 of 31 SKILL.md files. This is the most load-bearing item in WS H.
-
-**Do:** read-only pass over all 31 skills. Per skill: is G12 declared, is it
-actually implemented (NEEDS_INPUT / [CONFIRM] markers, cite-or-abstain behaviour,
-gap-state rendering), or merely mentioned. Produce `_audit/H3-G12-AUDIT.md` with
-file:line evidence and a per-skill verdict. Fix nothing.
-
-### O4. Desktop runtime audits G1 to G7
-**Do:** read-only inventories, one output file. Third-party imports and whether they
-are guarded; cross-skill path references (12 skills read
-`/mnt/skills/user/lilly-brand-assets-1c344a/...`, including the supplier-risk
-anti-fabrication rules, so a partial install silently drops a guardrail); builder
-self-containment; output-path portability; tool and connector assumptions.
-
-**Verify:** produce findings only. Do not fix. Fixing is G9 and needs review.
+**Standing rule: when blocked, STOP AND LOG IT and move to the next item.** Never
+guess, never work around, never touch the DO NOT TOUCH list to unblock yourself.
+Commit per item. Malicious-code review per increment.
 
 ---
 
-## Tier 2: valuable, autonomous, lower risk
+## What is ACTUALLY blocked, and why
 
-### O5. Fix the stale `case-handoff-schema.md` (item E1)
-rfp-case-manager's copy is correct and explicitly calls rfp-engine's superseded
-legacy. Bring rfp-engine's into line, and add the numeric kernel's discipline: a
-named source of truth plus a do-not-hand-edit header. This is the one REAL drift bug
-in the suite.
-
-### O6. Kernel-copy verification manifest (item C9)
-Manifest of the 12 vendored `numeric_kernel.py` copies with hashes, so future drift
-is detectable by script rather than by an audit that mistakes comment changes for
-drift, as this one did.
-
-### O7. Re-check the other lens skills for slice contracts
-Part 3 found contract-review HAS a slice contract, buried in the file being retired.
-The earlier finding "only deal-tab has one" was therefore wrong. Re-check every lens
-skill and correct `_audit/SYNTHESIS.md` and `_audit/RECONCILIATION.md`.
-
-### O8. B6 and B7 cleanup, NON-HELD skills only
-Orphaned static dashboard HTML and stale superseded prose. Skip anything in the DO
-NOT TOUCH list. If a file's status is unclear, skip it and log it.
-
----
-
-## DO NOT TOUCH tonight
-
-| Item | Why |
+| Blocker | Items |
 |---|---|
-| **`lilly-contract-review` ANY file** | Documented HOLD, `PLATFORM-CONSOLIDATION-TRACKER.md:172`. The obligations and Compliance Evidence rescues are DECIDED but still need Marc's explicit go to edit a held file. |
-| **Retiring `dashboard-canonical.md`** | Three rescues must land first, one of which is the D1 slice contract itself. |
-| **WS J orchestration** | Open decision conflict: the audit recommended a new skill, contradicting the locked THEO-maturation decision. Do not start either way. |
-| **I1 help-desk** | Marc decision pending. I2 is network-blocked regardless. |
-| **A11 lock the hubs** | Needs Marc sign-off. |
-| **B1, B2 category-strategy spec** | Needs Marc confirming 5 tabs. |
-| **Any locked dashboard artifact** | Deal, RFx, Landscape, Category Strategy are locked. |
-| **Phase 2 work ahead of Phase 1** | Phase order is locked. O2 and O5 are exceptions only because they touch neither a held file nor a locked artifact. |
+| **HELD FILE** `lilly-contract-review` | D1, F1, B4-for-that-skill, C1 wiring, the two decided rescues |
+| **MARC DECISION** | A5 (hub home TBD), A11 (lock sign-off), B1, B2 (needs 5-tab confirm), B9, I1, J1-J3 (open conflict with a locked decision) |
+| **MARC'S EYE** visual work he reviews | A8 Landscape design uplift, A9 recolor |
+| **NETWORK** | I2 |
+| **DEPENDS ON BLOCKED WORK** | A6 (needs A5), I3 (needs I1), retiring `dashboard-canonical.md` (needs the rescues) |
+
+Everything else is fair game.
 
 ---
 
-## Recommended run
+## Tier 1: do first, highest value
 
-**O1, O2, O3 in parallel; then O5, O6, O7 in parallel; O4 alongside; O8 last.**
+**O1. Coverage matrix output-mode re-audit.** Merge the three parts into
+`_audit/F1-COVERAGE-MATRIX.md`, add a "which output modes does this reach" column,
+re-audit all 342 rows against the test: *if the user requests ONLY the redlined
+track-changes .docx, does this check still run and does its result reach them?* The
+matrix currently misreports itself as complete. A gate that says PASS wrongly is
+worse than one that fails.
 
-O1 is the single highest-value item, because it corrects a gate that currently
-misreports itself as passed. O2 is the highest-value BUILD, and the one thing on
-this list that leaves a working artifact behind.
+**O2. Build `deduction_score()`** in `lilly-procurement-kernels`. Deduction model,
+starts at 100, four coverage columns, Hard Stops always -15 never reduced. NOT
+`weighted_score()`. TWO calibration assertions, both raise: too-harsh (zero Hard
+Stops + 10 covered must not exceed 30 points) and too-generous (standalone with 5+
+findings must not be under 25). Unit-test against `risk-scoring.md`'s worked example
+(-36, score 64). Stdlib only. **Do NOT wire it into contract-review.**
+
+**O3. C3 kernel the rfp-response-analysis Bid Leveling normalization.** The
+unaudited input currently gating an audited ranking. Highest-correctness kernel item
+that touches no held file.
+
+**O4. C2 kernel playbook-learning's Difficulty Score and partition rates.** No
+kernel at all today, and its own changelog records the exact scaling-overshoot bug
+`weighted_score`'s guard prevents. Vendor the kernel into the skill first.
+
+---
+
+## Tier 2: kernel adoption, all non-held skills
+
+Same pattern each: identify the prose arithmetic, replace with a kernel call, keep
+the model supplying judgment inputs, test.
+
+**O5. C4** supplier-landscape Weighted Scoring Matrix.
+**O6. C5** category-strategy Pareto / HHI / CAGR / YoY / tail-threshold / anomaly.
+**O7. C6** negotiation-simulator reciprocity ratio and anchor capture.
+**O8. C7** rfp-engine weight-sum check.
+**O9. C8** commercial-negotiation-prep rollup gap.
+**O10. C10** wire or retire `convert_currency()`.
+**O11. C9** kernel-copy hash manifest so future drift is script-detectable.
+
+---
+
+## Tier 3: slice contracts (design already approved)
+
+The field-ownership table is approved at `MASTER-REMAINING-WORK.md:320`. This is
+authoring an approved design into SKILL.md text, not designing.
+
+**O12. D2** scope-sow-architect slice contract (owns `scope{}`).
+**O13. D3** pro-forma-builder slice contract (owns `commercialLines[]`,
+`scenarios[]`, `assumptions[]`, `proforma{}`, `benchmarks[]`).
+**O14. D4** RFx slice contracts into the four feeders, per
+`RFx-REDESIGN-SPEC.md` section D.
+**O15. D5** deal-room slice-contribution contract.
+**O16. D6** deal-room `hub_slices` staleness assertions.
+**O17. D7** deal-tab build schema validation.
+
+**Note:** D1 is contract-review and is HELD. Also, Part 3 found contract-review
+already HAS a slice contract buried in `dashboard-canonical.md`, so re-check the
+others before assuming absence (that is O24).
+
+---
+
+## Tier 4: handoff discipline and generators
+
+**O18. E1** fix the stale `case-handoff-schema.md` in rfp-engine. The one real drift
+bug. Add a named source of truth and a do-not-hand-edit header.
+**O19. E2** apply that same discipline to every shared schema.
+**O20. E3** formalize evaluation-engine's outbound handoff (currently named
+generically, no schema).
+**O21. E4** build a real XLSX generator for rfp-engine's structured artifacts.
+**O22. E5** JSON-sidecar ownership table for category-strategy.
+**O23. F4 + F5** batch invoice-rate-card-auditor's per-line loop into one code pass,
+and wire a generator for its outputs. Largest-N input in the suite.
+**O24. F6** wire pro-forma's dashboard to the generator's ground truth.
+**O25. F8** JS reconciliation assertion in theos-field-guide before render.
+**O26. F9** generator coverage sweep for every remaining model-assembled deliverable.
+Findings, not builds.
+
+---
+
+## Tier 5: audits (read-only, produce findings, fix nothing)
+
+**O27. H3** G12 claim-gate implement-vs-mention across all 31 skills. Most
+load-bearing item in WS H.
+**O28. G1-G7** Desktop runtime audits: guarded imports, cross-skill paths (12 skills
+read `/mnt/skills/user/lilly-brand-assets-1c344a/...` including the supplier-risk
+anti-fabrication rules), builder self-containment, output paths, tool assumptions.
+**O29. G8** define the canonical per-skill runtime smoke test, 8 assertions.
+**O30. O24 above** re-check every lens skill for an existing slice contract and
+correct `_audit/SYNTHESIS.md` and `RECONCILIATION.md`, since the "only deal-tab"
+finding is proven wrong.
+**O31. H5** verify citations resolve rather than merely exist. Scriptable.
+
+---
+
+## Tier 6: cleanup, last, most drift-prone
+
+**O32. B5** remove documented-dead code from vendored `.py` and `assets/`.
+**O33. B6** retire orphaned static dashboard HTML.
+**O34. B7** prune stale instructions and superseded prose, NON-HELD skills only.
+**O35. B8** update guardrail numbering references (two skills still cite G1-G10 or
+G1-G11).
+**O36. A10** Landscape seed bugs: score-scale drift to a single `pvAssess` source,
+7-vs-9 supplier count, ESG shown as a scored dash. Plus dead code
+(`pvRequestDataCard`, `pvDDSection`, `pvVerdictHeaderHtml`, `pvCompPositionHtml`).
+**O37. A2** wire the RFx to Deal handoff emitter. rfx-hub now exists so this is
+unblocked.
+
+---
+
+## Judgment calls flagged, not assumed
+
+**A7 My Work dashboard** is described as a deterministic PORT of the platform My
+Work render, which is well specified and arguably autonomous. It is a large new
+build and a port can drift from its source in ways only Marc would notice. **Ask
+before starting; do not start unattended.**
+
+**Phase order.** `PROGRAM-MASTER-PLAN.md:41-43` puts Phase 1 dashboards before
+Phase 2 skills work. Most of Tiers 2 to 6 are Phase 2. Marc has already broken this
+deliberately once for the generator wiring. **If he has not said otherwise, run
+them anyway and LOG that they jumped the sequence**, because the remaining Phase 1
+items are all blocked on his decisions and waiting would waste the night.
+
+---
+
+## DO NOT TOUCH
+
+`lilly-contract-review` (any file) · retiring `dashboard-canonical.md` · WS J
+orchestration · I1 help-desk · A11 locking hubs · B1/B2 category-strategy spec ·
+A5/A6 Deep Dive · A8/A9 Landscape visual work · any locked dashboard artifact.
+
+---
 
 ## Morning report
 
-Leave `_audit/OVERNIGHT-REPORT.md`: what completed, what was skipped and why, every
-STOP AND LOG, and the decisions now waiting on Marc.
+`_audit/OVERNIGHT-REPORT.md`: what completed with commit hashes, what was skipped
+and why, every STOP AND LOG, what jumped the phase order, and the decisions now
+waiting on Marc.
