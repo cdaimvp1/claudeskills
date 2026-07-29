@@ -18,9 +18,8 @@
       "expected": "flagged as referenced but not provided"
     }
   ],
-
   "aggregate_assertions": {
-    "hard_stop_count": 5,
+    "hard_stop_count": 6,
     "hs4_raised_as_hard_stop": false,
     "ae_finding_present": true,
     "ae_finding_severity": "LOW",
@@ -28,20 +27,66 @@
     "arithmetic_findings_minimum": 8,
     "false_positives_allowed": 0,
     "protection_score_band": "Critical",
-    "protection_score_range": [0, 24],
+    "protection_score_range": [
+      0,
+      24
+    ],
     "rule12_calculation_table_present": true,
     "hard_stop_deduction_each": -15,
-    "hard_stop_deduction_total": -75
+    "hard_stop_deduction_total": -90,
+    "hs4_note": "6 is the CORRECT Hard Stop count (5 playbook + D-1 from the DPA checklist). The HS-4 control therefore tests WHICH six, not how many: a run reaching six by raising HS-4 is wrong even though its total matches."
   },
-
   "hard_stops": [
-    {"id": "HS-1", "topic": "trade sanctions", "wo_ref": "8.1", "governing_ref": "MSA:25.2", "rule": "playbook.md:17-22", "escalate": "Alessandro Curti"},
-    {"id": "HS-2", "topic": "debarment knowingly qualifier", "wo_ref": "7.1", "governing_ref": "MSA:24.1", "rule": "playbook.md:23-28", "escalate": null},
-    {"id": "HS-3", "topic": "tax disclosure rights", "wo_ref": "9.1", "governing_ref": "MSA:8.2", "rule": "playbook.md:29-34", "escalate": "Adam Shields"},
-    {"id": "HS-5", "topic": "AI provider not a subcontractor", "wo_ref": "6.5", "governing_ref": "EXHIBIT-C:3.6,SPS:4.4", "rule": "playbook.md:42-47", "escalate": "Legal AIPC"},
-    {"id": "HS-6", "topic": "indemnification sole and exclusive remedy", "wo_ref": "12.1", "governing_ref": "MSA:17", "rule": "playbook.md:48-54", "escalate": null}
+    {
+      "id": "HS-1",
+      "topic": "trade sanctions",
+      "wo_ref": "8.1",
+      "governing_ref": "MSA:25.2",
+      "rule": "playbook.md:17-22",
+      "escalate": "Alessandro Curti"
+    },
+    {
+      "id": "HS-2",
+      "topic": "debarment knowingly qualifier",
+      "wo_ref": "7.1",
+      "governing_ref": "MSA:24.1",
+      "rule": "playbook.md:23-28",
+      "escalate": null
+    },
+    {
+      "id": "HS-3",
+      "topic": "tax disclosure rights",
+      "wo_ref": "9.1",
+      "governing_ref": "MSA:8.2",
+      "rule": "playbook.md:29-34",
+      "escalate": "Adam Shields"
+    },
+    {
+      "id": "HS-5",
+      "topic": "AI provider not a subcontractor",
+      "wo_ref": "6.5",
+      "governing_ref": "EXHIBIT-C:3.6,SPS:4.4",
+      "rule": "playbook.md:42-47",
+      "escalate": "Legal AIPC"
+    },
+    {
+      "id": "HS-6",
+      "topic": "indemnification sole and exclusive remedy",
+      "wo_ref": "12.1",
+      "governing_ref": "MSA:17",
+      "rule": "playbook.md:48-54",
+      "escalate": null
+    },
+    {
+      "id": "D-1",
+      "topic": "breach notification 96 hours (dual-classified: also data_protection)",
+      "wo_ref": "6.1",
+      "governing_ref": "MSA:9.2,SPS:6.1",
+      "rule": "dpa-review-checklist.md:43,48",
+      "escalate": "Legal AIPC",
+      "note": "Hard Stops are not defined in playbook.md alone. dpa-review-checklist.md section 3 uses a 'Hard Stop If' column (contrast section 4, which uses 'Flag If') and line 48 restates it: 'Hard Stop: Breach notification timeline > 72 hours.' This key previously cited that very row as D-1's basis while excluding it from the Hard Stop count, which was self-contradictory."
+    }
   ],
-
   "absence_detection": {
     "id": "AE-ABSENT",
     "topic": "adverse event reporting clause absent from the work order",
@@ -57,66 +102,304 @@
       "standalone_column": "wrong coverage status passed to deduction_score()"
     }
   },
-
   "arithmetic": [
-    {"id": "A-1", "kind": "line_math", "role": "Data Engineer", "rate": 165, "qty": 1200, "computed": 198000, "stated": 198500, "delta": 500, "favours": "supplier"},
-    {"id": "A-2", "kind": "line_math", "role": "Project Manager", "rate": 145, "qty": 400, "computed": 58000, "stated": 57000, "delta": -1000, "favours": "lilly", "note": "must still be flagged; arithmetic-verification.md:13 is direction-agnostic"},
-    {"id": "A-3", "kind": "grand_total", "computed": 679900, "stated": 685000, "delta": 5100},
-    {"id": "A-4", "kind": "nte", "nte": 675000, "stated_total": 685000, "corrected_total": 680400, "exceeds_by_stated": 10000, "exceeds_by_corrected": 5400},
-    {"id": "A-5", "kind": "rate_card_overage", "role": "Senior Data Engineer", "card_rate": 210, "billed_rate": 235, "qty": 960, "overage": 24000, "note": "arithmetic internally correct; requires cross-reference to the rate card"},
-    {"id": "A-6", "kind": "uom_change", "role": "Analytics Consultant", "card_unit": "per hour", "quoted_unit": "per day", "quoted_rate": 1400, "hourly_equivalent": 175, "note": "price is correct and it is still a finding, per EXHIBIT-B:3.2"},
-    {"id": "A-7", "kind": "markup_cap", "cap": 0.10, "quoted": 0.25, "refs": "WO-10:4.5 vs EXHIBIT-B:3.1"},
-    {"id": "A-8", "kind": "escalation", "quoted_pct": 0.05, "cap_pct": 0.03, "refs": "MSA:3.2 cap exceeded AND EXHIBIT-B:4.1 rates locked in initial term", "note": "two independent grounds"}
+    {
+      "id": "A-1",
+      "kind": "line_math",
+      "role": "Data Engineer",
+      "rate": 165,
+      "qty": 1200,
+      "computed": 198000,
+      "stated": 198500,
+      "delta": 500,
+      "favours": "supplier"
+    },
+    {
+      "id": "A-2",
+      "kind": "line_math",
+      "role": "Project Manager",
+      "rate": 145,
+      "qty": 400,
+      "computed": 58000,
+      "stated": 57000,
+      "delta": -1000,
+      "favours": "lilly",
+      "note": "must still be flagged; arithmetic-verification.md:13 is direction-agnostic"
+    },
+    {
+      "id": "A-3",
+      "kind": "grand_total",
+      "computed": 679900,
+      "stated": 685000,
+      "delta": 5100
+    },
+    {
+      "id": "A-4",
+      "kind": "nte",
+      "nte": 675000,
+      "stated_total": 685000,
+      "corrected_total": 680400,
+      "exceeds_by_stated": 10000,
+      "exceeds_by_corrected": 5400
+    },
+    {
+      "id": "A-5",
+      "kind": "rate_card_overage",
+      "role": "Senior Data Engineer",
+      "card_rate": 210,
+      "billed_rate": 235,
+      "qty": 960,
+      "overage": 24000,
+      "note": "arithmetic internally correct; requires cross-reference to the rate card"
+    },
+    {
+      "id": "A-6",
+      "kind": "uom_change",
+      "role": "Analytics Consultant",
+      "card_unit": "per hour",
+      "quoted_unit": "per day",
+      "quoted_rate": 1400,
+      "hourly_equivalent": 175,
+      "note": "price is correct and it is still a finding, per EXHIBIT-B:3.2"
+    },
+    {
+      "id": "A-7",
+      "kind": "markup_cap",
+      "cap": 0.1,
+      "quoted": 0.25,
+      "refs": "WO-10:4.5 vs EXHIBIT-B:3.1"
+    },
+    {
+      "id": "A-8",
+      "kind": "escalation",
+      "quoted_pct": 0.05,
+      "cap_pct": 0.03,
+      "refs": "MSA:3.2 cap exceeded AND EXHIBIT-B:4.1 rates locked in initial term",
+      "note": "two independent grounds"
+    }
   ],
-
   "corrected_figures": {
     "line_sum": 645400,
     "expenses": 35000,
     "total": 680400,
     "stated_subtotal_foots_to_stated_lines": true
   },
-
   "playbook_positions": [
-    {"id": "P-1", "topic": "automatic renewal", "wo_ref": "3.1", "governing_ref": "MSA:1.2", "rule": "playbook.md:57-66"},
-    {"id": "P-2", "topic": "50% advance payment", "wo_ref": "4.4", "governing_ref": "MSA:3.3", "rule": "playbook.md:78-89"},
-    {"id": "P-3", "topic": "confidentiality survival 2 years", "wo_ref": "5.1", "governing_ref": "MSA:4.2", "rule": "playbook.md:90-98", "coverage_column": "covered"},
-    {"id": "P-4", "topic": "CGL insurance 1M below 2M", "wo_ref": "10.1", "governing_ref": "MSA:14.1", "rule": "playbook.md:152-160", "coverage_column": "covered"},
-    {"id": "P-5", "topic": "cure period 90 days", "wo_ref": "11.1", "governing_ref": "MSA:16.2", "rule": "playbook.md:170-178", "coverage_column": "covered"},
-    {"id": "P-6", "topic": "liability cap lesser-of 1.5M", "wo_ref": "13.1", "governing_ref": "MSA:18.1", "rule": "playbook.md:187-197", "grounds": ["below 3M floor", "lesser-of construct", "silent downgrade of MSA cap"]},
-    {"id": "P-7", "topic": "governing law Texas", "wo_ref": "14.1", "governing_ref": "MSA:26.1", "rule": "playbook.md:224-232"},
-    {"id": "P-8", "topic": "mandatory arbitration", "wo_ref": "14.2", "governing_ref": "MSA:27.1", "rule": "playbook.md:233-241"},
-    {"id": "P-9", "topic": "SLA degraded to 99.0% quarterly commercially-reasonable", "wo_ref": "15.1", "governing_ref": "EXHIBIT-B:1.1", "coverage_column": "covered"}
+    {
+      "id": "P-1",
+      "topic": "automatic renewal",
+      "wo_ref": "3.1",
+      "governing_ref": "MSA:1.2",
+      "rule": "playbook.md:57-66"
+    },
+    {
+      "id": "P-2",
+      "topic": "50% advance payment",
+      "wo_ref": "4.4",
+      "governing_ref": "MSA:3.3",
+      "rule": "playbook.md:78-89"
+    },
+    {
+      "id": "P-3",
+      "topic": "confidentiality survival 2 years",
+      "wo_ref": "5.1",
+      "governing_ref": "MSA:4.2",
+      "rule": "playbook.md:90-98",
+      "coverage_column": "covered"
+    },
+    {
+      "id": "P-4",
+      "topic": "CGL insurance 1M below 2M",
+      "wo_ref": "10.1",
+      "governing_ref": "MSA:14.1",
+      "rule": "playbook.md:152-160",
+      "coverage_column": "covered"
+    },
+    {
+      "id": "P-5",
+      "topic": "cure period 90 days",
+      "wo_ref": "11.1",
+      "governing_ref": "MSA:16.2",
+      "rule": "playbook.md:170-178",
+      "coverage_column": "covered"
+    },
+    {
+      "id": "P-6",
+      "topic": "liability cap lesser-of 1.5M",
+      "wo_ref": "13.1",
+      "governing_ref": "MSA:18.1",
+      "rule": "playbook.md:187-197",
+      "grounds": [
+        "below 3M floor",
+        "lesser-of construct",
+        "silent downgrade of MSA cap"
+      ]
+    },
+    {
+      "id": "P-7",
+      "topic": "governing law Texas",
+      "wo_ref": "14.1",
+      "governing_ref": "MSA:26.1",
+      "rule": "playbook.md:224-232"
+    },
+    {
+      "id": "P-8",
+      "topic": "mandatory arbitration",
+      "wo_ref": "14.2",
+      "governing_ref": "MSA:27.1",
+      "rule": "playbook.md:233-241"
+    },
+    {
+      "id": "P-9",
+      "topic": "SLA degraded to 99.0% quarterly commercially-reasonable",
+      "wo_ref": "15.1",
+      "governing_ref": "EXHIBIT-B:1.1",
+      "coverage_column": "covered"
+    }
   ],
-
   "data_protection": [
-    {"id": "D-1", "topic": "breach notification 96 hours", "wo_ref": "6.1", "governing_ref": "MSA:9.2,SPS:6.1", "rule": "dpa-review-checklist.md:43"},
-    {"id": "D-2", "topic": "TLS 1.0", "wo_ref": "6.2", "governing_ref": "SPS:5.1", "rule": "dpa-review-checklist.md:88"},
-    {"id": "D-3", "topic": "sub-processor notice 10 days", "wo_ref": "6.3", "governing_ref": "SPS:4.2", "rule": "dpa-review-checklist.md:55"},
-    {"id": "D-4", "topic": "supplier asserts Controller status", "wo_ref": "6.4", "governing_ref": "SPS:1.1", "rule": "dpa-review-checklist.md:25"},
-    {"id": "D-5", "topic": "secondary use carve-out", "wo_ref": "6.4", "governing_ref": "SPS:3.1-3.2", "escalate": "Legal AIPC"},
-    {"id": "D-6", "topic": "human-authored notes classified as Usage Data", "wo_ref": "6.4", "governing_ref": "EXHIBIT-A:4", "rule": "definition-tracing-checklist.md:38-43", "note": "definition-tracing failure; not findable by keyword match; this is the mechanism behind D-4 and D-5"}
+    {
+      "id": "D-1",
+      "topic": "breach notification 96 hours AND trigger shifted from 'becoming aware' (MSA:9.2) to 'confirming the incident' (WO:6.1)",
+      "wo_ref": "6.1",
+      "governing_ref": "MSA:9.2,SPS:6.1",
+      "rule": "dpa-review-checklist.md:43",
+      "also_hard_stop": true,
+      "second_defect": "The trigger change may matter more than the 24 extra hours: a supplier can defer 'confirmation' indefinitely, so the clock need never start."
+    },
+    {
+      "id": "D-2",
+      "topic": "TLS 1.0",
+      "wo_ref": "6.2",
+      "governing_ref": "SPS:5.1",
+      "rule": "dpa-review-checklist.md:88"
+    },
+    {
+      "id": "D-3",
+      "topic": "sub-processor notice 10 days",
+      "wo_ref": "6.3",
+      "governing_ref": "SPS:4.2",
+      "rule": "dpa-review-checklist.md:55"
+    },
+    {
+      "id": "D-4",
+      "topic": "supplier asserts Controller status",
+      "wo_ref": "6.4",
+      "governing_ref": "SPS:1.1",
+      "rule": "dpa-review-checklist.md:25"
+    },
+    {
+      "id": "D-5",
+      "topic": "secondary use carve-out",
+      "wo_ref": "6.4",
+      "governing_ref": "SPS:3.1-3.2",
+      "escalate": "Legal AIPC"
+    },
+    {
+      "id": "D-6",
+      "topic": "human-authored notes classified as Usage Data",
+      "wo_ref": "6.4",
+      "governing_ref": "EXHIBIT-A:4",
+      "rule": "definition-tracing-checklist.md:38-43",
+      "note": "definition-tracing failure; not findable by keyword match; this is the mechanism behind D-4 and D-5"
+    }
   ],
-
   "vendor_tactics": [
-    {"id": "V-1", "category": 2, "topic": "deliverable ambiguity, no acceptance criteria", "wo_ref": "1.1-1.2", "rule": "vendor-tactics.md:32-49", "also_violates": "EXHIBIT-B:5.1"},
-    {"id": "V-2", "category": 5, "topic": "responsibility shifting to Lilly", "wo_ref": "2.1-2.3", "rule": "vendor-tactics.md:100-118"},
-    {"id": "V-3", "category": 9, "topic": "dependency inflation with re-baseline and chargeable delay", "wo_ref": "2.4", "rule": "vendor-tactics.md:191-209"},
-    {"id": "V-4", "category": 7, "topic": "notwithstanding the master agreement", "wo_ref": "13.1", "rule": "vendor-tactics.md:143-166"},
-    {"id": "V-5", "category": 11, "topic": "retroactive, work commenced 19 days before signature", "wo_ref": "header", "rule": "vendor-tactics.md:233-249", "commenced": "2026-07-13", "signed": "2026-08-01"}
+    {
+      "id": "V-1",
+      "category": 2,
+      "topic": "deliverable ambiguity, no acceptance criteria",
+      "wo_ref": "1.1-1.2",
+      "rule": "vendor-tactics.md:32-49",
+      "also_violates": "EXHIBIT-B:5.1"
+    },
+    {
+      "id": "V-2",
+      "category": 5,
+      "topic": "responsibility shifting to Lilly",
+      "wo_ref": "2.1-2.3",
+      "rule": "vendor-tactics.md:100-118"
+    },
+    {
+      "id": "V-3",
+      "category": 9,
+      "topic": "dependency inflation with re-baseline and chargeable delay",
+      "wo_ref": "2.4",
+      "rule": "vendor-tactics.md:191-209"
+    },
+    {
+      "id": "V-4",
+      "category": 7,
+      "topic": "notwithstanding the master agreement",
+      "wo_ref": "13.1",
+      "rule": "vendor-tactics.md:143-166"
+    },
+    {
+      "id": "V-5",
+      "category": 11,
+      "topic": "retroactive, work commenced 19 days before signature",
+      "wo_ref": "header",
+      "rule": "vendor-tactics.md:233-249",
+      "commenced": "2026-07-13",
+      "signed": "2026-08-01"
+    }
   ],
-
   "compliance_evidence": [
-    {"id": "S-2", "item": "SOC 2 Type II", "required_by": "SPS:9.2", "expected_state": "Awaiting"}
+    {
+      "id": "S-2",
+      "item": "SOC 2 Type II",
+      "required_by": "SPS:9.2",
+      "expected_state": "Awaiting"
+    }
   ],
-
   "negative_controls": [
-    {"id": "N-1", "silent_on": "intellectual property assignment", "covered_by": "MSA:5.1,EXHIBIT-C:15", "expected": "no finding"},
-    {"id": "N-2", "silent_on": "audit rights", "covered_by": "MSA:11.1-11.2,SPS:9.1", "expected": "no finding"},
-    {"id": "N-3", "silent_on": "data subject rights and deletion", "covered_by": "SPS:7.1-7.2", "expected": "no finding"},
-    {"id": "N-4", "silent_on": "return and destruction", "covered_by": "SPS:10.1-10.3", "expected": "no finding"},
-    {"id": "N-5", "silent_on": "force majeure", "covered_by": "MSA:15.1-15.2", "expected": "no finding"},
-    {"id": "N-6", "silent_on": "assignment and change of control", "covered_by": "MSA:20.1", "expected": "no finding"},
-    {"id": "N-7", "silent_on": "international transfer and SCCs", "covered_by": "SPS:8.1-8.2", "expected": "no finding"},
-    {"id": "N-8", "silent_on": "adverse event reporting", "covered_by": "MSA:23", "expected": "LOW finding in the covered column, NOT a hard stop"}
+    {
+      "id": "N-1",
+      "silent_on": "intellectual property assignment",
+      "covered_by": "MSA:5.1,EXHIBIT-C:15",
+      "expected": "no finding"
+    },
+    {
+      "id": "N-2",
+      "silent_on": "audit rights",
+      "covered_by": "MSA:11.1-11.2,SPS:9.1",
+      "expected": "no finding"
+    },
+    {
+      "id": "N-3",
+      "silent_on": "data subject rights and deletion",
+      "covered_by": "SPS:7.1-7.2",
+      "expected": "no finding"
+    },
+    {
+      "id": "N-4",
+      "silent_on": "return and destruction",
+      "covered_by": "SPS:10.1-10.3",
+      "expected": "no finding"
+    },
+    {
+      "id": "N-5",
+      "silent_on": "force majeure",
+      "covered_by": "MSA:15.1-15.2",
+      "expected": "no finding"
+    },
+    {
+      "id": "N-6",
+      "silent_on": "assignment and change of control",
+      "covered_by": "MSA:20.1",
+      "expected": "no finding"
+    },
+    {
+      "id": "N-7",
+      "silent_on": "international transfer and SCCs",
+      "covered_by": "SPS:8.1-8.2",
+      "expected": "no finding"
+    },
+    {
+      "id": "N-8",
+      "silent_on": "adverse event reporting",
+      "covered_by": "MSA:23",
+      "expected": "LOW finding in the covered column, NOT a hard stop"
+    }
   ]
 }

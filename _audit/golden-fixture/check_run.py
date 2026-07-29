@@ -311,7 +311,9 @@ def _perfect_run(exp):
         "run_id": "selftest-perfect", "mode": "Full review", "found": found,
         "extra": [],
         "aggregates": {
-            "hard_stop_count": 5, "protection_score": 12,
+            # 6, not 5: D-1 (96-hour breach notification) is a Hard Stop under
+            # dpa-review-checklist.md:43/48 as well as a data-protection finding.
+            "hard_stop_count": 6, "protection_score": 12,
             "protection_score_band": "Critical",
             "rule12_calculation_table_present": True,
             "ae_finding_severity": "LOW", "ae_finding_coverage_column": "covered",

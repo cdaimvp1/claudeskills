@@ -21,6 +21,16 @@ just "output differs".
 
 **HS-4 is deliberately NOT in this list. See the negative controls.**
 
+**CORRECTION, 2026-07-29.** This list previously held 5 entries and the aggregate asserted
+`hard_stop_count: 5`, while Part 5 cited `dpa-review-checklist.md:43` as D-1's basis. That
+row is inside a **"Hard Stop If"** column, and line 48 restates it as a Hard Stop, so the
+key was citing a Hard Stop rule and then not counting it. Hard Stops are NOT defined in
+`playbook.md` alone. D-1 is now listed here as well as in Part 5, and the count is **6**.
+
+Found because a blind run raised the 96-hour window as a Hard Stop and stated plainly that
+it could find no `playbook.md` entry for it. The run was reading more carefully than this
+key was written.
+
 ---
 
 ## Part 2 — The absence-detection case. The single most important row in this fixture.
@@ -47,7 +57,10 @@ at `23.3`.
    because AE never appears in the WO and so never triggers retrieval of the AE rule.
 2. **False Hard Stop.** Flagging HS-4 means the skill pattern-matched "no AE clause" without
    reading the governing document. That is the Rule 9 defect and it inflates the Hard Stop
-   count to six.
+   count to six. **CORRECTED 2026-07-29:** six is now the CORRECT count (5 playbook
+   Hard Stops + D-1 from the DPA checklist), so this control tests WHICH six, not how
+   many. A run reaching six by raising HS-4 is still wrong; a run reaching six via D-1 is
+   right. Do not judge this control on the number alone.
 3. **Wrong column.** A LOW finding scored in the Standalone column rather than
    Governed: Covered means `deduction_score()` was called with the wrong coverage status.
 
@@ -90,7 +103,7 @@ Corrected figures for reference: line sum **645,400**, total with expenses **680
 
 | # | Planted | Where | Expected |
 |---|---|---|---|
-| D-1 | Breach notification **96 hours** | `WO-10:6.1` vs `MSA:9.2` and `SPS:6.1` (72) | Exceeds the 72-hour ceiling. `dpa-review-checklist.md:43` |
+| D-1 | Breach notification **96 hours**, AND trigger shifted from "becoming aware" to "confirming the incident" | `WO-10:6.1` vs `MSA:9.2` and `SPS:6.1` (72) | Exceeds the 72-hour ceiling. **This is ALSO a HARD STOP**: `dpa-review-checklist.md:43` sits under a "Hard Stop If" column and line 48 restates it. The trigger shift is a second, separate weakening: a supplier can defer "confirmation" indefinitely, so the clock need never start. |
 | D-2 | **TLS 1.0** | `WO-10:6.2` vs `SPS:5.1` (TLS 1.2+) | Below the encryption floor. `dpa-review-checklist.md:88` |
 | D-3 | Sub-processor notice **10 days** | `WO-10:6.3` vs `SPS:4.2` (30 days) | Below the notice floor. `dpa-review-checklist.md:55` |
 | D-4 | Supplier asserts **Controller** status over Usage Data | `WO-10:6.4` vs `SPS:1.1` | Supplier must be Processor only. `dpa-review-checklist.md:25` |

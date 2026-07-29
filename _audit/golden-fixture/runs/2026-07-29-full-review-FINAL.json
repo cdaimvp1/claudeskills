@@ -1,0 +1,162 @@
+{
+  "run_id": "2026-07-29-full-review-FINAL",
+  "mode": "Full review",
+  "found": [
+    {
+      "id": "HS-1",
+      "evidence": "WO-10 \u00a78.1 Trade Sanctions :: The WO qualifies personnel screening with \"where commercially reasonable to do so\" and drops the MSA's immediate-notification obligation. Tr"
+    },
+    {
+      "id": "HS-2",
+      "evidence": "WO-10 \u00a77.1 Debarment :: The debarment certification is qualified with \"knowingly engaged,\" which the playbook treats as an unacceptable escape clause for Lilly's FD"
+    },
+    {
+      "id": "HS-3",
+      "evidence": "WO-10 \u00a79.1 Taxes :: The WO bars Lilly from disclosing the Work Order or its pricing to any tax authority without Supplier's prior written consent, reversing Lil"
+    },
+    {
+      "id": "HS-5",
+      "evidence": "WO-10 \u00a76.5 Data Protection :: The WO states the third-party AI model provider behind Meridian Insight \"is not a Subcontractor or Sub-processor for the purposes of the Agr"
+    },
+    {
+      "id": "HS-6",
+      "evidence": "WO-10 \u00a712.1 Indemnification :: The WO makes Supplier's Section 17 indemnification obligations Supplier's \"sole and exclusive remedy\" and folds indemnified claims into the "
+    },
+    {
+      "id": "AE-ABSENT",
+      "evidence": "MSA \u00a723 (absence in WO) :: WO-10 does not include an adverse event reporting clause, but the MSA already mandates one and it survives termination."
+    },
+    {
+      "id": "P-1",
+      "evidence": "WO-10 \u00a73.1 Term and Renewal :: The WO renews automatically for successive 12-month terms unless either party opts out 90 days before expiry, contrary to the MSA's structur"
+    },
+    {
+      "id": "P-2",
+      "evidence": "WO-10 \u00a74.4 Fees :: The WO requires Lilly to pay 50% of the Subtotal on signature, which is advance payment the governing agreement flatly prohibits."
+    },
+    {
+      "id": "P-3",
+      "evidence": "WO-10 \u00a75.1 Confidentiality :: Confidentiality survival is set at 2 years, below both the MSA's 5-year survival period and the playbook's 3-year fallback minimum."
+    },
+    {
+      "id": "P-4",
+      "evidence": "WO-10 \u00a710.1 Insurance :: The WO restates Commercial General Liability at $1,000,000 per occurrence, half the MSA's $2,000,000 minimum, and is silent on the other req"
+    },
+    {
+      "id": "P-5",
+      "evidence": "WO-10 \u00a76.2 Data Protection :: The WO permits encryption in transit at \"TLS 1.0 or higher,\" a deprecated, insecure protocol version, well below the SPS floor."
+    },
+    {
+      "id": "P-6",
+      "evidence": "WO-10 \u00a712.1 Indemnification :: The WO makes Supplier's Section 17 indemnification obligations Supplier's \"sole and exclusive remedy\" and folds indemnified claims into the "
+    },
+    {
+      "id": "P-7",
+      "evidence": "WO-10 \u00a714.1-14.2 Governing Law and Disputes :: The WO moves governing law to Texas and imposes mandatory binding arbitration in Dallas with a waiver of the right to litigate, both of whic"
+    },
+    {
+      "id": "P-8",
+      "evidence": "WO-10 \u00a714.1-14.2 Governing Law and Disputes :: The WO moves governing law to Texas and imposes mandatory binding arbitration in Dallas with a waiver of the right to litigate, both of whic"
+    },
+    {
+      "id": "D-1",
+      "evidence": "WO-10 \u00a76.1 Data Protection :: The WO sets a 96-hour security-incident notification window (triggered on \"confirming\" the incident) against a 72-hour standard triggered on"
+    },
+    {
+      "id": "D-2",
+      "evidence": "WO-10 \u00a76.2 Data Protection :: The WO permits encryption in transit at \"TLS 1.0 or higher,\" a deprecated, insecure protocol version, well below the SPS floor."
+    },
+    {
+      "id": "D-3",
+      "evidence": "WO-10 \u00a76.5 Data Protection :: The WO states the third-party AI model provider behind Meridian Insight \"is not a Subcontractor or Sub-processor for the purposes of the Agr"
+    },
+    {
+      "id": "D-5",
+      "evidence": "WO-10 \u00a76.4 Data Protection :: The WO reclassifies free-text notes entered by Lilly personnel as \"Usage Data\" owned/controlled by Supplier and usable for service improveme"
+    },
+    {
+      "id": "D-6",
+      "evidence": "WO-10 \u00a76.4 Data Protection :: The WO reclassifies free-text notes entered by Lilly personnel as \"Usage Data\" owned/controlled by Supplier and usable for service improveme"
+    },
+    {
+      "id": "V-1",
+      "evidence": "WO-10 \u00a71.2, Deliverable D-4 :: The primary execution deliverable is defined by reference to \"Exhibit E (Data Migration Plan),\" which was not included in the document set p"
+    },
+    {
+      "id": "V-2",
+      "evidence": "WO-10 \u00a72.4 Lilly Responsibilities :: If Lilly does not deliver any Section 2 item within 5 business days of request, Supplier may re-baseline the schedule with resulting delay c"
+    },
+    {
+      "id": "V-3",
+      "evidence": "WO-10 \u00a72.4 Lilly Responsibilities :: If Lilly does not deliver any Section 2 item within 5 business days of request, Supplier may re-baseline the schedule with resulting delay c"
+    },
+    {
+      "id": "V-4",
+      "evidence": "WO-10 \u00a713.1 Limitation of Liability :: The WO caps Supplier's aggregate liability at the \"lesser of\" $1,500,000 or fees paid, unilaterally (Supplier only), \"notwithstanding the Ma"
+    },
+    {
+      "id": "V-5",
+      "evidence": "WO-10 Header / Signature Block :: Services commencement date (13 July 2026) precedes the Supplier signature date (1 August 2026) by 19 days, meaning work began before Lilly's"
+    },
+    {
+      "id": "A-1",
+      "evidence": "WO-10 \u00a713.1 Limitation of Liability :: The WO caps Supplier's aggregate liability at the \"lesser of\" $1,500,000 or fees paid, unilaterally (Supplier only), \"notwithstanding the Ma"
+    },
+    {
+      "id": "A-2",
+      "evidence": "WO-10 \u00a710.1 Insurance :: The WO restates Commercial General Liability at $1,000,000 per occurrence, half the MSA's $2,000,000 minimum, and is silent on the other req"
+    },
+    {
+      "id": "A-3",
+      "evidence": "WO-10 \u00a74.3 Fees :: The WO imposes a flat 5% annual rate increase beginning year 2, exceeding the governing 3% CPI-U-indexed cap and not tied to any index."
+    },
+    {
+      "id": "A-4",
+      "evidence": "WO-10 \u00a76.4 Data Protection :: The WO reclassifies free-text notes entered by Lilly personnel as \"Usage Data\" owned/controlled by Supplier and usable for service improveme"
+    },
+    {
+      "id": "A-5",
+      "evidence": "WO-10 \u00a74.1 Fees (Senior Data Engineer) :: Senior Data Engineer is billed at $235.00/hour; the governing rate card caps this role at $210.00/hour and requires a written amendment for "
+    },
+    {
+      "id": "A-6",
+      "evidence": "WO-10 \u00a74.1 Fees (Analytics Consultant) :: Analytics Consultant is billed at $1,400.00 per day; the rate card prices this role at $175.00 per hour and requires a written amendment for"
+    },
+    {
+      "id": "A-7",
+      "evidence": "WO-10 \u00a74.1-4.2 Fees :: The fee table's stated Total ($685,000.00) does not equal Subtotal + Expenses ($644,900.00 + $35,000.00 = $679,900.00, a $5,100 discrepancy)"
+    },
+    {
+      "id": "A-8",
+      "evidence": "WO-10 \u00a74.1-4.2 Fees :: The fee table's stated Total ($685,000.00) does not equal Subtotal + Expenses ($644,900.00 + $35,000.00 = $679,900.00, a $5,100 discrepancy)"
+    },
+    {
+      "id": "S-1",
+      "evidence": "WO-10 \u00a71.2, Deliverable D-4 :: The primary execution deliverable is defined by reference to \"Exhibit E (Data Migration Plan),\" which was not included in the document set p"
+    },
+    {
+      "id": "S-2",
+      "evidence": "SPS \u00a79.2 (obligation) / document set :: SPS \u00a79.2 obligates Supplier to provide its current SOC 2 Type II report annually; no such report is present in the reviewed document set."
+    }
+  ],
+  "extra": [
+    {
+      "topic": "missing BAA for patient support programme data",
+      "severity": "MEDIUM",
+      "where": "WO-10"
+    },
+    {
+      "topic": "missing Clinical Trial Liability insurance",
+      "severity": "MEDIUM",
+      "where": "WO-10"
+    }
+  ],
+  "aggregates": {
+    "hard_stop_count": 6,
+    "protection_score": 0,
+    "protection_score_band": "Critical",
+    "rule12_calculation_table_present": true,
+    "ae_finding_severity": "LOW",
+    "ae_finding_coverage_column": "covered"
+  }
+}

@@ -3020,3 +3020,63 @@ actually failed on.
 - a blank `evidence_source` on a risk row is refused; "Not Determined" is the honest answer
 
 **#36 is complete: all five F9 builds are done.**
+
+---
+
+## ANSWER KEY CORRECTED: the Hard Stop count is 6, not 5
+
+Marc asked which source was right. The evidence settles it against the key:
+
+- `MSA:81` and `SPS:62` both require notification within **72 hours** of becoming aware
+- `WO-10:88` sets **96 hours**
+- `dpa-review-checklist.md:43` sits under a column headed **"Hard Stop If"**, and line 48
+  restates it: *"Hard Stop: Breach notification timeline > 72 hours."*
+- the checklist distinguishes deliberately: section 3 uses "Hard Stop If", section 4 uses
+  "Flag If"
+
+And the decisive point: **the key's own D-1 row cited `dpa-review-checklist.md:43` as its
+basis** while excluding D-1 from the Hard Stop count. It was citing a Hard Stop rule and
+then not counting it.
+
+Applied: `hard_stop_count` 5 -> 6, deduction total -75 -> -90, D-1 listed in `hard_stops`
+as dual-classified, and `_perfect_run` in check_run.py updated to match (the fixture's own
+self-test failed 12/16 until it did, which is the check working).
+
+**The HS-4 negative control had to be reworded.** It previously read that raising HS-4
+"inflates the Hard Stop count to six". Six is now correct, so the control tests WHICH six,
+not how many. A run reaching six via HS-4 is still wrong; via D-1 it is right.
+
+**A second defect in that clause, previously unrecorded.** The MSA triggers at "becoming
+aware"; the WO triggers at "confirming the incident". A supplier can defer confirmation
+indefinitely, so the clock need never start. That may matter more than the 24 extra hours.
+Added to D-1's expected text.
+
+### Re-scoring every recorded run
+
+| run | hard stops | against the corrected key |
+|---|---|---|
+| baseline redline-only | 7 | over by one (P-2 wrongly escalated); D-1 was RIGHT |
+| baseline full-review | 7 | same |
+| POSTFIX (both modes) | 5 | **under by one, caused by my own fix** |
+| RULE9B | 5 | same |
+| FINAL (after the closed-list correction) | **6** | correct |
+
+Worth owning plainly: **my Fix 3 caused the under-count.** It declared Hard Stops to come
+from `playbook.md` alone, so the post-fix runs dutifully demoted a real Hard Stop to HIGH.
+The original runs had D-1 right and P-2 wrong; my fix corrected P-2 and broke D-1. Only
+after the closed-list rule was corrected to name both files did a run get both right.
+
+### The FINAL run, scored under --require-evidence
+
+```
+MAPPING PROVENANCE  claimed 34, with evidence 34, without 0
+hard_stops 6/6   absence_detection 1/1   arithmetic 8/8   vendor_tactics 5/5
+compliance_evidence 1/1   missing_documents 1/1
+HS-4 correctly NOT raised   AE present LOW/covered   score 0 Critical   Rule 12 table present
+VERDICT: FAIL, 2 problems  ->  P-9 not found, D-4 not found
+```
+
+**Two problems, from 15 at baseline.** Both are genuine and both are single findings, not
+mechanisms: P-9 (SLA degraded to 99.0% quarterly) and D-4 (supplier asserting Controller
+status, which this run folded into its Usage Data finding rather than raising separately).
+V-5 is now found, which is what this run was built to verify.
