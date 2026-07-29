@@ -1235,3 +1235,15 @@ small,sub,sup{font-size:9px}
    Decomposition, Risk register. The margin moves to the row. */
 .cs-row2,.cs-paretorow,.cs-screl,.cs-kpirow{margin-bottom:14px}
 .cs-row2:last-child,.cs-paretorow:last-child,.cs-screl:last-child{margin-bottom:0}
+
+
+/* Consolidation scatter legend + kind bars */
+.cs-k-cap::before{background:var(--cs-plum)!important}
+.cs-k-spr::before{background:var(--cs-burnt)!important}
+.cs-k-vol::before{background:var(--cs-teal)!important}
+.cs-k-size::before{background:transparent!important;border:1.5px solid var(--cs-mut2)!important;border-radius:50%!important}
+.cs-ckinds{margin-top:14px;border-top:1px solid var(--cs-line);padding-top:11px}
+.cs-ck-row{display:grid;grid-template-columns:150px minmax(0,1fr) 74px;gap:10px;align-items:center;
+  font-size:11px;color:var(--cs-mut2);margin-bottom:7px}
+.cs-ck-row b{text-align:right;font-size:13px;color:var(--cs-ink);font-variant-numeric:tabular-nums}
+.cs-ck-row .cs-bar{width:100%}

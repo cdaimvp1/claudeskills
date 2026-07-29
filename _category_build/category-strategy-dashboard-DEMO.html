@@ -1973,6 +1973,18 @@ small,sub,sup{font-size:9px}
 .cs-row2,.cs-paretorow,.cs-screl,.cs-kpirow{margin-bottom:14px}
 .cs-row2:last-child,.cs-paretorow:last-child,.cs-screl:last-child{margin-bottom:0}
 
+
+/* Consolidation scatter legend + kind bars */
+.cs-k-cap::before{background:var(--cs-plum)!important}
+.cs-k-spr::before{background:var(--cs-burnt)!important}
+.cs-k-vol::before{background:var(--cs-teal)!important}
+.cs-k-size::before{background:transparent!important;border:1.5px solid var(--cs-mut2)!important;border-radius:50%!important}
+.cs-ckinds{margin-top:14px;border-top:1px solid var(--cs-line);padding-top:11px}
+.cs-ck-row{display:grid;grid-template-columns:150px minmax(0,1fr) 74px;gap:10px;align-items:center;
+  font-size:11px;color:var(--cs-mut2);margin-bottom:7px}
+.cs-ck-row b{text-align:right;font-size:13px;color:var(--cs-ink);font-variant-numeric:tabular-nums}
+.cs-ck-row .cs-bar{width:100%}
+
 </style>
 </head>
 <body>
@@ -2962,7 +2974,7 @@ function csNarrNote(x) {
 var CS_NAV = [
   ['overview', 'Overview',          null],
   ['spend',    'Spend & Suppliers', [['pareto', 'Pareto & Tail'], ['suppliers', 'Suppliers'], ['subcats', 'Subcategories']]],
-  ['trend',    'Trend & Change',    [['trend', 'Trend'], ['rational', 'Rationalization'], ['tail', 'Tail & Contracts']]],
+  ['trend',    'Trend & Change',    [['trend', 'Trend'], ['rational', 'Tail & Rationalization']]],
   ['market',   'Market & Risk',     null],
   ['strategy', 'Strategy & Plays',  [['strategy', 'Strategy'], ['savings', 'Savings & Scorecard']]]
 ];
@@ -3048,6 +3060,13 @@ function scOverview() {
         : csGap('Spend renewing in the next 12 months and the largest decision windows.', 'renewal + notice dates per agreement'),
         { icon: 'cal', role: 'emph', sub: d.renewals ? 'next 12 months' : '', conf: d.renewals ? 'Moderate' : 'Limited' })
     + '</div>';
+
+  /* The exposure half of the old Contract Opportunities panel: renewal timing and
+     contract hygiene, which belong beside Renewal Exposure rather than on a
+     consolidation screen. The consolidation half stayed on Tail & Rationalization. */
+  var xs = csContractOppSplit(d);
+  if (xs.exposure.length) h += csCard('Contract exposure', csContractOpps(xs.exposure),
+      { icon: 'cal', role: 'emph', sub: xs.exposure.length + ' agreements at risk', conf: 'Moderate' });
   return h;
 }
 
@@ -3459,48 +3478,7 @@ function scTrend() {
   return h;
 }
 
-/* ===========================================================================
-   SCREEN 11 — TREND & CHANGE > RATIONALIZATION
-   =========================================================================== */
-function scRational() {
-  var d = csData(), n = d.narr || {};
-  var h = '';
-  var ovl = n.rationalizationOverlap || n.rationalizationReseller || n.rationalizationGap;
 
-  h += csCard('Overlap & Consolidation',
-      d.overlaps ? csOverlaps(d.overlaps) : (ovl ? csNarr(ovl)
-        : csGap('Duplicate or overlapping suppliers and tools.', 'capability tags per supplier')),
-      { icon: 'grid', role: 'solid', sub: d.overlaps ? d.overlaps.length + ' overlapping capabilities' : 'narrative',
-        conf: d.overlaps ? 'Moderate' : 'Limited' });
-
-  h += csCard('Utilization / Shelfware', d.utilization ? csUtilization(d.utilization)
-      : csGap('Licences bought against licences actually used.', 'licence count vs active users'),
-      { icon: 'warn', role: 'emph', sub: d.utilization ? 'licences bought against active' : '', conf: d.utilization ? 'Moderate' : 'Limited' });
-
-  h += csCard('Action Matrix', d.actionMatrix ? csActionMatrix(d.actionMatrix)
-      : csGap('Retain / renegotiate / consolidate / retire / replace, with value, effort and timing.', 'per-supplier action + renewal window'),
-      { icon: 'list', sub: d.actionMatrix ? d.actionMatrix.length + ' suppliers dispositioned' : '',
-        conf: d.actionMatrix ? 'Moderate' : 'Limited' });
-  return h;
-}
-
-/* ===========================================================================
-   SCREEN 12 — TREND & CHANGE > TAIL & CONTRACTS
-   =========================================================================== */
-function scTail() {
-  var d = csData();
-  var h = '';
-  h += csCard('Tail Consolidation Opportunities', d.tailOpps ? csTailOpps(d.tailOpps)
-      : csGap('Groups of tail suppliers that can be consolidated, with the receiving vehicle and the saving.',
-              'tail grouping records (group, vendors, combined spend, target vehicle, estimated saving)'),
-      { icon: 'list', role: 'solid', sub: d.tailOpps ? d.tailOpps.length + ' groups' : '', conf: d.tailOpps ? 'Moderate' : 'Limited' });
-
-  h += csCard('Contract Opportunities', d.contractOpps ? csContractOpps(d.contractOpps)
-      : csGap('Expiring agreements and off-contract spend, with the action and the window.',
-              'agreement records with expiry, notice window and at-risk value'),
-      { icon: 'cal', role: 'emph', sub: d.contractOpps ? d.contractOpps.length + ' at risk' : '', conf: d.contractOpps ? 'Moderate' : 'Limited' });
-  return h;
-}
 
 /* ===========================================================================
    POPULATED PANEL RENDERERS
@@ -5250,6 +5228,248 @@ function csMarketIntelSplit(mk) {
 }
 
 /* ===========================================================================
+   TAIL & RATIONALIZATION — the merged screen (option D)
+
+   Overlap & Consolidation asked "are we buying the same capability twice".
+   Tail Consolidation Opportunities asked "are we buying small things from too
+   many people". Both end in the same move, so they are one screen answering one
+   question: where are we buying the same thing more than once, and what is it
+   worth to stop.
+
+   What did NOT merge, deliberately: Utilization/Shelfware answers a different
+   question (paying for what we do not use) and Action Matrix closes the tab with
+   every supplier dispositioned. Contract Opportunities SPLIT: the one
+   item routing off-contract spend onto agreements that already exist is
+   consolidation and stays here; the four that are renewal timing or contract
+   hygiene are exposure and moved to Overview beside Renewal Exposure.
+   =========================================================================== */
+
+/* Three sources, one shape. Kind is the distinction the two old panels carried:
+   capability = the same thing bought twice, sprawl = small things bought from
+   too many people, volume = same supplier, fewer contracts, better tier. */
+function csConsolidationOpps(d) {
+  var out = [];
+
+  (d.subcats || []).forEach(function (sc) {
+    (sc.opps || []).forEach(function (o) {
+      var from = o.from || 0, to = o.to || 0;
+      out.push({
+        title: o.t, detail: o.d,
+        kind: o.kind === 'volume' ? 'volume' : (from >= 20 ? 'sprawl' : 'capability'),
+        value: o.value == null ? null : o.value,
+        from: from, to: to, removed: Math.max(0, from - to),
+        vehicle: o.vehicle || '', where: sc.n,
+        effort: o.kind === 'volume' ? 'Medium' : (from >= 20 ? 'High' : (from <= 4 ? 'Low' : 'Medium'))
+      });
+    });
+  });
+
+  (d.tailOpps || []).forEach(function (t) {
+    var n = (t.vendors || []).length;
+    out.push({
+      title: t.group, detail: t.action,
+      kind: 'sprawl', value: t.saving == null ? null : t.saving,
+      from: n, to: 1, removed: Math.max(0, n - 1),
+      vehicle: '', where: 'tail', effort: t.effort || 'Medium',
+      combined: t.combined, vendors: t.vendors
+    });
+  });
+
+  /* Capability overlaps carry no saving of their own; they are the evidence
+     behind the capability opportunities above, and drive the coverage map. */
+  return out.sort(function (a, b) { return (b.value || 0) - (a.value || 0); });
+}
+
+var CS_EFFORT_X = { Low: 0.18, Medium: 0.5, High: 0.84 };
+var CS_KIND = {
+  capability: { label: 'Capability', tone: 'var(--plum)', cls: 'p-p' },
+  sprawl:     { label: 'Supplier sprawl', tone: 'var(--emph)', cls: 'p-e' },
+  volume:     { label: 'Volume', tone: 'var(--teal)', cls: 'p-t' }
+};
+
+/* Value against effort. The ranked list says what things are worth; it does not
+   say what to do first. This does, and it exposes something the list hides: the
+   biggest supplier-count reductions tend to be the hardest and least valuable. */
+function csConsolScatter(d) {
+  var ops = csConsolidationOpps(d).filter(function (o) { return o.value != null; });
+  if (!ops.length) return csGap('Where to start: value against effort.', 'opportunity records with a value and an effort');
+  var W = 760, H = 340, PADL = 74, PADR = 30, PADT = 30, PADB = 54;
+  var pw = W - PADL - PADR, ph = H - PADT - PADB;
+  var maxV = ops.reduce(function (a, o) { return Math.max(a, o.value || 0); }, 0) || 1;
+  var maxR = ops.reduce(function (a, o) { return Math.max(a, o.removed || 0); }, 0) || 1;
+
+  var placed = ops.map(function (o) {
+    var cx = PADL + (CS_EFFORT_X[o.effort] != null ? CS_EFFORT_X[o.effort] : 0.5) * pw;
+    var cy = PADT + ph - ((o.value || 0) / maxV) * ph;
+    var r = csBubbleR((o.removed || 0) / maxR);
+    var right = cx < PADL + pw * 0.55;
+    return { o: o, cx: cx, cy: cy, r: r, right: right,
+             lx: right ? cx + r + 13 : cx - r - 13, y: cy + 4 };
+  });
+  csPlaceLabels(placed, 14);
+
+  var dots = placed.map(function (p) {
+    var k = CS_KIND[p.o.kind] || CS_KIND.capability;
+    var leader = (Math.abs(p.y - (p.cy + 4)) > 6)
+      ? '<line x1="' + (p.right ? p.cx + p.r : p.cx - p.r).toFixed(1) + '" y1="' + p.cy.toFixed(1)
+        + '" x2="' + p.lx.toFixed(1) + '" y2="' + (p.y - 4).toFixed(1) + '" class="cs-kdlead"/>' : '';
+    return '<g class="cs-kdot">' + leader
+      + '<circle cx="' + p.cx.toFixed(1) + '" cy="' + p.cy.toFixed(1) + '" r="' + p.r.toFixed(1)
+      + '" fill="' + k.tone + '" opacity=".82"><title>' + csEsc(p.o.title + ' · ' + k.label + ' · '
+      + csUsd(p.o.value) + ' · ' + p.o.effort + ' effort'
+      + (p.o.removed ? ' · ' + csNum(p.o.removed) + ' suppliers removed' : '')) + '</title></circle>'
+      + '<text x="' + p.lx.toFixed(1) + '" y="' + p.y.toFixed(1) + '" class="cs-kdlab"'
+      + (p.right ? '' : ' text-anchor="end"') + '>'
+      + csEsc(String(p.o.title).slice(0, 30)) + ' · ' + csUsd(p.o.value) + '</text></g>';
+  }).join('');
+
+  return '<div class="cs-pwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" class="cs-kplot" role="img" '
+    + 'aria-label="Consolidation value against effort">'
+    + '<line x1="' + (PADL + pw / 2) + '" y1="' + PADT + '" x2="' + (PADL + pw / 2) + '" y2="' + (PADT + ph) + '" class="cs-p80h"/>'
+    + '<line x1="' + PADL + '" y1="' + (PADT + ph / 2) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph / 2) + '" class="cs-p80h"/>'
+    + csQuadLabel(PADL + 4, PADT - 12, 'start', ['Do first', 'high value, low effort'])
+    + csQuadLabel(W - PADR - 2, PADT - 12, 'end', ['Plan properly', 'high value, high effort'])
+    + csQuadLabel(PADL + 4, PADT + ph + 16, 'start', ['Sweep up', 'low value, low effort'])
+    + csQuadLabel(W - PADR - 2, PADT + ph + 16, 'end', ['Leave it', 'low value, high effort'])
+    + '<line x1="' + PADL + '" y1="' + (PADT + ph) + '" x2="' + (W - PADR) + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
+    + '<line x1="' + PADL + '" y1="' + PADT + '" x2="' + PADL + '" y2="' + (PADT + ph) + '" class="cs-pax"/>'
+    + ['Low', 'Medium', 'High'].map(function (e) {
+        return '<text x="' + (PADL + CS_EFFORT_X[e] * pw).toFixed(1) + '" y="' + (PADT + ph + 34)
+          + '" class="cs-pyr" text-anchor="middle">' + e + '</text>';
+      }).join('')
+    + [0, 0.5, 1].map(function (t) {
+        return '<text x="' + (PADL - 8) + '" y="' + (PADT + ph - t * ph + 4).toFixed(1) + '" class="cs-pyl">'
+          + csUsd(maxV * t) + '</text>';
+      }).join('')
+    + '<text x="' + (PADL + pw / 2) + '" y="' + (H - 6) + '" class="cs-axt">Effort to execute</text>'
+    + '<text x="14" y="' + (PADT + ph / 2) + '" class="cs-axt" transform="rotate(-90 14,' + (PADT + ph / 2) + ')">Value</text>'
+    + dots + '</svg></div>'
+    + '<div class="cs-fc-key"><span class="cs-k-cap">Capability</span><span class="cs-k-spr">Supplier sprawl</span>'
+    + '<span class="cs-k-vol">Volume</span><span class="cs-k-size">bubble = suppliers removed</span></div>'
+    + csConsolRead(d, ops);
+}
+
+function csConsolRead(d, ops) {
+  var byKind = { capability: 0, sprawl: 0, volume: 0 };
+  ops.forEach(function (o) { byKind[o.kind] = (byKind[o.kind] || 0) + (o.value || 0); });
+  var hardBig = ops.filter(function (o) { return o.effort === 'High'; })
+    .sort(function (a, b) { return (b.removed || 0) - (a.removed || 0); })[0];
+  if (!hardBig) return '';
+  return '<div class="cs-read"><div class="cs-read-d">'
+    + 'The money is in <b>capability overlap</b> (' + csUsd(byKind.capability) + '), the effort is in '
+    + '<b>supplier sprawl</b> (' + csUsd(byKind.sprawl) + '). '
+    + 'The largest supplier-count reduction on the board, <b>' + csEsc(hardBig.title) + '</b> at '
+    + csNum(hardBig.removed) + ' suppliers, is also high effort and worth only ' + csUsd(hardBig.value)
+    + '. A ranked list hides that; the quadrant does not. Start top-left.'
+    + '</div></div>';
+}
+
+/* The same set as a table, because the scatter says what first and the table
+   says what exactly. */
+function csConsolList(d) {
+  var ops = csConsolidationOpps(d);
+  if (!ops.length) return csGap('Consolidation opportunities.', 'per-subcategory opportunity records and tail groupings');
+  var rows = ops.map(function (o) {
+    var k = CS_KIND[o.kind] || CS_KIND.capability;
+    return '<tr><td class="cs-l"><b>' + csEsc(o.title) + '</b>'
+      + (o.where && o.where !== 'tail' ? '<span class="cs-sub2">' + csEsc(o.where) + '</span>' : '')
+      + '</td>'
+      + '<td class="cs-num"><span class="cs-pill cs-pill-' + (o.kind === 'sprawl' ? 'burnt' : o.kind === 'volume' ? 'teal' : 'plum')
+      + '">' + k.label + '</span></td>'
+      + '<td class="cs-num">' + (o.from ? csNum(o.from) + ' &rarr; ' + csNum(o.to) : 'same') + '</td>'
+      + '<td class="cs-num">' + (o.value == null ? 'not sized' : csUsd(o.value)) + '</td>'
+      + '<td class="cs-num">' + csEsc(o.effort) + '</td>'
+      + '<td class="cs-why">' + csEsc(o.detail || '') + (o.vehicle ? ' <b>' + csEsc(o.vehicle) + '</b>' : '') + '</td></tr>';
+  });
+  return csTable(['Opportunity', 'Kind', 'Suppliers', 'Value', 'Effort', 'What to do'], rows);
+}
+
+function csConsolTotals(d) {
+  var ops = csConsolidationOpps(d);
+  var tot = ops.reduce(function (a, o) { return a + (o.value || 0); }, 0);
+  var low = ops.filter(function (o) { return o.effort === 'Low'; })
+    .reduce(function (a, o) { return a + (o.value || 0); }, 0);
+  var byKind = { capability: 0, sprawl: 0, volume: 0 };
+  ops.forEach(function (o) { byKind[o.kind] += (o.value || 0); });
+  var max = Math.max(byKind.capability, byKind.sprawl, byKind.volume) || 1;
+  var bar = function (k, label, tone) {
+    return '<div class="cs-ck-row"><span>' + label + '</span>'
+      + '<span class="cs-bar cs-bar-' + tone + '" style="width:100%"><i style="width:'
+      + ((byKind[k] / max) * 100).toFixed(0) + '%"></i></span>'
+      + '<b>' + csUsd(byKind[k]) + '</b></div>';
+  };
+  return '<div class="cs-split2">'
+    + '<div class="cs-stat"><div class="cs-stat-v">' + csUsd(tot) + '</div>'
+      + '<div class="cs-stat-l">identified</div>'
+      + '<div class="cs-stat-s">' + ops.length + ' opportunities</div></div>'
+    + '<div class="cs-stat"><div class="cs-stat-v">' + csUsd(low) + '</div>'
+      + '<div class="cs-stat-l">low effort</div>'
+      + '<div class="cs-stat-s">start here</div></div>'
+    + '</div>'
+    + '<div class="cs-ckinds"><div class="cs-lab2">By kind</div>'
+    + bar('capability', 'Capability overlap', 'plum')
+    + bar('sprawl', 'Supplier sprawl', 'emph')
+    + bar('volume', 'Volume consolidation', 'teal') + '</div>';
+}
+
+/* ---- the merged screen ---- */
+function scTailRational() {
+  var d = csData(), n = d.narr || {};
+  var h = '';
+
+  h += '<div class="cs-row2">'
+    + csCard('Where to start', csConsolScatter(d),
+        { icon: 'target', role: 'solid', sub: 'value against effort', conf: csConfFor(d, 'savings') })
+    + csCard('What it is worth', csConsolTotals(d),
+        { icon: 'money', role: 'teal', sub: 'by kind', conf: csConfFor(d, 'savings') })
+    + '</div>';
+
+  h += csCard('Consolidation opportunities', csConsolList(d)
+      + csNote('<b>Capability</b> is the same thing bought twice. <b>Supplier sprawl</b> is small things '
+        + 'bought from too many people. <b>Volume</b> is the same supplier on fewer contracts at a better '
+        + 'tier. The first two were separate panels until they were merged; they always ended in the '
+        + 'same move.'),
+      { icon: 'list', sub: 'ranked by value', conf: csConfFor(d, 'savings') });
+
+  if (d.overlaps) h += csCard('Capability coverage', csOverlaps(d.overlaps),
+      { icon: 'grid', sub: d.overlaps.length + ' capabilities served more than once', conf: 'Moderate' });
+
+  h += '<div class="cs-row2">'
+    + csCard('Utilization / shelfware', d.utilization ? csUtilization(d.utilization)
+        : csGap('Licences bought against licences actually used.', 'licence count vs active users'),
+        { icon: 'warn', role: 'emph', sub: 'a different question: paying for what we do not use',
+          conf: d.utilization ? 'Moderate' : 'Limited' })
+    + csCard('Action matrix', d.actionMatrix ? csActionMatrix(d.actionMatrix)
+        : csGap('Retain / renegotiate / consolidate / retire / replace, with value, effort and timing.', 'per-supplier action + renewal window'),
+        { icon: 'list', sub: d.actionMatrix ? d.actionMatrix.length + ' suppliers dispositioned' : '',
+          conf: d.actionMatrix ? 'Moderate' : 'Limited' })
+    + '</div>';
+
+  var split = csContractOppSplit(d);
+  if (split.consol.length) {
+    h += csCard('Off-contract spend to route', csContractOpps(split.consol)
+        + csNote('These are consolidation: spend moving onto agreements that already exist. Renewal '
+          + 'timing and contract hygiene are exposure rather than consolidation, so they sit on '
+          + 'Overview beside Renewal Exposure.'),
+        { icon: 'cal', sub: split.consol.length + ' to route onto existing vehicles', conf: 'Moderate' });
+  }
+  return h;
+}
+
+/* Marc: contract opportunities can stay here IF they are consolidation. Read
+   against the data, only one of the five is: routing off-contract spend onto
+   agreements that already exist. The other four are renewal timing and contract
+   hygiene, which are exposure, not consolidation, so they go to Overview beside
+   Renewal Exposure. Splitting beats moving all five in either direction. */
+function csContractOppSplit(d) {
+  var all = d.contractOpps || [];
+  var isConsol = function (o) {
+    return /catalogue|existing master|existing MSA|preferred-supplier|route through/i.test(o.action || '');
+  };
+  return { consol: all.filter(isConsol), exposure: all.filter(function (o) { return !isConsol(o); }) };
+}
+
+/* ===========================================================================
    render loop
    =========================================================================== */
 function csBody() {
@@ -5257,7 +5477,7 @@ function csBody() {
   if (CS_TAB === 'spend')    return sub === 'suppliers' ? scSuppliers() : sub === 'subcats' ? scSubcats() : scPareto();
   if (CS_TAB === 'market')   return scMarket();
   if (CS_TAB === 'strategy') return sub === 'savings' ? scSavings() : scStrategy();
-  if (CS_TAB === 'trend')    return sub === 'rational' ? scRational() : sub === 'tail' ? scTail() : scTrend();
+  if (CS_TAB === 'trend')    return sub === 'rational' ? scTailRational() : scTrend();
   return scOverview();
 }
 function csRender() {
