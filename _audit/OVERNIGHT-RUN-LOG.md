@@ -830,3 +830,43 @@ failure rather than a gap, and that the skill keeps every standalone deliverable
 produces (never-regress).
 
 **No code changed. Malicious-code review: not applicable by scope, prose only.**
+
+### O18 DONE, 2026-07-29. E1 case-handoff-schema. The drift went BOTH ways.
+
+**The handoff's characterization was wrong, and acting on it would have destroyed
+content.** It said "rfp-case-manager's copy is correct and calls rfp-engine's superseded.
+Fix rfp-engine's to match." Diffing the two JSON blocks first showed the drift was
+bidirectional:
+
+```
+rfp-engine AHEAD:        artifact type enum carries "Addendum | QA_Log"; mirror lacked both
+rfp-case-manager AHEAD:  delivery_method carries the message_compose graceful-degradation
+                         wording; source had the older "not a file artifact" phrasing
+mirror's NOTE stale:     it asserts rfp-engine "still describes legacy provisioning actions
+                         on receipt". rfp-engine's file already states the no-provisioning
+                         behaviour, so the note described a defect that had been fixed
+```
+
+Copying case-manager over rfp-engine, as instructed, would have silently dropped
+`Addendum` and `QA_Log` from the artifact enum.
+
+**Source of truth named: `rfp-engine-1c344a/references/case-handoff-schema.md`.** rfp-engine
+PRODUCES the payload and rfp-case-manager CONSUMES it, so the producer owns the schema.
+That is the general rule worth carrying into E2, not a coin toss.
+
+**Verification, actual output:**
+```
+post-fix schema diff: IDENTICAL, 0 differences
+Addendum/QA_Log present in mirror: True
+degradation wording present in source: True
+stale 'still describes legacy provisioning' claim removed: True
+```
+
+The source now carries a do-not-hand-edit header stating the mirror relationship, what a
+schema change requires (edit source, re-copy mirror, same commit, say so in the message),
+and a dated record of the reconciliation. The mirror says plainly that it is a copy and not
+a second authority.
+
+Kept deliberately: the v2.0 no-provisioning behaviour in the mirror. That is rfp-case-
+manager's OWN decision about what it does on receipt, not a property of the schema, so it
+belongs there. Reworded to note the source agrees rather than to claim it disagrees.
