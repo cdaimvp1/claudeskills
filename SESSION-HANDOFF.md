@@ -1,5 +1,10 @@
 # Session handoff — read this first on resume
 
+> **VERSION LOCKED 2026-07-29.** Read `VERSION-LOCK-2026-07-29.md` first: it
+> records what is locked, the decisions that must not be quietly reversed, the
+> four known gaps, and the seven traps. This file is the working detail beneath it.
+
+
 Written 2026-07-28. Everything below is verified state, not intention. If the
 context compacted, start here.
 
