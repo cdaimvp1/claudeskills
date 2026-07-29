@@ -31,7 +31,8 @@ Everything else is fair game.
 
 ## Tier 1: do first, highest value
 
-**O1. Coverage matrix output-mode re-audit.** The merge is DONE (`2720f66`),
+**O1. Coverage matrix output-mode re-audit. DONE** (`2720f66`, `19afc3f`, plus the Part 3
+sweep). All three parts complete. Left here for the record. The merge is DONE (`2720f66`),
 `_audit/F1-COVERAGE-MATRIX.md` exists. Three things remain, and O1 is not complete
 until all three are:
 

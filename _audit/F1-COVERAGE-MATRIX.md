@@ -47,11 +47,16 @@ slip. Two readings, and they have very different consequences:
    or `ai-standard.md` with **no row at all**, which is precisely the silent drop this
    matrix exists to prevent.
 
-**This must be resolved during the O1 re-audit**, which touches every row anyway. The
-check is a coverage sweep of Part 3's six source files: walk each file section by
-section and confirm every substantive item has a row. Until that is done, Part 3's
-coverage is UNKNOWN, not complete. Parts 1 and 2 are believed complete on the same
-test but should get the same sweep while the re-audit is open.
+**RESOLVED. See the "Part 3 coverage sweep" section below.** Both readings were right.
+The 135 was a stale estimate never reconciled against the rows actually written, AND the
+sweep found genuinely uncovered content: `dashboard-canonical.md:124-223`, Panels 2 and
+3, 100 lines that Part 3 never walked. Most of that survives via `pass-artifacts.md:64`,
+but **four items have no surviving home anywhere in the skill** and are a fourth rescue
+candidate Marc has not yet seen.
+
+Part 3's coverage is now KNOWN. Parts 1 and 2 have not had the same sweep; they are
+believed complete because their citation coverage is materially denser, but that is a
+belief, not a measurement.
 
 Destination split across the whole matrix: deterministic Stage 0 location and extraction
 feeding a pass; Stage 1 candidates that propose but never decide; pass judgment
@@ -483,6 +488,115 @@ once the default mode is the only one many users ever see.
 - Row-count reconciliation: DONE, 307 not 342.
 - **Part 3 coverage sweep: STILL OWED.** Part 3's 37-row gap is not settled, so its
   coverage remains UNKNOWN and this matrix is still not a passed gate.
+
+---
+
+# Part 3 coverage sweep (O1, 2026-07-29)
+
+Settles the 37-row gap. Part 3 reported 135 rows and delivered 98.
+
+**Method.** Extracted every `file:line` citation in Part 3, built the covered line set per
+source file, and inspected every uncited span of 5 lines or more against the source.
+
+**Citation coverage by file:**
+
+| File | Lines cited | Uncited spans of 5+ lines |
+|---|---|---|
+| `review-summary-design.md` | 118/165, 71% | 1-6, 8-14, 33-37, 83-87 |
+| `pass-artifacts.md` | 99/123, 80% | 1-14 |
+| `sme-matrix.md` | 119/139, 85% | none |
+| `lilly-templates.md` | 147/164, 89% | 84-90 |
+| `ai-standard.md` | 190/207, 91% | 1-8 |
+| **`dashboard-canonical.md`** | **217/353, 61%** | 76-82, 85-95, 97-103, 105-109, 113-118, **124-223** |
+
+## Verdict: both readings were right
+
+The stale-estimate reading was right (Part 3 wrote 98 rows and reported a number it never
+reconciled) **and** the never-written reading was right. The sweep found genuinely
+uncovered content, and it is concentrated in exactly one span.
+
+**`dashboard-canonical.md:124-223` is Panels 2 and 3, Legal Negotiation and Commercial
+Analysis, 100 lines, and Part 3 never walked them.** Part A covered the layout shell,
+Panel 1's sub-tabs, the anti-patterns and the Deal-tab contribution section. Panels 2 and
+3 were skipped entirely.
+
+Most of that content does survive, which is why this is a gap and not a disaster:
+`pass-artifacts.md:64` already requires "pricing decomposition, per-unit economics,
+discount architecture, value at risk, assumptions register, benchmark data with sources
+and confidence" as Pass 3 output, `:73` and `:119` gate on it, `:90` carries historical
+acceptance rate, and `review-summary-design.md` Section 06 carries negotiation strategy
+and BATNA. Part 3 simply never connected Panels 2 and 3 to those homes.
+
+## Four items with NO surviving home anywhere in the skill
+
+Verified by grepping every reference file and `SKILL.md`. Each appears in
+`dashboard-canonical.md` and nowhere else.
+
+| Source | What it is | Status |
+|---|---|---|
+| `dashboard-canonical.md:132` | **Compliance Leverage** KPI on the Panel 2 Strategy sub-tab | No home. Not in any reference file or SKILL.md |
+| `dashboard-canonical.md:132` | **Difficulty** KPI on the same row | No home in this skill. The concept exists in `negotiation-playbook-learning` but nothing in contract-review carries it |
+| `dashboard-canonical.md:204` | **Governance carry-forward recommendations** (Renewal Strategy) | No home |
+| `dashboard-canonical.md:205` | **Volume optimization opportunities** (Renewal Strategy) | No home |
+
+`dashboard-canonical.md:183` cost waterfall chart is presentation only and correctly
+retires with the dashboard. `:198-200` Discount Architecture survives via
+`pass-artifacts.md:64`. `:202-203` renewal pricing protection survives via
+`commercial-analysis.md:51-57`.
+
+**These four are a fourth rescue candidate and are NOT decided.** Marc decided obligations
+and the Compliance Evidence Checklist. He has not seen these, because Part 3 never
+surfaced them. They are lower stakes than the first three: two are dashboard KPI tiles
+whose underlying data may be reconstructible, and two are renewal-strategy
+recommendations. But "lower stakes" is a judgment for Marc, and the same test applies:
+does this change whether the contract should be signed, or how it should be negotiated.
+Governance carry-forward and volume optimization are negotiation recommendations, which
+argues they matter on any run that produces negotiation output.
+
+## Two minor presentation gaps, no action needed
+
+- `review-summary-design.md:7` fixes the output filename convention
+  (`[Supplier]_Review_Summary_v[N].docx`). Not rowed. Generator template detail.
+- `review-summary-design.md:33-37` section-number-badge layout technique. Not rowed,
+  but covered in substance by Part 3's rows on the palette, typography and formatting
+  rules all becoming generator template constants.
+
+The other uncited spans (`pass-artifacts.md:1-14`, `ai-standard.md:1-8`,
+`review-summary-design.md:1-6`) are titles and rationale framing, already covered by
+Part 3's row on `pass-artifacts.md:15-19`. No loss.
+
+## Cross-cutting catch: the insurance threshold check needs to know which paper governs
+
+Not a coverage gap, but the sweep surfaced it and it affects the shared-implementation
+list above.
+
+`lilly-templates.md:90` records that the **US PO Terms & Conditions carry materially
+different thresholds from the MSA templates: $25M cyber insurance versus $5M or more in
+MSAs, and a 15-day cure period versus 30 days.**
+
+The shared-implementation list names two insurance threshold sources, `playbook.md:152-160`
+and `pharma-requirements.md:114-127`, and says the higher applicable minimum governs.
+**There is a third**, and it is nearly an order of magnitude higher on cyber. A single
+shared insurance check that is not aware of which paper governs will validate a PO-governed
+contract against a $5M floor when the real floor is $25M, and pass it.
+
+Same applies to the cure-period threshold in `playbook.md:170-178`, which assumes the MSA's
+30 days.
+
+**Correction required:** the shared threshold checks take the governing template as an
+input. Stage 1 already identifies the template (`lilly-templates.md:37-83`, Part 3 Part E),
+so the input is available. This is cheap to get right now and expensive to discover later,
+because the failure mode is a silent pass.
+
+## O1 status
+
+All three parts of O1 are now done. Part 3's coverage is **KNOWN**, not UNKNOWN: 98 rows,
+four named items with no surviving home, two minor presentation gaps, one cross-cutting
+threshold catch.
+
+**This matrix is still not a passed gate**, because the four rescue candidates above are
+undecided and the five at-risk clusters from the output-mode audit are unapplied. It is
+now an accurate map of what is owed, which it was not this morning.
 # Part 1: mechanical and structural group
 
 *Verbatim from `F1-COVERAGE-MATRIX-PART1-mechanical.md`. 119 rows (its own summary says 118).*

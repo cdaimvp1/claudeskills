@@ -46,7 +46,7 @@ Update this table as you go. It is the fastest way to resume.
 
 | Item | Status | Commit | Notes |
 |---|---|---|---|
-| O1 coverage matrix output-mode re-audit | PART DONE | `2720f66` | merge done, 307 rows not 342. Output-mode column + Part 3 coverage sweep still owed |
+| O1 coverage matrix output-mode re-audit | **DONE** | `2720f66` `19afc3f` +sweep | 307 rows. 5 at-risk clusters. Part 3 sweep found 4 items with no home = 4th rescue candidate, undecided |
 | O2 build `deduction_score()` | NOT STARTED | | kernel skill only, do NOT wire |
 | O3 C3 Bid Leveling kernel | NOT STARTED | | gates an audited ranking |
 | O4 C2 playbook-learning Difficulty Score | NOT STARTED | | proven bug in its own changelog |
@@ -147,3 +147,59 @@ HELD skill and is NOT SAFE autonomously.
 
 **O1 remaining:** the Part 3 coverage sweep. Part 3's 37-row gap is unsettled, so its
 coverage is UNKNOWN and this matrix is still not a passed gate.
+
+### O1 Part 3 coverage sweep DONE, 2026-07-29. O1 COMPLETE.
+
+Settled the 37-row gap. Method: extracted every `file:line` citation in Part 3, built the
+covered line set per source file, inspected every uncited span of 5+ lines against source.
+
+```
+review-summary-design.md  118/165  71%   gaps 1-6, 8-14, 33-37, 83-87
+pass-artifacts.md          99/123  80%   gaps 1-14
+sme-matrix.md             119/139  85%   none
+lilly-templates.md        147/164  89%   gaps 84-90
+ai-standard.md            190/207  91%   gaps 1-8
+dashboard-canonical.md    217/353  61%   gaps ... 124-223  <-- the material one
+```
+
+**Verdict: BOTH readings were right.** The 135 was a stale estimate, AND real content was
+uncovered. `dashboard-canonical.md:124-223` is Panels 2 and 3 (Legal Negotiation,
+Commercial Analysis), 100 lines, never walked by Part 3.
+
+Most survives: `pass-artifacts.md:64` already requires pricing decomposition, per-unit
+economics, discount architecture, value at risk, assumptions register and benchmarks as
+Pass 3 output, with gates at `:73` and `:119`; `:90` carries acceptance rate;
+`review-summary-design.md` Section 06 carries negotiation strategy and BATNA.
+
+**FOUR items have no surviving home. Verified by grep across every reference file and
+SKILL.md; each appears in dashboard-canonical.md and nowhere else:**
+- `:132` Compliance Leverage KPI
+- `:132` Difficulty KPI (concept exists in negotiation-playbook-learning, not in this skill)
+- `:204` Governance carry-forward recommendations
+- `:205` Volume optimization opportunities
+
+`:183` cost waterfall is presentation only, correctly retires. `:198-200` Discount
+Architecture survives via pass-artifacts.md:64. `:202-203` renewal pricing protection
+survives via commercial-analysis.md:51-57.
+
+**This is a FOURTH RESCUE CANDIDATE and it is NOT DECIDED.** Marc decided obligations and
+the Compliance Evidence Checklist. He has not seen these four because Part 3 never
+surfaced them. Two are negotiation recommendations, which argues they matter on any run
+producing negotiation output. Decision is his, not mine. NOT actioned.
+
+**Cross-cutting catch, worth more than the gap that found it.** `lilly-templates.md:90`:
+the US PO Terms & Conditions carry **$25M cyber insurance versus $5M+ in MSAs**, and a
+15-day cure versus 30-day. The shared-implementation list named only two insurance
+threshold sources (playbook.md:152-160, pharma-requirements.md:114-127). There is a
+third, nearly an order of magnitude higher. A shared insurance check that does not know
+which paper governs will validate a PO-governed contract against a $5M floor and PASS it.
+Failure mode is a silent pass. Same applies to the cure-period threshold. Stage 1 already
+identifies the template, so the input is available. Recorded as a required correction.
+
+**What I deliberately did not do:** did not action the four rescue candidates, did not
+touch any skill file, wrote only to `_audit/`. Re-verified after both splices that the
+merge remains lossless: missing=0 for all three part files.
+
+**O1 is COMPLETE.** The matrix is still NOT a passed gate: four rescue candidates
+undecided, five at-risk clusters unapplied, both blocked on a HELD skill. It is now an
+accurate map of what is owed, which it was not this morning.
