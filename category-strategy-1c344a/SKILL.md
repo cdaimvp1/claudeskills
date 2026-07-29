@@ -2185,6 +2185,64 @@ Alongside the dashboard, write a small JSON sidecar so downstream skills (rfp-en
 
 Reconciliation assertion: a cloner MUST verify `total_spend_3yr` equals the sum of the annual series, each supplier and subcategory `tot` equals s3+s4+s5, and `savings_pipeline` low/high are real ranges (never a single fabricated point). Set `numbers_reconcile` to true only after these checks pass; otherwise set it false and label the affected figures NEEDS_INPUT.
 
+### Field ownership and consumer contract
+
+> **SOURCE OF TRUTH. This section, not the example above, is the contract.**
+>
+> The JSON above is an ILLUSTRATIVE INSTANCE. Its values are example data. A consumer that
+> reads it as a schema will hardcode `"commodity": "999"` and a `v10.6.6` suite stamp. This
+> table is what a consumer may rely on.
+>
+> **This skill is the sole producer of every field below.** No consumer writes back into the
+> sidecar. Where a consumer needs a field this table does not list, extend this table rather
+> than adding an undeclared key, because an undeclared key is indistinguishable from a typo
+> to everyone downstream.
+
+| Field | Stability | Read by |
+|---|---|---|
+| `suite`, `skill`, `as_of` | **STABLE** | provenance stamp, all consumers |
+| `category{commodity,name,mode}` | **STABLE** | rfp-engine, market-rate-benchmarking, supplier-deep-dive |
+| `totals{}` | **STABLE** | market-rate-benchmarking (scoping), supplier-deep-dive |
+| `concentration{top1,top5,top10,hhi}` | **STABLE** | all three. Computed by `hhi()` and `pareto_segments()` in the vendored kernel, never by hand |
+| `kraljic{quadrant,supply_risk,profit_impact}` | **STABLE** | supplier-deep-dive (dossier scoping) |
+| `recommended_strategy` | **STABLE** | **rfp-engine**, which carries it into Section 1.1 Background per its `SKILL.md:195` |
+| `savings_pipeline[]` | **STABLE** | rfp-engine (sizing), supplier-deep-dive (vendor selection) |
+| `scorecard_kpis[]` | ADVISORY | no declared consumer today |
+| `research_log_ref` | ADVISORY | pointer only, not a citation. See the Research log section |
+| `numbers_reconcile` | **STABLE, and a gate** | every consumer MUST check it. `false` means the figures did not reconcile and are labelled NEEDS_INPUT; a consumer that reads the numbers anyway is consuming figures this skill has already declared untrustworthy |
+
+**STABLE** means a consumer may depend on the key existing with that shape. ADVISORY means
+it may change or disappear; do not build on it.
+
+### Known gap: rfp-engine expects a shortlist this sidecar does not carry
+
+`rfp-engine-1c344a/SKILL.md:195` says it consumes, from this skill, "the recommended
+sourcing approach **and any named supplier shortlist**", carrying the latter "into the
+supplier invitation list at Step 3 for user confirmation".
+
+**There is no shortlist field in this sidecar.** The closest is `savings_pipeline[].vendor`,
+which is a savings-opportunity list and is not the same thing: a vendor can appear there for
+a renewal renegotiation without being a candidate to invite to an event.
+
+So rfp-engine either re-parses the dashboard, which is exactly what the sidecar exists to
+prevent, or the shortlist is passed by hand. Recorded here rather than silently patched: a
+`shortlist[]` field is a real design addition with a consumer waiting for it, and it should
+be added deliberately with its own definition of what qualifies a supplier for it.
+
+### Relationship direction, which the framing above understates
+
+The one-line description calls this sidecar a feed to "downstream skills". Two of the three
+named consumers also flow **into** this skill:
+
+- `market-rate-benchmarking-1c344a/SKILL.md:706` has a section "**To `category-strategy`**"
+  and its Portfolio Rationalization tab is meant to be embeddable here.
+- `supplier-deep-dive-1c344a/SKILL.md:347` adds a supplier of interest **into** the category
+  dashboard.
+
+Those inbound flows are NOT part of this sidecar and do not write to it. They are separate
+handoffs. The distinction matters because "downstream" implies a one-way pipeline, and
+treating an inbound flow as if it could edit the sidecar would give it two producers.
+
 ---
 
 ## Research log (enhancement, additive)

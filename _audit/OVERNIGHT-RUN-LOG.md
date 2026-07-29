@@ -1523,3 +1523,47 @@ paths the H5 resolver was reporting are gone; smoke test still 0 failed assertio
 
 **Scope checked:** no other skill has this defect. A sweep comparing every skill's declared
 `name:` against the install paths in its own SKILL.md returns this one only.
+
+### Task #9 DONE, 2026-07-29. E5 category-strategy sidecar ownership table.
+
+**Assessed the stated `Depends on: B1` and judged it does NOT apply.** Stating that openly
+rather than either ignoring the dependency or skipping the item.
+
+B1 retires category-strategy's reference-JSX spec. This sidecar carries ANALYSIS DATA
+(concentration, kraljic, savings pipeline), not dashboard structure. Retiring a JSX spec
+does not change what data the sidecar holds, and the disputed tab count (B2) does not
+either. If B1 lands later, nothing authored here needs rework. Reversible if Marc disagrees:
+it is one added section.
+
+**What the gap actually was.** The plan says the sidecar has "no named fields". It does have
+a JSON example with 12 keys. The real gap is that **an example is not a contract**: a
+consumer reading it as a schema hardcodes `"commodity": "999"` and a `v10.6.6` stamp.
+Authored a field-ownership table declaring, per field, whether it is STABLE (a consumer may
+depend on it) or ADVISORY (may change, do not build on it), and which of the three named
+consumers reads it. Verified mechanically: all 12 illustrative keys are covered.
+
+**`numbers_reconcile` is called out as STABLE AND A GATE.** A consumer that reads the
+figures while it is `false` is consuming numbers this skill has already declared
+untrustworthy and labelled NEEDS_INPUT.
+
+**REAL FINDING: rfp-engine expects a shortlist this sidecar does not carry.**
+`rfp-engine-1c344a/SKILL.md:195` consumes from this skill "the recommended sourcing approach
+**and any named supplier shortlist**", carrying the shortlist "into the supplier invitation
+list at Step 3". **There is no shortlist field.** The nearest is
+`savings_pipeline[].vendor`, which is not the same thing: a vendor can appear there for a
+renewal renegotiation without being a candidate to invite to an event.
+
+So rfp-engine either re-parses the dashboard, which is exactly what the sidecar exists to
+prevent, or the shortlist moves by hand. **Recorded, not silently patched.** A `shortlist[]`
+field is a real design addition with a consumer already waiting for it, and it needs its own
+definition of what qualifies a supplier, which is Marc's call rather than mine.
+
+**Also corrected the framing.** The sidecar is described as feeding "downstream skills", but
+two of the three named consumers also flow INTO this skill
+(`market-rate-benchmarking:706` has a "To category-strategy" section;
+`supplier-deep-dive:347` adds a supplier of interest into the category dashboard). Those are
+separate handoffs that do NOT write to the sidecar. The distinction matters because treating
+an inbound flow as able to edit the sidecar would give it two producers, which is the defect
+E1 and E2 exist to prevent.
+
+Smoke test on the skill after the change: 0 failed assertions.
