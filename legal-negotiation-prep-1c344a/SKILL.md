@@ -401,6 +401,38 @@ If any applicable box is unchecked, STOP. Complete before proceeding.
 
 ### Phase 5: Output Generation
 
+**Build the SKELETON with code, write the ARGUMENT yourself.**
+
+```bash
+python briefing_skeleton_generator.py <positions.json> <out.docx>
+python briefing_skeleton_selftest.py                    # 33 assertions
+```
+
+The generator emits the briefing with every heading, table and count already correct, and
+clearly marked `[PROSE: ...]` placeholders where the argument goes. It never writes the
+argument: that is this skill's whole value, and a generator authoring negotiation rationale
+would produce worse output than you will. Same split `executive-summary-package` uses.
+
+| built by code | written by you |
+|---|---|
+| Position Map and MSA Coverage table | Executive Summary |
+| tier tables, per-tier counts, totals | Leverage Map |
+| the not-tiered list and WHY each is missing | Fallback Sequencing |
+| BINDING markers | Predicted Supplier Pushback |
+
+**It refuses to soften a BINDING tier.** `tier_kernel` marks any deterministically decided
+result (source `playbook` or `msa`) as binding, and its own trace says such a result can
+never be softened regardless of any other input. If the incoming position claims a different
+tier than the kernel assigned, the generator raises rather than rendering it. A briefing
+that shows a Lilly non-negotiable as tradeable hands the negotiator a position Lilly never
+agreed to hold, which is worse than no briefing.
+
+**A position the kernel could not decide is REVIEW, never a guessed tier.** It appears in a
+"Not tiered: inputs missing" section naming the missing inputs. An invented tier is a
+negotiating instruction nobody authorised.
+
+
+
 Produce the briefing document using the `docx` skill. See the Negotiation Briefing Document Design Specification (inlined below) for the full design specification - color palette, typography, layout techniques, section structure, and anti-patterns. The briefing must match the magazine-quality visual standard used across the RFx pipeline reports. Use the Negotiation Briefing Template (inlined below) for content structure and field definitions; use the design spec for visual rendering. If the `docx` skill or code execution is unavailable (for example, inside Word), produce the in-document equivalent with the same sections, styled headings, designed tables, and position cards rendered in the document's native styling.
 
 Every run renders the Position Map & MSA Coverage panel on page 1, between the Executive Summary and Section 01 (see "Position Map & MSA Coverage Panel" in both inlined reference files below), built from the Phase 2 tier classification (left side) and the Phase 1A protective-provision records (right side). This is a fixed, always-rendered part of the page-1 skeleton, not an optional add-on: when a governing MSA was not read this session, render its labeled fallback state rather than omitting it.

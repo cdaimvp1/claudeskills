@@ -1070,9 +1070,13 @@ governed rate is 150. A price can be internally correct and still wrong.
 the rate card states per hour is a finding even where the money happens to match, because
 the next invoice will not.
 
-State the count: how many priced rows exist, and how many you verified. Those two numbers
-must match, and a reader who cannot see them cannot tell a clean table from an unchecked
-one.
+State THREE numbers, because two of them are routinely confused: how many priced rows
+exist, how many you CHECKED, and how many PASSED. Checked must equal exists. Passed is
+whatever it is.
+
+Do not report passed as though it were checked. "2 of 6 verified" reads as four rows
+skipped when it may mean four rows checked and found wrong, which is the opposite of a gap
+in the review.
 
 **Computation requirement (HARD RULE, no model arithmetic).** The checks in `references/arithmetic-verification.md` state WHAT to verify; the arithmetic itself MUST be executed by the vendored `numeric_kernel.py`, never produced by model math. Line-item math (rate x hours = line total, 3E-1 #1) MUST be checked by calling `verify_line_math(rate, hours, stated_total)`. Escalation checks (compounding vs simple, and each escalated rate verified against the contractual cap, 3E-2) MUST be computed by calling `escalate(base, rate, year, compounding)` and comparing the returned value to the supplier's stated rate. Report exactly what these functions return; any discrepancy they surface is a finding. This does not change the substance of the checklist above, only how its numbers are computed. The kernel is vendored in this skill's own directory (`lilly-contract-review-1c344a/numeric_kernel.py`), copied verbatim from `lilly-procurement-kernels-1c344a/numeric_kernel.py`.
 
@@ -1082,7 +1086,25 @@ one.
 
 Hard Stops are non-negotiable. If any Hard Stop is triggered, flag it prominently. See `references/playbook.md` § Hard Stops for the complete list.
 
-**The Hard Stop list is CLOSED (HARD RULE).** A finding is a Hard Stop if and only if it matches an entry in `references/playbook.md` § Hard Stops. Severity is decided by WHICH RULE the finding violates, never by how serious the finding feels. A genuinely alarming provision that is not on that list is HIGH, not a Hard Stop.
+**The Hard Stop list is CLOSED, and it spans MORE THAN ONE reference file (HARD RULE).**
+A finding is a Hard Stop if and only if it matches an entry in one of:
+
+| source | covers |
+|---|---|
+| `references/playbook.md` § Hard Stops | the commercial and legal non-negotiables |
+| `references/dpa-review-checklist.md` | the data-protection Hard Stops, e.g. "Breach notification timeline > 72 hours" at line 48 |
+
+Severity is decided by WHICH RULE the finding violates, never by how serious the finding
+feels. A genuinely alarming provision matching no entry in either file is HIGH, not a Hard
+Stop.
+
+An earlier version of this rule named `playbook.md` alone. That was wrong, and it put a
+careful reviewer in an impossible position: a 96-hour breach-notification window IS a Hard
+Stop under `dpa-review-checklist.md:48`, so the reviewer had to either drop a real Hard Stop
+or break this rule. **If you find a Hard Stop whose entry lives somewhere neither file
+covers, raise it AND say so** rather than silently downgrading it. A rule that forces a
+true finding to be dropped is a worse defect than the over-escalation it was written to
+prevent.
 
 **Do not promote a finding into a Hard Stop.** Two real cases from the fixture baseline, both correctly detected and both mis-severitied:
 
@@ -1091,7 +1113,9 @@ Hard Stops are non-negotiable. If any Hard Stop is triggered, flag it prominentl
 
 Escalating either one inflates the Hard Stop count, which is not cosmetic: the count drives the escalation path, the named escalation contact, and the Protection Score deduction. Six Hard Stops where there are four sends the review to the wrong people and understates the score.
 
-**Before emitting, reconcile the count.** For every finding marked Hard Stop, name the specific `playbook.md` Hard Stop entry it matches. A Hard Stop you cannot pin to an entry is not one; downgrade it to HIGH and keep the finding.
+**Before emitting, reconcile the count.** For every finding marked Hard Stop, name the
+specific entry it matches AND the file it came from. A Hard Stop you cannot pin to an entry
+in either file is not one; downgrade it to HIGH and keep the finding.
 
 **Hard Stop comment format (inserted into document):**
 ```

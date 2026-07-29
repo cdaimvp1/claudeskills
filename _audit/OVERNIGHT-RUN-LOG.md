@@ -2898,3 +2898,63 @@ decision still open.
 Also refuses: enum violations on status / current_phase / role / meeting status, an
 unimplemented schema_version, duplicate supplier or event ids, and a Closed case still in an
 active phase.
+
+---
+
+## V-5 verified, and the run exposed a defect in MY OWN FIX
+
+**V-5 is fixed.** The blind run reports "services commenced 19 days before signature
+(approval manipulation)". Broadening Category 11's scope worked.
+
+**But the same run went from 5 Hard Stops back to 6, and the agent was RIGHT.** It raised a
+96-hour breach-notification window as a Hard Stop and noted, accurately, that it could find
+no `playbook.md` entry number for it.
+
+`references/dpa-review-checklist.md:48` states: *"Hard Stop: Breach notification timeline >
+72 hours. Escalate to Legal AIPC."* The WO has 96 hours. It IS a Hard Stop under the skill's
+own rules.
+
+My Fix 3 said a finding is a Hard Stop "if and only if it matches an entry in
+`references/playbook.md`". That was wrong: Hard Stops live in at least two reference files.
+The rule put a careful reviewer in an impossible position, forcing a choice between dropping
+a true finding and breaking a stated rule. It did the best available thing, raising it and
+flagging the missing entry.
+
+**A rule that forces a true finding to be dropped is a worse defect than the
+over-escalation it was written to prevent.** Corrected: the closed list now names both
+files, and instructs that a Hard Stop whose entry lives in neither should be raised AND
+called out rather than silently downgraded.
+
+**Open question for Marc, genuinely unresolvable here.** The fixture's answer key expects
+5 Hard Stops and classes the 96-hour window as a data-protection finding (D-1). The skill's
+`dpa-review-checklist.md:48` says it is a Hard Stop. Both cannot be right. Either the answer
+key undercounts or the checklist overstates, and which one is correct is a question about
+Lilly's actual policy, not about this code.
+
+**Second, smaller issue: my arithmetic metric was ambiguous.** The run reported "2 of 6
+priced rows verified", meaning two rows PASSED, where earlier runs reported 6 of 6 meaning
+six were CHECKED. Both were honest; the metric was not. SKILL.md now asks for three numbers,
+exists / checked / passed, and warns that reporting passed as checked reads as four skipped
+rows when it may mean four rows checked and found wrong, which is the opposite of a gap.
+
+## F9 build 4 of 5 — legal-negotiation-prep briefing skeleton (DONE)
+
+`briefing_skeleton_generator.py` + self-test, **33/33**.
+
+The F9 split, implemented literally: code builds the Position Map, the tier tables, the
+counts, the totals and the BINDING markers; the model writes the Executive Summary, Leverage
+Map, Fallback Sequencing and Predicted Supplier Pushback, into `[PROSE: ...]` placeholders
+that name what belongs there so an unfilled briefing is obviously unfinished.
+
+The generator re-derives no tiering. `tier_kernel.assign_tier` decides, and this lays out
+the result including the kernel's own trace (G11).
+
+**Its central refusal: a BINDING tier cannot be softened on the way into the document.** If
+the incoming position claims a different tier than the kernel assigned, it raises. A briefing
+showing a Lilly non-negotiable as tradeable hands the negotiator a position Lilly never
+agreed to hold.
+
+Writing the test corrected an assumption of mine: `binding=True` covers the whole
+DETERMINISTIC path (source `playbook` or `msa`), not just Tier 1 RED LINE. I had assumed
+only Tier 1 was binding, and the test failed until I checked the kernel instead of guessing.
+The non-binding negative control now has to be constructed by removing a required input.
