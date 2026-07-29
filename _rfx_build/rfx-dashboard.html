@@ -3005,6 +3005,83 @@ html:root{ --nested:#EDE8E0; --nested-rule:#DCD5CA; }
   border-bottom:1px solid var(--line2);
 }
 .tabbar>*{justify-content:flex-start}
+
+
+/* =============================================================================
+   Chat and search surfaces sit on the PAGE ground, not the panel ground.
+   Marc: the entry fields and the workers' bubbles were the same white as the
+   panel behind them, so they read as part of the panel rather than as things
+   you can type in or messages someone sent. On the page colour they separate.
+   The user's own bubble keeps its dark fill: it is deliberately inverted and is
+   not a worker's message.
+   ============================================================================= */
+.bub{background:var(--bg)}
+.msg.me .bub{background:#423C35}
+.composer input,.composer textarea,.chatin,.chatin input,.chatin textarea{
+  background:var(--bg);border:1px solid var(--line2)}
+.composer input:focus,.composer textarea:focus,.chatin input:focus,.chatin textarea:focus{
+  outline:none;border-color:var(--plum)}
+input[type="search"],input[type="text"],.srch,.cmsearch,.cmsearch input{
+  background:var(--bg);border:1px solid var(--line2)}
+input[type="search"]:focus,input[type="text"]:focus{outline:none;border-color:var(--plum)}
+
+
+/* =============================================================================
+   TYPE LADDER, standardised.
+   RFx was rendering eight distinct sizes: 0, 7, 9, 11, 12, 13, 16 and 20. There
+   is no reason for that many, and 7 and 9 are below the point where anything is
+   comfortably readable on a projector.
+
+   The ladder is now FOUR sizes and nothing else:
+     11  meta, captions, chart and axis labels, chips, table headers, eyebrows
+     13  body copy, table cells, panel titles (weight and case carry the rank)
+     20  figures and section headings
+     28  the page h1 only
+
+   Hierarchy comes from weight and case, not from more sizes. Most of the strays
+   were inline styles written by the renderers, so they are caught by attribute
+   selector rather than chased one call site at a time.
+   ============================================================================= */
+#tabbody [style*="font-size:7px"],#tabbody [style*="font-size:8px"],
+#tabbody [style*="font-size:9px"],#tabbody [style*="font-size:10px"],
+#tabbody [style*="font:700 9px"],#tabbody [style*="font:600 9px"],
+#tabbody [style*="font:800 9px"],#tabbody [style*="font:700 8px"],
+#tabbody [style*="9px var"],#tabbody [style*="8px var"],#tabbody [style*="7px var"]{
+  font-size:11px !important;
+}
+#tabbody [style*="font-size:12px"],#tabbody [style*="12px var"],
+#tabbody [style*="font-size:12.5px"],#tabbody [style*="font-size:11.5px"]{
+  font-size:11px !important;
+}
+#tabbody [style*="font-size:14px"],#tabbody [style*="font-size:15px"],
+#tabbody [style*="font-size:16px"],#tabbody [style*="font-size:18px"],
+#tabbody [style*="14px var"],#tabbody [style*="16px var"],#tabbody [style*="18px var"]{
+  font-size:13px !important;
+}
+/* class-based strays */
+#tabbody .rq-id-raw,.rc-pre,.normhow-badge,.rfxprovb,.rfxsk,.k,.kl,.il,.lk,.lead,
+#tabbody .lbl,#tabbody .cap,#tabbody small{font-size:11px}
+#tabbody h3,#tabbody h4,.ptitle{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+#tabbody h2{font-size:20px}
+/* chart and SVG text floors at 11 as well */
+#tabbody text{font-size:11px}
+
+
+/* The type tokens themselves, which is what every class-based size reads.
+   --fz-mono was 9px, which put the mono figures and chips below the readable
+   floor, and --fz-h / --fz-title at 16px added a step the ladder does not need:
+   panel titles carry rank by weight and case, not by size. */
+html:root{
+  --fz-mono:11px;
+  --fz-meta:11px;
+  --fz-body:13px;
+  --fz-sm:13px;
+  --fz-title:13px;
+  --fz-h:13px;
+  --fz-label:11px;
+  --fz-head:20px;
+  --fz-display:28px;
+}
 </style><style>/* ===========================================================================
  * theo-color.css - the AUTHORITATIVE color + shading token layer for Theo.
  *
@@ -8702,7 +8779,7 @@ function ensureCommCss(){ if(document.getElementById('comm-css'))return; var s=d
  '.cmbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}'+
  '.cmbar select,.cmbar input{border:1px solid var(--line2,#CECCC7);border-radius:8px;padding:7px 10px;font:inherit;font-size:13px}'+
  '.cmhidden{font:600 11px var(--mono,monospace);color:var(--mut2);margin-top:10px}.cmhidden a{color:var(--navy);cursor:pointer;text-decoration:underline}'+
- '.cmparties{display:flex;gap:5px;flex-wrap:wrap}.cmpp{font:600 11px var(--mono,monospace);color:var(--mut);background:var(--well,#DDDCD8);border-radius:20px;padding:2px 7px}'
+ '.cmparties{display:flex;gap:5px;flex-wrap:wrap}.cmpp{font:600 11px var(--mono,monospace);color:var(--mut);background:transparent;border:1px solid var(--line2);border-radius:20px;padding:2px 7px}'
  ; document.head.appendChild(s);
 }
 function commChLbl(c){return {email:'Email',meeting:'Meeting',call:'Call',chat:'Chat',teams:'Teams',portal:'Portal'}[c]||c;}
@@ -8805,7 +8882,10 @@ function commHTML(){
 }
 function commOpen(id){
  var e=pvData('commLog',COMM_LOG).find(function(x){return x.id===id;});if(!e)return;
- var parties=(e.parties||[]).map(function(p){return '<span class="cmpp">'+escD(p)+'</span>';}).join('');
+ var parties=(e.parties||[]).map(function(p){
+   var pc=pvAvColor(p);
+   return '<span class="cmpp" style="color:'+pc+';border-color:'+pc+'">'+escD(p)+'</span>';
+ }).join('');
  var isCand=e.state==='candidate';
  var candBg=e.personal?'var(--pink-t,#FBE7E3)':'var(--amber-t,#FBF1DA)';
  var candBd=e.personal?'var(--red,#C8202E)':'var(--amber-d,#8A5A00)';

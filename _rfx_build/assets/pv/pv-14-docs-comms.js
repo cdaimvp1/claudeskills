@@ -194,7 +194,7 @@ function ensureCommCss(){ if(document.getElementById('comm-css'))return; var s=d
  '.cmbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}'+
  '.cmbar select,.cmbar input{border:1px solid var(--line2,#CECCC7);border-radius:8px;padding:7px 10px;font:inherit;font-size:13px}'+
  '.cmhidden{font:600 11px var(--mono,monospace);color:var(--mut2);margin-top:10px}.cmhidden a{color:var(--navy);cursor:pointer;text-decoration:underline}'+
- '.cmparties{display:flex;gap:5px;flex-wrap:wrap}.cmpp{font:600 11px var(--mono,monospace);color:var(--mut);background:var(--well,#DDDCD8);border-radius:20px;padding:2px 7px}'
+ '.cmparties{display:flex;gap:5px;flex-wrap:wrap}.cmpp{font:600 11px var(--mono,monospace);color:var(--mut);background:transparent;border:1px solid var(--line2);border-radius:20px;padding:2px 7px}'
  ; document.head.appendChild(s);
 }
 function commChLbl(c){return {email:'Email',meeting:'Meeting',call:'Call',chat:'Chat',teams:'Teams',portal:'Portal'}[c]||c;}
@@ -297,7 +297,10 @@ function commHTML(){
 }
 function commOpen(id){
  var e=pvData('commLog',COMM_LOG).find(function(x){return x.id===id;});if(!e)return;
- var parties=(e.parties||[]).map(function(p){return '<span class="cmpp">'+escD(p)+'</span>';}).join('');
+ var parties=(e.parties||[]).map(function(p){
+   var pc=pvAvColor(p);
+   return '<span class="cmpp" style="color:'+pc+';border-color:'+pc+'">'+escD(p)+'</span>';
+ }).join('');
  var isCand=e.state==='candidate';
  var candBg=e.personal?'var(--pink-t,#FBE7E3)':'var(--amber-t,#FBF1DA)';
  var candBd=e.personal?'var(--red,#C8202E)':'var(--amber-d,#8A5A00)';
