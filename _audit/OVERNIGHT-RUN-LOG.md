@@ -607,3 +607,37 @@ one cent, matching `verify_line_math`. A one-cent shortfall (33.33 x 3 against
 100.00) still refuses rather than being absorbed.
 
 **Malicious-code review: SAFE.** Additive only, imports unchanged.
+
+### O10 DONE, 2026-07-29. C10 wire or retire `convert_currency()`. VERDICT: WIRE.
+
+**It is not dead code.** `deal-room-1c344a/SKILL.md:502` already names it as the
+sanctioned conversion path ("via the vendored kernel's `convert_currency()` where
+a conversion is genuinely needed"). Retiring it was the wrong branch.
+
+**But I found a genuinely unwired site**, and it is the one that matters most:
+`category-strategy-1c344a/references/data-quality-rules.md:610-633` carries a full
+multi-currency detection and conversion framework, including a four-priority rate
+ladder, with NO kernel call. Conversion was prose arithmetic over a spend cube.
+
+That is the largest-N monetary dataset in the suite. A conversion applied
+inconsistently across a few thousand rows does not announce itself: it surfaces as
+a supplier whose spend looks smaller than it is, which ranks it lower in the
+Pareto, which changes its tier. Wired, with the reasoning stated at the call site.
+
+**Also tightened a real hazard next to it.** Detection step 3 says "if all amounts
+appear to be in one currency, assume USD unless told otherwise". Fine as a
+single-currency-file default, dangerous as a fallback for an unrecognized code
+inside a multi-currency file. `convert_currency()` refuses an unknown code rather
+than assuming parity, and the wiring text now says those records are quarantined
+or the user supplies the rate. A record converted at an invented parity rate is
+worse than a quarantined one, because it still counts toward every total.
+
+**Deliberately NOT touched:** `pro-forma-builder-1c344a/SKILL.md:204` documents
+that its generator does NOT call `convert_currency()` at workbook-build time, and
+gives the reason (every monetary field must already be single-currency before the
+Assumptions register runs). That is a documented decision with a stated rationale,
+so it stays. Reversing it to "wire everything" would be exactly the shortcut
+reversal the standing rules forbid.
+
+No kernel code changed this increment, so no new tests and no malicious-code
+surface. 96/96 still passing.

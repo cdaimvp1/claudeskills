@@ -631,6 +631,27 @@ Always:
   - Calculate and report FX impact if > 2% of total spend
 ```
 
+**HARD RULE, kernel usage (per Execution Guardrails G11).** Perform the conversion
+itself by calling `convert_currency(value, currency, fx_table)` in the vendored
+`numeric_kernel.py`, once per record, not by multiplying freehand across a spend
+cube. `fx_table` maps a currency code to its multiplier to reach USD, and carries
+the rate the priority ladder above selected.
+
+The reason this one matters more than its arithmetic suggests: this is the
+largest-N monetary dataset the suite handles, and a conversion applied
+inconsistently across a few thousand rows does not announce itself. It shows up
+as a supplier whose spend looks smaller than it is, which then ranks lower in the
+Pareto, which then changes its tier.
+
+`convert_currency()` **refuses an unknown currency code rather than assuming
+parity**. That refusal is the point. Detection step 3 above ("if all amounts
+appear to be in one currency, assume USD unless told otherwise") is a reasonable
+default for a single-currency file, but it must never become a silent fallback
+for an unrecognized code inside a multi-currency file: those records are
+quarantined per Q-002's spirit, or the user supplies the rate. A record converted
+at an invented parity rate is worse than a quarantined one, because it still
+counts toward every total.
+
 ---
 
 ## 7. Quarantine Criteria
