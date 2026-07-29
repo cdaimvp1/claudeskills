@@ -413,6 +413,30 @@ Reject / Dismiss logs the rejection (to `history.rejected_inferences[]`) to supp
 - **My Savings** (on-demand; offered only when `savings{}` present): `{ committed, achieved, ci, ca, target, pipeline:[{name,amount,status}] }` renders an achieved hero, a target-progress bar, a cost-improvement vs cost-avoidance split bar, and the pipeline with status pips. All sums deterministic.
 - **Report Card** (on-demand, optional; offered only when `reportCard{}` present): `{ gpa, categories:[{name,value,target,grade}], bandwidth:{load,sustainable} }` renders a GPA, a graded category list, and a load-vs-sustainable bandwidth gauge.
 
+**Reconciliation gate (F8), runs before either figure view paints.** `savings{}` and
+`reportCard{}` are model-populated per run, so a bad number would otherwise render silently
+and read as fact. The engine now refuses the affected VIEW, naming the field and the
+problem, and leaves the rest of the board alone. Refusing the whole board over one savings
+typo would trade a wrong number for a dead screen, which is the opposite of the engine's
+standing promise that a bad payload never blanks it.
+
+Asserted on `savings{}`: `achieved <= committed`; `ci + ca == achieved`, so the split bar
+and the hero cannot disagree; every monetary field numeric and non-negative; every pipeline
+amount numeric (a `"TBD"` would otherwise coerce to `$0` and render as a real figure).
+
+Asserted on `reportCard{}`: grades come from a recognised set, and values/targets are
+numeric.
+
+**NOT asserted, deliberately: the relationship between `gpa` and `categories`.** No formula
+is defined anywhere in this skill, and **the shipped seed does not foot under the obvious
+reading**: its grades (B, C, B, A, D) average 2.60 against a stated GPA of 3.4. Asserting a
+rule here would INVENT one rather than enforce it, and would then fail the engine's own
+seed. **This is an open question for Marc**: either the GPA is weighted (in which case the
+weights need stating), or it is an independent self-assessment (in which case it should be
+labelled as one rather than presented above a category list that implies it is their
+average). Until then it renders as supplied, with the categories beside it, and neither
+claims to derive the other.
+
 **Not built (documented skip):** prune candidate id-24, the org-wide "portfolio scale band" ($X org portfolio / N reps), was intentionally not built. It requires cross-user / org aggregation, which is a locked suite-wide HARD-NO. A purely personal spend tile could be added later if a personal spend source (ARIA / SHARP) is wired; it is out of scope now.
 
 **The board, the user, and Submit:** the user reads the board, opens rows, types a direction per item ("draft the reply and cc Liza", "move to waiting", "this is done, remove it"), and stages them. One **Submit** sends all staged directions back to you in a single turn via `sendPrompt` where the host provides it, or the clipboard hand-off otherwise (the engine does both). You carry out the directions, and on the next render fold the results into the delta, including `close:true` for anything the user marked done.

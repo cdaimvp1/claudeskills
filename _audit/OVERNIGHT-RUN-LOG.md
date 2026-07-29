@@ -1686,3 +1686,55 @@ the other.
 **Flagged for the same treatment:** `B1` is cited by 3 items and likely carries the same
 overloading. `C9`, `D1`, `H1` and `H4` were spot-checked and appear to be genuine
 build-order dependencies.
+
+### Task #11 DONE, 2026-07-29. F8 field-guide reconciliation gate.
+
+Added `fgReconcileSavings()`, `fgReconcileRC()` and `fgRefusalHtml()` to
+`references/field-guide-engine.html`, gating both figure views before they paint.
+
+**Verification, actual output (11/11), run against the ENGINE'S OWN `num()` and `money()`
+rather than sandbox stand-ins:**
+```
+shipped seed savings reconciles (must not false-positive)     PASS
+shipped seed reportCard reconciles                            PASS
+F8 CRITERION: achieved > committed REFUSES                    PASS
+ci + ca != achieved REFUSES                                   PASS
+non-numeric pipeline amount REFUSES                           PASS
+negative target REFUSES                                       PASS
+non-numeric committed REFUSES                                 PASS
+unrecognised grade REFUSES                                    PASS
+gpa NOT asserted vs categories                                PASS
+absent savings / reportCard are not errors                    PASS x2
+```
+Engine script still parses; smoke test on the skill unchanged.
+
+**Refuses the VIEW, not the board.** The engine's standing promise is that a bad payload
+never blanks the screen. Blanking everything over one savings typo would trade a wrong
+number for a dead board, so the refusal is scoped to the affected view and names the field
+and the problem.
+
+**MY OWN TEST CAUGHT TWO BUGS IN MY OWN CODE, both of which would have shipped:**
+1. **`fmtMoney` does not exist in the engine.** I invented the name; the real formatter is
+   `money()`. Six call sites, every one a ReferenceError the moment a refusal fired. So the
+   gate would have crashed precisely when it was needed. Fixed.
+2. **The non-numeric check could never fire.** `num()` coerces `"TBD"` to `0`, so
+   `isFinite(num(x))` is always true. A pipeline amount of `"TBD"` sailed through and would
+   have rendered as `$0`, a fabricated figure presented as real. Now tested on the RAW value.
+
+This is the second time tonight that testing against a skill's REAL helpers rather than
+plausible ones caught a defect (the first was pro-forma's `validate_assumptions`). Worth
+stating as a rule: a self-test that stubs the environment tests the stub.
+
+**FINDING, and it changes F8's premise. The GPA invariant does not exist.** F8 asked to
+validate "that Report Card categories foot to the stated GPA". No formula is defined
+anywhere in the skill, and **the shipped seed does not foot under the obvious reading**: its
+grades (B, C, B, A, D) average 2.60 against a stated GPA of 3.4.
+
+So asserting it would have INVENTED the rule and then failed the engine's own seed.
+Deliberately not asserted. Recorded in SKILL.md as an open question for Marc: either the GPA
+is weighted, in which case the weights need stating, or it is an independent
+self-assessment, in which case it should be labelled as one rather than sitting above a
+category list that implies it is their average.
+
+`savings{}` by contrast has genuinely well-defined invariants, both of which hold in the
+seed, and both are now enforced.

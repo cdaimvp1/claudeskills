@@ -2419,12 +2419,98 @@ body {
   }
 
   // -- My savings (HIGH; offered when savings{} present) --
+  // ---- F8: reconciliation gate, runs BEFORE a view paints ------------------
+  // The KPI strip and the Savings / Report Card figures are described as
+  // deterministic, but savings{} and reportCard{} are MODEL-POPULATED per run, so
+  // a bad number renders silently and looks authoritative. This refuses the
+  // affected VIEW rather than the whole board: the engine's standing promise is
+  // that a bad payload never blanks the screen, and blanking everything over one
+  // savings typo would trade a wrong number for a dead board.
+  //
+  // Only invariants the spec actually DEFINES are asserted. See fgReconcileRC.
+  function fgReconcileSavings(s) {
+    var bad = [];
+    if (!s) return bad;
+    var committed = num(s.committed), achieved = num(s.achieved);
+    var ci = num(s.ci), ca = num(s.ca);
+    if (achieved > committed + 0.5) {
+      bad.push("achieved (" + money(achieved) + ") exceeds committed (" +
+               money(committed) + "). Savings cannot be realised beyond what was committed.");
+    }
+    if ((s.ci != null || s.ca != null) && Math.abs((ci + ca) - achieved) > 0.5) {
+      bad.push("the cost-improvement / cost-avoidance split (" + money(ci) + " + " +
+               money(ca) + " = " + money(ci + ca) + ") does not equal achieved (" +
+               money(achieved) + "). The split bar and the hero would disagree.");
+    }
+    // num() coerces a non-numeric string to 0, so isFinite(num(x)) can never
+    // catch one. Test the RAW value. Caught by this module's own test, where
+    // an amount of "TBD" sailed through as 0 and would have rendered as $0.
+    function notNumeric(v) {
+      if (v == null) return false;
+      if (typeof v === "number") return !isFinite(v);
+      var n = parseFloat(v);
+      return isNaN(n) || String(v).trim() !== String(n);
+    }
+    [["committed", s.committed], ["achieved", s.achieved], ["target", s.target]].forEach(function (kv) {
+      if (notNumeric(kv[1])) bad.push(kv[0] + ' is not a number (got "' + kv[1] + '").');
+      else if (kv[1] != null && num(kv[1]) < 0) bad.push(kv[0] + " is negative.");
+    });
+    (s.pipeline || []).forEach(function (row, i) {
+      if (row && notNumeric(row.amount)) {
+        bad.push("pipeline row " + (i + 1) + " (" + (row.name || "unnamed") +
+                 ') has a non-numeric amount ("' + row.amount + '"), which would render as $0.');
+      }
+    });
+    return bad;
+  }
+
+  // Report Card: the spec defines NO relationship between gpa and categories, and
+  // the shipped seed does not foot under the obvious reading (grades B,C,B,A,D
+  // average 2.60 against a stated 3.4). Asserting a formula here would INVENT the
+  // rule rather than enforce it, so this checks only what is defined: grades come
+  // from a known set, and values/targets are numeric. The gpa-to-categories
+  // relationship is flagged in SKILL.md as undefined, for Marc to settle.
+  var FG_GRADES = ["A+","A","A-","B+","B","B-","C+","C","C-","D+","D","D-","F"];
+  function fgReconcileRC(rc) {
+    var bad = [];
+    if (!rc) return bad;
+    (rc.categories || []).forEach(function (c, i) {
+      var label = (c && c.name) ? c.name : ("category " + (i + 1));
+      if (c && c.grade != null && FG_GRADES.indexOf(String(c.grade)) === -1) {
+        bad.push(label + ' carries grade "' + c.grade + '", which is not a recognised grade.');
+      }
+      if (c && c.value != null && typeof c.value !== "number" && isNaN(parseFloat(c.value))) bad.push(label + " has a non-numeric value.");
+      if (c && c.target != null && typeof c.target !== "number" && isNaN(parseFloat(c.target))) bad.push(label + " has a non-numeric target.");
+    });
+    var b = rc.bandwidth;
+    if (b && b.load != null && b.sustainable != null) {
+      if (!isFinite(num(b.load)) || !isFinite(num(b.sustainable))) {
+        bad.push("bandwidth load / sustainable are not both numeric.");
+      }
+    }
+    return bad;
+  }
+
+  function fgRefusalHtml(viewName, problems) {
+    var html = '<div class="home-empty" style="border-left:4px solid var(--lds-g-color-feedback-error, #C0362C);padding-left:12px">';
+    html += '<p><strong>' + escapeHtml(viewName) + ' not shown: the figures do not reconcile.</strong></p>';
+    html += '<p>Showing nothing here is deliberate. A figure that does not reconcile is worse than a missing one, because it renders as fact.</p><ul>';
+    problems.forEach(function (m) { html += '<li>' + escapeHtml(m) + '</li>'; });
+    html += '</ul><p>Correct the values in the <code>#fgData</code> island and re-render. The rest of the board is unaffected.</p></div>';
+    return html;
+  }
+
   function renderSavings() {
     dockEl.innerHTML = "";
     var s = SAVINGS;
     var html = viewHeader("My savings", "Committed vs achieved this year, with the active pipeline. Figures are illustrative and sum deterministically.");
     if (!s) {
       html += '<p class="home-empty">No savings summary carried this run.</p>';
+      panelEl.innerHTML = html; wirePanelLinks(panelEl); return;
+    }
+    var svBad = fgReconcileSavings(s);
+    if (svBad.length) {
+      html += fgRefusalHtml("My savings", svBad);
       panelEl.innerHTML = html; wirePanelLinks(panelEl); return;
     }
     var achieved = num(s.achieved), target = num(s.target), committed = num(s.committed);
@@ -2475,6 +2561,11 @@ body {
     var html = viewHeader("Report card", "A self-scored read on category health and your bandwidth. Grades and labels are illustrative.");
     if (!rc) {
       html += '<p class="home-empty">No report card carried this run.</p>';
+      panelEl.innerHTML = html; wirePanelLinks(panelEl); return;
+    }
+    var rcBad = fgReconcileRC(rc);
+    if (rcBad.length) {
+      html += fgRefusalHtml("Report card", rcBad);
       panelEl.innerHTML = html; wirePanelLinks(panelEl); return;
     }
     html += '<div class="rc-gpa"><span class="rc-gpa-num">' + escapeHtml(String(rc.gpa != null ? rc.gpa : "n/a")) +
