@@ -546,3 +546,32 @@ by (Y - Z). Both are pinned by tests.
 
 **Malicious-code review: SAFE.** Imports unchanged, no dangerous constructs,
 additive only. SKILL.md change is prose plus a fenced example.
+
+### O8 DONE, 2026-07-29. C7 rfp-engine weight-sum check.
+
+Added `assert_weight_sum()` to the kernel, vendored into `rfp-engine-1c344a`
+(which had none), wired the Evaluation-weight sanity check at SKILL.md:384.
+
+**Verification: 91/91 passed, 0 failed.** All six consuming copies identical.
+
+**Why a new function rather than `weighted_score()`.** rfp-engine works in
+PERCENTAGE points (weights sum to 100), `weighted_score()` enforces the 1.0
+fractional convention, and rfp-engine does not score at all at this point in its
+workflow. It BUILDS and confirms the grid that evaluation-engine and
+rfp-response-analysis later score against. So it needs validation without
+scoring, on a different scale. `assert_weight_sum(weights, expected=100.0)`
+does that and still serves the 1.0 convention by default. Tolerance defaults to
+0.001 x expected, preserving evaluation-engine's stated relative precision on
+either scale.
+
+**It refuses rather than normalizes, which is the skill's own rule** (SKILL.md:384,
+"surface the discrepancy rather than silently normalizing"). A renormalized set
+would differ from the one the evaluation team confirmed, with nothing left to
+show it changed, and it would distort every downstream ranking.
+
+**Caught a case a sum check alone would pass:** weights of 110 and -10 foot to
+exactly 100. The function rejects the negative weight, because a negative
+evaluation weight inverts the criterion rather than de-emphasizing it. Pinned by
+test.
+
+**Malicious-code review: SAFE.** Additive only, imports unchanged.

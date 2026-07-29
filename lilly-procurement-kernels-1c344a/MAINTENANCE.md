@@ -15,6 +15,7 @@ that multiple Lilly Procurement Skills each describe independently in prose:
 | `weighted_score` | market-rate-benchmarking (Composite Contract Quality Score) AND evaluation-engine (Effective_Weight_Frac / Score Validation Checks) - both skills independently require weights to foot to 1.0; this is one shared guard instead of two divergent ones |
 | `npv` | pro-forma-builder (Financial Methodology, end-of-year Year-1 discounting) |
 | `quadrature_rollup` | should-cost-builder (Aggregation Method: quadrature + >15% LOW-confidence widening) |
+| `assert_weight_sum` | rfp-engine (the Evaluation-weight sanity check, 100-percent convention, validation only) |
 | `reciprocity` / `anchor_capture` | negotiation-simulator (the two Structured Debrief metrics and every degenerate case its v2.3 changelog records defining) |
 | `hhi` / `hhi_band` | category-strategy (`references/analysis-methodology.md`, HHI and its concentration bands) |
 | `pareto_segments` | category-strategy (Pareto methodology, A/B/C/D segments, p80/p95/p99, efficiency ratio) |
@@ -173,6 +174,16 @@ skills themselves draw a hard line. Specifically:
   combined component (summing their spreads linearly) before calling this
   function, per should-cost-builder's own text, until a grouping-aware
   version is added here.
+- **`assert_weight_sum` validates without scoring, and never normalizes.**
+  rfp-engine BUILDS the weight grid that evaluation-engine and
+  rfp-response-analysis later score against, and its own rule says to "surface
+  the discrepancy rather than silently normalizing". A renormalized set would
+  differ from the set the evaluation team confirmed, with nothing left to show
+  it changed. It also rejects a negative weight even when the set foots (110 and
+  -10 sum to 100), because a negative evaluation weight inverts a criterion
+  rather than de-emphasizing it, and a sum check alone would pass it.
+  `tolerance` defaults to 0.001 x expected so the same RELATIVE precision as
+  evaluation-engine's stated +/- 0.001 applies on either the 1.0 or the 100 scale.
 - **`reciprocity` and `anchor_capture` return a STATE, and return None for the
   number in every case where their source forbids printing one.** These two
   metrics are almost entirely edge cases, and negotiation-simulator's v2.3

@@ -386,6 +386,59 @@ def quadrature_rollup(component_bases: Sequence[float],
     )
 
 
+def assert_weight_sum(weights: Dict[str, float], expected: float = 1.0,
+                      tolerance: Optional[float] = None) -> float:
+    """Validate that a weight set foots, and return the sum. Raises if it does not.
+
+    A validation-only companion to weighted_score(), for skills that BUILD and
+    confirm a weight set before any scoring happens.
+
+    Source for the 100-scale convention: rfp-engine-1c344a/SKILL.md:384, the
+    "Evaluation-weight sanity check": "within each category, the
+    Evaluation_Weight values must sum to 100% (no over- or under-allocation) ...
+    If any category does not sum to 100% ... surface the discrepancy rather than
+    silently normalizing."
+
+    That last clause is why this raises rather than returning a normalized set.
+    rfp-engine builds the grid that evaluation-engine and rfp-response-analysis
+    later score against, so a weight set that quietly renormalizes here distorts
+    every downstream ranking with nothing left to show that it happened.
+
+    `expected` is the scale: 1.0 for a fractional convention (market-rate-
+    benchmarking, evaluation-engine) or 100.0 for a percentage convention
+    (rfp-engine). `tolerance` defaults to 0.001 x expected, preserving the same
+    RELATIVE precision as evaluation-engine's stated "+/- 0.001" on a 1.0 scale
+    when the caller works in percentage points.
+    """
+    if not weights:
+        raise InvalidInputError(
+            "cannot validate an empty weight set. An empty category is a "
+            "discrepancy to surface, not a set that trivially foots"
+        )
+    if expected <= 0:
+        raise InvalidInputError(f"expected scale must be positive, got {expected}")
+    if tolerance is None:
+        tolerance = 0.001 * expected
+    for k, v in weights.items():
+        if v is None or isinstance(v, bool) or not isinstance(v, (int, float)):
+            raise InvalidInputError(f"weight for {k!r} is not numeric: {v!r}")
+        if v < 0:
+            raise InvalidInputError(
+                f"weight for {k!r} is negative ({v}). A negative evaluation "
+                "weight inverts the criterion rather than de-emphasizing it"
+            )
+    total = sum(weights.values())
+    if abs(total - expected) > tolerance:
+        raise WeightSumError(
+            f"weights sum to {total:.4f}, not {expected:g} (tolerance {tolerance:g}). "
+            f"{'Over' if total > expected else 'Under'}-allocated by "
+            f"{abs(total - expected):.4f}. Surface this discrepancy and fix the "
+            "weights with the evaluation team; do NOT silently normalize, because "
+            "the corrected set would then differ from what was confirmed"
+        )
+    return total
+
+
 # ===========================================================================
 # NEGOTIATION-METRICS face
 # ===========================================================================
@@ -1732,6 +1785,29 @@ if __name__ == "__main__":
         f"base={qr_widened.total_base}, low={qr_widened.total_low}, high={qr_widened.total_high}",
     )
 
+    # --- assert_weight_sum: rfp-engine's 100-scale convention ---------------
+    # Source: rfp-engine-1c344a/SKILL.md:384, "the Evaluation_Weight values must
+    # sum to 100% (no over- or under-allocation) ... surface the discrepancy
+    # rather than silently normalizing."
+    _check(
+        "assert_weight_sum: accepts a category footing to 100 on the percentage "
+        "convention, and still accepts the 1.0 fractional convention",
+        assert_weight_sum({"security": 40.0, "functionality": 35.0, "cost": 25.0},
+                          expected=100.0) == 100.0
+        and assert_weight_sum({"a": 0.6, "b": 0.4}) == 1.0,
+    )
+    _neg_but_foots = False
+    try:
+        assert_weight_sum({"a": 110.0, "b": -10.0}, expected=100.0)
+    except InvalidInputError:
+        _neg_but_foots = True
+    _check(
+        "assert_weight_sum: rejects a negative weight even when the set FOOTS "
+        "to 100 (110 + -10). A negative evaluation weight inverts the criterion "
+        "rather than de-emphasizing it, and a sum check alone would pass it",
+        _neg_but_foots,
+    )
+
     # --- Golden: negotiation-simulator reciprocity worked example ----------
     # Source: negotiation-simulator-1c344a/SKILL.md:468, "Example: gave 3,
     # received 2 -> '3 given : 2 received, reciprocity index 0.7, state
@@ -2172,6 +2248,24 @@ if __name__ == "__main__":
 
 
 
+    _check_raises(
+        "assert_weight_sum: refuses an over-allocated category (105) rather "
+        "than normalizing, per rfp-engine SKILL.md:384. Normalizing would make "
+        "the scored set differ from the set the evaluation team confirmed",
+        lambda: assert_weight_sum({"a": 40.0, "b": 35.0, "c": 30.0}, expected=100.0),
+        WeightSumError,
+    )
+    _check_raises(
+        "assert_weight_sum: refuses an under-allocated category (95)",
+        lambda: assert_weight_sum({"a": 40.0, "b": 35.0, "c": 20.0}, expected=100.0),
+        WeightSumError,
+    )
+    _check_raises(
+        "assert_weight_sum: refuses an empty weight set, because an empty "
+        "category is a discrepancy to surface, not a set that trivially foots",
+        lambda: assert_weight_sum({}, expected=100.0),
+        InvalidInputError,
+    )
     # --- negotiation-metrics refusals --------------------------------------
     _check_raises(
         "reciprocity: refuses a negative concession count",
