@@ -608,7 +608,22 @@ escalated = (
 # lilly_position_prevailed + supplier_prevailed + negotiated + escalated == 1.0
 ```
 
-**Reporting standard:** Always report `acceptance_rate` (strict), `lilly_position_prevailed` (includes fallbacks), `supplier_prevailed`, `negotiated`, `escalated`, and the N used for each. Before delivering, verify the four partition rates sum to 100% (within rounding); if they do not, you have miscounted an outcome and must recount. Note that strict `acceptance_rate` is a subset of `lilly_position_prevailed` (it excludes fallbacks), so it is reported as a quality measure and is NOT part of the 100% partition.
+**Reporting standard:** Always report `acceptance_rate` (strict), `lilly_position_prevailed` (includes fallbacks), `supplier_prevailed`, `negotiated`, `escalated`, and the N used for each. Note that strict `acceptance_rate` is a subset of `lilly_position_prevailed` (it excludes fallbacks), so it is reported as a quality measure and is NOT part of the 100% partition.
+
+**HARD RULE, kernel usage (per Execution Guardrails G11).** These rates are NOT counted by hand or by model arithmetic. Call `outcome_partition()` in the vendored `numeric_kernel.py` with the outcome-code counts and read the five rates off the returned object.
+
+```
+from numeric_kernel import outcome_partition, difficulty_score
+
+part = outcome_partition({
+    "ACCEPTED_AS_IS": 4, "ACCEPTED_WITH_MINOR_CHANGES": 2, "HARD_STOP_HELD": 1,
+    "LILLY_FALLBACK_USED": 1, "COUNTER_ACCEPTED": 2, "REJECTED_BY_SUPPLIER": 1,
+    "HARD_STOP_EXCEPTION": 1, "NEGOTIATED_COMPROMISE": 2,
+    "ESCALATED_TO_SME": 1, "ESCALATED_TO_LEGAL": 1, "NOT_APPLICABLE": 3,
+})
+```
+
+The sum-to-1.0 integrity check is enforced inside the function: if the four partition rates do not foot, it raises `PartitionError` rather than returning rates. Do not rescale or round to make them fit. A failure means an outcome was miscounted, which is what the check is for, so recount and re-call. An unknown outcome code raises `OutcomeCodeError`, and a set where every position is `NOT_APPLICABLE` raises `InvalidInputError` rather than reporting four zero rates as though they had been measured.
 
 ## Negotiation Difficulty Score
 
@@ -634,7 +649,11 @@ scaling_factor = 100 / 15        # = 6.6667
 difficulty = (weighted_sum / applicable) × scaling_factor
 ```
 
-The average weight per applicable position ranges from 0 (every applicable position ACCEPTED_AS_IS / HARD_STOP_HELD, weight 0) to 15 (every applicable position a HARD_STOP_EXCEPTION). Multiplying by 100/15 maps that 0-to-15 range onto 0-to-100, so the result is mathematically bounded to 0-100. Still clamp to 0-100 as a defensive guard against rounding. Categorize:
+The average weight per applicable position ranges from 0 (every applicable position ACCEPTED_AS_IS / HARD_STOP_HELD, weight 0) to 15 (every applicable position a HARD_STOP_EXCEPTION). Multiplying by 100/15 maps that 0-to-15 range onto 0-to-100, so the result is mathematically bounded to 0-100. Still clamp to 0-100 as a defensive guard against rounding.
+
+**HARD RULE, kernel usage (per Execution Guardrails G11).** Do not compute this by hand. Call `difficulty_score()` in the vendored `numeric_kernel.py` with the same outcome-code counts, and read `score`, `band` and `leadership_flag` off the result. It returns `None` when there are no applicable positions, which is the NEEDS_INPUT case named below: render NEEDS_INPUT, never a score of 0, because 0 reads as "this negotiation was easy" when in fact nothing was measured. If the score ever falls outside 0-100 before clamping, the function raises rather than clipping, because that condition means a weight now exceeds the stated maximum of 15, which is the v2.1 scaling-overshoot bug reappearing rather than a rounding artifact.
+
+Categorize:
 - 0-25: Low difficulty
 - 26-50: Medium difficulty
 - 51-75: High difficulty

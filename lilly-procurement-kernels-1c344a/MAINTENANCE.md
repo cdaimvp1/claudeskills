@@ -15,6 +15,8 @@ that multiple Lilly Procurement Skills each describe independently in prose:
 | `weighted_score` | market-rate-benchmarking (Composite Contract Quality Score) AND evaluation-engine (Effective_Weight_Frac / Score Validation Checks) - both skills independently require weights to foot to 1.0; this is one shared guard instead of two divergent ones |
 | `npv` | pro-forma-builder (Financial Methodology, end-of-year Year-1 discounting) |
 | `quadrature_rollup` | should-cost-builder (Aggregation Method: quadrature + >15% LOW-confidence widening) |
+| `outcome_partition` | negotiation-playbook-learning (`references/outcome-schema.md`, the win/loss partition and the sum-to-1.0 integrity check) |
+| `difficulty_score` | negotiation-playbook-learning (the 0-100 Negotiation Difficulty Score, its bands, and the v2.1 scaling fix) |
 | `level_bid` | rfp-response-analysis (`references/bid-leveling.md`, the three normalization formulas and the escalation rule at SKILL.md:1704) |
 | `deduction_score` | lilly-contract-review (`references/risk-scoring.md`, the combined-protection-weighted deduction table, the Hard Stop invariant, and BOTH anti-drift calibration checks) |
 | `score_band` | lilly-contract-review (`references/risk-scoring.md:37-42`, the four residual-risk bands) |
@@ -166,6 +168,26 @@ skills themselves draw a hard line. Specifically:
   combined component (summing their spreads linearly) before calling this
   function, per should-cost-builder's own text, until a grouping-aware
   version is added here.
+- **`difficulty_score` returns None rather than 0 when no positions are
+  applicable.** negotiation-playbook-learning's own text says "if applicable ==
+  0, difficulty is NEEDS_INPUT". A score of 0 means "every position held", which
+  is the easiest possible negotiation; returning it for an unmeasured one would
+  invert the finding.
+- **`difficulty_score` raises instead of clamping when the score exceeds 100.**
+  The source calls the clamp "a defensive guard against rounding". If the clamp
+  ever has real work to do, a per-position weight exceeds the stated maximum of
+  15, which is precisely the v2.1 scaling-overshoot bug that skill's changelog
+  records fixing. Clipping it would restore the bug silently.
+- **`difficulty_score`'s bands are evaluated as <=25 Low, <=50 Medium, <=75
+  High, else Very high.** The source states them as integer ranges (0-25, 26-50,
+  51-75, 76-100), which leaves a non-integer score such as 25.4 undefined
+  between Low and Medium. This kernel resolves it downward. Flagged as a
+  judgment call, in the same family as the seven pre-existing ambiguities the F1
+  coverage matrix surfaced; if the source is ever tightened, follow it.
+- **`outcome_partition` raises rather than rescaling when the four rates do not
+  sum to 1.0.** The source says a failure means an outcome was miscounted and
+  must be recounted. Normalizing the rates to fit would hide exactly the
+  miscount the check exists to surface.
 - **`level_bid` refuses `one_time=None` rather than defaulting it to zero.**
   Bid Leveling element 5 requires an unpriced cost be carried as a labeled
   placeholder, "never defaulted to zero and never dropped from the comparison".

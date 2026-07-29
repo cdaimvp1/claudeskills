@@ -48,7 +48,7 @@ Update this table as you go. It is the fastest way to resume.
 |---|---|---|---|
 | O1 coverage matrix output-mode re-audit | **DONE** | `2720f66` `19afc3f` +sweep | 307 rows. 5 at-risk clusters. Part 3 sweep found 4 items with no home = 4th rescue candidate, undecided |
 | O2 build `deduction_score()` | **DONE** | `18b955b` | 43/43 self-test. Golden -36/64 exact. Both calibrations raise. NOT wired, per brief |
-| O3 C3 Bid Leveling kernel | NOT STARTED | | gates an audited ranking |
+| O3 C3 Bid Leveling kernel | **DONE** | `32e3cbd` | 54/54. level_bid() built AND wired. Kernel-drift finding for O11 |
 | O4 C2 playbook-learning Difficulty Score | NOT STARTED | | proven bug in its own changelog |
 | O5-O10 C4,C5,C6,C7,C8,C10 kernel adoption | NOT STARTED | | non-held skills |
 | O11 C9 kernel hash manifest | NOT STARTED | | |
@@ -348,3 +348,65 @@ real changes rather than noise. No content was altered by that step.
 eval/exec/pickle/base64 across the kernel returns 0. Kernel diff is 293 insertions
 and ZERO deletions, so nothing existing was altered. The SKILL.md change is prose
 plus a fenced example, no executable content.
+
+### O4 DONE, 2026-07-29. playbook-learning Difficulty Score and partition rates kerneled AND wired.
+
+Built `difficulty_score()` and `outcome_partition()` in the kernel, vendored the
+kernel into `negotiation-playbook-learning-1c344a` (which had NO kernel at all
+before this), and wired both call sites in SKILL.md. Source: that skill's
+SKILL.md:574-608 (partition math) and :613-641 (difficulty score).
+
+**Verification, actual output. This one has TRUE goldens**, because the source
+published its own worked answers at SKILL.md:641 ("Band verification"):
+
+```
+SUMMARY: 63/63 passed, 0/63 failed
+
+lone HARD_STOP_EXCEPTION   100.0  Very high  (leadership flag)   source says 100
+lone REJECTED_BY_SUPPLIER   66.7  High                           source says 66.7
+lone ESCALATED_TO_LEGAL     53.3  High                           source says 53.3
+lone COUNTER_ACCEPTED       53.3  High                           source says 53.3
+lone NEGOTIATED_COMPROMISE  33.3  Medium                         source says 33.3
+lone LILLY_FALLBACK_USED    20.0  Low                            source says 20
+partition sums to 1.0 over denominator 16, NOT_APPLICABLE excluded
+strict acceptance 0.4375 is a SUBSET of lilly_prevailed 0.5
+```
+
+All six band verifications reproduce to the source's own stated precision.
+
+**The bug this closes.** That skill's v2.1 changelog (SKILL.md:33) records fixing
+"difficulty-score scaling (max per-position weight set to 15, scaling_factor =
+100/15) so a single HARD_STOP_EXCEPTION can no longer push the 0-100 score past
+100" and making "the win/loss outcome partition exhaustive (rates sum to 100%)".
+Both halves were prose. Both are now invariants:
+- the score raises if it exceeds 100 before clamping, rather than clipping,
+  because if the clamp ever has real work to do then a weight exceeds the stated
+  maximum, which IS the v2.1 bug returning rather than a rounding artifact;
+- the partition raises if the four rates do not foot to 1.0, and does not
+  rescale, because the source says a failure means a miscount to be recounted.
+
+**Two design calls, both disclosed in MAINTENANCE.md:**
+1. `difficulty_score()` returns None, not 0, when no positions are applicable.
+   The source says "if applicable == 0, difficulty is NEEDS_INPUT". A score of 0
+   means "every position held", the easiest possible negotiation, so returning 0
+   for an unmeasured one would invert the finding.
+2. Bands are evaluated as <=25 Low, <=50 Medium, <=75 High, else Very high. The
+   source states integer ranges (0-25, 26-50, ...) which leave a score of 25.4
+   undefined between Low and Medium. Resolved downward and flagged, same family
+   as the seven pre-existing ambiguities in the F1 matrix.
+
+**Wired, not just built.** Both call sites in SKILL.md now carry a HARD RULE with
+a worked call and the refusal behavior. This skill is NOT held.
+
+**Kernel-copy consistency maintained deliberately.** Adding the outcome face made
+rfp-response-analysis's O3 copy one revision stale, so I re-vendored it in the
+same increment. Both consuming copies now diff IDENTICAL against the source and
+both run 63/63. A full re-vendor sweep across all non-held consumers is still
+owed once the C-tier finishes; that is O11's job and it is where the drift
+detection belongs. `lilly-contract-review` is NOT re-vendored, deliberately: HELD.
+
+**Malicious-code review of this increment: SAFE.** Kernel imports unchanged
+(`math`, `dataclasses`, `typing`). Grep for os/sys/subprocess/socket/urllib/
+`__import__`/eval/exec/pickle/base64 returns 0 across the kernel. Kernel diff is
+310 insertions and ZERO deletions. The two SKILL.md changes are prose plus fenced
+examples, no executable content.

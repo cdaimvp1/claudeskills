@@ -389,6 +389,222 @@ def quadrature_rollup(component_bases: Sequence[float],
 
 
 # ===========================================================================
+# OUTCOME face
+# ===========================================================================
+#
+# Source: negotiation-playbook-learning-1c344a/SKILL.md, inlined
+# "references/outcome-schema.md" -> the win/loss partition math (SKILL.md:574-608)
+# and "## Negotiation Difficulty Score" (SKILL.md:613-640).
+#
+# That skill had no kernel at all before this, and its own v2.1 changelog
+# (SKILL.md:33) records the bug this face exists to make unrepeatable: "Fixed
+# difficulty-score scaling (max per-position weight set to 15, scaling_factor =
+# 100/15) so a single HARD_STOP_EXCEPTION can no longer push the 0-100 score
+# past 100; made the win/loss outcome partition exhaustive (rates sum to 100%)".
+# Both halves of that fix are invariants here rather than prose: the score is
+# bounded by construction and asserted, and the partition raises if it does not
+# foot to 1.0.
+
+
+class OutcomeCodeError(KernelError):
+    """Raised for an outcome code outside the eleven the schema defines."""
+
+
+class PartitionError(KernelError):
+    """Raised when the four win/loss partition rates do not sum to 1.0.
+
+    SKILL.md:607 states the integrity check directly: "lilly_position_prevailed
+    + supplier_prevailed + negotiated + escalated == 1.0", and :610 tells the
+    reader that a failure means "you have miscounted an outcome and must
+    recount". That is a recount instruction, not a rounding tolerance, so this
+    raises rather than normalizing the rates to fit.
+    """
+
+
+# SKILL.md:564-570, the outcome-code to partition-bucket map. NOT_APPLICABLE is
+# excluded from the denominator rather than assigned a bucket.
+_LILLY_PREVAILED = ("ACCEPTED_AS_IS", "ACCEPTED_WITH_MINOR_CHANGES",
+                    "HARD_STOP_HELD", "LILLY_FALLBACK_USED")
+_SUPPLIER_PREVAILED = ("COUNTER_ACCEPTED", "REJECTED_BY_SUPPLIER",
+                       "HARD_STOP_EXCEPTION")
+_NEGOTIATED = ("NEGOTIATED_COMPROMISE",)
+_ESCALATED = ("ESCALATED_TO_SME", "ESCALATED_TO_LEGAL")
+_NOT_APPLICABLE = "NOT_APPLICABLE"
+
+# SKILL.md:576-583. Strict acceptance EXCLUDES fallbacks, so it is a subset of
+# lilly_position_prevailed and is deliberately NOT part of the 100% partition
+# (SKILL.md:610 says so explicitly).
+_STRICT_ACCEPTANCE = ("ACCEPTED_AS_IS", "ACCEPTED_WITH_MINOR_CHANGES",
+                      "HARD_STOP_HELD")
+
+_ALL_OUTCOME_CODES = (_LILLY_PREVAILED + _SUPPLIER_PREVAILED + _NEGOTIATED
+                      + _ESCALATED + (_NOT_APPLICABLE,))
+
+# SKILL.md:620-628. Codes absent from this map carry weight 0
+# (ACCEPTED_AS_IS, ACCEPTED_WITH_MINOR_CHANGES, HARD_STOP_HELD).
+_DIFFICULTY_WEIGHTS = {
+    "REJECTED_BY_SUPPLIER": 10,
+    "COUNTER_ACCEPTED": 8,
+    "NEGOTIATED_COMPROMISE": 5,
+    "ESCALATED_TO_SME": 6,
+    "ESCALATED_TO_LEGAL": 8,
+    "HARD_STOP_EXCEPTION": 15,
+    "LILLY_FALLBACK_USED": 3,
+}
+
+# SKILL.md:615, :630-632. The max per-position weight is 15, so 100/15 maps an
+# average-weight-per-position range of 0-to-15 onto 0-to-100 by construction.
+_MAX_POSITION_WEIGHT = 15
+_DIFFICULTY_SCALING_FACTOR = 100 / _MAX_POSITION_WEIGHT
+
+# SKILL.md:636-639.
+_DIFFICULTY_BANDS = ((25, "Low"), (50, "Medium"), (75, "High"),
+                     (100, "Very high"))
+
+
+@dataclass
+class OutcomePartition:
+    """The four win/loss rates plus strict acceptance, over one denominator."""
+
+    denominator: int
+    acceptance_rate: float
+    lilly_position_prevailed: float
+    supplier_prevailed: float
+    negotiated: float
+    escalated: float
+
+
+@dataclass
+class DifficultyScore:
+    """A 0-100 negotiation difficulty score with its band label."""
+
+    score: float
+    band: str
+    weighted_sum: int
+    applicable: int
+    leadership_flag: bool
+
+
+def _validate_counts(counts: Dict[str, int]) -> None:
+    for code, n in counts.items():
+        if code not in _ALL_OUTCOME_CODES:
+            raise OutcomeCodeError(
+                f"unknown outcome code {code!r}. The schema defines exactly "
+                f"{sorted(_ALL_OUTCOME_CODES)} (SKILL.md:564-570)"
+            )
+        if not isinstance(n, int) or isinstance(n, bool) or n < 0:
+            raise InvalidInputError(
+                f"count for {code} must be a non-negative integer, got {n!r}"
+            )
+
+
+def outcome_partition(counts: Dict[str, int]) -> OutcomePartition:
+    """Compute the win/loss partition and strict acceptance rate.
+
+    Source: negotiation-playbook-learning SKILL.md:574-608.
+
+    `denominator` is every applicable position, i.e. the sum of all counts
+    except NOT_APPLICABLE (SKILL.md:574, "denominator = total_applicable -
+    count(NOT_APPLICABLE)").
+
+    Raises `PartitionError` if the four partition rates do not sum to 1.0.
+    SKILL.md:610 says a failure means an outcome was miscounted and must be
+    recounted, so this refuses rather than rescaling the rates to fit, which
+    would hide the miscount the check exists to surface.
+
+    Note that `acceptance_rate` is STRICT: it excludes LILLY_FALLBACK_USED and
+    is therefore a subset of `lilly_position_prevailed`, not a fifth partition
+    member. SKILL.md:610 states this explicitly.
+    """
+    _validate_counts(counts)
+    denominator = sum(n for c, n in counts.items() if c != _NOT_APPLICABLE)
+    if denominator == 0:
+        raise InvalidInputError(
+            "denominator is 0: every position was NOT_APPLICABLE, or no counts "
+            "were supplied. There is no partition to report; label this "
+            "NEEDS_INPUT rather than reporting zero rates"
+        )
+
+    def _rate(codes):
+        return sum(counts.get(c, 0) for c in codes) / denominator
+
+    part = OutcomePartition(
+        denominator=denominator,
+        acceptance_rate=_rate(_STRICT_ACCEPTANCE),
+        lilly_position_prevailed=_rate(_LILLY_PREVAILED),
+        supplier_prevailed=_rate(_SUPPLIER_PREVAILED),
+        negotiated=_rate(_NEGOTIATED),
+        escalated=_rate(_ESCALATED),
+    )
+
+    total = (part.lilly_position_prevailed + part.supplier_prevailed
+             + part.negotiated + part.escalated)
+    if abs(total - 1.0) > 1e-9:
+        raise PartitionError(
+            f"the four partition rates sum to {total}, not 1.0 "
+            f"(lilly={part.lilly_position_prevailed}, "
+            f"supplier={part.supplier_prevailed}, negotiated={part.negotiated}, "
+            f"escalated={part.escalated}). SKILL.md:610, an outcome has been "
+            "miscounted and must be recounted. Refusing to rescale"
+        )
+    return part
+
+
+def difficulty_score(counts: Dict[str, int]) -> Optional[DifficultyScore]:
+    """Compute the 0-100 Negotiation Difficulty Score (higher = harder).
+
+    Source: negotiation-playbook-learning SKILL.md:613-640.
+
+    Returns None when there are no applicable positions. SKILL.md:630 says
+    "never divide by zero; if applicable == 0, difficulty is NEEDS_INPUT", so
+    None is the caller's cue to render NEEDS_INPUT rather than a score of 0,
+    which would read as "this negotiation was easy" when nothing was measured.
+
+    The 0-100 bound holds by construction: the maximum per-position weight is
+    15 and the scaling factor is 100/15, so the worst possible average weight
+    per position maps to exactly 100. This is asserted rather than assumed,
+    because restoring the pre-v2.1 scaling would break it silently.
+    """
+    _validate_counts(counts)
+    applicable = sum(n for c, n in counts.items() if c != _NOT_APPLICABLE)
+    if applicable == 0:
+        return None
+
+    weighted_sum = sum(_DIFFICULTY_WEIGHTS.get(c, 0) * n
+                       for c, n in counts.items() if c != _NOT_APPLICABLE)
+    score = (weighted_sum / applicable) * _DIFFICULTY_SCALING_FACTOR
+
+    # SKILL.md:634 calls the clamp "a defensive guard against rounding". If it
+    # ever has real work to do, the scaling is wrong, which is exactly the v2.1
+    # bug, so the overshoot is caught rather than quietly clipped.
+    if score < -1e-9 or score > 100 + 1e-9:
+        raise InvalidInputError(
+            f"difficulty score {score} fell outside 0-100 before clamping. The "
+            f"score is bounded by construction (max weight {_MAX_POSITION_WEIGHT}, "
+            f"scaling {_DIFFICULTY_SCALING_FACTOR:.4f}), so this means a weight "
+            "exceeds the stated maximum. This is the v2.1 scaling-overshoot bug "
+            "(SKILL.md:33) reappearing, not a rounding artifact"
+        )
+    score = min(100.0, max(0.0, score))
+
+    band = _DIFFICULTY_BANDS[-1][1]
+    for ceiling, label in _DIFFICULTY_BANDS:
+        if score <= ceiling:
+            band = label
+            break
+
+    return DifficultyScore(
+        score=score,
+        band=band,
+        weighted_sum=weighted_sum,
+        applicable=applicable,
+        # SKILL.md:639, "76-100: Very high difficulty (flag for procurement
+        # leadership awareness)".
+        leadership_flag=score > 75,
+    )
+
+
+# ===========================================================================
 # LEVELING face
 # ===========================================================================
 #
@@ -1146,6 +1362,81 @@ if __name__ == "__main__":
         f"base={qr_widened.total_base}, low={qr_widened.total_low}, high={qr_widened.total_high}",
     )
 
+    # --- Golden: negotiation-playbook-learning band verification -----------
+    # Source: negotiation-playbook-learning-1c344a/SKILL.md:641, "Band
+    # verification (single-position negotiations)", which states every one of
+    # these six numbers and its band explicitly. This is a true golden test:
+    # the source did the arithmetic and published the answers.
+    _band_cases = [
+        ("HARD_STOP_EXCEPTION", 100.0, "Very high", True),
+        ("REJECTED_BY_SUPPLIER", 66.7, "High", False),
+        ("ESCALATED_TO_LEGAL", 53.3, "High", False),
+        ("COUNTER_ACCEPTED", 53.3, "High", False),
+        ("NEGOTIATED_COMPROMISE", 33.3, "Medium", False),
+        ("LILLY_FALLBACK_USED", 20.0, "Low", False),
+    ]
+    _band_ok = True
+    _band_detail = []
+    for _code, _expected, _band, _flag in _band_cases:
+        _d = difficulty_score({_code: 1})
+        if (abs(_d.score - _expected) > 0.05 or _d.band != _band
+                or _d.leadership_flag != _flag):
+            _band_ok = False
+        _band_detail.append(f"{_code}={_d.score:.1f}/{_d.band}")
+    _check(
+        "difficulty_score: all six single-position band verifications from "
+        "SKILL.md:641 reproduce exactly (HARD_STOP_EXCEPTION 100 Very high, "
+        "REJECTED_BY_SUPPLIER 66.7 High, ESCALATED_TO_LEGAL and "
+        "COUNTER_ACCEPTED 53.3 High, NEGOTIATED_COMPROMISE 33.3 Medium, "
+        "LILLY_FALLBACK_USED 20 Low)",
+        _band_ok,
+        "; ".join(_band_detail),
+    )
+    _check(
+        "difficulty_score: the >75 leadership flag fires ONLY on the "
+        "exception-level case, which is what the v2.1 rescaling was for",
+        difficulty_score({"HARD_STOP_EXCEPTION": 1}).leadership_flag is True
+        and difficulty_score({"REJECTED_BY_SUPPLIER": 1}).leadership_flag is False,
+    )
+    _check(
+        "difficulty_score: a negotiation where every position held scores 0 / Low "
+        "(ACCEPTED_AS_IS and HARD_STOP_HELD carry weight 0)",
+        difficulty_score({"ACCEPTED_AS_IS": 3, "HARD_STOP_HELD": 2}).score == 0.0,
+    )
+    _check(
+        "difficulty_score: applicable == 0 returns None so the caller renders "
+        "NEEDS_INPUT (SKILL.md:630). Returning 0 would read as 'this was easy' "
+        "when nothing was measured",
+        difficulty_score({"NOT_APPLICABLE": 5}) is None,
+    )
+
+    # Partition: SKILL.md:574-608, four rates over one denominator.
+    _pcounts = {
+        "ACCEPTED_AS_IS": 4, "ACCEPTED_WITH_MINOR_CHANGES": 2,
+        "HARD_STOP_HELD": 1, "LILLY_FALLBACK_USED": 1,
+        "COUNTER_ACCEPTED": 2, "REJECTED_BY_SUPPLIER": 1,
+        "HARD_STOP_EXCEPTION": 1, "NEGOTIATED_COMPROMISE": 2,
+        "ESCALATED_TO_SME": 1, "ESCALATED_TO_LEGAL": 1, "NOT_APPLICABLE": 3,
+    }
+    _part = outcome_partition(_pcounts)
+    _psum = (_part.lilly_position_prevailed + _part.supplier_prevailed
+             + _part.negotiated + _part.escalated)
+    _check(
+        "outcome_partition: the four win/loss rates sum to exactly 1.0 over a "
+        "denominator that excludes NOT_APPLICABLE (SKILL.md:574, :607)",
+        abs(_psum - 1.0) < 1e-9 and _part.denominator == 16,
+        f"got sum={_psum}, denominator={_part.denominator}",
+    )
+    _check(
+        "outcome_partition: strict acceptance_rate excludes fallbacks, so it is "
+        "a SUBSET of lilly_position_prevailed and not a fifth partition member "
+        "(SKILL.md:610)",
+        _part.acceptance_rate == 7 / 16
+        and _part.acceptance_rate < _part.lilly_position_prevailed,
+        f"got acceptance={_part.acceptance_rate}, "
+        f"lilly_prevailed={_part.lilly_position_prevailed}",
+    )
+
     # --- level_bid: the three formulas at SKILL.md:1698-1700 ---------------
     # Source: rfp-response-analysis-1c344a/SKILL.md, inlined bid-leveling.md.
     # No worked numeric example is given in the source, so these are hand
@@ -1374,6 +1665,25 @@ if __name__ == "__main__":
 
 
 
+
+    # --- outcome face refusals ---------------------------------------------
+    _check_raises(
+        "outcome_partition: refuses an outcome code outside the eleven the "
+        "schema defines",
+        lambda: outcome_partition({"MAYBE": 1}),
+        OutcomeCodeError,
+    )
+    _check_raises(
+        "outcome_partition: refuses when every position is NOT_APPLICABLE, "
+        "rather than reporting four zero rates as if they were measured",
+        lambda: outcome_partition({"NOT_APPLICABLE": 4}),
+        InvalidInputError,
+    )
+    _check_raises(
+        "difficulty_score: refuses a negative outcome count",
+        lambda: difficulty_score({"COUNTER_ACCEPTED": -1}),
+        InvalidInputError,
+    )
     # --- level_bid refusals -------------------------------------------------
     _check_raises(
         "level_bid: refuses one_time=None rather than defaulting it to zero. "
