@@ -324,3 +324,45 @@ NEXT (post-lock, Marc's approved order; separate workstreams — do NOT reopen t
 skill → #3/#6 RFx→Deal handoff + comms-evidence methodology (RFx mockup = task #20, spec
 _redesign_proposals/RFx-REDESIGN-SPEC.md) → #4 Category Strategy rebuild. Landscape MCM pass (#15)
 still pending (hardcoded hexes in pv-07* engine). All under never-regress/branch + Desktop-usage-efficient.
+
+---
+
+# LOCKED 2026-07-29
+
+The Deal dashboard is locked. Marc's call, after every gate closed.
+
+**What closed it**
+
+| Item | State |
+|---|---|
+| #11 Positions port | DONE. Every block of the locked mockup was already live; the missing piece was the severity filter bar, now built and verified (12 to 2 hard-stop, 12 to 7 high, counts follow, selection stays visible). |
+| #12 Communications filters | DONE. Status, category and expand-all were already working; search was missing. All three now compose through one function. |
+| #14 Pale-fill sweep | DONE at the token layer: --danger, --danger-t, --warn-t, --surface2. Zero red, zero sub-floor fills render. |
+| #16 Verification + malicious-code sweep | PASS on both halves. Evidence in DEAL-16-VERIFICATION.md. |
+| Six judgment calls | ANSWERED. See below. |
+
+**The six judgment calls, as decided**
+
+1. Protection-Scorecard spine: **keep the 8 categories.** The scorecard and the
+   register stay the same object seen twice.
+2. L&P navigator: **keep the group bands.** Protections and obligations are read
+   at different moments.
+3. Boot auto-expand: **start collapsed.** Changed. Auto-expand pushed the page
+   down and chose a first item for the reader.
+4. Cross-Doc "Open Document Risks" reframe: **not adopted.** On reading it against
+   the live panel it is a rename plus one good idea. The live title distinguishes
+   a conflict between documents we hold from a gap where a document is absent,
+   and right now that is 0 conflicts against 3 gaps, which the proposed title
+   would hide. The good idea, an "ask it drives" column, is a column, not a
+   restructure.
+5. Document Family Register click-to-open: **no.** These artifacts are
+   self-contained single files with no file-system access, so the link would be a
+   promise the page cannot keep. Expand-in-place with the excerpt is the honest
+   version if it is ever wanted.
+6. #13 Next-Session Brief: **dropped.** Already absent from live source;
+   recoverable from git history.
+
+**What lock means.** No further design change without Marc reopening it. Bug
+fixes and the restyle-protocol layer are not design changes. The dashboard build
+path is `deal-room-1c344a/dashboard/build_deal_artifact.py` reading `_parts/*`;
+see SOURCE-OF-TRUTH.md.

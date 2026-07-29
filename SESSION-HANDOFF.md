@@ -24,7 +24,18 @@ screen). Both must be rebuilt and copied on every change.
 
 ---
 
-## NEXT ACTION: Deal #17 — lock, then the docs/skills set
+## NEXT ACTION: D0 (Marc's decision), then D1 and D3
+
+Deal is **LOCKED** (#17, 2026-07-29). D4 and L3 are **DONE**. D2 is deferred by
+Marc. D1 and D3 remain and are blocked on D0.
+
+D0 in one line: the Deal-tab dashboard code physically lives inside
+`deal-room-1c344a/`, which is a DIFFERENT product (a live negotiation manager
+with a persistent concession ledger). The dashboard is static and reflect-only.
+One skill directory currently claims both.
+
+--- (superseded section below) ---
+## Was: Deal #17 — lock, then the docs/skills set
 
 Deal #11, #12, #14 and #16 are DONE and verified live. #16 passed both halves;
 the evidence is in `_deal_build/DEAL-16-VERIFICATION.md`. #17 is not blocked.

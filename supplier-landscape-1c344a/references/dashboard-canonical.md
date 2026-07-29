@@ -17,7 +17,13 @@
 - Risk Assessment: portfolio summary, cross-supplier risk-by-dimension heatmap (rank-ordered), selected-supplier register + material events.
 
 ## Palette (LOCKED)
-plum #5C2B50 primary, teal #2F6E6B secondary, burnt-orange #C15E19 emphasis; critical-red for gaps/critical only. No blue, no green. Encoded in the engine (theo-color.css + pv.css tokens + render code); never overridden per run.
+plum #5C2B50 primary (structure, panel identity, section rules, primary bars), teal #2F6E6B secondary (favourable, settled, complete), burnt-orange #C15E19 emphasis (attention, gate, risk, blocked, outstanding) with #9A4A13 as its deeper shade. Burnt orange is solid only: no lighter or amber variant. **There is no red, green, yellow or amber anywhere in the system.** The former "critical-red for gaps/critical" is gone; critical now reads as burnt orange, which is why the emphasis colour is reserved for attention and never used decoratively.
+
+Role tints have a floor and may not be paler than it: plum #C6B5C2, teal #B6CCCB, burnt #ECCFBA. Anything paler disappears on a projector. If a tint needs to be quieter, go neutral, not paler. Pale washes as panel backgrounds are banned, #FBEFC9 above all.
+
+A fourth family, muted mid-century supplier hues (#7A2436 burgundy, #123C82 navy, #5A6B33 olive, #8A6A1F ochre, #4A5A6B slate), exists ONLY to tell suppliers apart. A supplier hue may mark identity, never whether something is good.
+
+Encoded in the engine (theo-color.css + pv.css tokens + render code); never overridden per run. L1/L2 (2026-07-28) mapped 194 off-palette hex literals in pv-07*.js and pv.css onto these tokens, because the engine wrote hex straight into inline styles and bypassed the variable layer entirely.
 
 ## Determinism guarantee
 Same data object in => byte-identical dashboard out. Structure, tabs, components, palette, and layout never change per run or mode; only the data changes. Every tab always renders; genuinely-absent data is gap-stated in place ("Data not available" / "not assessed"), never dropped, blanked, or fabricated.

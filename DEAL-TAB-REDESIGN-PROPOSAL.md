@@ -1,3 +1,36 @@
+> # SUPERSEDED — do not build from this document
+>
+> **D4, 2026-07-29.** This proposal specifies **six** sub-tabs:
+> Overview, Scope, Review, Strategy & Positions, Pricing & Commercial, Pro-forma.
+>
+> **What shipped is four**, and the four are locked:
+>
+> | Tab | Subtabs |
+> |---|---|
+> | **Overview** | none |
+> | **Terms & Review** | Documents & Conflicts · Legal & Protection · Scope & Performance · Sources & Evidence |
+> | **Economics** | Deal Table & ZOPA · Financial Model |
+> | **Negotiation** | Positions · Trade Plan · Communications |
+>
+> The shipped IA is canonical. It differs from this proposal in three ways worth
+> recording, because each was a deliberate decision and not drift:
+>
+> 1. **Scope did not get its own top-level tab.** It became a subtab of Terms &
+>    Review, because scope questions are read alongside the legal ones, not apart
+>    from them.
+> 2. **Strategy & Positions and Pricing & Commercial did not split into peers.**
+>    Positions, Trade Plan and Communications are subtabs of Negotiation; the
+>    numbers live in Economics. The proposal split Negotiate to relieve
+>    overloading; the shipped answer relieved it with subtabs instead, which kept
+>    the top bar to four.
+> 3. **Pro-forma is a subtab of Economics**, named Financial Model, not a
+>    top-level tab.
+>
+> This document is kept for the analysis in section 2, which is still sound. The
+> IA in section 1 is not. Build from the table above.
+
+---
+
 # Deal Tab Redesign Proposal (assessment synthesis)
 
 # Deal Tab Redesign — Decision-Ready Proposal
