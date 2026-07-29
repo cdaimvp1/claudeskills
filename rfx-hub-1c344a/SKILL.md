@@ -92,8 +92,8 @@ this contract exists to catch, so leaving them unlisted defeated it.
 is settled. The inferred column is my reading of the seeded object
 (`dashboard/assets/seed/project-view.js`, `projectView.domain.rfx`) against each skill's
 stated remit, and is NOT approved design. Each assignment is defensible (`scale` to
-rfp-engine because that skill already mandates the suite-canonical 0-5 band set at its
-SKILL.md:384; the event metadata to rfp-case-manager because it is the state and lifecycle
+rfp-engine because that skill already mandates the suite-canonical 0-5 band set at
+`rfp-engine-1c344a/SKILL.md:384`; the event metadata to rfp-case-manager because it is the state and lifecycle
 owner; `modelDecision` to evaluation-engine because scenario re-weighting is sensitivity
 analysis) but defensible is not the same as confirmed. **Marc should confirm the inferred
 column.** Until he does, treat it as the working assignment rather than the contract.

@@ -1379,3 +1379,74 @@ package after stripping ..... 37,561 KB
 **Nothing was deleted and no packaging step was run.** Stripping is a deliberate reviewed
 step taken against this manifest at packaging time (K1). Recorded here so the assessment
 exists when that moment comes, rather than being improvised then.
+
+### Task #7, 2026-07-29. H5 is BLOCKED on H4. Adjacent tool built and kept.
+
+`_audit/H5-CITATION-FINDINGS.md`, `_audit/h5_citation_resolver.py`.
+
+**I built the wrong tool first, then read H5's actual definition.** Recording that rather
+than presenting the tool as if it were the item.
+
+H5 is about citations a skill EMITS in its deliverables, chiefly external URLs: "a resolve
+check on every emitted citation: URL fetched this run, or snapshot hash matched, or
+explicitly labelled unverified", verified by seeding a dead URL. It is NOT about internal
+file cross-references, which is what I checked.
+
+**H5 `Depends on: H4`, and H4 is one of the eight untriaged WS H items behind a Marc
+decision.** A per-citation resolve state has nowhere to live until provenance is per-fact:
+today a document carries one provenance record, so there is no field on which to record
+that THIS URL was fetched, hash-matched, or unverified. H5 proper cannot be built yet, and
+attempting it would mean inventing the field that is H4's whole job.
+
+**Ground state measured (the unblocked groundwork):**
+```
+skills emitting external URLs .................. 7 of 32
+skills requiring a capture date / "this session"  2
+generators enforcing a resolve check IN CODE ... 0
+```
+G12 already specifies the right shape at `lilly-brand-assets:1117` ("an accessed web source
+with URL plus capture date"). **Stated once, centrally, enforced nowhere.** Same pattern H3
+found for "drop, do not dilute": a correct rule with no mechanism.
+
+**The named worst case is already documented and still open.**
+`procurement-help-desk-1c344a/SKILL.md:129-131`, Global ProtectLilly: on the now.lilly.com
+intranet, not SharePoint, so the M365 connector "may NOT reach this page ... the source most
+likely to fail retrieval ... the retrieval gap has not yet been re-verified". A policy URL
+that will be cited, probably cannot be reached, and where nothing forces the difference
+between "fetched" and "cited from memory" to be visible. That is all of H5 in one example.
+
+**The adjacent tool I kept**, checking internal cross-references, which nothing else covers:
+```
+line-number citations checked ... 12    resolved 12    broken 0
+cross-skill path citations ...... 166   target missing 153
+```
+
+**The interesting result is the SCARCITY, not the breakage. Twelve line-level citations
+across 32 skills.** The suite cites files constantly and lines almost never. G12 asks for
+"a document plus section/page"; internal referencing is file-level, so a reader chasing a
+claim lands on a whole document rather than a place in it. That is the difference between a
+checkable source and a plausible one.
+
+**Two real catches, both mine:**
+1. An ambiguous citation I wrote earlier tonight: `rfx-hub/SKILL.md` carried a bare
+   `SKILL.md:384` inside prose about rfp-engine. Correct in context, ambiguous in form,
+   resolves against the wrong file mechanically. Fixed to `rfp-engine-1c344a/SKILL.md:384`.
+2. A resolver bug: my first version preferred a same-skill basename match over an explicit
+   path, so the corrected citation still reported false. A citation carrying a path is
+   explicit and must be honoured first. Fixed, reason recorded in the code.
+
+**153 cross-skill misses: 145 are the brand-assets dangling pointers, independently
+reproduced by a second tool**, which is a useful confirmation of the G1-G7 finding.
+
+**One NEW finding, not a citation at all:** eight paths under
+`/mnt/skills/user/executive-summary/` come from an INSTALL SCRIPT at
+`executive-summary-package-1c344a/SKILL.md:1096-1150`. **That skill installs under a
+different name than its directory** (`executive-summary` vs `executive-summary-package-1c344a`).
+Possibly deliberate, but a manifest built from directory names will not match what lands on
+disk. Flagged for K1.
+
+**Recommendation:** H5 stays blocked on H4. What is worth doing now regardless: enforce the
+capture-date requirement in whichever generator emits a benchmark or research table, so a
+citation without one raises rather than renders. Same ledger-boundary pattern as the
+contract-review fix pack, and it needs no new provenance model, only a required field on an
+existing structure.
