@@ -1952,3 +1952,42 @@ correct:
 and two are narrow with their residual exposure named. The three `KNOWN_OPEN` entries and
 the one `KNOWN_EXCEPTIONS` entry all remain REAL open defects tracked as B7 and the F1
 rewire respectively; pinning does not fix them, it stops them concealing anything else.
+
+### TRACEABILITY AUDIT, 2026-07-29. Traced every finding to a task. Found 6 gaps in my own tracking.
+
+Marc asked whether the "real open items" I keep referencing actually have plans. Checked
+rather than asserted. **Most did. Six did not**, and I had been saying "tracked as B7" as an
+assumption.
+
+**THE ASSUMPTION THAT WAS WRONG.** `_audit/UPGRADE-PLAN.md` B7 says: "remove old mode
+pickers, superseded IA prose, routing lists". It does **not** name the dangling brand-assets
+pointers or the three A7 doc pointers. A future reader working B7 would have had no reason
+to look for either. Saying "tracked as B7" was a guess dressed as a fact.
+
+**GAPS FOUND AND CLOSED:**
+
+1-2. **The 26-skill dangling pointer sweep** and **the three A7 doc pointers**, now written
+explicitly into task #15 with the fix stated (delete the pointers, keep the inline content,
+do NOT restore the 8 files) and a **completion criterion**: when done, DELETE the KNOWN_OPEN
+entries. The allowlist must not survive as permanent furniture, and the smoke test must end
+green with an EMPTY KNOWN_OPEN.
+
+3-5. **H3's three surviving findings had no task at all** (new task #35): "drop, do not
+dilute" adopted nowhere (2 hits suite-wide, both inside its own definition); eleven skills
+with no code-enforced claim gate, **supplier-deep-dive first** because it asserts exactly the
+debarment/sanctions/financial-distress statuses G12's third prohibition names with no code
+path that refuses; and two skills missing the ABSTAIN mechanism.
+
+6. **F9's five build decisions had no tasks** (new task #36). The sweep decided build-or-prose
+and built nothing, per its scope, but only rfp-engine's E4 was tracked. scope-sow-architect
+(four structured artifacts, zero generators), negotiation-playbook-learning (now cheap
+because O4 did its arithmetic), rfp-case-manager schemas, legal-negotiation-prep's split, and
+the supplier-landscape DOCX were all findings with nowhere to land.
+
+**The lesson, same shape as the slice-contract correction.** An audit that produces findings
+and a task list that does not absorb them is how a finding becomes folklore: still true,
+still cited in conversation, never scheduled. Producing findings is only half of an audit
+item; the other half is making sure something will act on them.
+
+**Net position after this audit:** every finding from tonight now maps to either a completed
+fix, a workable task, or a task blocked with the blocker named. Nothing is floating.
