@@ -47,7 +47,7 @@ Update this table as you go. It is the fastest way to resume.
 | Item | Status | Commit | Notes |
 |---|---|---|---|
 | O1 coverage matrix output-mode re-audit | **DONE** | `2720f66` `19afc3f` +sweep | 307 rows. 5 at-risk clusters. Part 3 sweep found 4 items with no home = 4th rescue candidate, undecided |
-| O2 build `deduction_score()` | NOT STARTED | | kernel skill only, do NOT wire |
+| O2 build `deduction_score()` | **DONE** | `18b955b` | 43/43 self-test. Golden -36/64 exact. Both calibrations raise. NOT wired, per brief |
 | O3 C3 Bid Leveling kernel | NOT STARTED | | gates an audited ranking |
 | O4 C2 playbook-learning Difficulty Score | NOT STARTED | | proven bug in its own changelog |
 | O5-O10 C4,C5,C6,C7,C8,C10 kernel adoption | NOT STARTED | | non-held skills |
@@ -272,3 +272,79 @@ skill is HELD (`PLATFORM-CONSOLIDATION-TRACKER.md:172`). The queue says build it
 in the kernel only and do NOT wire it, and that is what happened. The function
 currently has no caller in the suite, which is deliberate. Recorded in
 MAINTENANCE.md so a later reader does not mistake it for dead code.
+
+### O3 DONE, 2026-07-29. Bid Leveling normalization kerneled AND wired.
+
+Built `level_bid()` in the kernel, re-vendored into `rfp-response-analysis-1c344a`,
+and wired SKILL.md to require it. Source: `rfp-response-analysis-1c344a/SKILL.md`
+:1696-1704, the inlined `references/bid-leveling.md` normalization formulas.
+
+**Why this one mattered.** That skill already routes its Weighted Scoring Matrix
+through `weighted_score()`, so the RANKING arithmetic was audited. But the pricing
+dimension of that matrix reads the normalized TCO, and the normalization was prose
+the model executed by hand. An audited ranking over an unaudited input is not
+audited. Its own Rule 6 ("Never rank, score, or recommend on unleveled figures") is
+now enforced by code rather than instruction.
+
+**Verification, actual output:**
+
+```
+SUMMARY: 54/54 passed, 0/54 failed
+```
+
+Kernel source and the re-vendored copy both run clean. The vendored copy's code
+body diffs IDENTICAL against the source.
+
+Hand calculations against the three quoted formulas (the source gives no worked
+numeric example, so these are labeled hand checks, not source goldens):
+```
+flat:  annual 120000, units 500, term 3, one_time 45000
+       reported_tco 405000        = 120000*3+45000     PASS
+       per_unit     240           = 120000/500         PASS
+       per_unit_yr  270           = 405000/3/500       PASS
+escalated 3yr @5% compounding, year1=base:
+       per_year [100000, 105000, 110250]               PASS
+```
+
+**Three refusals, each a way a number could misrepresent one supplier against another:**
+- `one_time=None` raises. Element 5 says an unpriced cost is a labeled placeholder,
+  "never defaulted to zero". A silent zero flatters whichever supplier disclosed
+  least, which is the exact distortion leveling exists to remove.
+- A multi-year escalator with `first_year_escalated` unstated raises. The source
+  says call `escalate()` per contract year but never says whether year 1 already
+  carries one escalation, and `escalate()`'s own docstring flags the same ambiguity
+  while noting pro-forma-builder resolves it the other way. **Measured: the two
+  readings differ by 15,762.50 on a 3-year 5% term against a 100,000 annual stack.**
+  That is material to a ranking, so the caller states the convention.
+- Zero units or `term_years` < 1 raise. Neither can produce a per-unit basis.
+
+**Wired, not just built** (per the integrate-or-don't-ship rule). SKILL.md:1704 now
+carries a HARD RULE with a worked call, the three refusals, and an instruction not
+to hand-compute around a raise. Unlike O2, this skill is NOT held, so wiring was in
+scope and leaving it unwired would have been false-complete.
+
+**Finding, surfaced by re-vendoring: the shared kernel exists in three variants.**
+Hashes across the 11 vendored copies fell into 3 groups. Diffed all of them:
+**the code bodies are byte-identical** (`830d8c9f628a` for all 11 with the vendor
+header stripped). The only differences are the vendor-date comment on line 1
+(2026-07-21 for 7 skills, 2026-07-22 for 4) and a call-manifest comment
+scope-sow-architect adds. So the drift is benign TODAY. It is also invisible
+without doing this by hand, which is precisely the argument for O11's hash
+manifest. Recorded there.
+
+Also note: none of the 11 vendored copies carried `deduction_score()` from O2, and
+only rfp-response-analysis has been re-vendored now. That is deliberate. Re-vendoring
+to all of them would touch `lilly-contract-review`, which is HELD.
+
+**Housekeeping, disclosed because it makes one diff look bigger than it is.**
+`OVERNIGHT-RUN-LOG.md` and `OVERNIGHT-QUEUE.md` were MIXED line endings at HEAD
+(149 CRLF / 125 LF in the run log). My earlier Python writes normalized them to
+CRLF, producing a whole-file diff. I have normalized both to LF to match the rest
+of what this session wrote, so future diffs on these two resume-critical files show
+real changes rather than noise. No content was altered by that step.
+
+**Malicious-code review of this increment: SAFE.** Kernel imports remain `math`,
+`dataclasses`, `typing` only. Grep for os/sys/subprocess/socket/urllib/`__import__`/
+eval/exec/pickle/base64 across the kernel returns 0. Kernel diff is 293 insertions
+and ZERO deletions, so nothing existing was altered. The SKILL.md change is prose
+plus a fenced example, no executable content.

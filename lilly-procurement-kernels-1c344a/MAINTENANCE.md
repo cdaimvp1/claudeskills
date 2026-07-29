@@ -15,6 +15,7 @@ that multiple Lilly Procurement Skills each describe independently in prose:
 | `weighted_score` | market-rate-benchmarking (Composite Contract Quality Score) AND evaluation-engine (Effective_Weight_Frac / Score Validation Checks) - both skills independently require weights to foot to 1.0; this is one shared guard instead of two divergent ones |
 | `npv` | pro-forma-builder (Financial Methodology, end-of-year Year-1 discounting) |
 | `quadrature_rollup` | should-cost-builder (Aggregation Method: quadrature + >15% LOW-confidence widening) |
+| `level_bid` | rfp-response-analysis (`references/bid-leveling.md`, the three normalization formulas and the escalation rule at SKILL.md:1704) |
 | `deduction_score` | lilly-contract-review (`references/risk-scoring.md`, the combined-protection-weighted deduction table, the Hard Stop invariant, and BOTH anti-drift calibration checks) |
 | `score_band` | lilly-contract-review (`references/risk-scoring.md:37-42`, the four residual-risk bands) |
 
@@ -165,6 +166,22 @@ skills themselves draw a hard line. Specifically:
   combined component (summing their spreads linearly) before calling this
   function, per should-cost-builder's own text, until a grouping-aware
   version is added here.
+- **`level_bid` refuses `one_time=None` rather than defaulting it to zero.**
+  Bid Leveling element 5 requires an unpriced cost be carried as a labeled
+  placeholder, "never defaulted to zero and never dropped from the comparison".
+  A silent zero flatters whichever supplier disclosed least, which is the exact
+  distortion the leveling stage exists to remove.
+- **`level_bid` refuses a multi-year escalated bid when `first_year_escalated`
+  is unstated.** rfp-response-analysis says to call `escalate()` once per
+  contract year but never says whether contract year 1 already carries one
+  escalation. `escalate()`'s own docstring flags the same ambiguity and notes
+  pro-forma-builder resolves it the other way. On a 3-year term at 5 percent
+  against a 100,000 annual stack the two readings differ by 15,762.50, which is
+  material to a ranking, so the caller states the convention.
+- **`level_bid` computes the single-year per-unit figure off the STATED annual
+  price, unescalated, even when the multi-year TCO is escalated.** That is what
+  SKILL.md:1698 defines (`annual / units`), and it is not a multi-year sum.
+  Escalating it would double-count against the TCO figure beside it.
 - **`deduction_score` does not choose the deduction, it validates the one it is
   given.** `risk-scoring.md:28` step 4 explicitly reserves the value WITHIN each
   table range to judgment ("editing errors or MSA-alignment restorations take

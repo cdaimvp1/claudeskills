@@ -1,4 +1,5 @@
-# Vendored verbatim from lilly-procurement-kernels-1c344a/numeric_kernel.py on 2026-07-21; source of truth is lilly-procurement-kernels-1c344a/numeric_kernel.py. Do not hand-edit here; edit the source and re-vendor.
+# Vendored verbatim from lilly-procurement-kernels-1c344a/numeric_kernel.py on 2026-07-29; source of truth is lilly-procurement-kernels-1c344a/numeric_kernel.py. Do not hand-edit here; edit the source and re-vendor.
+# rfp-response-analysis-1c344a calls: weighted_score() (the Weighted Scoring Matrix total, Section 8) and level_bid() (Phase 4 Bid Leveling normalization, the input that matrix's pricing dimension reads). level_bid() calls escalate() internally per SKILL.md:1704 for multi-year escalated TCO. The remaining functions are vendored for completeness (this is a verbatim copy of the shared kernel) but not called by this skill's own workflow.
 """
 numeric_kernel.py
 Lilly Procurement Skills - Shared Numeric Kernel
@@ -11,10 +12,11 @@ principles. Where a source file gives a formula but no worked numeric example,
 that is disclosed in the docstring and in the self-test output rather than
 inventing a "verified" number.
 
-Three faces:
+Four faces:
   NORMALIZATION - to_hourly, convert_currency, percentile_gate
   VERIFICATION  - verify_line_math, escalate, weighted_score
   COMPUTATION   - npv, quadrature_rollup
+  SCORING       - deduction_score, score_band
 
 Design pattern (matches the suite's own "refuse, don't guess" rule):
   - Unknown units, unknown currencies, and weight sets that don't foot to 1.0
@@ -31,7 +33,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence
+from typing import Dict, List, Optional, Sequence
 
 
 # ===========================================================================
@@ -387,6 +389,550 @@ def quadrature_rollup(component_bases: Sequence[float],
 
 
 # ===========================================================================
+# LEVELING face
+# ===========================================================================
+#
+# Source: rfp-response-analysis-1c344a/SKILL.md, inlined
+# "references/bid-leveling.md" -> "## Normalization formulas" (SKILL.md:1696-1704)
+#
+# Why this is in the kernel at all. rfp-response-analysis already routes its
+# Weighted Scoring Matrix through weighted_score(), so the RANKING arithmetic is
+# audited. But the pricing dimension of that matrix reads the NORMALIZED TCO,
+# and the normalization producing it was prose the model executed by hand. An
+# audited ranking computed over an unaudited input is not audited. Rule 6 of
+# that skill ("Never rank, score, or recommend on unleveled figures") is exactly
+# the invariant these functions enforce.
+#
+# The three formulas, quoted from SKILL.md:1698-1700:
+#   normalized_price_per_unit_per_year = annual / units
+#   reported_TCO = (annual * term_years) + one_time
+#   normalized_TCO_per_unit_per_year = reported_TCO / term_years / units
+#
+# The second is qualified in the source as "flat, no escalation; this is the
+# illustrative-dashboard simplification". SKILL.md:1704 then makes the real rule
+# explicit: when a proposal states a multi-year escalator and the comparison
+# spans more than one year, the year-by-year escalated recurring cost MUST be
+# computed by calling escalate() once per contract year and summed, "rather than
+# the flat annual * term_years shorthand above". level_bid() implements that
+# rule as a refusal, not a preference: ask for a flat TCO on an escalated
+# multi-year proposal and it raises.
+
+
+class LevelingError(KernelError):
+    """Raised when a bid cannot be leveled onto the common comparison basis.
+
+    Every raise here is a case where returning a number would silently
+    misrepresent one supplier against another, which is the specific harm
+    rfp-response-analysis's Bid Leveling gate exists to prevent.
+    """
+
+
+@dataclass
+class LeveledBid:
+    """One supplier's pricing normalized onto the common comparison basis.
+
+    Field names follow `bid_leveling_worksheet.csv`'s columns where they
+    correspond, so a worksheet row can be written straight from this object
+    instead of being re-derived.
+    """
+
+    reported_tco: float
+    recurring_total: float
+    one_time_cost: float
+    normalized_price_per_unit: float
+    normalized_tco_per_unit_per_year: float
+    per_year_recurring: List[float] = field(default_factory=list)
+    term_years: int = 0
+    units: float = 0.0
+    escalator_pct: float = 0.0
+    flat_shorthand_used: bool = True
+    supplier_stated_total: Optional[float] = None
+    stated_vs_computed_variance: Optional[float] = None
+
+
+def level_bid(
+    *,
+    annual_recurring: float,
+    units: float,
+    term_years: int,
+    one_time: Optional[float],
+    escalator_pct: float = 0.0,
+    compounding: bool = True,
+    first_year_escalated: Optional[bool] = None,
+    supplier_stated_total: Optional[float] = None,
+) -> LeveledBid:
+    """Normalize one supplier's reported pricing onto the common basis.
+
+    Implements the three formulas at SKILL.md:1698-1700 and the escalation rule
+    at :1704. Refuses rather than returning a figure that would misrepresent one
+    supplier against another.
+
+    Arguments:
+      annual_recurring      the stated annual recurring price (subscription,
+                            support, hosting, managed services)
+      units                 the named-unit count for the common basis
+      term_years            the RFP's stated term, in whole years
+      one_time              one-time costs (implementation, setup, migration).
+                            Must be a number. See the refusal note below
+      escalator_pct         the proposal's stated annual escalator as a
+                            fraction, e.g. 0.03 for 3 percent. 0.0 means the
+                            proposal states no escalator
+      compounding           True for "Year N = Year N-1 x (1+rate)", False for
+                            simple escalation off the base. Passed to escalate()
+      first_year_escalated  whether contract year 1 already carries one
+                            escalation. Required when an escalator applies over
+                            more than one year, see below
+      supplier_stated_total the supplier's own headline total, if stated. When
+                            given, the variance against the computed TCO is
+                            returned so element 7's "reported vs normalized"
+                            gap is visible rather than absorbed
+
+    Refusals, each tied to a specific way a number could mislead:
+
+      one_time=None refuses. Element 5 of the eight required elements says a
+      cost no supplier priced is carried as a labeled placeholder, "never
+      defaulted to zero and never dropped from the comparison". Coercing an
+      unknown one-time cost to 0 is precisely that defaulting, and it flatters
+      whichever supplier was least forthcoming. A supplier whose one-time costs
+      are unknown is Pending Clarification and does not get a leveled TCO.
+
+      first_year_escalated=None refuses when escalator_pct != 0 and
+      term_years > 1. The source says to call escalate() per year but never says
+      whether contract year 1 is already escalated. The kernel's own escalate()
+      docstring flags the same ambiguity and notes pro-forma-builder resolves it
+      the other way. On a 3-year term at 5 percent the two readings differ by
+      roughly a full year of escalation across the recurring stack, which is
+      material to a ranking, so the caller states the convention rather than the
+      kernel guessing it.
+
+      A stated escalator over a multi-year term never silently uses the flat
+      shorthand. That is the whole point of SKILL.md:1704.
+    """
+    if units is None or units <= 0:
+        raise InvalidInputError(
+            f"units must be positive, got {units!r}. The common comparison basis "
+            "is a per-unit figure, so a zero or missing unit count cannot produce one"
+        )
+    if not isinstance(term_years, int) or isinstance(term_years, bool) or term_years < 1:
+        raise InvalidInputError(
+            f"term_years must be a whole number of years >= 1, got {term_years!r}"
+        )
+    if annual_recurring is None or annual_recurring < 0:
+        raise InvalidInputError(
+            f"annual_recurring must be zero or positive, got {annual_recurring!r}"
+        )
+    if one_time is None:
+        raise LevelingError(
+            "one_time is None. Bid Leveling element 5 requires an unpriced cost be "
+            "carried as a labeled placeholder, never defaulted to zero and never "
+            "dropped. Supply a should-cost placeholder value, or leave this supplier "
+            "at Pending Clarification and exclude it from the normalized comparison"
+        )
+    if one_time < 0:
+        raise InvalidInputError(f"one_time must be zero or positive, got {one_time!r}")
+
+    escalates = escalator_pct != 0.0 and term_years > 1
+    if escalates and first_year_escalated is None:
+        raise LevelingError(
+            f"a {escalator_pct:.2%} escalator applies over {term_years} years but "
+            "first_year_escalated was not stated. SKILL.md:1704 requires escalate() "
+            "per contract year, and the source does not define whether contract "
+            "year 1 already carries one escalation. Pass first_year_escalated=False "
+            "if the stated annual price IS year 1's price (the usual reading), True "
+            "if year 1 is already escalated off an earlier base"
+        )
+
+    per_year: List[float] = []
+    if escalates:
+        offset = 0 if first_year_escalated else 1
+        for n in range(1, term_years + 1):
+            exponent = n - offset
+            if exponent < 1:
+                # escalate() refuses year < 1 by design, and an exponent of 0 is
+                # the unescalated base year, so it is used directly.
+                per_year.append(float(annual_recurring))
+            else:
+                per_year.append(
+                    escalate(annual_recurring, escalator_pct, exponent, compounding)
+                )
+    else:
+        # SKILL.md:1699 flat shorthand, legal only when no escalator applies.
+        per_year = [float(annual_recurring)] * term_years
+
+    recurring_total = sum(per_year)
+    reported_tco = recurring_total + float(one_time)
+
+    variance = None
+    if supplier_stated_total is not None:
+        variance = reported_tco - float(supplier_stated_total)
+
+    return LeveledBid(
+        reported_tco=reported_tco,
+        recurring_total=recurring_total,
+        one_time_cost=float(one_time),
+        # SKILL.md:1698, a single-year figure off the stated annual price, so it
+        # is deliberately NOT escalated even when the multi-year TCO is.
+        normalized_price_per_unit=annual_recurring / units,
+        # SKILL.md:1700.
+        normalized_tco_per_unit_per_year=reported_tco / term_years / units,
+        per_year_recurring=per_year,
+        term_years=term_years,
+        units=float(units),
+        escalator_pct=escalator_pct,
+        flat_shorthand_used=not escalates,
+        supplier_stated_total=supplier_stated_total,
+        stated_vs_computed_variance=variance,
+    )
+
+
+# ===========================================================================
+# SCORING face
+# ===========================================================================
+#
+# Source: lilly-contract-review-1c344a/references/risk-scoring.md
+#
+# This is a DEDUCTION model and is deliberately NOT weighted_score(). It starts
+# at 100 and subtracts, the deduction for a finding depends on how well the
+# governing documents already cover that finding's category, and Hard Stops are
+# fixed at -15 in every column. weighted_score() is a weighted average over
+# criteria that must foot to 1.0, which is a different shape entirely. Do not
+# route one through the other.
+#
+# The division of labour matters and is the reason this function takes a
+# per-finding deduction rather than computing one. risk-scoring.md:28 step 4
+# reserves the value WITHIN the range to human or model judgment ("findings that
+# are editing errors or MSA-alignment restorations take the low end; findings
+# that represent genuine unprotected exposure take the high end"). Code cannot
+# make that call. What code CAN do, and what this function does, is refuse a
+# deduction that falls outside the range the table allows, refuse a reduced Hard
+# Stop, and refuse a total that fails either calibration check. The model still
+# rules; the kernel stops it ruling outside the table.
+
+
+class CoverageStatusError(KernelError):
+    """Raised for a coverage status outside standalone/covered/confirm/gap."""
+
+
+class SeverityError(KernelError):
+    """Raised for a finding severity outside the five rows of the deduction table."""
+
+
+class HardStopReducedError(KernelError):
+    """Raised when a Hard Stop carries any deduction other than -15.
+
+    risk-scoring.md:17 puts -15 in all four coverage columns and :31 states
+    "Hard Stops are never reduced. A Hard Stop is a non-negotiable Lilly
+    position regardless of what the MSA says. The deduction is always -15."
+    This is the invariant the redesign spec asks the kernel to enforce rather
+    than leave as an instruction, so a reduced Hard Stop refuses here instead of
+    quietly producing a flattering score.
+    """
+
+
+class DeductionRangeError(KernelError):
+    """Raised when a per-finding deduction falls outside its table range.
+
+    The range is selected by (severity, coverage status) per
+    risk-scoring.md:15-21. Judgment picks the value inside the range; anything
+    outside it is a scoring error, most commonly the Standalone column applied
+    to a category the governing documents actually cover.
+    """
+
+
+class CalibrationError(KernelError):
+    """Raised when a total deduction fails one of the two anti-drift checks.
+
+    risk-scoring.md:74-83 carries BOTH directions:
+      too harsh   (:76-81) zero Hard Stops, 10+ of 14 categories Covered, and
+                  findings primarily alignment or clarification, yet total
+                  deductions exceed 30. Indicates the Standalone column was
+                  used where Governed: Covered should apply.
+      too generous(:83)    a standalone supplier-paper document with no
+                  governing documents and 5+ findings, yet total deductions are
+                  under 25.
+
+    The too-generous direction is the more dangerous of the two, because it
+    understates risk and a flattering number does not invite scrutiny. Both
+    raise here. Neither is advisory.
+    """
+
+
+# risk-scoring.md:15-21, transcribed verbatim. Ranges are (most_negative,
+# least_negative) so that a deduction d is valid when low <= d <= high.
+_COVERAGE_COLUMNS = ("standalone", "covered", "confirm", "gap")
+
+_HARD_STOP = "Hard Stop"
+_HARD_STOP_DEDUCTION = -15.0
+
+_DEDUCTION_TABLE = {
+    # severity        standalone     covered      confirm      gap
+    "Hard Stop": {
+        "standalone": (-15.0, -15.0),
+        "covered": (-15.0, -15.0),
+        "confirm": (-15.0, -15.0),
+        "gap": (-15.0, -15.0),
+    },
+    "HIGH": {
+        "standalone": (-10.0, -7.0),
+        "covered": (-5.0, -3.0),
+        "confirm": (-7.0, -5.0),
+        "gap": (-10.0, -7.0),
+    },
+    "MEDIUM": {
+        "standalone": (-6.0, -4.0),
+        "covered": (-3.0, -2.0),
+        "confirm": (-4.0, -3.0),
+        "gap": (-6.0, -4.0),
+    },
+    "LOW": {
+        "standalone": (-3.0, -2.0),
+        "covered": (-1.0, -1.0),
+        "confirm": (-2.0, -1.0),
+        "gap": (-3.0, -2.0),
+    },
+    "Protection Gap": {
+        "standalone": (-5.0, -3.0),
+        "covered": (-2.0, -1.0),
+        "confirm": (-3.0, -2.0),
+        "gap": (-5.0, -3.0),
+    },
+}
+
+# risk-scoring.md:37-42. Bands are inclusive at both ends and contiguous.
+_SCORE_BANDS = (
+    (75, 100, "Low"),
+    (50, 74, "Moderate"),
+    (25, 49, "High"),
+    (0, 24, "Critical"),
+)
+
+_TOTAL_PROTECTION_CATEGORIES = 14  # risk-scoring.md:25 names all 14
+
+
+@dataclass
+class ScoredFinding:
+    """One finding as the deduction table sees it.
+
+    `deduction` is the value judgment already picked from the table range, as a
+    negative number. `rationale` is carried through untouched so the Rule 12
+    calculation table can be rendered from this object rather than re-authored.
+    """
+
+    severity: str
+    coverage_status: str
+    deduction: float
+    finding_id: str = ""
+    category: str = ""
+    rationale: str = ""
+
+
+@dataclass
+class ProtectionScore:
+    """Result of deduction_score(), shaped for the Rule 12 calculation table.
+
+    `rows` carries one entry per finding with the column that was used and the
+    range it had to fall inside, which is exactly what SKILL.md Rule 12 requires
+    be emitted so the score is auditable and reproducible by the reader. It is
+    returned as data, not prose: the generator renders it, so the table cannot
+    disagree with the score it accompanies.
+    """
+
+    score: int
+    raw_score: float
+    band: str
+    total_deduction: float
+    hard_stop_count: int
+    finding_count: int
+    covered_category_count: Optional[int]
+    rows: List[Dict[str, object]] = field(default_factory=list)
+    clamped: bool = False
+
+
+def score_band(score: float) -> str:
+    """Map a 0-100 Protection Score to its residual-risk label.
+
+    Source: risk-scoring.md:37-42. Boundaries are exact and inclusive: 75 is
+    Low, 74 is Moderate, 50 is Moderate, 49 is High, 25 is High, 24 is Critical.
+    """
+    if score < 0 or score > 100:
+        raise InvalidInputError(
+            f"score {score} is outside the 0-100 scale defined at risk-scoring.md:37-42"
+        )
+    for low, high, label in _SCORE_BANDS:
+        if low <= score <= high:
+            return label
+    raise InvalidInputError(f"no band covers score {score}")  # unreachable by construction
+
+
+def deduction_score(
+    findings: Sequence[ScoredFinding],
+    *,
+    covered_category_count: Optional[int] = None,
+    governing_docs_present: bool = True,
+    alignment_dominant: Optional[bool] = None,
+) -> ProtectionScore:
+    """Compute the 0-100 Protection Score from validated findings.
+
+    Implements risk-scoring.md in full: the starting point of 100 (:11), the
+    severity-by-coverage deduction table (:15-21), the Hard Stop invariant
+    (:17, :31), the 0-100 scale and its four bands (:37-42), and BOTH anti-drift
+    calibration checks (:76-81 and :83).
+
+    Arguments:
+      findings                 the validated PASS_4_PREP findings, each carrying
+                               the deduction already chosen from its table range
+      covered_category_count   how many of the 14 protection categories
+                               PASS_2_COVERAGE marks Covered. Required to
+                               evaluate the too-harsh calibration check
+      governing_docs_present   False for a standalone supplier-paper document
+                               with no governing documents. Drives the
+                               too-generous check
+      alignment_dominant       whether the findings are primarily MSA-alignment
+                               or clarification items rather than new
+                               unprotected exposures. This is the third
+                               criterion at risk-scoring.md:79 and it is a
+                               judgment, so the caller supplies it
+
+    Raises rather than returning a wrong number, in every case:
+      SeverityError / CoverageStatusError  unknown severity or column
+      HardStopReducedError                 a Hard Stop deducting other than -15
+      DeductionRangeError                  a deduction outside its table range
+      CalibrationError                     either anti-drift check fails
+      InvalidInputError                    a positive deduction, or the
+                                           too-harsh check cannot be evaluated
+                                           because alignment_dominant is unknown
+
+    On the last one: when zero Hard Stops and 10+ Covered categories both hold,
+    the too-harsh check is live and its third criterion cannot be guessed. The
+    kernel refuses rather than assuming, matching this module's standing
+    refuse-do-not-guess rule. Passing alignment_dominant=False disables that one
+    check honestly; omitting it does not.
+    """
+    if not isinstance(findings, Sequence) or isinstance(findings, (str, bytes)):
+        raise InvalidInputError("findings must be a sequence of ScoredFinding")
+
+    rows: List[Dict[str, object]] = []
+    total_deduction = 0.0
+    hard_stop_count = 0
+
+    for i, f in enumerate(findings):
+        where = f.finding_id or f"index {i}"
+
+        if f.severity not in _DEDUCTION_TABLE:
+            raise SeverityError(
+                f"finding {where}: severity {f.severity!r} is not one of "
+                f"{sorted(_DEDUCTION_TABLE)} (risk-scoring.md:15-21)"
+            )
+        status = f.coverage_status.strip().lower() if isinstance(f.coverage_status, str) else f.coverage_status
+        if status not in _COVERAGE_COLUMNS:
+            raise CoverageStatusError(
+                f"finding {where}: coverage status {f.coverage_status!r} is not one of "
+                f"{list(_COVERAGE_COLUMNS)} (risk-scoring.md:15)"
+            )
+
+        deduction = float(f.deduction)
+        if deduction > 0:
+            raise InvalidInputError(
+                f"finding {where}: deduction {deduction} must be negative or zero; "
+                "this is a deduction model, not an additive score"
+            )
+
+        # risk-scoring.md:83, "Every finding in a standalone document uses the
+        # Standalone column." The three Governed columns describe what a
+        # governing document provides, so they cannot apply when there is none.
+        if not governing_docs_present and status != "standalone":
+            raise CoverageStatusError(
+                f"finding {where}: coverage status {status!r} used on a document with "
+                "no governing documents. risk-scoring.md:83, every finding in a "
+                "standalone document uses the Standalone column"
+            )
+
+        if f.severity == _HARD_STOP:
+            hard_stop_count += 1
+            if deduction != _HARD_STOP_DEDUCTION:
+                raise HardStopReducedError(
+                    f"finding {where}: Hard Stop deduction is {deduction}, must be "
+                    f"{_HARD_STOP_DEDUCTION} in every coverage column. "
+                    "risk-scoring.md:31, Hard Stops are never reduced"
+                )
+        else:
+            low, high = _DEDUCTION_TABLE[f.severity][status]
+            if not (low <= deduction <= high):
+                raise DeductionRangeError(
+                    f"finding {where}: deduction {deduction} is outside the "
+                    f"{f.severity} / {status} range [{low}, {high}] "
+                    "(risk-scoring.md:15-21). The usual cause is the Standalone "
+                    "column applied to a category the governing documents cover"
+                )
+
+        total_deduction += deduction
+        rows.append({
+            "finding_id": f.finding_id,
+            "category": f.category,
+            "severity": f.severity,
+            "coverage_status": status,
+            "column_used": "Standalone" if status == "standalone" else f"Governed: {status.capitalize()}",
+            "allowed_range": _DEDUCTION_TABLE[f.severity][status],
+            "deduction": deduction,
+            "rationale": f.rationale,
+        })
+
+    raw_score = 100.0 + total_deduction  # total_deduction is negative
+    clamped = raw_score < 0
+    score = int(round(max(0.0, raw_score)))
+
+    # --- Anti-drift calibration, both directions, both raising -------------
+    magnitude = abs(total_deduction)
+
+    # Too harsh: risk-scoring.md:76-81. ALL THREE criteria must hold.
+    two_mechanical_criteria_hold = (
+        hard_stop_count == 0
+        and covered_category_count is not None
+        and covered_category_count >= 10
+    )
+    if two_mechanical_criteria_hold and magnitude > 30:
+        if alignment_dominant is None:
+            raise InvalidInputError(
+                "the too-harsh calibration check at risk-scoring.md:76-81 is live "
+                f"(zero Hard Stops, {covered_category_count} of "
+                f"{_TOTAL_PROTECTION_CATEGORIES} categories Covered, total deduction "
+                f"{magnitude}) but its third criterion cannot be evaluated: pass "
+                "alignment_dominant=True if the findings are primarily MSA-alignment "
+                "or clarification items, False if they are new unprotected exposures"
+            )
+        if alignment_dominant:
+            raise CalibrationError(
+                f"too harsh: total deduction {magnitude} exceeds 30 with zero Hard "
+                f"Stops, {covered_category_count} of {_TOTAL_PROTECTION_CATEGORIES} "
+                "categories Covered, and findings that are primarily alignment or "
+                "clarification items. risk-scoring.md:81, the scoring is likely using "
+                "the Standalone column where Governed: Covered should apply. "
+                "Re-check each finding's deduction against its PASS_2_COVERAGE status"
+            )
+
+    # Too generous: risk-scoring.md:83.
+    if not governing_docs_present and len(findings) >= 5 and magnitude < 25:
+        raise CalibrationError(
+            f"too generous: a standalone document with no governing documents and "
+            f"{len(findings)} findings produced a total deduction of only {magnitude}, "
+            "under the 25-point floor at risk-scoring.md:83. Every finding in a "
+            "standalone document uses the Standalone column"
+        )
+
+    return ProtectionScore(
+        score=score,
+        raw_score=raw_score,
+        band=score_band(score),
+        total_deduction=total_deduction,
+        hard_stop_count=hard_stop_count,
+        finding_count=len(findings),
+        covered_category_count=covered_category_count,
+        rows=rows,
+        clamped=clamped,
+    )
+
+
+# ===========================================================================
 # Self-test
 # ===========================================================================
 
@@ -600,6 +1146,195 @@ if __name__ == "__main__":
         f"base={qr_widened.total_base}, low={qr_widened.total_low}, high={qr_widened.total_high}",
     )
 
+    # --- level_bid: the three formulas at SKILL.md:1698-1700 ---------------
+    # Source: rfp-response-analysis-1c344a/SKILL.md, inlined bid-leveling.md.
+    # No worked numeric example is given in the source, so these are hand
+    # calculations against the quoted formulas, labeled as such rather than
+    # presented as source-verified goldens.
+    _lb = level_bid(annual_recurring=120000, units=500, term_years=3, one_time=45000)
+    _check(
+        "level_bid: flat case matches all three quoted formulas "
+        "(TCO 405000 = 120000*3+45000; per-unit 240 = 120000/500; "
+        "per-unit-per-year 270 = 405000/3/500). Hand calculation, NOT a "
+        "source-quoted worked example",
+        _lb.reported_tco == 405000 and _lb.normalized_price_per_unit == 240
+        and abs(_lb.normalized_tco_per_unit_per_year - 270) < 1e-9,
+        f"got tco={_lb.reported_tco}, per_unit={_lb.normalized_price_per_unit}, "
+        f"per_unit_per_year={_lb.normalized_tco_per_unit_per_year}",
+    )
+
+    # SKILL.md:1704: a stated escalator over a multi-year term MUST route
+    # through escalate() per year and be summed, never the flat shorthand.
+    _esc = level_bid(annual_recurring=100000, units=100, term_years=3, one_time=0,
+                     escalator_pct=0.05, compounding=True, first_year_escalated=False)
+    _check(
+        "level_bid: a stated escalator over a multi-year term routes through "
+        "escalate() per contract year and sums, per SKILL.md:1704, instead of "
+        "the flat annual*term shorthand",
+        [round(v, 2) for v in _esc.per_year_recurring] == [100000.0, 105000.0, 110250.0]
+        and _esc.flat_shorthand_used is False,
+        f"got per_year={_esc.per_year_recurring}, flat={_esc.flat_shorthand_used}",
+    )
+    _esc_true = level_bid(annual_recurring=100000, units=100, term_years=3, one_time=0,
+                          escalator_pct=0.05, compounding=True, first_year_escalated=True)
+    _check(
+        "level_bid: the two first-year conventions differ by 15762.50 on a "
+        "3-year 5% stack, which is why the kernel refuses to pick one silently",
+        abs((_esc_true.recurring_total - _esc.recurring_total) - 15762.50) < 0.01,
+        f"got delta={_esc_true.recurring_total - _esc.recurring_total}",
+    )
+    _simple = level_bid(annual_recurring=100000, units=100, term_years=3, one_time=0,
+                        escalator_pct=0.05, compounding=False, first_year_escalated=False)
+    _check(
+        "level_bid: simple (non-compounding) escalation routes through "
+        "escalate(compounding=False), Year N = Base * (1 + rate*N)",
+        [round(v, 2) for v in _simple.per_year_recurring] == [100000.0, 105000.0, 110000.0],
+        f"got {_simple.per_year_recurring}",
+    )
+    _one_yr = level_bid(annual_recurring=50000, units=10, term_years=1,
+                        one_time=1000, escalator_pct=0.05)
+    _check(
+        "level_bid: an escalator on a 1-year term needs no convention and "
+        "correctly uses the flat figure (no multi-year sum exists to escalate)",
+        _one_yr.flat_shorthand_used and _one_yr.reported_tco == 51000,
+        f"got flat={_one_yr.flat_shorthand_used}, tco={_one_yr.reported_tco}",
+    )
+    _var = level_bid(annual_recurring=120000, units=500, term_years=3,
+                     one_time=45000, supplier_stated_total=360000)
+    _check(
+        "level_bid: element 7's reported-vs-normalized gap is returned as a "
+        "number (45000, the one-time cost this supplier left out of its "
+        "headline), so it is visible rather than absorbed",
+        _var.stated_vs_computed_variance == 45000,
+        f"got variance={_var.stated_vs_computed_variance}",
+    )
+
+    # --- Golden: risk-scoring.md Supplier A WO 10 worked example ----------
+    # Source: lilly-contract-review-1c344a/references/risk-scoring.md:52-72,
+    # "Worked Example: Supplier A WO 10 (illustrative)". All 11 rows of the
+    # table are entered verbatim below with the severity, PASS_2 status and
+    # deduction the source states. The source's own totals are "Total
+    # deductions: -36" and "Score: 64", and :72 states that 64 sits in the
+    # Moderate band. Context line :54 gives "9 of 14 protection categories
+    # Covered ... Zero Hard Stops", which is what makes this example ALSO the
+    # negative case for the too-harsh calibration check: at 9 Covered it is
+    # below the 10+ threshold, so a -36 total must NOT raise here.
+    _wo10 = [
+        ScoredFinding(finding_id="1", category="Scope (N/A)", severity="HIGH",
+                      coverage_status="standalone", deduction=-7),
+        ScoredFinding(finding_id="2", category="SLA", severity="HIGH",
+                      coverage_status="covered", deduction=-4),
+        ScoredFinding(finding_id="3", category="AI Governance", severity="HIGH",
+                      coverage_status="covered", deduction=-3),
+        ScoredFinding(finding_id="4", category="Commitment", severity="MEDIUM",
+                      coverage_status="confirm", deduction=-3),
+        ScoredFinding(finding_id="5", category="IP", severity="MEDIUM",
+                      coverage_status="covered", deduction=-2),
+        ScoredFinding(finding_id="6", category="Pharma", severity="MEDIUM",
+                      coverage_status="covered", deduction=-3),
+        ScoredFinding(finding_id="7", category="Delivery (N/A)", severity="MEDIUM",
+                      coverage_status="standalone", deduction=-4),
+        ScoredFinding(finding_id="8", category="Commercial (N/A)", severity="MEDIUM",
+                      coverage_status="standalone", deduction=-4),
+        ScoredFinding(finding_id="9", category="Delivery", severity="MEDIUM",
+                      coverage_status="covered", deduction=-2),
+        ScoredFinding(finding_id="10", category="Commercial (N/A)", severity="LOW",
+                      coverage_status="standalone", deduction=-2),
+        ScoredFinding(finding_id="11", category="Scope (N/A)", severity="LOW",
+                      coverage_status="standalone", deduction=-2),
+    ]
+    _wo10_result = deduction_score(_wo10, covered_category_count=9)
+    _check(
+        "deduction_score: risk-scoring.md worked example 'Supplier A WO 10' "
+        "reproduces total deductions -36 and Score 64 exactly",
+        _wo10_result.total_deduction == -36 and _wo10_result.score == 64,
+        f"got total={_wo10_result.total_deduction}, score={_wo10_result.score}",
+    )
+    _check(
+        "deduction_score: the same example lands in the Moderate band, "
+        "matching risk-scoring.md:72 ('Score of 64 = Moderate')",
+        _wo10_result.band == "Moderate",
+        f"got band={_wo10_result.band}",
+    )
+    _check(
+        "deduction_score: emits one calculation-table row per finding, which is "
+        "what SKILL.md Rule 12 requires be visible for the score to be valid",
+        len(_wo10_result.rows) == 11 and _wo10_result.rows[0]["column_used"] == "Standalone",
+        f"got {len(_wo10_result.rows)} rows, first column_used="
+        f"{_wo10_result.rows[0]['column_used'] if _wo10_result.rows else 'n/a'}",
+    )
+
+    # Hard Stop invariant: risk-scoring.md:17 puts -15 in all four columns and
+    # :31 states "Hard Stops are never reduced ... always -15."
+    _hs_all_columns = [
+        deduction_score([ScoredFinding(severity="Hard Stop", coverage_status=_c,
+                                       deduction=-15)],
+                        covered_category_count=0).total_deduction
+        for _c in ("standalone", "covered", "confirm", "gap")
+    ]
+    _check(
+        "deduction_score: a Hard Stop deducts exactly -15 in ALL FOUR coverage "
+        "columns (risk-scoring.md:17, :31, never reduced)",
+        _hs_all_columns == [-15, -15, -15, -15],
+        f"got {_hs_all_columns}",
+    )
+
+    # Scale boundaries: risk-scoring.md:37-42, four contiguous inclusive bands.
+    _bands = [score_band(_s) for _s in (100, 75, 74, 50, 49, 25, 24, 0)]
+    _check(
+        "score_band: exact boundaries per risk-scoring.md:37-42 "
+        "(75 Low / 74 Moderate, 50 Moderate / 49 High, 25 High / 24 Critical)",
+        _bands == ["Low", "Low", "Moderate", "Moderate", "High", "High",
+                   "Critical", "Critical"],
+        f"got {_bands}",
+    )
+
+    _check(
+        "deduction_score: no findings scores 100 (risk-scoring.md:11 starting point)",
+        deduction_score([]).score == 100 and deduction_score([]).band == "Low",
+    )
+
+    # Calibration NEGATIVE cases: the checks must stay silent when their
+    # conditions are not all met, or they would block correct scores.
+    _harsh_set = [ScoredFinding(severity="HIGH", coverage_status="standalone",
+                                deduction=-8) for _ in range(5)]  # -40 total
+    _check(
+        "deduction_score: too-harsh check does NOT fire when the third criterion "
+        "is False (findings are genuine exposures, not alignment items), "
+        "risk-scoring.md:79",
+        deduction_score(_harsh_set, covered_category_count=12,
+                        alignment_dominant=False).score == 60,
+    )
+    _check(
+        "deduction_score: too-harsh check does NOT fire below 10 Covered "
+        "categories, which is why the -36 worked example above is legal",
+        deduction_score(_harsh_set, covered_category_count=9,
+                        alignment_dominant=True).score == 60,
+    )
+    _at_30 = [ScoredFinding(severity="MEDIUM", coverage_status="covered",
+                            deduction=-3) for _ in range(10)]  # exactly -30
+    _check(
+        "deduction_score: too-harsh check does NOT fire at exactly 30 "
+        "(risk-scoring.md:76 says 'exceeds a 30-point deduction')",
+        deduction_score(_at_30, covered_category_count=12,
+                        alignment_dominant=True).score == 70,
+    )
+
+    # Clamping is a JUDGMENT CALL, disclosed: risk-scoring.md defines a 0-100
+    # scale but does not say what happens when deductions exceed 100. The score
+    # clamps at 0 and raw_score keeps the unclamped value so nothing is hidden.
+    _clamped = deduction_score(
+        [ScoredFinding(severity="Hard Stop", coverage_status="gap", deduction=-15)
+         for _ in range(8)], covered_category_count=0)
+    _check(
+        "deduction_score: clamps at 0 rather than going negative, and preserves "
+        "the unclamped raw_score (-20). NOT source-specified, disclosed judgment",
+        _clamped.score == 0 and _clamped.raw_score == -20 and _clamped.clamped
+        and _clamped.band == "Critical",
+        f"got score={_clamped.score}, raw={_clamped.raw_score}, "
+        f"clamped={_clamped.clamped}, band={_clamped.band}",
+    )
+
     print()
     print("=" * 78)
     print("NEGATIVE TESTS (must refuse)")
@@ -637,6 +1372,119 @@ if __name__ == "__main__":
         InvalidInputError,
     )
 
+
+
+    # --- level_bid refusals -------------------------------------------------
+    _check_raises(
+        "level_bid: refuses one_time=None rather than defaulting it to zero. "
+        "Bid Leveling element 5, an unpriced cost is a labeled placeholder, "
+        "never a silent zero, because zero flatters the least forthcoming bid",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=1, one_time=None),
+        LevelingError,
+    )
+    _check_raises(
+        "level_bid: refuses a multi-year escalated bid when the first-year "
+        "convention is unstated. The source says call escalate() per year but "
+        "never says whether year 1 is already escalated, and the gap is "
+        "material to a ranking",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=3, one_time=0,
+                          escalator_pct=0.03),
+        LevelingError,
+    )
+    _check_raises(
+        "level_bid: refuses zero units (a per-unit basis cannot be computed)",
+        lambda: level_bid(annual_recurring=1, units=0, term_years=1, one_time=0),
+        InvalidInputError,
+    )
+    _check_raises(
+        "level_bid: refuses term_years < 1",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=0, one_time=0),
+        InvalidInputError,
+    )
+    _check_raises(
+        "level_bid: refuses a negative one_time cost",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=1, one_time=-5),
+        InvalidInputError,
+    )
+    # --- deduction_score refusals ------------------------------------------
+    _check_raises(
+        "deduction_score: refuses a Hard Stop reduced below -15 "
+        "(risk-scoring.md:31, never reduced, in any column)",
+        lambda: deduction_score([ScoredFinding(severity="Hard Stop",
+                                               coverage_status="covered",
+                                               deduction=-10)]),
+        HardStopReducedError,
+    )
+    _check_raises(
+        "deduction_score: refuses a HIGH/Governed-Covered finding carrying -9, a "
+        "Standalone-column value. This is the exact Rule 7 failure mode, the "
+        "Standalone column applied to a category the MSA covers",
+        lambda: deduction_score([ScoredFinding(severity="HIGH",
+                                               coverage_status="covered",
+                                               deduction=-9)]),
+        DeductionRangeError,
+    )
+    _check_raises(
+        "deduction_score: refuses an unknown severity ('SEVERE')",
+        lambda: deduction_score([ScoredFinding(severity="SEVERE",
+                                               coverage_status="gap",
+                                               deduction=-5)]),
+        SeverityError,
+    )
+    _check_raises(
+        "deduction_score: refuses an unknown coverage status ('partial')",
+        lambda: deduction_score([ScoredFinding(severity="HIGH",
+                                               coverage_status="partial",
+                                               deduction=-8)]),
+        CoverageStatusError,
+    )
+    _check_raises(
+        "deduction_score: refuses a positive deduction (this is a deduction "
+        "model, not an additive score)",
+        lambda: deduction_score([ScoredFinding(severity="LOW",
+                                               coverage_status="covered",
+                                               deduction=1)]),
+        InvalidInputError,
+    )
+    _check_raises(
+        "deduction_score: CALIBRATION 1 of 2, too harsh. Zero Hard Stops, 12 of "
+        "14 Covered, alignment-dominant findings, total -40. risk-scoring.md:81",
+        lambda: deduction_score(
+            [ScoredFinding(severity="HIGH", coverage_status="standalone",
+                           deduction=-8) for _ in range(5)],
+            covered_category_count=12, alignment_dominant=True),
+        CalibrationError,
+    )
+    _check_raises(
+        "deduction_score: refuses to evaluate the too-harsh check when its third "
+        "criterion is unknown, rather than assuming it. Refuse, do not guess",
+        lambda: deduction_score(
+            [ScoredFinding(severity="HIGH", coverage_status="standalone",
+                           deduction=-8) for _ in range(5)],
+            covered_category_count=12),
+        InvalidInputError,
+    )
+    _check_raises(
+        "deduction_score: CALIBRATION 2 of 2, too generous. Standalone document, "
+        "no governing docs, 5 findings, total only -10 against the 25-point "
+        "floor at risk-scoring.md:83. This is the more dangerous direction, "
+        "because a flattering score does not invite scrutiny",
+        lambda: deduction_score(
+            [ScoredFinding(severity="LOW", coverage_status="standalone",
+                           deduction=-2) for _ in range(5)],
+            governing_docs_present=False),
+        CalibrationError,
+    )
+    _check_raises(
+        "deduction_score: refuses a Governed column on a document with no "
+        "governing documents (risk-scoring.md:83, every finding in a standalone "
+        "document uses the Standalone column)",
+        lambda: deduction_score([ScoredFinding(severity="HIGH",
+                                               coverage_status="covered",
+                                               deduction=-4)],
+                                governing_docs_present=False),
+        CoverageStatusError,
+    )
     print()
     print("=" * 78)
     passed = sum(1 for _, ok, _ in _results if ok)

@@ -1701,7 +1701,34 @@ For a supplier with reported annual recurring price `annual`, named-unit count `
 - `reported_TCO = (annual * term_years) + one_time` (flat, no escalation; this is the illustrative-dashboard simplification carried in the reference JSX's `normPricing()`, acceptable when the RFP's stated term is the only period being compared)
 - `normalized_TCO_per_unit_per_year = reported_TCO / term_years / units`
 
-**Kernel usage (per Execution Guardrails G11).** When a supplier's proposal states a multi-year escalator and the comparison spans more than one year (the common case for a 3-year TCO), the year-by-year escalated recurring cost MUST be computed by calling `escalate()` in the vendored `numeric_kernel.py`, once per contract year, rather than the flat `annual * term_years` shorthand above. Sum the per-year escalated values to get the recurring component of `reported_TCO`. The flat shorthand is only acceptable when a supplier's proposal states no escalator, or when computing the single-year `normalized_price_per_unit_per_year` figure (which is not a multi-year sum). If a discount rate is separately in scope (net present value of the multi-year TCO, not just its nominal sum), call `npv()` instead; do not blend NPV and nominal TCO in the same comparison without labeling which is which.
+**HARD RULE, kernel usage (per Execution Guardrails G11).** The three formulas above are NOT computed by hand or by model arithmetic. Call `level_bid()` in the vendored `numeric_kernel.py`, once per supplier per priced scenario, and read `reported_tco`, `normalized_price_per_unit` and `normalized_tco_per_unit_per_year` off the returned `LeveledBid`. This is the same discipline Section 8 already applies to the Weighted Scoring Matrix via `weighted_score()`, and it exists for the same reason: the pricing dimension of that audited matrix reads the normalized TCO, so an unaudited normalization would leave an audited ranking resting on a hand-computed input.
+
+```
+from numeric_kernel import level_bid
+
+leveled = level_bid(
+    annual_recurring=120000,      # stated annual recurring price
+    units=500,                    # named-unit count for the common basis
+    term_years=3,                 # the RFP's stated term
+    one_time=45000,               # implementation, setup, migration
+    escalator_pct=0.05,           # 0.0 when the proposal states no escalator
+    compounding=True,
+    first_year_escalated=False,   # required when an escalator spans >1 year
+    supplier_stated_total=360000, # optional, surfaces element 7's gap
+)
+```
+
+`level_bid()` handles the escalation rule itself: when a proposal states a multi-year escalator and the comparison spans more than one year (the common case for a 3-year TCO), it calls `escalate()` once per contract year and sums, rather than the flat `annual * term_years` shorthand above. The flat shorthand is used only when a proposal states no escalator, or for the single-year `normalized_price_per_unit_per_year` figure, which is not a multi-year sum. `per_year_recurring` on the result carries the year-by-year schedule so the sum is auditable rather than asserted.
+
+**Three things it refuses, rather than returning a number that would misrepresent one supplier against another:**
+
+- **`one_time=None` raises `LevelingError`.** Element 5 above requires an unpriced cost be carried as a labeled placeholder, never defaulted to zero. Coercing it to zero flatters whichever supplier was least forthcoming. A supplier whose one-time costs are unknown stays Pending Clarification and is excluded from the normalized comparison, which is the pre-existing non-fabrication behavior.
+- **A multi-year escalator with `first_year_escalated` unstated raises `LevelingError`.** The source does not define whether contract year 1 already carries one escalation, and on a 3-year 5 percent term the two readings differ by 15,762.50 on a 100,000 annual stack. That is material to a ranking, so the convention is stated per supplier rather than assumed.
+- **Zero or missing `units`, or `term_years` below 1, raise `InvalidInputError`.** A per-unit comparison basis cannot be produced from either.
+
+If `level_bid()` raises, do not hand-compute around it: resolve the named field, or leave that supplier Pending and excluded, per Rule 6 and the gate check below.
+
+If a discount rate is separately in scope (net present value of the multi-year TCO, not just its nominal sum), call `npv()` instead; do not blend NPV and nominal TCO in the same comparison without labeling which is which.
 
 ## Worksheet schemas (pipeline artifacts)
 

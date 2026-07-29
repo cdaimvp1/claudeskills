@@ -387,6 +387,203 @@ def quadrature_rollup(component_bases: Sequence[float],
 
 
 # ===========================================================================
+# LEVELING face
+# ===========================================================================
+#
+# Source: rfp-response-analysis-1c344a/SKILL.md, inlined
+# "references/bid-leveling.md" -> "## Normalization formulas" (SKILL.md:1696-1704)
+#
+# Why this is in the kernel at all. rfp-response-analysis already routes its
+# Weighted Scoring Matrix through weighted_score(), so the RANKING arithmetic is
+# audited. But the pricing dimension of that matrix reads the NORMALIZED TCO,
+# and the normalization producing it was prose the model executed by hand. An
+# audited ranking computed over an unaudited input is not audited. Rule 6 of
+# that skill ("Never rank, score, or recommend on unleveled figures") is exactly
+# the invariant these functions enforce.
+#
+# The three formulas, quoted from SKILL.md:1698-1700:
+#   normalized_price_per_unit_per_year = annual / units
+#   reported_TCO = (annual * term_years) + one_time
+#   normalized_TCO_per_unit_per_year = reported_TCO / term_years / units
+#
+# The second is qualified in the source as "flat, no escalation; this is the
+# illustrative-dashboard simplification". SKILL.md:1704 then makes the real rule
+# explicit: when a proposal states a multi-year escalator and the comparison
+# spans more than one year, the year-by-year escalated recurring cost MUST be
+# computed by calling escalate() once per contract year and summed, "rather than
+# the flat annual * term_years shorthand above". level_bid() implements that
+# rule as a refusal, not a preference: ask for a flat TCO on an escalated
+# multi-year proposal and it raises.
+
+
+class LevelingError(KernelError):
+    """Raised when a bid cannot be leveled onto the common comparison basis.
+
+    Every raise here is a case where returning a number would silently
+    misrepresent one supplier against another, which is the specific harm
+    rfp-response-analysis's Bid Leveling gate exists to prevent.
+    """
+
+
+@dataclass
+class LeveledBid:
+    """One supplier's pricing normalized onto the common comparison basis.
+
+    Field names follow `bid_leveling_worksheet.csv`'s columns where they
+    correspond, so a worksheet row can be written straight from this object
+    instead of being re-derived.
+    """
+
+    reported_tco: float
+    recurring_total: float
+    one_time_cost: float
+    normalized_price_per_unit: float
+    normalized_tco_per_unit_per_year: float
+    per_year_recurring: List[float] = field(default_factory=list)
+    term_years: int = 0
+    units: float = 0.0
+    escalator_pct: float = 0.0
+    flat_shorthand_used: bool = True
+    supplier_stated_total: Optional[float] = None
+    stated_vs_computed_variance: Optional[float] = None
+
+
+def level_bid(
+    *,
+    annual_recurring: float,
+    units: float,
+    term_years: int,
+    one_time: Optional[float],
+    escalator_pct: float = 0.0,
+    compounding: bool = True,
+    first_year_escalated: Optional[bool] = None,
+    supplier_stated_total: Optional[float] = None,
+) -> LeveledBid:
+    """Normalize one supplier's reported pricing onto the common basis.
+
+    Implements the three formulas at SKILL.md:1698-1700 and the escalation rule
+    at :1704. Refuses rather than returning a figure that would misrepresent one
+    supplier against another.
+
+    Arguments:
+      annual_recurring      the stated annual recurring price (subscription,
+                            support, hosting, managed services)
+      units                 the named-unit count for the common basis
+      term_years            the RFP's stated term, in whole years
+      one_time              one-time costs (implementation, setup, migration).
+                            Must be a number. See the refusal note below
+      escalator_pct         the proposal's stated annual escalator as a
+                            fraction, e.g. 0.03 for 3 percent. 0.0 means the
+                            proposal states no escalator
+      compounding           True for "Year N = Year N-1 x (1+rate)", False for
+                            simple escalation off the base. Passed to escalate()
+      first_year_escalated  whether contract year 1 already carries one
+                            escalation. Required when an escalator applies over
+                            more than one year, see below
+      supplier_stated_total the supplier's own headline total, if stated. When
+                            given, the variance against the computed TCO is
+                            returned so element 7's "reported vs normalized"
+                            gap is visible rather than absorbed
+
+    Refusals, each tied to a specific way a number could mislead:
+
+      one_time=None refuses. Element 5 of the eight required elements says a
+      cost no supplier priced is carried as a labeled placeholder, "never
+      defaulted to zero and never dropped from the comparison". Coercing an
+      unknown one-time cost to 0 is precisely that defaulting, and it flatters
+      whichever supplier was least forthcoming. A supplier whose one-time costs
+      are unknown is Pending Clarification and does not get a leveled TCO.
+
+      first_year_escalated=None refuses when escalator_pct != 0 and
+      term_years > 1. The source says to call escalate() per year but never says
+      whether contract year 1 is already escalated. The kernel's own escalate()
+      docstring flags the same ambiguity and notes pro-forma-builder resolves it
+      the other way. On a 3-year term at 5 percent the two readings differ by
+      roughly a full year of escalation across the recurring stack, which is
+      material to a ranking, so the caller states the convention rather than the
+      kernel guessing it.
+
+      A stated escalator over a multi-year term never silently uses the flat
+      shorthand. That is the whole point of SKILL.md:1704.
+    """
+    if units is None or units <= 0:
+        raise InvalidInputError(
+            f"units must be positive, got {units!r}. The common comparison basis "
+            "is a per-unit figure, so a zero or missing unit count cannot produce one"
+        )
+    if not isinstance(term_years, int) or isinstance(term_years, bool) or term_years < 1:
+        raise InvalidInputError(
+            f"term_years must be a whole number of years >= 1, got {term_years!r}"
+        )
+    if annual_recurring is None or annual_recurring < 0:
+        raise InvalidInputError(
+            f"annual_recurring must be zero or positive, got {annual_recurring!r}"
+        )
+    if one_time is None:
+        raise LevelingError(
+            "one_time is None. Bid Leveling element 5 requires an unpriced cost be "
+            "carried as a labeled placeholder, never defaulted to zero and never "
+            "dropped. Supply a should-cost placeholder value, or leave this supplier "
+            "at Pending Clarification and exclude it from the normalized comparison"
+        )
+    if one_time < 0:
+        raise InvalidInputError(f"one_time must be zero or positive, got {one_time!r}")
+
+    escalates = escalator_pct != 0.0 and term_years > 1
+    if escalates and first_year_escalated is None:
+        raise LevelingError(
+            f"a {escalator_pct:.2%} escalator applies over {term_years} years but "
+            "first_year_escalated was not stated. SKILL.md:1704 requires escalate() "
+            "per contract year, and the source does not define whether contract "
+            "year 1 already carries one escalation. Pass first_year_escalated=False "
+            "if the stated annual price IS year 1's price (the usual reading), True "
+            "if year 1 is already escalated off an earlier base"
+        )
+
+    per_year: List[float] = []
+    if escalates:
+        offset = 0 if first_year_escalated else 1
+        for n in range(1, term_years + 1):
+            exponent = n - offset
+            if exponent < 1:
+                # escalate() refuses year < 1 by design, and an exponent of 0 is
+                # the unescalated base year, so it is used directly.
+                per_year.append(float(annual_recurring))
+            else:
+                per_year.append(
+                    escalate(annual_recurring, escalator_pct, exponent, compounding)
+                )
+    else:
+        # SKILL.md:1699 flat shorthand, legal only when no escalator applies.
+        per_year = [float(annual_recurring)] * term_years
+
+    recurring_total = sum(per_year)
+    reported_tco = recurring_total + float(one_time)
+
+    variance = None
+    if supplier_stated_total is not None:
+        variance = reported_tco - float(supplier_stated_total)
+
+    return LeveledBid(
+        reported_tco=reported_tco,
+        recurring_total=recurring_total,
+        one_time_cost=float(one_time),
+        # SKILL.md:1698, a single-year figure off the stated annual price, so it
+        # is deliberately NOT escalated even when the multi-year TCO is.
+        normalized_price_per_unit=annual_recurring / units,
+        # SKILL.md:1700.
+        normalized_tco_per_unit_per_year=reported_tco / term_years / units,
+        per_year_recurring=per_year,
+        term_years=term_years,
+        units=float(units),
+        escalator_pct=escalator_pct,
+        flat_shorthand_used=not escalates,
+        supplier_stated_total=supplier_stated_total,
+        stated_vs_computed_variance=variance,
+    )
+
+
+# ===========================================================================
 # SCORING face
 # ===========================================================================
 #
@@ -947,6 +1144,69 @@ if __name__ == "__main__":
         f"base={qr_widened.total_base}, low={qr_widened.total_low}, high={qr_widened.total_high}",
     )
 
+    # --- level_bid: the three formulas at SKILL.md:1698-1700 ---------------
+    # Source: rfp-response-analysis-1c344a/SKILL.md, inlined bid-leveling.md.
+    # No worked numeric example is given in the source, so these are hand
+    # calculations against the quoted formulas, labeled as such rather than
+    # presented as source-verified goldens.
+    _lb = level_bid(annual_recurring=120000, units=500, term_years=3, one_time=45000)
+    _check(
+        "level_bid: flat case matches all three quoted formulas "
+        "(TCO 405000 = 120000*3+45000; per-unit 240 = 120000/500; "
+        "per-unit-per-year 270 = 405000/3/500). Hand calculation, NOT a "
+        "source-quoted worked example",
+        _lb.reported_tco == 405000 and _lb.normalized_price_per_unit == 240
+        and abs(_lb.normalized_tco_per_unit_per_year - 270) < 1e-9,
+        f"got tco={_lb.reported_tco}, per_unit={_lb.normalized_price_per_unit}, "
+        f"per_unit_per_year={_lb.normalized_tco_per_unit_per_year}",
+    )
+
+    # SKILL.md:1704: a stated escalator over a multi-year term MUST route
+    # through escalate() per year and be summed, never the flat shorthand.
+    _esc = level_bid(annual_recurring=100000, units=100, term_years=3, one_time=0,
+                     escalator_pct=0.05, compounding=True, first_year_escalated=False)
+    _check(
+        "level_bid: a stated escalator over a multi-year term routes through "
+        "escalate() per contract year and sums, per SKILL.md:1704, instead of "
+        "the flat annual*term shorthand",
+        [round(v, 2) for v in _esc.per_year_recurring] == [100000.0, 105000.0, 110250.0]
+        and _esc.flat_shorthand_used is False,
+        f"got per_year={_esc.per_year_recurring}, flat={_esc.flat_shorthand_used}",
+    )
+    _esc_true = level_bid(annual_recurring=100000, units=100, term_years=3, one_time=0,
+                          escalator_pct=0.05, compounding=True, first_year_escalated=True)
+    _check(
+        "level_bid: the two first-year conventions differ by 15762.50 on a "
+        "3-year 5% stack, which is why the kernel refuses to pick one silently",
+        abs((_esc_true.recurring_total - _esc.recurring_total) - 15762.50) < 0.01,
+        f"got delta={_esc_true.recurring_total - _esc.recurring_total}",
+    )
+    _simple = level_bid(annual_recurring=100000, units=100, term_years=3, one_time=0,
+                        escalator_pct=0.05, compounding=False, first_year_escalated=False)
+    _check(
+        "level_bid: simple (non-compounding) escalation routes through "
+        "escalate(compounding=False), Year N = Base * (1 + rate*N)",
+        [round(v, 2) for v in _simple.per_year_recurring] == [100000.0, 105000.0, 110000.0],
+        f"got {_simple.per_year_recurring}",
+    )
+    _one_yr = level_bid(annual_recurring=50000, units=10, term_years=1,
+                        one_time=1000, escalator_pct=0.05)
+    _check(
+        "level_bid: an escalator on a 1-year term needs no convention and "
+        "correctly uses the flat figure (no multi-year sum exists to escalate)",
+        _one_yr.flat_shorthand_used and _one_yr.reported_tco == 51000,
+        f"got flat={_one_yr.flat_shorthand_used}, tco={_one_yr.reported_tco}",
+    )
+    _var = level_bid(annual_recurring=120000, units=500, term_years=3,
+                     one_time=45000, supplier_stated_total=360000)
+    _check(
+        "level_bid: element 7's reported-vs-normalized gap is returned as a "
+        "number (45000, the one-time cost this supplier left out of its "
+        "headline), so it is visible rather than absorbed",
+        _var.stated_vs_computed_variance == 45000,
+        f"got variance={_var.stated_vs_computed_variance}",
+    )
+
     # --- Golden: risk-scoring.md Supplier A WO 10 worked example ----------
     # Source: lilly-contract-review-1c344a/references/risk-scoring.md:52-72,
     # "Worked Example: Supplier A WO 10 (illustrative)". All 11 rows of the
@@ -1111,6 +1371,39 @@ if __name__ == "__main__":
     )
 
 
+
+    # --- level_bid refusals -------------------------------------------------
+    _check_raises(
+        "level_bid: refuses one_time=None rather than defaulting it to zero. "
+        "Bid Leveling element 5, an unpriced cost is a labeled placeholder, "
+        "never a silent zero, because zero flatters the least forthcoming bid",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=1, one_time=None),
+        LevelingError,
+    )
+    _check_raises(
+        "level_bid: refuses a multi-year escalated bid when the first-year "
+        "convention is unstated. The source says call escalate() per year but "
+        "never says whether year 1 is already escalated, and the gap is "
+        "material to a ranking",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=3, one_time=0,
+                          escalator_pct=0.03),
+        LevelingError,
+    )
+    _check_raises(
+        "level_bid: refuses zero units (a per-unit basis cannot be computed)",
+        lambda: level_bid(annual_recurring=1, units=0, term_years=1, one_time=0),
+        InvalidInputError,
+    )
+    _check_raises(
+        "level_bid: refuses term_years < 1",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=0, one_time=0),
+        InvalidInputError,
+    )
+    _check_raises(
+        "level_bid: refuses a negative one_time cost",
+        lambda: level_bid(annual_recurring=1, units=1, term_years=1, one_time=-5),
+        InvalidInputError,
+    )
     # --- deduction_score refusals ------------------------------------------
     _check_raises(
         "deduction_score: refuses a Hard Stop reduced below -15 "
