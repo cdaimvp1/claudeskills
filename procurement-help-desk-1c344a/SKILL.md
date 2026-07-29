@@ -13,7 +13,7 @@ description: >
   process-navigator = procurement-rep policy/threshold/system-requirement questions (TPRM/SAE/AIR/
   Privacy, bid thresholds).
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
@@ -75,7 +75,7 @@ This skill is chat-only, runs from a free-text question, and needs no uploaded s
 # Version
 - **Skill:** Procurement Help Desk
 - **Version:** 0.1 (OFFLINE SCAFFOLD - INERT until the network-gated steps below are run)
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation). Connector posture: M365 connector strongly recommended and required for live, Lilly-verified answers; without it the skill still answers from general procurement principles, clearly labeled "not Lilly-verified". Vendored fallback content (see Knowledge Sources) does NOT YET EXIST; it is a network-gated harvest, not yet performed. Until that harvest runs, the no-connector degradation path in this skill has nothing curated to fall back on and must say so explicitly rather than improvise.

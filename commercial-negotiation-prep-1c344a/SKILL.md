@@ -13,7 +13,7 @@ description: >
   full negotiation plan. BOUNDARY: for a bottoms-up "what should it cost" teardown
   use should-cost-builder-1c344a; this skill is the top-down market view that brackets both.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
@@ -35,7 +35,7 @@ This skill runs fully without ARIA. ARIA is an optional internal-data layer. Whe
 <!-- ARIA-ENRICHMENT:END -->
 
 
-<!-- MERGED PACKAGE (v10.6.6): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
+<!-- MERGED PACKAGE (v10.7.0): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (DOCX/XLSX not generating, output too thin, benchmarks missing), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -139,7 +139,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 <!-- SHARED-BLOCK:END -->
 # Version
 - **Skill:** Commercial Negotiation Prep
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 2.1
 - **Last Updated:** June 2, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

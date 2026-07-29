@@ -11,11 +11,11 @@ description: >
   passive shared foundation. For a launch menu, "what skills do I have", "what can these skills do", or
   "what should I do next", route to procurement-launcher (THEO).
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
   version: "2.1"
 ---
 
-<!-- MERGED PACKAGE (v10.6.6): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
+<!-- MERGED PACKAGE (v10.7.0): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
 
 # Lilly Brand Assets and Shared References
 

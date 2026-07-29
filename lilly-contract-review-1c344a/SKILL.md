@@ -13,7 +13,7 @@ description: >
   review", "contract analysis", "Hard Stop check", "review this order form", "review this SOW",
   "map the contract stack", "what governs this SOW", "contract stack mapper".
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 > **Build discipline (G10):** This skill emits a large single-file artifact. Assemble it across multiple writes, never one create_file call: scaffold first (imports, component shell, export), then append one section per write to /mnt/user-data/outputs, and run a structural self-test before present_files. A single oversized write can truncate the file mid-stream. Full rule: lilly-brand-assets guardrail G10.
@@ -148,7 +148,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 
 # Version
 - **Skill:** Contract Review
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 3.7
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

@@ -13,14 +13,14 @@ description: >
   vs an EXECUTED contract; redline via lilly-contract-review, rate-vs-market via
   market-rate-benchmarking, should-cost via should-cost-builder.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 > **Build discipline (G10):** The dashboard emitted by this skill is a large single-file artifact. Assemble it across multiple writes, never one create_file call: scaffold first (imports, color tokens, kernel mirrors, component shell, export), then append the data object, then each tab, one write per section, to `/mnt/user-data/outputs`. Run a structural self-test (balanced braces, no truncated token, totals reconcile) before `present_files`. Full rule: lilly-brand-assets guardrail G10.
 
-<!-- Suite: v10.6.6 -->
+<!-- Suite: v10.7.0 -->
 
-<!-- MERGED PACKAGE (v10.6.6): This is a single-file install. The canonical dashboard reference implementation is inlined at the end of this document under "## INLINED: examples/invoice_rate_card_auditor_canonical_dashboard.jsx". The one file this skill does NOT inline is its vendored numeric kernel: `numeric_kernel.py` ships as a real, importable/runnable companion file at this skill's own root (`invoice-rate-card-auditor-1c344a/numeric_kernel.py`) because it is executed code, not reference prose. Shared suite references (guardrails, color palette, dashboard components, DOCX design system) live in `lilly-brand-assets-1c344a/SKILL.md`; read them from there, do not look for local copies. -->
+<!-- MERGED PACKAGE (v10.7.0): This is a single-file install. The canonical dashboard reference implementation is inlined at the end of this document under "## INLINED: examples/invoice_rate_card_auditor_canonical_dashboard.jsx". The one file this skill does NOT inline is its vendored numeric kernel: `numeric_kernel.py` ships as a real, importable/runnable companion file at this skill's own root (`invoice-rate-card-auditor-1c344a/numeric_kernel.py`) because it is executed code, not reference prose. Shared suite references (guardrails, color palette, dashboard components, DOCX design system) live in `lilly-brand-assets-1c344a/SKILL.md`; read them from there, do not look for local copies. -->
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-07-22) -->
 ## ARIA ENRICHMENT (optional, suite-wide)
@@ -147,7 +147,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 
 # Version
 - **Skill:** Invoice & Rate-Card Auditor
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 1.0
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

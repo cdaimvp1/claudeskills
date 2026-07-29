@@ -13,7 +13,7 @@ description: >
   BOUNDARY: produces the rate/market evidence; for building a negotiation plan,
   counter-offer, or TCO walkaway from that evidence, use commercial-negotiation-prep.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
@@ -35,9 +35,9 @@ This skill runs fully without ARIA. ARIA is an optional internal-data layer. Whe
 <!-- ARIA-ENRICHMENT:END -->
 
 
-<!-- Suite: v10.6.6 -->
+<!-- Suite: v10.7.0 -->
 
-<!-- MERGED PACKAGE (v10.6.6): All reference, example, and component files are inlined in this document (search for the heading "INLINED REFERENCE FILES"). When the skill text says "(inlined below)" for a reference, the content is present under the heading matching that filename. Do NOT attempt to read those reference files from disk; they are here. -->
+<!-- MERGED PACKAGE (v10.7.0): All reference, example, and component files are inlined in this document (search for the heading "INLINED REFERENCE FILES"). When the skill text says "(inlined below)" for a reference, the content is present under the heading matching that filename. Do NOT attempt to read those reference files from disk; they are here. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, share button missing, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -149,7 +149,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 # Version
 - **Skill:** Market Rate Benchmarking
 - **Version:** 2.2
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation)

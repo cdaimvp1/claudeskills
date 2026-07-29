@@ -14,11 +14,11 @@ description: >
   in my voice", "personal writing style", "audit this against my voice profile", "update my
   voice profile".
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
-> **Suite:** v10.6.6
+> **Suite:** v10.7.0
 
 > **Troubleshooting and usage guidance (inlined below):** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports a problem, answer from this inlined guidance:
 > - **What it does:** captures the user's personal writing voice once (BUILD), then applies it on demand to draft emails, memos, talking points, or replies (DRAFT). It also audits a draft against the saved voice (AUDIT) and edits the saved profile (UPDATE). The profile is a user-carried JSON file; there is no shared store and no inbox monitoring.
@@ -128,7 +128,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 # Version
 - **Skill:** Voice Profile (Personal Writing Voice)
 - **Version:** 1.2
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Last Updated:** June 2, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation; this skill degrades gracefully if it is absent)

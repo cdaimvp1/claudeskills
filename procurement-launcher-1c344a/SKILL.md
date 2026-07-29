@@ -13,13 +13,13 @@ description: >
   which skill should I use / get me started / teach me the suite"; lilly-brand-assets owns only
   brand tokens, the user manual, and troubleshooting, not menu routing.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 > **Build discipline (G10):** This skill emits a large single-file artifact. Assemble it across multiple writes, never one create_file call: scaffold first (imports, component shell, export), then append one section per write to /mnt/user-data/outputs, and run a structural self-test before present_files. A single oversized write can truncate the file mid-stream. Full rule: lilly-brand-assets guardrail G10.
 
 
-<!-- COMPANION FILES (v10.6.6): This skill intentionally does NOT inline its reference and asset files. assets/theo-widget.html (the launcher widget), references/teach-mode.md (Teach mode), and references/routing-and-chains.md (chain-aware routing data) are separate companion files loaded from disk on demand, exactly as instructed at each point they are used below. Do not attempt to reconstruct their content from memory. -->
+<!-- COMPANION FILES (v10.7.0): This skill intentionally does NOT inline its reference and asset files. assets/theo-widget.html (the launcher widget), references/teach-mode.md (Teach mode), and references/routing-and-chains.md (chain-aware routing data) are separate companion files loaded from disk on demand, exactly as instructed at each point they are used below. Do not attempt to reconstruct their content from memory. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, share button missing, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -117,7 +117,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 # Version
 - **Skill:** Procurement Launcher (THEO)
 - **Version:** 2.10
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation); lilly-contract-review v3.5+; negotiation-simulator v2.3+ (for phrase-carried mode detection); rfp-engine v2.3+; evaluation-engine v2.2+; rfp-case-manager v2.2+; theos-field-guide v2.2+ (replaces daily-digest)

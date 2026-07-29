@@ -12,7 +12,7 @@ description: >
   "FRAP question", "ProtectLilly", "playbook says". BOUNDARY: answers questions about a process;
   use workflow-map to DRAW a process diagram and timeline-builder to ESTIMATE durations.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
@@ -74,7 +74,7 @@ This skill is chat-only, runs from a free-text question, and needs no uploaded s
 # Version
 - **Skill:** Process Navigator
 - **Version:** 1.2
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation). Connector posture: M365 connector strongly recommended and required for live, Lilly-verified policy reads; without it the skill still answers from general procurement principles, clearly labeled "not Lilly-verified".

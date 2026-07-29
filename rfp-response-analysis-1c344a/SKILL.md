@@ -11,7 +11,7 @@ description: >
   "produce the supplier evaluation report". Produces a comprehensive analysis_summary.docx
   (the primary deliverable), an interactive dashboard, and pipeline artifacts for evaluation-engine.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 > **Build discipline (G10):** This skill emits a large single-file artifact. Assemble it across multiple writes, never one create_file call: scaffold first (imports, component shell, export), then append one section per write to /mnt/user-data/outputs, and run a structural self-test before present_files. A single oversized write can truncate the file mid-stream. Full rule: lilly-brand-assets guardrail G10.
@@ -35,7 +35,7 @@ This skill runs fully without ARIA. ARIA is an optional internal-data layer. Whe
 <!-- ARIA-ENRICHMENT:END -->
 
 
-<!-- MERGED PACKAGE (v10.6.6): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
+<!-- MERGED PACKAGE (v10.7.0): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, share button missing, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -142,7 +142,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 - **Helpful:** Pricing templates, MSA redlines per vendor, the original RFP instructions.
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill:** RFP Response Analysis
 - **Version:** 3.6
 - **Last Updated:** July 22, 2026

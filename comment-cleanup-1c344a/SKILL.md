@@ -9,7 +9,7 @@ description: >
   comments", "comment cleanup", "reduce the comments", "comments are too verbose",
   "strip internal comments", "prepare these comments for the supplier".
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
@@ -118,7 +118,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 - **Helpful:** Who the document is going to (supplier vs internal), which comments to preserve.
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill:** Comment Cleanup
 - **Version:** 1.1.0
 - **Last Updated:** July 22, 2026

@@ -7,7 +7,7 @@ description: >
   Analyzes uploaded contracts/work orders and generates professional, decision-focused summaries
   ready for direct submission to the Lilly approval workflow.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
@@ -28,7 +28,7 @@ This skill runs fully without ARIA. ARIA is an optional internal-data layer. Whe
 <!-- ARIA-ENRICHMENT:END -->
 
 
-<!-- MERGED PACKAGE (v10.6.6): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
+<!-- MERGED PACKAGE (v10.7.0): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "load references/foo.md", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, share button missing, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -135,7 +135,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 - **Helpful:** Your grade level and the business owner's grade level (for FRAP chain calculation).
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill Version:** 2.3
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
@@ -1059,7 +1059,7 @@ Example:
 | Field | Value |
 |-------|-------|
 | Author | Marc Lane, Associate Director, Global IT Procurement |
-| Suite | v10.6.6 |
+| Suite | v10.7.0 |
 | Version | 2.3 |
 | Last Updated | July 22, 2026 |
 | Description | Generates Lilly-approved ATC/ATS Executive Summary Word documents for procurement approval workflows. |

@@ -14,7 +14,7 @@ description: >
   "challenge my recommendation before I present it", "prep for the CPO review", "internal
   executive challenge".
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
@@ -137,7 +137,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 <!-- SHARED-BLOCK:END -->
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill:** Negotiation Simulator
 - **Version:** 2.5
 - **Last Updated:** July 2026

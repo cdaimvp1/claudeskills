@@ -12,11 +12,11 @@ description: >
   BOUNDARY: process-navigator ANSWERS the rule questions (need TPRM, which threshold, PO vs MSA);
   workflow-map DRAWS the resulting phases and tasks. Want a picture or task list, use this skill.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
-> **Suite:** v10.6.6
+> **Suite:** v10.7.0
 >
 > **Troubleshooting and usage guidance (inlined below):** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error, answer from this inline note. (The shared `lilly-brand-assets-1c344a` user manual is the fuller reference when that foundation is installed; this skill never hard-depends on it.) Common cases: (a) **diagram looks wrong / too generic** - the skill ran without process-navigator and timeline-builder reachable, so phases and durations are inferred defaults labeled "Inferred, not policy-verified"; run inside the suite Project so those siblings are callable, or provide the request document. (b) **owners all show `[OWNER?]`** - no Field Guide state or case file carried a roster; answer the single batched owners question or paste the state JSON. (c) **email diagram does not render in Outlook** - the recipient is on a client that strips inline SVG; the labeled ASCII plain-text fallback under the SVG (plus the SVG alt text) is the safe degrade, do not delete it for unknown recipients. (d) **which model** - Opus for the full map and phase reasoning; Sonnet is fine for a quick re-render of an already-determined phase set. This skill is chat-first by default; React/dashboard/share-button errors apply only to the optional artifact mode, not to in-chat or email output.
 
@@ -73,7 +73,7 @@ These rules govern HOW this skill behaves. They are shared across all Lilly proc
 
 # Version
 - **Skill:** Workflow Map
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 1.3
 - **Last Updated:** July 21, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

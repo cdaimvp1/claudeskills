@@ -3142,3 +3142,21 @@ four non-dashboard skills. Both are review aids rather than packaging, and item 
 particular wants a human looking at the renders.
 
 **#29 is complete for K1 and the delivery refresh.**
+
+## Version: v10.7.0 (Marc's call)
+
+Bumped **88 live declarations across 30 skills** (`suite:` frontmatter, `Suite:` body
+blocks, `MERGED PACKAGE (...)` headers).
+
+**Left alone, deliberately: 5 changelog entries and 5 examples.** Changelog lines record
+what a PAST release did, and rewriting them falsifies history, the same rule applied to the
+B8 guardrail ranges. The examples are a JSON schema sample and its own warning text about
+hardcoding a suite stamp: bumping one without the other would desynchronise the warning
+from the thing it warns about. One `suite: v10.6.6` remains and is correct, inside a
+changelog line recording a past version-stamp reconciliation.
+
+Rebuilt and re-verified: 32 packages, all extract-and-retest green.
+
+Delivered as `Lilly_Procurement_Skills_v10_7_0_Bundle_2026-07-29.zip`, 21,095 KB,
+sha256 571c4896..., byte-identical in Downloads and the Desktop delivery folder. The two
+mislabelled cuts from before the decision were removed rather than left beside it.

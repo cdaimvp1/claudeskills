@@ -14,7 +14,7 @@ description: >
   deliver, accept, and govern. Route legal/redline/Protection-Score questions to
   lilly-contract-review.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
   version: "1.0"
 ---
 
@@ -55,7 +55,7 @@ available in this session." - and nothing more. Never invent the values. Do not 
 <!-- ARIA-ENRICHMENT:END -->
 
 
-<!-- Suite: v10.6.6 -->
+<!-- Suite: v10.7.0 -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to
@@ -290,7 +290,7 @@ skill reflects into and never replaces.
 
 # Version
 - **Skill:** Scope & SOW Architect
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 1.0
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

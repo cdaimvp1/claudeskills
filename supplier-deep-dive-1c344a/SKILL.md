@@ -12,7 +12,7 @@ description: >
   BOUNDARY: this skill profiles ONE named supplier in depth. For a market-wide "who are the top
   suppliers for X" comparison across many vendors, use supplier-landscape instead.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 > **Build discipline (G10):** This skill emits a large single-file artifact. Assemble it across multiple writes, never one create_file call: scaffold first (imports, component shell, export), then append one section per write to /mnt/user-data/outputs, and run a structural self-test before present_files. A single oversized write can truncate the file mid-stream. Full rule: lilly-brand-assets guardrail G10.
@@ -139,7 +139,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 <!-- SHARED-BLOCK:END -->
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill:** Supplier Deep-Dive
 - **Version:** 1.2
 - **Last Updated:** July 21, 2026

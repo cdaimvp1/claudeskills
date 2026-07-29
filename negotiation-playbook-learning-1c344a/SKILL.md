@@ -12,12 +12,12 @@ description: >
   or "negotiation intelligence". Produces outcome records, pattern reports, and playbook amendment
   recommendations. Feeds back into lilly-contract-review to make future redlines smarter.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
-<!-- MERGED PACKAGE (v10.6.6): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "(inlined below)", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
+<!-- MERGED PACKAGE (v10.7.0): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "(inlined below)", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
 
-Suite: v10.6.6
+Suite: v10.7.0
 
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, share button missing, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
 
@@ -25,7 +25,7 @@ Suite: v10.6.6
 # Version
 - **Skill:** Negotiation Playbook Learning
 - **Version:** 2.1
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Last Updated:** June 2, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation; degrades gracefully if absent)

@@ -11,7 +11,7 @@ description: >
   market-rate-benchmarking; for the full negotiation brief, TCO, and counter-offer strategy use
   commercial-negotiation-prep, which consumes this skill's cost anchor.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
@@ -134,7 +134,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 <!-- SHARED-BLOCK:END -->
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill:** Should-Cost Builder
 - **Version:** 1.2
 - **Last Updated:** July 22, 2026

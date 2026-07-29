@@ -16,10 +16,10 @@ description: >
   playbook-learning-1c344a analyzes patterns across CLOSED deals and is fed by this skill at
   close.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
-<!-- MERGED PACKAGE (v10.6.6): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "(inlined below)", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
+<!-- MERGED PACKAGE (v10.7.0): All reference, example, and component files are inlined at the end of this document. When the skill text says "read references/foo.md" or "(inlined below)", the content is already present below under the heading matching that filename. Do NOT attempt to read files from disk; they are here. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, state not persisting, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -123,7 +123,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 <!-- SHARED-BLOCK:END -->
 # Version
 - **Skill:** Deal Room
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 1.2
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

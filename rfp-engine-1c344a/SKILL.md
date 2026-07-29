@@ -9,7 +9,7 @@ description: >
   issuance-ready RFP packages with cross-referenced artifacts. Works across all sourcing domains:
   software, professional services, lab services, chemicals, equipment, facilities, and more.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
@@ -30,7 +30,7 @@ This skill runs fully without ARIA. ARIA is an optional internal-data layer. Whe
 <!-- ARIA-ENRICHMENT:END -->
 
 
-<!-- Suite: v10.6.6 -->
+<!-- Suite: v10.7.0 -->
 <!-- v10.3.7: Reference files live as companion files in references/ and assets/ subfolders of this skill. When the skill text says 'read references/foo.md' or 'load references/foo.md', read the actual file from disk. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
@@ -134,7 +134,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 <!-- SHARED-BLOCK:END -->
 # Version
 - **Skill:** RFP/RFI Engine
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 2.4
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

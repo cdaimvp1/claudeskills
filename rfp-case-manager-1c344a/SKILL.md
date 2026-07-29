@@ -12,7 +12,7 @@ description: >
   case", "what's the latest on the [vendor] RFP", "where are we with the [category] sourcing",
   "schedule the demos", "ingest emails from this RFP", "refresh the case".
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
@@ -121,7 +121,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 
 
 # Version
-- Suite: v10.6.6
+- Suite: v10.7.0
 - **Skill:** RFP Case Manager
 - **Version:** 2.3
 - **Last Updated:** July 21, 2026

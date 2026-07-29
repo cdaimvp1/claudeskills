@@ -14,7 +14,7 @@ description: >
   single-vendor dossier use supplier-deep-dive, for negotiation strategy use
   commercial-negotiation-prep.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 > **Build discipline (G10):** This skill's optional dashboard is a single-file JSX artifact. Assemble it across multiple writes, never one create_file call: scaffold first (imports, component shell, export), then append one section per write to /mnt/user-data/outputs, and run a structural self-test before present_files. Full rule: lilly-brand-assets guardrail G10.
@@ -38,9 +38,9 @@ This skill runs fully without ARIA. ARIA is an optional internal-data layer. Whe
 - Full method and source mapping: the ARIA Enrichment spec inlined in the lilly-brand-assets foundation (search "INLINED: references/aria-enrichment.md"). If the foundation lacks it, follow this block and note the foundation did not carry the spec.
 <!-- ARIA-ENRICHMENT:END -->
 
-Suite: v10.6.6
+Suite: v10.7.0
 
-<!-- MERGED PACKAGE (v10.6.6): This is a single-file install. The vendored `numeric_kernel.py` and the reference dashboard `examples/sole_source_challenge_canonical_dashboard.jsx` ship as companion files in this skill's own directory; every other reference this skill needs (guardrails, house styles, dashboard components, brand colors, scoring scales) is inlined in the shared foundation, `lilly-brand-assets-1c344a/SKILL.md`. When this file says "read the foundation" or "per lilly-brand-assets", read that skill's inlined sections; do not look for separate files on disk for that content. -->
+<!-- MERGED PACKAGE (v10.7.0): This is a single-file install. The vendored `numeric_kernel.py` and the reference dashboard `examples/sole_source_challenge_canonical_dashboard.jsx` ship as companion files in this skill's own directory; every other reference this skill needs (guardrails, house styles, dashboard components, brand colors, scoring scales) is inlined in the shared foundation, `lilly-brand-assets-1c344a/SKILL.md`. When this file says "read the foundation" or "per lilly-brand-assets", read that skill's inlined sections; do not look for separate files on disk for that content. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, share button missing, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -128,7 +128,7 @@ Drafting an SME escalation (Compliance for a gating screen, the category lead fo
 # Version
 - **Skill:** Sole-Source Challenge and Justification
 - **Version:** 1.0
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation). Vendors its own copy of `numeric_kernel.py` (from lilly-procurement-kernels-1c344a) for the kernel-computed Defensibility Score (G11).

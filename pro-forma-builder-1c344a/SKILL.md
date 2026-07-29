@@ -11,7 +11,7 @@ description: >
   "TCO model", "NPV / ROI / payback", "savings model", "model the financials", "cost model for this
   deal", "five-year cost projection".
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 > **HARD RULE (dashboard figures come from ground truth, never from narrative).** The
@@ -161,7 +161,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 <!-- SHARED-BLOCK:END -->
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill:** Pro-Forma Builder
 - **Version:** 1.2
 - **Last Updated:** July 21, 2026

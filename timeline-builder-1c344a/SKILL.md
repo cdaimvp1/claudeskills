@@ -12,13 +12,13 @@ description: >
   request", "estimate remaining weeks", "draft a status timeline". BOUNDARY: estimates DURATION only;
   use workflow-map for the phase diagram and process-navigator for "what process applies".
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
-<!-- MERGED PACKAGE (v10.6.6): The canonical dashboard example and its spec are inlined at the end of this document, under "## INLINED: examples/timeline_builder_canonical_dashboard.jsx" and "## INLINED: references/dashboard-canonical.md". When the "Deliverables" section below or the dashboard spec refers to either file, the content is already present in this same document; do not attempt to read them from disk. -->
+<!-- MERGED PACKAGE (v10.7.0): The canonical dashboard example and its spec are inlined at the end of this document, under "## INLINED: examples/timeline_builder_canonical_dashboard.jsx" and "## INLINED: references/dashboard-canonical.md". When the "Deliverables" section below or the dashboard spec refers to either file, the content is already present in this same document; do not attempt to read them from disk. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
-> **Suite:** v10.6.6
+> **Suite:** v10.7.0
 >
 > **Troubleshooting and usage guidance (inlined below):** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error, answer from this inline note. (The shared `lilly-brand-assets-1c344a` user manual is the fuller reference when that foundation is installed; this skill never hard-depends on it.) Common cases: (a) **estimate looks too large/too small** - confirm the contract instrument, deal-size band, and which risk reviews are actually triggered; an over-broad tier or a summed (instead of max) parallel band is the usual cause. (b) **output too thin** - the skill ran without a document; provide the SOW/email or answer the three Step 1 pickers. (c) **calibration keeps re-asking** - the `timeline_calibration.json` file is not in the conversation or Project; paste it back or re-run the three-question calibration. (d) **which model** - Opus for the full estimate and reasoning; Sonnet is fine for a quick re-render of an already-computed estimate. This skill is chat-first; it does not render a React dashboard by default, so React/share-button errors do not apply unless the optional Gantt view was requested.
 
@@ -127,7 +127,7 @@ Drafting outbound communications that are NOT this skill's primary requested del
 
 # Version
 - **Skill:** Timeline Builder
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Version:** 1.2
 - **Last Updated:** July 22, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement

@@ -14,11 +14,11 @@ description: >
   is out of scope (no dedicated agenda skill exists in this suite), and for daily triage across
   all meetings use theos-field-guide.
 metadata:
-  suite: v10.6.6
+  suite: v10.7.0
 ---
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
-> **Suite:** v10.6.6
+> **Suite:** v10.7.0
 
 > **Troubleshooting and usage guidance (inlined below):** If the user asks how to use this skill, what output to expect, or reports a problem, answer from this inlined guidance:
 > - **What it does:** gathers M365 context for one upcoming meeting and produces a one-page, five-section brief (chat markdown by default; optional one-page DOCX or an unsent Outlook draft to yourself).
@@ -60,7 +60,7 @@ These rules govern HOW this skill behaves. They are shared across all Lilly proc
 <!-- SHARED-BLOCK:END -->
 
 # Version
-- **Suite:** v10.6.6
+- **Suite:** v10.7.0
 - **Skill:** Meeting Prep Brief
 - **Version:** 1.3
 - **Last Updated:** July 22, 2026
