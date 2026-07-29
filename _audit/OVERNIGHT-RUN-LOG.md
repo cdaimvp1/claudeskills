@@ -1567,3 +1567,61 @@ an inbound flow as able to edit the sidecar would give it two producers, which i
 E1 and E2 exist to prevent.
 
 Smoke test on the skill after the change: 0 failed assertions.
+
+### Task #10 DONE, 2026-07-29. F6 pro-forma dashboard wired to ground truth.
+
+Built `pro-forma-builder-1c344a/dashboard_adapter.py` and wired SKILL.md with a HARD RULE.
+
+**Assessed the stated `Depends on: A11` and judged it does NOT apply**, same as E5's B1.
+A11 locks the five hubs; pro-forma's dashboard is a skill-level artifact, not a hub. The
+adapter emits FIGURES, not layout, so the D1 rewrite to the converged 4-tab IA changes what
+the tabs look like and not where their numbers come from. It survives that rewrite and in
+fact makes it easier.
+
+**The drift this closes.** `pro_forma_model.xlsx` comes from `compute_ground_truth()` in one
+generator call. The optional dashboard was hand-assembled from narrative figures. Two
+artifacts, two derivations, one set of numbers, so they could disagree and nothing would
+say so. This was the only remaining hand-built artifact in the best-wired skill in its
+group, which is exactly why it was worth closing: a skill that computes everything correctly
+and then hand-types the summary into a second deliverable has moved the error, not removed it.
+
+**Verification, actual output:**
+```
+python dashboard_adapter.py   ->  SUMMARY: 6/6 passed
+  dashboard data builds from ground truth
+  every scenario NPV present
+  dashboard NPV equals workbook NPV, every scenario
+  provenance records zero hand-entered figures
+  a drifted NPV is REJECTED
+  a scenario missing from the dashboard is REJECTED
+smoke test in a flat isolated install: 0 failed assertions
+imports: json, sys, typing (stdlib only)
+```
+
+**Two of the six cases deliberately tamper with a figure**, because an assertion that has
+never fired is not known to work. One perturbs an NPV, one removes a scenario; both must
+raise.
+
+**Stronger than F6's stated criterion.** F6 asks to "assert dashboard NPV equals workbook
+NPV cell". The adapter checks EVERY scenario's NPV and every cashflow period, not just the
+base case. A base-case match with a drifted alternative scenario is still two artifacts that
+disagree, and the alternative scenario is precisely what a reader uses to argue for a
+different decision.
+
+**Two process notes, recorded because both were my errors:**
+1. My first version imported `validate_pro_forma_input`, which does not exist. The real name
+   is `validate_assumptions`. Caught immediately by running it.
+2. My second version hand-built a minimal register, which the generator's own validator
+   REFUSED for six missing required fields. That refusal is the generator working correctly.
+   Rather than weaken the register, the self-test now uses the sample register from the
+   generator's own `__main__` block verbatim, so the adapter is tested against the same
+   input the workbook path is tested against and cannot pass against a shape the generator
+   would reject. **A self-test that ran 0/0 was the intermediate state and was not
+   acceptable to ship.**
+
+**Does not touch the workbook path**, which `MASTER-REMAINING-WORK.md:316` preserves
+explicitly. No fallback that assembles from narrative figures is offered, because that
+fallback IS the drift being removed.
+
+**Malicious-code review: SAFE.** Imports `json`, `sys`, `typing` plus the vendored generator.
+No network, subprocess, eval, exec, pickle or base64. Writes nothing.

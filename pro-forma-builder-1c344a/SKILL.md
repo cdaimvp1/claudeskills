@@ -14,6 +14,30 @@ metadata:
   suite: v10.6.6
 ---
 
+> **HARD RULE (dashboard figures come from ground truth, never from narrative).** The
+> dashboard's data object is produced by calling `build_dashboard_data()` in
+> `dashboard_adapter.py` (this skill's own directory), which reads
+> `compute_ground_truth()`, the same computation that produces `pro_forma_model.xlsx`. Do
+> not hand-enter a figure into the dashboard from the narrative, and do not recompute one:
+> the workbook and the dashboard must be two renderings of one calculation, not two
+> calculations of one thing.
+>
+> Before presenting both artifacts, call `assert_dashboard_matches_workbook(data, gt)`. It
+> raises `DashboardWorkbookMismatch` on any scenario whose NPV or cashflow series differs,
+> not just the base case: a base-case match with a drifted alternative scenario is still two
+> artifacts that disagree, and the alternative is what a reader uses to argue for a
+> different decision. If it raises, deliver NEITHER until it is resolved, because a reader
+> given both has no way to tell which is wrong.
+>
+> Self-test with `python dashboard_adapter.py` (6/6 expected). It runs against the same
+> sample register the generator's own self-test uses, and two of its cases deliberately
+> tamper with a figure to prove the drift check fires rather than merely existing.
+>
+> This does not touch the workbook path, which `MASTER-REMAINING-WORK.md:316` preserves
+> explicitly. It also emits FIGURES, not layout, so the D1 rewrite of this skill's
+> `dashboard-canonical.md` changes what the tabs look like and not where their numbers come
+> from.
+
 > **Build discipline (G10):** Applies to the optional `pro_forma_dashboard.jsx` artifact, this skill's only large single-file hand-assembled output. (The primary `pro_forma_model.xlsx` deliverable is instead produced in one call to the vendored `pro_forma_generator.py`, not chunked create_file writes.) When building the dashboard: assemble it across multiple writes, never one create_file call: scaffold first (imports, component shell, export), then append one section per write to /mnt/user-data/outputs, and run a structural self-test before present_files. A single oversized write can truncate the file mid-stream. Full rule: lilly-brand-assets guardrail G10.
 
 
