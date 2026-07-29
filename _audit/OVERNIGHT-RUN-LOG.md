@@ -3121,3 +3121,24 @@ Combined deliverable written to Downloads, as item 14 asked:
 `Lilly_Procurement_Skills_2026-07-29.zip`, 21,095 KB, sha256 5570b5b5...
 
 `_package/` is gitignored: build artifacts, reproducible from the script, not source.
+
+## K2 — Desktop delivery folder refreshed (DONE)
+
+`C:\Users\marcs\OneDrive\Desktop\Lilly_Procurement_Skills_v10_6_6_Bundle_2026-07-29.zip`
+21,601,741 bytes, sha256 5570b5b5..., byte-identical to the Downloads copy, zip integrity
+verified, 32 `.skill` packages + the manifest.
+
+**Naming, deliberately.** The Desktop's latest was `v10_6_4_Bundle.zip`, two behind: the
+suite itself claims **v10.6.6** (98 SKILL.md references). This bundle is labelled v10.6.6
+with a date stamp rather than bumped to a new version number, because **deciding the release
+version is not mine to make**. It is honestly the v10.6.6 suite as it stands on 2026-07-29,
+including this programme's fixes. If those changes warrant 10.6.7 or 10.7.0, say so and it
+can be relabelled; inventing the number would have put a version identity into a delivery
+folder on no authority.
+
+Remaining K2 sub-items from `MASTER-REMAINING-WORK.md:421-422` NOT done and not claimed:
+the dummy-data render per skill for Artifacts review, and doc/deck HTML previews for the
+four non-dashboard skills. Both are review aids rather than packaging, and item 17 in
+particular wants a human looking at the renders.
+
+**#29 is complete for K1 and the delivery refresh.**
