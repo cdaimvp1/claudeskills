@@ -1,0 +1,1311 @@
+/* =============================================================================
+   Category Strategy dashboard — stylesheet.
+
+   Type scale (locked, same as the other three dashboards):
+     9 label · 11 meta · 13 body · 16 title · 20 heading · 28 display
+   Nothing below 9. Nothing off the scale.
+
+   Colour: plum #5C2B50 primary, teal #2F6E6B secondary, burnt orange #C15E19
+   for EMPHASIS ONLY and always solid — a rule or a mark, never a pale wash.
+   Containers stay neutral; colour marks meaning on small objects. That is the
+   pattern the platform itself follows.
+   ============================================================================= */
+:root{
+  --cs-ink:#1A1A1A; --cs-mut:#564F48; --cs-mut2:#4A443C;
+  --cs-line:#E1E0DC; --cs-line2:#D3CDC3;
+  --cs-bg:#F4F1EC; --cs-surface:#FFFFFF;
+  --cs-plum:#5C2B50; --cs-plum-d:#43203B;
+  --cs-teal:#2F6E6B; --cs-burnt:#C15E19; --cs-burnt-d:#9A4A13;
+  --cs-band:#F0ECEF;
+  --cs-sans:'Libre Franklin',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+}
+/* The shell owns the page canvas. Overriding it here is what made this
+   dashboard sit on a different background from Deal, RFx and Landscape. */
+html,body{margin:0;background:var(--bg,#E2E6E1);color:var(--cs-ink);font-family:var(--cs-sans);font-size:13px;-webkit-font-smoothing:antialiased}
+.cs-main{box-sizing:border-box}
+.cs-main{max-width:1320px;margin:0 auto;padding:28px 40px 70px}
+
+/* ---- header ---- */
+.cs-eyebrow{font:700 9px var(--cs-sans);letter-spacing:.09em;text-transform:uppercase;color:var(--cs-mut2);margin-bottom:5px}
+.cs-h1{font-size:28px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--cs-ink)}
+.cs-sub{font-size:11px;color:var(--cs-mut);margin-top:5px}
+.cs-cats{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}
+.cs-cat{appearance:none;border:1px solid var(--cs-line2);background:var(--cs-surface);color:var(--cs-mut);
+  font:600 11px var(--cs-sans);padding:6px 12px;border-radius:30px;cursor:pointer}
+.cs-cat:hover{border-color:var(--cs-plum);color:var(--cs-plum)}
+.cs-cat.on{background:var(--cs-plum);border-color:var(--cs-plum);color:#fff;font-weight:700}
+.cs-tabs{display:flex;gap:2px;border-bottom:1px solid var(--cs-line2);margin:18px 0 18px;overflow-x:auto}
+.cs-tab{appearance:none;background:transparent;border:0;border-bottom:2.5px solid transparent;
+  color:var(--cs-mut);font:600 13px var(--cs-sans);padding:9px 13px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.cs-tab:hover{color:var(--cs-ink)}
+.cs-tab.on{color:var(--cs-ink);font-weight:800;border-bottom-color:var(--cs-plum)}
+
+/* ---- cards ---- */
+.cs-card{background:var(--cs-surface);border:1px solid var(--cs-line2);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.cs-cardhd{display:flex;align-items:baseline;gap:10px;background:var(--cs-band);
+  padding:10px 15px;border-bottom:1px solid var(--cs-line2)}
+.cs-ct{font:800 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-cs{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-cardbd{padding:14px 15px}
+.cs-card.cs-emph{border-left:4px solid var(--cs-burnt)}
+.cs-card.cs-quiet .cs-cardhd{background:var(--cs-surface)}
+.cs-row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.cs-row2{grid-template-columns:1fr}}
+
+/* ---- KPIs ---- */
+.cs-kpirow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
+.cs-kpi{background:var(--cs-surface);border:1px solid var(--cs-line2);border-radius:10px;padding:12px 14px}
+.cs-kpi-l{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-kpi-v{font-size:20px;font-weight:800;line-height:1.15;margin-top:5px;color:var(--cs-ink);letter-spacing:-.01em}
+.cs-kpi-plum .cs-kpi-v{color:var(--cs-plum)}
+.cs-kpi-teal .cs-kpi-v{color:var(--cs-teal)}
+.cs-kpi-s{font-size:11px;color:var(--cs-mut);margin-top:4px;line-height:1.4}
+
+/* ---- tables ---- */
+.cs-tblwrap{overflow-x:auto;border:1px solid var(--cs-line);border-radius:9px}
+.cs-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.cs-tbl th{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);
+  text-align:center;padding:9px 11px;background:var(--cs-band);border-bottom:1px solid var(--cs-line2);white-space:nowrap}
+.cs-tbl td{padding:10px 11px;border-bottom:1px solid var(--cs-line);text-align:center;vertical-align:top}
+.cs-tbl tr:last-child td{border-bottom:none}
+.cs-tbl th.cs-l,.cs-tbl td.cs-l{text-align:left}
+.cs-tbl tbody tr:hover td{background:#FBF9FA}
+.cs-sub2{display:block;font-size:11px;color:var(--cs-mut);font-weight:400;margin-top:2px;line-height:1.4}
+.cs-mit{font-size:11px;color:var(--cs-mut);line-height:1.45;max-width:360px;white-space:normal}
+.cs-inline{margin-left:8px;font-size:11px;color:var(--cs-mut)}
+.cs-up{color:var(--cs-teal);font-weight:700}
+.cs-down{color:var(--cs-burnt-d);font-weight:700}
+.cs-tier{font:700 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--cs-plum);
+  border:1px solid var(--cs-plum);border-radius:30px;padding:2px 9px;white-space:nowrap}
+.cs-needs{font-size:11px;color:var(--cs-burnt-d)}
+
+/* ---- bars, bands, pills ---- */
+.cs-bar{display:inline-block;width:110px;height:8px;border-radius:5px;background:#E6E1DA;overflow:hidden;vertical-align:middle}
+.cs-bar i{display:block;height:100%;border-radius:5px;background:var(--cs-plum)}
+.cs-bar-teal i{background:var(--cs-teal)}
+.cs-band{display:inline-block;font:800 9px var(--cs-sans);letter-spacing:.05em;width:20px;height:20px;line-height:20px;
+  border-radius:50%;color:#fff;background:var(--cs-plum)}
+.cs-band-B{background:var(--cs-teal)}
+.cs-band-C{background:#8A8179}
+.cs-pill{display:inline-block;font:700 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;
+  padding:2px 9px;border-radius:30px;border:1px solid currentColor;white-space:nowrap}
+.cs-pill-plum{color:var(--cs-plum)} .cs-pill-teal{color:var(--cs-teal)} .cs-pill-burnt{color:var(--cs-burnt-d)}
+
+/* ---- controls ---- */
+.cs-ctrl{display:flex;align-items:center;gap:11px;margin-bottom:12px;flex-wrap:wrap}
+.cs-ctrl-l{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-ctrl input[type=range]{flex:1;min-width:160px;max-width:280px;accent-color:var(--cs-plum)}
+.cs-ctrl-v{font:700 11px var(--cs-sans);color:var(--cs-plum)}
+.cs-segbar{display:inline-flex;border:1px solid var(--cs-line2);border-radius:30px;overflow:hidden;margin-bottom:12px}
+.cs-seg{appearance:none;background:transparent;border:0;font:700 11px var(--cs-sans);color:var(--cs-mut);
+  padding:6px 14px;cursor:pointer}
+.cs-seg.on{background:var(--cs-plum);color:#fff}
+
+/* ---- trend + lists ---- */
+.cs-trend{display:flex;align-items:flex-end;gap:14px;height:150px;padding:6px 0 0}
+.cs-trend-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+.cs-trend-v{font:700 11px var(--cs-sans);color:var(--cs-ink);margin-bottom:5px}
+.cs-trend-bar{flex:1;width:100%;max-width:56px;display:flex;align-items:flex-end;background:#F1EDEA;border-radius:6px 6px 0 0}
+.cs-trend-bar i{display:block;width:100%;background:var(--cs-plum);border-radius:6px 6px 0 0;min-height:3px}
+.cs-trend-l{font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);margin-top:6px}
+.cs-suplist,.cs-frag{display:flex;flex-direction:column;gap:8px}
+.cs-suprow,.cs-frag-row{display:flex;align-items:center;gap:10px}
+.cs-supn,.cs-frag-n{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-supv,.cs-frag-v{font:700 11px var(--cs-sans);color:var(--cs-ink);width:64px;text-align:right}
+.cs-supp{font-size:11px;color:var(--cs-mut);width:48px;text-align:right}
+
+/* ---- prose, notes, gaps ---- */
+.cs-prose,.cs-find,.cs-thesis{font-size:13px;line-height:1.6;color:var(--cs-ink)}
+.cs-thesis{font-size:13px;font-weight:600}
+.cs-note{font-size:11px;line-height:1.55;color:var(--cs-mut);margin-top:10px}
+.cs-note b{color:var(--cs-ink)}
+.cs-lab2{display:block;font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-plum);margin-bottom:4px}
+.cs-implic{margin-top:10px;padding-top:10px;border-top:1px solid var(--cs-line)}
+.cs-dq{display:flex;gap:8px;flex-wrap:wrap}
+.cs-chip{font:600 11px var(--cs-sans);color:var(--cs-mut);border:1px solid var(--cs-line2);border-radius:30px;padding:3px 10px}
+.cs-src{display:inline-block;font:700 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--cs-teal);border-bottom:1px dotted var(--cs-teal);cursor:help;margin-left:6px}
+
+/* a gap is stated plainly: burnt rule, neutral ground, and the field named */
+.cs-gap{border:1px dashed var(--cs-line2);border-left:3px solid var(--cs-burnt);border-radius:8px;padding:12px 14px}
+.cs-gap-k{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-burnt-d);margin-bottom:5px}
+.cs-gap-t{font-size:13px;color:var(--cs-ink);line-height:1.5}
+.cs-gap-f{font-size:11px;color:var(--cs-mut);margin-top:6px}
+.cs-gap-f b{color:var(--cs-ink);font-family:var(--cs-sans)}
+
+/* ---- forces, plays, posture ---- */
+.cs-force{padding:10px 0;border-bottom:1px solid var(--cs-line)}
+.cs-force:last-child{border-bottom:none}
+.cs-force-h{display:flex;align-items:center;gap:10px}
+.cs-force-f{font-size:13px;font-weight:700;flex:1}
+.cs-force-d{font-size:11px;color:var(--cs-mut);line-height:1.5;margin-top:4px}
+.cs-plays{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.cs-play{border:1px solid var(--cs-line2);border-radius:9px;padding:12px 13px;border-left:3px solid var(--cs-plum)}
+.cs-play-h{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.cs-play-n{font-size:13px;font-weight:700;flex:1}
+.cs-play-v{font-size:16px;font-weight:800;color:var(--cs-plum)}
+.cs-play-hz{font-size:11px;font-weight:600;color:var(--cs-mut)}
+.cs-play-b{font-size:11px;color:var(--cs-mut);line-height:1.5;margin-top:6px}
+.cs-play-t{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);margin-top:8px}
+.cs-posture{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px;
+  font-size:11px;color:var(--cs-mut)}
+.cs-posture b{color:var(--cs-plum);margin-right:5px}
+.cs-kraljic-pos{font-size:16px;font-weight:800;color:var(--cs-plum);margin-bottom:8px}
+
+/* form controls must not fall back to the browser default 13.3333px */
+button,input,select,textarea{font-family:inherit;font-size:13px}
+small,sub,sup{font-size:9px}
+
+/* =============================================================================
+   POPULATED PANELS
+
+   Styles for the panels that render only when the data carries the structure.
+   Same rules as everything above: neutral containers, colour on small marks,
+   burnt orange solid and only where something needs acting on.
+   ============================================================================= */
+
+/* illustrative-data banner */
+.cs-demo{background:var(--cs-burnt-d);color:#fff;font:700 11px var(--cs-sans);
+  letter-spacing:.02em;padding:9px 36px;text-align:center}
+
+/* headline stat pair */
+.cs-split2{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
+.cs-stat{min-width:140px}
+.cs-stat-v{font-size:28px;font-weight:800;line-height:1.05;letter-spacing:-.015em;color:var(--cs-plum)}
+.cs-stat-l{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2);margin-top:4px}
+.cs-stat-s{font-size:13px;color:var(--cs-mut);margin-top:3px}
+.cs-stat-emph .cs-stat-v{color:var(--cs-burnt)}
+
+/* table cell roles */
+.cs-tbl td.cs-num{white-space:nowrap;font-variant-numeric:tabular-nums}
+.cs-tbl td.cs-why{text-align:left;font-size:11px;color:var(--cs-mut);line-height:1.45;max-width:34ch}
+.cs-tbl td.cs-barcell{width:120px}
+.cs-tbl td.cs-was{color:var(--cs-mut)}
+.cs-sub2{display:block;font-size:11px;color:var(--cs-mut);font-weight:400;margin-top:2px}
+.cs-bar-emph i{background:var(--cs-burnt)}
+.cs-bar-plum i{background:var(--cs-plum)}
+
+/* row state: a left rule, never a wash */
+.cs-tbl tr.cs-st-critical td:first-child{box-shadow:inset 3px 0 0 var(--cs-burnt)}
+.cs-tbl tr.cs-st-watch td:first-child{box-shadow:inset 3px 0 0 var(--cs-plum)}
+.cs-tbl tr.cs-st-done td:first-child{box-shadow:inset 3px 0 0 var(--cs-teal)}
+.cs-tbl tr.cs-st-nocontrol td:first-child{box-shadow:inset 3px 0 0 var(--cs-burnt-d)}
+.cs-state{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);
+  border:1px solid var(--cs-line2);border-radius:30px;padding:2px 8px;white-space:nowrap}
+.cs-st-validated .cs-state{color:var(--cs-teal);border-color:var(--cs-teal)}
+.cs-st-pending .cs-state,.cs-st-modelled .cs-state{color:var(--cs-mut)}
+
+/* escalation triggers */
+.cs-trig-row{border-top:1px solid var(--cs-line);padding:11px 0}
+.cs-trig-row:first-child{border-top:0;padding-top:0}
+.cs-trig-hd{display:flex;align-items:baseline;gap:10px}
+.cs-trig-r{font-size:13px;font-weight:700}
+.cs-trig-t{margin-left:auto;font:700 11px var(--cs-sans);color:var(--cs-burnt);white-space:nowrap}
+.cs-trig-c{font-size:11px;color:var(--cs-mut);margin-top:3px}
+.cs-trig-a{font-size:13px;margin-top:5px;display:flex;align-items:baseline;gap:8px}
+.cs-trig-a b{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-trig-o{margin-left:auto;font-size:11px;color:var(--cs-mut);white-space:nowrap}
+
+/* execution pillars */
+.cs-pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.cs-pillar{border-top:3px solid var(--cs-plum);padding-top:10px}
+.cs-pillar-n{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;line-height:1.25}
+.cs-pillar-i{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex:none;
+  border-radius:50%;background:var(--cs-plum);color:#fff;font:800 11px var(--cs-sans)}
+.cs-pillar-o{font-size:13px;color:var(--cs-ink);line-height:1.5;margin-top:7px}
+.cs-pillar-m{display:flex;justify-content:space-between;gap:10px;margin-top:9px;
+  font:600 11px var(--cs-sans);color:var(--cs-mut);border-top:1px solid var(--cs-line);padding-top:7px}
+
+/* action window pill */
+.cs-win{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
+  border-radius:30px;padding:2px 9px;border:1px solid var(--cs-line2);color:var(--cs-mut2)}
+.cs-win-03{border-color:var(--cs-burnt);color:var(--cs-burnt)}
+.cs-win-36{border-color:var(--cs-plum);color:var(--cs-plum)}
+.cs-win-612{border-color:var(--cs-teal);color:var(--cs-teal)}
+
+/* capability overlap */
+.cs-ovl-row{border-top:1px solid var(--cs-line);padding:11px 0}
+.cs-ovl-row:first-child{border-top:0;padding-top:0}
+.cs-ovl-hd{display:flex;align-items:baseline;gap:10px}
+.cs-ovl-c{font-size:16px;font-weight:700}
+.cs-ovl-v{margin-left:auto;font-size:13px;font-weight:700;color:var(--cs-burnt);font-variant-numeric:tabular-nums}
+.cs-ovl-s{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.cs-ovl-r{font-size:11px;color:var(--cs-mut);margin-top:6px;line-height:1.5}
+
+/* disposition */
+.cs-act{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
+  border-radius:4px;padding:3px 8px;border:1px solid var(--cs-line2);color:var(--cs-mut2)}
+.cs-act-retire,.cs-act-replace{border-color:var(--cs-burnt);color:var(--cs-burnt)}
+.cs-act-renegotiate,.cs-act-consolidate{border-color:var(--cs-plum);color:var(--cs-plum)}
+.cs-act-retain{border-color:var(--cs-teal);color:var(--cs-teal)}
+
+/* forecast */
+.cs-fc{display:flex;gap:12px;align-items:flex-end;height:210px;margin-bottom:10px}
+.cs-fc-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+.cs-fc-v{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:5px}
+.cs-fc-plot{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.cs-fc-bar{width:56%;background:var(--cs-plum);border-radius:3px 3px 0 0;display:block}
+.cs-fc-col.is-proj .cs-fc-bar{background:var(--cs-teal)}
+.cs-fc-band{position:absolute;left:22%;width:56%;background:rgba(47,110,107,.20);border-top:1px solid var(--cs-teal);
+  border-bottom:1px solid var(--cs-teal);border-radius:2px}
+.cs-fc-l{font-size:11px;color:var(--cs-mut);margin-top:6px}
+.cs-fc-key,.cs-rv-key{display:flex;gap:16px;font:600 11px var(--cs-sans);color:var(--cs-mut)}
+.cs-fc-key span,.cs-rv-key span{display:flex;align-items:center;gap:6px}
+.cs-fc-key span::before,.cs-rv-key span::before{content:'';width:11px;height:11px;border-radius:2px;background:var(--cs-plum)}
+.cs-k-proj::before{background:var(--cs-teal)!important}
+.cs-k-band::before{background:rgba(47,110,107,.20)!important;border:1px solid var(--cs-teal)}
+.cs-k-vol::before{background:var(--cs-teal)!important}
+
+/* rate vs volume */
+.cs-rv{margin-bottom:12px}
+.cs-rv-bar{display:flex;height:22px;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.cs-rv-rate{background:var(--cs-plum)}
+.cs-rv-vol{background:var(--cs-teal)}
+
+/* movement since last strategy */
+.cs-dir{font-size:11px;line-height:1}
+.cs-dir-up{color:var(--cs-burnt)}
+.cs-dir-down{color:var(--cs-teal)}
+
+/* roadmap */
+.cs-road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:900px){.cs-road{grid-template-columns:1fr}}
+.cs-road-hd{font:800 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum);
+  display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:2px solid var(--cs-plum);margin-bottom:10px}
+.cs-road-hd span{margin-left:auto;color:var(--cs-mut2);font-weight:700}
+.cs-road-i{border:1px solid var(--cs-line2);border-radius:8px;padding:10px 12px;margin-bottom:9px}
+.cs-road-i.cs-st-critical{border-left:3px solid var(--cs-burnt)}
+.cs-road-i.cs-st-watch{border-left:3px solid var(--cs-plum)}
+.cs-road-i.cs-st-done{border-left:3px solid var(--cs-teal)}
+.cs-road-a{font-size:13px;line-height:1.45}
+.cs-road-m{font-size:11px;color:var(--cs-mut);margin-top:6px}
+
+/* ---- narrative records --------------------------------------------------- */
+.cs-nrs{display:flex;flex-direction:column;gap:12px}
+.cs-nr{border-left:3px solid var(--cs-line2);padding-left:12px}
+.cs-nr-emph{border-left-color:var(--cs-burnt)}
+.cs-nr-plum{border-left-color:var(--cs-plum)}
+.cs-nr-teal{border-left-color:var(--cs-teal)}
+.cs-nr-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cs-nr-t{font-size:16px;font-weight:700;line-height:1.3}
+.cs-nr-k{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--cs-plum)}
+.cs-nr-emph .cs-nr-k{color:var(--cs-burnt)}
+.cs-nr-teal .cs-nr-k{color:var(--cs-teal)}
+.cs-nr-c{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut)}
+.cs-nr-d{font-size:13px;line-height:1.55;color:var(--cs-ink);margin-top:5px}
+.cs-nr-kv{font-size:13px;margin-top:3px}
+.cs-nr-kv span{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);margin-right:7px}
+
+/* ---- row height rule -----------------------------------------------------
+   Every column in a side-by-side row ends on the same line. A column may hold
+   one panel or a stack; whichever grew scrolls inside itself rather than
+   pushing its neighbour out of alignment.                                    */
+.cs-row2{align-items:stretch}
+.cs-row2>.cs-card{display:flex;flex-direction:column;margin-bottom:0}
+.cs-row2>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow:auto}
+.cs-unq{font-size:13px;font-weight:600;color:var(--cs-mut)}
+
+/* =============================================================================
+   RESTRUCTURE: subtabs, evidence badges, charts
+   ============================================================================= */
+
+/* ---- subtabs ---- */
+.cs-subtabs{display:flex;gap:2px;margin:-8px 0 18px;flex-wrap:wrap}
+.cs-subtab{appearance:none;background:transparent;border:1px solid transparent;border-radius:6px;
+  color:var(--cs-mut);font:600 13px var(--cs-sans);padding:6px 12px;cursor:pointer}
+.cs-subtab:hover{color:var(--cs-ink);background:var(--cs-band)}
+.cs-subtab.on{color:var(--cs-plum);background:var(--cs-band);border-color:var(--cs-line2);font-weight:700}
+
+/* ---- evidence strength badge (the Deal / Landscape control) ---- */
+.cs-cov{display:inline-flex;align-items:center;gap:6px;font:600 9px var(--cs-sans);letter-spacing:.05em;
+  text-transform:uppercase;border:1px solid var(--cs-line2);border-radius:30px;padding:3px 9px;white-space:nowrap;
+  color:var(--cs-mut2);background:transparent;margin-left:12px}
+.cs-cs{margin-left:auto}
+.cs-dots{display:inline-flex;gap:2px}
+.cs-dots i{width:5px;height:5px;border-radius:50%;background:var(--cs-line2)}
+.cs-cov-strong{color:var(--cs-teal);border-color:var(--cs-teal)}
+.cs-cov-strong .cs-dots i{background:var(--cs-teal)}
+.cs-cov-moderate{color:var(--cs-plum);border-color:var(--cs-plum)}
+.cs-cov-moderate .cs-dots i:nth-child(-n+2){background:var(--cs-plum)}
+.cs-cov-limited{color:var(--cs-burnt);border-color:var(--cs-burnt)}
+.cs-cov-limited .cs-dots i:nth-child(1){background:var(--cs-burnt)}
+
+/* ---- inline help ---- */
+.cs-help{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;
+  border:1px solid var(--cs-line2);border-radius:50%;font:700 9px var(--cs-sans);color:var(--cs-mut);
+  cursor:help;vertical-align:middle}
+.cs-help:hover,.cs-help:focus{border-color:var(--cs-plum);color:var(--cs-plum);outline:none}
+
+/* ---- top suppliers, ten then scroll ---- */
+/* Ten rows visible, the eleventh clipped so the scroll is obvious. Row is
+   5+5 padding + 19 line + 1 rule = 30px. */
+.cs-scroll10{max-height:280px;overflow-y:auto;padding-right:8px;scrollbar-gutter:stable}
+.cs-suprow{height:28px;box-sizing:border-box}
+.cs-suprow{display:grid;grid-template-columns:20px minmax(0,1fr) 110px 74px 46px;gap:9px;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--cs-line)}
+.cs-suprow:last-child{border-bottom:none}
+.cs-supr{font:700 9px var(--cs-sans);color:var(--cs-mut);text-align:right}
+.cs-supn{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-supv,.cs-supp{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.cs-supp{color:var(--cs-mut)}
+
+/* ---- forecast toggle ---- */
+.cs-ctrlbar{display:flex;justify-content:flex-end;margin-bottom:8px}
+.cs-toggle{appearance:none;display:inline-flex;align-items:center;gap:8px;background:transparent;
+  border:1px solid var(--cs-line2);border-radius:30px;padding:4px 12px 4px 6px;cursor:pointer;
+  font:600 11px var(--cs-sans);color:var(--cs-mut)}
+.cs-toggle-t{width:26px;height:14px;border-radius:9px;background:var(--cs-line2);position:relative;transition:background .12s}
+.cs-toggle-t::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;
+  background:#fff;transition:transform .12s}
+.cs-toggle.on{color:var(--cs-plum);border-color:var(--cs-plum)}
+.cs-toggle.on .cs-toggle-t{background:var(--cs-plum)}
+.cs-toggle.on .cs-toggle-t::after{transform:translateX(12px)}
+.cs-fc-col.is-ytd .cs-fc-bar{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 5px,#7A3C6B 5px 10px)}
+.cs-k-ytd::before{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 4px,#7A3C6B 4px 8px)!important}
+.cs-k-a::before{background:var(--cs-plum)!important}
+.cs-k-b::before{background:#C9C2B8!important}
+.cs-k-line::before{background:var(--cs-burnt)!important;height:3px!important;border-radius:2px!important}
+.cs-k-rate::before{background:var(--cs-plum)!important}
+
+/* ---- SVG charts ---- */
+.cs-pwrap,.cs-rkwrap{width:100%;overflow-x:auto}
+.cs-psvg{width:100%;min-width:600px;height:auto;display:block}
+.cs-pb-a{fill:var(--cs-plum)}
+.cs-pb-b{fill:#C9C2B8}
+.cs-pline{fill:none;stroke:var(--cs-burnt);stroke-width:2}
+.cs-pdot{fill:var(--cs-burnt)}
+.cs-p80{stroke:var(--cs-burnt);stroke-width:1.5;stroke-dasharray:5 4}
+.cs-p80h{stroke:var(--cs-line2);stroke-width:1;stroke-dasharray:3 4}
+.cs-p80t{font:700 11px var(--cs-sans);fill:var(--cs-burnt)}
+.cs-pax{stroke:var(--cs-line2);stroke-width:1}
+.cs-plab{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:end}
+.cs-pyr,.cs-pyl{font:400 11px var(--cs-sans);fill:var(--cs-mut)}
+.cs-ptail{font:600 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:end}
+.cs-axt{font:600 11px var(--cs-sans);fill:var(--cs-mut2);text-anchor:middle}
+.cs-quadl{font:600 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:end}
+.cs-fd{fill:var(--cs-teal);opacity:.75}
+.cs-fd-hot{fill:var(--cs-burnt);opacity:.85}
+.cs-fdlab{font:400 11px var(--cs-sans);fill:var(--cs-ink)}
+.cs-rk{fill:var(--cs-plum)}
+.cs-rk-hot{fill:var(--cs-burnt)}
+.cs-rknum{font:700 11px var(--cs-sans);fill:#fff;text-anchor:middle}
+.cs-rkzone{fill:var(--cs-burnt);opacity:.07}
+.cs-rkleg{margin:8px 0 0;padding-left:20px;font-size:11px;color:var(--cs-mut);columns:2;column-gap:26px}
+.cs-rkleg li{margin-bottom:3px;break-inside:avoid}
+.cs-rkleg li.hot{color:var(--cs-burnt);font-weight:600}
+
+/* ---- read-outs ---- */
+.cs-read{border-left:3px solid var(--cs-burnt);padding:2px 0 2px 12px;margin-top:12px}
+.cs-read-t{font:800 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-burnt)}
+.cs-read-d{font-size:13px;line-height:1.6;margin-top:5px}
+.cs-ul{margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.6}
+.cs-ul li{margin-bottom:5px}
+
+/* ---- tail effort mismatch ---- */
+.cs-mismatch{margin-top:12px;border-top:1px solid var(--cs-line);padding-top:10px}
+.cs-mm-row{display:grid;grid-template-columns:150px minmax(0,1fr) 62px;gap:10px;align-items:center;
+  font-size:11px;color:var(--cs-mut2);margin-bottom:6px}
+.cs-mm-row b{text-align:right;font-size:13px;color:var(--cs-ink);font-variant-numeric:tabular-nums}
+.cs-mm-row .cs-bar{width:100%}
+
+/* ---- Kraljic grid ---- */
+.cs-kgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:560px}
+.cs-kcell{border:1px solid var(--cs-line2);border-radius:8px;padding:12px 14px;background:var(--cs-surface)}
+.cs-kcell-l{font-size:16px;font-weight:700;color:var(--cs-mut)}
+.cs-kcell-d{font-size:11px;color:var(--cs-mut);margin-top:4px;line-height:1.45}
+.cs-kcell.on{border-color:var(--cs-plum);border-width:2px;padding:11px 13px}
+.cs-kcell.on .cs-kcell-l{color:var(--cs-plum)}
+.cs-kcell.on .cs-kcell-d{color:var(--cs-ink)}
+.cs-kaxis{display:flex;justify-content:space-between;max-width:560px;margin-top:6px;
+  font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut)}
+.cs-implic{margin-top:12px;border-top:1px solid var(--cs-line);padding-top:10px}
+
+/* ---- Porter ---- */
+.cs-verdict-v{font-size:20px;font-weight:800;letter-spacing:-.01em}
+.cs-verdict-plum .cs-verdict-v{color:var(--cs-plum)}
+.cs-verdict-teal .cs-verdict-v{color:var(--cs-teal)}
+.cs-verdict-burnt .cs-verdict-v{color:var(--cs-burnt)}
+.cs-verdict-d{font-size:13px;line-height:1.6;margin-top:8px;max-width:80ch}
+.cs-leverbar{position:relative;height:8px;border-radius:5px;margin:14px 0 22px;max-width:560px;
+  background:linear-gradient(90deg,var(--cs-burnt) 0%,#C9C2B8 50%,var(--cs-teal) 100%)}
+.cs-leverbar i{position:absolute;top:-4px;width:3px;height:16px;background:var(--cs-ink);border-radius:2px;transform:translateX(-1.5px)}
+.cs-lb-l,.cs-lb-r{position:absolute;top:13px;font:600 9px var(--cs-sans);letter-spacing:.05em;
+  text-transform:uppercase;color:var(--cs-mut)}
+.cs-lb-l{left:0}
+.cs-lb-r{right:0}
+.cs-force{border-top:1px solid var(--cs-line);padding:11px 0}
+.cs-force:first-child{border-top:0;padding-top:0}
+.cs-force-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cs-force-f{font-size:16px;font-weight:700;min-width:170px}
+.cs-force-h .cs-bar{flex:1;max-width:240px}
+.cs-force-d{font-size:13px;color:var(--cs-mut);line-height:1.55;margin-top:5px}
+
+/* ---- market intelligence ---- */
+.cs-mis{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.cs-mi{border-top:3px solid var(--cs-plum);padding-top:10px}
+.cs-mi-k{font-size:20px;font-weight:800;color:var(--cs-burnt);letter-spacing:-.01em}
+.cs-mi-t{font-size:16px;font-weight:700;line-height:1.3;margin-top:3px}
+.cs-mi-d{font-size:13px;line-height:1.55;color:var(--cs-mut2);margin-top:6px}
+.cs-mi-s{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cs-cite{font:600 9px var(--cs-sans);letter-spacing:.03em;text-transform:uppercase;color:var(--cs-teal);
+  border:1px solid var(--cs-teal);border-radius:30px;padding:2px 8px;text-decoration:none}
+.cs-cite:hover{background:var(--cs-teal);color:#fff}
+
+/* ---- savings waterfall and scorecard ---- */
+.cs-wf-row{display:grid;grid-template-columns:110px minmax(0,1fr) 92px 180px;gap:12px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--cs-line)}
+.cs-wf-row:last-child{border-bottom:none}
+.cs-wf-l{font-size:13px;font-weight:700}
+.cs-wf-bar{height:16px;background:#EFEBE4;border-radius:3px;overflow:hidden}
+.cs-wf-bar i{display:block;height:100%;border-radius:3px}
+.cs-wf-plum{background:var(--cs-plum)}
+.cs-wf-teal{background:var(--cs-teal)}
+.cs-wf-none{display:block;height:100%;width:100%;
+  background:repeating-linear-gradient(135deg,transparent 0 6px,var(--cs-line2) 6px 7px)}
+.cs-wf-v{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.cs-wf-s{font-size:11px;color:var(--cs-mut)}
+.cs-scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.cs-scard{border:1px solid var(--cs-line2);border-radius:8px;padding:12px 13px}
+.cs-scard.is-need{border-style:dashed}
+.cs-scard-k{font-size:13px;font-weight:700;line-height:1.3}
+.cs-scard-r{display:flex;align-items:baseline;gap:8px;margin-top:7px}
+.cs-scard-c{font-size:20px;font-weight:800;color:var(--cs-plum);letter-spacing:-.01em}
+.cs-scard.is-need .cs-scard-c{font-size:13px;font-weight:600;color:var(--cs-mut)}
+.cs-scard-a{color:var(--cs-mut)}
+.cs-scard-t{font-size:13px;font-weight:700;color:var(--cs-teal)}
+.cs-spark{width:100%;height:24px;margin-top:6px}
+.cs-spark polyline{fill:none;stroke:var(--cs-plum);stroke-width:1.5}
+.cs-scard-n{font-size:11px;color:var(--cs-mut);line-height:1.45;margin-top:6px}
+.cs-scard-f{font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);margin-top:6px}
+
+/* ---- tail and contract opportunities ---- */
+.cs-opp{border-top:1px solid var(--cs-line);padding:12px 0}
+.cs-opp:first-child{border-top:0;padding-top:0}
+.cs-opp-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cs-opp-n{font-size:16px;font-weight:700}
+.cs-opp-v{margin-left:auto;font-size:16px;font-weight:800;color:var(--cs-teal);font-variant-numeric:tabular-nums}
+.cs-opp-v2{font-size:11px;color:var(--cs-mut);margin-top:3px}
+.cs-opp-s{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.cs-opp-r{font-size:13px;line-height:1.55;margin-top:8px;border-left:3px solid var(--cs-burnt);padding-left:11px}
+.cs-opp-r b{font:800 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-burnt);
+  display:block;margin-bottom:2px}
+
+/* ---- swing tornado ---- */
+.cs-tornado{display:block;width:100%;height:10px;background:#EFEBE4;border-radius:3px;overflow:hidden}
+.cs-tornado i{display:block;height:100%;border-radius:3px}
+.cs-tor-up{background:var(--cs-burnt)}
+.cs-tor-dn{background:var(--cs-teal)}
+.cs-play-i{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex:none;
+  border-radius:50%;background:var(--cs-plum);color:#fff;font:800 9px var(--cs-sans);margin-right:7px}
+.cs-pstrip{list-style:none;margin:10px 0 0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px 18px;counter-reset:ps}
+.cs-pstrip li{counter-increment:ps;display:flex;align-items:baseline;gap:8px;font-size:11px;
+  padding:3px 0;border-bottom:1px solid var(--cs-line)}
+.cs-pstrip li::before{content:counter(ps);font-weight:700;color:var(--cs-mut);min-width:16px;text-align:right}
+.cs-ps-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.cs-ps-v{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--cs-mut)}
+.cs-ps-more{font-size:11px;color:var(--cs-mut);margin-top:8px}
+
+/* ---- platform Strategy blocks --------------------------------------------
+   .pillrow3 / .dk-pillar / .callout-blue / .seqline, carried across with the
+   palette and the locked type scale applied. Platform pillar type is 21/12/11;
+   this scale has no 21 or 12, so it renders 20/13/11.                        */
+.cs-pillrow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:900px){.cs-pillrow3{grid-template-columns:1fr}}
+.cs-pillar3{background:var(--cs-surface);border:1px solid var(--cs-line2);border-top:3px solid var(--cs-mut);
+  border-radius:14px;padding:16px;min-width:0}
+.cs-pillar3-plum{border-top-color:var(--cs-plum)}
+.cs-pillar3-teal{border-top-color:var(--cs-teal)}
+.cs-pillar3-burnt{border-top-color:var(--cs-burnt)}
+.cs-p3-k{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.cs-pillar3-plum .cs-p3-k{color:var(--cs-plum)}
+.cs-pillar3-teal .cs-p3-k{color:var(--cs-teal)}
+.cs-pillar3-burnt .cs-p3-k{color:var(--cs-burnt)}
+.cs-p3-t{font-size:13px;font-weight:700;color:var(--cs-ink);margin-top:4px;line-height:1.35}
+.cs-p3-d{font-size:11px;color:var(--cs-mut);margin-top:5px;line-height:1.5}
+.cs-callout{background:transparent;border:1px solid var(--cs-line2);border-left:4px solid var(--cs-plum);
+  border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.55;margin-bottom:14px;color:var(--cs-ink)}
+.cs-callout>strong:first-child{color:var(--cs-plum)}
+.cs-callout .cs-nr{border-left:0;padding-left:0}
+.cs-seqline{margin:8px 0;font-size:13px;line-height:1.55}
+.cs-seqline strong{color:var(--cs-ink)}
+.cs-pre{white-space:pre-wrap}
+
+/* =============================================================================
+   STRATEGY & PLAYS: the platform's outer tab
+   Carried across from .metric / .plays-head / .rechead / .pcard / .modelp,
+   with the palette substituted (platform blue -> teal, amber -> plum, red ->
+   burnt) and the locked type scale applied where the platform uses 21/14/12.
+   ============================================================================= */
+.cs-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  background:var(--cs-surface);border:1px solid var(--cs-line2);border-radius:10px;margin-bottom:18px}
+.cs-metric{padding:13px 16px;border-right:1px solid var(--cs-line)}
+.cs-metric:last-child{border-right:none}
+.cs-metric .lab{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-metric .val{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:8px;line-height:1}
+.cs-metric .note{font-size:11px;color:var(--cs-mut);margin-top:6px}
+
+.cs-plays-head{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.cs-plays-head svg{width:18px;height:18px;stroke:var(--cs-plum);fill:none;stroke-width:2}
+.cs-plays-head .pk{font:700 9px var(--cs-sans);letter-spacing:.07em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-plays-head .reflect{font:600 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--cs-burnt);border:1px solid var(--cs-burnt);border-radius:30px;padding:3px 9px;margin-left:auto}
+.cs-rechead{font-size:13px;line-height:1.55;color:var(--cs-mut);margin-bottom:14px;max-width:100ch}
+.cs-rechead b{color:var(--cs-ink);font-weight:700}
+
+.cs-plays-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-bottom:18px;align-items:start}
+@media(max-width:1000px){.cs-plays-wrap{grid-template-columns:1fr}}
+.cs-plays-col{display:flex;flex-direction:column;gap:11px}
+
+.cs-pcard{border:1.5px solid var(--cs-line2);border-radius:13px;background:var(--cs-surface);
+  padding:12px 15px;cursor:pointer;transition:.12s}
+.cs-pcard:hover{border-color:var(--cs-mut2)}
+.cs-pcard.on{border-color:var(--cs-plum);background:linear-gradient(180deg,#EDDFE9,#fff)}
+.cs-pcard .pcrow{display:flex;align-items:center;gap:10px}
+.cs-pcard .pcheck{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--cs-line2);flex:none;
+  display:flex;align-items:center;justify-content:center;color:#fff;background:var(--cs-surface)}
+.cs-pcard.on .pcheck{background:var(--cs-plum);border-color:var(--cs-plum)}
+.cs-pcard .pcheck svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:3;opacity:0}
+.cs-pcard.on .pcheck svg{opacity:1}
+.cs-pcard .pcic{width:30px;height:30px;border-radius:8px;background:var(--cs-bg);border:1px solid var(--cs-line);
+  display:flex;align-items:center;justify-content:center;flex:none}
+.cs-pcard .pcic svg{width:16px;height:16px;stroke:var(--cs-ink);fill:none;stroke-width:2}
+.cs-pcard .pcname{font-size:16px;font-weight:700}
+.cs-pcard .pcsub{font-size:11px;color:var(--cs-mut);margin-top:8px;line-height:1.45}
+.cs-pcard .pcfig{display:flex;gap:20px;margin-top:11px;flex-wrap:wrap}
+.cs-pcard .pcf{display:flex;flex-direction:column}
+.cs-pcard .pcf .v{font-size:13px;font-weight:700;color:var(--cs-plum);font-variant-numeric:tabular-nums}
+.cs-pcard .pcf .k{font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:3px}
+.cs-effort{font:600 9px var(--cs-sans);letter-spacing:.04em;text-transform:uppercase;border-radius:30px;
+  padding:2px 8px;margin-left:auto;border:1px solid}
+.cs-effort.lo{color:var(--cs-teal);border-color:var(--cs-teal)}
+.cs-effort.md{color:var(--cs-plum);border-color:var(--cs-plum)}
+.cs-effort.hi{color:var(--cs-burnt);border-color:var(--cs-burnt)}
+
+.cs-modelp{border:1px solid var(--cs-line);border-radius:14px;background:var(--cs-surface);
+  position:sticky;top:16px;overflow:hidden}
+.cs-modelp .mph{background:var(--cs-ink);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:9px}
+.cs-modelp .mph svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.cs-modelp .mph .mt{font-size:13px;font-weight:700}
+.cs-modelp .mph .mn{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.05em;
+  text-transform:uppercase;color:rgba(255,255,255,.72)}
+.cs-modelp .mpb{padding:14px 16px}
+.cs-horizon{display:inline-flex;background:var(--cs-bg);border:1px solid var(--cs-line);border-radius:30px;
+  padding:3px;gap:2px;margin-bottom:14px}
+.cs-horizon button{border:none;background:transparent;font:600 11px var(--cs-sans);color:var(--cs-mut);
+  padding:5px 12px;border-radius:30px;cursor:pointer}
+.cs-horizon button.on{background:var(--cs-plum);color:#fff}
+.cs-bignum{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--cs-ink);
+  font-variant-numeric:tabular-nums}
+.cs-bignum-k{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:6px}
+.cs-bars3{display:flex;align-items:flex-end;gap:10px;height:78px;margin:16px 0 4px}
+.cs-bar3{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;justify-content:flex-end;height:100%}
+.cs-bar3 i{width:100%;background:var(--cs-teal);border-radius:5px 5px 0 0;min-height:3px;transition:height .35s}
+.cs-bar3 .bl{font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-bar3 .bv{font-size:11px;font-weight:700;color:var(--cs-ink);font-variant-numeric:tabular-nums}
+.cs-miniload{font-size:11px;color:var(--cs-mut);align-self:center;margin:auto}
+.cs-mrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;
+  border-top:1px solid var(--cs-line);font-size:11px}
+.cs-mrow .mk{color:var(--cs-mut)}
+.cs-mrow .mv{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.cs-mrow .mu{color:var(--cs-mut2);font-weight:400}
+.cs-riskbar{height:8px;border-radius:6px;background:var(--cs-line);overflow:hidden;margin-top:7px}
+.cs-riskbar i{display:block;height:100%;border-radius:6px;transition:width .35s}
+.cs-prow{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.cs-pbtn{font:700 11px var(--cs-sans);border-radius:30px;padding:8px 15px;cursor:pointer;
+  border:1.5px solid var(--cs-line2);background:var(--cs-surface);color:var(--cs-ink)}
+.cs-pbtn.primary{background:var(--cs-plum);border-color:var(--cs-plum);color:#fff}
+.cs-pbtn:hover{border-color:var(--cs-mut2)}
+.cs-pbtn.primary:hover{background:var(--cs-plum-d);border-color:var(--cs-plum-d)}
+.cs-playmsg{font-size:11px;line-height:1.5;color:var(--cs-ink);border-left:3px solid var(--cs-burnt);
+  padding-left:10px;margin-top:11px}
+
+.cs-draftcard{border:1px solid var(--cs-plum);background:var(--cs-surface);border-radius:14px;
+  margin:14px 0 4px;overflow:hidden}
+.cs-draftcard .dch{display:flex;align-items:center;gap:9px;padding:12px 15px;
+  border-bottom:1px solid var(--cs-line);background:var(--cs-band)}
+.cs-draftcard .dch .dt{font-size:13px;font-weight:700}
+.cs-draftcard .dch .dbadge{margin-left:auto;font:600 9px var(--cs-sans);letter-spacing:.04em;
+  text-transform:uppercase;color:var(--cs-plum);background:var(--cs-surface);border:1px solid var(--cs-plum);
+  border-radius:30px;padding:3px 9px}
+.cs-draftcard .dcb{padding:13px 15px;font-size:13px;line-height:1.6;color:var(--cs-ink);
+  max-height:340px;overflow:auto}
+.cs-draftcard .dcb .cs-nr{border-left:0;padding-left:0}
+
+/* ---- stacked current-year forecast ---- */
+.cs-fc-plot{position:relative}
+.cs-fc-add{position:absolute;left:22%;width:56%;border-radius:3px 3px 0 0;display:block;
+  background:repeating-linear-gradient(135deg,var(--cs-teal) 0 5px,#4A8F8B 5px 10px)}
+.cs-fc-col.is-stack .cs-fc-bar{border-radius:0}
+.cs-k-add::before{background:repeating-linear-gradient(135deg,var(--cs-teal) 0 4px,#4A8F8B 4px 8px)!important}
+
+/* ---- key findings as cards ---- */
+.cs-mi-emph{border-top-color:var(--cs-burnt)}
+.cs-mi-teal{border-top-color:var(--cs-teal)}
+.cs-mi-plum{border-top-color:var(--cs-plum)}
+.cs-mi-teal .cs-mi-k{color:var(--cs-teal)}
+.cs-mi-plum .cs-mi-k{color:var(--cs-plum)}
+
+/* ---- spend under contract: one bar, every exposure a segment ---- */
+.cs-cvhead{display:flex;gap:28px;margin-bottom:12px}
+.cs-cvbig b{display:block;font-size:28px;font-weight:800;letter-spacing:-.015em;line-height:1;color:var(--cs-plum)}
+.cs-cvbig span{display:block;font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:5px}
+.cs-cvbig-x b{color:var(--cs-burnt)}
+.cs-cvbar{display:flex;height:26px;border-radius:5px;overflow:hidden;margin-bottom:14px}
+.cs-cvseg{display:block;height:100%}
+.cs-cvseg-ok{background:var(--cs-plum)}
+.cs-cvseg-x0{background:var(--cs-burnt)}
+.cs-cvseg-x1{background:var(--cs-burnt-d)}
+.cs-cvrow{display:grid;grid-template-columns:10px minmax(0,1.1fr) minmax(0,1.4fr) 74px 52px;gap:10px;
+  align-items:center;padding:6px 0;border-bottom:1px solid var(--cs-line)}
+.cs-cvrow:last-child{border-bottom:none}
+.cs-cvsw{width:10px;height:10px;border-radius:2px;background:var(--cs-burnt)}
+.cs-cvrow:nth-child(even) .cs-cvsw{background:var(--cs-burnt-d)}
+.cs-cvn{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-cvw{font-size:11px;color:var(--cs-mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-cvv,.cs-cvp{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.cs-cvp{color:var(--cs-mut)}
+
+/* ---- renewal exposure timeline ---- */
+.cs-timeline{margin-top:4px}
+.cs-tlaxis{position:relative;height:16px;margin-left:auto;margin-bottom:6px;
+  display:block;padding-left:calc(38% + 20px)}
+.cs-tlm{position:absolute;font:600 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--cs-mut2);transform:translateX(-50%)}
+.cs-tlrow{display:grid;grid-template-columns:minmax(0,150px) 74px minmax(0,1fr) 88px;gap:12px;
+  align-items:center;padding:7px 0;border-bottom:1px solid var(--cs-line)}
+.cs-tlrow:last-child{border-bottom:none}
+.cs-tlrow.is-urgent .cs-tln{color:var(--cs-burnt)}
+.cs-tln{font-size:13px;font-weight:600;overflow:hidden}
+.cs-tln small{display:block;font-size:11px;font-weight:400;color:var(--cs-mut);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-tlv{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.cs-tltrack{position:relative;height:14px;background:var(--cs-band);border-radius:4px}
+.cs-tlbar{position:absolute;top:0;height:14px;border-radius:4px;background:var(--cs-teal);display:block}
+.cs-tlbar.is-urgent{background:var(--cs-burnt)}
+.cs-tlbar-none{background:repeating-linear-gradient(135deg,transparent 0 5px,var(--cs-line2) 5px 6px);
+  border:1px dashed var(--cs-line2);box-sizing:border-box}
+.cs-tlpast{position:absolute;top:0;height:14px;border-radius:4px 0 0 4px;display:block;
+  background:repeating-linear-gradient(135deg,transparent 0 4px,var(--cs-burnt) 4px 5px);opacity:.5}
+.cs-tld{font-size:11px;color:var(--cs-mut);text-align:right;white-space:nowrap}
+
+/* ---- Pareto row: chart wide, tail panel vertical beside it ---- */
+.cs-paretorow{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(260px,1fr);gap:14px;
+  align-items:stretch;margin-bottom:14px}
+@media(max-width:1050px){.cs-paretorow{grid-template-columns:1fr}}
+.cs-paretorow>.cs-card{display:flex;flex-direction:column;margin-bottom:0}
+.cs-paretorow>.cs-card>.cs-cardbd{flex:1;min-height:0}
+.cs-ptail2{fill:var(--cs-mut2)}
+.cs-read{margin-top:0}
+.cs-read+.cs-note{margin-top:12px}
+
+/* ---- tail threshold slider ---- */
+.cs-tslider{margin-bottom:16px}
+.cs-tslider input[type=range]{width:100%;accent-color:var(--cs-plum);margin:0}
+.cs-tsticks{display:flex;justify-content:space-between;margin-top:5px}
+.cs-tsticks span{font:600 11px var(--cs-sans);color:var(--cs-mut)}
+.cs-tsticks span.on{color:var(--cs-plum);font-weight:700}
+.cs-tslab{font-size:11px;color:var(--cs-mut);margin-top:5px}
+
+/* ---- concentric tail donuts ---- */
+.cs-tdwrap{position:relative;display:flex;justify-content:center;margin:4px 0 12px}
+.cs-donut{width:140px;height:140px;display:block}
+.cs-donut circle{fill:none;stroke-width:14}
+.cs-dnbg{stroke:var(--cs-band)}
+.cs-dnsup{stroke:var(--cs-burnt);stroke-linecap:butt}
+.cs-dnspend{stroke:var(--cs-teal);stroke-linecap:butt}
+.cs-tdmid{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.cs-tdmid b{display:block;font-size:20px;font-weight:800;line-height:1;letter-spacing:-.01em}
+.cs-tdmid span{display:block;font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:3px}
+.cs-tdkey{border-top:1px solid var(--cs-line)}
+.cs-tdk{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--cs-line);font-size:11px}
+.cs-tdk i{width:10px;height:10px;border-radius:2px;flex:none}
+.cs-tdk i.k-sup{background:var(--cs-burnt)}
+.cs-tdk i.k-spend{background:var(--cs-teal)}
+.cs-tdk span{color:var(--cs-mut2)}
+.cs-tdk b{margin-left:auto;font-size:13px;font-variant-numeric:tabular-nums}
+.cs-tdfig{display:flex;gap:18px;margin-top:11px}
+.cs-tdfig b{display:block;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.cs-tdfig span{display:block;font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:3px}
+
+/* ---- supplier list: search, filters, sortable, clickable ---- */
+.cs-supctl{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.cs-search{flex:1;min-width:180px;max-width:320px;font:400 13px var(--cs-sans);color:var(--cs-ink);
+  border:1px solid var(--cs-line2);border-radius:30px;padding:7px 14px;background:var(--cs-surface)}
+.cs-search:focus{outline:none;border-color:var(--cs-plum)}
+.cs-filter{font:600 11px var(--cs-sans);color:var(--cs-mut2);border:1px solid var(--cs-line2);
+  border-radius:30px;padding:7px 12px;background:var(--cs-surface);cursor:pointer}
+.cs-filter:focus{outline:none;border-color:var(--cs-plum)}
+.cs-supcount{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-clearb{font:600 11px var(--cs-sans);color:var(--cs-plum);background:transparent;border:0;
+  cursor:pointer;text-decoration:underline;padding:0}
+.cs-empty{font-size:13px;color:var(--cs-mut);padding:18px 0;text-align:center}
+.cs-sortb{font:700 9px var(--cs-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--cs-mut2);
+  background:transparent;border:0;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
+.cs-sortb.on{color:var(--cs-plum)}
+.cs-sortb i{font-style:normal;font-size:9px}
+.cs-suplink{font:600 13px var(--cs-sans);color:var(--cs-plum);background:transparent;border:0;
+  padding:0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px}
+.cs-suplink:hover{color:var(--cs-plum-d)}
+.cs-tbl tr.is-open td{background:var(--cs-band)}
+.cs-tbl tr.is-open td:first-child{box-shadow:inset 3px 0 0 var(--cs-plum)}
+.cs-oppn{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;
+  border-radius:30px;background:var(--cs-burnt);color:#fff;font:700 11px var(--cs-sans)}
+
+/* ---- frozen header on the overview supplier list ---- */
+.cs-suphead{position:sticky;top:0;z-index:2;background:var(--cs-surface);
+  border-bottom:1px solid var(--cs-line2);height:26px}
+.cs-suphead span{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-suphb{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+
+/* ---- renewal decision matrix ---- */
+.cs-rmwrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(220px,1fr);gap:18px;align-items:center}
+@media(max-width:900px){.cs-rmwrap{grid-template-columns:1fr}}
+.cs-rm{fill:var(--cs-plum);opacity:.42}
+.cs-rm-on{fill:var(--cs-burnt);opacity:.9}
+.cs-rmq{font-size:16px;font-weight:700;color:var(--cs-plum);margin-top:3px}
+.cs-rmd{font-size:13px;line-height:1.55;color:var(--cs-ink);margin-top:7px}
+.cs-rmblock{font-size:11px;color:var(--cs-mut);border:1px dashed var(--cs-line2);border-radius:6px;
+  padding:6px 10px;margin-top:9px}
+
+/* ---- subcategory split: map left, detail right ---- */
+.cs-screl{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:14px;
+  align-items:stretch;margin-bottom:14px}
+@media(max-width:1050px){.cs-screl{grid-template-columns:1fr}}
+.cs-screl>.cs-card{display:flex;flex-direction:column;margin-bottom:0}
+.cs-screl>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow:auto}
+.cs-fdg{cursor:pointer}
+.cs-fdg circle{transition:r .12s}
+.cs-fdg:hover circle{opacity:1}
+.cs-fdg.on .cs-fdlab{font-weight:700}
+.cs-fdg.on circle{stroke:var(--cs-ink);stroke-width:2}
+.cs-scname{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.cs-scmeta{font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:4px}
+.cs-scfig{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-top:12px;
+  border-top:1px solid var(--cs-line);padding-top:11px}
+.cs-scfig b{display:block;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.cs-scfig span{display:block;font:600 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cs-mut2);margin-top:2px}
+.cs-scopp{border-left:3px solid var(--cs-plum);padding-left:11px;margin-top:12px}
+.cs-scopp-volume{border-left-color:var(--cs-teal)}
+.cs-scopp-h{display:flex;align-items:baseline;gap:10px}
+.cs-scopp-k{font:700 9px var(--cs-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-plum)}
+.cs-scopp-volume .cs-scopp-k{color:var(--cs-teal)}
+.cs-scopp-v{margin-left:auto;font-size:13px;font-weight:800;color:var(--cs-burnt);font-variant-numeric:tabular-nums}
+.cs-scopp-t{font-size:13px;font-weight:700;line-height:1.35;margin-top:3px}
+.cs-scopp-d{font-size:11px;color:var(--cs-mut);line-height:1.5;margin-top:4px}
+.cs-scopp-f{font-size:11px;color:var(--cs-mut2);margin-top:5px}
+.cs-scopp-f b{color:var(--cs-ink)}
+
+/* ---- Pareto axes ---- */
+.cs-pgrid{stroke:var(--cs-line);stroke-width:1}
+.cs-pyl{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:end}
+.cs-pyr{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:start}
+.cs-pyt{font:700 9px var(--cs-sans);letter-spacing:.06em;fill:var(--cs-mut2);text-anchor:end;text-transform:uppercase}
+.cs-pyt-r{text-anchor:start}
+
+/* The evidence chip belongs at the far right of the header, past the subtitle. */
+.cs-cardhd{flex-wrap:wrap}
+.cs-cs{margin-left:auto}
+.cs-cov{margin-left:12px;order:3}
+.cs-cardhd .cs-ct{order:1}
+.cs-cardhd .cs-cs{order:2}
+.cs-tailcard .cs-cardhd .cs-cov{margin-left:auto}
+
+/* ---- charts render 1:1 so their text is the size it declares --------------
+   width:100% on a 620-unit viewBox inside a 900px column magnifies every label
+   in it. max-width pinned to the viewBox width stops that; the charts still
+   shrink on narrow screens, they just never blow up.                        */
+.cs-tsvg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
+.cs-psvg{width:100%;max-width:960px;min-width:0;height:auto;display:block;margin:0 auto}
+.cs-rksvg{width:100%;max-width:620px;height:auto;display:block;margin:0 auto}
+.cs-rmsvg{max-width:620px}
+.cs-fragsvg{max-width:660px}
+.cs-tbv{font:700 11px var(--cs-sans);fill:var(--cs-ink);text-anchor:middle}
+.cs-tbl2{font:400 11px var(--cs-sans);fill:var(--cs-mut);text-anchor:middle}
+.cs-tby{font:400 11px var(--cs-sans);fill:var(--cs-mut2);text-anchor:end}
+.cs-tline{stroke-width:2;stroke-dasharray:6 4}
+.cs-tgrid{stroke-width:1}
+.cs-taxis{stroke-width:1}
+
+/* ---- trend chart: HTML bars, SVG overlay for band and line ---- */
+.cs-fc{position:relative;display:flex;align-items:flex-end;gap:14px;height:230px;margin-bottom:10px}
+.cs-fc-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;min-width:0}
+.cs-fc-v{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:5px;white-space:nowrap}
+.cs-fc-plot{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.cs-fc-bar{width:56%;background:var(--cs-plum);border-radius:3px 3px 0 0;display:block}
+.cs-fc-col.is-proj .cs-fc-bar{background:var(--cs-teal)}
+.cs-fc-col.is-ytd .cs-fc-bar{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 5px,#7A3C6B 5px 10px)}
+.cs-fc-add{position:absolute;left:22%;width:56%;border-radius:3px 3px 0 0;display:block;
+  background:repeating-linear-gradient(135deg,var(--cs-teal) 0 5px,#4A8F8B 5px 10px)}
+.cs-fc-l{font-size:11px;color:var(--cs-mut);margin-top:6px;white-space:nowrap}
+/* the overlay covers the plot band only: below the value row, above the labels */
+.cs-tover{position:absolute;left:0;right:0;top:22px;bottom:23px;width:100%;height:calc(100% - 45px);
+  pointer-events:none;overflow:visible}
+.cs-tover .cs-tband{fill:var(--cs-teal);opacity:.16;stroke:none}
+.cs-tover .cs-tline{fill:none;stroke:var(--cs-burnt);stroke-width:2;stroke-dasharray:6 4;
+  vector-effect:non-scaling-stroke}
+
+/* =============================================================================
+   RESTYLE PROTOCOL — theo dashboards restyle protocol.zip, applied to Category
+   Strategy. Appended last so it wins over the rules above without !important.
+
+   Deltas from what this dashboard had:
+     - role tints raised to the new floor (the old ones were ~10% and invisible)
+     - panels get a full-height left spine, not a top border
+     - panel headers get a gradient band, a rule, an icon and a 13/800 uppercase
+       title; 9px was too small to be a title
+     - nested blocks move off white onto the well
+     - tables, chips and bars take the protocol treatment
+     - tabs go black-on-black-underline at every level, idle medium grey
+     - 16px is removed from the ladder: hierarchy is weight and case, not size
+     - figures are Roboto Mono
+   ============================================================================= */
+:root{
+  /* structural hues */
+  --plum:#5C2B50;      --plum-l:#7A3C6B;   --plum-dk:#3E1C36;
+  --teal-d:#2F6E6B;    --teal-l:#4A8F8B;   --teal-deep:#1F4A48;
+  --emph:#C15E19;      --emph-tx:#A2500F;
+
+  /* role tints at the new floor. Never paler than these. */
+  --plum-t:#C6B5C2;    --teal-t:#B6CCCB;   --emph-t:#ECCFBA;
+  --plum-band:#DDCFDA; --teal-band:#CFE0DE; --emph-band:#ECCFBA;
+  --plum-rule:#B99CB0; --teal-rule:#9FBFBC; --emph-rule:#C68A55;
+
+  --well:#F4F1EC;      --rule:#E2DCD4;     --line2:#CECCC7;
+  --pri-fg:#F3ECF1;    --sec-fg:#EAF4F2;
+  --track:#E7E3DC;
+  --tab-idle:#6E6862;
+  --shadow-card:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);
+  --mono:'Roboto Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  /* the dashboard's own aliases, re-pointed at the protocol values */
+  --cs-line2:#CECCC7;  --cs-line:#E2DCD4;  --cs-band:#DDCFDA;
+}
+
+/* ---- 3.1 panel: left spine, no top border ---- */
+.cs-card{
+  border:1px solid var(--line2);
+  border-left:3px solid var(--plum);
+  border-radius:8px;
+  box-shadow:var(--shadow-card);
+  display:flex;flex-direction:column;min-width:0;overflow:hidden;
+}
+.cs-card.cs-role-teal{border-left-color:var(--teal-d)}
+.cs-card.cs-role-emph{border-left-color:var(--emph)}
+.cs-card.cs-emph{border-left-color:var(--emph)}
+
+/* ---- 3.2 panel header ---- */
+.cs-cardhd{
+  display:flex;align-items:center;gap:9px;padding:12px 15px;flex:none;flex-wrap:wrap;
+  background:linear-gradient(180deg,var(--plum-band),var(--cs-surface));
+  border-bottom:1px solid var(--plum-rule);
+}
+.cs-ct{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--plum)}
+.cs-cs{margin-left:auto;font-size:11px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--cs-mut)}
+.cs-chic{width:17px;height:17px;flex:none;color:var(--plum);display:block}
+.cs-chic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;display:block}
+
+.cs-card.cs-role-teal .cs-cardhd{
+  background:linear-gradient(180deg,var(--teal-band),var(--cs-surface));
+  border-bottom-color:var(--teal-rule);
+}
+.cs-card.cs-role-teal .cs-ct,.cs-card.cs-role-teal .cs-chic{color:var(--teal-d)}
+
+.cs-card.cs-role-emph .cs-cardhd,.cs-card.cs-emph .cs-cardhd{
+  background:linear-gradient(180deg,var(--emph-band),var(--cs-surface));
+  border-bottom-color:var(--emph-rule);
+}
+.cs-card.cs-role-emph .cs-ct,.cs-card.cs-role-emph .cs-chic,
+.cs-card.cs-emph .cs-ct,.cs-card.cs-emph .cs-chic{color:var(--emph-tx)}
+
+/* 3.4 solid header: plum only, one per screen, on the panel that answers it */
+.cs-card.cs-role-solid .cs-cardhd{background:var(--plum);border-bottom:none}
+.cs-card.cs-role-solid .cs-ct,.cs-card.cs-role-solid .cs-chic{color:var(--pri-fg)}
+.cs-card.cs-role-solid .cs-cs{color:#E2CFDD}
+.cs-card.cs-role-solid .cs-cov{color:#E2CFDD;border-color:rgba(255,255,255,.45)}
+.cs-card.cs-role-solid .cs-cov .cs-dots i{background:#E2CFDD}
+.cs-card.cs-quiet .cs-cardhd{background:linear-gradient(180deg,var(--plum-band),var(--cs-surface))}
+
+/* ---- 3.5 section dividers ---- */
+.cs-sect{margin:24px 0 0}
+.cs-secthd{margin-bottom:10px}
+.cs-secthd .t{
+  font:700 9px var(--mono);letter-spacing:.02em;text-transform:capitalize;color:var(--cs-mut);
+  padding-left:10px;border-left:3px solid var(--plum);line-height:1.15;display:block;
+}
+
+/* ---- 3.6 nested blocks off white ---- */
+.cs-cardbd{padding:13px 15px;flex:1;min-width:0}
+.cs-kpi,.cs-scard,.cs-pillar3,.cs-road-i,.cs-mi,.cs-opp,.cs-metric,
+.cs-kcell,.cs-pcard,.cs-gap,.cs-tdkey{background:var(--well)}
+.cs-kpirow .cs-kpi{border-color:var(--rule)}
+.cs-gap{border-color:var(--rule)}
+.cs-read{background:var(--well);border-radius:0 6px 6px 0;padding:9px 12px}
+.cs-note{color:var(--cs-mut)}
+
+/* ---- 3.7 tables ---- */
+.cs-tbl th{
+  background:var(--plum-t);color:var(--plum-dk);
+  font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.08em;
+  padding:7px 10px;border-bottom:none;
+}
+.cs-card.cs-role-teal .cs-tbl th{background:var(--teal-t);color:var(--teal-deep)}
+.cs-tbl td{padding:8px 10px;border-bottom:1px solid var(--rule);font-size:13px}
+.cs-tbl tbody tr:nth-child(even) td{background:var(--well)}
+.cs-tbl tbody tr:hover td{background:#EFE9EE}
+.cs-tbl td.cs-num{font:700 11px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.cs-sortb{font:700 9px var(--mono);letter-spacing:.08em;color:var(--plum-dk)}
+.cs-sortb.on{color:var(--plum)}
+
+/* ---- 3.8 chips ---- */
+.cs-chip,.cs-tier,.cs-pill,.cs-state,.cs-act,.cs-win,.cs-effort,.cs-cov{
+  font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 9px;border-radius:30px;white-space:nowrap;
+}
+.cs-chip,.cs-tier{background:var(--plum-t);color:var(--plum-dk);border:none}
+.cs-pill-teal,.cs-state{background:var(--teal-t);color:var(--teal-deep);border:none}
+.cs-pill-plum{background:var(--plum-t);color:var(--plum-dk);border:none}
+.cs-pill-burnt{background:var(--emph);color:#fff;border:none}
+.cs-oppn{background:var(--emph);color:#fff;font:700 9px var(--mono)}
+
+/* ---- 3.9 bars ---- */
+.cs-bar{height:9px;border-radius:5px;background:var(--track)}
+.cs-bar i{border-radius:5px}
+.cs-supv,.cs-supp,.cs-wf-v,.cs-tlv,.cs-cvv,.cs-cvp,.cs-fc-v,.cs-tdfig b,.cs-scfig b,
+.cs-mm-row b,.cs-tdk b,.cs-opp-v,.cs-scopp-v,.cs-mrow .mv{
+  font-family:var(--mono);font-variant-numeric:tabular-nums;
+}
+
+/* ---- 3.10 tabs: black label, black underline, at every level ---- */
+.cs-tabs,.cs-subtabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.cs-tab,.cs-subtab{
+  font-family:var(--cs-sans);font-size:13px;font-weight:600;color:var(--tab-idle);
+  background:transparent;border:none;border-bottom:3px solid transparent;
+  padding:9px 12px;margin-bottom:-1px;border-radius:0;
+}
+.cs-tab:hover,.cs-subtab:hover{color:var(--cs-ink);background:transparent}
+.cs-tab.on,.cs-subtab.on{color:var(--cs-ink);font-weight:700;border-bottom-color:var(--cs-ink);background:transparent}
+.cs-subtabs{border-bottom:1px solid var(--line2);gap:4px;margin:-8px 0 18px}
+.cs-tabs{gap:4px}
+.cs-cat.on{background:var(--plum);border-color:var(--plum)}
+
+/* ---- 2. type ladder: 9 / 11 / 13 / 20 / 28. No 16. ---- */
+.cs-nr-t,.cs-force-f,.cs-ovl-c,.cs-opp-n,.cs-pillar-n,.cs-kcell-l,.cs-mi-t,
+.cs-scopp-t,.cs-rmq,.cs-tdfig b,.cs-scfig b,.cs-play-n,.cs-p3-t,.cs-pcard .pcname{
+  font-size:13px;font-weight:700;
+}
+.cs-mi-t,.cs-nr-t{letter-spacing:0}
+.cs-scname,.cs-stat-v,.cs-cvbig b,.cs-kpi-v,.cs-bignum,.cs-tdmid b,.cs-p3-k,.cs-scard-c,
+.cs-verdict-v,.cs-nr-k,.cs-mi-k,.cs-ovl-v,.cs-opp-v{
+  font-family:var(--mono);font-weight:700;
+}
+.cs-kpi-v,.cs-bignum,.cs-p3-k,.cs-scard-c,.cs-verdict-v,.cs-scname{font-size:20px;letter-spacing:-.01em}
+.cs-stat-v,.cs-cvbig b,.cs-h1{font-size:28px}
+.cs-tdmid b,.cs-mi-k,.cs-nr-k,.cs-ovl-v,.cs-opp-v,.cs-tdfig b,.cs-scfig b{font-size:20px}
+.cs-eyebrow,.cs-lab,.cs-lab2,.cs-kpi-l,.cs-stat-l,.cs-cvbig span,.cs-scmeta,
+.cs-tdfig span,.cs-scfig span,.cs-scard-f,.cs-supr,.cs-suphead span,.cs-supcount{
+  font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+}
+
+/* ---- 4.1 / 4.2 equal-height rows, scroll inside the body ---- */
+.cs-row2,.cs-paretorow,.cs-screl{align-items:stretch}
+.cs-row2>.cs-card,.cs-paretorow>.cs-card,.cs-screl>.cs-card{margin-bottom:0}
+.cs-row2>.cs-card>.cs-cardbd,.cs-paretorow>.cs-card>.cs-cardbd,
+.cs-screl>.cs-card>.cs-cardbd{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin}
+
+
+/* =============================================================================
+   Legend, band visibility, and the stray tab scrollbar
+   ============================================================================= */
+
+/* 1. overflow-x:auto alone computes overflow-y:auto, and a 1px height
+      difference between the strip and its buttons then shows a vertical
+      scrollbar. Both axes have to be declared, on every strip and its wrapper. */
+.cs-tabs,.cs-subtabs,.cs-cats,.cs-segbar,.cs-supctl{
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;
+}
+.cs-tabs::-webkit-scrollbar,.cs-subtabs::-webkit-scrollbar{height:6px}
+.cs-tabs::-webkit-scrollbar-thumb,.cs-subtabs::-webkit-scrollbar-thumb{
+  background:var(--line2);border-radius:3px}
+
+/* 3. the confidence band was 16% teal over an off-white card, which is
+      invisible. It now carries a readable fill and its own dashed edge. */
+.cs-tover .cs-tband{fill:var(--cs-teal);opacity:.30;stroke:var(--cs-teal);
+  stroke-width:1.5;stroke-dasharray:5 4;vector-effect:non-scaling-stroke}
+
+/* 4. legend swatches drew plum for everything because the base rule set a plum
+      background and the per-key overrides were not all present. Each key now
+      states its own swatch, and they match what the chart actually draws. */
+.cs-fc-key span::before,.cs-rv-key span::before{
+  content:'';width:14px;height:11px;border-radius:2px;background:var(--cs-plum);flex:none}
+.cs-k-hist::before{background:var(--cs-plum)}
+.cs-k-ytd::before{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 4px,#7A3C6B 4px 8px)}
+.cs-k-add::before{background:repeating-linear-gradient(135deg,var(--cs-teal) 0 4px,#4A8F8B 4px 8px)}
+.cs-k-proj::before{background:var(--cs-teal)}
+.cs-k-band::before{background:rgba(47,110,107,.30);border:1.5px dashed var(--cs-teal);
+  box-sizing:border-box;border-radius:2px}
+.cs-k-trend::before{background:transparent;border-radius:0;height:0;
+  border-top:3px dashed var(--cs-burnt)}
+.cs-k-a::before{background:var(--cs-plum)}
+.cs-k-b::before{background:#C9C2B8}
+.cs-k-line::before{background:var(--cs-burnt);height:3px;border-radius:2px}
+.cs-k-rate::before{background:var(--cs-plum)}
+.cs-k-vol::before{background:var(--cs-teal)}
+.cs-fc-key,.cs-rv-key{align-items:center}
+
+
+/* The first legend block used !important, so the corrected swatches above lost.
+   Same specificity, stated last, and marked so the intent is unambiguous. */
+.cs-k-hist::before{background:var(--cs-plum)!important;border:0!important;height:11px!important}
+.cs-k-ytd::before{background:repeating-linear-gradient(135deg,var(--cs-plum) 0 4px,#7A3C6B 4px 8px)!important}
+.cs-k-add::before{background:repeating-linear-gradient(135deg,var(--cs-teal) 0 4px,#4A8F8B 4px 8px)!important}
+.cs-k-proj::before{background:var(--cs-teal)!important;border:0!important;height:11px!important}
+.cs-k-band::before{background:rgba(47,110,107,.30)!important;border:1.5px dashed var(--cs-teal)!important;
+  height:11px!important;border-radius:2px!important;box-sizing:border-box}
+.cs-k-trend::before{background:transparent!important;border:0!important;border-top:3px dashed var(--cs-burnt)!important;
+  height:0!important;border-radius:0!important;width:16px!important}
+/* the strip is 1px taller than its buttons, which is what produced the bar */
+.cs-tabs,.cs-subtabs{padding-bottom:1px}
+.cs-tab,.cs-subtab{margin-bottom:0}
+.cs-tabs{border-bottom:1px solid var(--line2)}
+
+
+/* =============================================================================
+   Review 3
+   ============================================================================= */
+
+/* 1. The Pareto panel was left with a block of empty white below the chart. The
+      row is equal-height by design and Tail Analysis is the taller column, so
+      the slack landed under a chart that had no reason to grow. The chart now
+      absorbs it: the body is a column, the plot wrapper takes flex:1 and the
+      SVG stretches to fill. Same row height, no dead space. */
+.cs-paretorow > .cs-card > .cs-cardbd{display:flex;flex-direction:column;overflow:visible}
+.cs-paretorow .cs-pwrap{flex:1;min-height:0;display:flex;align-items:stretch}
+.cs-paretorow .cs-psvg{width:100%;height:100%;max-width:none}
+.cs-paretorow .cs-fc-key{flex:none;margin-top:8px}
+
+/* 4. Marc: text still gets too small across the dashboard. The 9px step is
+      gone. The ladder is 11 / 13 / 20 / 28: eyebrows, table headers, chips and
+      axis labels all move up to 11, which is the chart floor anyway, so nothing
+      on the page is now smaller than anything in a chart. */
+.cs-eyebrow,.cs-lab,.cs-lab2,.cs-kpi-l,.cs-stat-l,.cs-cvbig span,.cs-scmeta,
+.cs-tdfig span,.cs-scfig span,.cs-scard-f,.cs-supr,.cs-suphead span,.cs-supcount,
+.cs-ct,.cs-cs,.cs-cov,.cs-chip,.cs-tier,.cs-pill,.cs-state,.cs-act,.cs-win,.cs-effort,
+.cs-tbl th,.cs-sortb,.cs-oppn,.cs-mi-s,.cs-cite,.cs-road-hd,.cs-pillar-m,.cs-nr-c,
+.cs-trig-t,.cs-scopp-k,.cs-opp-v2,.cs-wf-s,.cs-mrow,.cs-bignum-k,.cs-p3-d,
+.cs-plays-head .pk,.cs-plays-head .reflect,.cs-metric .lab,.cs-modelp .mph .mn,
+.cs-bar3 .bl,.cs-tdk,.cs-tsticks span,.cs-tslab,.cs-ps-more,.cs-rmblock,.cs-tld,
+.cs-secthd .t{
+  font-size:11px;
+}
+.cs-ct{font-size:13px}          /* panel titles stay a step above their labels */
+.cs-secthd .t{font-size:13px}   /* section bands stay above panel titles */
+.cs-plab,.cs-pyl,.cs-pyr,.cs-ptail,.cs-axt,.cs-quadl,.cs-fdlab,.cs-rknum,.cs-p80t{font-size:11px}
+.cs-tbv,.cs-tbl2,.cs-tby{font-size:11px}
+
+/* two-line quadrant labels need room and must not be clipped */
+.cs-quadl{font-weight:600}
+.cs-rmsvg,.cs-psvg,.cs-fragsvg,.cs-rksvg{overflow:visible}
+
+/* 6. Subcategory names are links and do move the detail pane, so they read like
+      links and show which row is live. */
+.cs-suplink{text-decoration-thickness:1px}
+.cs-tbl tr.is-open .cs-suplink{color:var(--plum-dk);font-weight:700}
+
+
+/* The last 9px holdouts: the play-card figure labels (.pcf .k), the timeline
+   month ruler, the leverage-bar end labels, the help marker, the Kraljic axis
+   captions, the read-out eyebrow and the draft badge. Nothing renders below 11
+   anywhere on this dashboard now. */
+.cs-pcard .pcf .k,.cs-tlm,.cs-kaxis,.cs-read-t,.cs-lb-l,.cs-lb-r,
+.cs-draftcard .dch .dbadge,.cs-modelp .mph .mn,.cs-metric .lab,
+.cs-plays-head .pk,.cs-plays-head .reflect,.cs-p3-k+.cs-p3-t,.cs-bar3 .bl,
+.cs-scard-f,.cs-mi-s .cs-cite{font-size:11px}
+.cs-help{width:15px;height:15px;font-size:11px}
+/* inline 9px written by the renderers */
+.cs-main [style*="9px"]{font-size:11px}
+.cs-main [style*="8px var"]{font-size:11px}
+
+
+/* The Pareto SVG now stretches to fill the panel, so its text is scaled down by
+   the viewBox ratio. Declared a step up so it LANDS at 11 rather than starting
+   there and shrinking. */
+.cs-paretorow .cs-p80t,.cs-paretorow .cs-pyl,.cs-paretorow .cs-pyr,
+.cs-paretorow .cs-ptail,.cs-paretorow .cs-plab{font-size:13px}
+.cs-tdmid span,.cs-trig-a b{font-size:11px}
+
+
+/* =============================================================================
+   Market & Risk: one screen, segmented
+   ============================================================================= */
+.cs-segrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.cs-seg2{display:inline-flex;background:var(--well);border:1px solid var(--line2);border-radius:30px;
+  padding:3px;gap:2px;flex-wrap:wrap}
+.cs-seg2 button{border:0;background:transparent;font:600 11px var(--cs-sans);color:var(--cs-mut);
+  padding:6px 13px;border-radius:30px;cursor:pointer}
+.cs-seg2 button.on{background:var(--plum);color:#fff;font-weight:700}
+.cs-seg2 button.gap{color:var(--emph-tx)}
+.cs-seg2-r{margin-left:auto}
+.cs-seglab{font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2);
+  padding:6px 4px 6px 10px}
+
+/* Kraljic plot */
+.cs-kplot{width:100%;max-width:620px;height:auto;display:block;margin:0 auto;overflow:visible}
+.cs-kdot{cursor:pointer}
+.cs-kdot circle{transition:opacity .12s}
+.cs-kdot.dim{opacity:.3}
+.cs-kdot.on circle{stroke:var(--cs-ink);stroke-width:2.5}
+.cs-kdot.on .cs-kdlab{font-weight:700}
+.cs-kdlab{font:400 11px var(--cs-sans);fill:var(--cs-ink);text-anchor:middle}
+.cs-kavg{fill:none;stroke:var(--cs-mut2);stroke-width:2;stroke-dasharray:4 3}
+
+/* Porter radars */
+.cs-fcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.cs-fcard{border-top:3px solid var(--teal);padding-top:9px}
+.cs-radar{width:100%;max-width:150px;height:auto;display:block;margin:0 auto 6px}
+.cs-rring{fill:none;stroke:var(--line2);stroke-width:1}
+.cs-fcard-t{font-size:13px;font-weight:700;text-align:center;line-height:1.3}
+.cs-fcard-d{font-size:11px;color:var(--cs-mut);line-height:1.5;margin-top:6px}
+
+/* segment filter banner */
+.cs-segbanner{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:14px;
+  background:var(--well);border:1px solid var(--line2);border-left:3px solid var(--plum);
+  border-radius:8px;padding:10px 14px}
+.cs-segb-k{font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--cs-mut2)}
+.cs-segb-n{font-size:13px;font-weight:800;color:var(--plum)}
+.cs-segb-m{font:700 11px var(--mono);color:var(--cs-mut)}
+.cs-segb-x{margin-left:auto;font:600 11px var(--cs-sans);color:var(--plum);background:transparent;
+  border:1px solid var(--plum);border-radius:30px;padding:4px 12px;cursor:pointer}
+.cs-segb-x:hover{background:var(--plum);color:#fff}
+
+/* market intelligence split */
+.cs-misplit{display:grid;grid-template-columns:1fr 1.1fr;gap:16px;align-items:start}
+@media(max-width:1000px){.cs-misplit{grid-template-columns:1fr}}
+.cs-means{background:var(--well);border-radius:8px;padding:13px 15px}
+.cs-acc{border:1px solid var(--line2);border-radius:8px;margin-bottom:6px;overflow:hidden;background:var(--surface)}
+.cs-acch{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--well);cursor:pointer;
+  list-style:none}
+.cs-acch::-webkit-details-marker{display:none}
+.cs-acch b{font:700 20px var(--mono);color:var(--emph);letter-spacing:-.01em;min-width:74px}
+.cs-acch u{font-size:13px;font-weight:700;text-decoration:none;flex:1;line-height:1.3}
+.cs-accb{padding:10px 12px;font-size:13px;line-height:1.55;color:var(--cs-mut2);border-top:1px solid var(--rule)}
+
+
+/* =============================================================================
+   Review 4
+   ============================================================================= */
+
+/* Kraljic: labels beside the bubbles with leader lines, pushed apart vertically
+   so none hides under a neighbour. */
+.cs-kdlab{font:400 11px var(--cs-sans);fill:var(--cs-ink)}
+.cs-kdlead{stroke:var(--cs-line2);stroke-width:1}
+.cs-kdot.on .cs-kdlead{stroke:var(--cs-ink)}
+
+/* The constant material is its own panel now, two columns on a wide screen. */
+.cs-pnotes{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.cs-pnotes{grid-template-columns:1fr}}
+.cs-pn-block .cs-lab2{margin-bottom:5px}
+.cs-pn-d{font-size:13px;line-height:1.6;color:var(--cs-mut2)}
+.cs-pnotes .cs-nr{border-left:0;padding-left:0}
+
+/* Market intelligence: closed rows show the subject, open rows the headline. */
+.cs-acc .cs-acc-open{display:none}
+.cs-acc[open] .cs-acc-shut{display:none}
+.cs-acc[open] .cs-acc-open{display:block}
+.cs-acch u{font-size:13px;font-weight:700;text-decoration:none;flex:1;line-height:1.3}
+.cs-acc-shut{color:var(--cs-mut2)}
+
+/* Year-over-year step, on the chart where the comparison happens. */
+.cs-fc-yoy{font:700 11px var(--mono);letter-spacing:.02em;margin-bottom:2px}
+.cs-fc-yoy.up{color:var(--cs-burnt)}
+.cs-fc-yoy.dn{color:var(--cs-teal)}
+
+
+/* Grid rows lost their bottom margin when their children were made equal-height:
+   .cs-card carries margin-bottom:14px normally, and setting it to 0 inside a row
+   left the row itself flush against whatever followed. Every panel that sits
+   directly after a row was affected: All suppliers, Key Findings, Change
+   Decomposition, Risk register. The margin moves to the row. */
+.cs-row2,.cs-paretorow,.cs-screl,.cs-kpirow{margin-bottom:14px}
+.cs-row2:last-child,.cs-paretorow:last-child,.cs-screl:last-child{margin-bottom:0}
+
+
+/* Consolidation scatter legend + kind bars */
+.cs-k-cap::before{background:var(--cs-plum)!important}
+.cs-k-spr::before{background:var(--cs-burnt)!important}
+.cs-k-vol::before{background:var(--cs-teal)!important}
+.cs-k-size::before{background:transparent!important;border:1.5px solid var(--cs-mut2)!important;border-radius:50%!important}
+.cs-ckinds{margin-top:14px;border-top:1px solid var(--cs-line);padding-top:11px}
+.cs-ck-row{display:grid;grid-template-columns:150px minmax(0,1fr) 74px;gap:10px;align-items:center;
+  font-size:11px;color:var(--cs-mut2);margin-bottom:7px}
+.cs-ck-row b{text-align:right;font-size:13px;color:var(--cs-ink);font-variant-numeric:tabular-nums}
+.cs-ck-row .cs-bar{width:100%}
+
+
+/* Bubble labels must survive being drawn over a translucent bubble. A soft halo
+   in the panel colour separates the glyphs from whatever sits behind them
+   without adding a box. */
+.cs-kdlab{paint-order:stroke fill;stroke:var(--cs-surface);stroke-width:3.5px;
+  stroke-linejoin:round;font-weight:600}
+.cs-kdot.on circle{fill-opacity:.62}
+.cs-kdot:hover circle{fill-opacity:.62}
+
+
+/* Every chart pinned to its own viewBox width, so it renders 1:1 in a column
+   wide enough for it and only ever scales DOWN, never up. Combined with sizing
+   each viewBox to the column it lives in, declared text sizes are the sizes that
+   actually render. This is the third time SVG scaling has moved the type ladder;
+   it is now closed at the source. */
+.cs-kplot{max-width:600px}
+.cs-rksvg{max-width:520px}
+.cs-rmsvg{max-width:600px}
+.cs-fragsvg{max-width:600px}
+.cs-radar{max-width:420px}
+/* chart text one step up so it survives any residual scale-down */
+.cs-kdlab,.cs-quadl,.cs-rknum,.cs-fdlab,.cs-axt,.cs-pyl,.cs-pyr,.cs-p80t,.cs-ptail{font-size:13px}
+
+/* --- Porter overlay: one labelled pentagon, reads stacked beneath ---------- */
+/* viewBox is 420 wide, so pinning max-width to 420px renders the axis labels at
+   their declared 11px. An SVG scales with its container; text inside cannot hold
+   a size on its own. */
+.cs-radar{margin:0 auto 4px}
+.cs-rspoke{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 3}
+.cs-raxlab{font-size:11px;font-weight:700;fill:var(--cs-mut2,#4A443C)}
+.cs-raxnum{font-size:11px;fill:var(--cs-mut)}
+/* The card's colour bar is what binds a read to its shape, which is why there is
+   no legend: a legend here would say the segment names twice. */
+.cs-fcards{display:block;border-top:1px solid var(--cs-rule,#E2DCD4);margin-top:9px;padding-top:2px}
+.cs-fcard{border-top:0;border-left:4px solid var(--teal);padding:8px 0 8px 11px;
+  border-bottom:1px solid var(--cs-rule,#E2DCD4)}
+.cs-fcard:last-child{border-bottom:0}
+.cs-fcard-t{text-align:left}
+.cs-fcard-d{margin-top:3px}
+
+/* --- Market intelligence rows: figure moves into the opened card ----------- */
+/* A shut row is a subject only. The figure and its headline appear together in
+   the body, where the sentence that gives the number a denominator is also
+   visible. */
+.cs-acch b{display:none}
+.cs-accfig{display:flex;align-items:baseline;gap:11px;margin-bottom:7px}
+.cs-accfig b{display:block;font:700 20px var(--mono);color:var(--emph);
+  letter-spacing:-.01em;white-space:nowrap;flex:none}
+.cs-accfig span{font-size:13px;font-weight:700;color:var(--cs-ink,#1A1A1A);line-height:1.3}
+
+/* --- type ladder: the last three off-ladder cases -------------------------- */
+/* The sort caret was the only 9px left in the dashboard. */
+.cs-sortb i{font-size:11px;font-style:normal}
+/* SVG text scales with its container, so a chart whose column is narrower than
+   its viewBox renders its labels BELOW the declared size. These two do: the
+   priority plot at 0.965 and the risk heatmap at 0.839. Declared size is
+   compensated so the RENDERED size lands on 13px. Measured, not guessed. */
+.cs-kplot .cs-kdlab,.cs-kplot .cs-quadl,.cs-kplot .cs-axt,
+.cs-kplot .cs-pyl,.cs-kplot .cs-pyr,.cs-kplot text{font-size:13.5px}
+.cs-rksvg .cs-rknum,.cs-rksvg .cs-quadl,.cs-rksvg .cs-axt,
+.cs-rksvg .cs-rklab,.cs-rksvg text{font-size:15.5px}

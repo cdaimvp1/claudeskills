@@ -288,14 +288,30 @@ Use web search to gather external pricing benchmarks. Follow the benchmarking me
 
 **Benchmark freshness and inflation adjustment (surface per rate line).** Every external rate carries an "as of" date. For any benchmark older than 12 months, apply the category-appropriate inflation factor from the benchmarking guide (IT labor 3-5%/yr, SaaS 5-8%/yr, consulting 3-5%/yr, lab 2-4%/yr; hardware is typically DEFLATIONARY at roughly -3 to -5%/yr, so an old hardware benchmark is adjusted DOWN, not up). On each rate-line output, show one line: `Benchmark age: [N] months | Adjustment applied: [+/-X%] ([category] [direction]) | Adjusted benchmark: $[value]`. State the assumption; never silently age a number. If all sources are current (<=12 months), say "current, no aging applied."
 
+### Role-family deduplication and dated benchmark cache (per Execution Guardrails G7, F3)
+
+The research minimums above are a floor, not a target. This mechanism removes duplicated search effort; it does not remove search, and it does not lower the floor.
+
+**(a) Deduplicate by role family, not by line.** Before running Phase 1 searches, cluster rate lines that resolve to the same role/market family: same role or service, same seniority/spec tier, same geography, same delivery model (onshore/nearshore/offshore). Three supplier rate lines that are all genuinely "Senior Java Developer, offshore" are one family; research the family once via Phase 1's search strategy and apply the result to every member. A line that differs on any family-defining dimension is its own family and gets its own full research pass. Points-per-line does not fall: if a family yields fewer than 5 usable points, that family gets additional searches, exactly as a standalone distinct line would. On a rate card of genuinely distinct roles, clustering finds no families and this saves nothing, which is correct.
+
+**Forbidding double-count against the percentile gate.** `percentile_gate(n_points, min_points=5)` (in `numeric_kernel.py`, see market-rate-benchmarking's Rule 2 and Rule 5) is evaluated once per family, using that family's actual usable point count. Every member line of the family reports that same `n_points` and the same percentile band or range/median resolution. Do NOT sum a family's point count across its member lines, whether at the gate check or in any portfolio-level evidence rollup: a family with 5 usable points and 3 member lines is 5 points of evidence, not 15. Summing would let duplicated evidence clear a floor it has not actually cleared, which is the main accuracy risk in this change. It is closed by keeping exactly one point set per family (see the cache below) and having every consumer, the gate, the confidence label, and any rollup, read that one set.
+
+**(b) Persist a dated benchmark cache.** Save each family's research result to Project knowledge as `benchmark_cache.json` (or emit as a downloadable file when Project knowledge is unavailable), keyed by family (role/service + tier + geography + delivery model + category). Each entry carries the raw usable data points, source(s), `fetched_date`, and `usable_n`. A later rate line in the same run, or a later run of this skill, recalls a cache hit within the max age instead of re-searching, and states the reused date on that rate line's output ("Benchmark reused from [date], family: [name]"). A cache hit past the max age is not used; the skill re-searches and overwrites the entry with a fresh `fetched_date`. This is CC2 recall-don't-recompute, with `timeline_calibration.json` as the working precedent for persisting a materialized artifact to Project knowledge.
+
+**Max cache age: 90 days.** Chosen because this skill draws on the same labor/SaaS/consulting rate-survey cadence as market-rate-benchmarking (Janco, TEKsystems, Robert Half and equivalents typically refresh quarterly to semi-annually), so 90 days is conservative against that cadence and comfortably inside the 12-month threshold above which this skill already requires an inflation adjustment. A cache hit inside 90 days needs no aging adjustment; one past 90 days is discarded rather than aged, since aging is for adjusting a number the skill is choosing to keep, not for justifying an unbounded reuse window. Where market-rate-benchmarking has already produced a fresher benchmark for the same family in this engagement, prefer that output over running an independent search, to avoid two skills researching the same family with different as-of dates.
+
+**Both floors stay.** `percentile_gate()` is unchanged and is never bypassed by family clustering or the cache: a point set that would fail the gate today still fails it on recall. The G7 research minimum is unchanged; this mechanism only decides whether a search that would otherwise be repeated is instead recalled or shared across a family.
+
 ### GATE CHECK: Phase 1 Complete (per Execution Guardrails G2, G7)
 
 Before proceeding to Phase 2 (Internal Spend Analysis), confirm:
-- [ ] Research minimums met for every rate line being benchmarked (3+ independent web searches per rate line, or the line explicitly flagged LOW confidence per G7)
-- [ ] Benchmark Research Log recorded (query, source, date, result count, usable data points) for every rate line
+- [ ] Research minimums met for every rate line being benchmarked (3+ independent web searches per rate line or per role family, or the line explicitly flagged LOW confidence per G7)
+- [ ] Benchmark Research Log recorded (query, source, date, result count, usable data points) for every rate line or family
 - [ ] Phase 1A: governing MSA and prior WOs/SOWs searched for and read (or documented as unavailable); rate lock provisions, volume commitments, and renewal history noted
 - [ ] Phase 1B (when triggered by >5 rate lines, multiple pricing models, or a niche category): the multi-pass benchmarking passes completed
 - [ ] Benchmark freshness/inflation adjustment applied and stated for every rate line
+- [ ] Every family-clustered rate line reports the same `n_points` and percentile resolution as its family; no portfolio rollup sums points across a family's member lines
+- [ ] Every cached benchmark states its `fetched_date` and is within the 90-day max cache age, or was re-searched
 
 If any applicable box is unchecked, STOP. Complete the missing item before proceeding to Phase 2.
 

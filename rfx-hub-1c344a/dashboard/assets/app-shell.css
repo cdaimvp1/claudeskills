@@ -1,0 +1,53 @@
+/* app-shell.css, the shared Theo chrome (red topbar + left rail + content frame).
+   Pair with app-shell.js, tasks-drawer.css/js and theo-brand.js. Class names
+   (.topbar/.role/.switch/.brand/.who/.mqbtn) are canonical, theo-brand.js and
+   tasks-drawer.js query them by name, so do NOT rename. Layout-only classes
+   (.app/.rail/.nav/.shell-main) are namespaced enough not to collide with dash-kit.
+   Values mirror the inline chrome in category-strategy.html so every page matches. */
+:root{
+  /* #61 Wave 0, darkened warm neutral ramp (design-system-spec-v2 §7) */
+  --red:#E1251B;--red-d:#B41E16;--ink:#1A1A1A;--mut:#3E3933;--mut2:#4A443C;
+  --line:#E1E0DC;--line2:#CECCC7;--bg:#E2E6E1;--pink-t:#FBE7E3;--ai:#2E5E8C;--ai-t:#E4EBF1;
+  --bblue:#0F3A85;--teal:#0A5266;--ai-prov:#7A0E8C;
+  --surface:#FFFFFF;--panel:#E4E3E0;--nested:#E4E4DF;--well:#DDDCD8;
+  --shadow:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);
+  --shadow-1:0 1px 2px rgba(38,30,20,.05),0 1px 3px rgba(38,30,20,.08);
+  --shadow-2:0 2px 4px rgba(38,30,20,.06),0 4px 8px -2px rgba(38,30,20,.10);
+  --shadow-3:0 4px 6px -2px rgba(38,30,20,.05),0 12px 16px -4px rgba(38,30,20,.12);
+  --inset:inset 0 1px 2px rgba(38,30,20,.05);
+  --sans:'Libre Franklin',system-ui,Arial,sans-serif;--mono:'Roboto Mono',ui-monospace,monospace;
+  --fz-sm:13px;--fz-meta:11px;--fz-mono:9px;--fz-floor:11px;
+}
+/* Dark theme, additive override of token VALUES only; light stays byte-identical. */
+html[data-theme="dark"]{color-scheme:dark;--tint-fce4e0:#3B1E19;--tint-e4ebf1:#2C2C2C;
+  --red:#F0574C;--red-d:#D2453A;--ink:#ECECEC;--mut:#B0B0B0;--mut2:#8A8A8A;
+  --line:#3A3A3A;--line2:#484848;--bg:#1C1C1C;--pink-t:#3A211E;--ai:#6E9AD8;--ai-t:#2E2E2E;
+  --bblue:#6E9AD8;--teal:#49B591;--ai-prov:#C77DD6;
+  --surface:#262626;--panel:#2B2B2B;--nested:#303030;--well:#363636;--header:#0A0A0A;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+  --shadow-1:0 1px 2px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+  --shadow-2:0 2px 4px rgba(0,0,0,.55),0 4px 8px -2px rgba(0,0,0,.5);
+  --shadow-3:0 4px 6px -2px rgba(0,0,0,.5),0 12px 16px -4px rgba(0,0,0,.55);
+  --inset:inset 0 1px 2px rgba(0,0,0,.4);
+}
+.topbar{background:var(--header,var(--red));color:#fff;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:20}
+.topbar .brand img{height:23px;display:block}
+.topbar .role{display:flex;align-items:center;gap:11px}
+.topbar .who{display:flex;align-items:center;gap:9px}
+.topbar .who .av{width:31px;height:31px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:var(--fz-meta);font-weight:700}
+.topbar .who .nm{font-size:var(--fz-sm);font-weight:600;line-height:1.15}
+.topbar .who .ti{font-size:var(--fz-meta);opacity:.85;line-height:1.2}
+.topbar .switch{background:transparent;border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:30px;padding:6px 13px;font-family:var(--sans);font-weight:600;font-size:var(--fz-meta);cursor:pointer}
+.topbar .switch:hover{background:rgba(255,255,255,.14)}
+.app{display:grid;grid-template-columns:58px 1fr;min-height:calc(100vh - 56px)}
+.rail{border-right:1px solid var(--line);background:var(--bg);padding:14px 9px;display:flex;flex-direction:column;gap:6px}
+.rail .nav{position:relative;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mut);text-decoration:none}
+.rail .nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2}
+.rail .nav:hover{background:var(--surface);color:var(--ink)}
+.rail .nav.on{background:var(--pink-t);color:var(--red)}
+.rail .nav .tip{position:absolute;left:48px;top:50%;transform:translateY(-50%) scale(.96);transform-origin:left;background:var(--ink);color:var(--surface);font-size:13px;font-weight:600;padding:5px 10px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:.12s;z-index:30}
+.rail .nav:hover .tip{opacity:1;transform:translateY(-50%) scale(1)}
+/* content frame, dashboards keep their own inner max-width/background */
+.shell-main{min-width:0}
+/* a contextual breadcrumb strip (the dashboards' "← Back to project") sits flush under the topbar */
+.shell-main > .dash-back{display:block;background:var(--surface);color:var(--red);font:600 13px var(--sans);text-decoration:none;padding:8px 18px;border-bottom:1px solid var(--line)}
