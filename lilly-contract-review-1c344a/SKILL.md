@@ -196,7 +196,21 @@ These rules are non-negotiable. A single fabricated finding or misattributed pro
 
 **Rule 8: Do not add findings for emphasis.** Every finding must represent a genuine gap, risk, or improvement opportunity. Do not add low-risk findings to make the review look more thorough. A review with 5 real findings is more valuable than a review with 5 real findings and 10 padding findings that dilute the signal.
 
-**Rule 9: Score combined protection, always.** Before scoring any risk category, read the governing documents and determine what protection they provide for that category. Only findings that represent genuine gaps AFTER accounting for MSA/exhibit coverage are valid findings. A WO that lacks a renewal clause but operates under an MSA with Exhibit B Section 4.1 (5-year rate lock with CPI cap) has LOW renewal risk, not HIGH. A WO with no AE reporting clause under an MSA with Section 3.8 (1 business day reporting) has LOW AE risk, not HIGH. Failure to check the governing document before scoring is the single most common source of false positives and a deflated Protection Score.
+**Rule 9: Score combined protection, always. Report the absence either way.** Before scoring any risk category, read the governing documents and determine what protection they provide for that category. Coverage changes a finding's SEVERITY and its SCORING COLUMN. It never deletes the finding. A WO that lacks a renewal clause but operates under an MSA with Exhibit B Section 4.1 (5-year rate lock with CPI cap) has LOW renewal risk, not HIGH. A WO with no AE reporting clause under an MSA with Section 3.8 (1 business day reporting) has LOW AE risk, not HIGH. Failure to check the governing document before scoring is the single most common source of false positives and a deflated Protection Score.
+
+**Rule 9a: A covered absence is a LOW finding, never silence (HARD RULE).** This is the other half of Rule 9 and it is the half that gets dropped. When a protection the review checks for is ABSENT from the document under review but PRESENT in a governing document, the correct output is a **LOW finding scored in the `Governed: Covered` column**, naming the governing clause that supplies the protection. It is NOT a Hard Stop, and it is NOT nothing.
+
+Three different outputs, three different meanings, and only one is correct:
+
+| What you do | What the reader concludes | Correct? |
+|---|---|---|
+| Raise it as a Hard Stop | the contract has no such protection at all | NO. This is the false-positive failure: pattern-matching "clause missing" without reading the governing document |
+| Say nothing | the reviewer checked and found nothing to report, OR never checked | NO. Silent omission. The reader cannot tell a clean result from a skipped one |
+| LOW finding, `Governed: Covered`, citing the governing clause | the protection exists, it lives upstream, and here is where | YES |
+
+**"The MSA already covers it" is the reason the finding is LOW and in the Covered column. It is never the reason to omit the finding.** A reviewer who drops a covered absence has produced a document that is indistinguishable from one where the check never ran, which is precisely the state a reader cannot audit.
+
+This applies to every absence the review tests for, including adverse-event reporting, audit rights, records retention, insurance, business continuity and termination assistance.
 
 **Rule 10: Trace definitions before generating data/AI/IP findings.** Every finding involving data rights, AI model training, IP ownership, or confidentiality must trace the relevant defined terms through the governing documents using `references/definition-tracing-checklist.md` and confirm which definition applies and why. "This raises concerns about Lilly data" without citing the specific definition is not a finding. "Recordings are Lilly Information per A.1.19, not Usage Data per A.1.37, so Section 9.1.4 does not authorize use for model training" IS a finding. The definition trace is the reasoning chain that turns a generic observation into a grounded, defensible position.
 
@@ -997,6 +1011,35 @@ EXHIBIT/ATTACHMENT STATUS:
 
 **Read `references/arithmetic-verification.md` for the complete procedure.** This covers basic arithmetic (line-item math, subtotals, grand totals, NTE), price increase/escalation verification (compounding vs simple, formula-derived rate checks, renewal cap compliance, hidden increase detection), and change order pricing validation. Apply to any document with pricing, rates, hours, or financial calculations.
 
+**Per-line sweep is MANDATORY and exhaustive (HARD RULE).** Verify EVERY row of EVERY
+priced table, then the table, then the document. Checking the grand total and stopping is
+the failure this rule exists to prevent: a blind run of the fixture caught the totals that
+did not foot and still reached only half the required arithmetic findings, because several
+defects sat in rows whose own column sums were internally consistent.
+
+Run all five check types. They catch different defects and finding one does not excuse the
+others:
+
+| # | Check | Catches |
+|---|---|---|
+| 1 | rate x quantity = stated line total, per row | a single wrong line total |
+| 2 | sum of line totals = stated subtotal | a row omitted from the sum |
+| 3 | subtotal + adjustments = stated grand total, and grand total <= any not-to-exceed | a total that contradicts the document's own cap |
+| 4 | **every rate CROSS-REFERENCED against the governing rate card** | a row that foots perfectly against a rate nobody agreed to |
+| 5 | **every unit of measure cross-referenced** (per hour vs per day vs per unit) | a correct-looking price on the wrong basis |
+
+**Checks 4 and 5 are the ones that get skipped**, because a row that foots looks finished.
+It is not: `165 x 1,200 = 198,000` is arithmetically perfect and still a finding if the
+governed rate is 150. A price can be internally correct and still wrong.
+
+**A correct price is still a finding when the basis changed.** A role quoted per day when
+the rate card states per hour is a finding even where the money happens to match, because
+the next invoice will not.
+
+State the count: how many priced rows exist, and how many you verified. Those two numbers
+must match, and a reader who cannot see them cannot tell a clean table from an unchecked
+one.
+
 **Computation requirement (HARD RULE, no model arithmetic).** The checks in `references/arithmetic-verification.md` state WHAT to verify; the arithmetic itself MUST be executed by the vendored `numeric_kernel.py`, never produced by model math. Line-item math (rate x hours = line total, 3E-1 #1) MUST be checked by calling `verify_line_math(rate, hours, stated_total)`. Escalation checks (compounding vs simple, and each escalated rate verified against the contractual cap, 3E-2) MUST be computed by calling `escalate(base, rate, year, compounding)` and comparing the returned value to the supplier's stated rate. Report exactly what these functions return; any discrepancy they surface is a finding. This does not change the substance of the checklist above, only how its numbers are computed. The kernel is vendored in this skill's own directory (`lilly-contract-review-1c344a/numeric_kernel.py`), copied verbatim from `lilly-procurement-kernels-1c344a/numeric_kernel.py`.
 
 **Critical rule:** Arithmetic and pricing errors are always flagged in the redlined .docx as tracked changes (correcting the wrong numbers) AND as comments (explaining the discrepancy with the calculation shown). They are also always included in the Review Summary under Commercial Analysis. Pricing errors that exceed the contractual escalation cap are flagged as 🔴 HIGH RISK.
@@ -1004,6 +1047,17 @@ EXHIBIT/ATTACHMENT STATUS:
 ### Step 4: Hard Stop Identification
 
 Hard Stops are non-negotiable. If any Hard Stop is triggered, flag it prominently. See `references/playbook.md` § Hard Stops for the complete list.
+
+**The Hard Stop list is CLOSED (HARD RULE).** A finding is a Hard Stop if and only if it matches an entry in `references/playbook.md` § Hard Stops. Severity is decided by WHICH RULE the finding violates, never by how serious the finding feels. A genuinely alarming provision that is not on that list is HIGH, not a Hard Stop.
+
+**Do not promote a finding into a Hard Stop.** Two real cases from the fixture baseline, both correctly detected and both mis-severitied:
+
+- a 50% advance payment contradicting the master agreement's no-advance-payment position is a **playbook position violation (HIGH)**, because "advance payment" appears in the playbook's Not-Acceptable payment terms, not in its Hard Stop list
+- reclassifying human-authored Lilly notes as freely-trainable Usage Data is a **data-protection finding (HIGH)**, unless it also trips the specific AI/sub-processor Hard Stop, which is a different rule about the AI provider's contractual status
+
+Escalating either one inflates the Hard Stop count, which is not cosmetic: the count drives the escalation path, the named escalation contact, and the Protection Score deduction. Six Hard Stops where there are four sends the review to the wrong people and understates the score.
+
+**Before emitting, reconcile the count.** For every finding marked Hard Stop, name the specific `playbook.md` Hard Stop entry it matches. A Hard Stop you cannot pin to an entry is not one; downgrade it to HIGH and keep the finding.
 
 **Hard Stop comment format (inserted into document):**
 ```
@@ -1039,12 +1093,27 @@ Output emission is controlled by `output_mode` (set by Output Selection or by ph
 
 **Mode -> emission matrix:**
 
-| Mode | Step 5A Redline | Step 5B Vendor Response | Step 5C Dashboard | Step 6 Review Summary |
-|---|---|---|---|---|
-| Full review | YES | YES | YES | YES |
-| Redline only | YES | NO | NO | NO |
-| Dashboard only | NO | NO | YES | NO |
-| Briefing only | NO | NO | NO | YES |
+| Mode | Step 5A Redline | **5A.2 Protection Score block** | Step 5B Vendor Response | Step 5C Dashboard | Step 6 Review Summary |
+|---|---|---|---|---|---|
+| Full review | YES | **YES** | YES | YES | YES |
+| Redline only | YES | **YES** | NO | NO | NO |
+| Dashboard only | NO | **YES** | NO | YES | NO |
+| Briefing only | NO | **YES** | NO | NO | YES |
+
+**5A.2 is emitted in EVERY mode that emits anything (HARD RULE).** Before this column
+existed, the Protection Score and its Rule 12 calculation table lived only in the Dashboard
+and the Review Summary, so `Redline only` produced neither. `Redline only` is the DEFAULT
+mode: a reader who typed "review this contract" got a marked-up document carrying no score
+and no way to see one had been withheld.
+
+A blind run of the fixture confirmed this: the redline-only run reported
+`protection_score: null`, `protection_score_band: null`,
+`rule12_calculation_table_present: false`. It behaved exactly as the matrix instructed,
+which is why the fix belongs in the matrix and not in a reminder.
+
+**Rule 12 governs the block: a score without its per-item calculation table is invalid.**
+So 5A.2 always carries both, or neither. Emitting a bare number would satisfy the column
+and violate the rule it exists to serve.
 
 `Stack Map only` is not a row in this matrix -- it does not use Step 5 at all. It exits at Step 0.5 with its own two artifacts (governing-document map DOCX + manifest JSON) and never reaches Steps 1-7, so none of the four columns above apply. See Step 0.5.
 
@@ -1149,6 +1218,44 @@ comments from the redlined document. Only 🟡 LILLY POSITION comments should re
 ```
 
 For PDFs or non-DOCX files: produce the redlined .docx as a new document containing the full contract text with tracked changes and comments, plus a separate comment-annotated summary. The rep can then use the .docx as the negotiation instrument.
+
+#### 5A.2: Protection Score block (EVERY mode that emits anything)
+
+A compact block carrying the Protection Score AND its Rule 12 per-item calculation table.
+In `Redline only` it goes at the head of the redlined document, before the first tracked
+change, so the reader sees the score with the markup rather than in a separate artifact
+the mode does not produce. In the other modes it is the same content the Dashboard and
+Review Summary already carry, so it is rendered once and reused, never recomputed.
+
+This block does NOT turn `Redline only` into a full review. It adds no dashboard, no
+vendor response, no strategy narrative. It carries the one number a reviewer cannot act
+without, plus the derivation that makes the number checkable.
+
+```
+PROTECTION SCORE: [N]/100  -  [Band]
+Hard Stops: [N]   HIGH: [N]   MEDIUM: [N]   LOW: [N]
+
+How this score was calculated (Rule 12):
+| # | Finding | Severity | Protection category | Coverage status | Column used | Deduction |
+|---|---------|----------|---------------------|-----------------|-------------|-----------|
+| 1 | ...     | HARD STOP| ...                 | Standalone      | Standalone  | -15       |
+...
+Starting score 100. Total deductions: [N]. Final: [N] (floored at 0).
+```
+
+**Requirements:**
+
+1. **The table is not optional.** Rule 12: a Protection Score without its per-item
+   calculation table is invalid. If the table cannot be produced, do not emit a score;
+   state that the score could not be derived and why.
+2. **Every row names its coverage status and the column used**, so a reader can see
+   whether a finding was scored as a standalone gap or as governed-and-covered. This is
+   where a Rule 9a covered absence becomes visible as a LOW in `Governed: Covered`.
+3. **The deduction figures come from the kernel**, never from model arithmetic (G11). The
+   Protection Score is a DEDUCTION model starting at 100, not a weighted average.
+4. **The Hard Stop count in this block must equal the number of findings marked Hard Stop
+   in the redline**, each pinned to a `playbook.md` Hard Stop entry per Step 4. If the two
+   disagree, the review is internally inconsistent and must be reconciled before emitting.
 
 #### 5B: Vendor Response Draft (Full review only)
 
