@@ -1226,3 +1226,12 @@ small,sub,sup{font-size:9px}
 .cs-fc-yoy{font:700 11px var(--mono);letter-spacing:.02em;margin-bottom:2px}
 .cs-fc-yoy.up{color:var(--cs-burnt)}
 .cs-fc-yoy.dn{color:var(--cs-teal)}
+
+
+/* Grid rows lost their bottom margin when their children were made equal-height:
+   .cs-card carries margin-bottom:14px normally, and setting it to 0 inside a row
+   left the row itself flush against whatever followed. Every panel that sits
+   directly after a row was affected: All suppliers, Key Findings, Change
+   Decomposition, Risk register. The margin moves to the row. */
+.cs-row2,.cs-paretorow,.cs-screl,.cs-kpirow{margin-bottom:14px}
+.cs-row2:last-child,.cs-paretorow:last-child,.cs-screl:last-child{margin-bottom:0}

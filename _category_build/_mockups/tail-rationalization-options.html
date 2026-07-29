@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<title>Tail &amp; Rationalization — merge options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--plum:#5C2B50;--plum-dk:#3E1C36;--teal:#2F6E6B;--teal-deep:#1F4A48;--emph:#C15E19;--emph-tx:#A2500F;
+--plum-t:#C6B5C2;--teal-t:#B6CCCB;--emph-t:#ECCFBA;--plum-band:#DDCFDA;--teal-band:#CFE0DE;--emph-band:#ECCFBA;
+--plum-rule:#B99CB0;--teal-rule:#9FBFBC;--emph-rule:#C68A55;--well:#F4F1EC;--nested:#EDE8E0;--rule:#E2DCD4;
+--line2:#CECCC7;--ink:#1A1A1A;--mut:#5B534C;--mut2:#4A443C;--surface:#fff;--track:#E7E3DC;
+--sans:'Libre Franklin',system-ui,sans-serif;--mono:'Roboto Mono',monospace;
+--shadow:0 1px 2px rgba(38,30,20,.06),0 2px 6px rgba(38,30,20,.07);}
+*{box-sizing:border-box}
+body{margin:0;background:#E2E6E1;font-family:var(--sans);color:var(--ink);font-size:13px}
+.wrap{max-width:1320px;margin:0 auto;padding:28px 40px 70px}
+h1{font-size:28px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+.sub{font-size:13px;color:var(--mut);margin:0 0 18px;max-width:94ch;line-height:1.6}
+.sect{margin:28px 0 10px;border-left:3px solid var(--plum);padding-left:11px}
+.sect b{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.why{font-size:13px;color:var(--mut2);line-height:1.6;margin:0 0 12px;max-width:96ch}
+.card{background:var(--surface);border:1px solid var(--line2);border-left:3px solid var(--plum);
+border-radius:8px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+.card.teal{border-left-color:var(--teal)}.card.emph{border-left-color:var(--emph)}
+.hd{display:flex;align-items:center;gap:9px;padding:12px 15px;flex-wrap:wrap;
+background:linear-gradient(180deg,var(--plum-band),var(--surface));border-bottom:1px solid var(--plum-rule)}
+.card.teal .hd{background:linear-gradient(180deg,var(--teal-band),var(--surface));border-bottom-color:var(--teal-rule)}
+.card.emph .hd{background:linear-gradient(180deg,var(--emph-band),var(--surface));border-bottom-color:var(--emph-rule)}
+.hd .ct{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--plum)}
+.card.teal .hd .ct{color:var(--teal)}.card.emph .hd .ct{color:var(--emph-tx)}
+.hd .cs{margin-left:auto;font-size:11px;color:var(--mut)}
+.hd.solid{background:var(--plum);border-bottom:none}.hd.solid .ct{color:#F3ECF1}.hd.solid .cs{color:#E2CFDD}
+.bd{padding:13px 15px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+.rowA{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;align-items:stretch}
+.rec{background:var(--emph);color:#fff;font:700 11px var(--mono);letter-spacing:.06em;
+text-transform:uppercase;border-radius:30px;padding:2px 9px}
+.opth{display:flex;align-items:baseline;gap:10px;border-left:3px solid var(--plum);padding-left:11px;margin:26px 0 6px}
+.opth b{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--plum)}
+.opth span{font-size:11px;color:var(--mut)}
+.lbl{font:700 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut2)}
+.note{font-size:11px;color:var(--mut);line-height:1.55;margin-top:9px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--plum-t);color:var(--plum-dk);font:700 11px var(--mono);text-transform:uppercase;
+letter-spacing:.07em;padding:7px 10px;text-align:left}
+td{padding:8px 10px;border-bottom:1px solid var(--rule)}
+tbody tr:nth-child(even) td{background:var(--well)}
+.num{text-align:right;font-family:var(--mono);font-weight:700}
+.pill{font:700 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;border-radius:30px;padding:2px 9px}
+.p-e{background:var(--emph);color:#fff}.p-p{background:var(--plum-t);color:var(--plum-dk)}
+.p-t{background:var(--teal-t);color:var(--teal-deep)}
+svg{display:block;width:100%;height:auto}
+.stat{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:12px}
+.stat div b{display:block;font:700 28px var(--mono);letter-spacing:-.015em;line-height:1}
+.stat div span{display:block;font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;
+color:var(--mut2);margin-top:4px}
+.opp{border-top:1px solid var(--rule);padding:11px 0}.opp:first-child{border-top:0;padding-top:0}
+.opp-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.opp-n{font-size:13px;font-weight:700}
+.opp-v{margin-left:auto;font:700 13px var(--mono);color:var(--teal)}
+.opp-d{font-size:11px;color:var(--mut);line-height:1.5;margin-top:4px}
+.chip{font:600 11px var(--sans);color:var(--mut);border:1px solid var(--line2);border-radius:30px;padding:2px 9px;
+display:inline-block;margin:4px 4px 0 0}
+.bar{height:9px;border-radius:5px;background:var(--track);overflow:hidden;display:block}
+.bar i{display:block;height:100%;border-radius:5px}
+</style></head><body><div class="wrap">
+
+<h1>Tail &amp; Rationalization</h1>
+<p class="sub">You are right that these overlap. <b>Overlap &amp; Consolidation</b> (Rationalization)
+asks "are we buying the same capability more than once". <b>Tail Consolidation Opportunities</b>
+(Tail &amp; Contracts) asks "are we buying small things from too many people". Both end in the same
+move, fewer suppliers, and both currently list opportunities in the same shape. Merged, the screen
+answers one question: <b>where are we buying the same thing more than once, and what is it worth to
+stop.</b></p>
+
+<div class="sect"><b>What merges, and what does not</b></div>
+<table>
+ <thead><tr><th>Panel today</th><th>Lives on</th><th>In the merge</th></tr></thead>
+ <tbody>
+  <tr><td>Overlap &amp; Consolidation</td><td>Rationalization</td><td><b>Merges.</b> Duplicate capability</td></tr>
+  <tr><td>Tail Consolidation Opportunities</td><td>Tail &amp; Contracts</td><td><b>Merges.</b> Duplicate supplier</td></tr>
+  <tr><td>Utilization / Shelfware</td><td>Rationalization</td><td><b>Stays.</b> Different question: paying for what we do not use</td></tr>
+  <tr><td>Action Matrix</td><td>Rationalization</td><td><b>Stays,</b> as the closing panel: every supplier dispositioned</td></tr>
+  <tr><td>Contract Opportunities</td><td>Tail &amp; Contracts</td><td><b>Moves out.</b> Renewal windows and off-contract spend are a contract-exposure question, not a consolidation one. It belongs on Overview beside Renewal Exposure, or as its own subtab.</td></tr>
+ </tbody></table>
+<p class="note">That last row is the real decision in this merge. If Contract Opportunities stays, the
+tab is doing two jobs again and you are back where you started.</p>
+
+<!-- ============================================================= -->
+<div class="opth"><b>Option A — one ranked list, both kinds together</b><span class="rec">Recommended</span>
+ <span>simplest, and the ranking is the analysis</span></div>
+<p class="why">Every consolidation opportunity in one list, ranked by value, each tagged by which kind
+it is. The reader does not care whether an opportunity came from capability overlap or supplier
+sprawl; they care what it is worth and how hard it is. Tagging keeps the distinction without
+splitting the screen.</p>
+
+<div class="card"><div class="hd solid"><span class="ct">Consolidation opportunities</span>
+ <span class="cs">9 · ranked by value · $21.4M total</span></div><div class="bd">
+ <div class="stat">
+  <div><b>$21.4M</b><span>identified</span></div>
+  <div><b>9</b><span>opportunities</span></div>
+  <div><b>4</b><span>low effort, $8.1M</span></div>
+ </div>
+ <table><thead><tr><th>Opportunity</th><th>Kind</th><th>Suppliers</th><th class="num">Value</th><th>Effort</th></tr></thead>
+  <tbody>
+   <tr><td><b>Retire Zoom and Webex; standardise on Teams</b><br><span style="font-size:11px;color:var(--mut)">Teams already licensed inside the EA, 94% adoption</span></td>
+    <td><span class="pill p-p">Capability</span></td><td>4 &rarr; 1</td><td class="num">$5.6M</td><td>Low</td></tr>
+   <tr><td><b>Lift committed-use coverage 42% to 75-85%</b></td>
+    <td><span class="pill p-t">Volume</span></td><td>same</td><td class="num">$5.5M</td><td>Medium</td></tr>
+   <tr><td><b>Retire duplicate endpoint and identity tooling</b></td>
+    <td><span class="pill p-p">Capability</span></td><td>3 &rarr; 1</td><td class="num">$4.2M</td><td>Medium</td></tr>
+   <tr><td><b>Collapse four campaign tools onto the Adobe ETLA</b></td>
+    <td><span class="pill p-p">Capability</span></td><td>4 &rarr; 1</td><td class="num">$3.1M</td><td>Low</td></tr>
+   <tr><td><b>Consolidate 88 security vendors to three platforms</b></td>
+    <td><span class="pill p-e">Supplier sprawl</span></td><td>88 &rarr; 3</td><td class="num">$2.4M</td><td>High</td></tr>
+   <tr><td><b>Scientific tail behind a catalogue route</b></td>
+    <td><span class="pill p-e">Supplier sprawl</span></td><td>142 &rarr; 40</td><td class="num">$1.8M</td><td>High</td></tr>
+  </tbody></table>
+ <div class="note"><b>Kind</b> is the distinction the two old panels carried. <b>Capability</b> = buying the
+ same thing twice. <b>Supplier sprawl</b> = buying small things from too many people.
+ <b>Volume</b> = same supplier, fewer contracts, better tier.</div>
+</div></div>
+
+<!-- ============================================================= -->
+<div class="opth"><b>Option B — effort-versus-value scatter, list below</b>
+ <span>the sequencing question, answered visually</span></div>
+<p class="why">The list tells you what things are worth. It does not tell you what to do first. Plotting
+value against effort does: the top-left quadrant is where you start, and it is visible before anyone
+reads a row. Bubble size is the number of suppliers removed, so the biggest circles are the ones that
+also simplify the estate.</p>
+
+<div class="card"><div class="hd solid"><span class="ct">Where to start</span>
+ <span class="cs">value against effort · bubble = suppliers removed</span></div><div class="bd">
+ <svg viewBox="0 0 760 330">
+  <line x1="380" y1="20" x2="380" y2="270" stroke="var(--line2)" stroke-dasharray="3 4"/>
+  <line x1="70" y1="145" x2="740" y2="145" stroke="var(--line2)" stroke-dasharray="3 4"/>
+  <text x="76" y="34" font-size="11" fill="var(--emph-tx)" font-family="Libre Franklin" font-weight="700">Do first · high value, low effort</text>
+  <text x="734" y="34" font-size="11" fill="var(--mut)" text-anchor="end" font-family="Libre Franklin">Plan properly · high value, high effort</text>
+  <text x="76" y="262" font-size="11" fill="var(--mut)" font-family="Libre Franklin">Sweep up · low value, low effort</text>
+  <text x="734" y="262" font-size="11" fill="var(--mut)" text-anchor="end" font-family="Libre Franklin">Leave it · low value, high effort</text>
+  <line x1="70" y1="270" x2="740" y2="270" stroke="var(--line2)"/><line x1="70" y1="20" x2="70" y2="270" stroke="var(--line2)"/>
+  <text x="405" y="308" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin">Effort to execute &rarr;</text>
+  <text x="20" y="145" font-size="11" text-anchor="middle" fill="var(--mut2)" font-family="Libre Franklin" transform="rotate(-90 20,145)">Value</text>
+  <circle cx="150" cy="62" r="20" fill="var(--plum)" opacity=".8"/><text x="178" y="66" font-size="11" font-family="Libre Franklin">Teams standardisation · $5.6M</text>
+  <circle cx="335" cy="70" r="12" fill="var(--teal)" opacity=".8"/><text x="355" y="74" font-size="11" font-family="Libre Franklin">Committed-use coverage · $5.5M</text>
+  <circle cx="352" cy="112" r="16" fill="var(--plum)" opacity=".8"/><text x="376" y="116" font-size="11" font-family="Libre Franklin">Endpoint / identity · $4.2M</text>
+  <circle cx="146" cy="132" r="18" fill="var(--plum)" opacity=".8"/><text x="172" y="136" font-size="11" font-family="Libre Franklin">Adobe ETLA · $3.1M</text>
+  <circle cx="628" cy="176" r="26" fill="var(--emph)" opacity=".85"/><text x="600" y="180" font-size="11" text-anchor="end" font-family="Libre Franklin">Security sprawl 88&rarr;3 · $2.4M</text>
+  <circle cx="655" cy="222" r="24" fill="var(--emph)" opacity=".85"/><text x="627" y="226" font-size="11" text-anchor="end" font-family="Libre Franklin">Scientific tail 142&rarr;40 · $1.8M</text>
+ </svg>
+ <div class="note">Two of the three largest bubbles sit bottom-right: the biggest supplier-count
+ reductions are also the hardest and the least valuable. That is the finding, and a ranked list hides
+ it. The money is in capability overlap; the effort is in tail sprawl.</div>
+</div></div>
+
+<!-- ============================================================= -->
+<div class="opth"><b>Option C — capability map, duplication shown not asserted</b>
+ <span>strongest for "why are we buying this twice"</span></div>
+<p class="why">Rows are capabilities, cells are suppliers. Where a row has more than one filled cell you
+are paying more than once, and you can see it without reading a number. Best at making the case to a
+business owner who does not accept that their tool is a duplicate; weakest at sequencing.</p>
+
+<div class="card"><div class="hd"><span class="ct">Capability coverage</span><span class="cs">where more than one supplier serves one need</span></div><div class="bd">
+ <table><thead><tr><th>Capability</th><th>Microsoft</th><th>Adobe</th><th>Zoom</th><th>Others</th><th class="num">Spend</th></tr></thead>
+  <tbody>
+   <tr><td><b>Collaboration</b></td>
+    <td><span class="pill p-t">In EA</span></td><td>&mdash;</td><td><span class="pill p-e">Paid</span></td>
+    <td><span class="chip">Webex</span><span class="chip">Slack</span></td><td class="num">$122.0M</td></tr>
+   <tr><td><b>Analytics</b></td>
+    <td><span class="pill p-t">In EA</span></td><td>&mdash;</td><td>&mdash;</td>
+    <td><span class="chip">SAS</span><span class="chip">Tableau</span><span class="chip">Qlik</span></td><td class="num">$96.0M</td></tr>
+   <tr><td><b>Endpoint security</b></td>
+    <td><span class="pill p-t">In EA</span></td><td>&mdash;</td><td>&mdash;</td>
+    <td><span class="chip">CrowdStrike</span></td><td class="num">$61.0M</td></tr>
+   <tr><td><b>Document / signing</b></td>
+    <td><span class="pill p-t">In EA</span></td><td><span class="pill p-e">Paid</span></td><td>&mdash;</td>
+    <td><span class="chip">DocuSign</span></td><td class="num">$38.0M</td></tr>
+  </tbody></table>
+ <div class="note"><b>In EA</b> means already paid for inside an existing agreement. Every row with an
+ "In EA" cell AND a "Paid" cell is money spent on something already owned. That is four rows and
+ $317M of addressable capability, which is a harder fact to argue with than a savings estimate.</div>
+</div></div>
+
+<!-- ============================================================= -->
+<div class="opth"><b>Option D — A and B together, which is what I would build</b><span class="rec">Recommended shape</span></div>
+<p class="why">The scatter answers "what first", the list answers "what exactly", and they share one
+data set. Utilization and the Action Matrix keep their own panels below, because they answer different
+questions. Contract Opportunities moves off this tab.</p>
+
+<div class="rowA">
+ <div class="card"><div class="hd solid"><span class="ct">Where to start</span><span class="cs">value vs effort</span></div>
+  <div class="bd" style="color:var(--mut);font-size:13px">The Option B scatter.</div></div>
+ <div class="card teal"><div class="hd"><span class="ct">What it is worth</span><span class="cs">$21.4M · 9 opportunities</span></div>
+  <div class="bd">
+   <div class="stat"><div><b>$21.4M</b><span>identified</span></div><div><b>$8.1M</b><span>low effort</span></div></div>
+   <div style="margin-top:8px"><span class="lbl">By kind</span>
+    <div style="margin-top:6px;font-size:11px">Capability overlap
+     <span class="bar" style="margin:3px 0"><i style="width:61%;background:var(--plum)"></i></span>$12.9M</div>
+    <div style="font-size:11px">Supplier sprawl
+     <span class="bar" style="margin:3px 0"><i style="width:20%;background:var(--emph)"></i></span>$4.2M</div>
+    <div style="font-size:11px">Volume consolidation
+     <span class="bar" style="margin:3px 0"><i style="width:19%;background:var(--teal)"></i></span>$4.3M</div>
+   </div></div></div>
+</div>
+<div class="card"><div class="hd"><span class="ct">Consolidation opportunities</span><span class="cs">ranked, tagged by kind</span></div>
+ <div class="bd" style="color:var(--mut);font-size:13px">The Option A table.</div></div>
+<div class="row2">
+ <div class="card emph"><div class="hd"><span class="ct">Utilization / shelfware</span><span class="cs">unchanged</span></div>
+  <div class="bd" style="color:var(--mut);font-size:13px">Different question: paying for what we do not use.</div></div>
+ <div class="card"><div class="hd"><span class="ct">Action matrix</span><span class="cs">unchanged, closes the tab</span></div>
+  <div class="bd" style="color:var(--mut);font-size:13px">Every supplier dispositioned: retain, renegotiate, consolidate, retire, replace.</div></div>
+</div>
+
+<div class="sect"><b>What I would build, and the one thing I need from you</b></div>
+<p class="why"><b>Option D</b>: scatter and list together, Utilization and Action Matrix kept below.
+Tab renamed <b>Tail &amp; Rationalization</b>, and Trend &amp; Change drops from three subtabs to two.<br><br>
+<b>The decision:</b> where does <b>Contract Opportunities</b> go? It is renewal windows and off-contract
+spend, which is contract exposure and not consolidation. My recommendation is that it joins
+<b>Renewal Exposure on Overview</b>, since both answer "what is coming at us and when". Leaving it on
+this tab is the one choice that would undo the merge.</p>
+
+</div></body></html>
