@@ -1934,6 +1934,36 @@ small,sub,sup{font-size:9px}
 .cs-acch u{font-size:13px;font-weight:700;text-decoration:none;flex:1;line-height:1.3}
 .cs-accb{padding:10px 12px;font-size:13px;line-height:1.55;color:var(--cs-mut2);border-top:1px solid var(--rule)}
 
+
+/* =============================================================================
+   Review 4
+   ============================================================================= */
+
+/* Kraljic: labels beside the bubbles with leader lines, pushed apart vertically
+   so none hides under a neighbour. */
+.cs-kdlab{font:400 11px var(--cs-sans);fill:var(--cs-ink)}
+.cs-kdlead{stroke:var(--cs-line2);stroke-width:1}
+.cs-kdot.on .cs-kdlead{stroke:var(--cs-ink)}
+
+/* The constant material is its own panel now, two columns on a wide screen. */
+.cs-pnotes{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.cs-pnotes{grid-template-columns:1fr}}
+.cs-pn-block .cs-lab2{margin-bottom:5px}
+.cs-pn-d{font-size:13px;line-height:1.6;color:var(--cs-mut2)}
+.cs-pnotes .cs-nr{border-left:0;padding-left:0}
+
+/* Market intelligence: closed rows show the subject, open rows the headline. */
+.cs-acc .cs-acc-open{display:none}
+.cs-acc[open] .cs-acc-shut{display:none}
+.cs-acc[open] .cs-acc-open{display:block}
+.cs-acch u{font-size:13px;font-weight:700;text-decoration:none;flex:1;line-height:1.3}
+.cs-acc-shut{color:var(--cs-mut2)}
+
+/* Year-over-year step, on the chart where the comparison happens. */
+.cs-fc-yoy{font:700 11px var(--mono);letter-spacing:.02em;margin-bottom:2px}
+.cs-fc-yoy.up{color:var(--cs-burnt)}
+.cs-fc-yoy.dn{color:var(--cs-teal)}
+
 </style>
 </head>
 <body>
@@ -2877,13 +2907,34 @@ function scTrend() {
   var d = csData(), m = d.meta || {}, n = d.narr || {};
   var h = '';
 
+  /* The old strip led with FY24-to-FY25 and FY23-to-FY24, which the chart below
+     already draws. Those two moved ONTO the chart as year-over-year deltas, and
+     the strip now carries what the chart cannot say: how much of the growth was
+     price rather than volume, how concentrated the growth was, and whether the
+     supplier base grew with the spend. */
+  var rv = d.rateVolume, sw = (d.swing || []).slice().sort(function (a, b) {
+    return Math.abs(b.delta || 0) - Math.abs(a.delta || 0); });
+  var top3 = sw.slice(0, 3).reduce(function (a, x) { return a + Math.abs(x.delta || 0); }, 0);
+  var swTotal = sw.reduce(function (a, x) { return a + Math.abs(x.delta || 0); }, 0);
+  var perVendorNow = (m.s25 && m.vendors) ? m.s25 / m.vendors : null;
+  var perVendorPrior = (m.s24 && m.vendorsPrior) ? m.s24 / m.vendorsPrior : null;
+  var pvDelta = (perVendorNow && perVendorPrior)
+    ? ((perVendorNow - perVendorPrior) / perVendorPrior) * 100 : null;
+
   h += '<div class="cs-kpirow">'
-    + csKpi('FY24 to FY25', (m.yoy2425 != null ? (m.yoy2425 > 0 ? '+' : '') + csPct(m.yoy2425) : '--'),
-        (m.chg2425 != null ? (m.chg2425 > 0 ? '+' : '') + csUsd(m.chg2425) : ''), 'plum')
-    + csKpi('FY23 to FY24', (m.yoy2324 != null ? (m.yoy2324 > 0 ? '+' : '') + csPct(m.yoy2324) : '--'),
-        (m.chg2324 != null ? (m.chg2324 > 0 ? '+' : '') + csUsd(m.chg2324) : ''))
-    + csKpi('3-yr CAGR', csPct(m.cagr2325), 'FY23 to FY25')
-    + csKpi('Vendor movement', (m.newVendorsNet != null ? (m.newVendorsNet > 0 ? '+' : '') + csNum(m.newVendorsNet) : '--'), 'net vendors')
+    + csKpi('Price vs volume', rv && rv.total
+        ? csPct((rv.rate / rv.total) * 100, 0) + ' price'
+        : '--',
+        rv && rv.total ? csUsd(rv.rate) + ' of ' + csUsd(rv.total) + ' was rate, not quantity'
+                       : 'needs a rate and quantity split', 'plum')
+    + csKpi('Growth concentration', swTotal ? csPct((top3 / swTotal) * 100, 0) : '--',
+        swTotal ? 'of the movement came from three suppliers' : 'needs swing[]', 'emph')
+    + csKpi('Spend per supplier', perVendorNow ? csUsd(Math.round(perVendorNow)) : '--',
+        pvDelta != null
+          ? (pvDelta > 0 ? '+' : '') + csPct(pvDelta, 0) + ' vs FY24, so spend grew faster than the base'
+          : 'FY25 average')
+    + csKpi('Supplier base', (m.newVendorsNet != null ? (m.newVendorsNet > 0 ? '+' : '') + csNum(m.newVendorsNet) : '--'),
+        m.vendorsPrior ? csNum(m.vendorsPrior) + ' to ' + csNum(m.vendors) + ' active' : 'net movement', 'teal')
     + '</div>';
 
   h += csCard('Spend Trend and Forecast', csTrendChart(d),
@@ -3363,7 +3414,15 @@ function csTrendSvg(series, opts) {
       ? p.y + ': ' + csUsd(p.banked) + ' spent so far, ' + csUsd(p.total - p.banked)
         + ' projected for the rest of the year, ' + csUsd(p.total) + ' full year'
       : p.y + ': ' + csUsd(p.v) + (p.kind === 'proj' ? ' projected' : p.kind === 'ytd' ? ' year to date' : '');
+    /* The year-over-year step, drawn where the comparison actually happens.
+       This is what the two removed KPI cards used to say. */
+    var prev = i > 0 ? (series[i - 1].total != null ? series[i - 1].total : series[i - 1].v) : null;
+    var yoy = (prev && top) ? ((top - prev) / prev) * 100 : null;
+    var yoyTag = yoy == null ? ''
+      : '<div class="cs-fc-yoy ' + (yoy >= 0 ? 'up' : 'dn') + '">'
+        + (yoy > 0 ? '+' : '') + csPct(yoy, 1) + '</div>';
     return '<div class="cs-fc-col is-' + p.kind + '" title="' + csEsc(tip) + '">'
+      + yoyTag
       + '<div class="cs-fc-v">' + csUsd(top) + '</div>'
       + '<div class="cs-fc-plot">' + bar + '</div>'
       + '<div class="cs-fc-l">' + csEsc(p.y) + '</div></div>';
@@ -3915,11 +3974,17 @@ function csRiskMatrix(d, rows) {
   if (!r.length) return csGap('Category risk register.', 'risks[]');
   var W = 620, H = 380, PAD = 56;
   var pw = W - PAD * 2, ph = H - PAD * 2;
+  /* Same bubble scale as the Kraljic plot, so a circle reads the same size for
+     the same weight across both panels. Severity drives the radius: a
+     high/high risk is a big circle, a low/low one is small. */
   var dots = r.map(function (x, i) {
     var cx = PAD + ((csLI(x.l) - 0.5) / 3.2) * pw;
     var cy = PAD + ph - ((csLI(x.i) - 0.5) / 3.2) * ph;
     var hot = csLI(x.l) >= 2.5 && csLI(x.i) >= 2.5;
-    return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="13" class="' + (hot ? 'cs-rk-hot' : 'cs-rk') + '">'
+    var weight = (csLI(x.l) * csLI(x.i)) / (3.5 * 3.5);
+    var rr = csBubbleR(weight);
+    return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + rr.toFixed(1)
+      + '" class="' + (hot ? 'cs-rk-hot' : 'cs-rk') + '">'
       + '<title>' + csEsc(x.risk + ' · likelihood ' + x.l + ' · impact ' + x.i) + '</title></circle>'
       + '<text x="' + cx.toFixed(1) + '" y="' + (cy + 4).toFixed(1) + '" class="cs-rknum">' + (i + 1) + '</text>';
   }).join('');
@@ -4355,6 +4420,26 @@ function csSegKraljic(segs) {
     return { seg: s, x: risk, y: Math.min(1, (s.pct || 0) / maxPct), perVendor: per[i] };
   });
 }
+/* Shared bubble geometry. Area scales with the value, which is what the eye
+   actually reads, and both ends are clamped so a small bubble stays legible and
+   a large one does not swallow its neighbours. Used by the Kraljic plot and the
+   risk heatmap so the two are comparable at a glance. */
+var CS_R_MIN = 10, CS_R_MAX = 26;
+function csBubbleR(frac) {
+  var f = Math.max(0, Math.min(1, frac || 0));
+  return CS_R_MIN + (CS_R_MAX - CS_R_MIN) * Math.sqrt(f);
+}
+/* Labels are placed after every bubble is positioned, then pushed apart on the
+   vertical until none overlaps. Previously each label sat a fixed distance under
+   its own bubble, which put it underneath the next bubble down. */
+function csPlaceLabels(items, minGap) {
+  var gap = minGap || 13;
+  var sorted = items.slice().sort(function (a, b) { return a.y - b.y; });
+  for (var i = 1; i < sorted.length; i++) {
+    if (sorted[i].y - sorted[i - 1].y < gap) sorted[i].y = sorted[i - 1].y + gap;
+  }
+  return items;
+}
 function csKraljicQuad(p) {
   return p.y >= 0.5
     ? (p.x >= 0.5 ? 'Strategic' : 'Leverage')
@@ -4387,35 +4472,53 @@ function csKraljicPlot(d) {
         : 'subcats[] with a vendor count');
   }
   var pts = csSegKraljic(segs);
-  var W = 620, H = 340, PADL = 62, PADR = 26, PADT = 26, PADB = 48;
+  var W = 760, H = 360, PADL = 96, PADR = 116, PADT = 30, PADB = 52;
   var pw = W - PADL - PADR, ph = H - PADT - PADB;
   var maxSize = segs.reduce(function (a, s) {
     return Math.max(a, CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0));
   }, 0) || 1;
+  /* One scale for every bubble chart on this dashboard, so a circle means the
+     same thing whichever panel it is in. See CS_R_MIN / CS_R_MAX. */
 
   var avgX = pts.reduce(function (a, p) { return a + p.x; }, 0) / pts.length;
   var avgY = pts.reduce(function (a, p) { return a + p.y; }, 0) / pts.length;
 
-  var dots = pts.map(function (p) {
+  /* Position every bubble first, then place the labels off to one side and
+     push them apart vertically. Labels used to sit a fixed distance under their
+     own bubble, which parked them underneath the next bubble down. Each label
+     leans away from the centre so it never crosses the plot. */
+  var placed = pts.map(function (p) {
     var s = p.seg;
     var v = s.market ? (CS_SEG_SIZE === 'vendors' ? (1 - s.buyerPower) : s.impact)
                      : (CS_SEG_SIZE === 'vendors' ? (s.vc || 0) : (s.tot || 0));
-    var r = 9 + 17 * Math.sqrt(Math.max(0, v) / (s.market ? 1 : maxSize));
+    var r = csBubbleR(Math.max(0, v) / (s.market ? 1 : maxSize));
     var cx = PADL + p.x * pw, cy = PADT + ph - p.y * ph;
-    var q = csKraljicQuad(p);
+    var right = p.x < 0.58;                       // lean away from the far edge
+    return { p: p, s: s, r: r, cx: cx, cy: cy, right: right,
+             lx: right ? cx + r + 13 : cx - r - 13, y: cy + 4 };
+  });
+  csPlaceLabels(placed, 14);
+
+  var dots = placed.map(function (o) {
+    var s = o.s, p = o.p, q = csKraljicQuad(p);
     var tone = q === 'Strategic' ? 'var(--emph)' : q === 'Leverage' ? 'var(--plum)'
              : q === 'Bottleneck' ? 'var(--emph-tx)' : 'var(--teal)';
     var on = CS_SEG_SEL === s.key, dim = CS_SEG_SEL && !on;
+    var leader = (Math.abs(o.y - (o.cy + 4)) > 6)
+      ? '<line x1="' + (o.right ? o.cx + o.r : o.cx - o.r).toFixed(1) + '" y1="' + o.cy.toFixed(1)
+        + '" x2="' + o.lx.toFixed(1) + '" y2="' + (o.y - 4).toFixed(1) + '" class="cs-kdlead"/>' : '';
     return '<g class="cs-kdot' + (on ? ' on' : '') + (dim ? ' dim' : '') + '" onclick="csSegPick(\''
       + csEsc(String(s.key).replace(/'/g, "\\'")) + '\')" role="button" tabindex="0">'
-      + '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1)
+      + leader
+      + '<circle cx="' + o.cx.toFixed(1) + '" cy="' + o.cy.toFixed(1) + '" r="' + o.r.toFixed(1)
       + '" fill="' + tone + '"><title>' + csEsc(s.market
           ? s.key + ' · ' + q + ' · ' + s.headline
           : s.key + ' · ' + q + ' · ' + csUsd(s.tot)
             + (s.vc ? ' · ' + csNum(s.vc) + ' vendors · ' + csUsd(Math.round(p.perVendor)) + ' average each' : ''))
       + '</title></circle>'
-      + '<text x="' + cx.toFixed(1) + '" y="' + (cy + r + 13).toFixed(1) + '" class="cs-kdlab">'
-      + csEsc(String(s.key).slice(0, 22)) + '</text></g>';
+      + '<text x="' + o.lx.toFixed(1) + '" y="' + o.y.toFixed(1) + '" class="cs-kdlab"'
+      + (o.right ? '' : ' text-anchor="end"') + '>'
+      + csEsc(String(s.key).slice(0, 24)) + '</text></g>';
   }).join('');
 
   return csSegToggle(d)
@@ -4468,15 +4571,27 @@ function csKraljicRead(d, pts) {
       + 'governance on the named few. That distinction is invisible at category level.'
     : 'Every segment sits on the same side of the supply-risk divide as the category average, so the '
       + 'category-level read holds at this grain.';
-  return '<div class="cs-read"><div class="cs-read-d">' + lead + '</div></div>'
-    + (n.kraljicImpl ? '<div class="cs-implic"><span class="cs-lab2">What that means for how we buy</span>'
-        + csNarr(n.kraljicImpl) + '</div>' : '')
-    + csNote('Profit impact is share of category spend. Supply risk is <b>average spend per vendor</b> in '
-      + 'the segment, log-scaled: where the money sits in a few large relationships the incumbent is hard '
-      + 'to replace, and where it is spread thin across many small ones it is not. A raw vendor count was '
-      + 'the obvious proxy and it was wrong, because it made Scientific Research, which has the most '
-      + 'vendors in the portfolio, look like the safest segment. Both axes are read off held data; neither '
-      + 'is a judgement.');
+  /* Only the segmented finding stays in the card: it is the one part that
+     changes when the toggle moves. The posture and the axis definition are
+     constant, so they sit in their own panel below the row. */
+  return '<div class="cs-read"><div class="cs-read-d">' + lead + '</div></div>';
+}
+
+/* The posture and the axis definition do not move when the toggle moves, so
+   they are a panel of their own rather than dead weight inside the chart card. */
+function csPositionNotes(d) {
+  var n = d.narr || {};
+  var impl = n.kraljicImpl
+    ? '<div class="cs-pn-block"><div class="cs-lab2">What that means for how we buy</div>'
+      + csNarr(n.kraljicImpl) + '</div>' : '';
+  var axes = '<div class="cs-pn-block"><div class="cs-lab2">How the axes are derived</div>'
+    + '<div class="cs-pn-d"><b>Profit impact</b> is share of category spend. '
+    + '<b>Supply risk</b> is average spend per vendor in the segment, log-scaled: where the money sits in '
+    + 'a few large relationships the incumbent is hard to replace, and where it is spread thin across many '
+    + 'small ones it is not. A raw vendor count was the obvious proxy and it was wrong, because it made '
+    + 'Scientific Research, which has the most vendors in the portfolio, look like the safest segment. '
+    + 'Both axes are read off held data; neither is a judgement.</div></div>';
+  return '<div class="cs-pnotes">' + impl + axes + '</div>';
 }
 
 /* ---- Porter, per segment, on the same toggle ---- */
@@ -4555,6 +4670,9 @@ function scMarket() {
         { icon: 'scales', role: 'teal', sub: 'Porter · same segmentation', conf: csConfFor(d, 'forces') })
     + '</div>';
 
+  h += csCard('Reading the position', csPositionNotes(d),
+      { icon: 'doc', sub: 'constant across every segmentation', conf: csConfFor(d, 'narr') });
+
   h += csSect('What the market is doing');
   h += csCard('Market intelligence', d.market ? csMarketIntelSplit(d.market)
       : csGap('What the supply market is doing, and what it means for this category.', 'market research records with sources'),
@@ -4569,7 +4687,7 @@ function scMarket() {
 
   var rk = csRisksFor(d);
   h += '<div class="cs-row2">'
-    + csCard('Risk heat map', csRiskMatrix(d, rk.rows),
+    + csCard('Risk heatmap', csRiskMatrix(d, rk.rows),
         { icon: 'shield', sub: 'likelihood against impact', conf: csConfFor(d, 'risks') })
     + csCard('Escalation triggers', d.triggers ? csTriggers(csTriggersFor(d))
         : csGap('The conditions that would force a change of strategy, with the threshold for each.', 'trigger threshold per risk'),
@@ -4603,10 +4721,30 @@ function csTriggersFor(d) {
 }
 
 /* Market intelligence: the read on one side, the sourced headlines on the other. */
+/* Derive a short subject from the headline when the data does not carry one. */
+var CS_SUBJECTS = [
+  [/renewal|bump|uplift/i, 'Renewal pricing'],
+  [/after signature|unexpected|consumption/i, 'Unbudgeted AI charges'],
+  [/megavendor|installed base|list price/i, 'Megavendor list increases'],
+  [/regulat|ai act|penalt/i, 'AI regulation in contracts'],
+  [/insurance|indemnit/i, 'Indemnity and insurance gap'],
+  [/consolidat/i, 'Vendor consolidation']
+];
+function csSubjectOf(x) {
+  var hay = (x.t || '') + ' ' + (x.d || '');
+  for (var i = 0; i < CS_SUBJECTS.length; i++) if (CS_SUBJECTS[i][0].test(hay)) return CS_SUBJECTS[i][1];
+  return String(x.t || '').split(/[,:.]/)[0].slice(0, 34);
+}
 function csMarketIntelSplit(mk) {
+  /* Closed, a headline like "The routine renewal bump is gone" tells you nothing
+     about what is inside. Closed rows show the SUBJECT; the headline is the
+     payoff and appears when the row opens. */
   var acc = (mk.headlines || []).map(function (x, i) {
+    var shut = x.subject || csSubjectOf(x);
     return '<details class="cs-acc"' + (i === 0 ? ' open' : '') + '>'
-      + '<summary class="cs-acch"><b>' + csEsc(x.k) + '</b><u>' + csEsc(x.t) + '</u></summary>'
+      + '<summary class="cs-acch"><b>' + csEsc(x.k) + '</b>'
+      + '<u class="cs-acc-shut">' + csEsc(shut) + '</u>'
+      + '<u class="cs-acc-open">' + csEsc(x.t) + '</u></summary>'
       + '<div class="cs-accb">' + csEsc(x.d)
       + '<div class="cs-mi-s">' + (x.src || []).map(function (s) {
           return '<a class="cs-cite" href="' + csEsc(s.u) + '" target="_blank" rel="noopener">' + csEsc(s.n) + '</a>';

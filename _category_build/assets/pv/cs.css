@@ -1196,3 +1196,33 @@ small,sub,sup{font-size:9px}
 .cs-acch b{font:700 20px var(--mono);color:var(--emph);letter-spacing:-.01em;min-width:74px}
 .cs-acch u{font-size:13px;font-weight:700;text-decoration:none;flex:1;line-height:1.3}
 .cs-accb{padding:10px 12px;font-size:13px;line-height:1.55;color:var(--cs-mut2);border-top:1px solid var(--rule)}
+
+
+/* =============================================================================
+   Review 4
+   ============================================================================= */
+
+/* Kraljic: labels beside the bubbles with leader lines, pushed apart vertically
+   so none hides under a neighbour. */
+.cs-kdlab{font:400 11px var(--cs-sans);fill:var(--cs-ink)}
+.cs-kdlead{stroke:var(--cs-line2);stroke-width:1}
+.cs-kdot.on .cs-kdlead{stroke:var(--cs-ink)}
+
+/* The constant material is its own panel now, two columns on a wide screen. */
+.cs-pnotes{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.cs-pnotes{grid-template-columns:1fr}}
+.cs-pn-block .cs-lab2{margin-bottom:5px}
+.cs-pn-d{font-size:13px;line-height:1.6;color:var(--cs-mut2)}
+.cs-pnotes .cs-nr{border-left:0;padding-left:0}
+
+/* Market intelligence: closed rows show the subject, open rows the headline. */
+.cs-acc .cs-acc-open{display:none}
+.cs-acc[open] .cs-acc-shut{display:none}
+.cs-acc[open] .cs-acc-open{display:block}
+.cs-acch u{font-size:13px;font-weight:700;text-decoration:none;flex:1;line-height:1.3}
+.cs-acc-shut{color:var(--cs-mut2)}
+
+/* Year-over-year step, on the chart where the comparison happens. */
+.cs-fc-yoy{font:700 11px var(--mono);letter-spacing:.02em;margin-bottom:2px}
+.cs-fc-yoy.up{color:var(--cs-burnt)}
+.cs-fc-yoy.dn{color:var(--cs-teal)}
