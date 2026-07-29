@@ -24,6 +24,28 @@ only the six contract documents.
 
 ## Running it
 
+**0. Build the quarantine with the script, do not assemble it by hand.**
+
+```bash
+python make_blind_run.py <target_dir>
+```
+
+It copies the six documents plus a copy of the skill, copies NOTHING else from this
+directory, and then VERIFIES the result: it refuses if the answer key, the expected
+findings or a test banner is present. Relying on the runner to simply not look is not a
+control; a directory that cannot reach the key is.
+
+**A defect this found, worth stating because it would have silently spoiled every run
+done by hand.** All six documents open with:
+
+> `**SYNTHETIC TEST DOCUMENT. Contains deliberately planted defects. See ANSWER-KEY.md.**`
+
+That contaminates a blind run twice. It tells the reviewer defects were planted, so they
+hunt harder than they would on a real contract and the run measures effort rather than the
+skill's ordinary behaviour. And it names the answer key, inviting the lookup this protocol
+forbids. The banner is useful to a human browsing the repo, so it stays in the originals
+and the script strips it from the copies.
+
 **1. Give the runner the six documents and nothing else.**
 
 ```
