@@ -1045,6 +1045,16 @@ vendor_name,reason_code,reason_detail,source,date
 
 ## Market Context Schema
 
+> **FALLBACK COPY, not the source of truth.** The authority for `landscape_handoff.json` is
+> `rfp-engine-1c344a/references/landscape-intake-schema.md`. rfp-engine is the CONSUMER of
+> this handoff and owns the schema, because the consumer is the party that breaks when the
+> shape is wrong. Steps 5 and the handoff section above already say this.
+>
+> What follows is inlined so the handoff stays complete and self-describing when rfp-engine
+> is not installed. Do not hand-edit it as though it were the schema: change the source
+> first, then re-sync this block in the same commit. If the two disagree, the source wins
+> and this copy is the defect.
+
 Included in `landscape_handoff.json` and optionally in `supplier_landscape_ui.json`:
 
 | Field | Description | Required |

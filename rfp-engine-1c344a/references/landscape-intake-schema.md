@@ -1,5 +1,26 @@
 # Landscape Intake Schema -- supplier-landscape → rfp-engine
 
+> **SOURCE OF TRUTH. Do not hand-edit any copy of this schema.**
+>
+> This file is the single source of truth for `landscape_handoff.json`.
+>
+> Ownership here sits with the CONSUMER (rfp-engine), which is the opposite of the
+> convention used for `case_handoff.json`, where the producer owns the schema. That is
+> deliberate and both skills already agree on it: `supplier-landscape-1c344a/SKILL.md:310`
+> and `:322` say plainly that the schema "lives in the rfp-engine skill, which is the
+> consumer of this handoff". The reasoning is that the consumer is the party that breaks
+> when the shape is wrong, so it defines what it can ingest.
+>
+> `supplier-landscape-1c344a` carries an inlined **Market Context Schema** as a
+> self-describing FALLBACK, used only when rfp-engine is not installed, so the handoff is
+> still complete standalone. That fallback is a copy, not a second authority. If this
+> schema changes, check that fallback in the same commit.
+>
+> **The suite uses both ownership conventions and now says so per schema.** Producer-owns
+> for `case_handoff.json`, consumer-owns here. Neither is wrong, but a reader cannot infer
+> which applies, so every shared schema states its owner in a header like this one rather
+> than leaving it to be worked out from the direction of the arrow.
+
 Schema for `landscape_handoff.json`. Produced by supplier-landscape at the end of Step 5. Consumed by rfp-engine when landscape outputs are provided as input.
 
 ---

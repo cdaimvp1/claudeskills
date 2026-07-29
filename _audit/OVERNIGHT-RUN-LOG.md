@@ -870,3 +870,38 @@ a second authority.
 Kept deliberately: the v2.0 no-provisioning behaviour in the mirror. That is rfp-case-
 manager's OWN decision about what it does on receipt, not a property of the schema, so it
 belongs there. Reworded to note the source agrees rather than to claim it disagrees.
+
+### O19 DONE, 2026-07-29. E2 source-of-truth discipline across shared schemas.
+
+Surveyed every cross-skill handoff payload and applied the E1 discipline. Three exist:
+
+| Payload | Producer | Consumer | Owner | State after this pass |
+|---|---|---|---|---|
+| `case_handoff.json` | rfp-engine | rfp-case-manager | **producer** | Fixed in E1. Source header + synced mirror + one pointer in `artifact-schemas.md:283` that was already correct |
+| `landscape_handoff.json` | supplier-landscape | rfp-engine | **consumer** | Header added to the source; the inlined fallback in supplier-landscape:1046 now labelled a fallback copy |
+| `evaluation_engine_handoff.json` | rfp-response-analysis | evaluation-engine | not yet declared | **Left for E3 (O20)**, which is specifically about formalizing this one |
+
+**The finding worth Marc's attention: the suite uses BOTH ownership conventions.**
+
+`case_handoff.json` is producer-owned. `landscape_handoff.json` is consumer-owned, and
+that is not an accident: `supplier-landscape-1c344a/SKILL.md:310` and `:322` already state
+it explicitly ("that schema lives in the rfp-engine skill, which is the consumer of this
+handoff"). Both have a coherent rationale. Producer-owns says the party that writes the
+payload defines it. Consumer-owns says the party that BREAKS when the shape is wrong
+defines what it can ingest.
+
+I did NOT force them into one convention. Flipping either would reverse a documented
+decision to make a rule tidy, and the consumer-owns case is stated in two places in a
+shipped skill. What was actually wrong is that a reader had no way to tell which applied
+to a given schema. So each source file now DECLARES its owner and the reasoning in a
+header, and each mirror or fallback declares that it is a copy.
+
+If Marc wants one convention suite-wide, that is a real decision with a real blast radius
+and it should be made deliberately, not as a side effect of tidying. Flagged, not taken.
+
+**Third-copy check:** `rfp-engine-1c344a/references/artifact-schemas.md:283` references
+`case_handoff.json` but correctly says "See `case-handoff-schema.md` for full schema"
+rather than restating it. That is already the right pattern and was left alone. A pointer
+cannot drift; a copy can.
+
+**No code changed. Prose and headers only.**
