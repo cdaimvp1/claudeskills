@@ -207,3 +207,118 @@ gates step 6.
    does this need a representative synthetic?
 3. Whether the redline .docx mechanics move to code in this piece of work or a
    later one. It is the highest-risk deliverable and could reasonably be deferred.
+
+---
+
+# Addendum (Marc, 2026-07-29)
+
+## 11. Is the deterministic work free? Mostly, with one real exception
+
+**Free:** the Python execution itself. Parsing a contract, resolving
+cross-references, tracing defined terms, checking numeric consistency consumes no
+model tokens. A Stage 1 check reporting "Section 12.3 does not exist" costs nothing
+to compute and produces a one-line finding. Those checks are as close to free as
+anything in this design, and they are strictly additive to accuracy.
+
+**NOT free:** the OUTPUT of Stage 0. The `contract_index` only helps if the model
+reads it, and everything the model reads costs tokens. A verbose index could cost
+MORE than the raw text it replaces.
+
+That makes compactness a hard design constraint, not a nicety:
+
+- **The index must be smaller than the prose it replaces**, or it is a regression.
+  Store anchors and structure, never restated clause text. A clause entry is an id,
+  a heading, a span reference and any extracted facts, not a copy of the clause.
+- **Passes read SLICES, not the whole index.** Pass 2 needs the cross-reference
+  graph and the defined-terms register. It does not need the numeric register. Each
+  pass loads only what its job requires.
+- **Full clause text is fetched on demand**, by id, for the clauses a pass is
+  actually reasoning about.
+
+Two other honest costs. Python execution is fast but not instant, so wall clock
+falls less than token cost. And the extraction code is real software that must be
+maintained and can have bugs, which is precisely why Pass 1 verifying it is
+mandatory rather than optional.
+
+Net expectation: Stage 1 checks are effectively free. Stage 0 is a large win only
+if the index is disciplined. Design the index for compactness first, richness
+second.
+
+## 12. COVERAGE GUARANTEE (mandatory gate)
+
+Marc: "the current design and reference documents should be 100% covered in the new
+design even if handled a different way."
+
+This is the governing acceptance criterion. Handling something differently is
+allowed. Losing it is not.
+
+### The spine
+
+The current skill carries **15 reference documents, 2,669 lines**, plus **12
+numbered Rules** in SKILL.md:
+
+| Reference | Lines | Reference | Lines |
+|---|---|---|---|
+| ai-standard.md | 207 | pass-artifacts.md | 123 |
+| arithmetic-verification.md | 93 | pharma-requirements.md | 143 |
+| commercial-analysis.md | 176 | playbook.md | 263 |
+| contract-stack-map.md | 235 | review-summary-design.md | 165 |
+| dashboard-canonical.md | 353 | risk-scoring.md | 84 |
+| definition-tracing-checklist.md | 95 | sme-matrix.md | 139 |
+| dpa-review-checklist.md | 140 | vendor-tactics.md | 289 |
+| lilly-templates.md | 164 | | |
+
+### Required artifact: a coverage matrix
+
+Before any implementation begins, produce `F1-COVERAGE-MATRIX.md` with one row per
+discrete check, rule, checklist item and output requirement in the current skill.
+Each row states:
+
+| Column | Meaning |
+|---|---|
+| Source | reference doc plus section, or Rule number |
+| What it does today | the check or requirement, in one line |
+| Handled in the new design by | Stage 0, Stage 1, a named pass, a generator, or the kernel |
+| Same or different | identical, or changed and how |
+| How it is verified | the specific test proving it still happens |
+
+Rules for the matrix:
+
+1. **Every row must land somewhere.** A row with no destination is a blocker, not a
+   footnote. Implementation does not start with an unresolved row.
+2. **"Handled by Stage 1" is not sufficient on its own** for anything requiring
+   judgment. If a check needs meaning, it maps to a pass, with Stage 1 at most
+   proposing candidates.
+3. **`dashboard-canonical.md` is the one legitimate deletion**, because Marc retired
+   that deliverable. Record it as RETIRED with the reason, not as covered. Check
+   whether any other reference depends on it before deleting.
+4. **Where a check moves from model to code, the matrix must say what the code does
+   when it cannot decide.** Abstain and escalate to the model is correct. Silently
+   passing is not.
+
+### The reference documents are not all the same kind of thing
+
+They need different treatment and the matrix must reflect it:
+
+- **Mechanical checklists** (`definition-tracing-checklist.md`,
+  `arithmetic-verification.md`, `dpa-review-checklist.md`) are the strongest Stage 1
+  candidates. Much of their content is genuinely true or false.
+- **Judgment corpora** (`playbook.md`, `vendor-tactics.md`, `commercial-analysis.md`,
+  `pharma-requirements.md`) mostly stay with the model. Code can index them for
+  retrieval so a pass loads only relevant entries rather than the whole corpus,
+  which is a real token saving at no accuracy cost.
+- **Output specs** (`review-summary-design.md`, `contract-stack-map.md`,
+  `pass-artifacts.md`) become generator templates, and are enforced rather than
+  merely described.
+- **Routing and standards** (`sme-matrix.md`, `lilly-templates.md`,
+  `ai-standard.md`) are lookups. Deterministic where the key is exact, model where
+  it is fuzzy.
+- **`risk-scoring.md`** becomes `deduction_score()` plus its generated calculation
+  table.
+
+### Relationship to the golden fixture
+
+The coverage matrix and the golden fixture test different things and both are
+required. The matrix proves no check was LOST in the design. The fixture proves no
+finding was lost in PRACTICE. A design can pass the matrix and still regress, and a
+fixture can pass on one contract while a check has silently disappeared for another.
