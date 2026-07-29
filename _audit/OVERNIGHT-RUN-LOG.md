@@ -203,3 +203,72 @@ merge remains lossless: missing=0 for all three part files.
 **O1 is COMPLETE.** The matrix is still NOT a passed gate: four rescue candidates
 undecided, five at-risk clusters unapplied, both blocked on a HELD skill. It is now an
 accurate map of what is owed, which it was not this morning.
+
+### O2 DONE, 2026-07-29. `deduction_score()` built in the kernel.
+
+Built `deduction_score()` and `score_band()` in
+`lilly-procurement-kernels-1c344a/numeric_kernel.py` as a new SCORING face.
+Source: `lilly-contract-review-1c344a/references/risk-scoring.md`, read in full.
+
+**Verification, actual output:**
+
+```
+SUMMARY: 43/43 passed, 0/43 failed
+```
+
+That is the whole module self-test (`python numeric_kernel.py`), 21 new assertions
+plus every pre-existing one, no regressions.
+
+**The golden test is the source's own worked example**, Supplier A WO 10,
+`risk-scoring.md:52-72`, all 11 rows entered verbatim:
+```
+total_deduction: -36.0   expected -36   PASS
+score:           64      expected 64    PASS
+band:            Moderate expected Moderate  PASS
+rows:            11 calculation-table rows emitted
+```
+
+**Invariants enforced, each raising rather than returning a wrong number:**
+- Hard Stop deducts exactly -15 in ALL FOUR coverage columns, never reduced
+  (`:17`, `:31`). Tested against all four columns explicitly.
+- A deduction outside its (severity, coverage status) range refuses. The named
+  failure mode is the Standalone column applied to a category the MSA covers,
+  which is exactly the Rule 7 defect.
+- **BOTH calibration checks raise**, as the corrected spec requires.
+  Too harsh (`:76-81`) and too generous (`:83`). Boundary-tested: exactly 30
+  does not fire, because the source says "exceeds".
+- Unknown severity, unknown coverage status, positive deduction all refuse.
+
+**Three judgment calls, all disclosed in MAINTENANCE.md rather than left implicit:**
+1. The too-harsh check has THREE criteria at `:76-80`, not two. The queue's
+   one-line summary named only two. The source governs. The third criterion is a
+   judgment, so when the two mechanical criteria hold the caller must supply
+   `alignment_dominant`; omitting it RAISES rather than defaulting either way,
+   because defaulting True blocks legitimate harsh scores and defaulting False
+   silently disables the check.
+2. Added conservatism beyond the brief: a document with no governing documents
+   must use the Standalone column for every finding (`:83`). The Governed columns
+   describe protection a governing document provides, so they cannot apply when
+   there is none.
+3. Clamping at 0 is NOT source-specified. `risk-scoring.md` defines a 0-100 scale
+   but is silent on deductions exceeding 100. Score clamps, `raw_score` keeps the
+   unclamped value, `clamped` flag set, so the clamp hides nothing.
+
+**Division of labour, deliberately:** the function does NOT choose the deduction.
+`:28` step 4 reserves the value within each range to judgment. Code validates the
+boundary; the model still rules. Same narrow-but-never-decide split as everywhere
+else in the redesign.
+
+**Malicious-code review of this increment: SAFE.** Evidence, not assertion:
+imports are `math`, `dataclasses`, `typing` only. Grep for `os`/`sys`/`subprocess`/
+`socket`/`urllib`/`__import__`/`eval(`/`exec(`/`compile(`/`getattr(`/`setattr(`/
+`open(`/`pickle`/`marshal`/`base64` returns NONE across the whole file. No I/O, no
+network, no dynamic dispatch. Diff is 556 insertions and 2 deletions, and both
+deletions are the docstring line and the import line I edited on purpose, so no
+existing behavior was altered.
+
+**What I deliberately did not do: NOT wired into lilly-contract-review.** That
+skill is HELD (`PLATFORM-CONSOLIDATION-TRACKER.md:172`). The queue says build it
+in the kernel only and do NOT wire it, and that is what happened. The function
+currently has no caller in the suite, which is deliberate. Recorded in
+MAINTENANCE.md so a later reader does not mistake it for dead code.

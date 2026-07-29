@@ -15,6 +15,8 @@ that multiple Lilly Procurement Skills each describe independently in prose:
 | `weighted_score` | market-rate-benchmarking (Composite Contract Quality Score) AND evaluation-engine (Effective_Weight_Frac / Score Validation Checks) - both skills independently require weights to foot to 1.0; this is one shared guard instead of two divergent ones |
 | `npv` | pro-forma-builder (Financial Methodology, end-of-year Year-1 discounting) |
 | `quadrature_rollup` | should-cost-builder (Aggregation Method: quadrature + >15% LOW-confidence widening) |
+| `deduction_score` | lilly-contract-review (`references/risk-scoring.md`, the combined-protection-weighted deduction table, the Hard Stop invariant, and BOTH anti-drift calibration checks) |
+| `score_band` | lilly-contract-review (`references/risk-scoring.md:37-42`, the four residual-risk bands) |
 
 If any of the owning skills above changes its documented formula, threshold,
 or tolerance, this file is the one place that must change to keep the whole
@@ -163,3 +165,40 @@ skills themselves draw a hard line. Specifically:
   combined component (summing their spreads linearly) before calling this
   function, per should-cost-builder's own text, until a grouping-aware
   version is added here.
+- **`deduction_score` does not choose the deduction, it validates the one it is
+  given.** `risk-scoring.md:28` step 4 explicitly reserves the value WITHIN each
+  table range to judgment ("editing errors or MSA-alignment restorations take
+  the low end; genuine unprotected exposure takes the high end"). Code cannot
+  make that call and does not try. What it enforces is the boundary: a
+  deduction outside its (severity, coverage status) range refuses, a Hard Stop
+  at anything other than -15 refuses, and a total that fails either calibration
+  check refuses. The model still rules; the kernel stops it ruling outside the
+  table. This is the same narrow-but-never-decide split the redesign applies
+  everywhere else.
+- **`deduction_score` refuses to evaluate the too-harsh calibration check when
+  its third criterion is unknown.** `risk-scoring.md:76-80` states THREE
+  criteria, and the third ("findings are primarily MSA-alignment or
+  clarification items, not new unprotected exposures") is a judgment. When the
+  two mechanical criteria hold and the deduction exceeds 30, the caller must
+  pass `alignment_dominant`. Omitting it raises `InvalidInputError` rather than
+  defaulting either way, because defaulting True would block legitimate harsh
+  scores and defaulting False would silently disable the check. Note that the
+  overnight queue's one-line summary of this check named only two criteria; the
+  source names three and the source governs.
+- **`deduction_score` enforces that a document with no governing documents uses
+  the Standalone column for every finding.** `risk-scoring.md:83` says so
+  directly, and the three Governed columns describe protection a governing
+  document provides, so they cannot apply when there is none. This is an ADDED
+  conservatism beyond what the redesign spec asked for, recorded here rather
+  than left implicit.
+- **`deduction_score` clamps the score at 0 rather than returning a negative
+  number. This is a judgment call, not source-specified.** `risk-scoring.md`
+  defines a 0-100 scale but never says what happens when deductions exceed 100.
+  The clamped value is returned as `score` and the unclamped value is preserved
+  as `raw_score` with a `clamped` flag, so the clamp hides nothing. If a source
+  skill ever states the intended behavior, follow it and remove this note.
+- **`deduction_score` is NOT wired into lilly-contract-review.** It is built and
+  tested standalone in this kernel. That skill is under a documented HOLD
+  (`PLATFORM-CONSOLIDATION-TRACKER.md:172`), so wiring is a separate, reviewed
+  change. Until then this function has no caller in the suite, which is
+  deliberate rather than an oversight.
