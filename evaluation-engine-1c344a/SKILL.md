@@ -551,6 +551,51 @@ Use conditional language:
 
 See the Scoring Methodology reference (inlined below) for scale definitions and aggregation formulas.
 
+## RFx-hub contribution, output slice
+
+`rfx-hub-1c344a` composes an RFx dashboard from four feeder skills. This skill is one of
+them. It contributes a bounded slice and nothing else.
+
+**This skill owns, and is the only skill that may write:**
+
+| Field | Contents |
+|---|---|
+| `panel[]` | panel scoring, the official ranking, and the dispersion, calibration, audit-trail and readiness figures that accompany it |
+| `modelDecision` | award-scenario modelling: the re-weighted scenarios and their outcomes. This is sensitivity analysis and belongs to the official scorer, not to the hub |
+| `blocker` | what is preventing the panel from reaching a decision, and who owns it |
+| `finalLocked` | whether official scoring is locked |
+
+**Its scores are labelled OFFICIAL in the hub, and that label is an accuracy mechanism, not
+presentation.** This skill is the sole owner of the official score and the official award
+recommendation. rfp-response-analysis contributes an AI first pass labelled **proposed**.
+The hub must render the distinction; if it cannot, it does not render the scores. An AI
+first pass mistaken for a panel decision is precisely what the labelling prevents.
+
+**Every field carries a `sourceRef`** tracing to the panel record that produced it. A field
+without one is a build failure, not a gap to render. For this slice that matters more than
+for any other, because an unattributed official score is the one number in the whole hub
+that a reader will act on without checking.
+
+**The hub composes, it never re-scores.** It does not recompute a weighted total, re-run
+sensitivity, or reconcile this skill's official scores against rfp-response-analysis's
+proposed ones. Where the two differ, that difference is a finding for a human, not an
+arithmetic problem for the hub to resolve.
+
+**Scoring-ownership direction, restated at the hub boundary.** This skill either imports
+rfp-response-analysis's proposed figures as-is (Trusted mode), displays them alongside
+independent stakeholder scoring (Reference mode, the default), or ignores them (Disabled
+mode). The hub inherits that resolution; it does not make its own.
+
+**This skill keeps everything it already produces.** `evaluation_report.docx`, every CSV,
+and the full communications suite (BAFO, award, non-award, debrief) are unaffected.
+Contributing a slice is additive and this skill remains fully usable with no hub present.
+
+**Forward note.** `_redesign_proposals/RFx-REDESIGN-SPEC.md` section D names this slice as
+`scores.panel`, `ranking`, `sensitivity`, `dispersion`, `calibration`, `auditTrail` and
+`readiness` as discrete fields. The table above binds to the object the hub ships today
+(`{criteria, requirements, suppliers, panel, qa}`), where they travel inside `panel[]`.
+Extend the table when the hub object grows; do not replace it.
+
 ## Cross-Artifact Consistency Rules
 
 - **Evaluation Report** rankings must match `final_score_rollup.csv`

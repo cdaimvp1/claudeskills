@@ -453,6 +453,46 @@ If user provides example RFPs, templates, or prior materials:
 
 All generated content must be original and tailored to the current sourcing need.
 
+## RFx-hub contribution, output slice
+
+`rfx-hub-1c344a` composes an RFx dashboard from four feeder skills. This skill is one of
+them. It contributes a bounded slice and nothing else.
+
+**This skill owns, and is the only skill that may write:**
+
+| Field | Contents |
+|---|---|
+| `criteria[]` | the evaluation criteria and their weights |
+| `requirements[]` | the requirements grid, per-requirement weight and priority tier |
+| `scale` | the scoring band definition. This skill already mandates the suite-canonical 0.0-5.0 five-tier scale at the Evaluation-weight sanity check above, so downstream skills consume it without rescaling |
+| `structureLocked` | whether the RFP structure is locked against further edits |
+
+Weight-sum discipline lives here, not in the hub. The `assert_weight_sum()` check above is
+what makes this slice trustworthy: the hub consumes the weights as given and never
+re-derives or renormalizes them.
+
+**Every field carries a `sourceRef`** naming where the value came from (the requirements
+document, an addendum, or a confirmed user decision). A field without one is not a gap to
+render, it is a build failure: the hub must refuse rather than display an uncited number,
+because an uncited weight is indistinguishable from an invented one.
+
+**The hub composes, it never rebuilds.** It does not construct a competing requirements
+matrix, re-derive weights, or re-tier requirements. If the hub needs something this slice
+does not carry, the fix is to extend this slice, not to compute it there.
+
+**This skill keeps everything it already produces.** The locked institutional templates,
+`requirements_matrix.xlsx`, `case_handoff.json` and every other artifact in the Outputs
+section are unaffected. Contributing a slice is additive; it never reduces this skill's
+standalone deliverables, and this skill remains fully usable with no hub present.
+
+**Forward note, so it is not mistaken for a gap.** `_redesign_proposals/RFx-REDESIGN-SPEC.md`
+section D describes a richer hub object in which this skill also feeds the pricing template
+and addenda. The table above binds to the object the hub actually ships today
+(`{criteria, requirements, suppliers, panel, qa}`, seeded in
+`rfx-hub-1c344a/dashboard/assets/pv/pv-04-domain-data.js`). When the hub object grows to the
+spec's shape, extend this table rather than replacing it. The contract is deliberately
+written against what renders, not against what is planned.
+
 ## Cross-Artifact Consistency Rules
 
 - **Invitation Email** (draft text): must reference RFP timeline, submission deadline, response expectations, package contents, and procurement contact. If vendor contacts were collected, each vendor's email must be pre-addressed.

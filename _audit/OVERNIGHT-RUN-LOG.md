@@ -746,3 +746,87 @@ does not ship.
 every remaining model-assembled deliverable), queued as O26. Recorded there as a named,
 sized item rather than left as a footnote in a commit message. It is not small: the
 comparable generator is ~2,900 lines.
+
+### Tier 3 CORRECTION: the queue mis-sorted WS D. O12/O13/O15/O16/O17 are BLOCKED.
+
+The queue said "Tier 3: slice contracts (design already approved). The field-ownership
+table is approved at `MASTER-REMAINING-WORK.md:320`. This is authoring an approved design
+into SKILL.md text, not designing." The field CONTENT is approved. The ITEMS are not
+unblocked, and the queue did not check the dependency chain.
+
+Evidence, from `_audit/UPGRADE-PLAN.md` itself:
+```
+D1  Marc decision: tagged [Marc, after D0-D2] ... Depends on: A11, B4
+D2  Depends on: D1          D3  Depends on: D1          D5  Depends on: D1
+D6  Depends on: D5          D7  Depends on: D1-D3
+D4  Marc decision: no.      Depends on: A1
+```
+And `MASTER-REMAINING-WORK.md:320` tags the slice-contract line `[Marc, after D0-D2]`,
+"sequenced after dashboards per Marc".
+
+Gate status checked, not assumed:
+- **D0 CLOSED.** `deal-tab-1c344a/` exists with SKILL.md and dashboard.
+- **D2 NOT DONE.** `lilly-brand-assets-1c344a/SKILL.md:250-253` still declares "NO GREEN"
+  as the single source of truth. That item is `[Marc]`-tagged with ~26-skill blast radius.
+- **A11 NOT DONE** (lock the hubs, Marc sign-off), and D1 depends on it too.
+
+So D1 is doubly blocked, and D2/D3/D5/D6/D7 all chain off D1. **STOPPED AND LOGGED rather
+than proceeding.** Authoring them anyway would have been exactly the shortcut reversal the
+standing rules forbid: a tracker I wrote asserting "approved" over a source document that
+says "Marc".
+
+**D4 is the one WS D item that is genuinely clear**: "Marc decision: no", and its only
+dependency A1 (rfx-hub) closed in `ef270b5`. Done below.
+
+### O14 DONE, 2026-07-29. D4 RFx slice contracts into the four feeders.
+
+Authored "RFx-hub contribution, output slice" into `rfp-engine`, `rfp-case-manager`,
+`rfp-response-analysis` and `evaluation-engine`, and rewrote the matching table in
+`rfx-hub` so the contract is two-sided and checkable from either end.
+
+**Verification, mechanical, actual output:**
+```
+shipped RFX top-level keys: 19
+keys with no owner named in the hub contract: NONE
+  rfp-engine-1c344a                OK
+  rfp-case-manager-1c344a          OK
+  rfp-response-analysis-1c344a     OK
+  evaluation-engine-1c344a         OK
+BOTH SIDES AGREE
+```
+
+**The finding that made this worth doing properly.** The hub's pre-existing slice table
+named 5 fields. The object it actually renders (`dashboard/assets/seed/project-view.js`,
+`projectView.domain.rfx`) has **19 top-level keys**. So 14 fields had NO owner, which is
+precisely the condition D4's own verify criterion says must fail the build rather than
+render as a gap. The contract could not have caught the defect it exists to catch.
+
+All 19 are now assigned. The 14 beyond the spec are marked in a SEPARATE COLUMN as
+inferred from the seed rather than approved design, with the reasoning stated per
+assignment (`scale` to rfp-engine because that skill already mandates the canonical 0-5
+band set at its SKILL.md:384; event metadata to rfp-case-manager as state owner;
+`modelDecision`, which is award-scenario re-weighting, to evaluation-engine because
+scenario re-weighting is sensitivity analysis and belongs to the official scorer; `me` is
+hub-local viewer identity and not event data at all). **Marc should confirm the inferred
+column.** Defensible is not the same as confirmed, and the file says so.
+
+**Bound to what ships, not to what is planned.** `RFx-REDESIGN-SPEC.md` section D describes
+a richer object (`scores.aiFirstPass`, `coverage`, `commercial`, `participation`,
+`keyDates`, `caseHealth`, `ranking`, `sensitivity`, `dispersion`, `calibration`,
+`auditTrail`, `readiness`). The hub does not ship that object. Writing the contract against
+the spec would have produced a contract the hub cannot honour, so each feeder carries a
+"Forward note" recording the spec's superset and saying to EXTEND the table when the object
+grows, never replace it. Standing rule: do not trust a tracker over the running code.
+
+**The proposed-versus-official labelling is carried as an accuracy mechanism, not
+presentation**, in all three relevant files: rfp-response-analysis is **proposed**,
+evaluation-engine is **official**, and if the hub cannot render the distinction it does not
+render the scores. An AI first pass read as a panel decision is the specific failure it
+prevents. Where the two disagree, that is surfaced as a finding for a human, never
+reconciled arithmetically in the hub.
+
+Each feeder's section also states `sourceRef` per field, that an uncited field is a build
+failure rather than a gap, and that the skill keeps every standalone deliverable it already
+produces (never-regress).
+
+**No code changed. Malicious-code review: not applicable by scope, prose only.**
