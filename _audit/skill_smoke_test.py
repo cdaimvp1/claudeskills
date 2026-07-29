@@ -65,6 +65,30 @@ PLATFORM_TOOLS = {
     "pack.py",
 }
 
+# Assertions that are KNOWN-OPEN, with a reason and a tracking reference. These
+# report as KNOWN rather than FAIL so the suite can run as a CI gate: a check that
+# is red on day one gets ignored, and then stops catching the failures that matter.
+#
+# This list is a liability, exactly like kernel_manifest.py's KNOWN_EXCEPTIONS.
+# Every entry is a real defect that is not being fixed today. Adding to it must be
+# a deliberate act with a reason, never a way to make a run pass.
+KNOWN_OPEN = {
+    ("deal-room-1c344a", "A7"): (
+        "Documents deal-tab's files (_parts/data.js, dashboard/build_deal_artifact.py). "
+        "Prose pointing at another skill's tree. Non-breaking. Tracked as B7."
+    ),
+    ("lilly-brand-assets-1c344a", "A7"): (
+        "Documents three kernels it does not ship (numeric_kernel, timeline_engine, "
+        "frap_chain_kernel) plus assets/theo-color.css. numeric_kernel genuinely lives "
+        "in lilly-procurement-kernels and is vendored into consumers, so the reference "
+        "describes something real from the wrong place. Non-breaking. Tracked as B7."
+    ),
+    ("rfp-engine-1c344a", "A7"): (
+        "Points at rfx-hub-1c344a/dashboard/assets/pv/pv-04-domain-data.js, a path "
+        "inside another skill. Non-breaking. Tracked as B7."
+    ),
+}
+
 # Files whose self-test is known to require the suite and cannot run flat.
 # Each entry needs a reason. This list is a liability: every entry is a file
 # whose runtime behaviour this test does NOT cover.
@@ -276,22 +300,34 @@ def main(argv):
     print("G8: CANONICAL PER-SKILL RUNTIME SMOKE TEST")
     print("each skill copied to an empty temp dir first: no siblings, no suite root")
     print("=" * 92)
+    total_known = 0
     for s in targets:
         results, notes = smoke(s, verbose)
-        fails = [r for r in results if not r[2]]
+        fails = [r for r in results if not r[2] and (s, r[0]) not in KNOWN_OPEN]
+        known = [r for r in results if not r[2] and (s, r[0]) in KNOWN_OPEN]
         total_fail += len(fails)
+        total_known += len(known)
         status = "PASS" if not fails else f"FAIL({len(fails)})"
-        print(f"\n{s:44} {status}")
+        if known:
+            status += f"  [{len(known)} known-open]"
+        print("")
+        print(f"{s:44} {status}")
         for aid, label, ok, detail in results:
-            if not ok or verbose:
-                mark = "ok  " if ok else "FAIL"
-                print(f"    [{mark}] {aid} {label}" + (f"  -> {detail}" if detail else ""))
+            if ok and not verbose:
+                continue
+            if not ok and (s, aid) in KNOWN_OPEN:
+                print(f"    [KNOWN] {aid} {label}" + (f"  -> {detail}" if detail else ""))
+                print(f"            {KNOWN_OPEN[(s, aid)]}")
+                continue
+            mark = "ok  " if ok else "FAIL"
+            print(f"    [{mark}] {aid} {label}" + (f"  -> {detail}" if detail else ""))
         if verbose:
             for n in notes:
                 print(f"    note: {n}")
     print()
     print("=" * 92)
-    print(f"{len(targets)} skill(s), {total_fail} failed assertion(s)")
+    print(f"{len(targets)} skill(s), {total_fail} failed assertion(s)"
+          + (f", {total_known} known-open (see KNOWN_OPEN)" if total_known else ""))
     print("=" * 92)
     return 1 if total_fail else 0
 

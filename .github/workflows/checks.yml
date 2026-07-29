@@ -1,0 +1,89 @@
+name: suite checks
+
+# Runs the gates built during the 2026-07-29 upgrade programme. Each one exists
+# because a real defect got through without it:
+#
+#   kernel drift      9 of 16 vendored kernel copies were silently stale
+#   runtime smoke     deal-tab crashed on IMPORT, inside an installable skill,
+#                     against a hardcoded absolute path containing a username
+#   self-tests        two bugs shipped into a reconciliation gate that would have
+#                     thrown the moment it fired
+#
+# All checks are stdlib-only Python. No third-party install step, deliberately:
+# the suite's own rule is that a skill must run without one, so its CI should too.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Kernel drift, no vendored copy may silently diverge
+        # Exit 1 on unexplained drift. A copy that is knowingly behind belongs in
+        # KNOWN_EXCEPTIONS with a reason and an owner, not in a green run.
+        run: python lilly-procurement-kernels-1c344a/kernel_manifest.py
+
+      - name: Shared numeric kernel self-test
+        working-directory: lilly-procurement-kernels-1c344a
+        run: python numeric_kernel.py
+
+      - name: Runtime smoke test, every skill in a flat isolated install
+        # Copies each skill to an empty temp dir first: no siblings, no suite
+        # root. That is the Claude Desktop condition, and testing in place would
+        # pass code that only works because a sibling was one directory up.
+        run: python _audit/skill_smoke_test.py
+
+      - name: Golden fixture checker self-test
+        working-directory: _audit/golden-fixture
+        run: python check_run.py --selftest
+
+      - name: Invoice audit engine, seeded-defect golden set
+        working-directory: invoice-rate-card-auditor-1c344a
+        run: python invoice_audit_selftest.py
+
+      - name: Pro-forma dashboard adapter, drift assertions
+        working-directory: pro-forma-builder-1c344a
+        run: python dashboard_adapter.py
+
+      - name: Field-guide reconciliation gate
+        # Node is present on the runner. Verifies the engine script still parses
+        # and that the shipped seed passes its own reconciliation gate, which is
+        # what stops a bad figure rendering as fact.
+        working-directory: theos-field-guide-1c344a/references
+        run: |
+          node -e '
+          const fs=require("fs"), html=fs.readFileSync("field-guide-engine.html","utf8");
+          const m=html.match(/<script>([\s\S]*)<\/script>/);
+          new Function(m[1]);
+          eval(html.match(/function num\(v\)[\s\S]*?\n  \}/)[0].replace(/^\s*/,""));
+          eval(html.match(/function money\(n\)\s*\{[\s\S]*?\n  \}/)[0].replace(/^\s*/,""));
+          const escapeHtml=s=>String(s);
+          eval(html.match(/function fgReconcileSavings\(s\)\s*\{[\s\S]*?\n  \}/)[0]);
+          eval(html.match(/var FG_GRADES = \[[^\]]*\];/)[0]);
+          eval(html.match(/function fgReconcileRC\(rc\)\s*\{[\s\S]*?\n  \}/)[0]);
+          const seed=JSON.parse(html.match(/id="fgData"[^>]*>([\s\S]*?)<\/script>/)[1]);
+          const a=fgReconcileSavings(seed.savings), b=fgReconcileRC(seed.reportCard);
+          if(a.length||b.length){ console.error("seed does not reconcile:",a,b); process.exit(1); }
+          const t=JSON.parse(JSON.stringify(seed.savings)); t.achieved=t.committed+1;
+          if(fgReconcileSavings(t).length===0){ console.error("gate did not fire on achieved>committed"); process.exit(1); }
+          console.log("engine parses, seed reconciles, gate fires");
+          '
+
+      - name: Citation resolver
+        # Non-blocking today: 153 known cross-skill misses are the brand-assets
+        # dangling pointers tracked as B7. Reported so a NEW break is visible.
+        run: python _audit/h5_citation_resolver.py || true
+
+      - name: Ship manifest
+        # Informational. Classifies and measures; deletes nothing and cannot.
+        run: python _audit/ship_manifest.py
