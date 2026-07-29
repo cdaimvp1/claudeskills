@@ -2,7 +2,7 @@
 name: lilly-brand-assets-1c344a
 description: >
   Shared FOUNDATION for the Lilly procurement skill suite: brand logos, the canonical color palette,
-  execution guardrails (G1-G11), the dashboard component library, the DOCX design system, and the
+  execution guardrails (G1-G12), the dashboard component library, the DOCX design system, and the
   user manual (troubleshooting, model selection, per-skill usage). Triggers on "Lilly branding",
   "Lilly colors", "brand colors", "how do I use this skill", "help with skills", "skill not working",
   "dashboard error", "dashboard crashed", "which model", "Opus or Sonnet", "troubleshoot", "not rendering",
@@ -43,7 +43,7 @@ human-facing reference material rather than something every skill run needs in c
 `user-manual.md` is SharePoint-primary with a local companion-file fallback; see "Reading
 the user manual" below for the read order.
 
-- **execution-guardrails.md** (inlined below): Mandatory guardrails (G1-G11) referenced by every skill; G11 (Kernel-Backed Computation) applies only to the subset of skills that vendor a numeric/decision kernel.
+- **execution-guardrails.md** (inlined below): Mandatory guardrails (G1-G12) referenced by every skill; G11 (Kernel-Backed Computation) applies only to the subset of skills that vendor a numeric/decision kernel.
 - **dashboard-components.md** (inlined below): Shared React component library for all dashboards.
 - **brand-colors.md** (inlined below): Lilly brand color palette with hex codes and usage rules, including the canonical status palette and the single documented green/teal exception.
 - **scoring-scales.md** (inlined below): The one canonical suite-wide evaluation scale (0.0-5.0) and its 5-tier requirements mapping.

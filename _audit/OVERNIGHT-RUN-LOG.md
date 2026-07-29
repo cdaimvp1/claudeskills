@@ -2102,3 +2102,73 @@ citation resolver ........... PASS (0 unresolved, was 153)
 **KNOWN_OPEN's docstring now records why it is empty and what refilling it would require**:
 a reason, an owner, a tracking reference, and a PINNED exact failure detail. A suppression
 list should be temporary by construction, and this one lasted about two hours.
+
+---
+
+## B8 — guardrail numbering
+
+The plan said "two skills still cite G1-G10 or G1-G11". That understated it.
+**27 SKILL.md files** carried a stale range, 57 occurrences, while the live suite
+defines through **G12**:
+
+- `## G11: Kernel-Backed Computation (HARD RULE for Kernel-Consuming Skills)`
+- `## G12: Claim-Gate, Cite or Abstain (HARD RULE, suite-wide)`
+
+so "G1-G12" is a truthful range, not a bumped number.
+
+A blind find-and-replace would have been wrong here, because two different kinds of
+text mention a range and only one of them should move:
+
+| kind | example | action |
+|---|---|---|
+| LIVE reference | prose asserting which guardrails this skill follows | update to G1-G12 |
+| HISTORICAL record | a changelog line recording a past correction | leave it alone |
+
+Rewriting a changelog entry would falsify the record of what the skill used to do.
+
+**Result: 26 skills updated, 48 live references corrected, 4 changelog entries preserved.**
+
+`lilly-contract-review-1c344a` was excluded because it is HELD
+(PLATFORM-CONSOLIDATION-TRACKER.md:172). Verified untouched:
+`git diff --stat lilly-contract-review-1c344a/` is empty.
+
+## B6 — orphaned dashboard HTML
+
+Eight static HTML files ship inside skills. Six are unreferenced by their own SKILL.md,
+which looked like ~12.5 MB of orphans. It is not, and the distinction matters:
+**unreferenced by SKILL.md is not the same as orphaned**, because a builder's output
+artifact is reached through the builder, not through a prose pointer.
+
+Checking each against its builder's declared output settled it:
+
+| file | verdict |
+|---|---|
+| `rfx-dashboard.html` | builder default output. CURRENT. |
+| `supplier-landscape-PLATFORM.html` | builder default output. CURRENT. |
+| `deal-dashboard-v2.html` | builder default output (`build_deal_dashboard.py:209`). CURRENT. |
+| `deal-dashboard.html` | **superseded.** Not the builder default, not reproducible. |
+| `category-strategy-dashboard{,-DEMO}.html` | builder takes explicit `--out`. UNRESOLVED, left alone. |
+
+The decisive evidence on deal-tab: `deal-dashboard-v2.html` hashes to `6b8b6a1f...`,
+which is exactly the byte-identical build the superseded marker had already verified.
+So v2 is the current artifact and the non-v2 file is the leftover.
+
+**Nothing was deleted**, per the standing instruction to keep old skill files until the
+new package is proven in real use. Instead `_audit/ship_manifest.py` gained a
+`SUPERSEDED_ARTIFACTS` category that reports the file as strippable-at-packaging.
+
+It is pinned to an exact sha256, following the same discipline as
+`kernel_manifest.KNOWN_EXCEPTIONS`: **the exception is keyed to the exact expected
+content, not to the filename.** If the file is ever rebuilt, the pin goes stale and the
+tool refuses to count it as strippable rather than stripping the wrong thing. Proven by
+tampering:
+
+```
+normal:  deal-tab-1c344a/dashboard/deal-dashboard.html  1796 KB  -> counted
+tampered: 0 KB | PIN STALE, NOT counted as strippable: expected f49166be74c9, found 3233f79a12f
+```
+
+Ship manifest now: 46,508 KB as-is, 10,705 KB dead weight, **35,803 KB after stripping.**
+
+Gates after B6+B8: smoke 32 skills / 0 failures, kernel manifest 15 of 16 + 1 held,
+kernel self-test 96/96, fixture check_run 11/11.

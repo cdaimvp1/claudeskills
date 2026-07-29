@@ -25,6 +25,7 @@ Stdlib only. Read-only.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -48,6 +49,21 @@ DEAD_WEIGHT_DIRS = {
 DEAD_WEIGHT_FILES = {
     ".pyc": "compiled bytecode",
     "nonascii_check.txt": "one-off encoding check output",
+}
+
+# Superseded build artifacts: a shipped HTML that an OLDER build left behind, sitting
+# beside the current one. Pinned to an exact sha256 so that if the file is ever rebuilt
+# or replaced, this stops matching and the artifact ships rather than being silently
+# stripped. Same discipline as kernel_manifest.KNOWN_EXCEPTIONS: the exception is keyed
+# to the exact expected content, not to the filename.
+SUPERSEDED_ARTIFACTS = {
+    "deal-tab-1c344a/dashboard/deal-dashboard.html": (
+        "f49166be74c9ec7893d1ff39c3c6d254ad3201bd36abd3eccfec51889cfdd684",
+        "Superseded by deal-dashboard-v2.html, which IS this skill's builder default "
+        "output (build_deal_dashboard.py:209 --out default) and whose hash matches the "
+        "build the superseded marker verified. Neither file is referenced by SKILL.md; "
+        "only v2 is reproducible from the builder.",
+    ),
 }
 
 
@@ -97,10 +113,24 @@ def dead_weight_in(skill):
                               DEAD_WEIGHT_DIRS[d]))
                 dn.remove(d)
         for f in fn:
+            full = os.path.join(dp, f)
+            rel = os.path.relpath(full, ROOT).replace(os.sep, "/")
+            pin = SUPERSEDED_ARTIFACTS.get(rel)
+            if pin is not None:
+                want, why = pin
+                got = hashlib.sha256(open(full, "rb").read()).hexdigest()
+                if got == want:
+                    found.append((rel, kb(full), why))
+                # else: content changed since it was pinned. Do NOT strip it on the
+                # strength of a stale pin; surface it so a human re-checks.
+                else:
+                    found.append((rel, 0, "PIN STALE, NOT counted as strippable: "
+                                          f"expected {want[:12]}, found {got[:12]}. "
+                                          "Re-verify before stripping."))
+                continue
             for suffix, why in DEAD_WEIGHT_FILES.items():
                 if f.endswith(suffix):
-                    full = os.path.join(dp, f)
-                    found.append((os.path.relpath(full, ROOT), kb(full), why))
+                    found.append((rel, kb(full), why))
     return found
 
 
