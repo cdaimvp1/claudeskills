@@ -72,7 +72,13 @@ not produce a Review Summary. The redline-only run is the strictest case, and pl
 the most common real use of this skill, which makes it the worst one to have quietly
 degraded.
 
-**Required before this matrix can be called complete:**
+**DONE, see the "Output-mode audit" section below.** It found five at-risk clusters. The
+severe one is that several completeness gates are wired to the Review Summary generator,
+which never executes in redline-only mode, so those gates silently do not fire in the
+DEFAULT mode. Summary of the rest: the Protection Score and the whole commercial
+analysis currently have no redline surface.
+
+The original brief, retained for the record:
 
 1. Add a column: **"Which output modes does this reach?"**
 2. Re-audit all 342 rows against the test: *if the user requests ONLY the redlined,
@@ -248,6 +254,235 @@ instruction becoming nothing is a loss, and the column is where the two are told
 
 ---
 
+
+---
+
+# Output-mode audit (O1, 2026-07-29)
+
+The re-audit Marc's correction called for. Answers, for every row in this matrix, the
+test: *if the user requests ONLY the redlined track-changes .docx, does this check still
+run, and does its result reach them?*
+
+## Method, and one deliberate deviation from the O1 brief
+
+O1 said "add a column". I did not add a sixth column to 307 verbatim rows, and that is a
+deliberate deviation, stated here rather than left for a reader to notice.
+
+Reason: the rows are the provenance record, carried word for word from three separate
+authoring passes. Rewriting all 307 to append a cell risks corrupting the thing the
+matrix exists to protect, and for roughly 85 percent of rows the answer is the same
+three words. Instead every row is classified by GROUP below, with each exception named
+individually. Coverage is the same, the classification is checkable per row, and the
+verbatim rows stay untouched.
+
+If a later reader wants the literal column, it can be generated from the group
+classification plus the exception register without re-reading the sources.
+
+## What the modes actually are
+
+Evidence, all from `lilly-contract-review-1c344a/SKILL.md`:
+
+Five modes today (`:225-248`), four after the dashboard retires: **Redline only**,
+**Briefing only**, **Full review**, **Stack map only**. Dashboard only retires with the
+deliverable.
+
+**Redline only is the DEFAULT** (`:248`, "Default to Redline only if the user does not
+respond"), and the reasoning given is that most users on a typical contract want the
+marked-up DOCX and nothing else.
+
+The emission matrix (`:1040-1047`):
+
+| Mode | 5A Redline | 5B Vendor Response | 5C Dashboard | 6 Review Summary |
+|---|---|---|---|---|
+| Full review | YES | YES | YES | YES |
+| Redline only | **YES** | NO | NO | **NO** |
+| Dashboard only | NO | NO | YES | NO |
+| Briefing only | NO | NO | NO | YES |
+
+`Stack map only` is not in the matrix. It exits at Step 0.5, never reaches Steps 1-7,
+and produces no findings, redline or Protection Score (`:1049`, `:720`, `:1742`).
+
+**The critical structural fact, and the good news** (`:1038`, `:1051`): the analytical
+workflow runs identically regardless of mode. Only emission varies.
+
+So the first half of the test is answered once, for every row: **yes, the check still
+runs.** Nothing is skipped in redline-only mode. The entire question is the second half,
+whether the RESULT reaches the user, and that reduces to a single question per row:
+**does this row's output have a surface in the redline?**
+
+## Surface classes
+
+| Class | Surface | Reaches a redline-only user |
+|---|---|---|
+| **S1** | Redline .docx: tracked change or comment | **YES** |
+| **S2** | Review Summary .docx | NO |
+| **S3** | Vendor response draft | NO (Full review only) |
+| **S4** | Dashboard | RETIRED |
+| **S5** | Stack Map .docx + manifest | NO (separate mode) |
+| **S6** | Internal: working notes, pass artifacts, findings ledger, kernel, schema | Only via S1/S2/S3/S5 |
+
+S6 is not a loss in itself. Pass artifacts are internal by design and always have been.
+S6 becomes a loss only where it has no onward S1 path.
+
+The model row for how this should be done already exists in the matrix:
+`arithmetic-verification.md:91` carries `must_appear_in: [redline_tracked_change,
+redline_comment, review_summary_commercial]`. One ledger entry, three generators reading
+it, so they cannot disagree. Every correction below is an instruction to look like that
+row.
+
+## Group classification, all 307 rows
+
+| Group | Rows | Class | Reaches redline-only |
+|---|---|---|---|
+| P1 definition-tracing | 15 | S1 via findings, 4 rows S6 gates | YES |
+| P1 arithmetic-verification | 16 | S1, explicit at `:91` | YES, 1 exception |
+| P1 dpa-review-checklist | 49 | S1 via findings and clause-anchored escalation comments | YES, 1 exception |
+| **P1 risk-scoring** | **9** | **S2 only** | **NO, all 9** |
+| P1 contract-stack-map | 30 | S5, mode-scoped by design | NO, and correct, 1 exception |
+| P2 playbook | 34 | S1 via findings | YES, 1 exception |
+| P2 vendor-tactics | 19 | S1 via findings | YES |
+| **P2 commercial-analysis** | **23** | **S2 Section 04** | **NO, 20 of 23** |
+| P2 pharma-requirements | 14 | S1 via findings | YES, 1 exception |
+| P3 dashboard rescue | 23 | corrected to S1+S2+slice by Marc | YES, 1 exception |
+| P3 review-summary-design | 23 | S2 by definition, it IS the spec | N/A, not a loss |
+| P3 pass-artifacts | 10 | S6 internal, always run | N/A, not a loss |
+| P3 sme-matrix | 15 | S1 clause-anchored comments | YES, table is S2 |
+| P3 lilly-templates | 5 | S6 internal classification | N/A |
+| P3 ai-standard | 10 | S1 via findings | YES |
+| P3 the 12 Rules | 12 | mixed | 3 exceptions |
+
+**Findings reach the redline. Analysis about the contract as a whole does not.** That is
+the shape of the problem in one sentence. The redline is a per-clause instrument, so
+anything anchored to a clause surfaces naturally, and anything that is a judgment about
+the document as a whole currently has nowhere to go.
+
+---
+
+## AT-RISK register
+
+Five clusters. Cluster C is the severe one.
+
+### Cluster A: the Protection Score and everything that explains it
+
+**Rows:** all 9 of P1 risk-scoring, Rules 7, 9 and 12 in P3G, the KPI card row in P3B,
+plus the rescued methodology narrative, coverage rollup and severity-versus-coverage
+cross-reference in P3A.
+
+**The problem, and it is worse than a missing number.** `SKILL.md:205` (Rule 12): the
+calculation table "must exist in Pass 4 working notes before the score is finalized AND
+be emitted in the output (the review summary and the dashboard's Protection Score
+panel), so the score is auditable and reproducible by the reader. **A score produced
+without this visible calculation table is invalid.**"
+
+Rule 12 names exactly two emission targets. One is being retired. The other is not
+emitted in redline-only mode. So on a default-mode run, after the retirement, the skill
+either omits its headline number entirely or emits one that is invalid by its own rule.
+
+The Protection Score is the most sign-or-not-sign relevant single output the skill
+produces. It clears the redline floor by any reading of Marc's principle.
+
+**Correction required:** the score, its band label, and the Rule 12 calculation table
+need an S1 surface. A front-matter block or a document-level comment on the redline is
+the natural home, since the score is a document-level judgment with no single clause to
+anchor to. Rule 12's text has to change anyway to drop the dashboard panel; make that
+edit add the redline target rather than just remove the dead one.
+
+### Cluster B: the commercial analysis
+
+**Rows:** 20 of the 23 P2 commercial-analysis rows. Value at Risk (overpayment,
+commitment, scope creep, renewal, and the total), the pricing assessment, benchmark
+table and confidence rating, commitment structure, term and renewal, scope-boundary and
+pricing-model risk mappings.
+
+**The problem:** commercial analysis is Section 04 of the Review Summary and has no
+other surface. The only commercial content that crosses into the redline today is
+arithmetic ERRORS, via `arithmetic-verification.md:91`. So a redline-only user is told
+the vendor's math is wrong, but not that the rate is 40 percent above market or that
+total Value at Risk is $2M.
+
+The three rows that are already safe are the arithmetic-error rows covered by `:91`.
+
+**Correction required:** Value at Risk and the market-position conclusion need an S1
+surface, on the same footing as an arithmetic error. Both change whether a reasonable
+person signs. The supporting benchmark methodology table can stay S2 without loss, since
+it is evidence for the conclusion rather than the conclusion.
+
+### Cluster C: completeness gates wired to generators that never run
+
+**Rows:** `playbook.md:252-263` (the 8-item Review Output Checklist),
+`pharma-requirements.md:128-143` (the 11-item pharma checklist),
+`commercial-analysis.md:25-31` and `:129` (the benchmark-sources and no-fabrication
+assertions).
+
+**This is the most severe finding in the audit, and the least visible.** The matrix
+correctly upgrades each of these from a prose self-check to a code-enforced assertion:
+the generator refuses to emit if a Hard Stop lacks its escalation contact, or if any of
+the 11 pharma items lacks a stored disposition. That is exactly the pattern
+`OPTIMIZATION-PRINCIPLES.md` calls the strongest available mechanism, because an
+exception cannot be forgotten and an instruction can.
+
+But each assertion is wired to the **Review Summary or Briefing generator**. In
+redline-only mode that generator never executes, so the assertion never fires.
+
+The upgrade therefore makes enforcement stronger in the two modes users rarely pick and
+weaker in the default one. Nothing looks wrong on such a run: no output is missing, no
+error is raised, the quality gate simply is not there. A silently absent gate is worse
+than a prose instruction, because a prose instruction at least still gets read.
+
+**Correction required:** completeness assertions belong at the **ledger** boundary, not
+the generator boundary. The ledger is built in every mode. Assert on ledger completeness
+before emission begins, then let each generator render from an already-validated ledger.
+This is a structural fix, and it should be applied as a rule to every gate in the matrix
+rather than to these four rows one at a time.
+
+### Cluster D: two output-format rows with no named redline destination
+
+`arithmetic-verification.md:82-88` (General Arithmetic Findings Format) and
+`dpa-review-checklist.md:123-139` (DPA Review Output Format). Both say "ledger schema
+plus generator" without naming which. Almost certainly intended to behave like `:91`.
+
+**Correction required:** name the destination explicitly, matching `:91`. Cheap.
+
+### Cluster E: a decided rescue routed into a mode redline-only users never invoke
+
+Part 3 proposed carrying the **Compliance Evidence Checklist** into
+`contract-stack-map.md` as a Stage 1 check, because that file is already the
+document-family authority.
+
+The Stage 1 placement is right. The SURFACE is not: the Stack Map is class S5, a
+separate mode that exits at Step 0.5 and never runs Steps 1-7. A redline-only user never
+invokes it. Marc has already decided this checklist survives precisely because it
+matters on a redline-only run, so routing its output into the Stack Map would reintroduce
+the loss his correction removed.
+
+**Correction required:** keep the Stage 1 check where Part 3 put it, but its result
+surfaces on the three decided surfaces (redline comment or front matter, Review Summary
+register, deal-tab slice). The Stack Map may ALSO render it. It may not be the only
+place.
+
+---
+
+## What this does not change
+
+Most of the matrix is fine, and the reason is worth recording so the re-audit is not
+re-run later on a hunch. Findings are clause-anchored, the redline is a clause-anchored
+instrument, and SME escalation comments are inserted at the relevant clause
+(`sme-matrix.md:5-20`). So the great majority of rows, roughly 240 of 307, reach a
+redline-only user without any change at all.
+
+The losses cluster in exactly one place: **judgments about the document as a whole**,
+which have no clause to attach to and were therefore given to the two deliverables that
+have room for a document-level narrative. That is a coherent design, and it was correct
+while the dashboard existed and the score had a panel of its own. It stops being correct
+once the default mode is the only one many users ever see.
+
+## Status of O1 after this pass
+
+- Output-mode column: DONE as a group classification plus exception register, with the
+  deviation from "a literal column" stated above.
+- Row-count reconciliation: DONE, 307 not 342.
+- **Part 3 coverage sweep: STILL OWED.** Part 3's 37-row gap is not settled, so its
+  coverage remains UNKNOWN and this matrix is still not a passed gate.
 # Part 1: mechanical and structural group
 
 *Verbatim from `F1-COVERAGE-MATRIX-PART1-mechanical.md`. 119 rows (its own summary says 118).*

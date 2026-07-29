@@ -100,3 +100,50 @@ Nothing under `lilly-contract-review` was written to. `dashboard-canonical.md` u
 
 **O1 is NOT complete.** Remaining: the output-mode column, the row-count reconciliation,
 and the Part 3 coverage sweep. See the revised O1 in the queue.
+
+### O1 output-mode audit DONE, 2026-07-29
+
+Added the "Output-mode audit" section to `_audit/F1-COVERAGE-MATRIX.md` (line 254).
+Re-verified after the splice that the merge is still lossless: missing_from_merge=0 for
+all three part files.
+
+**Evidence base, all read-only from `lilly-contract-review-1c344a/SKILL.md`:**
+`:225-248` five modes, Redline only is the DEFAULT; `:1040-1047` mode-to-emission
+matrix (Redline only = 5A redline YES, everything else NO); `:1038`/`:1051` the
+analytical workflow runs identically regardless of mode, only emission varies;
+`:205` Rule 12 names exactly two emission targets for the calculation table and says a
+score without a visible table is INVALID; `:1049`/`:720`/`:1742` Stack map only exits
+at Step 0.5 and never runs Steps 1-7.
+
+**Result: the check always RUNS in every mode. The question is only whether the RESULT
+reaches the user.** Roughly 240 of 307 rows are safe because findings are clause-anchored
+and the redline is a clause-anchored instrument. The losses cluster in one place,
+judgments about the document as a whole.
+
+**Five at-risk clusters, full detail in the matrix section:**
+- A: Protection Score + methodology + Rule 12 table + Rules 7/9. Only surface is the
+  Review Summary. Post-retirement, a default-mode run omits the headline number or emits
+  one Rule 12 itself calls invalid.
+- B: commercial analysis, 20 of 23 rows. Value at Risk and market position never reach a
+  redline-only user; only arithmetic ERRORS cross over, via `arithmetic-verification.md:91`.
+- C: **most severe.** Completeness gates (playbook 8-item checklist, pharma 11-item
+  checklist, benchmark-sources and no-fabrication assertions) are wired to the Review
+  Summary / Briefing generator, which never runs in redline-only mode. The gate does not
+  fire, nothing looks wrong. Fix is structural: assert at the LEDGER boundary, which is
+  built in every mode, not the generator boundary.
+- D: two output-format rows with no named redline destination. Cheap fix.
+- E: the decided Compliance Evidence Checklist rescue was routed into `contract-stack-map.md`,
+  class S5, a mode redline-only users never invoke. Stage 1 placement right, surface wrong.
+
+**Deliberate deviation, stated not hidden:** O1 said "add a column". I did not append a
+sixth cell to 307 verbatim provenance rows. Every row is classified by GROUP with each
+exception named individually, which is the same coverage without risking the rows. The
+deviation and its reason are recorded in the matrix section itself.
+
+**What I deliberately did not do:** wrote nothing to `lilly-contract-review`, made no
+correction to any skill file, did not touch `dashboard-canonical.md`. All five clusters
+are findings with stated corrections, not applied changes. Applying them means editing a
+HELD skill and is NOT SAFE autonomously.
+
+**O1 remaining:** the Part 3 coverage sweep. Part 3's 37-row gap is unsettled, so its
+coverage is UNKNOWN and this matrix is still not a passed gate.
