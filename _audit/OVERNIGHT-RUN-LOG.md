@@ -1019,3 +1019,54 @@ handoff is an enrichment and its absence is not a gap to state.
 **`lilly-contract-review` is the second named consumer and was NOT edited.** It is HELD.
 Its side of this contract is owed when the hold lifts, and is recorded here so it is not
 mistaken for done.
+
+### Task #1 PART DONE, 2026-07-29. Fixture harness built. Baseline BLOCKED, and why.
+
+**I cannot produce a valid baseline and did not fake one.** I authored `ANSWER-KEY.md` an
+hour before starting this task. Any finding I "detect" in the fixture is recall, not
+detection, and a baseline built that way reports green while proving nothing. That is worse
+than having no baseline, because it would be trusted.
+
+So I built the uncontaminated half: the harness that makes the run mechanical when someone
+who has NOT read the answer key performs it.
+
+**Delivered:**
+- `check_run.py`, a stdlib-only checker: takes a run file, diffs against
+  `expected-findings.json`, verdicts pass/fail, exit 1 on failure.
+- `RUN-PROTOCOL.md`, including the contamination rule stated as a hard requirement.
+- `runs/EXAMPLE-degraded-redline-only.json`, a hand-authored illustration, clearly labelled
+  as not a real run.
+
+**Verification, actual output:**
+```
+python check_run.py --selftest      ->  SELF-TEST: 11/11 passed   EXIT=0
+```
+The checker is tested before it is trusted, because a checker that passes everything is
+worse than no checker. The 11 cases cover a perfect run, a missing Hard Stop, all three
+absence-detection failure modes separately, a false positive on a negative control, a
+negative control named in `extra`, a dropped direction-agnostic arithmetic finding, a
+wrong score band, a missing Rule 12 table, and the case that must NOT fail (an unrelated
+extra finding).
+
+**End-to-end proof on the degraded case:**
+```
+python check_run.py runs/EXAMPLE-degraded-redline-only.json
+  hard_stops 5/5, arithmetic 8/8, playbook 9/9, vendor_tactics 5/5   total 33/36
+  MISSING: AE-ABSENT, D-6, S-2
+  protection_score absent, Rule 12 table absent, band not emitted
+  VERDICT: FAIL, 7 problems   EXIT=1
+```
+That is exactly the output-mode defect the coverage-matrix audit found, now reproduced
+mechanically: clause-anchored findings survive into the redline, and the Protection Score,
+the Rule 12 calculation table, the Compliance Evidence Checklist and the absence-detection
+row do not, because none of them has a surface in the default mode. **The fixture and the
+checker demonstrably detect the real defect**, which is the strongest evidence available
+that they will detect a regression.
+
+**Desktop:** `check_run.py` imports `json`, `os`, `sys` only. It lives in `_audit/`, is a
+test harness rather than a skill file, and ships with nothing. The six fixture documents
+are plain Markdown with no dependency at all.
+
+**What is still owed on Task #1:** a clean run by an actor who has not read the answer key.
+That is a fresh Claude Desktop session with the skill installed, given only the six contract
+documents. Tracked as its own task rather than left inside this one.
