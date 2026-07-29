@@ -2329,32 +2329,73 @@ function csForcesBySeg(d) {
   if (!show.length) show = segs.slice(0, 3);
   var AX = ['Rivalry', 'Supplier power', 'Substitutes', 'New entrants', 'Buyer power'];
 
-  var cards = show.map(function (s) {
+  /* Three shapes on one frame, so colour is the only thing binding a shape to its
+     read. The same colour opens that segment's card below; there is no separate
+     legend because the card IS the legend. */
+  var TONES = ['var(--plum)', 'var(--teal)', 'var(--emph)'];
+
+  /* viewBox width matches the rendered max-width so 11px text renders at 11px. */
+  var CX = 210, CY = 122, R = 82;
+  var pt = function (i, v) {
+    var a = (Math.PI * 2 * i / 5) - Math.PI / 2, r = (v / 3.5) * R;
+    return [CX + r * Math.cos(a), CY + r * Math.sin(a)];
+  };
+  var pstr = function (v) {
+    return AX.map(function (_, i) { return pt(i, v).map(function (n) { return n.toFixed(1); }).join(','); }).join(' ');
+  };
+
+  var frame = '';
+  [1, 2, 3.5].forEach(function (v) { frame += '<polygon points="' + pstr(v) + '" class="cs-rring"/>'; });
+  AX.forEach(function (_, i) {
+    var p = pt(i, 3.5);
+    frame += '<line x1="' + CX + '" y1="' + CY + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" class="cs-rspoke"/>';
+  });
+  /* Every axis named on the frame. Reading a pentagon by counting clockwise from
+     one label is a puzzle, not a chart. */
+  AX.forEach(function (a, i) {
+    var p = pt(i, 3.92), mid = Math.abs(p[0] - CX) < 6;
+    var anch = mid ? 'middle' : (p[0] > CX ? 'start' : 'end');
+    var x = mid ? p[0] : (p[0] > CX ? p[0] + 5 : p[0] - 5);
+    var w = a.split(' ');
+    if (w.length > 1 && !mid) {
+      frame += '<text class="cs-raxlab" x="' + x.toFixed(1) + '" y="' + (p[1] - 2).toFixed(1) + '" text-anchor="' + anch + '">'
+        + '<tspan x="' + x.toFixed(1) + '">' + csEsc(w[0]) + '</tspan>'
+        + '<tspan x="' + x.toFixed(1) + '" dy="1.15em">' + csEsc(w.slice(1).join(' ')) + '</tspan></text>';
+    } else {
+      frame += '<text class="cs-raxlab" x="' + x.toFixed(1) + '" y="' + (p[1] + (mid ? 0 : 4)).toFixed(1)
+        + '" text-anchor="' + anch + '">' + csEsc(a) + '</text>';
+    }
+  });
+  [1, 2, 3].forEach(function (v) {
+    frame += '<text class="cs-raxnum" x="' + (CX + 4) + '" y="' + (pt(0, v)[1] + 3).toFixed(1) + '">' + v + '</text>';
+  });
+
+  var shapes = '', cards = '';
+  show.forEach(function (s, i) {
+    var tone = TONES[i % TONES.length];
     var f = fs[s.key];
-    if (!f) return '<div class="cs-fcard"><div class="cs-fcard-t">' + csEsc(s.key) + '</div>'
-      + csGap('Five-force read for this segment.', 'forcesBySegment["' + s.key + '"]') + '</div>';
-    var R = 54, cxy = 70;
-    var pt = function (i, v) {
-      var a = (Math.PI * 2 * i / 5) - Math.PI / 2, r = (v / 3.5) * R;
-      return (cxy + r * Math.cos(a)).toFixed(1) + ',' + (cxy + r * Math.sin(a)).toFixed(1);
-    };
-    var ring = AX.map(function (_, i) { return pt(i, 3.5); }).join(' ');
-    var shape = AX.map(function (k, i) { return pt(i, csForceVal(f[k])); }).join(' ');
-    var tone = /^high/i.test(f['Supplier power'] || '') ? 'var(--emph)' : 'var(--plum)';
-    return '<div class="cs-fcard">'
-      + '<svg viewBox="0 0 140 140" class="cs-radar" role="img" aria-label="' + csEsc(s.key + ' five forces') + '">'
-      + '<polygon points="' + ring + '" class="cs-rring"/>'
-      + '<polygon points="' + AX.map(function (_, i) { return pt(i, 1.75); }).join(' ') + '" class="cs-rring"/>'
-      + '<polygon points="' + shape + '" fill="' + tone + '" fill-opacity=".22" stroke="' + tone + '" stroke-width="2"/>'
-      + '</svg>'
+    if (!f) {
+      cards += '<div class="cs-fcard" style="border-left-color:' + tone + '">'
+        + '<div class="cs-fcard-t">' + csEsc(s.key) + '</div>'
+        + csGap('Five-force read for this segment.', 'forcesBySegment["' + s.key + '"]') + '</div>';
+      return;
+    }
+    shapes += '<polygon points="' + AX.map(function (k, j) {
+        return pt(j, csForceVal(f[k])).map(function (n) { return n.toFixed(1); }).join(',');
+      }).join(' ')
+      + '" fill="' + tone + '" fill-opacity="0.16" stroke="' + tone + '" stroke-width="2.4"/>';
+    cards += '<div class="cs-fcard" style="border-left-color:' + tone + '">'
       + '<div class="cs-fcard-t">' + csEsc(s.key) + '</div>'
       + '<div class="cs-fcard-d">' + csEsc(f.read || '') + '</div></div>';
-  }).join('');
+  });
 
-  return '<div class="cs-fcards">' + cards + '</div>'
-    + csNote('Five axes clockwise from the top: rivalry, supplier power, substitutes, new entrants, '
-      + 'buyer power. A larger area toward an axis means that force is stronger. One radar for the whole '
-      + 'category would average a near-monopoly and a commodity market into a market that does not exist.'
+  return '<svg viewBox="0 0 420 265" class="cs-radar" role="img" aria-label="Five forces by segment">'
+      + frame + shapes + '</svg>'
+    + '<div class="cs-fcards">' + cards + '</div>'
+    + csNote('Distance from the centre is the strength of that force, ringed 1 to 3. Strong rivalry and '
+      + 'strong buyer power favour you; strong supplier power does not. The segments are overlaid because '
+      + 'the difference between them is the finding: one radar for the whole category would average a '
+      + 'near-monopoly and a commodity market into a market that does not exist.'
       + (CS_SEG_SEL ? '' : ' Showing the three largest segments; select one to isolate it.'));
 }
 

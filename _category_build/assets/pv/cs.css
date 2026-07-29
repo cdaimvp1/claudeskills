@@ -1267,6 +1267,23 @@ small,sub,sup{font-size:9px}
 .cs-rksvg{max-width:520px}
 .cs-rmsvg{max-width:600px}
 .cs-fragsvg{max-width:600px}
-.cs-radar{max-width:140px}
+.cs-radar{max-width:420px}
 /* chart text one step up so it survives any residual scale-down */
 .cs-kdlab,.cs-quadl,.cs-rknum,.cs-fdlab,.cs-axt,.cs-pyl,.cs-pyr,.cs-p80t,.cs-ptail{font-size:13px}
+
+/* --- Porter overlay: one labelled pentagon, reads stacked beneath ---------- */
+/* viewBox is 420 wide, so pinning max-width to 420px renders the axis labels at
+   their declared 11px. An SVG scales with its container; text inside cannot hold
+   a size on its own. */
+.cs-radar{margin:0 auto 4px}
+.cs-rspoke{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 3}
+.cs-raxlab{font-size:11px;font-weight:700;fill:var(--cs-mut2,#4A443C)}
+.cs-raxnum{font-size:11px;fill:var(--cs-mut)}
+/* The card's colour bar is what binds a read to its shape, which is why there is
+   no legend: a legend here would say the segment names twice. */
+.cs-fcards{display:block;border-top:1px solid var(--cs-rule,#E2DCD4);margin-top:9px;padding-top:2px}
+.cs-fcard{border-top:0;border-left:4px solid var(--teal);padding:8px 0 8px 11px;
+  border-bottom:1px solid var(--cs-rule,#E2DCD4)}
+.cs-fcard:last-child{border-bottom:0}
+.cs-fcard-t{text-align:left}
+.cs-fcard-d{margin-top:3px}
