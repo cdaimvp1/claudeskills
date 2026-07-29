@@ -102,6 +102,7 @@ import math
 import os
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 # ---------------------------------------------------------------------------
@@ -216,7 +217,8 @@ class DataPoint:
     criteria, which the templates reference but don't put in a single row."""
 
     source: str
-    date: str            # ISO-ish date string, e.g. "2025-11-01"; disclosure only, not parsed
+    date: str            # capture date, YYYY-MM-DD / YYYY-MM / YYYY. PARSED and enforced
+                         # by _validate_capture_date; a placeholder or unparseable value is refused
     tier: int             # 1-7, per Source Quality Hierarchy
     rate: float            # as provided, in the rate line's stated unit
     age_months: int = 0     # months old at benchmark date; 0 = current
@@ -270,6 +272,78 @@ class BenchmarkingInput:
     contract_quality: List[ContractQualityRow] = field(default_factory=list)
 
 
+# Placeholders that satisfy "a date is present" while carrying no capture date at all.
+# These are the strings a model reaches for when it does not know when a figure was taken.
+_DATE_PLACEHOLDERS = frozenset({
+    "", "tbd", "tba", "n/a", "na", "n/d", "none", "null", "unknown", "unspecified",
+    "recent", "current", "various", "ongoing", "latest", "-", "--", "?",
+})
+
+
+def _validate_capture_date(value: Any, rate_line_name: str, idx: int, errors: List[str]) -> bool:
+    """Enforce the capture-date requirement (H5 / item #32).
+
+    G12 (`lilly-brand-assets-1c344a/SKILL.md:1117`) defines a cited web source as "an
+    accessed web source with URL plus capture date", and this skill's own SKILL.md:788
+    requires "an 'as of' date" on every external figure. Both were stated and neither was
+    enforced: `date` was checked for KEY PRESENCE only, so `"date": ""` and
+    `"date": "recent"` both passed and rendered into the Sources tab as though they were
+    provenance.
+
+    A rate with no capture date cannot be aged, cannot be judged stale, and cannot be
+    re-verified. It is worse than a missing rate, because it looks like evidence.
+
+    Deterministic on purpose: this parses the string and consults no clock, so the same
+    input always produces the same result. Comparing against "today" would make the
+    generator's output depend on when it ran.
+    """
+    if not isinstance(value, str):
+        errors.append(
+            f"Rate line '{rate_line_name}' data_points[{idx}].date must be a date string, "
+            f"got {type(value).__name__}."
+        )
+        return False
+
+    raw = value.strip()
+    if raw.lower() in _DATE_PLACEHOLDERS:
+        errors.append(
+            f"Rate line '{rate_line_name}' data_points[{idx}].date is {value!r}, which is a "
+            "placeholder, not a capture date. SKILL.md:788 requires an 'as of' date on every "
+            "external figure. If the date is genuinely unknown, drop the data point rather "
+            "than carrying it with an empty provenance field."
+        )
+        return False
+
+    parsed = None
+    # Named-month formats are accepted because they are UNAMBIGUOUS real capture
+    # dates, just not ISO ones; refusing them would reject honest provenance over
+    # notation. Slash formats are deliberately NOT accepted: 03/04/2026 is March 4
+    # or 4 March depending on the reader, and a date that parses two ways is not
+    # provenance either.
+    for fmt in ("%Y-%m-%d", "%Y-%m", "%Y",
+                "%b %d, %Y", "%B %d, %Y", "%b %d %Y", "%B %d %Y",
+                "%d %b %Y", "%d %B %Y", "%b %Y", "%B %Y"):
+        try:
+            parsed = datetime.strptime(raw, fmt)
+            break
+        except ValueError:
+            continue
+    if parsed is None:
+        errors.append(
+            f"Rate line '{rate_line_name}' data_points[{idx}].date is {value!r}, which does "
+            "not parse as YYYY-MM-DD, YYYY-MM or YYYY. A capture date that cannot be parsed "
+            "cannot be used to age or stale-check the figure, so it is not provenance."
+        )
+        return False
+    if not (1990 <= parsed.year <= 2100):
+        errors.append(
+            f"Rate line '{rate_line_name}' data_points[{idx}].date has year {parsed.year}, "
+            "which is outside 1990-2100 and is almost certainly a typo."
+        )
+        return False
+    return True
+
+
 def _validate_data_point(dp: Dict[str, Any], rate_line_name: str, idx: int, errors: List[str]) -> Optional[DataPoint]:
     required = ("source", "date", "tier", "rate")
     missing = [f for f in required if f not in dp]
@@ -279,6 +353,9 @@ def _validate_data_point(dp: Dict[str, Any], rate_line_name: str, idx: int, erro
             f"field(s) {missing}. Rule 1: 'Every rate must have a cited "
             "source' (source, date, geography, and how it was derived)."
         )
+        return None
+    # Capture date must be REAL, not merely present. See _validate_capture_date.
+    if not _validate_capture_date(dp["date"], rate_line_name, idx, errors):
         return None
     tier = dp["tier"]
     if not isinstance(tier, int) or not (1 <= tier <= 7):
@@ -1404,6 +1481,37 @@ def _run_self_test() -> int:
         check("validate_benchmarking_input refuses an out-of-range tier (9)", False, "did not raise")
     except BenchmarkingValidationError as e:
         check("validate_benchmarking_input refuses an out-of-range tier (9)", True, str(e)[:120])
+
+    # --- capture-date enforcement (item #32 / H5) ------------------------------------
+    # G12 defines a cited source as carrying a capture date, and SKILL.md:788 requires an
+    # "as of" date on every external figure. Before this, `date` was checked for key
+    # PRESENCE only, so an empty string or "recent" passed straight into the Sources tab
+    # and rendered as provenance.
+    for bad_date in ("", "TBD", "recent", "sometime last year", "2025-02-30"):
+        broken_d = copy.deepcopy(sample)
+        broken_d["rate_lines"][0]["data_points"][0]["date"] = bad_date
+        try:
+            validate_benchmarking_input(broken_d)
+            check(f"validate_benchmarking_input refuses capture date {bad_date!r}",
+                  False, "did not raise")
+        except BenchmarkingValidationError as e:
+            check(f"validate_benchmarking_input refuses capture date {bad_date!r}",
+                  True, str(e)[:110])
+
+    # NEGATIVE CONTROL: the legitimate formats must still pass, or the check is just a
+    # blanket refusal of the Sources tab.
+    # "Nov 2025" belongs HERE, not in the refusal list above: it is an unambiguous real
+    # capture date in a different notation, and refusing it would reject honest
+    # provenance over formatting. Slash formats stay unaccepted (03/04 is ambiguous).
+    for good_date in ("2025-11-01", "2025-11", "2025", "Nov 2025", "Nov 21, 2025"):
+        okd = copy.deepcopy(sample)
+        okd["rate_lines"][0]["data_points"][0]["date"] = good_date
+        try:
+            validate_benchmarking_input(okd)
+            check(f"NEGATIVE CONTROL: capture date {good_date!r} still accepted", True)
+        except BenchmarkingValidationError as e:
+            check(f"NEGATIVE CONTROL: capture date {good_date!r} still accepted",
+                  False, str(e)[:110])
 
     broken3 = copy.deepcopy(sample)
     broken3["contract_quality"][0]["weights"] = {"Pricing": 0.30, "SLA": 0.30, "Legal": 0.25, "Operational": 0.20}

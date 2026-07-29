@@ -2403,3 +2403,44 @@ is indistinguishable in the output from a skill that lacks the mechanism.
 Conclusion strengthened in the findings doc: this tool's ABSENT results are unreliable in a
 specific direction, they UNDER-report. Treat an ABSENT as a prompt to go read the skill,
 never as a finding on its own.
+
+---
+
+## #32 — capture-date enforcement in research-table generators (DONE)
+
+H5 found the requirement "stated once, centrally, and enforced nowhere": G12 defines a
+cited source as carrying a capture date, and no generator checked for one. Three
+generators emit research tables, and all three had the same hole, in three flavours:
+
+| generator | before | after |
+|---|---|---|
+| `market_rate_generator.py` | `date` checked for KEY PRESENCE only; the dataclass comment literally said "disclosure only, not parsed", so `""` and `"recent"` rendered into the Sources tab as provenance | parsed and enforced, per data point |
+| `should_cost_generator.py` | `as_of_date` checked non-empty (so `"TBD"` passed); per-driver `source_date` unchecked entirely | both enforced; the Cost-Driver Assumption Ledger IS a research table |
+| `sole_source_generator.py` | no date validation at all | `alternatives[].date` and `research_log[].date` both enforced |
+
+Deterministic by design: it parses the string and consults NO clock. Comparing against
+"today" would make a generator's output depend on when it ran, which breaks reproducibility
+for no gain.
+
+**The rule was too strict on its first pass, and the skills' own data caught it.**
+sole-source's sample uses `"Jul 21, 2026"` and `"Jun 2026"`, and my ISO-only parse refused
+them. That was wrong: those ARE real capture dates, just not ISO, and refusing honest
+provenance over notation is a worse failure than the one being fixed. Named-month formats
+are now accepted.
+
+Slash formats are still refused, deliberately: `03/04/2026` is March 4 or 4 March depending
+on the reader, and a date that parses two ways is not provenance either. That line is
+principled rather than arbitrary, which is why it is written into the code comment.
+
+Placeholders (`""`, `TBD`, `n/a`, `recent`, `unknown`, `various`, ...) and unparseable junk
+are refused, as are impossible dates (`2025-02-30`) and years outside 1990-2100.
+
+The helper is duplicated in the three skills rather than added to `numeric_kernel`. That is
+deliberate: the kernel is vendored byte-identical into 16 skills and `lilly-contract-review`
+is HELD, so touching it would immediately create the drift `kernel_manifest.py` exists to
+prevent. It is a candidate for the kernel when the hold lifts, noted here so the duplication
+is a recorded decision and not an accident.
+
+Self-tests: market-rate 24 -> 34, should-cost 23 (unchanged, sample already ISO),
+sole-source 83. All carry NEGATIVE CONTROLS asserting valid dates still pass, because a
+date check that refuses everything is the easy failure mode.

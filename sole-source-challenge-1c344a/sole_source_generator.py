@@ -161,6 +161,7 @@ Register shape:
 from __future__ import annotations
 
 import copy
+from datetime import datetime
 import os
 import sys
 from dataclasses import dataclass, field
@@ -461,6 +462,70 @@ def _find_em_dashes(obj: Any, path: str = "root") -> List[str]:
     return found
 
 
+
+# Placeholders that satisfy "a date is present" while carrying no capture date at all.
+# These are the strings a model reaches for when it does not know when a figure was taken.
+_DATE_PLACEHOLDERS = frozenset({
+    "", "tbd", "tba", "n/a", "na", "n/d", "none", "null", "unknown", "unspecified",
+    "recent", "current", "various", "ongoing", "latest", "-", "--", "?",
+})
+
+
+def _check_capture_date(value, label, errors):
+    """Enforce the capture-date requirement (item #32 / H5).
+
+    G12 in `lilly-brand-assets-1c344a` defines a cited source as one carrying a capture
+    date. That was stated centrally and enforced nowhere: a date field checked only for
+    PRESENCE accepts "" and "TBD" and renders them as provenance.
+
+    A figure with no capture date cannot be aged, cannot be judged stale and cannot be
+    re-verified. It is worse than a missing figure, because it looks like evidence.
+
+    Deterministic: parses the string and consults no clock. Comparing against "today"
+    would make the generator's output depend on when it ran.
+
+    Appends to `errors` rather than raising, matching this validator's collect-then-report
+    style so the caller sees every problem in one pass.
+    """
+    if not isinstance(value, str):
+        errors.append("%s must be a date string, got %s." % (label, type(value).__name__))
+        return False
+    raw = value.strip()
+    if raw.lower() in _DATE_PLACEHOLDERS:
+        errors.append(
+            "%s is %r, which is a placeholder, not a capture date. If the date is genuinely "
+            "unknown, drop the data point rather than carrying it with an empty provenance "
+            "field." % (label, value)
+        )
+        return False
+    parsed = None
+    # Named-month formats are accepted because they are UNAMBIGUOUS real capture
+    # dates, just not ISO ones; refusing them would reject honest provenance over
+    # notation. Slash formats are deliberately NOT accepted: 03/04/2026 is March 4
+    # or 4 March depending on the reader, and a date that parses two ways is not
+    # provenance either.
+    for fmt in ("%Y-%m-%d", "%Y-%m", "%Y",
+                "%b %d, %Y", "%B %d, %Y", "%b %d %Y", "%B %d %Y",
+                "%d %b %Y", "%d %B %Y", "%b %Y", "%B %Y"):
+        try:
+            parsed = datetime.strptime(raw, fmt)
+            break
+        except ValueError:
+            parsed = None
+    if parsed is None:
+        errors.append(
+            "%s is %r, which does not parse as YYYY-MM-DD, YYYY-MM or YYYY. A capture date "
+            "that cannot be parsed cannot be used to age or stale-check the figure, so it is "
+            "not provenance." % (label, value)
+        )
+        return False
+    if not (1990 <= parsed.year <= 2100):
+        errors.append(
+            "%s has year %d, outside 1990-2100; almost certainly a typo." % (label, parsed.year)
+        )
+        return False
+    return True
+
 def validate_sole_source_input(register: Dict[str, Any]) -> SoleSourceInput:
     """Validate a raw sole-source register dict and return a typed
     SoleSourceInput. Refuses (raises SoleSourceValidationError) rather than
@@ -646,6 +711,9 @@ def validate_sole_source_input(register: Dict[str, Any]) -> SoleSourceInput:
             )
         if not excl_reason:
             excl_reason = "n/a, newly surfaced this run"
+        # item #32: an alternative candidate row is a CITED claim about a supplier, so
+        # its as-of date must be a real capture date, not a placeholder.
+        _check_capture_date(a.get("date"), f"'alternatives[{i}].date'", errors)
         alternatives.append(AlternativeCandidate(
             candidate_name=str(a["candidate_name"]).strip(), origin=origin,
             original_exclusion_reason=excl_reason, capability_gap=str(a["capability_gap"]).strip(),
@@ -729,6 +797,9 @@ def validate_sole_source_input(register: Dict[str, Any]) -> SoleSourceInput:
         if not isinstance(results, int) or isinstance(results, bool) or results < 0:
             errors.append(f"'research_log[{i}].results' must be a non-negative integer; got {results!r}.")
             results = 0
+        # item #32: the research log IS the research table; an entry with no real date
+        # cannot show WHEN the search was run, which is the only thing it is for.
+        _check_capture_date(r.get("date"), f"'research_log[{i}].date'", errors)
         research_log.append(ResearchLogEntry(
             query=str(r["query"]).strip(), source=str(r["source"]).strip(),
             date=str(r["date"]).strip(), results=int(results),

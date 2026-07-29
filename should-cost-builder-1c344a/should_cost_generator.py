@@ -123,6 +123,7 @@ verbatim from that same sub-rule.
 from __future__ import annotations
 
 import copy
+from datetime import datetime
 import os
 import sys
 from dataclasses import dataclass, field
@@ -257,6 +258,70 @@ REQUIRED_DRIVER_FIELDS = [
 ]
 
 
+
+# Placeholders that satisfy "a date is present" while carrying no capture date at all.
+# These are the strings a model reaches for when it does not know when a figure was taken.
+_DATE_PLACEHOLDERS = frozenset({
+    "", "tbd", "tba", "n/a", "na", "n/d", "none", "null", "unknown", "unspecified",
+    "recent", "current", "various", "ongoing", "latest", "-", "--", "?",
+})
+
+
+def _check_capture_date(value, label, errors):
+    """Enforce the capture-date requirement (item #32 / H5).
+
+    G12 in `lilly-brand-assets-1c344a` defines a cited source as one carrying a capture
+    date. That was stated centrally and enforced nowhere: a date field checked only for
+    PRESENCE accepts "" and "TBD" and renders them as provenance.
+
+    A figure with no capture date cannot be aged, cannot be judged stale and cannot be
+    re-verified. It is worse than a missing figure, because it looks like evidence.
+
+    Deterministic: parses the string and consults no clock. Comparing against "today"
+    would make the generator's output depend on when it ran.
+
+    Appends to `errors` rather than raising, matching this validator's collect-then-report
+    style so the caller sees every problem in one pass.
+    """
+    if not isinstance(value, str):
+        errors.append("%s must be a date string, got %s." % (label, type(value).__name__))
+        return False
+    raw = value.strip()
+    if raw.lower() in _DATE_PLACEHOLDERS:
+        errors.append(
+            "%s is %r, which is a placeholder, not a capture date. If the date is genuinely "
+            "unknown, drop the data point rather than carrying it with an empty provenance "
+            "field." % (label, value)
+        )
+        return False
+    parsed = None
+    # Named-month formats are accepted because they are UNAMBIGUOUS real capture
+    # dates, just not ISO ones; refusing them would reject honest provenance over
+    # notation. Slash formats are deliberately NOT accepted: 03/04/2026 is March 4
+    # or 4 March depending on the reader, and a date that parses two ways is not
+    # provenance either.
+    for fmt in ("%Y-%m-%d", "%Y-%m", "%Y",
+                "%b %d, %Y", "%B %d, %Y", "%b %d %Y", "%B %d %Y",
+                "%d %b %Y", "%d %B %Y", "%b %Y", "%B %Y"):
+        try:
+            parsed = datetime.strptime(raw, fmt)
+            break
+        except ValueError:
+            parsed = None
+    if parsed is None:
+        errors.append(
+            "%s is %r, which does not parse as YYYY-MM-DD, YYYY-MM or YYYY. A capture date "
+            "that cannot be parsed cannot be used to age or stale-check the figure, so it is "
+            "not provenance." % (label, value)
+        )
+        return False
+    if not (1990 <= parsed.year <= 2100):
+        errors.append(
+            "%s has year %d, outside 1990-2100; almost certainly a typo." % (label, parsed.year)
+        )
+        return False
+    return True
+
 def validate_should_cost_input(register: Dict[str, Any]) -> ShouldCostInput:
     """Validate a raw should-cost input register dict and return a typed
     ShouldCostInput. Refuses (raises ShouldCostValidationError) rather than
@@ -283,6 +348,8 @@ def validate_should_cost_input(register: Dict[str, Any]) -> ShouldCostInput:
     as_of_date = register["as_of_date"]
     if not isinstance(as_of_date, str) or not as_of_date:
         errors.append("'as_of_date' must be a non-empty string (e.g. '2026-07-23').")
+    else:
+        _check_capture_date(as_of_date, "'as_of_date'", errors)
 
     fx_rate_table = register.get("fx_rate_table", [])
     if not isinstance(fx_rate_table, list):
@@ -332,6 +399,10 @@ def validate_should_cost_input(register: Dict[str, Any]) -> ShouldCostInput:
         currency = str(d["currency"]).strip().upper()
         source = d["source"]
         source_date = d["source_date"]
+        # Item #32: the Cost-Driver Assumption Ledger IS a research table, so every row's
+        # source_date must be a real capture date. It was previously carried through
+        # unchecked, which let "TBD" render in the ledger as though it were provenance.
+        _check_capture_date(source_date, f"'cost_drivers[{i}].source_date'", errors)
         confidence = str(d["confidence"]).strip().upper()
         correlated_group = d.get("correlated_group") or None
 
