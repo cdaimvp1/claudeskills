@@ -52,7 +52,7 @@ Update this table as you go. It is the fastest way to resume.
 | O4 C2 playbook-learning Difficulty Score | **DONE** | `640ce4b` | 63/63. 6 source goldens exact. Kernel vendored (had none) + wired |
 | O5-O10 C4,C5,C6,C7,C8,C10 kernel adoption | **DONE** | `f011727` `808bce6` `a84b8fe` `8dee0c8` `4759c17` `b45a9ad` | 96/96. 5 new kernel faces. C10 verdict: WIRE, not retire |
 | O11 C9 kernel hash manifest | **DONE** | `24a2a2c` | found 9 stale copies, re-vendored 8, contract-review HELD as the 1 named exception |
-| O12-O17 D2-D7 slice contracts | NOT STARTED | | design already approved |
+| O12-O17 D2-D7 slice contracts | **D4 DONE, REST BLOCKED** | `c117406` | queue mis-sorted: D1 is [Marc, after D0-D2] + needs A11/B4; D2/D3/D5/D6/D7 chain off it. D2 (no-green) not done |
 | O18-O22 E1-E5 handoff discipline | NOT STARTED | | E1 is the one real drift bug |
 | O23-O26 F4,F5,F6,F8,F9 | NOT STARTED | | |
 | O27-O31 audits, read-only | NOT STARTED | | findings only, fix nothing |
