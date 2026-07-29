@@ -2568,3 +2568,33 @@ Worth noting what the tests target. The arithmetic is the kernel's and is tested
 these 29 assert what a SERIALIZER gets wrong: the wrong enum, a stated total contradicting
 its detail rows, a double-counted negotiation, and the zero case. Plus negative controls,
 an empty dataset and a correct stated distribution both being legitimate.
+
+---
+
+## A9 — "will these actually be better?" (Marc's question, and a real failure it found)
+
+Marc asked whether this programme will actually produce more accurate, more reliable
+skills. Rather than assert it, I checked the assumption the whole effort rests on: **a code
+gate only improves anything if the runtime path actually calls it.**
+
+It found a genuine false-complete, and it was mine. `deep_dive_validator.py`, built earlier
+today specifically to close H3's "an instruction can be forgotten, an exception cannot" gap,
+shipped with **ZERO references in its own SKILL.md.** The file existed; nothing told the
+model to run it. The skill would have behaved exactly as it did before, while the tracker
+recorded the gap as closed. That is the precise shape of the integrate-or-don't-ship failure.
+
+18 of 19 generators were correctly wired. One was not, and it was the newest.
+
+**Fixed twice over.** The validator is now wired into supplier-deep-dive as a HARD RULE step
+before delivery. And a new smoke-test assertion makes the class of failure permanent:
+
+```
+A9  every shipped generator is referenced by its own SKILL.md
+```
+
+A9 caught this before the fix and passes after. Its own limits are written into the code:
+presence in SKILL.md proves the model can FIND the generator, not that it runs it at the
+right moment. That is the strongest thing checkable statically, and it should not be
+mistaken for proof of runtime behaviour.
+
+Suite now 32 skills, 0 failed assertions, across 9 assertions each.

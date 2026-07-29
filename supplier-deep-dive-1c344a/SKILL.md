@@ -392,6 +392,34 @@ One JSON object per run, on the canonical 0.0-5.0 evaluation scale wherever a fi
 
 A consuming skill should treat any field with `confidence: "Low"` or a `RESEARCH_PENDING` note as provisional and re-verify before a decision. The `staleness` block tells downstream skills when to re-run the profile.
 
+## Validate the dossier before delivering it (HARD RULE)
+
+Before the dossier goes to a reader, run the gate over its JSON:
+
+```bash
+python deep_dive_validator.py <dossier.json>      # exits 2 and names the violation
+python deep_dive_validator_selftest.py            # 20 assertions
+```
+
+This is a CHECK, not a formatter: it changes nothing and refuses. It enforces Rule 2 and
+the supplier-risk anti-fabrication rules in code, because those are instructions and an
+instruction can be forgotten while an exception cannot.
+
+It refuses to let the dossier ship when:
+
+| refusal | the rule it enforces |
+|---|---|
+| a debarment, sanctions, breach or financial-distress status asserted with NO cited source | SKILL.md's own rule above: "not verified, requires a formal screen" is the answer |
+| a gating item carrying any status other than `REQUIRES_FORMAL_SCREEN` | a `PASS` is a fabricated clearance; this skill routes gating items to an SME, it does not adjudicate them |
+| a gating item with no `route_to_sme` | Rule 7; an unrouted gating item is a dead end |
+| a finding hedged into unfalsifiability ("may not fully address...") | G12 drop-do-not-dilute: if it cannot be cited, delete it |
+| named customers or financial figures against an empty research log | Rule 2, never fabricate customers or financials |
+| a confidence outside High / Medium / Low | Rule 5 |
+
+**It does NOT refuse honest gaps.** "Not verified, requires a formal screen" and "Not
+Publicly Disclosed" pass, as does a dossier with no gating items and an empty financials
+block. Abstaining is the correct answer, so the gate must never punish it.
+
 ## Hard Rules (skill-specific; the shared guardrails also apply)
 
 **Rule 1: One supplier per run.** If the user asks for multiple suppliers, route them to `supplier-landscape` instead, or produce ONE deep-dive and offer to run others sequentially.

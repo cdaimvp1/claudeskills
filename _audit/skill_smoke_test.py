@@ -28,6 +28,7 @@ THE EIGHT ASSERTIONS
   A6  no relative or package-style import (a flat install has no package)
   A7  every path the skill references relative to ITSELF resolves
   A8  every cross-skill path either resolves or has a stated inline fallback
+  A9  every shipped generator is referenced by its own SKILL.md
 
 A7 and A8 are separated deliberately. A7 is unambiguously the skill's own bug. A8
 is a suite-composition question, and on Desktop it is EXPECTED to be unresolvable,
@@ -284,6 +285,24 @@ def smoke(skill, verbose=False):
         if cross:
             notes.append(f"A8: {len(cross)} cross-skill path(s); on Desktop these are "
                          f"EXPECTED not to resolve, so the fallback is the assertion")
+        # --- A9 every shipped generator is REACHABLE from its SKILL.md -------
+        # A generator nobody is told to run is a false-complete: the code exists,
+        # the gate never fires, and the skill behaves exactly as it did before.
+        # This was not hypothetical. deep_dive_validator.py, built specifically to
+        # close H3's "instruction can be forgotten" gap, shipped with ZERO
+        # references in its own SKILL.md and would never have executed.
+        #
+        # Presence in SKILL.md is necessary, not sufficient: it proves the model
+        # can find the generator, not that it runs it at the right step. It is the
+        # strongest thing checkable statically.
+        own_py = [f[:-3] for f in os.listdir(dst)
+                  if f.endswith(".py")
+                  and f not in ("numeric_kernel.py", "kernel_manifest.py")
+                  and "selftest" not in f]
+        unreferenced = [f + ".py" for f in own_py if f not in text]
+        add("A9", f"every shipped generator ({len(own_py)}) is referenced by SKILL.md",
+            not unreferenced, ", ".join(unreferenced) if unreferenced else "none")
+
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
