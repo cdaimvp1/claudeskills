@@ -627,7 +627,112 @@ Extend the table when the hub object grows; do not replace it.
 
 | Upstream | This skill | Downstream |
 |----------|------------|------------|
-| rfp-engine, rfp-response-analysis (handoff payload), rfp-case-manager (case file) | evaluation-engine | contract negotiation chain |
+| rfp-engine, rfp-response-analysis (handoff payload), rfp-case-manager (case file) | evaluation-engine | `commercial-negotiation-prep`, `lilly-contract-review` via `evaluation_engine_award_handoff.json` |
+
+## Outbound Handoff: `evaluation_engine_award_handoff.json`
+
+> **SOURCE OF TRUTH. Do not hand-edit any copy of this schema.**
+>
+> This file is the authority for `evaluation_engine_award_handoff.json`. evaluation-engine
+> PRODUCES it, and it is the producer that owns the schema here, matching
+> `case_handoff.json` rather than `landscape_handoff.json` (see the note at the foot of
+> this section on why the suite carries both conventions).
+
+This skill's inbound handoff discipline is fully specified. Its outbound was not: the chain
+position named only "contract negotiation chain" with no payload, and
+`procurement-launcher-1c344a/references/routing-and-chains.md:75` repeated the same
+vagueness. That was the one asymmetry in the family, and it meant the official award
+decision reached its consumers as prose rather than as data.
+
+**Emit this after the award recommendation is final**, alongside the evaluation report.
+
+### Schema
+
+```json
+{
+  "schema_version": "1.0",
+  "handoff_timestamp": "ISO-8601 datetime",
+  "source_skill": "evaluation-engine",
+  "authority": "official",
+
+  "event": {
+    "event_id": "string - the RFx identifier carried from the inbound handoff",
+    "event_name": "string",
+    "category": "string",
+    "scoring_mode": "Trusted | Reference | Disabled - which AI Scoring Handling Mode ran",
+    "report_depth": "Brief | Full"
+  },
+
+  "award": {
+    "recommendation": "Single | Split | No Award | Re-solicit",
+    "primary_supplier_id": "string | null",
+    "secondary_supplier_id": "string | null - present only when recommendation is Split",
+    "allocation": "object | null - supplier_id to percentage, only when Split; must sum to 100",
+    "conditions": ["string - prerequisites attached to the award"],
+    "rationale": "string - why this supplier, in the panel's own words",
+    "decision_status": "Recommended - this skill recommends; it does not record an executed award"
+  },
+
+  "scoring": {
+    "grid": "array - the scoring_grid block verbatim (see section 6). One entry per supplier: supplier_id, ai_score, stakeholder_score, landscape_fit_score (key omitted entirely when absent, never null), coverage_pct, grand_total, award_tier, must_have_zero_flag, gate_detail",
+    "weights": "object - criterion to weight fraction, as scored. Must sum to 1.0",
+    "scale": "string - the scoring scale used, carried so a consumer never rescales",
+    "sensitivity_verdict": "string - the one-line robustness statement, always present even in Brief",
+    "dispersion_note": "string | null - stakeholder disagreement worth carrying forward"
+  },
+
+  "negotiation_inputs": {
+    "commercial_figures": "object - Year-1 cost and 3-year TCV per supplier, as scored",
+    "must_have_gaps": ["object - supplier_id, criterion_id, what was not met"],
+    "open_clarifications": ["string - unresolved items the negotiation should close"],
+    "leverage_notes": ["string - where the field was competitive, for the negotiation to use"]
+  },
+
+  "provenance": {
+    "citations": "array - every source citation carried through from the inbound handoff, per the citation flow-through rule above. A consumer must be able to trace any figure back to its origin document",
+    "scored_on": "ISO-8601 date",
+    "panel_size": "integer - number of stakeholders whose scores are in the rollup"
+  }
+}
+```
+
+### Validation rules
+
+A consumer validates on receipt. A payload failing any of these is rejected rather than
+partially consumed.
+
+| Check | Rule |
+|---|---|
+| `schema_version` | Must be "1.0" |
+| `authority` | Must be `"official"`. This distinguishes it from rfp-response-analysis's **proposed** figures, and a consumer must never blend the two |
+| `scoring.weights` | Must sum to 1.0 within 0.001. Validate by calling `assert_weight_sum()` in the vendored `numeric_kernel.py`, not by adding them up |
+| `award.allocation` | When `recommendation` is `Split`, must be present and sum to 100. Absent otherwise |
+| `award.primary_supplier_id` | Must resolve to a `supplier_id` present in `scoring.grid`. Null only when `recommendation` is `No Award` or `Re-solicit` |
+| `scoring.grid` | At least one entry. Any supplier with `must_have_zero_flag: true` must not be the primary recommendation |
+| `provenance.citations` | Non-empty. An award handoff with no citations is rejected: the citation flow-through rule above is not optional at the boundary |
+| `landscape_fit_score` | Key omitted entirely when no supplier-landscape handoff existed. Never `null`, never `0` |
+
+### Named consumers, and what each reads
+
+| Consumer | Reads | Must not |
+|---|---|---|
+| `commercial-negotiation-prep` | `negotiation_inputs`, `scoring.grid` commercial figures, `award.conditions` | Re-score a supplier or re-rank. It negotiates against the award, it does not revisit it |
+| `lilly-contract-review` | `award.primary_supplier_id`, `award.conditions`, `must_have_gaps` | Treat `conditions` as contract language. They are prerequisites to be drafted, not clauses to be inserted verbatim |
+
+### This handoff never auto-advances
+
+Consistent with the auto-advance rule above: emit the payload, tell the user it exists and
+which skill consumes it, and stop. Do not invoke a downstream skill automatically. The
+retirement of decision-deck left this skill with no auto-advance target and this handoff
+does not create one.
+
+### Why the producer owns this schema
+
+`case_handoff.json` is producer-owned and `landscape_handoff.json` is consumer-owned; the
+suite carries both conventions deliberately and each source file declares which applies.
+This one is producer-owned because it has **two** named consumers with different needs. A
+consumer-owned schema with two consumers has two authorities, which is how the two copies
+of `case_handoff.json` drifted in both directions at once.
 
 ## Scoring Matrix Improvement Suggestions
 

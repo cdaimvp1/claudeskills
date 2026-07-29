@@ -974,3 +974,48 @@ argument decaying on every edit.
 **Maintenance rule recorded:** if a change makes a row fail, the presumption is the change
 is wrong, and overriding that requires saying so explicitly in the commit with a reason.
 Same discipline as the kernel's KNOWN_EXCEPTIONS, and for the same reason.
+
+### O20 DONE, 2026-07-29. E3 evaluation-engine outbound handoff formalized.
+
+Authored `evaluation_engine_award_handoff.json` into `evaluation-engine-1c344a/SKILL.md`,
+fixed the matching vagueness at `routing-and-chains.md:75`, and added the consumer contract
+to `commercial-negotiation-prep`.
+
+**What was wrong.** This skill's INBOUND handoff discipline is fully specified. Its
+outbound named only "contract negotiation chain" with no payload, and the routing reference
+repeated the same phrase in quotes. So the official award decision left this skill as prose.
+That is the family's one asymmetry and the plan called it correctly.
+
+**What the schema carries:** event context and which scoring mode ran, the award itself
+(single/split/no-award, allocation, conditions, rationale), the `scoring_grid` block verbatim
+plus weights, scale and the sensitivity verdict, a `negotiation_inputs` block (commercial
+figures, must-have gaps, open clarifications, leverage notes) and a `provenance` block
+carrying citations through.
+
+**Three design points worth recording:**
+
+1. **`"authority": "official"` is a required field.** It is what stops a consumer blending
+   this skill's official figures with rfp-response-analysis's **proposed** ones. The same
+   distinction I carried into the D4 slice contracts, now enforced at the payload boundary
+   as well as the dashboard boundary.
+2. **`provenance.citations` must be non-empty or the payload is rejected.** The skill
+   already mandates citation flow-through internally (`SKILL.md:1296`); this makes it a
+   validation rule at the boundary rather than an internal habit. An award handoff with no
+   citations cannot support a negotiation, because every downstream figure would be
+   unattributable.
+3. **Producer-owns, and the file says why.** Unlike `landscape_handoff.json` this payload
+   has TWO named consumers. A consumer-owned schema with two consumers has two authorities,
+   which is exactly how the two copies of `case_handoff.json` drifted in both directions at
+   once. That reasoning is written into the section rather than left as convention.
+
+**The no-auto-advance rule is preserved explicitly.** `SKILL.md:1322` records that
+decision-deck was retired leaving no auto-advance target. Formalizing the handoff does not
+create one: emit the payload, name the consuming skill, stop.
+
+**Consumer side:** `commercial-negotiation-prep` now declares what it reads and two rules on
+receipt (do not re-score or re-rank; never blend official with proposed), plus that the
+handoff is an enrichment and its absence is not a gap to state.
+
+**`lilly-contract-review` is the second named consumer and was NOT edited.** It is HELD.
+Its side of this contract is owed when the hold lifts, and is recorded here so it is not
+mistaken for done.

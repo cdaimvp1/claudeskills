@@ -670,6 +670,38 @@ Savings Type:      [Rate reduction / Volume discount / Model change / Mix]
 Confidence:        [High / Medium / Low] - based on benchmark data quality
 ```
 
+## Inbound: `evaluation_engine_award_handoff.json`
+
+When an RFx preceded this negotiation, evaluation-engine emits
+`evaluation_engine_award_handoff.json`. This skill is one of its two named consumers.
+Schema and validation rules are owned by evaluation-engine and live in that skill's
+"Outbound Handoff" section. Do not restate the schema here; read it there.
+
+**What this skill reads:** `negotiation_inputs` (commercial figures, must-have gaps, open
+clarifications, leverage notes), the commercial figures in `scoring.grid`, and
+`award.conditions`.
+
+**Two rules on receipt, both load-bearing.**
+
+**Do not re-score and do not re-rank.** The payload carries `"authority": "official"`.
+evaluation-engine is the sole owner of the official score and the official award
+recommendation. This skill negotiates **against** that award; it does not revisit it. If
+the commercial position here suggests a different supplier, that is a finding to raise with
+the evaluation panel, not a ranking to recompute.
+
+**Never blend official and proposed figures.** rfp-response-analysis produces an AI first
+pass labelled **proposed**. If both reach this skill, they stay distinguishable in anything
+this skill produces. Averaging them, or presenting the proposed figure where the official
+one belongs, is the specific failure the `authority` field exists to prevent.
+
+**Validate before use.** Reject a payload failing evaluation-engine's validation table
+rather than consuming it partially. In particular `provenance.citations` must be non-empty:
+an award handoff with no citations cannot support a negotiation position, because every
+figure in the resulting briefing would be unattributable.
+
+**If no handoff exists**, this skill runs exactly as it does today from its own inputs. The
+handoff is an enrichment, never a precondition, and its absence is not a gap to state.
+
 ## Integration Dependencies
 
 ### From `rfp-engine` / `evaluation-engine`
