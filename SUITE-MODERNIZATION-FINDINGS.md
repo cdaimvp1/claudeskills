@@ -129,26 +129,73 @@ of contract review against a real document, not more static analysis. **OPEN.**
 
 ---
 
-## Finding 5 — the conversational layer partly exists and is not wired
+## Finding 5 (WRONG — corrected after reading the skills) — the routing layer already exists and is well built
 
-Three skills occupy this space:
+Marc pushed back and was right. The census counted files; it did not read them.
+Corrected on the evidence:
 
-- **procurement-help-desk** — 319 lines, no declared deliverable at all. This is
-  the closest thing to the conversational help skill Marc described.
-- **procurement-launcher** — 383 lines, emits `.html` / `.json`, described
-  elsewhere as having widget render and Teach-mode paths.
-- **process-navigator** — 383 lines, emits `.docx`.
+**A complete 31-skill chain map exists**:
+`procurement-launcher-1c344a/references/routing-and-chains.md`, 126 lines, headed
+"THEO's own operational data". It carries a Predecessors / Successors table for
+every skill in the suite, at a level of detail the census had no way to see. For
+example deal-room's entry names not just its neighbours but the exact shape of the
+one place it touches negotiation-playbook-learning (a `negotiation_outcome.json`
+written at close), and distinguishes a mid-run *lookup* (process-navigator) from a
+*sequence step*.
 
-So the pieces are present in some form. What the census cannot see is whether any
-of them does the thing Marc actually asked for: hand off to the next right skill
-when one finishes, re-run a skill with more data, or compose slices of several
-skills into one answer.
+**The launcher already names the next step after a skill finishes.** SKILL.md
+line 157 onward: THEO names "the next step or two after a skill finishes, using
+`references/routing-and-chains.md`", and knows that an absent successor means an
+endpoint rather than a gap. It carries chain context forward in words: "you have
+the shortlist from supplier-landscape; the next step is rfp-engine".
 
-**Not yet known:** whether any handoff mechanism exists between skills beyond the
-one documented RFx-to-Deal contract. **OPEN, and this is the largest open
-question of the seven.**
+**A conversational help skill already exists.** `procurement-help-desk` is a
+stakeholder-facing help desk over the four Lilly sources, with an intent taxonomy
+that routes a question to a source AND a system, and an explicit handoff to
+process-navigator when a question crosses into policy.
+
+**Handoff is not limited to RFx-to-Deal.** `rfp-engine → rfp-case-manager` has a
+formal `case-handoff-schema.md` with a schema, validation rules, and an
+actions-on-receipt section, carried in `case_handoff.json`.
+
+### What is genuinely missing, stated in the suite's own words
+
+The routing file draws the line itself, describing THEO as:
+
+> "explicitly a dispatcher, not an orchestrator - it names paths and hands off one
+> skill at a time, it does not itself call or run another skill"
+
+That sentence is the real answer to Marc's question 7. The suite has **routing**
+(knowing what comes next, and saying so). It does not have **orchestration**
+(running the next thing, or running several and composing them). Specifically
+absent:
+
+1. **Execution.** THEO names the next skill; the user re-invokes it by hand.
+2. **Re-run with more data.** Nothing models "same skill, second pass, now that
+   the POC is done" as distinct from a first run.
+3. **Slice composition.** The chain table is one-skill-to-one-skill. There is no
+   representation of an answer assembled from bounded slices of several skills,
+   which is the hub/slice idea. The only place a slice contract is actually
+   written into a SKILL.md is `deal-tab-1c344a`.
+4. `procurement-help-desk` is listed as "pending ... once it ships", so the
+   routing table may not yet route to it.
+
+This reframes the work: not "build a router", which exists and is good, but
+"promote a dispatcher into an orchestrator, and add slice composition."
 
 ---
+
+## Finding 6 (also corrected) — rfp-engine has a builder; it is JavaScript, not Python
+
+The census said rfp-engine declares `.csv`/`.xlsx`/`.json` with no code to build
+them. Wrong: `assets/lilly_rfx_template.js` is a Node.js DOCX builder supporting
+`--mode RFP|RFI`, `--branded --logo`, and optional section flags.
+
+The real question is therefore not "does code exist" but "is JavaScript the right
+runtime". Non-Python code by skill: deal-tab 36 JS files, supplier-landscape 10,
+rfp-engine 1. The dashboard engines are deliberately JS (the renderer runs in the
+browser). rfp-engine's document builder is the odd one out, and whether it should
+be Python is a real question for Marc's item 2. **OPEN.**
 
 ## What the census could not establish
 
@@ -159,7 +206,9 @@ These need reading, not counting, and they are the substance of Marc's question:
 3. Which of the 12 Python-free skills are computing in the model
 4. Whether the hub/slice output contract is written into each lens skill's
    SKILL.md, or only into the three that were done as D1
-5. Whether any skill-to-skill handoff exists beyond RFx-to-Deal
+5. ~~Whether any skill-to-skill handoff exists beyond RFx-to-Deal~~ — ANSWERED,
+   yes: a full 31-skill chain map plus a formal rfp-engine to rfp-case-manager
+   schema. The gap is orchestration and slice composition, not routing.
 6. Whether the "best version of itself" question has any answer other than a
    skill-by-skill read
 
