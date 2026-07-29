@@ -322,3 +322,119 @@ The coverage matrix and the golden fixture test different things and both are
 required. The matrix proves no check was LOST in the design. The fixture proves no
 finding was lost in PRACTICE. A design can pass the matrix and still regress, and a
 fixture can pass on one contract while a check has silently disappeared for another.
+
+---
+
+## 13. Data lifecycle: what is held, for how long, and where
+
+Marc: "we'd probably what? hold it all temporarily, keep what we need and discard
+what does not need to be kept long term... we wouldn't want to hold all of that
+forever but we also wouldn't want to constantly regenerate it."
+
+### The organising principle
+
+**Persist what cost MODEL TOKENS to derive. Discard what CODE can rebuild for
+free.**
+
+Stage 0 and Stage 1 are free Python. Given the source document, the clause tree,
+cross-reference graph and deterministic candidates can be rebuilt at any time for
+nothing. They are therefore NOT worth persisting.
+
+What is expensive is judgment: severity calls, coverage rulings, playbook matches,
+the negotiation positions. Those consumed model time and cannot be regenerated
+identically. They are worth keeping.
+
+This inverts the intuition that the big artifact is the valuable one. The index is
+the largest thing produced and the least worth keeping. The ledger is small and is
+the whole point.
+
+### Four tiers
+
+**Tier 0, session only, never written to disk.**
+Raw contract text, full clause bodies, parse intermediates, per-pass scratch. Held
+in the run, discarded when it ends. Rebuilt free by Stage 0 if ever needed again.
+
+**Tier 1, run artifact, written beside the deliverables.**
+The compact `contract_index`, the Stage 1 candidate list, and the pass working
+notes that Rule 12 and `pass-artifacts.md` already require to be emitted. These
+make THIS review auditable, which is a real requirement, not housekeeping. They
+live with the deliverables and the user keeps or deletes them together. They are
+not the skill's to manage after handoff.
+
+**Tier 2, durable, small, Project knowledge.**
+A `contract_review_record.json` per reviewed document, holding ONLY:
+
+- source fingerprint: filename, content hash, version label, review date
+- the findings ledger: id, clause anchor, severity, category, coverage status,
+  the deduction applied, rationale
+- the Protection Score and its Rule 12 calculation table
+- the coverage map (PASS_2_COVERAGE)
+- decisions and dispositions, including what the user overrode
+- SME routing outcomes
+
+**No clause text.** Anchors and hashes point at the source; they do not reproduce
+it. This keeps the record small and keeps confidential contract language out of
+persisted storage.
+
+**Tier 3, cross-contract aggregate.**
+Acceptance rates, supplier patterns, difficulty signals. This tier already has an
+owner: `negotiation-playbook-learning`. Contract review should feed it and not
+duplicate it.
+
+### What this buys on a re-run
+
+The re-run case Marc raised earlier, a second version of a contract arriving, is
+exactly what Tier 2 serves:
+
+1. Stage 0 re-parses the new version. Free.
+2. The content hash differs from the stored record, so the record is known stale
+   rather than silently reused.
+3. Code diffs the new clause tree against the stored ledger's anchors and reports
+   which findings are unchanged, which clauses moved, which are new, and which
+   previously-raised findings appear resolved.
+4. The model adjudicates only the delta, plus a verification sweep over the
+   unchanged regions.
+
+That is a large saving on the common real-world case, a redline coming back from a
+supplier, and it is only possible because the ledger was kept and the index was
+not.
+
+### Staleness must be explicit
+
+A stored record is used only when the source fingerprint matches. On mismatch it is
+marked superseded, never silently reused. Prior versions are kept as a chain rather
+than overwritten, because the negotiation history across versions is exactly what
+makes the record valuable.
+
+### Retention and confidentiality
+
+- **This skill is NOT a system of record.** The contract of record lives in the CLM
+  or ERP. Tier 2 is a review artifact, and must say so.
+- **No raw clause text in Tier 2**, for the reason above.
+- **State a retention period** and honour it. A review record from a contract
+  superseded years ago is liability, not an asset.
+- **The user must be able to see and delete what is held.** A skill that quietly
+  accumulates records of every contract reviewed is not acceptable, and the record
+  location must be stated in the run output.
+
+### Where it physically lives on Desktop
+
+Project knowledge, following the one working precedent in the suite,
+`timeline-builder`'s `timeline_calibration.json`, which already persists across
+runs and is explicitly checked to distinguish a first run from a later one.
+
+Degradation matters here, per WS H: if Project knowledge is unavailable, the record
+is emitted as a downloadable file and the run SAYS the record could not be
+persisted. It must never fail silently and never assume the store exists.
+
+### The open question for Marc
+
+Whether Tier 2 is keyed per contract, or rolls up per supplier. Per contract is
+simpler and safer. Per supplier is more useful for negotiation, since it shows what
+that supplier concedes across deals, but it aggregates confidential commercial
+terms across contracts into one artifact, which is a bigger disclosure surface and
+probably needs a policy view rather than an engineering decision.
+
+Recommendation: build per contract. Let `negotiation-playbook-learning` own the
+per-supplier aggregate, because that is already its job and it already has whatever
+handling was agreed for it.
