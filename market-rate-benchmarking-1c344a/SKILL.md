@@ -376,8 +376,14 @@ redesign the layout, controls, or component choices per run.
 #### Step 3: Benchmark Summary Output
 
 **Outputs:**
-- `rate_benchmarks_[category].xlsx` - all benchmark cards in tabular format with charts
+- `rate_benchmarks_[category].xlsx` - all benchmark cards in tabular format with charts. Produced by calling `market_rate_generator.py` (see "Workbook generation wiring" below), never hand-assembled cell by cell.
 - `benchmark_summary_[category].docx` - narrative summary with key findings
+
+**Workbook generation wiring (HARD RULE).** `rate_benchmarks_[category].xlsx` is produced by calling the vendored `market_rate_generator.py` (in this skill's own directory) with the validated Benchmarking Input as input, never by hand-assembling the workbook cell-by-cell in the moment. Call `generate_market_rate_workbook(raw_input, output_path)`, or its component functions `validate_benchmarking_input()` / `compute_ground_truth()` / `build_workbook()` individually when only part of the pipeline is needed. The generator validates the input, computes the Python-side ground truth via `numeric_kernel.py`, asserts the reconciliation invariants, and writes the Summary, Benchmarks, Sources and Contract Quality tabs as live Excel formulas that independently re-derive the same figures: percentiles as native `PERCENTILE.INC` over the Sources tab, and the contract-quality composite as a native `SUMPRODUCT` of scores and weights. If it raises `BenchmarkingValidationError` or `ReconciliationError`, do not deliver a workbook: surface the raised message and resolve it rather than hand-patching around the failure. If `market_rate_generator.py` cannot be read (missing or corrupted), fall back to hand-building the workbook per the conventions above and disclose plainly in the output that the vendored generator was unavailable this run.
+
+  SCOPE, stated honestly: the generator covers the EXTERNAL-mode `rate_benchmarks_[category].xlsx` only. The INTERNAL-mode `internal_benchmark_[category].xlsx` and the RATIONALIZATION-mode `rationalization_register.xlsx` / `capability_matrix.xlsx` have no generator and are still hand-assembled. Do not claim generator provenance for those three.
+
+  Hand-assembling the benchmark workbook is a correctness risk, not just a slower path: a percentile computed in prose is a point estimate with no audit trail, whereas the generated workbook re-derives it live from the Sources tab so a reviewer can see which data points produced it. It ships with a 24-check self-test; run `python market_rate_generator.py` to execute it.
 
 **Summary table format:**
 ```
