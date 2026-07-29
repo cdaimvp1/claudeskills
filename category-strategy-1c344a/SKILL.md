@@ -551,6 +551,35 @@ After completing Phases 1-5, generate all analytical content that will be embedd
 
 ### Phase 6: Deliverable Generation
 
+#### Dashboard build, rehomed 2026-07-29 (upgrade-plan items A3/A4)
+
+The locked, deterministic Category Strategy dashboard now ships INSIDE this skill at
+`dashboard/build_dashboard_category.py`. It was previously a repo-root build tree
+(`_category_build/`) that could not run from an installed skill because its platform-chrome
+import reached one directory above the build folder; that has been fixed by vendoring the
+chrome builder into `dashboard/_platform_build/` and re-pointing the import at the
+skill-local path. Verified: building from a directory containing only a copy of this skill
+(no sibling repo present) produces byte-identical (SHA-256-matched) output to the original
+`_category_build/` artifact, for both the real-data and `--demo` builds.
+
+    dashboard/build_dashboard_category.py    assembler; `python build_dashboard_category.py`
+                                              (add `--demo` for the illustrative/all-panels build)
+    dashboard/assets/seed/category-data.js   the ONLY file the model authors (plus the
+                                              market-intel and line-items seed files, which are
+                                              externally sourced market data, not Lilly spend)
+    dashboard/assets/pv/cs-render.js         renderer; do not hand-author markup here per run
+    dashboard/_platform_build/                vendored platform chrome (topbar/footer/tokens/fonts)
+
+**Data contract: the model authors ONLY the data object; the builder renders.** Do not
+hand-clone JSX per run. This build tree is the current locked structure. **Known open item
+(WS B1, not in this task's scope):** the JSX spec below this line (`INLINED:
+examples/category_strategy_canonical_dashboard.jsx` and the 11-tab canonical structure
+immediately below) describes the RETIRED pre-deterministic pattern and a tab count (11) that
+conflicts with the locked 5-tab structure in `VERSION-LOCK-2026-07-29.md`. It has not been
+removed or reconciled here; that cleanup is WS B1/B2, tracked separately in
+`_audit/UPGRADE-PLAN.md`. Until B1 lands, prefer the deterministic build above over the JSX
+instructions that follow.
+
 #### Single Deliverable: Category Strategy Dashboard (JSX)
 
 Interactive React dashboard. This is the ONE deliverable of this skill. There is no separate `category_strategy.docx` produced alongside it. The narrative content described in the inlined strategy template populates the dashboard tabs; the only time the strategy renders as an in-document Word artifact is the Word fallback path (when JSX cannot render), and that fallback IS the deliverable for that surface, not an additional document.

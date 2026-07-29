@@ -213,7 +213,7 @@ Determine mode from user intent. If ambiguous:
 
 ## Research Minimums (per Execution Guardrails G7)
 
-**Mode 1 (EXTERNAL):** Minimum 3 web searches per rate being benchmarked (named vendor, competitor pricing, analyst/comparison data). Track searches in a research log with query, results, and usable data points. If fewer than 2 independent sources found, flag confidence as LOW.
+**Mode 1 (EXTERNAL):** Minimum 3 web searches per rate being benchmarked, or per role family when Rule 6 clustering applies (named vendor, competitor pricing, analyst/comparison data). Track searches in a research log with query, results, and usable data points. If fewer than 2 independent sources found, flag confidence as LOW. A cache hit within the 90-day max age (Rule 6) satisfies this minimum without a new search; state the reused `fetched_date`.
 
 **Mode 2 (INTERNAL):** No web search minimum; depends on user-provided data. If fewer than 2 contracts available for comparison, flag confidence as LOW and recommend supplementing with Mode 1.
 
