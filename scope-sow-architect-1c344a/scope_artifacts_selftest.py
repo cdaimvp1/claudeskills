@@ -252,6 +252,56 @@ def run():
     ok("T31 sidecar score matches the computed score",
        payload["scope_definition_score"]["score_0to100"] == res["score"]["score_0to100"])
 
+    # --- DIAGNOSIS survives a failing rebuild (the correction) --------------------------
+    # pass-artifacts.md forbids shipping an unreconciled REWRITE. It does not forbid
+    # REPORTING the defect. An earlier version refused everything, suppressing the sidecar
+    # that documents the problem, which is backwards for a diagnostic skill.
+    tmp3 = tempfile.mkdtemp(prefix="f9_scope_diag_")
+    broken = spec()
+    broken["milestones"][0]["amount"] = 100000.0        # no longer sums to contract value
+    # Also break a rate-card row, because that is what exercises CLAMPING: the golden
+    # already scores payment_alignment 1.5, below the 2.4 footing cap, so a payment failure
+    # alone clamps nothing. staffing_rate_card is 3.5 and does get clamped.
+    broken["rate_card"][0]["line_total"] = 99999.0
+    res3 = build_all(broken, tmp3)
+    ok("T39 a failing rebuild STILL writes scope_findings.json",
+       os.path.isfile(os.path.join(tmp3, "scope_findings.json")))
+    ok("T40 a failing rebuild STILL writes raci_matrix.csv",
+       os.path.isfile(os.path.join(tmp3, "raci_matrix.csv")))
+    ok("T41 the REBUILT commercial workbook is WITHHELD",
+       not os.path.isfile(os.path.join(tmp3, "rate_card_and_payment_schedule.xlsx")))
+    ok("T42 the withholding is reported with a reason, not silent",
+       len(res3["withheld"]) == 1 and "does not foot" in res3["withheld"][0]["reason"],
+       repr(res3["withheld"]))
+    with open(os.path.join(tmp3, "scope_findings.json"), encoding="utf-8") as fh:
+        p3 = json.load(fh)
+    ok("T43 the arithmetic failure is RECORDED as a finding",
+       any(f["id"].startswith("GEN-PS") for f in p3["findings"]), repr([f["id"] for f in p3["findings"]]))
+    ok("T44 that finding states the numbers so a reader can check it",
+       any("450,000.00" in f.get("text", "") and "500,000.00" in f.get("text", "")
+           for f in p3["findings"] if f["id"].startswith("GEN-PS")))
+    ok("T44a BOTH arithmetic defects are recorded, not just the first",
+       len([f for f in p3["findings"] if f["id"].startswith("GEN-")]) == 2,
+       repr([f["id"] for f in p3["findings"] if f["id"].startswith("GEN-")]))
+    ok("T45 the generator-found defect CLAMPS its dimension rather than refusing",
+       any(r.get("clamped") for r in p3["scope_definition_score"]["calculation_table"]))
+    clamp = [r for r in p3["scope_definition_score"]["calculation_table"] if r.get("clamped")][0]
+    ok("T46 the clamp uses the doc's footing cap of 2.4", clamp["clamped"]["to"] == 2.4,
+       repr(clamp["clamped"]))
+    ok("T47 the clamp is VISIBLE: the submitted score is preserved beside it",
+       clamp["score_as_submitted"] > clamp["score"], repr(clamp))
+    ok("T48 the clamped score is lower than the clean one (a defect cannot improve a score)",
+       p3["scope_definition_score"]["score_0to100"] < res["score"]["score_0to100"],
+       "%s vs %s" % (p3["scope_definition_score"]["score_0to100"], res["score"]["score_0to100"]))
+
+    # NEGATIVE CONTROL: the CALLER's own inconsistency still refuses. Clamping is only for
+    # defects the generator discovered, never a way to paper over a bad input ledger.
+    raises("T49 a caller's score above THEIR OWN finding's ceiling still refuses",
+           SeverityCapError,
+           lambda: compute_scope_score(GOLDEN_SCORES,
+                                       [{"id": "C-1", "dimension": "acceptance_criteria",
+                                         "severity": "BLOCKING", "status": "open"}]))
+
     if _XL:
         rc = os.path.join(tmp, "rate_card_and_payment_schedule.xlsx")
         ok("T32 rate card workbook written", os.path.isfile(rc))
@@ -263,11 +313,23 @@ def run():
                     if isinstance(c.value, str) and c.value.startswith("=")]
         ok("T34 footing checks are LIVE formulas, so they survive editing",
            any("DOES NOT FOOT" in f for f in formulas), "%d formulas" % len(formulas))
+        # The real fix: a formula-only verdict reads as None to any programmatic reader,
+        # because openpyxl writes no cached value. The static column must carry the answer.
+        dwb = load_workbook(rc, data_only=True)["Rate Card"]
+        ok("T34a the BUILD-TIME verdict is readable programmatically (data_only=True)",
+           dwb.cell(row=2, column=7).value == "OK", repr(dwb.cell(row=2, column=7).value))
+        ok("T34b the live-formula column is blank to that same reader, which is why "
+           "the static one exists",
+           dwb.cell(row=2, column=8).value is None, repr(dwb.cell(row=2, column=8).value))
         ps = wb["Payment Schedule"]
         pf = [c.value for row in ps.iter_rows() for c in row
               if isinstance(c.value, str) and c.value.startswith("=")]
         ok("T35 reconciliation is SHOWN in the workbook, not just asserted in code",
            any("RECONCILES" in f for f in pf), repr(pf[-1:]))
+        dps = load_workbook(rc, data_only=True)["Payment Schedule"]
+        statics = [c.value for row in dps.iter_rows() for c in row if c.value == "RECONCILES"]
+        ok("T35a the reconciliation verdict is ALSO readable programmatically",
+           len(statics) == 1, repr(statics))
         cc = os.path.join(tmp, "change_control_log_template.xlsx")
         ok("T36 change-control template written", os.path.isfile(cc))
         cwb = load_workbook(cc)
@@ -277,15 +339,29 @@ def run():
     else:
         print("  skip  T32-T37 (openpyxl unavailable)")
 
-    # --- nothing is written when validation fails ----------------------------------------
+    # --- what a HARD refusal writes: nothing ---------------------------------------------
+    # The distinction that matters. An ARITHMETIC failure is a finding, so the diagnosis is
+    # still written (T39-T48). A LEDGER inconsistency means the input contradicts itself, so
+    # there is no trustworthy diagnosis to write and nothing is written at all.
     tmp2 = tempfile.mkdtemp(prefix="f9_scope_bad_")
     try:
-        bad = spec(); bad["milestones"][0]["amount"] = 1.0
-        build_all(bad, tmp2)
-    except ReconciliationError:
+        bad = spec()
+        bad["findings"].append({"id": "C-9", "dimension": "deliverables_definition",
+                                "severity": "BLOCKING", "status": "open"})
+        build_all(bad, tmp2)          # score 3.5 vs its own BLOCKING ceiling of 0.9
+    except SeverityCapError:
         pass
-    ok("T38 a refused build writes NO artifacts at all", os.listdir(tmp2) == [],
+    ok("T38 a LEDGER inconsistency writes NO artifacts at all", os.listdir(tmp2) == [],
        repr(os.listdir(tmp2)))
+
+    tmp4 = tempfile.mkdtemp(prefix="f9_scope_orphan_")
+    try:
+        bad2 = spec(); bad2["deliverables"][0]["responsible"] = ""
+        build_all(bad2, tmp4)
+    except OrphanError:
+        pass
+    ok("T38a an unflagged orphan also writes NO artifacts", os.listdir(tmp4) == [],
+       repr(os.listdir(tmp4)))
 
     print("=" * 84)
     print("SUMMARY: %d/%d passed, %d failed" % (len(PASS), len(PASS) + len(FAIL), len(FAIL)))

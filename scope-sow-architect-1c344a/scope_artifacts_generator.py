@@ -132,12 +132,25 @@ def score_band(score_0_100):
     raise ScopeArtifactError("score %r is outside 0-100" % score_0_100)
 
 
-def compute_scope_score(dimension_scores, findings):
+def compute_scope_score(dimension_scores, findings, auto_clamp_findings=None):
     """Composite via the kernel, with the severity ceilings enforced first.
 
     Returns the calculation table too, because a score without its visible per-dimension
     derivation is invalid per the suite validation checklist. The table is the artifact,
     not a debugging aid.
+
+    Two kinds of finding, treated differently on purpose:
+
+      `findings`             the CALLER's ledger. A score above one of these ceilings is an
+                             inconsistency in the caller's own input, so it REFUSES: the
+                             score and the ledger disagree and only a human can say which
+                             is right.
+      `auto_clamp_findings`  defects THIS generator discovered (a rate card that does not
+                             foot). The caller could not have reconciled a score against a
+                             finding that did not exist yet, so refusing would punish them
+                             for the generator's own discovery. These CLAMP the score down
+                             to the ceiling and record that they did, visibly, in the
+                             calculation table.
     """
     missing = [k for k in DIMENSION_WEIGHTS if k not in dimension_scores]
     if missing:
@@ -177,15 +190,35 @@ def compute_scope_score(dimension_scores, findings):
                 % (DIMENSION_LABELS[dim], dimension_scores[dim], cap)
             )
 
-    composite = weighted_score(dimension_scores, DIMENSION_WEIGHTS)   # refuses on bad weights
+    # Generator-discovered defects clamp rather than refuse. Each carries its own explicit
+    # cap where the scoring doc names one (a footing failure caps its dimension at 2.4),
+    # falling back to the severity ceiling otherwise.
+    effective = dict(dimension_scores)
+    clamped = {}
+    for f in (auto_clamp_findings or []):
+        dim = f.get("dimension")
+        if dim not in DIMENSION_WEIGHTS:
+            continue
+        cap = f.get("cap")
+        if cap is None:
+            cap = SEVERITY_CAPS.get((f.get("severity") or "").upper())
+        if cap is None:
+            continue
+        if effective[dim] > cap:
+            clamped[dim] = {"from": effective[dim], "to": cap, "by": f.get("id")}
+            effective[dim] = cap
+
+    composite = weighted_score(effective, DIMENSION_WEIGHTS)   # refuses on bad weights
     score_100 = round(composite * 20)
     table = [
         {
             "dimension": DIMENSION_LABELS[k],
             "weight": DIMENSION_WEIGHTS[k],
-            "score": dimension_scores[k],
-            "contribution": round(dimension_scores[k] * DIMENSION_WEIGHTS[k], 4),
+            "score": effective[k],
+            "score_as_submitted": dimension_scores[k],
+            "contribution": round(effective[k] * DIMENSION_WEIGHTS[k], 4),
             "ceiling": ceilings.get(k),
+            "clamped": clamped.get(k),
         }
         for k in DIMENSION_WEIGHTS
     ]
@@ -293,6 +326,7 @@ def write_scope_findings_json(findings, score, path):
         },
         "findings": findings,
         "finding_count": len(findings),
+        "clamped_dimensions": [r for r in score["calculation_table"] if r.get("clamped")],
         "note": ("Sidecar mirrors the findings ledger and the score calculation. Every "
                  "finding in the Diagnostic Report appears here; the two are generated "
                  "from the same object so they cannot disagree."),
@@ -323,7 +357,8 @@ def write_rate_card_xlsx(rows, milestones, contract_value, path):
     wb = Workbook()
     ws = wb.active
     ws.title = "Rate Card"
-    _header(ws, ["Role", "Level", "Rate", "Unit", "Quantity", "Line Total", "Footing Check"])
+    _header(ws, ["Role", "Level", "Rate", "Unit", "Quantity", "Line Total",
+                 "Footing Check (at build)", "Footing Check (live)"])
     for i, r in enumerate(rows, start=2):
         ws.cell(row=i, column=1, value=r.get("role"))
         ws.cell(row=i, column=2, value=r.get("level", ""))
@@ -331,8 +366,20 @@ def write_rate_card_xlsx(rows, milestones, contract_value, path):
         ws.cell(row=i, column=4, value=r.get("unit", "hour"))
         ws.cell(row=i, column=5, value=float(r["quantity"]))
         ws.cell(row=i, column=6, value=float(r["line_total"]))
-        # Live formula, so the check survives editing rather than freezing at build time.
-        ws.cell(row=i, column=7, value="=IF(ABS(C%d*E%d-F%d)<0.01,\"OK\",\"DOES NOT FOOT\")"
+        # TWO checks, on purpose, because each covers the other's blind spot.
+        #
+        # Column G is the BUILD-TIME verdict, a static value. openpyxl writes formulas
+        # without a cached result, so a live formula reads as None to every programmatic
+        # reader (load_workbook(data_only=True), pandas, any non-Excel consumer). A check
+        # that is blank unless a human opens Excel is not a check.
+        #
+        # Column H is the LIVE formula, which column G cannot be: it recomputes if someone
+        # edits a rate or a quantity after the build, so a later edit that breaks the
+        # footing is visible rather than silently contradicting the frozen verdict.
+        ws.cell(row=i, column=7,
+                value="OK" if verify_line_math(float(r["rate"]), float(r["quantity"]),
+                                               float(r["line_total"])) else "DOES NOT FOOT")
+        ws.cell(row=i, column=8, value="=IF(ABS(C%d*E%d-F%d)<0.01,\"OK\",\"DOES NOT FOOT\")"
                 % (i, i, i))
     last = len(rows) + 1
     ws.cell(row=last + 1, column=5, value="Total").font = Font(bold=True)
@@ -350,15 +397,21 @@ def write_rate_card_xlsx(rows, milestones, contract_value, path):
     ps.cell(row=mlast + 1, column=4, value="=SUM(D2:D%d)" % mlast).font = Font(bold=True)
     ps.cell(row=mlast + 2, column=3, value="Stated contract value").font = Font(bold=True)
     ps.cell(row=mlast + 2, column=4, value=float(contract_value))
-    ps.cell(row=mlast + 3, column=3, value="Reconciliation").font = Font(bold=True)
-    ps.cell(row=mlast + 3, column=4,
+    ps.cell(row=mlast + 3, column=3, value="Reconciliation (at build)").font = Font(bold=True)
+    # Static, for the same reason as the rate card: a formula-only verdict is None to every
+    # programmatic reader. build_all() has already refused if this does not reconcile, so
+    # this states the verdict rather than deciding it.
+    ps.cell(row=mlast + 3, column=4, value="RECONCILES")
+    ps.cell(row=mlast + 4, column=3, value="Reconciliation (live)").font = Font(bold=True)
+    ps.cell(row=mlast + 4, column=4,
             value="=IF(ABS(D%d-D%d)<0.01,\"RECONCILES\",\"DOES NOT RECONCILE\")"
             % (mlast + 1, mlast + 2))
-    ps.cell(row=mlast + 5, column=1,
-            value=("Reconciliation is shown, not just asserted: the cells above recompute "
-                   "in the workbook, so an edit that breaks the footing is visible to the "
-                   "reader rather than only to the generator."))
-    ps.cell(row=mlast + 5, column=1).alignment = Alignment(wrap_text=True)
+    ps.cell(row=mlast + 6, column=1,
+            value=("Two verdicts on purpose. The build-time row is a static value, so a "
+                   "programmatic reader sees it; the live row recomputes in Excel, so a "
+                   "later edit that breaks the footing is visible rather than silently "
+                   "contradicting the frozen verdict."))
+    ps.cell(row=mlast + 6, column=1).alignment = Alignment(wrap_text=True)
 
     wb.save(path)
     return path, sum(line_totals)
@@ -387,13 +440,75 @@ def write_change_control_xlsx(path, triggers=None, drafted=False):
     return path
 
 
+def _arithmetic_findings(spec):
+    """Run the arithmetic and return any failures AS FINDINGS rather than as exceptions.
+
+    This is the diagnosis path. A supplier's rate card that does not foot is precisely what
+    this skill exists to CATCH; refusing to report it would be backwards.
+
+    Not fabrication: each of these is a deterministic, recomputable defect with an exact
+    delta, and the finding states the numbers so a reader can check it.
+    """
+    found = []
+    for i, r in enumerate(spec.get("rate_card") or []):
+        try:
+            verify_rate_card([r])
+        except LineMathError as e:
+            found.append({
+                "id": "GEN-RC-%03d" % i,
+                "dimension": "staffing_rate_card",
+                "severity": "HIGH",
+                "status": "open",
+                # scope-quality-scoring.md: a footing failure caps this dimension at 2.4
+                # regardless of how well the rest of the dimension reads.
+                "cap": FOOTING_FAILURE_CAP,
+                "text": str(e),
+                "detected_by": "scope_artifacts_generator.verify_rate_card",
+            })
+    try:
+        verify_payment_schedule(spec.get("milestones") or [], spec["contract_value"])
+    except (LineMathError, ReconciliationError) as e:
+        found.append({
+            "id": "GEN-PS-001",
+            "dimension": "payment_alignment",
+            "severity": "HIGH",
+            "status": "open",
+            "cap": FOOTING_FAILURE_CAP,
+            "text": str(e),
+            "detected_by": "scope_artifacts_generator.verify_payment_schedule",
+        })
+    return found
+
+
 def build_all(spec, outdir):
-    """Build every structured artifact. Validates first; writes nothing if validation fails."""
-    findings = spec.get("findings") or []
-    score = compute_scope_score(spec["dimension_scores"], findings)
+    """Build the artifacts, separating DIAGNOSIS from REBUILD.
+
+    The refusal in `references/pass-artifacts.md` is scoped precisely: "Payment/rate-card
+    reconciliation in the REBUILT tables actually foots ... do not ship an unreconciled
+    REWRITE." It forbids shipping a rebuilt commercial artifact that still does not foot.
+    It does NOT forbid reporting the defect.
+
+    So:
+      * the DIAGNOSIS (`scope_findings.json`, `raci_matrix.csv`) is always written, and a
+        failing rate card or payment schedule is recorded IN it as a finding;
+      * the REBUILT commercial workbook is withheld when the arithmetic fails, because that
+        is the artifact the rule is about.
+
+    An earlier version of this function refused everything on any arithmetic failure, which
+    suppressed the very sidecar that documents the defect. That was backwards for a
+    diagnostic skill and is the reason this split is spelled out here.
+
+    Score, severity-ceiling and orphan errors still refuse outright: those mean the ledger
+    itself is inconsistent, so there is no trustworthy diagnosis to write.
+    """
+    findings = list(spec.get("findings") or [])
+    gen_findings = _arithmetic_findings(spec)
+    findings.extend(gen_findings)
+
+    score = compute_scope_score(spec["dimension_scores"],
+                                spec.get("findings") or [],
+                                auto_clamp_findings=gen_findings)
     raci_rows, orphans = build_raci(spec.get("deliverables") or [], findings)
-    verify_rate_card(spec.get("rate_card") or [])
-    verify_payment_schedule(spec.get("milestones") or [], spec["contract_value"])
 
     os.makedirs(outdir, exist_ok=True)
     written = {}
@@ -401,15 +516,28 @@ def build_all(spec, outdir):
         raci_rows, os.path.join(outdir, "raci_matrix.csv"))
     written["scope_findings.json"] = write_scope_findings_json(
         findings, score, os.path.join(outdir, "scope_findings.json"))
+
+    withheld = []
     if _OPENPYXL:
-        p, _ = write_rate_card_xlsx(
-            spec["rate_card"], spec["milestones"], spec["contract_value"],
-            os.path.join(outdir, "rate_card_and_payment_schedule.xlsx"))
-        written["rate_card_and_payment_schedule.xlsx"] = p
         written["change_control_log_template.xlsx"] = write_change_control_xlsx(
             os.path.join(outdir, "change_control_log_template.xlsx"),
             spec.get("change_control_triggers"), spec.get("change_control_drafted", False))
-    return {"score": score, "orphans": orphans, "written": written}
+        if gen_findings:
+            withheld.append({
+                "artifact": "rate_card_and_payment_schedule.xlsx",
+                "reason": ("the arithmetic does not foot, so a rebuilt commercial table "
+                           "would carry the same defect it was meant to fix. The failure "
+                           "is recorded in scope_findings.json as %s."
+                           % ", ".join(f["id"] for f in gen_findings)),
+            })
+        else:
+            p, _ = write_rate_card_xlsx(
+                spec["rate_card"], spec["milestones"], spec["contract_value"],
+                os.path.join(outdir, "rate_card_and_payment_schedule.xlsx"))
+            written["rate_card_and_payment_schedule.xlsx"] = p
+
+    return {"score": score, "orphans": orphans, "written": written,
+            "withheld": withheld, "generator_findings": gen_findings}
 
 
 def main(argv):

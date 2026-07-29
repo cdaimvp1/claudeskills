@@ -565,6 +565,21 @@ arithmetic and the invariants cannot drift: `rate_card_and_payment_schedule.xlsx
 `Rewritten_SOW.docx` is deliberately NOT generated. A rewritten scope is argument and
 specification, so it stays prose.
 
+**Diagnosis is never suppressed by a failing rebuild.** This distinction is the whole
+point of the skill. `references/pass-artifacts.md` forbids shipping an unreconciled
+REWRITE; it does not forbid REPORTING the defect. So:
+
+| situation | what happens |
+|---|---|
+| a rate card or payment schedule that does not foot | recorded AS A FINDING in `scope_findings.json`; the diagnosis and RACI still write; the rebuilt commercial workbook is WITHHELD with a stated reason |
+| the caller's own score contradicts their own findings ledger | hard refusal, nothing written. The input contradicts itself, so there is no trustworthy diagnosis to produce |
+| an orphaned deliverable with no finding naming it | hard refusal, nothing written |
+
+A defect the GENERATOR discovers clamps its dimension down to the ceiling rather than
+refusing, because the caller could not have reconciled a score against a finding that did
+not exist yet. The clamp is visible: the submitted score is preserved beside the effective
+one in the calculation table.
+
 **It refuses rather than shipping a broken artifact.**
 
 | refusal | why |

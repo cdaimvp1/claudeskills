@@ -2487,3 +2487,50 @@ The workbook shows its reconciliation as LIVE formulas rather than freezing the 
 build time, so an edit that breaks the footing is visible to the reader, not only to the
 generator. A refused build writes no artifacts at all (T38), so a partial set never reaches
 anyone.
+
+### F9 build 1 — two design defects corrected (Marc flagged both)
+
+Marc questioned the two design choices I had reported as features. Both were wrong, one
+of them badly. Self-test 41 -> **57/57**.
+
+**1. Live formulas were not a check.** openpyxl writes formulas WITHOUT a cached value, so
+every footing and reconciliation verdict read as `None` to any programmatic consumer
+(`load_workbook(data_only=True)`, pandas, anything that is not Excel). Verified directly.
+
+Worse, my own T34/T35 only asserted the formula STRING existed. They never asserted a check
+PASSED, because openpyxl cannot evaluate one. So the workbook's visible verification was
+itself unverified.
+
+Fixed by emitting BOTH: a static build-time verdict column that a programmatic reader can
+actually read, and the live formula beside it that recomputes if someone edits a rate after
+the build. Each covers the other's blind spot. T34a/T34b/T35a now assert exactly this,
+including asserting that the formula column IS blank to that reader, which is the reason
+the static column has to exist.
+
+**2. "A refused build writes no artifacts" was backwards for this skill.** The rule in
+`references/pass-artifacts.md` is scoped precisely: "Payment/rate-card reconciliation in the
+REBUILT tables actually foots ... do not ship an unreconciled REWRITE." It forbids shipping
+a rebuilt commercial artifact that still does not foot. It does NOT forbid reporting the
+defect.
+
+A supplier rate card that does not foot is exactly what this skill exists to CATCH. My
+version suppressed `scope_findings.json`, the artifact that documents the very defect, so
+the tool went silent precisely when it had found something.
+
+Now split:
+- arithmetic failure -> recorded AS A FINDING (`GEN-RC-*`, `GEN-PS-*`, each quoting the
+  numbers so a reader can check it); diagnosis and RACI still written; the rebuilt workbook
+  withheld with a stated reason
+- ledger inconsistency (the caller's score contradicts the caller's own findings) or an
+  unflagged orphan -> hard refusal, nothing written, because the input contradicts itself
+  and there is no trustworthy diagnosis to produce
+
+That split forced a second correction. Adding a generator-discovered finding would have
+capped a dimension the caller had already scored higher, so the run would have died on
+`SeverityCapError` and reintroduced the silence. A defect the GENERATOR finds now CLAMPS the
+dimension down to its ceiling instead of refusing, since the caller could not have
+reconciled against a finding that did not exist yet. A defect the CALLER declared still
+refuses. The clamp is visible: `score_as_submitted` sits beside the effective score.
+
+This also put `FOOTING_FAILURE_CAP = 2.4` to work. I had defined it from the scoring doc
+and then never used it, which is its own small lesson about constants that look implemented.
