@@ -1491,3 +1491,35 @@ implied.
 found the thing it was looking for. Before recording "no skill has X", state where X would
 live if it existed, and search there. The original claim is kept alongside the correction
 rather than deleted, because how it was wrong matters more than that it was wrong.
+
+### FIX, 2026-07-29. executive-summary-package install script was broken four ways.
+
+Followed up on what I had reported as a "naming inconsistency". It was worse than that, and
+reporting it as a nit was wrong.
+
+`executive-summary-package-1c344a/SKILL.md`'s Installation block would have produced a
+**non-functional skill**:
+
+1. Destination `/mnt/skills/user/executive-summary/` did not match the skill's declared
+   `name: executive-summary-package-1c344a`.
+2. Source path `executive-summary-package/` missing the `-1c344a` suffix.
+3. Copied `references/metadata-fields.md` and `references/default-structure.md`. **This
+   skill has no `references/` directory at all.** Those files do not exist.
+4. **Omitted `executive_summary_generator.py`** entirely, which SKILL.md:509 names as the
+   module that produces the primary `.docx` deliverable under a HARD RULE. A skill installed
+   by that script would have been missing its own generator.
+
+Point 4 is the real defect. The rest is stale naming; that one ships a skill that cannot do
+its main job.
+
+**Fixed:** paths corrected to the declared name, the two non-existent reference files
+dropped, the generator added, and the verify step now checks the generator explicitly
+because its absence is exactly what the old script caused. The correction is recorded inline
+above the block rather than silently applied.
+
+**Verified:** every file the script now copies exists; zero stale `/mnt/skills/user/
+executive-summary/` paths remain outside the explanatory note; the 8 phantom cross-skill
+paths the H5 resolver was reporting are gone; smoke test still 0 failed assertions.
+
+**Scope checked:** no other skill has this defect. A sweep comparing every skill's declared
+`name:` against the install paths in its own SKILL.md returns this one only.

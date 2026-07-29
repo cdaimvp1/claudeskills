@@ -1090,10 +1090,10 @@ Note: `/mnt/skills/user/` is writable. It is separate from `/mnt/skills/public/`
 
 4. If the user confirms, proceed. If the user provides corrections, update the threshold tables in SKILL.md before copying.
 5. Copy each skill folder to `/mnt/skills/user/`:
-  - executive-summary
+  - executive-summary-package-1c344a
 6. Verify each skill was copied successfully:
 ```bash
-  echo "executive-summary: $(test -f /mnt/skills/user/executive-summary/SKILL.md && echo OK || echo MISSING)"
+  echo "executive-summary-package-1c344a: $(test -f /mnt/skills/user/executive-summary-package-1c344a/SKILL.md && echo OK || echo MISSING)"
 ```
 7. Confirm to the user what was installed and that they should start a new conversation to use the skills
 
@@ -1135,25 +1135,35 @@ executive-summary-package/
 
 Read the skill contents first, then install:
 
+> **CORRECTED 2026-07-29.** The block below was stale in four ways and would have produced
+> a non-functional install. It targeted `/mnt/skills/user/executive-summary/`, which does not
+> match this skill's declared `name:` of `executive-summary-package-1c344a`; it sourced from
+> `executive-summary-package/` without the suffix; it copied
+> `references/metadata-fields.md` and `references/default-structure.md`, and **this skill has
+> no `references/` directory at all**; and it **omitted `executive_summary_generator.py`**,
+> the module that produces the primary `.docx` deliverable per the HARD RULE above. A skill
+> installed by the old script would have been missing its own generator.
+
 ```bash
 # Unzip if not already done
-unzip executive-summary-package.zip -d /tmp/exec-install 2>/dev/null
+unzip executive-summary-package-1c344a.zip -d /tmp/exec-install 2>/dev/null
 
 # Read the skill before installing (required)
-cat /tmp/exec-install/executive-summary-package/SKILL.md
-cat /tmp/exec-install/executive-summary-package/references/metadata-fields.md
-cat /tmp/exec-install/executive-summary-package/references/default-structure.md
+cat /tmp/exec-install/executive-summary-package-1c344a/SKILL.md
+cat /tmp/exec-install/executive-summary-package-1c344a/MAINTENANCE.md
 
-# Install
-mkdir -p /mnt/skills/user/executive-summary/references
-cp /tmp/exec-install/executive-summary-package/SKILL.md /mnt/skills/user/executive-summary/SKILL.md
-cp /tmp/exec-install/executive-summary-package/frap_chain_kernel.py /mnt/skills/user/executive-summary/frap_chain_kernel.py
-cp /tmp/exec-install/executive-summary-package/MAINTENANCE.md /mnt/skills/user/executive-summary/MAINTENANCE.md
-cp /tmp/exec-install/executive-summary-package/references/metadata-fields.md /mnt/skills/user/executive-summary/references/metadata-fields.md
-cp /tmp/exec-install/executive-summary-package/references/default-structure.md /mnt/skills/user/executive-summary/references/default-structure.md
+# Install. The destination name MUST match the `name:` in this file's frontmatter.
+mkdir -p /mnt/skills/user/executive-summary-package-1c344a
+cp /tmp/exec-install/executive-summary-package-1c344a/SKILL.md /mnt/skills/user/executive-summary-package-1c344a/SKILL.md
+cp /tmp/exec-install/executive-summary-package-1c344a/executive_summary_generator.py /mnt/skills/user/executive-summary-package-1c344a/executive_summary_generator.py
+cp /tmp/exec-install/executive-summary-package-1c344a/frap_chain_kernel.py /mnt/skills/user/executive-summary-package-1c344a/frap_chain_kernel.py
+cp /tmp/exec-install/executive-summary-package-1c344a/MAINTENANCE.md /mnt/skills/user/executive-summary-package-1c344a/MAINTENANCE.md
 
-# Verify
-echo "executive-summary: $(test -f /mnt/skills/user/executive-summary/SKILL.md && echo 'INSTALLED' || echo 'FAILED')"
+# Verify. The generator is checked explicitly: without it the skill cannot produce
+# its primary deliverable, and its absence is exactly what the old script caused.
+echo "SKILL.md:  $(test -f /mnt/skills/user/executive-summary-package-1c344a/SKILL.md && echo OK || echo MISSING)"
+echo "generator: $(test -f /mnt/skills/user/executive-summary-package-1c344a/executive_summary_generator.py && echo OK || echo MISSING)"
+echo "kernel:    $(test -f /mnt/skills/user/executive-summary-package-1c344a/frap_chain_kernel.py && echo OK || echo MISSING)"
 
 # Clean up
 rm -rf /tmp/exec-install
