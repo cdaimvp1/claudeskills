@@ -65,8 +65,9 @@ later pass reads instead of raw text:
 - numeric and date register: caps, payment terms, notice periods, durations,
   every figure with its location
 - document-family map: MSA, WO, SOW, exhibits, order of precedence
-- tracked changes and comments where present, via the existing `unpack.py` XML
-  machinery already proven in comment-cleanup
+- tracked changes and comments where present, via `unpack.py`, which is
+  environment-provided and already used by skills in this suite, with stdlib
+  zipfile plus XML as the fallback
 
 ### Stage 1: deterministic findings (new, Python)
 
@@ -361,7 +362,9 @@ make THIS review auditable, which is a real requirement, not housekeeping. They
 live with the deliverables and the user keeps or deletes them together. They are
 not the skill's to manage after handoff.
 
-**Tier 2, durable, small, Project knowledge.**
+**Tier 2, durable, small, Project knowledge.** ENHANCEMENT ONLY, never a
+prerequisite. See section 14: persistence in Desktop is user-mediated, so nothing
+about the review's accuracy may depend on it.
 A `contract_review_record.json` per reviewed document, holding ONLY:
 
 - source fingerprint: filename, content hash, version label, review date
@@ -438,3 +441,55 @@ probably needs a policy view rather than an engineering decision.
 Recommendation: build per contract. Let `negotiation-playbook-learning` own the
 per-supplier aggregate, because that is already its job and it already has whatever
 handling was agreed for it.
+
+---
+
+## 14. Claude Desktop feasibility (Marc's gate: if it will not work, park it)
+
+Verified against what the suite already does, not assumed.
+
+| Component | Verdict | Evidence |
+|---|---|---|
+| Stage 0 / Stage 1 Python | **FEASIBLE, proven** | The wired generators run in Desktop today. Their top-level imports are stdlib only (`dataclasses`, `typing`, `copy`, `math`, `os`, `sys`); third-party packages are imported defensively inside guards. Stage 0 must follow that pattern. |
+| .docx parsing | **FEASIBLE** | Skills already instruct reading .docx XML via `unpack.py`, which is environment-provided rather than a suite file. Stdlib `zipfile` plus XML parsing is the fallback. |
+| Generators for the deliverables | **FEASIBLE, proven** | Three generators already produce real workbooks in Desktop, two of them newly wired this session with passing self-tests. |
+| `deduction_score()` in the kernel | **FEASIBLE, trivial** | Pure arithmetic, stdlib only, same shape as existing kernel functions. |
+| Tier 2 durable record | **FEASIBLE BUT FRAGILE** | See below. This is the only weak component. |
+
+### The one weak component, stated plainly
+
+Cross-run persistence in Desktop is **user-mediated, not automatic**.
+`timeline-builder` is the only skill doing it, and its own text shows the shape of
+the problem: the file is "saved to Project knowledge (preferred) or emit as a
+downloadable file", and its troubleshooting section already carries the failure
+case, "calibration keeps re-asking: the `timeline_calibration.json` file is not in
+the conversation or Project; paste it back."
+
+So the mechanism exists, is established, and already has a documented failure mode
+in the one place it is used. A design that DEPENDS on it would inherit that
+failure.
+
+### What that means for this design
+
+Do NOT park the redesign. The expensive, high-value parts are all in the proven
+column. Park the DEPENDENCY instead:
+
+- **Stage 0, Stage 1, the generators and `deduction_score()` proceed.** These are
+  the accuracy and cost wins, and none of them needs persistence. They work on a
+  single run of a single contract, which is the normal case.
+- **Tier 2 and the diff-on-rerun become an ENHANCEMENT, never a prerequisite.** If
+  the record is present and its fingerprint matches, the skill offers the delta
+  review. If it is absent, unreadable or stale, the skill runs a FULL review and
+  says why. Degradation is to slower and complete, never to faster and partial.
+- **The full review must remain the default path**, so a broken or missing record
+  can never produce a lesser review. This is the WS H degradation ladder applied to
+  the skill's own state.
+
+### The rule this establishes for the suite
+
+No skill's ACCURACY may depend on cross-run persistence, because persistence in
+Desktop depends on the user. Persistence may buy speed. It may never be the thing
+that decides whether the work is done properly.
+
+Worth generalizing to WS J's cross-session journey state, which has the same
+exposure.
