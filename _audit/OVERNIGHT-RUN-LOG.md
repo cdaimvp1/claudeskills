@@ -2248,3 +2248,39 @@ the labels, not by re-adding a panel already judged valueless. Needs Marc's call
 
 Dashboard rebuilt (3.26 MB) and verified to carry the changes. Smoke test 32 skills, 0
 failed assertions.
+
+### A10 follow-through (Marc: "use your own judgement")
+
+**7-vs-9 closed at the label, not by reinstating the removed funnel.**
+
+Investigating it properly changed the answer. The two elimination sources mean OPPOSITE
+things and were sharing one label:
+
+| source | what it is | inside the evaluated count? |
+|---|---|---|
+| `elimReal` (`rec.eliminations`) | assessed suppliers carrying a HARD flag | YES |
+| `elimIllus` (`P.excludedVendors`) | vendors excluded before assessment | NO |
+
+Both rendered under the single heading "Eliminated before the shortlist", so a reader
+could add those rows to "Vendors evaluated" and reach a field size that does not exist.
+
+Worth stating plainly: **for the current seed the ambiguity does not actually appear.**
+`nimbus` has no `excludedVendors` and no disqualified supplier, so both sources are empty
+and the divider never renders. The count today is unambiguously 7. The defect is latent,
+and returns for any project that populates either source.
+
+Fixed structurally so it cannot recur:
+- the divider now reads "Eliminated on a hard flag · Included in the N evaluated" OR
+  "Excluded before assessment · Not included in the N evaluated", chosen by source;
+- the tile note says "assessed field", so the count states what it counts.
+
+The 4-count stat strip stays removed. Marc's decision on it is untouched.
+
+**`pvRequestDataCard` corrected in all five planning documents.** Each carried a live
+instruction to remove a function with zero occurrences in any code file. Marking them done
+rather than deleting the lines keeps the record of what was asked and what was found:
+`MASTER-REMAINING-WORK.md` (2 places), `PROGRAM-MASTER-PLAN.md`, `_audit/OVERNIGHT-QUEUE.md`,
+`_audit/UPGRADE-PLAN.md`, `_platform_build/DEEP-DIVE-REDESIGN-SPEC.md`.
+
+Rebuilt (3.26 MB); old label gone, both new labels present. Smoke 32/0, citations 0
+unresolved.

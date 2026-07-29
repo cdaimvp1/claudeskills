@@ -152,7 +152,7 @@ finding is proven wrong.
 G1-G11).
 **O36. A10** Landscape seed bugs: score-scale drift to a single `pvAssess` source,
 7-vs-9 supplier count, ESG shown as a scored dash. Plus dead code
-(`pvRequestDataCard`, `pvDDSection`, `pvVerdictHeaderHtml`, `pvCompPositionHtml`).
+(`pvDDSection`, `pvVerdictHeaderHtml`, `pvCompPositionHtml`). **[DONE 2026-07-29, A10]** `pvRequestDataCard` was also listed but has zero occurrences in any code file.
 **O37. A2** wire the RFx to Deal handoff emitter. rfx-hub now exists so this is
 unblocked.
 

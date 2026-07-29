@@ -303,7 +303,7 @@ Strategy & Plays on Category Strategy is LOCKED. Leave it exactly as built.
   - Sequence: quick reverts (OV1/RA1/HH1/G2/G3) → G1 reskin → per-tab restructure+narrative → new viz (FM4 quadrant, RR3 accordion, RR4 events, CO4 footprint).
 - `[do-now]` **Overview / TOP1** — supplier-count funnel (reviewed/passed/screened-out/recommended), one visible score scale (not 89/89.37/4.51/60.77), cut prose restating the ranking table, keep disposition labels ≠ quadrant labels. (LANDSCAPE-SPEC-GAP-REVIEW; PLATFORM-CONSOLIDATION C2; BUILD-TRACKER P6)
 - `[do-now]` **Seed bugs** — score-scale drift → single `pvAssess` source; 7-vs-9 supplier count → funnel; ESG shown as a scored dash → assessment-coverage note. (BUILD-TRACKER)
-- `[do-now]` Remove the "Request more data"/`pvRequestDataCard` panel (DEEP-DIVE-SPEC); remove dead code `pvDDSection`/`pvVerdictHeaderHtml`/`pvCompPositionHtml` (BUILD-TRACKER P7).
+- `[DONE 2026-07-29, A10]` Removed dead code `pvDDSection`/`pvVerdictHeaderHtml`/`pvCompPositionHtml` (BUILD-TRACKER P7). The "Request more data"/`pvRequestDataCard` panel needed no action: it has ZERO occurrences in any code file and was already gone before this pass. See `_audit/A10-LANDSCAPE-FINDINGS.md`.
 - `[do-now]` Deep-dive **supplier-type-aware (compose-by-traits) layout** — public/private/hyperscaler-product profiles (DEEP-DIVE-SPEC-v3).
 - `[Marc]` Segmentation quadrant threshold tuning (6 of 7 land in "Leader") (SPEC-v3-TOPLEVEL).
 - `[Marc]` Landscape D&B/Bloomberg enrichment backlog — UBO/corporate-family tree, operating-footprint geo, dependency/supply-chain network, comparative financial-statement table, industry-ratio benchmarking, sanctions/watchlist + ownership-exposure, ESG scorecard, trade-payment/default-risk (all gap-stateable). Optional.
@@ -402,8 +402,10 @@ not carried forward from trackers.
 8. **Landscape Overview / TOP1** — supplier-count funnel, one visible score scale.
 9. **Landscape seed bugs** — score-scale drift to a single `pvAssess` source;
    7-vs-9 supplier count; ESG shown as a scored dash.
-10. **Landscape dead code** — remove `pvRequestDataCard`, `pvDDSection`,
-    `pvVerdictHeaderHtml`, `pvCompPositionHtml`.
+10. **Landscape dead code** — **[DONE 2026-07-29, A10]** removed `pvDDSection`,
+    `pvVerdictHeaderHtml`, `pvCompPositionHtml`. `pvRequestDataCard` was on this list
+    but has ZERO occurrences in any code file, so there was nothing to remove.
+    See `_audit/A10-LANDSCAPE-FINDINGS.md`.
 11. **Deep-dive compose-by-traits layout** — public / private / hyperscaler-product.
 12. **Exec-Summary/Overview batch** — merge eliminated-before-shortlist into the
     Recommendation table, remove Start-an-RFx, row shading, drop weighted-score

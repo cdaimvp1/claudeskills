@@ -258,7 +258,9 @@ Skills: supplier-landscape.
 Why: score-scale drift means one number appears as 89 / 89.37 / 4.51 / 60.77 in four
 places (`MASTER-REMAINING-WORK.md:304`). That is an accuracy defect visible to a user.
 Change: single `pvAssess` source; supplier-count funnel resolving 7-vs-9; ESG rendered as
-an assessment-coverage note not a scored dash; remove `pvRequestDataCard`, `pvDDSection`,
+an assessment-coverage note not a scored dash; remove `pvDDSection`,
+(**[CORRECTION 2026-07-29]** `pvRequestDataCard` was on this list but does not exist in any
+code file. Nothing to remove. See `_audit/A10-LANDSCAPE-FINDINGS.md`.)
 `pvVerdictHeaderHtml`, `pvCompPositionHtml`.
 Verify: one score scale rendered suite-wide on the dashboard; grep confirms removed
 functions have no call sites.

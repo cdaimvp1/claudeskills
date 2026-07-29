@@ -63,7 +63,7 @@ File: `_platform_build/assets/pv/pv-07-landscape-render.js`  ·  rebuild: `pytho
     panel. The supplier-landscape skill (or its companion) offers "draft outreach emails
     to these suppliers"; responses flow back via M365 to re-enrich. That belongs in the
     skill's action layer, not rendered on the deep-dive page.
-  - Code: drop `pvRequestDataCard` call (~line 1941) + the function (~1693).
+  - Code: drop `pvRequestDataCard` call (~line 1941) + the function (~1693). **[DONE, verified 2026-07-29]** Neither the call nor the function exists any longer; zero occurrences in any code file.
 
 ---
 

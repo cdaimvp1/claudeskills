@@ -519,7 +519,7 @@ function pvMetricsHtml(refl){
  var L=refl.landscape,ms=L.marketStructure,cd=L.competitiveDynamics,rec=L.recommendation,lead=rec.lead;
  var fc=PVFIELD_CLS[cd.fieldType]||'low';
  return '<div class="metrics">'+
-  '<div class="metric"><div class="lab">Vendors evaluated</div><div class="val">'+escD(L.supplierCount)+'</div><div class="note">'+escD(L.category)+'</div></div>'+
+  '<div class="metric"><div class="lab">Vendors evaluated</div><div class="val">'+escD(L.supplierCount)+'</div><div class="note">'+escD(L.category)+' &middot; assessed field</div></div>'+
   '<div class="metric"><div class="lab">Eligible</div><div class="val">'+escD(L.eligibleCount)+'<small> of '+escD(L.supplierCount)+'</small></div><div class="note">'+escD(ms.disqualifiedCount)+' disqualified · '+escD(ms.incumbentCount)+' incumbent</div></div>'+
   '<div class="metric"><div class="lab">Recommended lead</div><div class="val" style="font-size:15px">'+escD(lead?lead.name:'None eligible')+'</div><div class="note">'+(lead?('composite '+escD(lead.compositeScore)+' · fit '+escD(pvFit5(lead))+'/5 · risk '+escD(lead.riskScore)+'/5'):'every candidate carries a hard flag')+'</div></div>'+
   '<div class="metric"><div class="lab">Field</div><div class="val"><span class="conf '+fc+'">'+escD(PVFIELD_LBL[cd.fieldType]||cd.fieldType)+'</span></div><div class="note">'+(cd.leaderGap!=null?('leader gap '+escD(cd.leaderGap)):'single eligible')+' · '+escD(PVLEVEL_LBL[ms.level]||ms.level)+' concentration</div></div>'+
@@ -1283,7 +1283,18 @@ function pvExecSummaryHtml(refl,input){
    '</div>';
  }).join('');
  var recHead='<div class="rgrid rhead"><span></span><span>Supplier</span><span>Segment</span><span class="n">Composite</span><span class="n">Fit</span><span class="n">Risk</span></div>';
- var elimDivider=elimRowsSrc.length?('<div class="rgrid rdiv"><span></span><span class="rnm rdiv-lbl">Eliminated before the shortlist</span><span class="rseg rdiv-note" style="grid-column:3/-1"></span></div>'):'';
+ // A10 (7-vs-9): these rows come from two sources that mean OPPOSITE things, and the old
+ // single label 'Eliminated before the shortlist' hid the difference, so a reader adding the
+ // rows to the evaluated count could reach a field size that does not exist.
+ //   elimReal  = assessed suppliers carrying a HARD flag. They ARE inside the evaluated count.
+ //   elimIllus = vendors excluded before assessment. They are NOT.
+ // The label now states which, and how it relates to the evaluated total.
+ var elimInField=!!elimReal.length;
+ var elimLbl=elimInField?'Eliminated on a hard flag':'Excluded before assessment';
+ var elimNote=elimInField
+   ?('Included in the '+escD(L.supplierCount)+' evaluated')
+   :('Not included in the '+escD(L.supplierCount)+' evaluated');
+ var elimDivider=elimRowsSrc.length?('<div class="rgrid rdiv"><span></span><span class="rnm rdiv-lbl">'+elimLbl+'</span><span class="rseg rdiv-note" style="grid-column:3/-1">'+elimNote+'</span></div>'):'';
  var elimRowsHtml=elimRowsSrc.map(function(v){
    return '<div class="rgrid elimr"><span class="rrk"><span class="ex">&#10005;</span></span><span class="rnm">'+escD(v.name)+'</span><span class="rseg elimreason" style="grid-column:3/-1">'+escD(v.reason)+'</span></div>';
  }).join('');
