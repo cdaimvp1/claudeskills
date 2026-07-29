@@ -2329,3 +2329,15 @@ html:root{ --nested:#EDE8E0; --nested-rule:#DCD5CA; }
   border-bottom:1px solid var(--line2);
 }
 .tabbar>*{justify-content:flex-start}
+
+
+/* A10: risk dimensions no supplier scored. The row stays visible (the gap is the
+   information) but must not read as scored data. Neutral, no status colour: an
+   unassessed dimension is neither good nor bad. */
+.rk-unassessed{
+  display:inline-block;margin-left:8px;padding:1px 7px;
+  font:600 10.5px/1.5 var(--sans);letter-spacing:.02em;
+  color:var(--mut2);border:1px solid var(--line2);border-radius:999px;
+  background:transparent;vertical-align:middle;white-space:nowrap;
+}
+.rk-unassessed-row .rcell{opacity:.55}

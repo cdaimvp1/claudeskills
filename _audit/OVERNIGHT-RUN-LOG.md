@@ -2202,3 +2202,49 @@ rather than sweep cleanup. It is dead weight, not a correctness bug.
 **Correction to A10 (task #16):** `pvRequestDataCard` no longer exists anywhere in code.
 All six repo-wide hits are planning docs still instructing its removal. The other three
 named functions are real and still present.
+
+---
+
+## A10 — Landscape seed bugs and dead code
+
+Full write-up with the measured before/after table: `_audit/A10-LANDSCAPE-FINDINGS.md`.
+
+Everything was verified by running the REAL engine (`PVSLE.reflect`) against the REAL
+seed, before and after, rather than reasoned about. That harness earned its keep twice:
+it caught a bug I had just introduced (calling the render-layer `pvFit5` from inside the
+pure `PVSLE` engine closure), and it turned "ESG is mis-shown" into a measurement (ESG is
+the only one of 6 risk dimensions no supplier scores).
+
+**Score-scale drift.** Four different things computed the same supplier's fit. The engine
+now owns the scale (`PVSLE.fit5`), `pvFit5` delegates to it, and every display site routes
+through it. Ordering and banding still run on the raw value, so rounding for display cannot
+change who ranks first. The authored `cand.fit` second source is no longer silently
+preferred, and disagreements with the computed rollup are surfaced instead of hidden.
+
+**ESG.** Illustrative numbers were injected so ESG "appears as a scored Risk-Assessment
+dimension". Worse, the injection MUTATED the shared candidate risk object, which
+`pvLandInput` passes by reference and `landscapeHTML()` re-reads on every re-render, so
+risk scores changed after the user's first click. Injection removed; ESG now renders as an
+assessment-coverage note.
+
+That forced a companion fix: `computeRisk` scored a missing dimension as 0, and risk is
+"higher = worse", so removing the injection alone would have credited every supplier with
+the best possible ESG result. Weight is now renormalized over scored dimensions only.
+
+Measured: every risk score rose (proving the old behaviour understated risk), rank order
+unchanged, and **one classification changes** — ClickHouse 2.33 → 2.50 crosses the 2.5
+threshold and becomes a challenger rather than a leader. That is the correct reading.
+
+**Dead code.** Removed `pvVerdictHeaderHtml`, `pvDDSection` (33.9 KB, its own last line
+recorded that it returns nothing), `pvCompPositionHtml`, plus `mtile`/`elimN`/`reviewedN`/
+`screenedN`/`rfxN`. `pvRequestDataCard`, the fourth name on A10's list, does not exist in
+any code file; A10's list needs correcting, not actioning.
+
+**7-vs-9 left open, deliberately.** A10 prescribes a supplier-count funnel. That funnel was
+built and then REMOVED at Marc's request ("adds no value"). A10's remedy predates and
+contradicts a later owner decision, so I did not reinstate it. The ambiguity is real (field
+of 7, plus elimination rows that let a reader total 9). Recommendation recorded: fix it in
+the labels, not by re-adding a panel already judged valueless. Needs Marc's call.
+
+Dashboard rebuilt (3.26 MB) and verified to carry the changes. Smoke test 32 skills, 0
+failed assertions.

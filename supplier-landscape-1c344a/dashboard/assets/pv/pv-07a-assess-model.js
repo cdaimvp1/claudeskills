@@ -236,6 +236,36 @@ var ASSESS_AUTHORED = {
   }
 };
 
+/* ---- THE fit scale. One definition, one rounding, one place. ----------------
+   A10 seed bug: the same supplier's fit was rendering as 89, 89.37, 4.51 and 60.77
+   because render sites each re-derived it (raw a.fitScore, an inline /20 sometimes
+   unrounded, and a separate cand.fit fallback). Everything that DISPLAYS fit now
+   goes through pvFit5.
+
+   Authored data carries fit on a 0-100 scale. The dashboard displays 0-5 at one
+   decimal, so fit and risk share an axis and are directly comparable.
+   Ordering, banding and thresholds still run on the raw 0-100 value: rounding for
+   display must not change who ranks first.                                        */
+function pvFit5(a) {
+  var f100 = (a && a.fitScore != null) ? a.fitScore : null;
+  if (f100 == null) return null;
+  // Delegate to the engine, which owns scoring and therefore owns the scale. Keeping a
+  // second copy of the /20 conversion here is exactly how the drift started.
+  if (typeof PVSLE !== 'undefined' && PVSLE && typeof PVSLE.fit5 === 'function') {
+    return PVSLE.fit5(f100);
+  }
+  var rnd = (typeof pvRound === 'function') ? pvRound
+          : function(n, d){ var p = Math.pow(10, d || 0); return Math.round(n * p) / p; };
+  return rnd(f100 / 20, 1);
+}
+
+/* Display form. Returns the em-dash placeholder rather than a fabricated 0 when
+   fit is unknown, so an absent score never reads as a scored zero. */
+function pvFit5Text(a) {
+  var v = pvFit5(a);
+  return v == null ? '—' : String(v);
+}
+
 /* ---- pvAssess(a, cand, input): the normalized assessment for ANY supplier ---- */
 function pvAssess(a, cand, input) {
   input = input || {}; cand = cand || {};
@@ -244,7 +274,7 @@ function pvAssess(a, cand, input) {
 
   // FIT, one scale (score5 primary, score100 available)
   var f100 = (a && a.fitScore != null) ? a.fitScore : null;
-  var f5 = f100 != null ? rnd(f100 / 20, 1) : null;
+  var f5 = pvFit5(a);
   var fitLabel = f5 == null ? 'Unknown' : f5 >= 4.25 ? 'High' : f5 >= 3.75 ? 'Moderate-high' : f5 >= 3.0 ? 'Moderate' : 'Low';
 
   // RISK, semantic + confidence
