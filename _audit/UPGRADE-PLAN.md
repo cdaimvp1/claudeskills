@@ -293,7 +293,21 @@ Effort: M. Marc decision: yes (decision 9). Depends on: nothing.
 
 ## WS C: Kernel adoption and coverage (Phase 2, some Phase 4)
 
-**C1. Add `protection_score()` to the canonical kernel.**
+**C1. Add `deduction_score()` to the canonical kernel.** BUILT 2026-07-29, `18b955b`.
+
+NAME RESOLVED (Marc, 2026-07-29): this plan and the session handoff disagreed, the plan
+saying `protection_score()` and the handoff `deduction_score()`. **`deduction_score()`
+is the name.** It describes what the function does (starts at 100 and subtracts, per
+coverage column, Hard Stops never reduced) rather than what it returns, and the
+distinction matters because the obvious wrong move is to route it through
+`weighted_score()`, which is a weighted average over criteria footing to 1.0 and a
+different shape entirely. Earlier `protection_score()` references in
+`_audit/F1-IMPLEMENTATION.md`, `GROUP-1-contract-legal.md` and
+`GROUP-6-output-foundations.md` are superseded by this line and are left in place as
+the audit record rather than rewritten.
+
+Still owed on C1: vendor to `lilly-contract-review` (BLOCKED, held) and the text fix in
+`lilly-brand-assets-1c344a/SKILL.md:1163-1166` (not held, still open).
 Skills: `lilly-procurement-kernels`, then vendor to lilly-contract-review; text fix in
 lilly-brand-assets.
 Why: the same number is prose-derived in two places
