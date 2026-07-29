@@ -575,3 +575,35 @@ evaluation weight inverts the criterion rather than de-emphasizing it. Pinned by
 test.
 
 **Malicious-code review: SAFE.** Additive only, imports unchanged.
+
+### O9 DONE, 2026-07-29. C8 commercial-negotiation-prep rollup gap.
+
+Added `assert_reconciles()` and `ReconciliationError` to the kernel, re-vendored,
+and wired SKILL.md:521.
+
+**Verification: 96/96 passed, 0 failed.** All seven consuming copies identical.
+
+**What the gap actually was.** This skill was NOT missing kernel adoption in
+general; it already calls `escalate()`, `percentile_gate()` and `to_hourly()`
+under explicit HARD RULEs. The gap is narrower and more interesting: SKILL.md:521
+says the year totals, "Year 1 as % of Total" and "Hidden Cost Ratio" "are plain
+sums and ratios with no dedicated kernel function; continue to compute those as
+directed elsewhere." Being plain sums is exactly why they were left unchecked,
+and exactly why they drift.
+
+The dashboard already states the contract at SKILL.md:1665: "NUMBERS RECONCILE:
+annualVal(line,'proposed') summed across LINES === meta.proposedAnnual ... A
+cloner MUST preserve this." **That was a comment addressed to a human cloner.**
+It is now an assertion that raises with the label and the exact difference.
+
+The arithmetic is trivial; the drift is not. A trivial sum carried in two places
+is the most common way a deck stops footing between its table and its headline,
+and that is the number a supplier sees.
+
+`assert_reconciles()` is deliberately general, because the same shape recurs at
+`contract-stack-map.md:222` (coverage_summary counts footing to array lengths)
+and in theos-field-guide's pre-render check, which is O25. Default tolerance is
+one cent, matching `verify_line_math`. A one-cent shortfall (33.33 x 3 against
+100.00) still refuses rather than being absorbed.
+
+**Malicious-code review: SAFE.** Additive only, imports unchanged.

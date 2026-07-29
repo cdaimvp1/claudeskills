@@ -15,6 +15,7 @@ that multiple Lilly Procurement Skills each describe independently in prose:
 | `weighted_score` | market-rate-benchmarking (Composite Contract Quality Score) AND evaluation-engine (Effective_Weight_Frac / Score Validation Checks) - both skills independently require weights to foot to 1.0; this is one shared guard instead of two divergent ones |
 | `npv` | pro-forma-builder (Financial Methodology, end-of-year Year-1 discounting) |
 | `quadrature_rollup` | should-cost-builder (Aggregation Method: quadrature + >15% LOW-confidence widening) |
+| `assert_reconciles` | commercial-negotiation-prep (per-line rollups vs stated KPI/ZOPA totals); the same shape recurs in contract-stack-map's coverage_summary and theos-field-guide's pre-render check |
 | `assert_weight_sum` | rfp-engine (the Evaluation-weight sanity check, 100-percent convention, validation only) |
 | `reciprocity` / `anchor_capture` | negotiation-simulator (the two Structured Debrief metrics and every degenerate case its v2.3 changelog records defining) |
 | `hhi` / `hhi_band` | category-strategy (`references/analysis-methodology.md`, HHI and its concentration bands) |
@@ -174,6 +175,14 @@ skills themselves draw a hard line. Specifically:
   combined component (summing their spreads linearly) before calling this
   function, per should-cost-builder's own text, until a grouping-aware
   version is added here.
+- **`assert_reconciles` exists because the arithmetic is trivial and the drift
+  is not.** commercial-negotiation-prep's dashboard already carried this contract
+  as a COMMENT addressed to a human cloner ("A cloner MUST preserve this"). A
+  trivial sum carried in two places is the most common way a deck stops footing
+  between its table and its headline, and a comment cannot catch it. Default
+  tolerance is one cent, matching verify_line_math's treatment of currency; pass
+  a wider tolerance only when the stated total is legitimately rounded, and say
+  so at the call site.
 - **`assert_weight_sum` validates without scoring, and never normalizes.**
   rfp-engine BUILDS the weight grid that evaluation-engine and
   rfp-response-analysis later score against, and its own rule says to "surface

@@ -388,6 +388,63 @@ def quadrature_rollup(component_bases: Sequence[float],
     )
 
 
+class ReconciliationError(KernelError):
+    """Raised when a stated total does not equal the sum of its components.
+
+    The suite hits this shape repeatedly: commercial-negotiation-prep's per-line
+    rollup versus its KPI totals, contract-stack-map's coverage_summary counts
+    versus its array lengths, theos-field-guide's pre-render check. In every
+    case the failure is the same, a headline figure that was typed or carried
+    separately from the lines it claims to summarize, and then drifted.
+    """
+
+
+def assert_reconciles(components: Sequence[float], stated_total: float,
+                      label: str = "rollup",
+                      tolerance: float = 0.01) -> float:
+    """Assert that `components` sum to `stated_total`. Returns the true sum.
+
+    Source for this specific use: commercial-negotiation-prep-1c344a/SKILL.md
+    :1665-1668, the reconciliation contract its dashboard carries as a comment:
+    "NUMBERS RECONCILE: annualVal(line,'proposed') summed across LINES ===
+    meta.proposedAnnual; same rollup rule applies to opening/target/walkaway/
+    p50/hist. A cloner MUST preserve this: change a line and the KPI row, ZOPA
+    totals, and Negotiation Prep Summary all move together because they are
+    computed from LINES below, not hand-typed separately."
+
+    That contract was a comment addressed to a human cloner. This makes it an
+    assertion. SKILL.md:521 already notes that the year totals and ratios "are
+    plain sums and ratios with no dedicated kernel function", which is exactly
+    the gap: the arithmetic is trivial, the DRIFT is not, and a trivial sum
+    typed in two places is the most common way a deck stops footing.
+
+    The default tolerance of 0.01 is one cent, matching verify_line_math's
+    treatment of currency. Pass a larger tolerance only when the stated total is
+    legitimately rounded (a figure presented in thousands, say), and say so.
+    """
+    if not components:
+        raise InvalidInputError(
+            f"{label}: cannot reconcile an empty component list. A total with no "
+            "components is a total with no support"
+        )
+    for i, c in enumerate(components):
+        if c is None or isinstance(c, bool) or not isinstance(c, (int, float)):
+            raise InvalidInputError(f"{label}: component {i} is not numeric: {c!r}")
+    if stated_total is None or not isinstance(stated_total, (int, float)):
+        raise InvalidInputError(f"{label}: stated_total is not numeric: {stated_total!r}")
+    actual = float(sum(components))
+    delta = actual - float(stated_total)
+    if abs(delta) > tolerance:
+        raise ReconciliationError(
+            f"{label} does not foot: {len(components)} components sum to "
+            f"{actual:,.2f} but the stated total is {stated_total:,.2f}, a "
+            f"difference of {delta:,.2f}. Fix the stated total or the components; "
+            "do not present both. A headline figure that disagrees with its own "
+            "lines is the defect this check exists to stop reaching a supplier"
+        )
+    return actual
+
+
 def assert_weight_sum(weights: Dict[str, float], expected: float = 1.0,
                       tolerance: Optional[float] = None) -> float:
     """Validate that a weight set foots, and return the sum. Raises if it does not.
@@ -1787,6 +1844,21 @@ if __name__ == "__main__":
         f"base={qr_widened.total_base}, low={qr_widened.total_low}, high={qr_widened.total_high}",
     )
 
+    # --- assert_reconciles: commercial-negotiation-prep's rollup contract ---
+    # Source: commercial-negotiation-prep-1c344a/SKILL.md:1665-1668, the
+    # dashboard's own reconciliation contract, which until now was a comment
+    # addressed to a human cloner rather than an assertion.
+    _check(
+        "assert_reconciles: a footing rollup returns the true sum",
+        assert_reconciles([303600.0, 88000.0, 42000.0], 433600.0,
+                          "proposedAnnual") == 433600.0,
+    )
+    _check(
+        "assert_reconciles: default tolerance is one cent, so 33.33+33.33+33.34 "
+        "reconciles to 100.00 but 33.33 x 3 (99.99) does not",
+        assert_reconciles([33.33, 33.33, 33.34], 100.0) == 100.0,
+    )
+
     # --- assert_weight_sum: rfp-engine's 100-scale convention ---------------
     # Source: rfp-engine-1c344a/SKILL.md:384, "the Evaluation_Weight values must
     # sum to 100% (no over- or under-allocation) ... surface the discrepancy
@@ -2250,6 +2322,25 @@ if __name__ == "__main__":
 
 
 
+    _check_raises(
+        "assert_reconciles: refuses a headline figure that disagrees with its "
+        "own lines. This is the drift the commercial-negotiation-prep dashboard "
+        "contract warns a cloner about at SKILL.md:1665, now enforced",
+        lambda: assert_reconciles([100.0, 200.0], 305.0, "KPI row"),
+        ReconciliationError,
+    )
+    _check_raises(
+        "assert_reconciles: refuses a one-cent shortfall (99.99 against 100.00) "
+        "rather than absorbing it",
+        lambda: assert_reconciles([33.33, 33.33, 33.33], 100.0),
+        ReconciliationError,
+    )
+    _check_raises(
+        "assert_reconciles: refuses an empty component list, because a total "
+        "with no components is a total with no support",
+        lambda: assert_reconciles([], 100.0),
+        InvalidInputError,
+    )
     _check_raises(
         "assert_weight_sum: refuses an over-allocated category (105) rather "
         "than normalizing, per rfp-engine SKILL.md:384. Normalizing would make "
