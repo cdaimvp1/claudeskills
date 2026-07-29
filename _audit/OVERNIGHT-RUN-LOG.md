@@ -1070,3 +1070,61 @@ are plain Markdown with no dependency at all.
 **What is still owed on Task #1:** a clean run by an actor who has not read the answer key.
 That is a fresh Claude Desktop session with the skill installed, given only the six contract
 documents. Tracked as its own task rather than left inside this one.
+
+### Task #2 DONE, 2026-07-29. H3 G12 claim-gate audit. The premise was misleading.
+
+`_audit/H3-CLAIMGATE-FINDINGS.md`, reproducible via `_audit/h3_claimgate_audit.py`.
+Read-only, findings only, nothing fixed.
+
+**Headline: the item's premise measured the wrong thing.** "G12 named in only 2 of 31
+SKILL.md files" is true and it counts the LABEL. G12's own text says it "consolidates the
+anti-fabrication rules already stated in GLOBAL OPERATING RULES 3 and 8 and the
+supplier-risk reference", so skills implement the underlying rules without citing the new
+umbrella name.
+
+Scoring the MECHANISMS instead:
+```
+IMPLEMENTED (abstain + cite + anti-fabrication)   30 of 32
+PARTIAL                                            2
+MENTION-ONLY                                       0
+ABSENT                                             0
+```
+The guardrail is broadly in force. Naming it is a documentation gap, not a control gap.
+
+**I caught a false finding in my own first pass and recorded it.** The first run graded
+`rfx-hub` and `deal-tab` ABSENT on all three core mechanisms. Both actually carry them,
+worded "Absent data is gap-stated in place ... Nothing is invented to complete a layout".
+My patterns matched `NEEDS_INPUT` and `[CONFIRM:` and missed `gap-stated`. **That is the
+same error the headline statistic makes: matching wording instead of mechanism.** Patterns
+corrected, both regraded, variants enumerated in the script with a comment so it is not
+re-introduced.
+
+**Three real gaps:**
+
+1. **"DROP, do not dilute" is adopted NOWHERE.** Verified independently: 2 hits across the
+   whole suite, both inside G12's own definition in lilly-brand-assets. Every other skill 0.
+   It matters more than the count suggests because it is the behaviour a model gets wrong
+   by default: faced with an unciteable finding, softening it into "the agreement may not
+   fully address X" is the natural move, and it produces deliverables full of
+   unfalsifiable observations that read as analysis. Abstaining is visible; diluting is not.
+
+2. **11 of 32 have no code-enforced gate**, so the claim-gate is an instruction that can be
+   forgotten. Not all equal: voice-profile, workflow-map and timeline-builder assert little.
+   **supplier-deep-dive is the one to look at first** because it produces a single-vendor
+   dossier full of exactly the status assertions G12's third prohibition names (debarment,
+   sanctions, financial distress, certifications) with no code path that refuses.
+
+3. **Four skills missing a core mechanism.** procurement-help-desk and workflow-map lack
+   ABSTAIN (the first is a genuine gap: an unanswerable question needs a marker, not a
+   plausible answer). rfx-hub and deal-tab lack CITE in prose, but for rfx-hub that is
+   largely closed already by the D4 slice contracts authored today, which require
+   `sourceRef` per field and make an uncited field a build failure. The prose has not
+   caught up with its own contract.
+
+**Explicitly recommended AGAINST:** adding "per G12" labels across 30 skills. The
+mechanisms are present; the label changes no behaviour and would create 30 diffs whose only
+effect is to make a future audit of this kind report a nicer number.
+
+**Stated limit:** this is a text audit. It proves presence, not correctness. A skill can
+carry every mechanism and apply them badly at runtime; only the golden fixture and the G8
+smoke test can speak to that.
