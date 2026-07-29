@@ -1190,3 +1190,70 @@ the exception count is never padded with rounding noise.
 **Malicious-code review: SAFE.** Imports are `json`, `sys`, `dataclasses`, `typing` plus
 the vendored kernel. No network, no subprocess, no eval/exec, no file writes except the
 explicit `--ledger` output path the caller names.
+
+### Task #4 DONE, 2026-07-29. G1-G7 Desktop runtime audit. One large finding.
+
+`_audit/G-RUNTIME-FINDINGS.md`, reproducible via `_audit/g_runtime_audit.py`. 32 skills.
+Read-only, findings only, nothing fixed.
+
+**HEADLINE: 26 skills point at 8 brand-assets reference files, and NONE of those files
+exist.**
+```
+execution-guardrails.md   23 skills   file exists: NO
+narrative-standards.md    23          NO
+house-styles.md           23          NO
+validation-checklist.md   23          NO
+supplier-risk.md          21          NO
+dashboard-components.md    7          NO
+brand-colors.md            5          NO
+docx-design-system.md      2          NO
+```
+`lilly-brand-assets-1c344a/references/` holds exactly two files (`aria-enrichment.md`,
+`user-manual.md`). The other fifteen were INLINED into that skill's SKILL.md and the
+standalone files removed. **Every pointer to them was left behind.**
+
+**This fails twice, and the second one is the interesting one.** On Desktop the sibling
+skill is not installed, so the path cannot resolve. But in the FULL SUITE, where the
+sibling IS installed, the file still does not exist. This is not a Desktop-only
+portability question the packaged suite gets away with; it is a broken pointer everywhere.
+
+**Mitigation, verified not assumed: all 26 carry the content inline themselves.** Measured,
+26 of 26. So the rules are reachable and no run loses them. What happens is a wasted,
+silent step, and a reader being trained that a broken path is normal, which is the
+condition under which a load-bearing broken path stops getting noticed.
+
+**Recommendation: delete the pointers, keep the inline content. Do NOT restore the eight
+files** — they were inlined deliberately and re-creating them gives the suite two copies of
+each, reintroducing exactly the drift E1 and E2 were about.
+
+**This substantially IS H8** (fix supplier-risk anti-fabrication reachability), and H8's
+premise understates it: not only `supplier-risk.md`, and the file is not merely unreachable
+on Desktop, it does not exist. Also overlaps B7.
+
+**Everything else is clean or better than expected:**
+- **G1 third-party imports: ZERO unguarded.** All eight (docx, openpyxl, pptx) are guarded.
+  `pro_forma_generator.py` is the reference pattern: detect at import, raise a clear
+  ImportError at workbook-BUILD time, so validation stays testable without the library.
+- **G3/G4 self-containment: ZERO relative or package imports.** 23 of 32 ship .py and every
+  one imports only stdlib plus modules beside it. Independently confirmed tonight by
+  running `numeric_kernel.py` and `invoice_audit_engine.py` in isolated directories
+  containing nothing else, 96/96 and 26/26.
+- **G5:** `/mnt/user-data/outputs` in 13 skills is the standard Claude output location, not
+  a repo path. No action.
+- **G7:** rfp-response-analysis documents the right recharts pattern, with a styled-div
+  fallback so the render degrades rather than failing.
+
+**G6 deliberately NOT overstated.** SharePoint 31, M365/Teams/Outlook 30, ask_user_input_v0
+19, and so on, are MENTIONS not hard dependencies. Spot checks show most sit inside a
+degradation sentence. Counting them as assumptions would repeat exactly the error the G12
+statistic made. What a text audit cannot say is whether each degradation path WORKS; that
+is G8 and G9, and it is stated as the honest limit.
+
+**Three skills thin on degradation language:** rfx-hub (1), deal-tab (2), sole-source-
+challenge (2). The first two are new hub skills and thinness is expected. **sole-source-
+challenge is the one to look at**: it is the only skill depending on TWO third-party
+libraries (docx and pptx) and it discusses absence least.
+
+`kernel_manifest.py` flagged in the report so a later reader does not file it as a defect:
+it walks the suite directory and cannot run standalone BY DESIGN, is referenced by no
+SKILL.md, and exits cleanly with a clear message outside the suite.
