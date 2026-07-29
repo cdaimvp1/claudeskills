@@ -1150,6 +1150,39 @@ For each finding, capture before scoring:
 
 ## Formula
 
+> **MIRROR, not the source of truth. Do not hand-edit the table below.**
+>
+> The authority for this method is
+> `lilly-contract-review-1c344a/references/risk-scoring.md`. The table here is a copy,
+> reproduced so this foundation reads standalone. **Verified identical to the source on
+> 2026-07-29**, row for row across all five severities and all four coverage columns.
+>
+> **The implementation is `deduction_score()` in `numeric_kernel.py`** (added 2026-07-29,
+> `18b955b`). It is NOT `weighted_score()`: this is a deduction model that starts at 100 and
+> subtracts, while `weighted_score()` is a weighted average over criteria footing to 1.0.
+> Routing one through the other is the obvious wrong move and the kernel's own docstring
+> says so.
+>
+> **What the kernel now enforces that this prose could only ask for:**
+> - **Hard Stops deduct exactly -15 in every coverage column** and refuse anything else.
+>   "Never reduced" is a code branch, not a reminder.
+> - **A deduction outside its (severity, coverage) range refuses.** The named failure mode is
+>   the Standalone column applied to a category the governing documents cover, which is the
+>   Rule 7 defect.
+> - **BOTH anti-drift calibration checks RAISE.** Too harsh (zero Hard Stops, 10+ categories
+>   Covered, alignment-dominant findings, yet more than a 30-point deduction) and too
+>   generous (a standalone document with 5+ findings under 25 points). The second is the more
+>   dangerous direction, because it understates risk and a flattering number does not invite
+>   scrutiny.
+> - **The visible calculation table this section requires is returned as data** (`rows` on the
+>   result), so the table and the score are rendered from one object and cannot disagree.
+>
+> The kernel does NOT choose the deduction. `risk-scoring.md` step 4 reserves the value
+> within each range to judgment; code validates the boundary and the model still rules.
+>
+> To change the method: edit `risk-scoring.md`, update `deduction_score()` and its tests,
+> then re-sync this mirror in the same commit and say in the message that all three moved.
+
 Start at **100** (a clean, fully protected contract) and **deduct** per finding, weighted by how much the governing documents already cover that finding's category (a finding the MSA already covers deducts less than the same finding standalone):
 
 | Finding Severity | Standalone | Governed: Covered | Governed: Confirm | Governed: Gap |

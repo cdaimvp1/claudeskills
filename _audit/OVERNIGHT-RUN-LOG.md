@@ -1991,3 +1991,48 @@ item; the other half is making sure something will act on them.
 
 **Net position after this audit:** every finding from tonight now maps to either a completed
 fix, a workable task, or a task blocked with the blocker named. Nothing is floating.
+
+### Task #14 DONE, 2026-07-29. C1's last non-held tail closed.
+
+`lilly-brand-assets-1c344a/SKILL.md:1150` carried a SECOND full derivation of the Protection
+Score: the same five-severity by four-column deduction table, its own worked micro-example,
+and the formula. Two copies of one method is the drift shape E1 and E2 exist to prevent.
+
+**Checked for live drift first: the tables are IDENTICAL**, row for row across all five
+severities and all four coverage columns. So this was latent risk, not a current defect, and
+the fix is the mirror discipline rather than a correction.
+
+**Applied the E1/E2 pattern**: named `lilly-contract-review-1c344a/references/risk-scoring.md`
+as the source of truth, labelled this copy a MIRROR, recorded the verified-identical date,
+and stated the change procedure (edit the source, update `deduction_score()` and its tests,
+re-sync the mirror in the same commit, say all three moved).
+
+**Also pointed it at the implementation, which is the part C1 was actually about.** The
+prose could only ASK for things the kernel now ENFORCES, and the header now says which:
+- Hard Stops deduct exactly -15 in every column and refuse anything else. "Never reduced" is
+  a code branch, not a reminder.
+- A deduction outside its (severity, coverage) range refuses, naming the Rule 7 failure mode.
+- BOTH calibration checks RAISE, and the header states why the too-generous direction is the
+  more dangerous one.
+- The visible calculation table this section demands is returned as DATA (`rows`), so the
+  table and the score render from one object and cannot disagree.
+- The kernel does not choose the deduction; `risk-scoring.md` step 4 reserves that to
+  judgment. Code validates the boundary, the model still rules.
+- It is NOT `weighted_score()`, and the header says so, because routing a deduction model
+  through a weighted average is the obvious wrong move.
+
+**Every claim in that header verified against the running kernel before committing:**
+```
+Hard Stop -15 in all four columns .... enforced
+reduced Hard Stop .................... refuses
+out-of-range deduction ............... refuses
+too-harsh calibration ................ raises
+too-generous calibration ............. raises
+calculation table returned as data ... rows[] with allowed_range, column_used, ...
+```
+Writing a doc header that asserts behaviour without running it would be the same defect as a
+citation that does not resolve.
+
+**C1 status: kernel BUILT and tested (O2), brand-assets prose FIXED (this). The one
+remaining tail is vendoring `deduction_score()` into `lilly-contract-review`, which is
+BLOCKED by the hold and belongs to the F1 rewire.**
