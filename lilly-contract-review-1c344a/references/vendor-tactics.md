@@ -232,11 +232,23 @@ Cross-reference every deliverable and scope item in the change order against the
 
 **Detection Category 11: Approval Manipulation**
 
-Some change orders attempt to bypass or circumvent formal procurement governance.
+Some instruments attempt to bypass or circumvent formal procurement governance.
+
+**Scope: ANY instrument that requires a Lilly signature.** Work Orders, SOWs, order forms,
+amendments and change orders alike. This category was originally written for change orders
+only, and the narrow wording caused a real miss: a Work Order whose services commenced 19
+days BEFORE signature went unflagged, because a strict reviewer looked for a citable rule,
+found one that spoke only of change orders, and correctly declined to stretch it. The tactic
+is identical whatever the document is called, so the rule now says so.
 
 Flag:
 - **Retroactive change orders:** Work already performed, now seeking retroactive approval. Language like "this change order covers work performed between [date] and [date]." This eliminates Lilly's right to negotiate or reject.
-- **Work started before approval:** Any indication that the vendor began work covered by the change order before Lilly signed it. Check dates - if the change order describes work already underway, the vendor is creating a fait accompli.
+- **Work started before approval (CHECK THE DATES ON EVERY INSTRUMENT):** compare the
+  stated commencement, effective or services-start date against the signature date. If work
+  begins first, Lilly has been committed before it agreed, and the leverage to negotiate any
+  term in the document is already gone. Quote both dates and the gap in days. This applies
+  to a Work Order or SOW exactly as it applies to a change order: an effective date earlier
+  than the signature date is the finding, whatever the instrument is called.
 - **Urgency language designed to bypass review:** "Urgent execution required," "time-sensitive - approval needed by [date]," "delay will impact go-live." Artificial urgency is a negotiation tactic to prevent thorough review.
 - **Authority bypass:** Change order routed to an approver below the FRAP threshold for the total value, or submitted as multiple small change orders that individually fall below approval thresholds but collectively exceed them (salami slicing).
 
