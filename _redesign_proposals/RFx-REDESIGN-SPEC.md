@@ -138,7 +138,7 @@ RfxToDealHandoff {
   selectedSupplier { id, name, advisoryTier }
   requirementModel { categoryCount, mustHaveCount, note: "weights locked at scoring" }
   normalizedTco { allInUnit, denominatorUnit, components[], reconciliation,
-                  tag: "indicative — firm in negotiation" }
+                  tag: "indicative - firm in negotiation" }
   awardConditions[]          // gate-pass status, mandatory-review outcomes
   openIssues[]               // open gating clarifications, unresolved gateConflict
   commitments[]              // supplier-stated terms/escalator/exit (or "to be negotiated")

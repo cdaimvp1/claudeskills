@@ -65,9 +65,15 @@ itself em-dash-free.
 **Resolved to the hyphen form**, defined once as `TCO_TAG` in the emitter and asserted by
 T4. T5 additionally asserts no em dash appears anywhere in the emitted object.
 
-The two documents that disagree should be corrected to match rather than left as a trap for
-the next implementer. That is a docs edit in files the plan treats as authoritative, so it
-is recorded here rather than made unilaterally.
+**CLOSED 2026-07-29 (Marc: "align the docs to the hyphen form").** Both disagreeing sources
+were corrected, so all three now carry `indicative - firm in negotiation`:
+
+- `_redesign_proposals/RFx-REDESIGN-SPEC.md:141` (was the em dash)
+- `deal-room-1c344a/SKILL.md:216` (was the comma)
+
+The only remaining occurrences of the old spellings are in this file and the run log, where
+they are quoted deliberately as the record of what the defect was. Do not "fix" those: a
+findings document that no longer states the finding is useless.
 
 ## Self-test coverage
 
