@@ -74,6 +74,21 @@ This dashboard does not author content. Each lens skill owns a slice of the data
 
 No lens skill builds its own version of this dashboard. Each contributes its slice.
 
+**Every field carries a `sourceRef`.** A field arriving without one is a build failure, not
+a gap to render. This dashboard composes other skills' findings, so it is the last place an
+uncited value can be caught before a reader treats a rendered number as established fact.
+
+Gap-stating is for data that is genuinely absent and named as such. An uncited value is
+worse than a missing one, because it looks like evidence: a missing figure prompts someone
+to go and find it, while a figure with no source gets quoted.
+
+**Drop, do not dilute (G12).** A finding that cannot cite a source is dropped, never softened
+into a hedged observation. This dashboard does not author content, so it has no business
+rewriting a lens skill's unsupported finding into something vaguer that survives review.
+
+(This matches `rfx-hub-1c344a`'s slice contract. This one predated the D4 pass that added the
+requirement there, which is the only reason it was missing.)
+
 ## Design system
 
 Restyle protocol, as applied 2026-07-28. Plum `#5C2B50` primary marks structure, teal

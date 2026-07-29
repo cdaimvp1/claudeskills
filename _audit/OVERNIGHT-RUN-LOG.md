@@ -2357,3 +2357,49 @@ file (T29).
    that same set is REFUSED as a Full package.
 
 Kernel manifest still 15 of 16 + 1 held: the vendored copy was read, never edited.
+
+---
+
+## H3 follow-through — the three claim-gate gaps (CLOSED)
+
+Final: **32 IMPLEMENTED, 0 PARTIAL, 0 ABSENT.** Full write-up appended to
+`_audit/H3-CLAIMGATE-FINDINGS.md`.
+
+**Gap 1, drop-do-not-dilute.** Added to the five finding-generating skills, under GLOBAL
+OPERATING RULE 3 (one of the two rules G12 says it consolidates) rather than as a bolted-on
+section. Adoption 1 -> 7. Deliberately NOT added to all 33 files carrying the shared block:
+composition dashboards generate no findings, so the rule has nothing to bite on, and adding
+it would be exactly the statistic-improving edit the H3 document argued against.
+contract-review is HELD, excluded, verified untouched; it needs the bullet when the hold lifts.
+
+**Gap 2, no code-enforced gate.** Built `supplier-deep-dive/deep_dive_validator.py` (20/20).
+It enforces the skill's OWN quoted rules and refuses rather than warns: an uncited
+debarment/sanctions/breach/financial-distress assertion, a gating item carrying anything
+other than REQUIRES_FORMAL_SCREEN (a PASS there is a fabricated clearance), an unrouted
+gating item, a diluted finding, named customers or financials against an empty research log.
+
+It carries negative controls, because a gate that refuses honest abstentions is as useless
+as one that refuses nothing. Check ORDER was corrected mid-build: the generic uncited check
+fired before the specific ones, so a diluted sanctions claim reported as merely uncited,
+telling the reader to add a citation when the right action is to delete the sentence.
+
+**Gap 3 was mostly MY OWN MEASUREMENT ERROR.** Only one of four entries survived:
+
+- `procurement-help-desk` "missing ABSTAIN": FALSE POSITIVE. SKILL.md:138 literally says
+  "ABSTAIN rather than fabricate" and the ABSTAIN pattern list did not contain the word
+  "abstain". The abstain audit could not detect the word abstain.
+- `workflow-map` "missing ABSTAIN": FALSE POSITIVE. It marks unknown stakeholders `[OWNER?]`
+  rather than inventing them, which is cite-or-abstain applied to stakeholders.
+- `rfx-hub` "missing CITE": closed by its own D4 slice contract, as predicted.
+- `deal-tab` "missing CITE": GENUINE, and fixed. Its slice contract now requires a sourceRef
+  on every field, matching rfx-hub, whose contract only had it because D4 came later.
+
+Four false negatives, all one mistake: matching WORDING instead of MECHANISM. Plus a fifth
+near-miss worth recording, because it is the nastiest kind: my fix for the "abstain" pattern
+was written with a corrupted escape and became a literal BACKSPACE character. It matched
+nothing, and the audit reported a clean zero rather than erroring. A regex that cannot match
+is indistinguishable in the output from a skill that lacks the mechanism.
+
+Conclusion strengthened in the findings doc: this tool's ABSENT results are unreliable in a
+specific direction, they UNDER-report. Treat an ABSENT as a prompt to go read the skill,
+never as a finding on its own.

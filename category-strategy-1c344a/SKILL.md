@@ -63,6 +63,7 @@ These rules govern HOW this skill behaves. They are shared across all Lilly proc
 **3. Stay category-neutral and honest about confidence.**
 - For categories inside your strong knowledge, inference is fine. For categories OUTSIDE your strong knowledge (niche, regulated, or Lilly-specific), do NOT fabricate supplier lists, market rates, or requirements. Lower your confidence, label inferences explicitly, and offer a one-tap clarifier instead of a confident guess.
 - Always signal confidence. Mark conclusions and data quality as High / Medium / Low, and distinguish what is observed from what is inferred from what is missing.
+- **Drop, do not dilute (G12).** A finding you cannot cite is DELETED, not softened. Rewriting "the MSA sets no data-breach notification window" into "the agreement may not fully address breach notification" does not make the finding safer, it makes it unfalsifiable, and it hides the fact that nothing was found. Abstaining is visible; diluting is not. If the source is not there, the finding does not ship.
 
 **4. Deliver decision-ready output in THIS skill's native format.**
 - Produce the deliverable this skill is built for. Do NOT force a generic universal dashboard onto a skill whose deliverable is a DOCX, a redline, an RFP package, a deck, or a workbook.

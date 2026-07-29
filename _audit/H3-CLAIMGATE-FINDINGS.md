@@ -116,3 +116,89 @@ mechanisms often live in reference files rather than the main body.
 mechanism and still apply them badly at runtime; only the golden fixture and the G8 smoke
 test can speak to that. Read this as a map of where the guardrail is declared, not as
 evidence that it fires.
+
+---
+
+# RESOLUTION, 2026-07-29
+
+Final state: **32 IMPLEMENTED, 0 PARTIAL, 0 MENTION-ONLY, 0 ABSENT.**
+
+## Gap 1, drop-do-not-dilute: CLOSED
+
+Added to the five finding-generating skills where dilution is available as an escape:
+supplier-deep-dive, supplier-landscape, legal-negotiation-prep, commercial-negotiation-prep,
+category-strategy. Placed under GLOBAL OPERATING RULE 3, which is one of the two rules G12
+says it consolidates, rather than bolted on as a new section.
+
+`lilly-contract-review` is on the list in principle but is **HELD**, so it was excluded and
+verified untouched. It needs the same bullet when the hold lifts.
+
+Adoption went from 1 skill (brand-assets, its own definition) to 7. It was deliberately NOT
+sprayed across all 33 files carrying the shared rules block: the composition dashboards do
+not generate findings, so the rule has nothing to bite on there, and adding it would be
+exactly the statistic-improving edit this document argued against.
+
+## Gap 2, no code-enforced gate: CLOSED for the skill that mattered
+
+`supplier-deep-dive-1c344a/deep_dive_validator.py` + self-test (20/20). It enforces THIS
+SKILL'S OWN quoted rules, not a standard invented for it, and it refuses rather than warns:
+
+- a gated status (debarment / sanctions / breach / financial distress) asserted with no
+  cited source
+- a gating item carrying any status other than `REQUIRES_FORMAL_SCREEN`, because a `PASS`
+  here is a fabricated clearance and this skill routes gating items to an SME rather than
+  adjudicating them
+- a gating item with no SME route
+- a diluted finding, in a risk dimension or in the recommendation rationale
+- named customers or financial figures against an empty research log
+- a confidence value outside High / Medium / Low
+
+It carries **negative controls**: honest abstentions ("Not verified, requires a formal
+screen", "Not Publicly Disclosed", an empty financials block, no gating items at all) must
+PASS. A gate that refuses everything is as useless as one that refuses nothing, and that is
+the failure mode a strict validator actually reaches, because every tightening looks like an
+improvement until it starts rejecting honest abstentions.
+
+Check ORDER was corrected during the build: the generic uncited-claim check originally fired
+before the specific gated-status and dilution checks, so a diluted sanctions claim was
+reported as merely uncited. That tells the reader to add a citation when the correct action
+is to delete the sentence.
+
+The other ten skills keep instruction-only gates. `voice-profile`, `workflow-map` and
+`timeline-builder` remain defensible; the rest are lower-stakes than deep-dive and are not
+closed here.
+
+## Gap 3: was mostly MY OWN MEASUREMENT ERROR
+
+Only one of the four entries survived contact with the evidence.
+
+| skill | claimed gap | actual |
+|---|---|---|
+| `procurement-help-desk` | missing ABSTAIN | **FALSE POSITIVE.** SKILL.md:138 says "ABSTAIN rather than fabricate", the most direct possible statement of the mechanism |
+| `workflow-map` | missing ABSTAIN | **FALSE POSITIVE.** Rule 2 marks an unknown stakeholder `[OWNER?]` rather than inventing one, which is cite-or-abstain applied to stakeholders |
+| `rfx-hub` | missing CITE | closed by its own D4 slice contract, as this document predicted |
+| `deal-tab` | missing CITE | **GENUINE.** Fixed: its slice contract now requires a `sourceRef` on every field, matching rfx-hub |
+
+### The pattern this audit kept repeating
+
+Four false negatives, all the same mistake: **matching wording instead of mechanism.**
+
+1. `rfx-hub` / `deal-tab` graded ABSENT because the patterns missed `gap-stated` (caught in
+   the original pass, and the reason this document warned about it).
+2. `procurement-help-desk` graded missing ABSTAIN because the ABSTAIN pattern list did not
+   contain the word **"abstain"**. The abstain audit could not detect the word abstain.
+3. `workflow-map` graded missing ABSTAIN because it uses `[OWNER?]` as its marker.
+4. A fifth near-miss: the fix for (2) was written into the script with a corrupted escape,
+   so the pattern became a literal backspace character. It matched nothing and the audit
+   **silently reported zero** rather than erroring. A regex that cannot match is
+   indistinguishable, in the output, from a skill that lacks the mechanism.
+
+All patterns are now enumerated in the script with comments saying why each exists, plus a
+generic bracketed-placeholder pattern so the next skill that coins its own marker is caught
+without another round of this.
+
+**The standing conclusion in "Method and its limits" is stronger than first written.** This
+is a text audit; it proves presence, not correctness, AND its absence findings are
+unreliable in a specific direction: they under-report, because a mechanism expressed in
+unanticipated words reads as a missing mechanism. Treat an ABSENT from this tool as a
+prompt to go and read the skill, never as a finding on its own.

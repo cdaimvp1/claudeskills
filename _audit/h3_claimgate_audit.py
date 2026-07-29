@@ -47,6 +47,17 @@ PATTERNS = {
         # these produced a false ABSENT on rfx-hub and deal-tab on the first run,
         # which is why the wording variants are enumerated rather than assumed.
         r"gap-stat", r"gap stat", r"labeled state", r"labelled state",
+        # THIRD false negative of the same kind: the bare word. procurement-help-desk
+        # says "ABSTAIN rather than fabricate" at SKILL.md:138, the most direct possible
+        # statement of the mechanism, and this list did not contain "abstain", so the
+        # abstain audit could not detect the word abstain. Matching wording instead of
+        # mechanism keeps producing the same failure; every variant found is kept here.
+        r"abstain",
+        # FOURTH, and the reason the note below exists: workflow-map marks an unknown
+        # stakeholder as [OWNER?] rather than inventing one, which IS cite-or-abstain
+        # applied to stakeholders. Generic bracketed ALL-CAPS placeholder, so the next
+        # skill that coins its own marker is caught without another round of this.
+        r"\[[A-Z_]+\?\]",
     ],
     "CITE": [
         r"\bcite\b", r"\bcited\b", r"\bcitation", r"source citation",
