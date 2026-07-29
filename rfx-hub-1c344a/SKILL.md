@@ -137,10 +137,45 @@ out of scope for this single-tab, no-drawer build (documented in `build_dashboar
 own header). The base render — mount plus all four subtabs — does not reach them and is
 unaffected. Same acceptance boundary as the Deal-tab and Landscape builds.
 
+## Send winner to Deal (the RFx-to-Deal handoff)
+
+When a winner is selected and the selection is final, emit the `RfxToDealHandoff` with the
+generator. Do NOT hand-write the object: the schema is owned by
+`_redesign_proposals/RFx-REDESIGN-SPEC.md` section C and must not be forked, and the numbers
+in it are inherited by the whole negotiation.
+
+```bash
+python rfx_handoff_emitter.py <rfx_event.json>           # the handoff object
+python rfx_handoff_emitter.py <rfx_event.json> --seed    # projected into deal-room Phase 1 intake
+python rfx_handoff_selftest.py                           # 28 assertions, run after any edit
+```
+
+**RFx never writes past selection.** Everything emitted is `draft: true`; Deal Room owns it
+all afterwards and re-derives the TCO.
+
+**The claim-gate on the seam (G12).** A commitment WITH a citation is emitted as a
+commitment. A commitment WITHOUT one is not dropped and is not asserted: it is demoted to an
+OPEN issue labelled `[CONFIRM ...]`. Deal Room must never inherit an agreed position that
+nobody can source. Drop the CLAIM, never the finding.
+
+**It refuses rather than guesses.** The generator raises, and the CLI exits 2, on:
+
+| refusal | why it is not a default |
+|---|---|
+| no selected supplier, or selection not final | there is nothing to hand over before a winner exists |
+| TCO components that do not sum to the total | an unauditable total is the thing this seam exists to prevent |
+| a component with no amount | treating it as 0 understates the total, and the error is inherited silently |
+| a finding that neither survives nor is demoted | the claim-gate may change a finding's status, never delete it |
+
+An unresolved `gateConflict` is carried into `openIssues` rather than resolved in either
+party's favour.
+
+**One contract value, one spelling.** The TCO tag is `indicative - firm in negotiation`.
+The spec renders it with an em dash and deal-room's SKILL.md paraphrases it with a comma;
+the em-dash-free form is canonical (see `_audit/A2-HANDOFF-FINDINGS.md`).
+
 ## Owed work
 
-- **A2** (RFx-to-Deal handoff emitter): not built here. This skill has no "Send winner to
-  Deal" action yet; wiring it emits `RfxToDealHandoff` per the RFx-Deal redesign spec and
-  depends on this hub existing, which is now true.
+- **A2** (RFx-to-Deal handoff emitter): **BUILT 2026-07-29.** See "Send winner to Deal" below.
 - Malicious-code sweep and in-browser 0-console-error check ahead of formal lock (the "#16
   gate") have not been re-run post-rehome; only the byte-identity build proof has.

@@ -2284,3 +2284,38 @@ rather than deleting the lines keeps the record of what was asked and what was f
 
 Rebuilt (3.26 MB); old label gone, both new labels present. Smoke 32/0, citations 0
 unresolved.
+
+---
+
+## A2 — RFx to Deal handoff emitter (BUILT)
+
+`rfx-hub-1c344a/rfx_handoff_emitter.py` + `rfx_handoff_selftest.py`, 28/28.
+Write-up: `_audit/A2-HANDOFF-FINDINGS.md`.
+
+A2 called this an unwired half-contract: the consumer (deal-room Phase 1) was wired on
+2026-07-25 and the emitter was honestly deferred until rfx-hub existed. It does now.
+
+Deterministic, stdlib-only, Desktop-runnable. The schema is not forked; section C of the
+RFx spec owns it and this implements it. `to_deal_room_seed()` projects the handoff into
+deal-room's intake shape, which is what turns A2's verify clause into an actual test
+rather than a claim.
+
+**Claim-gate:** an uncited commitment is demoted to an OPEN `[CONFIRM ...]` issue, never
+asserted as agreed and never dropped. An invariant raises `DroppedFindingError` if the
+count entering does not match the count leaving as commitment-or-demotion, so the gate
+cannot silently lose a finding.
+
+**Refusals:** no final selection, a TCO that does not reconcile, a component with no
+amount (never treated as 0), an unauditable total, a dropped finding. An unresolved
+gateConflict is carried into openIssues rather than resolved in either party's favour.
+
+**Finding: one contract value had three spellings.** The TCO tag appears as
+`indicative — firm in negotiation` (spec, em dash), `indicative - firm in negotiation`
+(canonical doc), and `indicative, firm in negotiation` (deal-room SKILL.md). Any
+round-trip equality check would fail against two of three, and the em-dash form breaks
+the standing no-em-dash rule. Resolved to the hyphen form, defined once and asserted.
+The two disagreeing documents should be corrected to match; recorded rather than changed
+unilaterally since both are authoritative.
+
+The self-test caught my own miscount while writing it: T14 expected 5 seeded issues where
+4 is right, because a demoted commitment counts once, not twice. Code right, test wrong.
