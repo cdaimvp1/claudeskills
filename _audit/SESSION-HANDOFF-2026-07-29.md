@@ -128,3 +128,95 @@ No Marc decision needed, no locked or held file touched, verifiable without him.
 - **Malicious-code review is mandatory** per increment.
 - **No em dashes**, in prose or code.
 - **Save and commit often.**
+
+---
+
+# UPDATE: coverage matrix complete (2026-07-29, end of session)
+
+All three parts done. **342 rows, 0 strict blockers.** Files:
+`_audit/F1-COVERAGE-MATRIX-PART1-mechanical.md` (118 rows),
+`PART2-judgment.md` (89), `PART3-outputs-rules.md` (135).
+
+Still owed: merge into one `_audit/F1-COVERAGE-MATRIX.md`.
+
+## Part 3 justified the whole exercise: three real losses caught
+
+Retiring `dashboard-canonical.md` would have silently deleted three things. This is
+exactly the regression the coverage guarantee exists to prevent, and none of it was
+visible without reading the file.
+
+**1. The Deal-tab contribution section (lines 224-353) IS D1.** It was added
+2026-07-29, earlier in the same session that retired the file. It documents this
+skill's data slice into `deal-tab-1c344a`. Deleting the file deletes the slice
+contract.
+
+This also corrects an earlier audit finding. The claim "only deal-tab has a slice
+contract" was wrong: contract-review has one too, it is just buried in the file
+being retired. Re-check the other lens skills before trusting that finding.
+
+**RELOCATE it to `references/deal-tab-contribution.md` BEFORE any deletion.**
+`deal-tab-1c344a` does not reference it back, so there is no dangling reference
+from that side, but the contract itself would be gone.
+
+**2. The Obligations sub-tab.** Register, imbalance analysis, deadline-urgency
+chips, verbatim-source-sentence field. `review-summary-design.md` has NO Obligations
+section, so the dashboard was the ONLY place this analysis surfaced outside a Deal
+build. Needs a new section in `review-summary-design.md` plus a field addition to
+`pass-artifacts.md` Pass 4.
+
+**3. The Documents sub-tab Compliance Evidence Checklist.** The fixed W-9 / SOC2
+list with Filed / Draft / Pending / Awaiting states, plus the document-family
+register. No surviving home. Maps to `contract-stack-map.md` as new Stage 1
+deterministic checks.
+
+`retentionClass()` and `evidenceStatus()` are pure lookups and port to the kernel at
+no cost. Dependencies: `SKILL.md` has 9 references to the file, and
+`examples/contract_review_canonical_dashboard.jsx` is wholly dependent and retires
+with it.
+
+## Rules affected
+
+- **Rules 7, 9, 12** upgrade from instruction to code-enforced via
+  `deduction_score()`.
+- **Rule 12 needs a text edit**: it names "the dashboard's Protection Score panel"
+  as an emission target that will no longer exist.
+- **Rules 5, 10, 11** gain a deterministic first pass that narrows but never decides.
+- **Rules 1-4, 6, 8** unchanged.
+
+## Spec correction from Part 1
+
+`deduction_score()` needs **TWO** calibration assertions, not one. The spec named
+only the too-harsh direction. `risk-scoring.md` also carries the converse: a
+standalone document with 5+ findings must not come in under 25 points. The
+too-generous case is the more dangerous one, because it understates risk and nobody
+questions a good number. Spec already corrected.
+
+## Pre-existing quality issues found (not redesign defects)
+
+Seven ambiguities in the judgment corpora where two reviewers would reach different
+answers today. One is a real contradiction: **playbook section 18 sets a 3M floor
+AND a 2x to 3x fallback, with no resolution when the fallback computes below the
+floor.** The rest are unbounded or untestable terms. Worth Marc's attention
+independently of this work, and they get MORE visible after the redesign, because
+Stage 1 proposing candidates against an ambiguous rule produces inconsistent
+candidates rather than absorbing the ambiguity in prose.
+
+## Efficiency finding worth acting on
+
+`playbook.md` and `pharma-requirements.md` are loaded **"Always", in full, with zero
+narrowing** (`SKILL.md:658, 666`). 406 lines into every run regardless of relevance.
+Retrieval indexing is a real saving at zero accuracy cost. A retrieval miss must
+fall back to the FULL corpus, never to skipping the check.
+
+## CORRECTED overnight sort
+
+**Retiring `dashboard-canonical.md` is NOT safe** and is now blocked on the three
+rescues above. Do the rescues first, as separate reviewed changes. This moves from
+"blocked pending review" to "blocked with known required work".
+
+Everything else in the SAFE list below is unchanged and still safe.
+
+**Also note:** the rescue work touches `lilly-contract-review`, which is under the
+documented HOLD at `PLATFORM-CONSOLIDATION-TRACKER.md:172`. Relocating the D1
+section is additive and low risk, but it is still a held file. **Get Marc's
+explicit go before touching it.**
