@@ -20,16 +20,22 @@
     "D-1",
     "D-2",
     "D-3",
+    "D-4",
+    "D-5",
     "D-6",
     "V-1",
+    "V-2",
     "V-3",
     "V-4",
     "A-1",
     "A-2",
     "A-3",
+    "A-4",
+    "A-5",
     "A-6",
     "A-7",
     "A-8",
+    "S-1",
     "V-5"
   ],
   "extra": [
@@ -37,11 +43,6 @@
       "topic": "no HIPAA BAA despite patient-support data in scope",
       "severity": "HIGH",
       "where": "WO-10"
-    },
-    {
-      "topic": "WO term outruns the MSA's current term",
-      "severity": "MEDIUM",
-      "where": "WO-10:3"
     }
   ],
   "aggregates": {

@@ -2719,3 +2719,47 @@ claiming the runs prove more than they do.
 
 Still worth removing the collision: rename the fixture's document so no future run has to
 reason about it. Recorded, not done, since renaming touches the fixture and its answer key.
+
+---
+
+## CORRECTION: I over-reported the failure. Most of it was my mapping, not the skill.
+
+Before troubleshooting the skill further I checked whether the remaining failures were real,
+because I had flagged in the baseline that I mapped `S-1`, `S-2` and `V-2` as not-found
+"not confidently". That caveat turned out to be the main story.
+
+Re-checking each remaining item against the run outputs:
+
+| item | I recorded | actually |
+|---|---|---|
+| A-4 NTE exceeded | not found | **found by both**, explicitly: stated total $685,000 exceeds the WO's own NTE |
+| A-5 rate-card overage | not found | **found by both**: Senior Data Engineer billed $235 against the card's $210 |
+| S-1 Exhibit E missing | not found | **found by both**, and by the redline run as a HIGH |
+| V-2 responsibility shifting | not found | **found by both** (WO 2.3/2.4, SMEs at 10 hrs/week plus the delay consequence) |
+| D-4 Controller status, D-5 secondary use | not found | **substantively present**, but BUNDLED into one 6.4 finding rather than raised as three |
+| S-2 SOC 2 Type II state | not found | **genuine miss.** The only SOC 2 mention sits inside an audit-rights covered-absence finding, not as an outstanding-evidence finding |
+
+**Corrected verdict: 1 problem (redline-only), 2 problems (full review).** Down from the 8
+and 9 I reported. The arithmetic-minimum failure also disappears once A-3 through A-6 are
+credited: the runs produce 8, which is the required minimum.
+
+The genuine remaining defects are:
+- **S-2, both modes.** SPS:9.2 requires SOC 2 Type II; its "Awaiting" state is not flagged
+  as outstanding compliance evidence. A real gap in absence-of-evidence detection, distinct
+  from the Rule 9a absence-of-clause detection now working.
+- **V-5, full review only.** Retroactive commencement (work started 19 days before
+  signature). The redline run caught it; the full review dropped it, having reasoned it did
+  not survive citation-checking.
+- **D-4/D-5 bundling**, which is a judgment call rather than a clear defect: three planted
+  findings at WO 6.4 arrive as one. Substantively the Controller assertion and the
+  secondary-use carve-out are both named as grounds. It matters only if three findings at
+  one clause should produce three separate remediation asks, which is arguable.
+
+**The lesson is about the measurement, not the skill.** I mapped conservatively, marked
+anything I had not verified as not-found, and then reported the resulting count as the
+skill's failure. Conservative mapping is not neutral: it manufactures failures, and I
+presented those numbers with more confidence than the method supported. The fixture is only
+as good as the mapping, and the mapping is the least rigorous part of this apparatus.
+
+Worth doing: make `check_run.py` accept evidence per claimed ID (the finding text that
+justifies the mapping), so a mapping is auditable rather than asserted. Recorded, not built.
