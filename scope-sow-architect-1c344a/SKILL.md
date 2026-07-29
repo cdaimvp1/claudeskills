@@ -148,15 +148,15 @@ more), never IT alone.
   fact is stated. Never fabricate depth, deliverables, or benchmarks to fill a section (see Rule 3).
 
 **9. Follow the Execution Guardrails. (HARD RULE, suite-wide.)**
-- Read and follow `/mnt/skills/user/lilly-brand-assets-1c344a/references/execution-guardrails.md`
+- Read and follow `the "## INLINED: references/execution-guardrails.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md`
   before every run. It contains the full text of the mandatory tool-selection rules, gate checks,
   anti-collapse signals, cross-reference tracing requirements, and pre-delivery self-tests.
 - When this skill produces an analytical document, deck, or dashboard, also read
-  `/mnt/skills/user/lilly-brand-assets-1c344a/references/narrative-standards.md` (output must read
+  `the "## INLINED: references/narrative-standards.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (output must read
   as connected analysis, not a key-value dump or bullet fragments),
-  `/mnt/skills/user/lilly-brand-assets-1c344a/references/validation-checklist.md` (re-verify
+  `the "## INLINED: references/validation-checklist.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (re-verify
   numbers, sources, and cross-artifact consistency before delivering), and
-  `/mnt/skills/user/lilly-brand-assets-1c344a/references/house-styles.md` (use the Magazine Report
+  `the "## INLINED: references/house-styles.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (use the Magazine Report
   house style; pull exact values from brand-colors.md / dashboard-components.md /
   docx-design-system.md; never invent off-style palettes, fonts, or components).
 - **Foundation dependency / graceful degradation:** these references live in the shared

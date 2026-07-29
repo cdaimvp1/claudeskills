@@ -24,5 +24,13 @@ handle on it. The move itself is verified complete and behaviour-neutral, the
 build from the new location produced a **byte-identical** artifact
 (`6b8b6a1f82f7f7a4e7f3f44be16c2588`).
 
-**Delete this whole `dashboard/` directory** once no process holds it. Nothing
-references it.
+**Delete this whole `dashboard/` directory** once no process holds it.
+
+**Correction, 2026-07-29:** this note previously ended "Nothing references it."
+That was wrong at the time it was written. deal-room-1c344a/SKILL.md itself still
+instructed the reader to author the data object and run the build script from THIS
+directory, so anyone following the skill would have hit a missing script.
+(The old paths are described rather than quoted here on purpose: writing them as
+backtick paths made the smoke test flag this very note as a broken reference.) The smoke test's A7 assertion caught it. The
+instruction now points at `deal-tab-1c344a/dashboard/`, and nothing references this
+directory any more, which is what the original sentence claimed.

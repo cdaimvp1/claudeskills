@@ -282,7 +282,7 @@ the blue-vs-red distinction.
 The palette every INTERACTIVE dashboard uses (skill-generated dashboards and the Deal / Landscape / RFx
 builds). It is a mid-century-modern system: plum plus teal plus burnt-orange, with NON-STOPLIGHT status.
 It does NOT govern documents (see the two-palette model at the top). In the Deal / Landscape / RFx builds
-the machine-authoritative token layer is `assets/theo-color.css`; the tokens here are the source a skill
+the machine-authoritative token layer is theo-color.css, which ships in the dashboard build tree of each rendering skill (for example deal-tab-1c344a/dashboard/assets/theo-color.css) rather than in this foundation; the tokens here are the source a skill
 uses when it generates a dashboard.
 
 | Role | Token | Hex | Note |
@@ -1103,7 +1103,7 @@ If a write does not visibly complete, re-issue that one section. Do not proceed 
 
 ## G11: Kernel-Backed Computation (HARD RULE for Kernel-Consuming Skills)
 
-Where a skill vendors a numeric/decision kernel (a Python module, such as `numeric_kernel.py`, `frap_chain_kernel.py`, or `timeline_engine.py`, shipped in that skill's own directory), all arithmetic and lookups covered by that kernel MUST be computed by calling the kernel, never performed in prose or by model judgment.
+Where a skill vendors a numeric/decision kernel (a Python module such as numeric_kernel.py, frap_chain_kernel.py or timeline_engine.py, shipped in THAT skill's own directory, not in this foundation), all arithmetic and lookups covered by that kernel MUST be computed by calling the kernel, never performed in prose or by model judgment.
 
 - **The rule:** if a kernel function exists for a computation (a weighted score, an NPV, a percentile gate, an FRAP chain lookup, a critical-path calculation, an escalation threshold, or any other figure the kernel covers), that function is called and its return value is used verbatim. The model does not re-derive, sanity-check by re-computing, round differently, or "correct" the kernel's output through its own arithmetic.
 - **A figure produced without the kernel is invalid.** If the kernel is missing, fails to import, or errors on the given input, the skill STOPS and reports the failure; it does not fall back to estimating the figure in prose. A plausible-looking number that did not come from calling the kernel is not a substitute and must not be presented as the computed result.
@@ -1157,7 +1157,8 @@ For each finding, capture before scoring:
 > reproduced so this foundation reads standalone. **Verified identical to the source on
 > 2026-07-29**, row for row across all five severities and all four coverage columns.
 >
-> **The implementation is `deduction_score()` in `numeric_kernel.py`** (added 2026-07-29,
+> **The implementation is `deduction_score()`, in the shared numeric kernel owned by
+> `lilly-procurement-kernels-1c344a` and vendored into each consuming skill** (added 2026-07-29,
 > `18b955b`). It is NOT `weighted_score()`: this is a deduction model that starts at 100 and
 > subtracts, while `weighted_score()` is a weighted average over criteria footing to 1.0.
 > Routing one through the other is the obvious wrong move and the kernel's own docstring

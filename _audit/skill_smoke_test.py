@@ -65,40 +65,18 @@ PLATFORM_TOOLS = {
     "pack.py",
 }
 
-# Assertions that are KNOWN-OPEN, with a reason and a tracking reference. These
-# report as KNOWN rather than FAIL so the suite can run as a CI gate: a check that
-# is red on day one gets ignored, and then stops catching the failures that matter.
+# Assertions that are KNOWN-OPEN, with a reason and a tracking reference.
 #
-# This list is a liability, exactly like kernel_manifest.py's KNOWN_EXCEPTIONS.
-# Every entry is a real defect that is not being fixed today. Adding to it must be
-# a deliberate act with a reason, never a way to make a run pass.
-KNOWN_OPEN = {
-    # value = (exact expected failure detail, reason). The detail is compared
-    # EXACTLY. If the same assertion fails for a DIFFERENT reason in the same
-    # skill, it is NOT suppressed and the gate goes red.
-    #
-    # That pinning is the point. Keying only on (skill, assertion) would suppress
-    # the whole check for that skill forever, so a NEW broken path in deal-room
-    # would sail through behind an entry that was about a different path. An
-    # allowlist that absorbs future defects is worse than no allowlist, because it
-    # reads as coverage.
-    ("deal-room-1c344a", "A7"): (
-        "_parts/data.js; _parts/style.css; dashboard/_parts/data.js; "
-        "dashboard/_platform_build/build_dashboard.py; dashboard/build_deal_artifact.py",
-        "Documents deal-tab's files. Prose pointing at another skill's tree. "
-        "Non-breaking. Tracked as B7.",
-    ),
-    ("lilly-brand-assets-1c344a", "A7"): (
-        "assets/theo-color.css; frap_chain_kernel.py; numeric_kernel.py; timeline_engine.py",
-        "Documents three kernels it does not ship. numeric_kernel genuinely lives in "
-        "lilly-procurement-kernels and is vendored into consumers, so the reference "
-        "describes something real from the wrong place. Non-breaking. Tracked as B7.",
-    ),
-    ("rfp-engine-1c344a", "A7"): (
-        "rfx-hub-1c344a/dashboard/assets/pv/pv-04-domain-data.js",
-        "Points at a path inside another skill. Non-breaking. Tracked as B7.",
-    ),
-}
+# EMPTY as of 2026-07-29, and that is the point. It briefly held three A7
+# doc-pointer failures while the B7 sweep was outstanding. All three are now FIXED
+# rather than excused, so the list retired with them.
+#
+# A suppression list should be temporary by construction. If this ever refills,
+# each entry must carry a reason, an owner and a tracking reference, and must pin
+# the EXACT expected failure detail so a different failure in the same skill still
+# goes red. Suppressing a whole assertion for a skill lets it absorb future
+# defects, which is worse than no list because it reads as coverage.
+KNOWN_OPEN = {}
 
 # Files whose self-test is known to require the suite and cannot run flat.
 # Each entry needs a reason. This list is a liability: every entry is a file
@@ -269,8 +247,17 @@ def smoke(skill, verbose=False):
         # the skill PRODUCES, and asserting they exist in the folder is backwards.
         # Caught as a false positive on the first run: rfp-response-analysis was
         # flagged for analysis_summary.docx, which is its primary deliverable.
+        #
+        # A path prefixed with ANOTHER skill's directory is a cross-skill
+        # reference, which is A8's job, not A7's. Excluded here so A7 stays what
+        # it claims to be: the skill's own broken self-references. Caught as a
+        # false positive on rfp-engine, which legitimately cites
+        # rfx-hub-1c344a/dashboard/... while documenting the shared RFX object.
+        other_skills = tuple(d + "/" for d in skills() if d != skill)
         for m in re.findall(r"`([a-zA-Z0-9_][a-zA-Z0-9_\-/]*\.(?:py|js|css))`",
                             text):
+            if m.startswith(other_skills):
+                continue
             if m.startswith("/") or "://" in m:
                 continue
             if os.path.basename(m) in PLATFORM_TOOLS:

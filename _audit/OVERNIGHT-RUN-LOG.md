@@ -2036,3 +2036,69 @@ citation that does not resolve.
 **C1 status: kernel BUILT and tested (O2), brand-assets prose FIXED (this). The one
 remaining tail is vendoring `deduction_score()` into `lilly-contract-review`, which is
 BLOCKED by the hold and belongs to the F1 rewire.**
+
+### Task #15 (dangling-pointer sweep) DONE, 2026-07-29. KNOWN_OPEN RETIRED.
+
+The allowlist I created two hours ago is now EMPTY, because everything it excused is fixed
+rather than suppressed. That was the completion criterion and it is met.
+
+**PART A: the 145 dead paths. All rewritten, none deleted.**
+26 skills pointed at 8 brand-assets reference files that exist nowhere. The content had been
+INLINED into `lilly-brand-assets/SKILL.md` (15 `## INLINED:` sections) and the standalone
+files removed, leaving every pointer behind.
+
+The fix was a **path rewrite, not a deletion**: each dead path now names the live inlined
+section, e.g. `.../references/execution-guardrails.md` becomes `the "## INLINED:
+references/execution-guardrails.md" section inside .../SKILL.md`. Verified all 8 targets
+exist before rewriting; the script only rewrote paths whose standalone file genuinely does
+not exist.
+
+```
+files rewritten ....... 23
+dead paths replaced ... 145
+dead paths remaining .. 0
+citation resolver ..... 0 citations do not resolve   (was 153)
+```
+
+**PART B: the three A7 failures. Two were REAL, one class was my own check.**
+
+**deal-room was a REAL runtime defect, and my G9 classification of it as "non-breaking
+prose" was WRONG.** `deal-room-1c344a/dashboard/` contains ONLY a superseded marker: the
+engine moved to `deal-tab-1c344a` on 2026-07-29 (D0). But deal-room's SKILL.md still
+instructed the reader to author `dashboard/_parts/data.js` and run
+`dashboard/build_deal_artifact.py` **from a directory that had been emptied**. Anyone
+following the skill would have hit a missing script. Repointed every reference (7 sites) at
+`deal-tab-1c344a/dashboard/`, with a degradation note for when that skill is not installed.
+
+**A second, neater defect inside the first:** the superseded marker asserted "**Nothing
+references it**" while the very skill containing it did, in six places. Corrected, and now
+true: `grep` for backticked `dashboard/` paths in deal-room returns 0.
+
+**rfp-engine and lilly-brand-assets were A7 FALSE POSITIVES, so I fixed the check, not the
+prose.** A7 flagged legitimate references to files that live in ANOTHER skill. A7's job is
+the skill's own broken self-references; cross-skill references are A8's, which asserts a
+fallback rather than a path. Added an exclusion for paths prefixed with another skill's
+directory, with the reason recorded in the code.
+
+Two brand-assets references were genuinely imprecise and were reworded rather than
+suppressed: generic kernel EXAMPLES were backticked as if they were this foundation's own
+paths, and the theo-color.css token layer is named without saying it ships in each rendering
+skill's dashboard tree. **One of those was my own text from the C1 fix an hour earlier**,
+which said "`deduction_score()` in `numeric_kernel.py`" without naming the owning skill.
+
+**A small irony worth recording:** my correction note in the superseded marker quoted the old
+paths in backticks, which made the smoke test flag the correction itself. Reworded to
+describe rather than quote them, with a line in the file explaining why.
+
+**FINAL STATE, all gates:**
+```
+kernel drift ................ PASS      golden fixture checker .... PASS
+numeric kernel 96/96 ........ PASS      invoice engine 26/26 ...... PASS
+runtime smoke, 32 skills .... PASS      pro-forma adapter 6/6 ..... PASS
+citation resolver ........... PASS (0 unresolved, was 153)
+32 skills, 0 failed assertions, KNOWN_OPEN = {}
+```
+
+**KNOWN_OPEN's docstring now records why it is empty and what refilling it would require**:
+a reason, an owner, a tracking reference, and a PINNED exact failure detail. A suppression
+list should be temporary by construction, and this one lasted about two hours.
