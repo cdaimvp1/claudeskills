@@ -1239,6 +1239,58 @@ artifact from a supplied data object), `lilly-brand-assets` and
 is on this list because it was created after the original exemption list was written and
 would otherwise read as an oversight.
 
+
+### G13b: Per-fact provenance, the `$src` sidecar (H4)
+
+G13 says every fact carries its rung. **G13b is the mechanism that makes that checkable.**
+
+Provenance lives BESIDE the values, keyed by field, not inside them:
+
+```json
+"meta": { "s23": 214800000, "yoy2425": 15.2 },
+"$src": {
+  "s23":     [{"name":"ARIA S2P, PO Product pull","tier":1,
+               "confidence":"Medium","asOf":"2026-06-01","stub":true}],
+  "yoy2425": {"kind":"derived","by":"annual[] FY24-FY25 delta"}
+}
+```
+
+**Two forms, because facts come in two kinds.**
+
+| form | for | shape |
+|---|---|---|
+| sourced | a value read from somewhere | a LIST of `{name, tier, confidence, asOf, stub}` |
+| derived | a value computed from other fields | `{kind:"derived", by:"<formula>"}` |
+
+**A derived figure has no source and must not be given one.** A CAGR computed from three
+spend figures is provenanced by its formula. Forcing a source onto it would fabricate
+provenance inside the guardrail written to prevent fabrication. A fact claiming to be both
+derived and sourced is refused: one of the two is untrue.
+
+**Why a sidecar rather than wrapping each value.** Inlining `{value, source, as_of,
+confidence}` was the original proposal. It breaks every consumer at once, since each reads
+`meta.s23` as a number, and it cannot express a derived figure honestly. The sidecar keeps
+values plain, supports SEVERAL sources per fact, and preserves two signals the flat shape
+has no room for: `tier` (which maps onto G13's rungs) and `stub`.
+
+**`stub: true` is legitimate and must never fail a build.** It marks illustrative or
+placeholder data, honestly labelled. What is NOT legitimate is shipping a deliverable built
+on stubs without saying so, which is why the validator reports them separately rather than
+either ignoring or rejecting them.
+
+**The sidecar's one weakness, and the rule that answers it.** Because provenance sits beside
+the value, a field can be added and its `$src` entry forgotten. So: **every field carries
+either a source list or a derived block. Silence is refused.** A field with no provenance is
+not rung 5 (abstain); it is unlabelled, which is the state G13 exists to eliminate.
+
+**Exempt fields are DECLARED by name, never inferred.** Identifiers, labels, free-text
+commentary and dataset metadata are not claims about the world. A heuristic exemption would
+quietly widen; a named list has to be edited on purpose, and the edit shows up in review.
+
+Reference implementation: the shared `provenance` validator (29 assertions), vendored into
+each consuming skill alongside `numeric_kernel` and run there by that skill's own provenance
+check. `category-strategy` is the wired example. Paths are deliberately not given here: an
+installed skill has no sibling directory to reach across.
 ---
 
 ## INLINED: references/risk-scoring.md

@@ -769,6 +769,25 @@ Read each confirmed strategy. Extract prior strategic direction, supplier landsc
 
 ---
 
+## Per-fact provenance (G13b / H4)
+
+```bash
+python check_provenance.py     # validates every seed fact carries its $src
+```
+
+This skill's seed is the suite's provenance precedent: `$src` blocks keyed by field, in
+two forms (a source LIST, or `{kind:"derived", by:"formula"}`). `provenance.py` is the
+vendored shared validator; `check_provenance.py` runs it over the seed.
+
+It refuses a field with a value and no `$src` entry, an empty source list, a source with
+no name or no usable `asOf`, a tier outside 1-7, and a fact claiming to be both derived
+and sourced. Exempt fields are declared BY NAME with a reason in `check_provenance.py`,
+never inferred.
+
+**Stub-sourced fields are reported, not rejected.** `stub: true` is honest labelling of
+illustrative data. Currently ALL 22 sourced fields in the seed are stub-backed, so any
+deliverable built on it must say so.
+
 ## Reference Files (2 of 5 inlined below; 3 load as companion files)
 
 Of the five category-strategy reference files, two are still INLINED at the end of this document (single-file install): `dashboard-canonical.md` and `strategy-template.md` -- read every run, so they stay inline. The other three -- `analysis-frameworks.md`, `analysis-methodology.md`, and `data-quality-rules.md` -- are generic reference/methodology material, not needed on every run, so they now load as companion files from `references/` instead, on the load condition named for each below. Where the workflow says "read references/X.md" or "see references/X.md" for the two inlined files, the content is inlined below under the matching `## INLINED:` heading; do not attempt to read them from disk. For the three companion files, load the actual file from `references/` per its stated condition; do not expect their content inlined below (each has a short pointer stub at its old `## INLINED:` heading instead).

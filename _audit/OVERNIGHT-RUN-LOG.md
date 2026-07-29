@@ -3392,3 +3392,62 @@ re-doing work already there, on the strength of a measurement that was wrong six
 
 WS H now: H1, H2, H6, H7, H8, H9, H10 closed. **H4 alone remains**, and it is a decision
 about whether the suite adopts per-fact provenance, not a scheduling question.
+
+---
+
+## H4 — per-fact provenance. Option B, as decided.
+
+`provenance.py` + self-test (**29/29**) in the kernels source, vendored into
+`category-strategy` and run by its `check_provenance.py`. Canonicalised as **G13b**.
+
+**The shape is the existing `$src` sidecar, not H4's proposed inline wrapper**, and the
+reasons were worth the decision:
+
+- **Non-breaking.** Every dashboard and generator reads `meta.s23` as a number. Inlining
+  `{value, source, as_of, confidence}` turns each value into an object and breaks all of
+  them at once.
+- **A derived figure has no source and must not be given one.** A CAGR computed from three
+  spend figures is provenanced by its FORMULA. Forcing a source onto it would fabricate
+  provenance inside the guardrail written to prevent fabrication. The validator refuses a
+  fact claiming to be both derived and sourced, because one of the two is untrue.
+- **A fact can have several sources.** The list form says so; a single `source` cannot.
+- **It preserves `tier` and `stub`**, which the flat shape has no room for. `tier` maps onto
+  G13's rungs, which is what makes the ladder checkable rather than aspirational.
+
+**The sidecar's one weakness is the check's entire purpose.** Provenance beside a value means
+a field can be added and its entry forgotten, so: every field carries a source list or a
+derived block, and **silence is refused**. A field with no provenance is not rung 5
+(abstain), it is unlabelled, which is exactly the state G13 exists to eliminate.
+
+### Run against the real shipped seed, it found things immediately
+
+Five fields carried values with no `$src`: `commodity`, `name`, `ytdNote`, `cutoff`, `p80`.
+On inspection none is a claim about the world: two identifiers, one free-text commentary,
+one dataset-metadata field that IS provenance, and one carrying the gap marker `~`.
+
+They are exempted **by name with a reason**, never by heuristic. A heuristic exemption
+widens quietly; a named list has to be edited on purpose and the edit shows up in review.
+
+### The finding that matters more than the mechanism
+
+**All 22 sourced fields in the category-strategy seed are `stub: true`.** The entire spend
+spine (`s23`, `s24`, `s25`, `vendors`, every tail figure) is illustrative data.
+
+It was always honestly labelled. Nothing was hidden. But nothing SURFACED it either, and a
+deliverable built on that seed would have carried real-looking figures with no reader ever
+being told. The stub flag was doing its job silently, which is half a job.
+
+`stub: true` does not fail the build, deliberately: it is honest labelling and rejecting it
+would punish the honesty. It is reported separately instead, with the instruction that any
+deliverable built on those fields must say so.
+
+### Scope, stated plainly
+
+H4 names 8 skills. **1 of 8 is wired.** The mechanism, the shape, the validator and the
+guardrail are done and proven against real data; the other 7 need their data objects to
+CARRY `$src` before a validator has anything to check, which is real per-skill work rather
+than a switch. Reporting 1 of 8 rather than claiming 8.
+
+`#31 / H5 proper` is now unblocked in principle: the per-fact provenance field it needed
+exists. It still needs the other 7 skills carrying it before a suite-wide resolve check
+means anything.
