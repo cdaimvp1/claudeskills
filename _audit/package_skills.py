@@ -114,9 +114,44 @@ def _is_dead(rel_path, name, is_dir):
     return False
 
 
+def dirs_still_depended_on(skill):
+    """Dead-weight dirs this skill's OWN shipped code still imports from.
+
+    `_platform_build` is dead weight in general: it builds the dashboard, and the shipped
+    artifact is the built HTML. But category-strategy and deal-tab each ship a
+    `build_dashboard_*.py` that does `sys.path.insert(0, PLATFORM)` and imports from inside
+    it. Stripping the directory while keeping the script produced a package whose builder
+    could not import, and it passed every check because the smoke test loads a skill without
+    executing its build scripts.
+
+    So the strip is now conditional on nothing shipped needing it. A dependency and its
+    dependent are stripped together or kept together.
+    """
+    src = os.path.join(ROOT, skill)
+    keep = set()
+    for dp, dn, fn in os.walk(src):
+        for f in fn:
+            if not f.endswith(".py"):
+                continue
+            full = os.path.join(dp, f)
+            # A file INSIDE a candidate dir referring to its own dir proves nothing.
+            rel = os.path.relpath(full, src).replace(os.sep, "/")
+            try:
+                text = open(full, encoding="utf-8", errors="ignore").read()
+            except OSError:
+                continue
+            for d in DEAD_WEIGHT_DIRS:
+                if d in rel.split("/"):
+                    continue
+                if d in text:
+                    keep.add(d)
+    return keep
+
+
 def build_package(skill, outdir):
     """Zip one skill, stripping dead weight. Returns (path, files, bytes, stripped)."""
     src = os.path.join(ROOT, skill)
+    keep_dirs = dirs_still_depended_on(skill)
     out = os.path.join(outdir, skill + ".skill")
     files = 0
     total = 0
@@ -126,6 +161,8 @@ def build_package(skill, outdir):
         for dp, dn, fn in os.walk(src):
             for d in list(dn):
                 rel = os.path.relpath(os.path.join(dp, d), ROOT).replace(os.sep, "/")
+                if d in keep_dirs:
+                    continue
                 if _is_dead(rel, d, True):
                     stripped.append(rel + "/")
                     dn.remove(d)
@@ -141,6 +178,40 @@ def build_package(skill, outdir):
                 files += 1
                 total += os.path.getsize(full)
     return out, files, total, stripped
+
+
+def check_strip_consistency(pkg, stripped):
+    """Refuse a package that ships code depending on something the strip removed.
+
+    Found by the A11 malicious-code sweep, not by extract-and-retest, which is the point
+    worth recording: the smoke test loads a skill, it does not EXECUTE its build scripts, so
+    a script broken by stripping passes every check and fails the first time a user runs it.
+
+    Two packages shipped `build_dashboard_*.py` while `_platform_build/` (the directory
+    holding the module they import) had been stripped as dead weight. The strip rationale
+    was sound in isolation, "the shipped artifact is the built HTML, the builder is not
+    needed": the error was stripping the dependency while keeping the dependent.
+
+    A dependency and its dependent must be stripped together or kept together. Never split.
+    """
+    stripped_dirs = [s.rstrip("/").split("/")[-1] for s in stripped if s.endswith("/")]
+    if not stripped_dirs:
+        return []
+    problems = []
+    with zipfile.ZipFile(pkg) as z:
+        for name in z.namelist():
+            if not name.endswith(".py"):
+                continue
+            try:
+                text = z.read(name).decode("utf-8", "ignore")
+            except KeyError:
+                continue
+            for d in stripped_dirs:
+                if d in text:
+                    problems.append(
+                        "%s references %r, which was stripped from this package"
+                        % (name, d))
+    return problems
 
 
 def verify_package(pkg, skill):
@@ -203,6 +274,10 @@ def main(argv):
     for skill in ship:
         pkg, files, size, stripped = build_package(skill, outdir)
         ok, tail = verify_package(pkg, skill)
+        strip_problems = check_strip_consistency(pkg, stripped)
+        if strip_problems:
+            ok = False
+            tail = ((tail + chr(10)) if tail else chr(10).join([])) + chr(10).join(strip_problems[:3])
         total_bytes += os.path.getsize(pkg)
         total_stripped += len(stripped)
         manifest.append({

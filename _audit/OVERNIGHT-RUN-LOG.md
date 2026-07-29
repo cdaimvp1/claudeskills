@@ -3160,3 +3160,56 @@ Rebuilt and re-verified: 32 packages, all extract-and-retest green.
 Delivered as `Lilly_Procurement_Skills_v10_7_0_Bundle_2026-07-29.zip`, 21,095 KB,
 sha256 571c4896..., byte-identical in Downloads and the Desktop delivery folder. The two
 mislabelled cuts from before the decision were removed rather than left beside it.
+
+---
+
+## A11 attempted: the lock is NOT executable, but its sweep found a real shipping defect
+
+**A11 cannot be completed, and my recommendation to approve it first was wrong.** A11 is
+"lock all five hubs". A7 describes the My Work hub as "the last unbuilt Phase 1 hub", and it
+does not exist: four of five hub skills are present, `my-work` is absent. You cannot lock
+five hubs when one has not been built. I under-read A11's dependency list (A1, A3-A5,
+A7-A10) when I called it "a sign-off, not a build". A5-A9 are substantial builds, not
+sign-offs.
+
+A11's OTHER half was executable and is done: `_audit/malicious_code_sweep.py`.
+
+### The sweep, after two rounds of correcting my own calibration
+
+First run: 411 INJECTION hits, nearly all English prose. The pattern
+`(SELECT|INSERT|UPDATE|DELETE)\s+.*\+\s*\w+` matched the comment "assumptions: live update
++ recalc". **A sweep with 411 false positives is worse than none, because nobody reads it.**
+Patterns now require a real SQL shape. It also crashed on a non-cp1252 character and was
+scanning minified React bundles that ship in nothing.
+
+Second: the dependency list filled with "the", "these", "should", "narrative", because a
+regex over `^\s*(from|import)\s+(\w+)` matched prose in docstrings. Replaced with the AST,
+which cannot make that mistake. A dependency audit reporting English words as packages
+trains its reader to skim, which is exactly how a real typosquat gets through.
+
+Final: **SECRETS 0, BYPASS 0, OBFUSCATION 0, INJECTION 0.** EGRESS 1 and EXEC 23, all
+reviewed and all benign: the EGRESS hit is the word "fetch" in a comment about a
+hypothetical, and every EXEC hit is `re.compile` or a JS regex `.exec()`, not code
+execution. No Python file in the suite imports any network library at all.
+
+### The real find: a shipped script broken by its own packaging
+
+`category-strategy` and `deal-tab` each ship `build_dashboard_*.py`, which does
+`sys.path.insert(0, PLATFORM)` and imports from `_platform_build/`. The packager STRIPPED
+`_platform_build/` as dead weight. **Both packages shipped a builder that could not import.**
+
+Extract-and-retest did not catch it, and that is the lesson: the smoke test LOADS a skill,
+it does not EXECUTE its build scripts. A script broken by stripping passes every check and
+fails the first time a user runs it.
+
+The strip rationale was sound in isolation ("the shipped artifact is the built HTML, the
+builder is not needed"). The error was stripping the dependency while keeping the dependent.
+
+Fixed generally, not per-skill:
+- `dirs_still_depended_on()` makes the strip conditional. A dead-weight dir referenced by
+  any shipped `.py` outside it is kept.
+- `check_strip_consistency()` refuses any package that ships code referencing something the
+  strip removed, so this class cannot recur silently.
+
+Both fired on exactly the two skills before the fix and pass after. Packages 21,098 -> 25,649
+KB, which is the cost of shipping a builder that actually runs.
