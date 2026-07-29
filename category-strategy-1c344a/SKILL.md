@@ -2214,20 +2214,33 @@ Reconciliation assertion: a cloner MUST verify `total_spend_3yr` equals the sum 
 **STABLE** means a consumer may depend on the key existing with that shape. ADVISORY means
 it may change or disappear; do not build on it.
 
-### Known gap: rfp-engine expects a shortlist this sidecar does not carry
+### RESOLVED 2026-07-29: this sidecar deliberately carries NO shortlist
 
-`rfp-engine-1c344a/SKILL.md:195` says it consumes, from this skill, "the recommended
-sourcing approach **and any named supplier shortlist**", carrying the latter "into the
-supplier invitation list at Step 3 for user confirmation".
+An earlier reading of `rfp-engine-1c344a/SKILL.md:195` looked like a gap: it said rfp-engine
+consumes from this skill "the recommended sourcing approach **and any named supplier
+shortlist**", and no shortlist field exists here.
 
-**There is no shortlist field in this sidecar.** The closest is `savings_pipeline[].vendor`,
-which is a savings-opportunity list and is not the same thing: a vendor can appear there for
-a renewal renegotiation without being a candidate to invite to an event.
+**The correct fix was to remove that expectation from rfp-engine, not to add a field here.**
 
-So rfp-engine either re-parses the dashboard, which is exactly what the sidecar exists to
-prevent, or the shortlist is passed by hand. Recorded here rather than silently patched: a
-`shortlist[]` field is a real design addition with a consumer waiting for it, and it should
-be added deliberately with its own definition of what qualifies a supplier for it.
+The suite already has a shortlist contract, and it belongs to a different skill.
+`recommended_shortlist` lives in `landscape_handoff.json` (schema at
+`rfp-engine-1c344a/references/landscape-intake-schema.md:88`) and is produced by
+**supplier-landscape**, which is named for it: the "Supplier Market Landscape and Shortlist
+Generator".
+
+That field is **user-confirmed by construction**. It is populated only after the user
+confirms which suppliers to include, it excludes eliminated suppliers, and rfp-engine
+confirms it again before generating the package.
+
+**Adding a `shortlist[]` here would have been actively harmful, not merely redundant.** This
+skill's supplier view is Pareto-derived management TIERING: it describes how to manage a
+supplier you already spend with. A shortlist is who to invite to a competitive event. Those
+are different questions, and a derived list feeding the same invitation field as a
+user-confirmed one would put two producers on one field with incompatible confirmation
+semantics. The failure mode is inviting a supplier that nobody approved.
+
+**What this skill contributes instead:** `recommended_strategy` and the supplier tiering, as
+CONTEXT for rfp-engine's Section 1.1 Background. Never an invitation list.
 
 ### Relationship direction, which the framing above understates
 

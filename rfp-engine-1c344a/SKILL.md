@@ -192,7 +192,11 @@ If user provides Supplier Landscape outputs (report, JSON, CSVs):
 
 If the user provides category-strategy or market-rate-benchmarking outputs:
 
-1. From category-strategy: carry the recommended sourcing approach and any named supplier shortlist into Section 1.1 (Background) for context, and into the supplier invitation list at Step 3 for user confirmation (never auto-invite from a shortlist without confirming).
+1. From category-strategy: carry the recommended sourcing approach (`recommended_strategy`) and its Pareto-derived supplier TIERING into Section 1.1 (Background) as context. **Do NOT take an invitation list from category-strategy.** Corrected 2026-07-29: this line previously said to carry "any named supplier shortlist" from that skill into the Step 3 invitation list. category-strategy has no shortlist field and should not have one. It produces management tiers, which describe how to manage a supplier you already spend with, not who to invite to a competitive event.
+
+   **The shortlist comes from supplier-landscape**, via `recommended_shortlist` in `landscape_handoff.json` (schema at `references/landscape-intake-schema.md:88`). That field is **user-confirmed by construction**: it is populated only after the user confirms which suppliers to include, it excludes eliminated suppliers, and it is confirmed again before the RFP package is generated.
+
+   Taking an invitation list from both sources would put two producers on one field with incompatible confirmation semantics, one gated on a human saying yes and one derived from spend analysis. The failure mode is inviting a supplier to a competitive event that nobody approved, so the single source is deliberate.
 2. From market-rate-benchmarking: carry target rate ranges into the pricing template as a labeled reference baseline, "Source: Market Rate Benchmarking" - an internal planning input only, never disclosed to suppliers as a ceiling or target.
 3. Mark any requirement, objective, or pricing assumption derived from either source with its origin label, per Rule 1 (traceability).
 

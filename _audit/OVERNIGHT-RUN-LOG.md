@@ -1738,3 +1738,61 @@ category list that implies it is their average.
 
 `savings{}` by contrast has genuinely well-defined invariants, both of which hold in the
 seed, and both are now enforced.
+
+### Tasks #33 and #34 RESOLVED, 2026-07-29. Both without inventing policy.
+
+Researched both rather than escalating them. Neither needed a new rule, because in both
+cases the rule already existed and was being looked for in the wrong place.
+
+**#33 SHORTLIST: do NOT add the field. Fixed a wrong pointer instead.**
+
+`recommended_shortlist` already exists at
+`rfp-engine-1c344a/references/landscape-intake-schema.md:88`, produced by
+**supplier-landscape**, the skill literally named "Supplier Market Landscape and Shortlist
+Generator". It is not a bare array: it is **user-confirmed by construction** (`:110`
+populated only after the user confirms; `:100` excludes eliminated suppliers; `:106`
+confirmed again before the package is generated).
+
+**Adding a `shortlist[]` to category-strategy would have been actively harmful, not merely
+redundant.** category-strategy's supplier view is Pareto-derived management TIERING, which
+answers how to manage a supplier you already spend with. A shortlist answers who to invite
+to a competitive event. A derived list feeding the same invitation field as a user-confirmed
+one puts two producers on one field with **incompatible confirmation semantics**, and the
+failure mode is inviting a supplier that nobody approved.
+
+So the defect was `rfp-engine/SKILL.md:195` naming the wrong source. Corrected there, and
+the matching "Known gap" note in category-strategy rewritten as RESOLVED with the reasoning.
+category-strategy contributes `recommended_strategy` and tiering as CONTEXT, never an
+invitation list.
+
+**#34 GPA: it was already declared self-scored. The defect was presentation.**
+
+The engine's own view header has always read "**A self-scored read** on category health".
+So it was never meant to derive from the categories, and my earlier framing of it as an
+undefined formula was wrong.
+
+Two real problems compounded it:
+1. **`scoring-scales.md` enumerates every exception to the 0.0-5.0 evaluation scale**
+   (supplier-landscape 0-10, Protection Score 0-100, negotiation difficulty 0-100,
+   data-quality 0-100) **and the GPA was in neither list**, so a list that reads as
+   exhaustive was not.
+2. The same doc requires "Any dashboard or report that shows these scores prints a one-line
+   scale legend". The Report Card printed a bare `3.4` in a 40px numeral above a graded
+   category list, with no legend and no basis, which implies it is their average.
+
+**Also: the seed's grades did not follow their own value/target ratios.** 66% carried a B
+while 70% carried a C, and 40% carried a D where any standard scale gives F. Illustrative
+data that contradicts itself teaches the wrong pattern.
+
+Fixed all four: the numeral now carries "self-scored, 4.0 scale. Not derived from the
+categories below."; the GPA is added to `scoring-scales.md`'s exception list with both
+non-obvious properties stated; and the seed grades are corrected to follow their own ratios
+(B, C, D, A, F).
+
+**The GPA itself was deliberately NOT recomputed.** It is self-scored by design, so deriving
+it would be wrong, and now for a positive reason rather than an absence of one.
+
+**Verification:** engine script parses; corrected seed passes the F8 reconciliation gate on
+both savings and reportCard; the 2 smoke-test failures across the four touched skills are
+the pre-existing G9 doc-pointer failures in rfp-engine and lilly-brand-assets, unchanged and
+unrelated.
