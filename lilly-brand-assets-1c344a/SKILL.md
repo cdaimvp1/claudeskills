@@ -1287,6 +1287,35 @@ not rung 5 (abstain); it is unlabelled, which is the state G13 exists to elimina
 commentary and dataset metadata are not claims about the world. A heuristic exemption would
 quietly widen; a named list has to be edited on purpose, and the edit shows up in review.
 
+### G13c: Citations must RESOLVE, not merely exist (H5)
+
+G13b makes every fact carry a source. G13c asks the next question: **can a reader actually
+follow it?**
+
+| verdict | meaning |
+|---|---|
+| **OK** | names a URL, a document, or a recognised system or filing, and is inside its staleness window |
+| **STALE** | followable, but captured longer ago than the window allows. The age is stated |
+| **UNDATED** | followable, but carries no usable capture date |
+| **UNRESOLVABLE** | names nothing a reader can reach |
+
+**UNRESOLVABLE is the finding this exists to surface.** "Internal analysis", "industry
+knowledge", "our experience": these read as citations and point at nothing. A citation
+nobody can follow is worse than an abstention, because it stops the reader looking.
+
+**It REPORTS rather than refuses.** Some deliverables legitimately rest on an internal
+read. The right response is to LABEL that as G13 rung 4, not to fail the run. Refusing
+would push authors toward dressing an internal read as an external source, which is worse
+than the thing being prevented.
+
+**Honest limit, stated rather than implied.** Offline, "resolve" cannot mean fetching the
+URL. This proves a citation is well-formed enough for a human to follow and current enough
+to trust. It cannot prove the source says what the citing text claims. Anything stronger
+would be the fabrication these guardrails exist to prevent.
+
+Run against the shipped category seed it checked 110 citations: 100 OK, **10 UNRESOLVABLE**
+("Benchmark & savings model, reflect-only estimate" names no followable source).
+
 Reference implementation: the shared `provenance` validator (29 assertions), vendored into
 each consuming skill alongside `numeric_kernel` and run there by that skill's own provenance
 check. `category-strategy` is the wired example. Paths are deliberately not given here: an

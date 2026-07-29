@@ -42,6 +42,7 @@ Stdlib only.
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime
 
 SRC_KEY = "$src"
@@ -269,3 +270,86 @@ def validate_rows(rows, name_key, as_of_key, label="rows",
         checked += 1
 
     return {"checked": checked, "abstained": abstained, "rows": len(rows)}
+
+
+# ------------------------------------------------------------------ H5: resolve checking
+
+# A citation must be resolvable BY SOMEONE. These are the shapes that can be followed.
+_URL = re.compile(r"^https?://\S+$", re.I)
+_DOC = re.compile(r"\.(pdf|docx?|xlsx?|pptx?|csv|md|txt)\b", re.I)
+_SYSTEM_REF = re.compile(r"\b(SAP|ARIA|LEAH|SharePoint|10-K|10-Q|SEC|OFAC|EDGAR|Gartner|"
+                         r"Forrester|IDC|ISO|SOC\s?2|EDC|BuyLilly)\b", re.I)
+
+UNRESOLVABLE_HINTS = ("internal analysis", "industry knowledge", "general knowledge",
+                      "common practice", "market understanding", "our experience",
+                      "widely known", "as is standard")
+
+
+def resolve_status(source_name, as_of=None, stale_after_days=None, today=None):
+    """Classify ONE citation: can a reader actually follow it, and is it current?
+
+    H5 asks for a check that citations RESOLVE, not merely exist. Offline, "resolve" cannot
+    mean fetching a URL, and pretending otherwise would be the fabrication this suite spends
+    its guardrails preventing. What IS checkable, and what this returns:
+
+        OK            names a followable thing (URL, document, or a known system/filing)
+                      and, where a window is given, is inside it
+        STALE         followable, but its capture date is older than the window allows
+        UNRESOLVABLE  names no followable thing. "Internal analysis" and "industry
+                      knowledge" are the common cases: they read as citations and point
+                      at nothing a reader can check.
+        UNDATED       followable but carries no usable capture date
+
+    UNRESOLVABLE is the finding H5 exists to surface. A citation nobody can follow is worse
+    than an abstention, because it stops the reader looking.
+    """
+    name = (source_name or "").strip()
+    if not name:
+        return {"status": "UNRESOLVABLE", "why": "no source named"}
+
+    low = name.lower()
+    for hint in UNRESOLVABLE_HINTS:
+        if hint in low:
+            return {"status": "UNRESOLVABLE",
+                    "why": "%r names no followable source; it reads as a citation and "
+                           "points at nothing a reader can check" % name}
+
+    followable = bool(_URL.match(name) or _DOC.search(name) or _SYSTEM_REF.search(name))
+    if not followable:
+        return {"status": "UNRESOLVABLE",
+                "why": "%r is not a URL, a document, or a recognised system or filing, so "
+                       "a reader has no way to reach it" % name}
+
+    if not _valid_as_of(as_of):
+        return {"status": "UNDATED", "why": "followable but carries no usable capture date"}
+
+    if stale_after_days is not None and today is not None:
+        for fmt in _DATE_FORMATS:
+            try:
+                d = datetime.strptime(as_of.strip(), fmt)
+            except ValueError:
+                continue
+            age = (today - d).days
+            if age > stale_after_days:
+                return {"status": "STALE", "age_days": age,
+                        "why": "captured %d days ago; the window is %d"
+                               % (age, stale_after_days)}
+            return {"status": "OK", "age_days": age}
+    return {"status": "OK"}
+
+
+def resolve_report(sources, stale_after_days=None, today=None):
+    """Run resolve_status over `[{name, asOf}, ...]` and group the verdicts.
+
+    Reports rather than raises. An UNRESOLVABLE citation is a finding for a human, not
+    necessarily a build failure: some deliverables legitimately cite an internal read, and
+    the right response is to LABEL it, which is G13 rung 4, not to refuse the run.
+    """
+    out = {"OK": [], "STALE": [], "UNDATED": [], "UNRESOLVABLE": []}
+    for s in sources or []:
+        name = s.get("name") if isinstance(s, dict) else s
+        as_of = s.get("asOf") if isinstance(s, dict) else None
+        r = resolve_status(name, as_of, stale_after_days, today)
+        out[r["status"]].append({"name": name, **r})
+    out["total"] = sum(len(out[k]) for k in ("OK", "STALE", "UNDATED", "UNRESOLVABLE"))
+    return out

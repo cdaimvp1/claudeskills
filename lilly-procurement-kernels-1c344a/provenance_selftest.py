@@ -18,6 +18,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from provenance import (                                        # noqa: E402
     MalformedSourceError,
     validate_rows,
+    resolve_status,
+    resolve_report,
     MissingProvenanceError,
     ProvenanceError,
     stub_report,
@@ -189,6 +191,47 @@ def run():
     ok("T29 confidence is case-normalised rather than rejected on case alone",
        validate_rows([{"source": "x", "date": "2026-01", "confidence": "high"}],
                      "source", "date", confidence_key="confidence")["checked"] == 1)
+
+    # --- H5: do citations RESOLVE, not merely exist? --------------------------------------
+    from datetime import datetime as _dt
+    TODAY = _dt(2026, 7, 29)
+
+    ok("T30 a URL resolves", resolve_status("https://sec.gov/x", "2026-06-01")["status"] == "OK")
+    ok("T31 a document name resolves", resolve_status("MSA_v3.docx", "2026-06-01")["status"] == "OK")
+    ok("T32 a known filing/system resolves",
+       resolve_status("10-K", "2026-02-11")["status"] == "OK")
+
+    # The finding H5 exists to surface.
+    for bogus in ("internal analysis", "industry knowledge", "our experience",
+                  "widely known in the market"):
+        ok("T33 UNRESOLVABLE: %-26r" % bogus,
+           resolve_status(bogus, "2026-06-01")["status"] == "UNRESOLVABLE")
+
+    ok("T34 an empty source is UNRESOLVABLE",
+       resolve_status("", "2026-06-01")["status"] == "UNRESOLVABLE")
+    ok("T35 a followable source with no date is UNDATED, not OK",
+       resolve_status("10-K", None)["status"] == "UNDATED")
+    ok("T36 UNDATED is distinct from UNRESOLVABLE",
+       resolve_status("10-K", None)["status"] != resolve_status("hearsay", "2026-01")["status"])
+
+    st = resolve_status("10-K", "2020-01-01", stale_after_days=365, today=TODAY)
+    ok("T37 an old citation is STALE, with its age stated",
+       st["status"] == "STALE" and st["age_days"] > 365, str(st))
+    ok("T38 NEGATIVE CONTROL: a recent citation inside the window is OK",
+       resolve_status("10-K", "2026-06-01", stale_after_days=365, today=TODAY)["status"] == "OK")
+    ok("T39 NEGATIVE CONTROL: no window means staleness is not judged",
+       resolve_status("10-K", "2005-01-01")["status"] == "OK")
+
+    rep = resolve_report([{"name": "https://sec.gov/x", "asOf": "2026-06-01"},
+                          {"name": "internal analysis", "asOf": "2026-06-01"},
+                          {"name": "10-K", "asOf": None}])
+    ok("T40 resolve_report groups every verdict",
+       len(rep["OK"]) == 1 and len(rep["UNRESOLVABLE"]) == 1 and len(rep["UNDATED"]) == 1,
+       str({k: len(v) for k, v in rep.items() if isinstance(v, list)}))
+    ok("T41 every UNRESOLVABLE carries a reason a human can act on",
+       all(r.get("why") for r in rep["UNRESOLVABLE"]))
+    ok("T42 resolve_report REPORTS rather than raises",
+       rep["total"] == 3)
 
     print("=" * 84)
     print("SUMMARY: %d/%d passed, %d failed" % (len(PASS), len(PASS) + len(FAIL), len(FAIL)))

@@ -3554,3 +3554,64 @@ documents and answers, not data objects). No remaining schema gaps.
 `#31 / H5 proper` is now fully unblocked: every skill that emits data carries per-fact
 provenance WITH a capture date, so a resolve check can verify both that a source exists and
 that it is current.
+
+---
+
+## #31 / H5 proper — DONE. Citations now resolve-checked, not just counted.
+
+`resolve_status()` and `resolve_report()` in the shared `provenance` module, canonicalised
+as **G13c**. Self-test 37 -> **53/53**. Vendored to all 5 consuming skills, manifest clean.
+
+Four verdicts: **OK**, **STALE** (with the age stated), **UNDATED** (followable but no
+capture date), **UNRESOLVABLE** (names nothing a reader can reach).
+
+**UNRESOLVABLE is the point.** "Internal analysis", "industry knowledge", "our experience"
+read as citations and point at nothing. A citation nobody can follow is worse than an
+abstention, because it stops the reader looking.
+
+**It reports rather than refuses**, deliberately. Some deliverables legitimately rest on an
+internal read; the right response is to label it G13 rung 4, not fail the run. Refusing
+would push authors toward dressing an internal read as an external source, which is worse
+than the thing being prevented.
+
+**Honest limit, written into the code:** offline, "resolve" cannot mean fetching a URL. This
+proves a citation is well-formed enough to follow and current enough to trust. It cannot
+prove the source says what the citing text claims. Claiming more would be the fabrication
+these guardrails exist to prevent.
+
+### Run against the real shipped seed
+
+110 citations checked: **100 OK, 0 STALE, 0 UNDATED, 10 UNRESOLVABLE.** The ten are
+"Benchmark & savings model, reflect-only estimate", which names no followable source. That
+is a real finding on shipped data, not a synthetic test.
+
+===============================================================================
+# RESUME BLOCK (written ahead of context compaction)
+===============================================================================
+
+**Everything unblocked is DONE.** 27 of 36 tracked items complete.
+
+State: smoke 32/0 · citations 0 unresolved · kernel manifest 15/16 + 1 HELD · provenance
+5/5 · fixture check_run 16/16 · 32 packages built and extract-and-retest verified · bundle
+`Lilly_Procurement_Skills_v10_7_0_Bundle_2026-07-29.zip` in Downloads and on the Desktop.
+
+**The 9 open items ALL need Marc, none is in progress:**
+
+| # | needs |
+|---|---|
+| 20 | decide: keep/delete/rebuild 4 orphaned dashboard items. Recommendation: KEEP (only 1 is provably superseded, and it is pinned by hash) |
+| 21 | ratify or correct D4's inferred ownership column in rfx-hub (~14 fields, 20 min) |
+| 22 | blocked on A11, which is NOT EXECUTABLE: A11 locks five hubs and the My Work hub (A7) does not exist |
+| 23 | go-ahead for retrieval indexing. Gate intent met (fixture 15 problems -> 2) |
+| 24 | keep or lift the contract-review HOLD. Recommendation: KEEP until the fixture is stable at 0 |
+| 25 | approve A5-A9. A11 cannot be approved until A7 builds My Work |
+| 26 | B1-B4, B9 skills-file decisions. B4 should wait for #22 |
+| 28 | J1-J3 orchestration, never triaged. I1-I3 confirmed NOT ACTIONABLE (I2 is network-blocked) |
+| 31 | **now DONE** |
+
+**Standing instruction from Marc:** for anything needing his decision, state the issue,
+pros and cons, a recommendation, then ASK before proceeding.
+
+**Recurring lesson, six occurrences:** a pattern list under-reports. Every "missing
+mechanism" finding in this programme that turned out false was a skill wording something
+differently. Treat an ABSENT from any text audit as a prompt to read the skill.
