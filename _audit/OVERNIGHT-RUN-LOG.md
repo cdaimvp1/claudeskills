@@ -2444,3 +2444,46 @@ is a recorded decision and not an accident.
 Self-tests: market-rate 24 -> 34, should-cost 23 (unchanged, sample already ISO),
 sole-source 83. All carry NEGATIVE CONTROLS asserting valid dates still pass, because a
 date check that refuses everything is the easy failure mode.
+
+---
+
+## F9 build 1 of 5 — scope-sow-architect structured artifacts (DONE)
+
+`scope-sow-architect-1c344a/scope_artifacts_generator.py` + self-test, **41/41**.
+
+F9 ranked this first: four structured deliverables, zero generators, and the arithmetic
+already in the vendored kernel. All four were hand-assembled, which is the drift case E1/E2
+exist to prevent.
+
+Built: `rate_card_and_payment_schedule.xlsx`, `raci_matrix.csv`,
+`change_control_log_template.xlsx`, `scope_findings.json`.
+NOT built: `Rewritten_SOW.docx`, which F9 classed PROSE and which stays prose. A rewritten
+scope is argument and specification, not assembly.
+
+**The score reproduces a published golden.** `references/scope-quality-scoring.md` carries a
+worked example stating composite 2.550 -> 51 -> "Moderate gap / Needs Targeted Fixes". The
+generator reproduces all three exactly, plus a named per-dimension contribution
+(0.15 x 3.5 = 0.525). Reproducing a number someone else wrote down is worth considerably
+more than asserting against numbers this code produced itself.
+
+Refusals, each traced to the skill's own rules rather than invented:
+- a rate-card row where rate x quantity does not equal the stated total (kernel
+  `verify_line_math()`, per row)
+- milestones that do not sum to the contract value (kernel `assert_reconciles()`).
+  `pass-artifacts.md`: "if it still does not foot, the rewritten SOW carries the same defect
+  it was meant to fix; do not ship an unreconciled rewrite"
+- a dimension scored above the ceiling its own findings impose (BLOCKING 0.9, HIGH 3.4,
+  MEDIUM 4.4, LOW uncapped). Findings drive dimension scores; when score and ledger
+  disagree, the ledger wins
+- an orphaned RACI deliverable with no open finding naming it. Note the nuance the skill
+  actually states: an orphan may EXIST, it may not be silently dropped
+- a weight set not summing to 1.0 (kernel `WeightSumError`)
+
+Negative controls throughout: a LOW finding caps nothing, a RESOLVED blocking finding caps
+nothing, a score exactly AT its ceiling passes, and a FLAGGED orphan is allowed through.
+Without those, a stricter-looking gate would just be a broken one.
+
+The workbook shows its reconciliation as LIVE formulas rather than freezing the check at
+build time, so an edit that breaks the footing is visible to the reader, not only to the
+generator. A refused build writes no artifacts at all (T38), so a partial set never reaches
+anyone.

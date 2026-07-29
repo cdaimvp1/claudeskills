@@ -551,6 +551,34 @@ per the rewrite map in `PASS_4_REBUILD`. Sections drafted from `references/sow-c
 defaults (not sourced from the user's input) are labeled "DRAFT - confirm with [owning
 stakeholder]" inline, never presented as if they were the user's own content.
 
+## Building the structured artifacts
+
+```bash
+python scope_artifacts_generator.py <spec.json> <outdir>   # builds all four
+python scope_artifacts_selftest.py                          # 41 assertions
+```
+
+Four of the deliverables are ASSEMBLY, not authoring, and are built by code so the
+arithmetic and the invariants cannot drift: `rate_card_and_payment_schedule.xlsx`,
+`raci_matrix.csv`, `change_control_log_template.xlsx`, `scope_findings.json`.
+
+`Rewritten_SOW.docx` is deliberately NOT generated. A rewritten scope is argument and
+specification, so it stays prose.
+
+**It refuses rather than shipping a broken artifact.**
+
+| refusal | why |
+|---|---|
+| a rate-card row where rate x quantity does not equal the stated total | verified by the kernel's `verify_line_math()` per row |
+| milestones that do not sum to the contract value | `assert_reconciles()`. `references/pass-artifacts.md`: if it still does not foot, "the rewritten SOW carries the same defect it was meant to fix; do not ship an unreconciled rewrite" |
+| a dimension scored above the ceiling its own findings impose | findings drive dimension scores; when the score and the ledger disagree, the ledger wins |
+| an orphaned RACI deliverable with no open finding naming it | an orphan may EXIST, but it may not be silently dropped |
+| a weight set not summing to 1.0 | the kernel's `WeightSumError` |
+
+The score is computed by `weighted_score()` (G11) and always emitted WITH its
+per-dimension calculation table: a score without a visible derivation is invalid.
+A refused build writes no artifacts at all, so a partial set never reaches a reader.
+
 ## Outputs (Mandatory, per Artifact Picker selection)
 
 | Output | Format | Purpose |
@@ -558,10 +586,10 @@ stakeholder]" inline, never presented as if they were the user's own content.
 | Scope Diagnostic Report | Word (Magazine Report house style) | Narrative diagnostic: Scope Definition Score with calculation table, section coverage map, all findings, RACI, acceptance-criteria scan, payment/rate-card reconciliation |
 | `scope_diagnostic_dashboard.jsx` | Interactive dashboard | The 7-tab canonical dashboard per `references/dashboard-canonical.md`; the same analysis as the report, in an explorable form |
 | `Rewritten_SOW.docx` | Word | The repaired/reconstructed, issuance-ready SOW per the locked skeleton above |
-| `rate_card_and_payment_schedule.xlsx` | Excel | Reconciled rate card (with footing checks) and payment milestone schedule (with reconciliation to total contract value), formulas live so the user can adjust inputs and see the check re-run |
-| `raci_matrix.csv` | CSV | Roles & responsibilities matrix, orphaned items flagged |
-| `change_control_log_template.xlsx` | Excel | Change-control trigger register/template, pre-populated with the DRAFT default if none existed, ready for the user to log actual changes going forward |
-| `scope_findings.json` | JSON | Machine-readable sidecar mirroring the findings ledger and the Scope Definition Score calculation, generated from `PASS_4_REBUILD` so it cannot drift from the human-readable artifacts. Schema per finding: `{id, severity (BLOCKING/HIGH/MEDIUM/LOW), title, dimension, where, verified (true/false), impact, action}`, plus a header block `{supplier, engagement_type, total_value, term, scope_definition_score, dimension_scores{...}, payment_reconciles (true/false), as_of_date}`. Local artifact only; never auto-sent or written to any M365 location. |
+| `rate_card_and_payment_schedule.xlsx` | Excel | Reconciled rate card (with footing checks) and payment milestone schedule (with reconciliation to total contract value), formulas live so the user can adjust inputs and see the check re-run **Built by `scope_artifacts_generator.py`.** |
+| `raci_matrix.csv` | CSV | Roles & responsibilities matrix, orphaned items flagged **Built by `scope_artifacts_generator.py`.** |
+| `change_control_log_template.xlsx` | Excel | Change-control trigger register/template, pre-populated with the DRAFT default if none existed, ready for the user to log actual changes going forward **Built by `scope_artifacts_generator.py`.** |
+| `scope_findings.json` | JSON | Machine-readable sidecar mirroring the findings ledger and the Scope Definition Score calculation, generated from `PASS_4_REBUILD` so it cannot drift from the human-readable artifacts. Schema per finding: `{id, severity (BLOCKING/HIGH/MEDIUM/LOW), title, dimension, where, verified (true/false), impact, action}`, plus a header block `{supplier, engagement_type, total_value, term, scope_definition_score, dimension_scores{...}, payment_reconciles (true/false), as_of_date}`. Local artifact only; never auto-sent or written to any M365 location. **Built by `scope_artifacts_generator.py`.** |
 
 ## Cross-Artifact Consistency Rules
 
