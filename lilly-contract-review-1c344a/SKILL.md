@@ -212,6 +212,40 @@ Three different outputs, three different meanings, and only one is correct:
 
 This applies to every absence the review tests for, including adverse-event reporting, audit rights, records retention, insurance, business continuity and termination assistance.
 
+**Rule 9b: An obligation to PROVIDE something is checked for the THING, not the clause (HARD RULE).**
+Rule 9a covers a missing clause. This covers the opposite shape: a clause that is present
+and correct, whose required ARTIFACT has not been delivered. The two failures look nothing
+alike and only one of them is visible while reading the contract.
+
+Governing documents oblige the supplier to hand over evidence: SOC 2 Type II or ISO 27001
+attestations, insurance certificates, BAAs, DPIAs, penetration-test summaries, subcontractor
+lists, business-continuity plans. Reading the clause that requires the artifact and moving
+on passes the review. **The artifact is what protects Lilly. The sentence requiring it is
+not.**
+
+For EVERY such obligation in the governing set, record one of three states:
+
+| State | Meaning | Finding? |
+|---|---|---|
+| **Provided** | the artifact is in the document set; cite it and its date | no |
+| **Awaiting** | the obligation exists and the artifact is not present | **YES, report it** |
+| **Not required** | the obligation does not apply to this engagement; say why | no |
+
+**"Awaiting" is a finding, not a status line.** A reader who sees nothing cannot tell
+whether the evidence was received, was chased, or was never checked for. This is the same
+silent-omission failure Rule 9a exists to prevent, one level up: there the clause was
+missing, here the proof is.
+
+Worked example. `SPS:9.2` requires the supplier to provide a current SOC 2 Type II report
+annually. If no report is in the document set, the correct output is a finding stating that
+the SOC 2 Type II report is **Awaiting**, citing `SPS:9.2` as the obligation. It is not a
+Hard Stop and it is not silence. Note the trap: the MSA and SPS both DISCUSS SOC 2, so a
+keyword check for "SOC 2" finds text and concludes the topic is handled. The question is
+not whether SOC 2 is mentioned, it is whether the report was delivered.
+
+Scope this to the governing set's own obligations. Do not invent evidence requirements the
+documents never imposed.
+
 **Rule 10: Trace definitions before generating data/AI/IP findings.** Every finding involving data rights, AI model training, IP ownership, or confidentiality must trace the relevant defined terms through the governing documents using `references/definition-tracing-checklist.md` and confirm which definition applies and why. "This raises concerns about Lilly data" without citing the specific definition is not a finding. "Recordings are Lilly Information per A.1.19, not Usage Data per A.1.37, so Section 9.1.4 does not authorize use for model training" IS a finding. The definition trace is the reasoning chain that turns a generic observation into a grounded, defensible position.
 
 **Rule 11: Calculate pharma-specific risk at stated volume.** When the contract states a processing volume (calls/year, patients/year, records/year, transactions/year), calculate the operational impact of common failure rates at that volume. A 1% false-negative rate at 780K calls/year is 7,800 potentially misclassified calls. A 0.1% data leakage rate at 1M records is 1,000 exposed records. State the number. This converts abstract risk categories into concrete operational exposure that drives specific SLA recommendations and gives the procurement rep a number to use in the negotiation.

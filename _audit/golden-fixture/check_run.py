@@ -6,6 +6,7 @@ Takes a RUN FILE describing what a review run actually produced, diffs it agains
 `expected-findings.json`, and returns a verdict. Exit 0 pass, 1 fail.
 
     python check_run.py runs/2026-07-29-full-review.json
+    python check_run.py <run.json> [--require-evidence]
     python check_run.py --selftest
 
 WHY A RUN FILE RATHER THAN PARSING THE DELIBERABLES
@@ -74,11 +75,67 @@ def expected_ids(exp):
     return groups
 
 
-def check(run, exp):
+def normalize_found(run):
+    """Accept both shapes of `found` and return (id_set, evidence_by_id, unevidenced).
+
+    Two shapes:
+        "found": ["HS-1", "A-1"]                                    bare, legacy
+        "found": [{"id": "HS-1", "evidence": "the run's own text"}] evidenced
+
+    WHY THIS EXISTS. Mapping a run's findings onto answer-key IDs is the least rigorous
+    part of this apparatus, and it produced a wrong result the first time it was used at
+    scale: four IDs were recorded as not-found that BOTH runs had actually reported
+    (A-4, A-5, S-1, V-2), and the inflated failure count was then presented as the skill's
+    result. Conservative mapping is not neutral. Marking anything unverified as not-found
+    manufactures failures, and it does so invisibly, because a bare ID list carries no
+    trace of whether a mapping was checked or merely assumed.
+
+    Requiring the run's own text beside each claimed ID makes a mapping auditable. It does
+    not make the mapping correct, and it cannot: only a reader comparing the evidence to
+    the answer key can do that. What it does is make an unchecked claim visible instead of
+    silent, in both directions.
+    """
+    raw = run.get("found", []) or []
+    ids, evidence, unevidenced = set(), {}, []
+    for item in raw:
+        if isinstance(item, str):
+            ids.add(item)
+            unevidenced.append(item)
+        elif isinstance(item, dict) and item.get("id"):
+            ids.add(item["id"])
+            ev = (item.get("evidence") or "").strip()
+            if ev:
+                evidence[item["id"]] = ev
+            else:
+                unevidenced.append(item["id"])
+    return ids, evidence, unevidenced
+
+
+def check(run, exp, require_evidence=False):
     """Return (failures, warnings, lines) for a run against the expectation."""
     failures, warnings, lines = [], [], []
     groups = expected_ids(exp)
-    found = set(run.get("found", []))
+    found, evidence, unevidenced = normalize_found(run)
+
+    # --- mapping provenance ---------------------------------------------
+    lines.append("MAPPING PROVENANCE")
+    lines.append(f"  claimed IDs: {len(found)}   with evidence: {len(evidence)}"
+                 f"   without: {len(unevidenced)}")
+    if unevidenced:
+        shown = ", ".join(sorted(unevidenced)[:10])
+        more = "" if len(unevidenced) <= 10 else f" (+{len(unevidenced) - 10} more)"
+        msg = (f"{len(unevidenced)} claimed ID(s) carry no evidence: {shown}{more}. "
+               "A bare ID records a conclusion, not a mapping.")
+        if require_evidence:
+            failures.append("unevidenced mapping: " + msg)
+            lines.append("  [FAIL] " + msg)
+        else:
+            warnings.append(msg)
+            lines.append("  [warn] " + msg)
+    else:
+        lines.append("  [OK  ] every claimed ID carries the run text that justifies it")
+    lines.append("")
+
     agg = run.get("aggregates", {})
     ex_agg = exp["aggregate_assertions"]
     mode = run.get("mode", "unspecified")
@@ -220,8 +277,8 @@ def check(run, exp):
     return failures, warnings, lines
 
 
-def report(run, exp):
-    failures, warnings, lines = check(run, exp)
+def report(run, exp, require_evidence=False):
+    failures, warnings, lines = check(run, exp, require_evidence)
     print("=" * 78)
     print("GOLDEN FIXTURE CHECK")
     print("=" * 78)
@@ -266,14 +323,41 @@ def _selftest():
     exp = load_expected()
     results = []
 
-    def case(label, mutate, should_fail):
+    def case(label, mutate, should_fail, require_evidence=False):
         run = _perfect_run(exp)
         mutate(run)
-        failures, _, _ = check(run, exp)
+        failures, _, _ = check(run, exp, require_evidence)
         failed = bool(failures)
         ok = failed == should_fail
         results.append((label, ok, failures[:1]))
         print(f"[{'PASS' if ok else 'FAIL'}] {label}")
+
+    # --- mapping-evidence checks ---------------------------------------------
+    # These lock in the behaviour that a bare ID list is a WARNING by default and a
+    # FAILURE when the result is going to be quoted. The default stays permissive so
+    # legacy run files still parse; --require-evidence is what a reported number uses.
+    def to_evidenced(run):
+        run["found"] = [{"id": i, "evidence": "run text citing %s" % i}
+                        for i in run["found"]]
+
+    case("bare IDs pass by default (legacy run files still parse)",
+         lambda r: None, False)
+    case("bare IDs FAIL under --require-evidence",
+         lambda r: None, True, require_evidence=True)
+    case("evidenced IDs pass under --require-evidence",
+         to_evidenced, False, require_evidence=True)
+
+    def half_evidenced(run):
+        to_evidenced(run)
+        run["found"][0]["evidence"] = "   "      # whitespace is not evidence
+    case("a blank evidence string counts as unevidenced",
+         half_evidenced, True, require_evidence=True)
+
+    def evidenced_but_missing(run):
+        to_evidenced(run)
+        run["found"] = [f for f in run["found"] if f["id"] != "HS-1"]
+    case("evidence does not excuse a genuinely missing ID",
+         evidenced_but_missing, True, require_evidence=True)
 
     print("=" * 78)
     print("CHECKER SELF-TEST")
@@ -317,9 +401,15 @@ def main(argv):
         print(__doc__)
         print("ERROR: supply a run file, or --selftest", file=sys.stderr)
         return 2
-    with open(argv[0], encoding="utf-8") as fh:
+    files = [a for a in argv if not a.startswith("--")]
+    if not files:
+        print("ERROR: supply a run file", file=sys.stderr)
+        return 2
+    with open(files[0], encoding="utf-8") as fh:
         run = json.load(fh)
-    return report(run, load_expected())
+    # --require-evidence turns the unevidenced-mapping warning into a failure. Use it for
+    # any run whose numbers will be quoted as a result.
+    return report(run, load_expected(), require_evidence="--require-evidence" in argv)
 
 
 if __name__ == "__main__":

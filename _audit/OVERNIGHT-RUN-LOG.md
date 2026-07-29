@@ -2763,3 +2763,45 @@ as good as the mapping, and the mapping is the least rigorous part of this appar
 
 Worth doing: make `check_run.py` accept evidence per claimed ID (the finding text that
 justifies the mapping), so a mapping is auditable rather than asserted. Recorded, not built.
+
+---
+
+## Mapping-evidence check + S-2 fix
+
+**1. `check_run.py` now audits the mapping, not just the run.** `found` accepts either bare
+IDs (legacy, still parses) or `{"id": ..., "evidence": ...}` carrying the run's own text
+that justifies the claim. Unevidenced claims WARN by default and FAIL under
+`--require-evidence`, which is what any run whose numbers get quoted should use.
+
+The rationale is written into the function, because it is the mistake this apparatus
+actually made: four IDs were recorded as not-found that both runs had reported, and the
+inflated failure count was then presented as the skill's result. **Conservative mapping is
+not neutral. It manufactures failures, invisibly**, because a bare ID list carries no trace
+of whether a mapping was checked or assumed.
+
+What it does NOT do, stated in the docstring so nobody over-trusts it: requiring evidence
+does not make a mapping correct. Only a reader comparing evidence against the answer key can
+do that. It makes an unchecked claim visible instead of silent, in both directions.
+
+Five self-test cases lock the behaviour, including that a blank evidence string does not
+count and that evidence does not excuse a genuinely missing ID. Self-test 11 -> **16/16**.
+
+**2. S-2 fixed by a new Rule 9b, and it is a different shape from 9a.** Rule 9a catches a
+missing CLAUSE. S-2 is the opposite: the clause is present and correct, and the ARTIFACT it
+requires was never delivered. `SPS:9.2` obliges the supplier to provide a SOC 2 Type II
+report annually; no report is in the set.
+
+Rule 9b requires a Compliance Evidence Register over the governing set's own obligations,
+each artifact recorded as **Provided / Awaiting / Not required**, with "Awaiting" being a
+FINDING rather than a status line.
+
+The rule names the trap that made this hard to see: the MSA and the SPS both DISCUSS SOC 2,
+so a keyword check finds text and concludes the topic is handled. The question is not
+whether SOC 2 is mentioned, it is whether the report was delivered. The clause is the
+promise; the artifact is the protection.
+
+Scoped deliberately: only obligations the governing documents themselves impose, so the rule
+cannot invent evidence requirements.
+
+Verification in flight: a fresh blind agent against a rebuilt quarantine, asked for a
+compliance evidence register alongside the findings.
