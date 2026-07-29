@@ -905,3 +905,72 @@ rather than restating it. That is already the right pattern and was left alone. 
 cannot drift; a copy can.
 
 **No code changed. Prose and headers only.**
+
+### GOLDEN FIXTURE BUILT, 2026-07-29. Marc's decision: synthetic.
+
+`_audit/golden-fixture/`. Six synthetic documents, an answer key, and a machine-readable
+expectation file. Does not touch `lilly-contract-review`, which is held.
+
+**Why it went first, ahead of the rest of the queue.** The coverage matrix has ~200 rows
+whose verification column reads "golden-fixture test: finding present in both runs", and
+there was no fixture. Every one of those rows was a promise with no instrument. F1 cannot
+be shown to have preserved anything without it.
+
+**The package.** MSA (Lilly paper, MPT 5.0 shape) plus Exhibit A definitions, Exhibit B
+SLA and rate card, Exhibit C AI Standard extract, and the SPS. The Work Order is the
+document under review and carries the defects. The governing family genuinely COVERS most
+categories, deliberately, so the fixture tests Rules 7 and 9 (combined protection) rather
+than defect detection alone: several WO defects must score in the Governed: Covered column,
+not Standalone.
+
+**Verification, actual output:**
+```
+JSON parses OK
+planted defects present in WO: 33/33
+negative controls genuinely absent from WO: 5/5
+AE absent from WO: True        AE present in MSA: True
+Usage Data human-authored exclusion in Exhibit A: True
+```
+Arithmetic independently recomputed before the answer key was written: line sum 645,400,
+corrected total 680,400, stated total 685,000 (+5,100), NTE 675,000 exceeded either way.
+
+**Coverage: 5 Hard Stops, 8 arithmetic defects, 9 playbook positions, 6 data-protection
+defects, 5 vendor tactics, 1 missing incorporated document, 1 compliance-evidence gap, and
+8 NEGATIVE CONTROLS.**
+
+**The negative controls are half the point.** A fixture that only plants defects cannot
+detect over-flagging, and Rule 5 (do not flag what the governing docs already resolve) is
+the most commonly violated rule in this skill. Eight categories the WO is silent on are
+already covered by the MSA or SPS and must produce NO finding.
+
+**Two rows carry most of the signal:**
+
+1. **The absence-detection case.** The WO has no adverse event clause at all. The correct
+   answer is a LOW finding in the Governed: Covered column, because MSA:23 covers it.
+   Three distinct bugs give three distinct wrong answers: silence means absence detection
+   is broken, a Hard Stop means the governing document was never read (the Rule 9 defect,
+   and it inflates the Hard Stop count to six), and a Standalone-column score means the
+   wrong coverage status reached `deduction_score()`. **This is also the exact case that
+   would break under content-keyed playbook retrieval**, since AE appears nowhere in the
+   WO and would never trigger its own rule. The retrieval-indexing change cannot ship
+   without passing this row.
+
+2. **D-6, the definition-tracing failure.** The WO classifies free-text notes written by
+   Lilly staff as Usage Data; Exhibit A:4 expressly excludes human-authored content from
+   that definition. No keyword match finds it. It is the mechanism behind the two findings
+   either side of it, and a run that catches those but misses this has found the symptom
+   and not the cause.
+
+**Aggregate assertions for fast checking:** exactly 5 Hard Stops, HS-4 NOT among them, AE
+present at LOW/Covered, at least 8 arithmetic findings including the one favouring Lilly,
+zero false positives, Protection Score in the Critical band (five Hard Stops deduct 75
+before anything else counts), Rule 12 calculation table present.
+
+**Stated limits, in the README rather than left implied:** it proves the planted checks
+still fire; it does not prove checks nobody thought to plant still fire. Regression net,
+not completeness proof. Completeness is argued by the coverage matrix; this stops that
+argument decaying on every edit.
+
+**Maintenance rule recorded:** if a change makes a row fail, the presumption is the change
+is wrong, and overriding that requires saying so explicitly in the commit with a reason.
+Same discipline as the kernel's KNOWN_EXCEPTIONS, and for the same reason.
