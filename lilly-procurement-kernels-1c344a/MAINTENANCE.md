@@ -109,6 +109,25 @@ Update `numeric_kernel.py` whenever:
    the suite's verification and reference source of truth.
 6. **Update the table above** if the change adds, removes, or re-homes a
    function's ownership.
+7. **Run the drift detector and refresh the manifest.**
+
+   ```
+   python lilly-procurement-kernels-1c344a/kernel_manifest.py            # check
+   python lilly-procurement-kernels-1c344a/kernel_manifest.py --write    # refresh
+   ```
+
+   It hashes the code BODY of every vendored copy, from the module docstring
+   onward, so per-skill vendor-header comments do not read as drift, and it
+   normalizes line endings so a CRLF checkout does not either. Exit 1 means
+   unexplained drift; that is deliberate, so it can run as a pre-commit or CI
+   check rather than be read as a report.
+
+   A copy that is knowingly behind belongs in `KNOWN_EXCEPTIONS` in that script,
+   with a reason and an owner. Today that list holds exactly one entry,
+   `lilly-contract-review-1c344a`, which is HELD. Keep the list short: every
+   entry is a skill running older arithmetic than the rest of the suite, and a
+   check that cries wolf on known exceptions gets ignored, at which point it
+   stops catching the unknown ones.
 
 ## Known limitations (deliberate refusals, and why)
 

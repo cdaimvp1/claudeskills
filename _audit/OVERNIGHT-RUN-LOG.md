@@ -641,3 +641,55 @@ reversal the standing rules forbid.
 
 No kernel code changed this increment, so no new tests and no malicious-code
 surface. 96/96 still passing.
+
+### O11 DONE, 2026-07-29. C9 kernel-copy hash manifest. Tier 2 COMPLETE.
+
+Built `lilly-procurement-kernels-1c344a/kernel_manifest.py` plus the generated
+`kernel_manifest.json`, and re-vendored every non-held stale copy.
+
+**Verification, actual output:**
+```
+python lilly-procurement-kernels-1c344a/kernel_manifest.py
+  ... 16 vendored copies found
+  [HELD  ] lilly-contract-review-1c344a   (known exception, PLATFORM-CONSOLIDATION-TRACKER.md:172)
+  [OK    ] x 15
+RESULT: 15 of 16 vendored copies match the source, 1 knowingly held.
+        No unexplained drift.
+EXIT=0
+```
+
+Self-test re-run inside all 8 re-vendored skills: **96/96 in every one.**
+
+**It found real drift on its first run, before I re-vendored: 9 of 16 copies were
+still on the pre-O2 kernel.** All nine hashed identically to each other, so the
+suite had exactly two kernel versions in circulation, not nine variants. Eight
+were non-held and are now current. The ninth is contract-review and stays behind.
+
+**Design decisions worth recording:**
+- The hash covers the CODE BODY only, from the module docstring onward. Whole-file
+  hashing reports drift on every copy forever, because each carries a vendor-date
+  header and a per-skill call manifest. A check that always fails trains its
+  reader to ignore it.
+- Line endings are normalized before hashing. This suite has already been bitten
+  by mixed CRLF/LF in tracked files, earlier in this very session.
+- Exit 1 on drift, so it can run as a pre-commit or CI gate rather than be read
+  as a report.
+- `KNOWN_EXCEPTIONS` carries a reason and an owner per entry, and the script
+  reports those as HELD rather than DRIFT so they do not fail the check. The
+  docstring says plainly that this list is a liability, not a feature: every
+  entry is a skill running older arithmetic than the rest of the suite.
+
+**Re-vendoring preserved each skill's own header verbatim**, including
+scope-sow-architect's two-line variant with its call manifest. Nothing was
+flattened to a common header.
+
+**`lilly-contract-review` was NOT re-vendored.** It is HELD. It is now the single
+recorded exception rather than an invisible one, which is a strictly better state
+than before: the divergence is named, reasoned, and will fail the check the moment
+someone removes the exception without re-vendoring.
+
+**Malicious-code review of `kernel_manifest.py`: SAFE by inspection.** Imports are
+`hashlib`, `json`, `os`, `sys`. It READS files and writes exactly one file
+(`kernel_manifest.json`, only under `--write`). No network, no subprocess, no
+eval/exec, no deletion, no writes outside the kernel skill directory. `os.listdir`
+and `os.path` are used for traversal only.

@@ -1,0 +1,23 @@
+{
+  "source": "lilly-procurement-kernels-1c344a/numeric_kernel.py",
+  "body_sha256": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+  "note": "Hash covers the code body only, from the module docstring onward, so per-skill vendor-header comments do not read as drift. Line endings normalized to LF. Refresh with kernel_manifest.py --write after any kernel change, and re-vendor every consuming copy.",
+  "vendored_copies": {
+    "category-strategy-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "commercial-negotiation-prep-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "deal-room-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "evaluation-engine-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "invoice-rate-card-auditor-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "lilly-contract-review-1c344a": "12b87c6e6a485ef6fc26e55699ea56414e08f2dbc77d8cee2e8ca3a2e2807d33",
+    "market-rate-benchmarking-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "negotiation-playbook-learning-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "negotiation-simulator-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "pro-forma-builder-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "rfp-engine-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "rfp-response-analysis-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "scope-sow-architect-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "should-cost-builder-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "sole-source-challenge-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195",
+    "supplier-landscape-1c344a": "3c22f0b1a07b305832bf807c6153ef51bc953951774a9f27f649f04d60dc2195"
+  }
+}
