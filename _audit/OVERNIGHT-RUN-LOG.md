@@ -3213,3 +3213,61 @@ Fixed generally, not per-skill:
 
 Both fired on exactly the two skills before the fix and pass after. Packages 21,098 -> 25,649
 KB, which is the cost of shipping a builder that actually runs.
+
+---
+
+## I1-I3: not actionable, and I overstated the risk
+
+I called the help desk "the only live honesty risk" and recommended deciding it first. On
+inspection that was wrong, and the correction matters more than the recommendation did.
+
+**The skill is already honest about its degraded state**, in three places:
+- `SKILL.md:136` "VENDORED SNAPSHOT STATUS: NOT YET HARVESTED ... say so plainly rather
+  than answering from memory of what BuyLilly 'probably' says"
+- `SKILL.md:138` "ABSTAIN rather than fabricate"
+- the placeholder itself: "contains NO Lilly content ... Do NOT fill this in from memory,
+  inference, or a guess. Every fact must come from an actual page read ... with the source
+  URL and the date"
+
+It is also correctly marked **PENDING** in the launcher registry with "content build
+network-gated", so it is not silently routable.
+
+This is the SAME skill my H3 audit wrongly flagged as missing ABSTAIN, because the pattern
+list did not contain the word "abstain". I have now under-read this skill's honesty twice.
+
+Per item:
+- **I1** is a decision whose recorded state is already "leave help-desk AS-IS for now,
+  finalize at Phase 3/WS6" (`PROGRAM-MASTER-PLAN.md:172`). Executing a merge now would
+  reverse a recorded decision.
+- **I2** is genuinely network-blocked. It requires real page reads from inside Lilly's
+  tenant, and the skill's own placeholder forbids filling it any other way. I cannot do it
+  and should not simulate it.
+- **I3** depends on I2.
+
+**Nothing to do here. The gap is real, documented, and correctly gated.**
+
+## WS H triaged: 1 closed, 2 done, 4 open, 1 sequenced
+
+Full classification in `_audit/WS-H-TRIAGE.md`, measured against the tree rather than argued.
+
+- **H8 CLOSED** by this programme: `deep_dive_validator.py` enforces the supplier-risk
+  anti-fabrication rules in code, and A9 forced it to be wired rather than merely present.
+- **H6 (29/32) and H7 (30/32) effectively done.** Confirm the stragglers, do not rebuild.
+- **H1 (17/32), H2 (30 bespoke ladders), H10 (1 adopter) genuinely open.**
+- **H4 (6/32) is the real project**, and it is the correct blocker for #31.
+- **H9 sequenced** behind H2, since there is no canonical ladder to reconcile against yet.
+
+Two findings worth keeping:
+
+**H10 is much smaller than "adopt beyond deal-room" implies.** The canonical contract names
+its intended consumers: deal-room, the two negotiation-prep skills, rfx-hub. Three
+non-adopters, not thirty-one. A suite-wide rollout is not what the source asks for, and
+adopting a methodology where it has nothing to bite on is the statistic-improving edit the
+H3 document argued against.
+
+**H4 deserves a decision, not a schedule.** Per-fact provenance is a data-model change
+across the suite. The other four open items are a contained piece of work; this one is not,
+and bundling it with them would hide that.
+
+Unlike the A11 dependency audit, where 10 of 19 citations proved spurious, WS H did not
+dissolve. Most of it is real.
