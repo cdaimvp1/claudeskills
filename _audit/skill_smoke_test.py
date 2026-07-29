@@ -73,19 +73,30 @@ PLATFORM_TOOLS = {
 # Every entry is a real defect that is not being fixed today. Adding to it must be
 # a deliberate act with a reason, never a way to make a run pass.
 KNOWN_OPEN = {
+    # value = (exact expected failure detail, reason). The detail is compared
+    # EXACTLY. If the same assertion fails for a DIFFERENT reason in the same
+    # skill, it is NOT suppressed and the gate goes red.
+    #
+    # That pinning is the point. Keying only on (skill, assertion) would suppress
+    # the whole check for that skill forever, so a NEW broken path in deal-room
+    # would sail through behind an entry that was about a different path. An
+    # allowlist that absorbs future defects is worse than no allowlist, because it
+    # reads as coverage.
     ("deal-room-1c344a", "A7"): (
-        "Documents deal-tab's files (_parts/data.js, dashboard/build_deal_artifact.py). "
-        "Prose pointing at another skill's tree. Non-breaking. Tracked as B7."
+        "_parts/data.js; _parts/style.css; dashboard/_parts/data.js; "
+        "dashboard/_platform_build/build_dashboard.py; dashboard/build_deal_artifact.py",
+        "Documents deal-tab's files. Prose pointing at another skill's tree. "
+        "Non-breaking. Tracked as B7.",
     ),
     ("lilly-brand-assets-1c344a", "A7"): (
-        "Documents three kernels it does not ship (numeric_kernel, timeline_engine, "
-        "frap_chain_kernel) plus assets/theo-color.css. numeric_kernel genuinely lives "
-        "in lilly-procurement-kernels and is vendored into consumers, so the reference "
-        "describes something real from the wrong place. Non-breaking. Tracked as B7."
+        "assets/theo-color.css; frap_chain_kernel.py; numeric_kernel.py; timeline_engine.py",
+        "Documents three kernels it does not ship. numeric_kernel genuinely lives in "
+        "lilly-procurement-kernels and is vendored into consumers, so the reference "
+        "describes something real from the wrong place. Non-breaking. Tracked as B7.",
     ),
     ("rfp-engine-1c344a", "A7"): (
-        "Points at rfx-hub-1c344a/dashboard/assets/pv/pv-04-domain-data.js, a path "
-        "inside another skill. Non-breaking. Tracked as B7."
+        "rfx-hub-1c344a/dashboard/assets/pv/pv-04-domain-data.js",
+        "Points at a path inside another skill. Non-breaking. Tracked as B7.",
     ),
 }
 
@@ -303,8 +314,10 @@ def main(argv):
     total_known = 0
     for s in targets:
         results, notes = smoke(s, verbose)
-        fails = [r for r in results if not r[2] and (s, r[0]) not in KNOWN_OPEN]
-        known = [r for r in results if not r[2] and (s, r[0]) in KNOWN_OPEN]
+        def _pinned(r):
+            return (s, r[0]) in KNOWN_OPEN and r[3] == KNOWN_OPEN[(s, r[0])][0]
+        fails = [r for r in results if not r[2] and not _pinned(r)]
+        known = [r for r in results if not r[2] and _pinned(r)]
         total_fail += len(fails)
         total_known += len(known)
         status = "PASS" if not fails else f"FAIL({len(fails)})"
@@ -315,9 +328,9 @@ def main(argv):
         for aid, label, ok, detail in results:
             if ok and not verbose:
                 continue
-            if not ok and (s, aid) in KNOWN_OPEN:
+            if not ok and (s, aid) in KNOWN_OPEN and detail == KNOWN_OPEN[(s, aid)][0]:
                 print(f"    [KNOWN] {aid} {label}" + (f"  -> {detail}" if detail else ""))
-                print(f"            {KNOWN_OPEN[(s, aid)]}")
+                print(f"            {KNOWN_OPEN[(s, aid)][1]}")
                 continue
             mark = "ok  " if ok else "FAIL"
             print(f"    [{mark}] {aid} {label}" + (f"  -> {detail}" if detail else ""))

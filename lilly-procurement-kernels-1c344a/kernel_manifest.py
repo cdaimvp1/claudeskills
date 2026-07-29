@@ -43,9 +43,20 @@ MANIFEST_FILENAME = "kernel_manifest.json"
 # an owner. A check that cries wolf on a known exception gets ignored, and then
 # it stops catching the unknown ones, which is the entire point of it.
 KNOWN_EXCEPTIONS = {
+    # value = (expected body sha256, reason). The hash is compared EXACTLY, so a
+    # known-stale copy stays green only while it is stale IN THE KNOWN WAY.
+    #
+    # Keying on the skill name alone would suppress ANY mismatch for that skill,
+    # which means a corrupted or hand-edited copy would also pass. The whole point
+    # of this script is to catch a copy nobody meant to change, so an exception
+    # that hides exactly that is worse than no exception at all.
     "lilly-contract-review-1c344a": (
-        "HELD per PLATFORM-CONSOLIDATION-TRACKER.md:172. Re-vendor as part of "
-        "the F1 rewire, once the hold lifts, not before."
+        "12b87c6e6a485ef6fc26e55699ea56414e08f2dbc77d8cee2e8ca3a2e2807d33",
+        "HELD per PLATFORM-CONSOLIDATION-TRACKER.md:172. Frozen at the pre-2026-07-29 "
+        "kernel (before the SCORING, LEVELING, OUTCOME, CONCENTRATION and "
+        "NEGOTIATION-METRICS faces landed). Re-vendor as part of the F1 rewire once "
+        "the hold lifts, not before. Any OTHER hash here is unexplained drift in a "
+        "held file and fails.",
     ),
 }
 
@@ -122,23 +133,31 @@ def main(argv) -> int:
     print(f"vendored copies found: {len(copies)}")
     print()
 
+    def _pinned(name, h):
+        exc = KNOWN_EXCEPTIONS.get(name)
+        return exc is not None and h == exc[0]
+
     drifted = [name for name, h in copies.items()
-               if h != source_hash and name not in KNOWN_EXCEPTIONS]
+               if h != source_hash and not _pinned(name, h)]
     held = [name for name, h in copies.items()
-            if h != source_hash and name in KNOWN_EXCEPTIONS]
+            if h != source_hash and _pinned(name, h)]
 
     for name in sorted(copies):
         if copies[name] == source_hash:
             status = "OK    "
-        elif name in KNOWN_EXCEPTIONS:
+        elif _pinned(name, copies[name]):
             status = "HELD  "
         else:
             status = "DRIFT "
         print(f"  [{status}] {name}")
         if copies[name] != source_hash:
             print(f"            expected {source_hash[:16]}, got {copies[name][:16]}")
-            if name in KNOWN_EXCEPTIONS:
-                print(f"            known exception: {KNOWN_EXCEPTIONS[name]}")
+            if _pinned(name, copies[name]):
+                print(f"            known exception: {KNOWN_EXCEPTIONS[name][1]}")
+            elif name in KNOWN_EXCEPTIONS:
+                print(f"            UNEXPECTED: {name} has an exception entry but its "
+                      f"hash does not match the pinned one. This is drift in a HELD "
+                      f"file and is NOT excused.")
 
     if write:
         with open(manifest_path, "w", encoding="utf-8", newline="\n") as fh:

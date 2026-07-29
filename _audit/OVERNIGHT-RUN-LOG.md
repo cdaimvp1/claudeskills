@@ -1903,3 +1903,52 @@ deletes nothing.
 **The field-guide step does more than parse.** It asserts the shipped seed reconciles AND
 that the gate actually fires on `achieved > committed`, because an assertion that has never
 fired is not known to work.
+
+### SUPPRESSION AUDIT, 2026-07-29. Two real holes found in my own allowlists, both closed.
+
+Marc asked how big the liabilities are and whether they were mitigated or eliminated. Audited
+all four suppression mechanisms I created tonight. **Two were real holes. Both are now
+eliminated, not documented.**
+
+**The test that matters: can it absorb a NEW defect?** An allowlist scoped to "suppress this
+check for this skill" absorbs every future failure of that check in that skill. That is
+worse than no allowlist, because it reads as coverage.
+
+**HOLE 1: `KNOWN_OPEN` suppressed the whole A7 assertion for 3 skills.** If deal-room later
+referenced a different missing file, A7 stayed suppressed and the gate would not have caught
+it.
+
+**HOLE 2: `KNOWN_EXCEPTIONS` suppressed ANY hash mismatch for contract-review.** The copy is
+knowingly stale, but a CORRUPTED or hand-edited one would also have passed. The entire
+purpose of that script is catching a copy nobody meant to change, so the exception hid
+exactly the case it exists to find.
+
+**FIX, applied to both: pin the exception to the exact known state, not to the check.**
+`KNOWN_OPEN` now stores the exact expected failure detail and compares it verbatim.
+`KNOWN_EXCEPTIONS` now stores the expected body sha256 of the held copy.
+
+**Proven by tampering, not asserted:**
+```
+TEST 1  append a comment to the HELD contract-review kernel
+        -> [DRIFT] "has an exception entry but its hash does not match the pinned one.
+                    This is drift in a HELD file and is NOT excused."
+        -> RESULT: DRIFT in 1 of 16.   restored -> green again
+
+TEST 2  add a NEW broken path to rfp-engine, which HAS an A7 allowlist entry
+        -> FAIL(1), detail shows BOTH the known path and totally_made_up_file.py
+        -> restored -> 0 failed, 1 known-open
+```
+
+**Residual liability, honestly stated.** Two suppressions remain and both are narrow and
+correct:
+- `SELFTEST_EXEMPT` skips A4 for `kernel_manifest.py`, which genuinely cannot run in a flat
+  install by design. It means that file's runtime behaviour is not covered by the smoke
+  test. It IS covered by CI, which runs it directly against the real suite.
+- `PLATFORM_TOOLS` excludes `unpack.py` / `pack.py` from A7. Those are platform-provided and
+  are supposed to be absent from a skill folder. If the platform ever renamed one, A7 would
+  not notice, which is an acceptable trade for not re-introducing the false positive.
+
+**Net position:** of four suppressions, two were real holes and are now closed with proof,
+and two are narrow with their residual exposure named. The three `KNOWN_OPEN` entries and
+the one `KNOWN_EXCEPTIONS` entry all remain REAL open defects tracked as B7 and the F1
+rewire respectively; pinning does not fix them, it stops them concealing anything else.
