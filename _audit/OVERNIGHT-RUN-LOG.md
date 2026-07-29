@@ -2674,3 +2674,48 @@ that a per-line sweep never happened for several lines.
 - Both runs were Sonnet subagents, not Claude Desktop. Same skill files, different harness.
 - `S-1`, `S-2`, `V-2` and the `N-*` missing-document rows were not mapped confidently and
   are recorded as not-found, which may understate the runs.
+
+---
+
+## The four fixes, VERIFIED by blind re-run
+
+Two fresh blind agents, fresh quarantine carrying the fixed skill, same protocol. Neither
+had seen the answer key or the earlier runs. Runs recorded as `*-POSTFIX.json`.
+
+| defect | before | after | fixed? |
+|---|---|---|---|
+| redline-only emits no Protection Score | `null` / `null` / table `false` | **0 / Critical / table TRUE** | YES |
+| absence detection (AE) silently omitted | 0 AE findings in BOTH modes | **AE reported LOW, `Governed: Covered`, in BOTH** | YES |
+| Hard Stop over-escalation | 7 vs expected 5, both modes | **exactly 5, both modes, each pinned to its playbook entry** | YES |
+| arithmetic coverage | 4 mapped | **6 mapped, 6 of 6 priced rows verified** | PARTLY |
+
+Problem count fell from 15 to 8 (redline) and 14 to 9 (full review).
+
+**The two modes now agree.** Before the fix they disagreed on the Hard Stop count and on the
+severity of WO 4.4. Now both report 5 Hard Stops, the same score, and the same band. Mode
+consistency was not a stated goal; it fell out of fixing the matrix and closing the Hard
+Stop list, which suggests those were the right root causes rather than patches.
+
+**Still FAIL, on DIFFERENT defects.** A-4, A-5 (arithmetic needing a rate-card
+cross-reference), D-4 and D-5 (two further findings at WO 6.4 beyond the one both runs
+caught), V-2, S-1 and S-2. The fixture is doing its job: it now surfaces the next layer
+rather than the one just closed. Arithmetic reached 6 against a minimum of 8, so fix 4
+improved coverage without closing it.
+
+### A contamination risk both agents found, unprompted
+
+`references/risk-scoring.md` carries a "Worked Example: **Supplier A WO 10**", the same name
+as the fixture's document under review. Both agents flagged it and both declined to adopt
+its numbers, deriving 5 Hard Stops and a score of 0 against the example's 0 and 64.
+
+It is a NAME collision, not a content leak: the example's findings (missing volume period,
+Insight Sessions, June 15 deadline) do not overlap a single planted defect.
+
+**It also cannot explain the improvement, because it is a controlled constant.** That file
+was present, unchanged, in the pre-fix runs, which produced no AE finding at all. The
+variable that changed between the two rounds is the skill's rules. That is the strongest
+statement available here about causation, and it is worth stating precisely rather than
+claiming the runs prove more than they do.
+
+Still worth removing the collision: rename the fixture's document so no future run has to
+reason about it. Recorded, not done, since renaming touches the fixture and its answer key.
