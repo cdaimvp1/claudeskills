@@ -20,6 +20,22 @@ metadata:
 
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
+## Per-fact provenance (G13b / H4)
+
+```bash
+python check_provenance.py <data.json>
+```
+
+`provenance.py` is the vendored shared validator. This skill carries provenance in the
+ROW form: each of its risk_matrix rows IS a fact and carries its own source columns (`evidence_source`).
+Same rules as the field-keyed sidecar; only the container differs.
+
+**Known schema gap, surfaced rather than hidden.** G13b requires a source AND a usable
+capture date per fact. These rows carry the source but have **no separate as-of field**,
+so a stale source is indistinguishable from a fresh one. Fixing that is a schema change,
+not a data fix, so the check enforces what exists (every row names a source or honestly
+abstains) and REPORTS the gap rather than passing silently or failing the build.
+
 ## ARIA ENRICHMENT (optional, suite-wide)
 
 This skill runs fully without ARIA. ARIA is an optional internal-data layer. When it is NOT available this run, ignore this section entirely and follow the rest of this skill as written. Do not fail, block, or tell the user to install anything.

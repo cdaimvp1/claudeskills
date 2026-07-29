@@ -205,3 +205,67 @@ def stub_report(values, src, exempt=()):
             if isinstance(e, dict) and e.get("stub"):
                 out.append({"field": field, "source": e.get("name"), "asOf": e.get("asOf")})
     return out
+
+
+# --------------------------------------------------------------------- row-level form
+
+def validate_rows(rows, name_key, as_of_key, label="rows",
+                  tier_key=None, confidence_key=None, abstentions=()):
+    """Validate ROW-level provenance: a list where each row IS a fact carrying its source.
+
+    The `$src` sidecar above suits an object of field-keyed facts (category-strategy's
+    seed). Four other skills carry provenance in the other natural container: a list of
+    rows, each with its own source columns. A market-rate data point, a cost-driver line, a
+    risk register entry and a deep-dive dimension are all "one fact, one row, one source".
+
+    Same principle, different shape, so the rules are the same:
+      * a row asserting a value must name its source
+      * that source must carry a usable capture date
+      * tier and confidence, where present, must be in range
+
+    `abstentions` are source values that HONESTLY say "no evidence" rather than naming one,
+    for example "Not Determined". They pass without a date, because there is nothing to
+    date. Refusing them would punish the honest answer and push callers toward inventing a
+    source, which is the opposite of the point.
+    """
+    if not isinstance(rows, list):
+        raise ProvenanceError("%s must be a list, got %s" % (label, type(rows).__name__))
+
+    checked = abstained = 0
+    for i, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise ProvenanceError("%s[%d] must be an object" % (label, i))
+
+        src_name = (row.get(name_key) or "").strip() if isinstance(row.get(name_key), str) else row.get(name_key)
+        if isinstance(src_name, str) and src_name.strip().lower() in {a.lower() for a in abstentions}:
+            abstained += 1
+            continue
+
+        if not src_name:
+            raise MissingProvenanceError(
+                "%s[%d] has no %s. Every row here asserts a fact, and a fact with no named "
+                "source is the state this check exists to catch." % (label, i, name_key))
+
+        as_of = row.get(as_of_key)
+        if not _valid_as_of(as_of):
+            raise MalformedSourceError(
+                "%s[%d] (%r) has %s=%r, which is not a usable capture date."
+                % (label, i, src_name, as_of_key, as_of))
+
+        if tier_key is not None and row.get(tier_key) is not None:
+            t = row[tier_key]
+            if not (isinstance(t, int) and TIER_MIN <= t <= TIER_MAX):
+                raise MalformedSourceError(
+                    "%s[%d] (%r) has %s=%r; the hierarchy runs %d-%d."
+                    % (label, i, src_name, tier_key, t, TIER_MIN, TIER_MAX))
+
+        if confidence_key is not None and row.get(confidence_key) is not None:
+            c = row[confidence_key]
+            norm = c.title() if isinstance(c, str) else c
+            if norm not in CONFIDENCE:
+                raise MalformedSourceError(
+                    "%s[%d] (%r) has %s=%r; expected one of %s."
+                    % (label, i, src_name, confidence_key, c, list(CONFIDENCE)))
+        checked += 1
+
+    return {"checked": checked, "abstained": abstained, "rows": len(rows)}

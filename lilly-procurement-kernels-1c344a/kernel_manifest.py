@@ -33,6 +33,13 @@ import sys
 
 SOURCE_SKILL = "lilly-procurement-kernels-1c344a"
 KERNEL_FILENAME = "numeric_kernel.py"
+
+# Additional vendored modules under the same discipline. provenance.py (H4/G13b) is
+# vendored into every skill that validates per-fact provenance, and it drifted within
+# minutes of being introduced: category-strategy received a copy made before
+# validate_rows() existed. One shared module means one drift problem, so it is tracked
+# here rather than trusted to whoever remembers to re-copy.
+EXTRA_VENDORED = ("provenance.py",)
 MANIFEST_FILENAME = "kernel_manifest.json"
 
 # Copies that are KNOWINGLY behind the source, with the reason. These report as
@@ -122,6 +129,42 @@ def collect(root: str):
     return source_hash, copies
 
 
+def collect_extra(root: str):
+    """Same drift check for every module in EXTRA_VENDORED.
+
+    Returns {filename: (source_hash, {skill: hash})}. Kept separate from collect() so the
+    kernel's own HELD exception cannot accidentally apply to another module.
+    """
+    out = {}
+    for fname in EXTRA_VENDORED:
+        src = os.path.join(root, SOURCE_SKILL, fname)
+        if not os.path.isfile(src):
+            continue
+        shash = sha256_body(src)
+        copies = {}
+        for name in sorted(os.listdir(root)):
+            d = os.path.join(root, name)
+            if not os.path.isdir(d) or name == SOURCE_SKILL:
+                continue
+            cand = os.path.join(d, fname)
+            if os.path.isfile(cand):
+                copies[name] = sha256_body(cand)
+        out[fname] = (shash, copies)
+    return out
+
+
+def report_extra(root: str) -> int:
+    failures = 0
+    for fname, (shash, copies) in sorted(collect_extra(root).items()):
+        drift = [k for k, v in copies.items() if v != shash]
+        print(chr(10) + f"{fname}: {len(copies) - len(drift)} of {len(copies)} "
+              f"vendored copies match")
+        for k in drift:
+            print(f"  DRIFT: {k}/{fname}")
+            failures += 1
+    return failures
+
+
 def main(argv) -> int:
     write = "--write" in argv
     root = find_suite_root(os.path.dirname(os.path.abspath(__file__)))
@@ -185,6 +228,11 @@ def main(argv) -> int:
         return 1
     print(f"RESULT: {len(copies) - len(held)} of {len(copies)} vendored copies "
           f"match the source, {len(held)} knowingly held. No unexplained drift.")
+    extra_failures = report_extra(root)
+    if extra_failures:
+        print(chr(10) + f"RESULT: DRIFT in {extra_failures} extra vendored "
+              f"copy(ies). Re-vendor from the source.")
+        return 1
     return 0
 
 

@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from provenance import (                                        # noqa: E402
     MalformedSourceError,
+    validate_rows,
     MissingProvenanceError,
     ProvenanceError,
     stub_report,
@@ -160,6 +161,34 @@ def run():
 
     raises("T21 refuses a non-dict values object", ProvenanceError,
            lambda: validate_provenance([], {}))
+
+    # --- row-level form: one fact per row, its source in its own columns -------------------
+    ROWS = [{"source": "10-K", "date": "2026-02-11", "tier": 1, "confidence": "High"},
+            {"source": "Gartner", "date": "2026-01", "tier": 2, "confidence": "Medium"}]
+    r = validate_rows(ROWS, "source", "date", tier_key="tier", confidence_key="confidence")
+    ok("T22 row-level provenance validates", r["checked"] == 2, str(r))
+
+    raises("T23 refuses a row with no named source", MissingProvenanceError,
+           lambda: validate_rows([{"source": "", "date": "2026-01"}], "source", "date"))
+    raises("T24 refuses a row whose date is a placeholder", MalformedSourceError,
+           lambda: validate_rows([{"source": "x", "date": "TBD"}], "source", "date"))
+    raises("T25 refuses an out-of-range tier in a row", MalformedSourceError,
+           lambda: validate_rows([{"source": "x", "date": "2026-01", "tier": 9}],
+                                 "source", "date", tier_key="tier"))
+
+    # The honest-abstention case. Refusing it would push a caller toward inventing a source.
+    ab = validate_rows([{"source": "Not Determined", "date": ""}], "source", "date",
+                       abstentions=("Not Determined",))
+    ok("T26 NEGATIVE CONTROL: an honest abstention passes without a date",
+       ab["abstained"] == 1 and ab["checked"] == 0, str(ab))
+
+    ok("T27 NEGATIVE CONTROL: an empty row list is legitimate",
+       validate_rows([], "source", "date")["rows"] == 0)
+    raises("T28 refuses a non-list", ProvenanceError,
+           lambda: validate_rows({}, "source", "date"))
+    ok("T29 confidence is case-normalised rather than rejected on case alone",
+       validate_rows([{"source": "x", "date": "2026-01", "confidence": "high"}],
+                     "source", "date", confidence_key="confidence")["checked"] == 1)
 
     print("=" * 84)
     print("SUMMARY: %d/%d passed, %d failed" % (len(PASS), len(PASS) + len(FAIL), len(FAIL)))

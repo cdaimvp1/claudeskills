@@ -3451,3 +3451,64 @@ than a switch. Reporting 1 of 8 rather than claiming 8.
 `#31 / H5 proper` is now unblocked in principle: the per-fact provenance field it needed
 exists. It still needs the other 7 skills carrying it before a suite-wide resolve check
 means anything.
+
+---
+
+## H4 wired across the remaining skills: 5 of 8 wired, 3 have nothing to validate
+
+Self-test 29 -> **37/37** (a second provenance FORM), `provenance.py` vendored into 5 skills
+and tracked against drift.
+
+### A second form, because facts come in two containers
+
+`category-strategy` keys facts by FIELD and carries a `$src` sidecar. The four generator
+skills carry them as ROWS, where each row IS a fact with its own source columns: a
+market-rate data point, a cost-driver line, a risk-register entry, a deep-dive dimension.
+
+Same principle, different container, so `validate_rows()` applies the same rules rather than
+forcing four skills to restructure their data. Rewriting working schemas to fit one shape
+would have been the change with all the risk and none of the benefit.
+
+| skill | form | validated |
+|---|---|---|
+| category-strategy | `$src` sidecar | field-keyed, sourced + derived |
+| market-rate-benchmarking | rows | source + date + tier |
+| should-cost-builder | rows | source + date + confidence (the fullest in the suite) |
+| supplier-landscape | rows | source name only, see gap |
+| supplier-deep-dive | rows | source name only, see gap |
+
+### A schema gap found, and surfaced rather than papered over
+
+`supplier-landscape` risk rows and `supplier-deep-dive` risk dimensions carry a source but
+have **no separate as-of field**, so a stale source is indistinguishable from a fresh one.
+G13b requires both.
+
+That is a SCHEMA change, not a data fix, so those two checks enforce what exists (every row
+names a source or honestly abstains) and REPORT the gap. Passing silently would hide it;
+failing the build would punish skills for a shape nobody has yet agreed to change.
+
+`"Not Determined"` passes as an honest abstention. Refusing it would push a caller toward
+inventing a source, which is the opposite of the point.
+
+### The 3 remaining skills have no data object to validate
+
+`commercial-negotiation-prep`, `process-navigator` and `procurement-help-desk` emit
+documents and answers, not structured data objects. Their per-fact discipline is already
+prose and already present: process-navigator's Rule 1 is "Cite every fact", help-desk
+discloses which tier answered and abstains otherwise.
+
+**Wiring a validator into them would validate nothing** — a file present, a check that
+never fires, which is precisely the false-complete A9 exists to catch. Recorded as
+not-applicable rather than counted as done.
+
+**So: 5 wired, 3 not applicable. H4 covers what it can cover.**
+
+### The vendoring drifted within minutes, and now cannot
+
+`category-strategy` got its copy of `provenance.py` BEFORE `validate_rows()` was added, so
+the shared module was inconsistent almost immediately. Caught by hashing the copies.
+
+`kernel_manifest.py` now tracks `EXTRA_VENDORED` modules under the same discipline as
+`numeric_kernel.py`, deliberately in a separate code path so the kernel's HELD exception
+cannot accidentally excuse another module. Tamper-tested: 5 of 5 match, and a one-line edit
+is caught and named.

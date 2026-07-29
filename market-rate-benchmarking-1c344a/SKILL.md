@@ -17,6 +17,21 @@ metadata:
 ---
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
+## Per-fact provenance (G13b / H4)
+
+```bash
+python check_provenance.py <data.json>
+```
+
+`provenance.py` is the vendored shared validator. This skill carries provenance in the
+ROW form: each of its data points IS a fact and carries its own source columns (`source`, `date`, `tier`).
+Same rules as the field-keyed sidecar; only the container differs.
+
+It refuses a row with no named source, a capture date that is a placeholder or
+unparseable, a tier outside 1-7, and a confidence outside High/Medium/Low. An honest
+abstention passes without a date, because refusing it would push a caller toward
+inventing a source.
+
 ## ARIA ENRICHMENT (optional, suite-wide)
 
 This skill runs fully without ARIA. ARIA is an optional internal-data layer. When it is NOT available this run, ignore this section entirely and follow the rest of this skill as written. Do not fail, block, or tell the user to install anything.
