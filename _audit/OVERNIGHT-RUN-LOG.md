@@ -2319,3 +2319,41 @@ unilaterally since both are authoritative.
 
 The self-test caught my own miscount while writing it: T14 expected 5 seeded issues where
 4 is right, because a demoted commitment counts once, not twice. Code right, test wrong.
+
+---
+
+## E4 — real XLSX generator for rfp-engine (BUILT)
+
+`rfp-engine-1c344a/rfp_xlsx_generator.py` + `rfp_xlsx_selftest.py`, 39/39.
+
+The gap E4 named was a claim with no implementation: `SKILL.md:292` and the Outputs table
+promised a 5-tier dropdown, conditional formatting and a locked structure on
+`requirements_matrix.xlsx`, and no code produced any of it. The DOCX sibling already had a
+real builder, which is what made this the widest claim-to-code gap in the skill.
+
+The schema is not invented: `references/artifact-schemas.md` sections 3 and 7 own it, down
+to the five named hexes. No green, per the status-palette rule.
+
+**Every positive assertion runs against a workbook written to disk and REOPENED**, which is
+E4's stated verify clause. Asserting against the in-memory object would only prove the code
+did what the code did, not that the features survive into the file, which is exactly where
+they get lost.
+
+Refusals: weights not summing to 100 (the kernel's `assert_weight_sum`, G11, not a hand
+sum), duplicate `Req_ID`, a value outside a controlled vocabulary, a missing weight, a
+package below its row/category minimum, openpyxl absent. A refused build leaves no partial
+file (T29).
+
+**Two bugs the self-test caught, both mine:**
+
+1. My colour extraction read `bgColor.rgb or fgColor.rgb`. For a solid `PatternFill` the
+   colour is in `fgColor`, and `bgColor` is `'00000000'` — a TRUTHY string — so every rule
+   read as black. T8 failed loudly, but the no-green check T9 PASSED VACUOUSLY against an
+   empty list. Fixed, and T8a now asserts the list is non-empty so T9 cannot pass on
+   emptiness again. A test that passes because it found nothing is worse than no test.
+2. My Brief-package sample sliced 12 rows off a Full set, which cuts categories mid-way so
+   the weights stopped summing to 100 and the generator correctly refused. The test data
+   was wrong, not the code. Brief now gets its own well-formed set, plus T28a asserting
+   that same set is REFUSED as a Full package.
+
+Kernel manifest still 15 of 16 + 1 held: the vendored copy was read, never edited.

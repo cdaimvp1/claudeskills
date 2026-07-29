@@ -289,7 +289,10 @@ The user taps to deselect anything they do not need. After response, map their s
 
 - **Invitation emails** -> one per vendor as labeled draft text (opened as an unsent draft via an approved message-compose surface if available, otherwise inline / `.md`; never sent automatically; with [Vendor Name] placeholders if contacts not provided)
 - **Instructions document** -> `[RFP|RFI]_Instructions.docx`, from the Lilly institutional template
-- **Requirements matrix** -> `requirements_matrix.xlsx` with 5-tier response scale and data validation
+- **Requirements matrix** -> `requirements_matrix.xlsx` with 5-tier response scale and data validation.
+  **Build it with `rfp_xlsx_generator.py`, never by hand.** The dropdowns, the conditional
+  formatting and the locked structure ARE the artifact; a hand-made sheet silently carries
+  none of them while looking correct.
 - **Pricing template** -> `pricing_template.xlsx`, context-aware
 - **Demo / presentation evaluation guide** -> `demo_evaluation_guide.docx` (Lilly internal: evaluator roster, scoring dimensions, calibration plan)
 - **Process schedule** -> `[RFP|RFI]_schedule.csv`
@@ -388,6 +391,38 @@ Before delivering, verify:
 - **Evaluation-weight sanity check (run before emitting `requirements_matrix.xlsx` and Section 1.7).** **HARD RULE, kernel usage (per Execution Guardrails G11):** run this check by calling `assert_weight_sum(category_weights, expected=100.0)` in the vendored `numeric_kernel.py`, once per category and once across the category structure, not by adding the column up by hand. It raises `WeightSumError` naming the over- or under-allocation, which is the "surface the discrepancy" behavior this rule already requires, and it never normalizes. It also rejects a negative weight even when the set foots to 100 (for example 110 and -10), which a sum check alone would pass and which inverts a criterion rather than de-emphasizing it. Within each category, the `Evaluation_Weight` values must sum to 100% (no over- or under-allocation); the category weights disclosed in Section 1.7 must match the category structure in the matrix; and the scoring scale must be the suite-canonical 0.0-5.0 / 5-tier scale (Meets OOB through Does Not Meet) so that downstream rfp-response-analysis and evaluation-engine consume it without rescaling. If any category does not sum to 100%, or weights were not user-provided, label them "DRAFT - confirm with evaluation team" per Accuracy Rule 2 and surface the discrepancy rather than silently normalizing. **Ownership direction:** this skill builds and confirms the requirements grid and evaluation criteria weights before any response exists; evaluation-engine applies those same weights to score actual responses once they arrive. It does not rebuild a competing matrix from scratch when this skill's matrix is available (see evaluation-engine's own Scoring Matrix Source rule).
 - **Addendum reconciliation (if any addendum has been issued):** every `Req_ID` referenced in an addendum's Section C exists in `requirements_matrix.xlsx` with a matching `Amendment_Ref`, and category weights are re-summed to 100% for any category touched by an amendment.
 
+## Building the XLSX artifacts
+
+```bash
+python rfp_xlsx_selftest.py      # 39 assertions, run after any edit
+```
+
+```python
+from rfp_xlsx_generator import build_requirements_matrix, build_pricing_template
+build_requirements_matrix(rows, 'requirements_matrix.xlsx', package='full')  # or 'brief'
+build_pricing_template('pricing_template.xlsx', domain_tabs=[...])
+```
+
+The schema is owned by `references/artifact-schemas.md` sections 3 and 7. The generator
+implements it; it does not redefine it, and the five tier hexes are the named ones from
+that document (no green, per the suite status-palette rule: a green "Meets OOB" would read
+as approval of a supplier claim nobody has verified).
+
+**It refuses rather than emitting a workbook that looks right.**
+
+| refusal | why a default would be wrong |
+|---|---|
+| category weights not summing to 100 | raised by the kernel's `assert_weight_sum` per G11. Silent normalization would distort every downstream ranking with nothing left to show it happened |
+| duplicate `Req_ID` | addenda and the Q&A consolidation path key off it, so a duplicate amends the wrong requirement |
+| a value outside a controlled vocabulary | `Priority`, `Response_Format` and `Source` are closed sets |
+| a missing `Evaluation_Weight` | treating it as 0 drops the requirement out of scoring silently |
+| fewer rows or categories than the package needs | the fix is more requirements, never invented padding |
+| openpyxl unavailable | a CSV carries neither the validation nor the formatting, so it is not this artifact |
+
+A refused build writes no partial file (asserted, T29). The optional `Dependencies` and
+`Amendment_Ref` columns appear ONLY when populated, so the locked structure column count is
+unchanged for runs that never used the synthesizer or issued an addendum.
+
 ### Step 6: Deliver Outputs and (If Enabled) Hand Off
 
 Present all files together with brief summary of:
@@ -410,11 +445,11 @@ Present all files together with brief summary of:
 |--------|--------|---------|
 | Invitation email(s) | `message_compose` tool (`kind: "email"`); inline draft + `.md` fallback if unavailable | RFP invitation produced as labeled email draft text. If an approved message-compose surface is available, the skill may open an unsent draft for the user to review; if unavailable, it emits the email as inline Markdown / `.md` for the user to copy into Outlook. Never sent automatically. See **Invitation Email Rules** below. |
 | `[RFP|RFI]_Instructions.docx` | Word | Supplier-facing instructions document - **MUST be generated from the Lilly institutional template** (see `assets/lilly_rfx_template.js` and `references/lilly-rfx-template-spec.md`) |
-| `requirements_matrix.xlsx` | Excel | Structured requirements with data validation dropdowns for 5-tier response scale, conditional formatting, locked structure |
+| `requirements_matrix.xlsx` | Excel | Structured requirements with data validation dropdowns for 5-tier response scale, conditional formatting, locked structure (**built by `rfp_xlsx_generator.py`**) |
 | `[RFP|RFI]_schedule.csv` | CSV | Process milestones (release to award) |
 | `post_award_timeline.csv` | CSV | Project/implementation timeline post-award |
 | `demo_evaluation_guide.docx` | Word | **Lilly internal only.** Evaluator roster with scoring assignments, scoring dimensions/weights, independent scoring instructions, calibration session plan, and Q&A protocol. Vendor-facing demo scenarios live in Section 4 of the Instructions document. |
-| `pricing_template.xlsx` | Excel | Context-aware pricing response template |
+| `pricing_template.xlsx` | Excel | Context-aware pricing response template (**built by `rfp_xlsx_generator.py`**) |
 | `stakeholder_roster.csv` | CSV | Lilly evaluators, demo attendees, approvers (if collected) |
 | `case_handoff.json` | JSON | Structured payload for rfp-case-manager (if handoff enabled) |
 | `[RFP\|RFI]_Addendum_[N].docx` | Word | Formal, supplier-facing amendment produced by RFP Q&A Consolidation when a Q&A batch yields a requirement-changing or scope-negotiation answer (see RFP Q&A Consolidation) |
