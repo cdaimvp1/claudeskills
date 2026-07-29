@@ -1128,3 +1128,65 @@ effect is to make a future audit of this kind report a nicer number.
 **Stated limit:** this is a text audit. It proves presence, not correctness. A skill can
 carry every mechanism and apply them badly at runtime; only the golden fixture and the G8
 smoke test can speak to that.
+
+### Task #3 DONE, 2026-07-29. F4 + F5 invoice-rate-card-auditor.
+
+Built `invoice_audit_engine.py` and `invoice_audit_selftest.py` in the skill, and wired
+SKILL.md with a HARD RULE at the head of Phase 2. F4's dependency (C9) landed earlier
+tonight, so it was unblocked.
+
+**Verification, actual output:**
+```
+python invoice_audit_selftest.py   ->  SUMMARY: 26/26 passed, 0 failed
+standalone in an isolated directory (Desktop case)  ->  26/26 passed
+imports: json, sys, dataclasses, typing   (stdlib only; os removed as unused)
+kernel drift after the change: 15 of 16 match, 1 knowingly held
+```
+
+**F4's own verify criterion, met in full.** It asked for "a golden invoice set with seeded
+defects (rate mismatch, escalation over cap, duplicate, unsupported hours) must produce
+exactly the seeded findings AND NO OTHERS". Six seeded defects, each asserted to the exact
+questioned amount:
+```
+L-04  rate above contract     (165-150) x 80        = 1,200
+L-05  line-item math error    6,500 - 6,000         =   500
+L-06  escalation over cap     (220-206) x 50        =   700   + RATE_VS_CONTRACT 700
+L-07  duplicate across invs   full stated_total     = 20,000
+L-08  unsupported charge      full stated_total     = 13,500
+L-09  hours discrepancy       20 x 200 (lower rate) =  4,000
+```
+Plus **three deliberately CLEAN lines that must produce nothing**. That half is the one
+that matters: an engine which flags everything passes a test that only checks the seeded
+defects were caught. All three stayed clean and landed in `clear_lines`.
+
+**Also asserted:** every severity-escalation trigger (6.8% over cap to Critical, 13,500
+unsupported to Critical, 16.7% hours to High), that the duplicate rule flags the LATER
+occurrence and not the original, and that confirmed plus pending equals the total.
+
+**What deliberately did NOT move to code.** The engine never guesses an ambiguous match. A
+role absent from the rate card, or a roster level HIGHER than billed (a favourable variance
+under Rule 7, never a questioned amount), goes to `needs_model_review` with the reason. The
+model judges only those lines rather than all of them. Judgment is narrowed, not removed,
+which is the same split used everywhere else in this programme.
+
+**Three refusals, all tested:**
+- unstated compounding-vs-simple reading raises `BlockingAmbiguityError` rather than
+  defaulting, because Operating Rule 2 makes it a blocking ambiguity and the two readings
+  produce different caps and therefore different findings;
+- a missing or refusing kernel raises `KernelUnavailableError` naming the line, per the
+  skill's own "a figure produced without the kernel is invalid" with no estimated fallback;
+- row counts or rollups that do not foot raise `ReconciliationError`.
+
+**Two subtleties from the spec that are easy to get wrong and are pinned by tests:**
+- **No double counting between the hours finding and the rate finding.** 3D uses the LOWER
+  of the two rates the line could defensibly be billed at, so the same excess dollars are
+  never questioned twice.
+- **`NO_TIMESHEETS_SUPPLIED` is NEEDS_INPUT, not an unsupported charge.** The absence of any
+  timesheet population is a data gap, not evidence against a specific line. Tested.
+
+**Immateriality holds:** a $5 variance on a $20,000 line is logged CLEAR, not scored, so
+the exception count is never padded with rounding noise.
+
+**Malicious-code review: SAFE.** Imports are `json`, `sys`, `dataclasses`, `typing` plus
+the vendored kernel. No network, no subprocess, no eval/exec, no file writes except the
+explicit `--ledger` output path the caller names.

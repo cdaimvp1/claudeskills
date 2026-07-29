@@ -224,6 +224,67 @@ Normalize resource and role names (a supplier's "Sr. Consultant" and the rate ca
 - [ ] The escalation clause is captured verbatim (rate, compounding/simple, trigger) or explicitly marked unavailable
 - [ ] PO and timesheets are captured if supplied, or explicitly marked not supplied
 
+### HARD RULE: Phases 2 to 4 run in code, not as a model loop
+
+**Call `invoice_audit_engine.py` in this skill's own directory.** It performs entity
+resolution (Phase 2), all six check families (Phase 3), and the severity table and rollup
+(Phase 4) in one execution, calling `verify_line_math()` and `escalate()` per line
+internally.
+
+```
+python invoice_audit_engine.py audit_input.json --ledger findings_ledger.json
+```
+
+or in-process:
+
+```
+from invoice_audit_engine import audit, build_ledger
+result = audit(audit_input)          # PASS_2 through PASS_4
+ledger = build_ledger(result)        # the JSON ledger, F5
+```
+
+**This is a COMPLETENESS fix before it is a cost fix.** Invoice populations are the
+largest-N input in this suite. A model loop over several thousand lines can skip one and
+nothing says so; code cannot. Lower token cost is a side effect and would not justify the
+change on its own.
+
+**What the engine does NOT do, deliberately.** It never guesses an ambiguous match. A line
+whose `role_billed` is absent from the rate card, or whose roster level is higher than
+billed (a favourable variance under Rule 7), is emitted in `needs_model_review` with the
+reason. **The model judges only those lines, not all of them.** Judgment is narrowed, never
+removed.
+
+It also REFUSES rather than assuming in three cases:
+
+- **The escalation clause's compounding-vs-simple reading is unstated.** Raises
+  `BlockingAmbiguityError`. Operating Rule 2 makes this a blocking ambiguity to be asked
+  once, tappable, and the two readings produce different caps and therefore different
+  findings.
+- **The kernel is missing or refuses on a line.** Raises `KernelUnavailableError`, naming
+  the line. Per Kernel Wiring above, a figure produced without the kernel is invalid and
+  there is deliberately no estimated fallback.
+- **Row counts or rollups do not foot.** Raises `ReconciliationError`. Lines in must equal
+  lines verified, the category rollup must sum to the Total Questioned Amount, and
+  confirmed plus pending must equal that total.
+
+**Self-test before trusting a run:**
+
+```
+python invoice_audit_selftest.py        # 26/26 expected
+```
+
+It runs a golden invoice set with six seeded defects (rate above contract, line-item math
+error, escalation over cap, duplicate across invoices, unsupported charge, hours
+discrepancy) and **three deliberately clean lines**. The clean lines matter as much as the
+seeded ones: an engine that flags everything passes a test that only checks the defects
+were caught. The suite asserts exact questioned amounts, every severity-escalation trigger,
+that the duplicate rule flags the LATER occurrence rather than the original, that a $5
+variance on a $20,000 line is CLEAR rather than a padded exception, and all three refusals
+above.
+
+The Phase 2 to 4 specifications below remain the authority for WHAT the engine does. Read
+them to understand or change a rule; do not hand-execute them line by line.
+
 ### Phase 2: Entity Resolution / Matching -> PASS_2_MATCH
 
 For every invoice line, resolve it against the other documents:
