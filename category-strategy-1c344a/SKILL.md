@@ -6,7 +6,7 @@ description: >
   objectives. (2) MANAGE updates an existing strategy with new market intelligence, supplier
   performance, and spend trajectory. (3) PREPARE cleans, normalizes, and classifies a raw spend
   extract into a reusable cleaned workbook and exception log (no strategy content, no dashboard).
-  DEVELOP and MANAGE produce an interactive dashboard (JSX); PREPARE produces a cleaned workbook
+  DEVELOP and MANAGE produce an interactive dashboard (self-contained HTML, built deterministically by `dashboard/build_dashboard_category.py`); PREPARE produces a cleaned workbook
   (XLSX) and never writes back to SAP, Ariba, SHARP, or the supplier master. Triggers on
   "category strategy", "sourcing strategy", "category plan", "strategic sourcing for", "update
   category strategy", "category management", "how should we source", "clean this spend file",
@@ -16,7 +16,11 @@ metadata:
   suite: v10.7.0
 ---
 
-> **Build discipline (G10):** This skill emits a large single-file artifact. Assemble it across multiple `create_file` writes, never bash/cat and never one oversized `create_file` call: scaffold first with `create_file` (imports, component shell, export), then append one section per write to /mnt/user-data/outputs (still via `create_file`, so shareability is preserved throughout), and run a structural self-test before present_files. A single oversized write can truncate the file mid-stream. Full rule: lilly-brand-assets guardrail G10.
+> **Build discipline (G10):** G10's multi-write assembly rule applied when this skill
+> hand-authored a large single-file dashboard. It no longer does: the dashboard is built
+> by `dashboard/build_dashboard_category.py` from a data object, so there is no oversized
+> `create_file` to truncate. G10 still applies to any large artifact this skill writes by
+> hand, such as the PREPARE-mode workbook. Full rule: lilly-brand-assets guardrail G10.
 
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-06-08) -->
@@ -264,7 +268,7 @@ Assessment:               [Met / Partially Met / Not Met -- because...]
 
 The dashboard quality depends on completing three distinct passes of work. Each pass ends with a user checkpoint where the user can review, adjust, or approve before the next pass begins. Do NOT collapse these into one pass. Do NOT jump from data loading to dashboard generation.
 
-**Pass artifacts (per Execution Guardrails G8).** Each pass produces a named artifact that must exist before the next begins: CS_1_DATA_RESEARCH (derived analytics checklist + research log), CS_2_SYNTHESIS (the 10 analytical content blocks), CS_3_DASHBOARD (the rendered JSX from those blocks). If you are writing the dashboard JSX without CS_1 and CS_2 complete, STOP, you collapsed the passes, go back.
+**Pass artifacts (per Execution Guardrails G8).** Each pass produces a named artifact that must exist before the next begins: CS_1_DATA_RESEARCH (derived analytics checklist + research log), CS_2_SYNTHESIS (the 10 analytical content blocks), CS_3_DASHBOARD (the DATA OBJECT built from those blocks, which the locked engine renders). If you are writing the data object without CS_1 and CS_2 complete, STOP, you collapsed the passes, go back.
 
 **Pass 1: Data Analysis + Research** (Phases 0-2)
 - Search SharePoint for prior decks, ask the user for uploads
@@ -281,11 +285,17 @@ The dashboard quality depends on completing three distinct passes of work. Each 
 - Then ask: "Here's the analytical content that will populate the dashboard. Want to adjust anything before I build it?"
 
 **Pass 3: Dashboard Generation** (Phase 6)
-- Build the JSX with all content from Passes 1 and 2 embedded
-- This pass is mechanical: the analytical depth is already established, the dashboard is the rendering layer
+- Build the DATA OBJECT with all content from Passes 1 and 2 embedded, then run
+  `python dashboard/build_dashboard_category.py`.
+- **Do NOT hand-author JSX/React or CSS: your only job is the data object; the shipped,
+  locked engine renders every tab.** This is the same discipline as supplier-landscape
+  and for the same reason: a hand-authored dashboard is a differently-shaped artifact
+  every run, which is a consistency defect before it is a cost defect.
+- This pass is mechanical: the analytical depth is already established, the engine is
+  the rendering layer
 - Include ALL years of data, including YTD/partial years (do NOT drop or exclude any year from the dataset)
 
-**Multi-category note:** When building for multiple categories, run Passes 1-2 for each category separately. Each category gets the full analytical treatment. The dashboard file is one JSX with a dropdown, but the analytical work per category is not reduced. If context pressure is evident (analysis getting thinner on the second category), tell the user: "I recommend building each category in its own conversation to maintain full depth. Shall I finish this one first, then you can come back for the second?"
+**Multi-category note:** When building for multiple categories, run Passes 1-2 for each category separately. Each category gets the full analytical treatment. The dashboard is one built artifact with a category dropdown, but the analytical work per category is not reduced. If context pressure is evident (analysis getting thinner on the second category), tell the user: "I recommend building each category in its own conversation to maintain full depth. Shall I finish this one first, then you can come back for the second?"
 
 ### Phase 0: Prior Strategy Discovery (search and ask are mandatory; prior decks are not required to proceed)
 
@@ -572,25 +582,31 @@ skill-local path. Verified: building from a directory containing only a copy of 
     dashboard/_platform_build/                vendored platform chrome (topbar/footer/tokens/fonts)
 
 **Data contract: the model authors ONLY the data object; the builder renders.** Do not
-hand-clone JSX per run. This build tree is the current locked structure. **Known open item
-(WS B1, not in this task's scope):** the JSX spec below this line (`INLINED:
-examples/category_strategy_canonical_dashboard.jsx` and the 11-tab canonical structure
-immediately below) describes the RETIRED pre-deterministic pattern and a tab count (11) that
-conflicts with the locked 5-tab structure in `VERSION-LOCK-2026-07-29.md`. It has not been
-removed or reconciled here; that cleanup is WS B1/B2, tracked separately in
-`_audit/UPGRADE-PLAN.md`. Until B1 lands, prefer the deterministic build above over the JSX
-instructions that follow.
+hand-clone JSX per run. This build tree is the current locked structure. **WS B1 landed 2026-07-30:** the retired pre-deterministic JSX build
+instructions below have been replaced with the deterministic ones. **Still open (WS B2):**
+the canonical spec inlined at the end of this file states an 11-tab structure, which
+conflicts with the locked 5 tabs in `VERSION-LOCK-2026-07-29.md`. Until B2 lands, the
+locked 5-tab structure wins over any tab count stated further down.
 
-#### Single Deliverable: Category Strategy Dashboard (JSX)
+#### Single Deliverable: Category Strategy Dashboard (BUILT, not hand-authored)
 
-Interactive React dashboard. This is the ONE deliverable of this skill. There is no separate `category_strategy.docx` produced alongside it. The narrative content described in the inlined strategy template populates the dashboard tabs; the only time the strategy renders as an in-document Word artifact is the Word fallback path (when JSX cannot render), and that fallback IS the deliverable for that surface, not an additional document.
+A self-contained interactive HTML artifact, built deterministically by `dashboard/build_dashboard_category.py`. This is the ONE deliverable of this skill. There is no separate `category_strategy.docx` produced alongside it. The narrative content described in the inlined strategy template populates the dashboard tabs; the only time the strategy renders as an in-document Word artifact is the Word fallback path (when the dashboard cannot be built or rendered), and that fallback IS the deliverable for that surface, not an additional document.
 
-The structure is LOCKED and identical in every mode. See the inlined `references/dashboard-canonical.md` (inlined below) for the full specification. Build every category dashboard to match the canonical layout, swapping in the new category's data and research. Do not redesign.
+The structure is LOCKED and identical in every mode, and the shipped engine owns
+it. **Do NOT hand-author JSX/React or CSS: your only job is the data object; the shipped,
+locked engine renders every tab.** Same discipline as supplier-landscape and for the same
+reason: a hand-authored dashboard is a differently-shaped artifact every run, which is a
+consistency defect before it is a cost defect.
 
-**MUST be created using `create_file`** (not bash/cat) to ensure shareability, and assembled per Execution Guardrail G10 (scaffold, then append section by section, not as a single oversized write).
+**Build it:** author the data object, then run `python dashboard/build_dashboard_category.py`.
+There is no `create_file` assembly step and no oversized-write risk, because you are not
+writing the artifact.
 
 Key requirements:
-- **Match the canonical structure every time.** Same dark header bar with red rule and mode/category label, same tabbed nav with NEEDS_INPUT dot markers on input-dependent tabs, same reusable components (Metric, Card, STable sortable + searchable, Tip, Pillar, SevPill), same recharts visualizations, same Lilly-approved color tokens (see `the "## INLINED: references/brand-colors.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md`), same Georgia serif titles and numbers on Arial body, same dark sources/confidence footer.
+- **The engine owns layout, components, charts, colour and type.** Header bar, tabbed nav
+  with NEEDS_INPUT markers, the shared components, the visualisations, the Lilly colour
+  tokens, the serif titles and the sources/confidence footer are all rendered by the
+  engine. Do not restyle them per run and do not redesign.
 - **No em dashes and no literal escape codes as text** (Global Rules 7). Use literal characters or restructure with hyphens, colons, parentheses.
 - **Vendor identity** uses VENDOR_PARENT2 with Vendor Name fallback (see Data Conventions section).
 - **Annual metrics only.** No quarterly toggle. Show annual spend by year.

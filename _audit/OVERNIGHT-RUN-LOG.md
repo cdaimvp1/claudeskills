@@ -4632,3 +4632,52 @@ correct, and every one would have gone stale again on the next routing change if
 manifest were not the source they are checked against.
 
 Smoke 33/0 - manifest check PASS - J1 check PASS - 33 packages extract-and-retest verified.
+
+---
+
+## B1 — category-strategy's reference-JSX dashboard spec retired. DONE.
+
+Decision was already locked ("Marc decision: no, the retirement is locked"); dependencies
+A3, A4 and A11 are all done, so this was startable without Marc. **The task list was wrong
+that all of #26 was blocked on him.**
+
+### What the file was still telling the model to do
+
+category-strategy's SKILL.md described a deliverable that no longer exists: an **11-tab
+hand-authored React/JSX dashboard**, assembled across multiple `create_file` writes per
+G10, with recharts visualisations and hand-matched colour tokens. What actually ships is a
+**5-tab, self-contained HTML artifact built by `dashboard/build_dashboard_category.py`**.
+
+A skill instructing the model to hand-build a retired artifact is worse than an out-of-date
+comment: the model would have followed it.
+
+### Six sites corrected
+
+1. the headline description of what DEVELOP and MANAGE produce
+2. the `CS_3_DASHBOARD` pass artifact: "the rendered JSX" -> the DATA OBJECT the engine renders
+3. Pass 3 itself: build the data object and run the builder, with the explicit
+   **"Do NOT hand-author JSX/React or CSS: your only job is the data object"** rule copied
+   from supplier-landscape rather than reworded
+4. the multi-category note ("one JSX with a dropdown" -> one built artifact)
+5. **G10 build discipline**, which existed because this skill hand-wrote a large single
+   file. It no longer does, so there is no oversized `create_file` to truncate. G10 is
+   retained for what this skill still writes by hand, the PREPARE-mode workbook.
+6. the "Single Deliverable ... (JSX)" section: heading, description, and the build
+   instructions, which now say the engine owns layout, components, charts, colour and type
+
+### No rule was deleted
+
+The substantive rules inside that section survive untouched: no em dashes, no literal
+escape codes as text, VENDOR_PARENT2 vendor identity, annual metrics only. Only the
+"how to build it" framing changed. Same discipline as B7a: restate, never drop.
+
+### Left standing on purpose
+
+A prior pass had put a marker in the file deferring this to B1. That marker is now updated
+rather than removed: **B1 landed, B2 has not.** The canonical spec inlined at the end of the
+file still states 11 tabs against the locked 5, and the marker now says the locked 5 wins
+until B2 lands. Removing the marker entirely would have hidden a live conflict.
+
+Smoke 33/0 - malicious sweep clean - 33 packages extract-and-retest verified.
+
+**B2 needs one word from Marc: confirm Category Strategy is 5 tabs.**
