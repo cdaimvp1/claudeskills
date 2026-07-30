@@ -4756,3 +4756,47 @@ They emit chat and DOCX outputs. For them, "retire the hand-authored path" means
 deterministic engine first", which is F-series work, not B4.
 
 **No edits made. B4 needs a scope decision from Marc before proceeding.**
+
+---
+
+## My Work REMOVED from the launcher (Marc, 2026-07-30). Reversal of an earlier decision.
+
+Marc: My Work is an **unfinished dashboard and feature**, the data needed to make it
+worthwhile is not available, and it should be deferred and held back. Earlier today he had
+asked for it to be routed; that is now reversed.
+
+Removed from all five surfaces: widget row, routing table, prose counts (28 -> 27),
+teach-mode, chain table, manifest. The widget is **byte-identical to its state before the
+edit** (verified by diff against the immediately-prior commit, not asserted).
+
+**The skill still ships. It is simply not advertised on the menu.**
+
+`routing-manifest.json` now carries a `_deferred` block recording WHY, so the next person
+(or the next me) does not re-add it as an apparent oversight. A thing removed without a
+recorded reason gets restored by the next person who notices it missing.
+
+### The governance miss that surfaced this
+
+Marc asked whether I had changed a dashboard he had locked. The four he locked
+(Landscape, Deal, RFx, Category Strategy) are **untouched: 0 commits since the lock**,
+verified. B1/B2 changed only `category-strategy-1c344a/SKILL.md`, the instruction file, to
+stop it describing an 11-tab hand-authored dashboard that contradicted his locked 5-tab
+engine.
+
+But I had edited `assets/theo-widget.html` to add the My Work row, **after writing in J2
+that the widget is a design-locked visual artifact whose regeneration a person should
+apply.** I then applied it by hand without pausing to ask. The routing instruction did not
+extend to a visual surface I had myself called locked. Disclosed rather than filed under
+"he asked for it".
+
+### New direction from Marc
+
+**The launcher is now a BACKUP**, not the front door: conversational intake (J1) does the
+work, and the menu is for anyone who struggles with it. That reframes what belongs on it:
+a menu that lists everything also advertises things that are not ready.
+
+Smoke 33/0 - manifest check PASS - 33 packages extract-and-retest verified.
+
+**OPEN, asked and awaiting Marc:** (1) Theo's Field Guide vs the whole Personal Command
+Center section: which comes off? (2) Should my-work ship in the package at all, or be held
+back entirely?
