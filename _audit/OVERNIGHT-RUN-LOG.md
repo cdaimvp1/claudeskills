@@ -3808,3 +3808,60 @@ not re-litigated. SECRETS 0, BYPASS 0, OBFUSCATION 0, INJECTION 0.
 A7 was the root block for three items. **A11 can now be attempted** (it needed A7 among
 A1/A3-A5/A7-A10), and A11 unblocks B7a -> J1 -> J2 -> (B7b, J3) plus #22 and #25.
 A11 still needs Marc's sign-off, and A5/A6 Deep Dive and A8/A9 Landscape remain.
+
+---
+
+## A11 lock all five hubs — EXECUTED AS FAR AS IT CAN GO. Cannot complete: Deep Dive does not exist.
+
+A11's stated work is "per-dashboard in-browser sweep plus full-codebase malicious-code
+pass, then tag", gated on Marc's sign-off (M14), depending on A1, A3-A5, A7-A10.
+
+### The blocker, precisely
+
+The five Phase 1 hubs (`PROGRAM-MASTER-PLAN.md:44-51`) are RFx, Category Strategy,
+**Deep Dive**, My Work, Landscape.
+
+- **Deep Dive (A5) has zero builders and zero HTML.** It is still on the fully-manual JSX
+  path. There is no artifact to sweep, and none to lock.
+- **Landscape is built but not "fully-locked"**: A8 (design uplift to Deal/RFx caliber)
+  and A9 (engine recolor to MCM) are both outstanding.
+
+So the tag cannot be applied. A11 is 1 of 3 preconditions short, and A7 was only one of them.
+
+### What WAS done, because it does not depend on the missing pieces
+
+**1. In-browser sweep of every built hub.** Landscape, Deal v2, RFx, Category Strategy and
+My Work: **0 console errors** across all five. The only error seen anywhere was a
+`favicon.ico` 404, which is a browser's default request, not a page defect.
+
+**2. Full-codebase malicious-code pass.** SECRETS 0, BYPASS 0, OBFUSCATION 0, INJECTION 0.
+EGRESS and EXEC hits all previously reviewed and recorded.
+
+**3. NEW permanent gate: `_audit/hub_selfcontainment.py`.** The in-browser sweep alone
+would not have caught the defect My Work shipped an hour earlier, because that page's
+markup was clean while its behaviour was not. This gate matches the MECHANISM: fetch,
+XMLHttpRequest, WebSocket, sendBeacon, dynamic import, `.src =` assignment, bundle-asset
+literals and `/api/` path literals, over a comment-stripped copy.
+
+**Result: 7 built artifacts, 0 findings.** Every hub dashboard is provably request-free.
+
+Two design points worth keeping:
+- It **names Deep Dive as NOT SWEPT** rather than silently skipping it. A sweep that omits
+  what does not exist reports green for a set it never examined, which is exactly how an
+  unbuilt dashboard gets counted as locked.
+- It **states what a clean result does not mean**: no requests is not the same as renders
+  correctly or figures reconcile.
+
+Worth recording: earlier console history showed category-strategy pages POSTing to
+`/api/supplier-risk` and `/api/category-strategy` and pulling the Theo chrome and dino.
+Those were pre-fix builds from earlier sessions. The current artifacts are clean, and the
+new gate now makes that a standing check rather than something noticed by accident.
+
+### Remaining for A11
+
+| precondition | state |
+|---|---|
+| A5 Deep Dive dashboard | **NOT BUILT** (effort L) |
+| A8 Landscape design uplift | outstanding |
+| A9 Landscape engine recolor | outstanding |
+| A11 sign-off | **Marc (M14)** |
