@@ -922,7 +922,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ComposedChar
 // 5 tabs, identical in DEVELOP and MANAGE modes and for every category or
 // commodity. Only the data and category-specific research change per run.
 // Data below is NEUTRAL and ILLUSTRATIVE (Supplier Alpha/Beta/Gamma, generic
-// subcategories). Clone the structure, swap the data.
+// subcategories). HISTORICAL reference only; the builder renders from a data object.
 // House style: SUITE STANDARD (Arial body, Georgia titles, dark #212121 header
 // with red rule, Lilly-approved palette). Same family as every other dashboard.
 // See references/dashboard-components.md for component implementations.
@@ -1678,7 +1678,7 @@ The spend cube construction, Pareto analysis, HHI and concentration metrics, cla
 
 # Category Strategy Dashboard - Canonical Structure (LOCKED)
 
-This spec is mandatory. Every category strategy dashboard, in DEVELOP mode and MANAGE mode alike, must follow this exact structure. Only the data and category-specific research change. Do not redesign the layout, tabs, components, or styling per run. The reference implementation is `examples/category_strategy_canonical_dashboard.jsx` (neutral illustrative data, not real). The shared component library is at `the "## INLINED: references/dashboard-components.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md`. Clone the structure, swap the data entirely.
+This spec is mandatory. Every category strategy dashboard, in DEVELOP mode and MANAGE mode alike, must follow this exact structure. Only the data and category-specific research change. Do not redesign the layout, tabs, components, or styling per run. The reference implementation is `examples/category_strategy_canonical_dashboard.jsx` (neutral illustrative data, not real). The shared component library is at `the "## INLINED: references/dashboard-components.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md`. Do NOT hand-author JSX/React or CSS: your only job is the data object; the shipped, locked engine renders every tab. Author the data object and run the builder; do not clone a JSX reference.
 
 ## Quality Bar (CRITICAL)
 

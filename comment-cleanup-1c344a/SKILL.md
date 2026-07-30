@@ -449,7 +449,45 @@ Workflow (read the .docx with `unpack.py` per G1 so tracked changes and authorsh
 
 This mode never fabricates or modifies contract terms; it only applies already-agreed changes and removes comments, behind the same approval gate as the rest of this skill.
 
-**Maintainer note (extraction recommendation, not user-facing; Marc-gated per master-plan Stage 6 -- do not act on this without his sign-off):** Yes, this probably warrants its own skill eventually. Reasoning for yes: it operates on a different, higher-risk surface (the operative contract body text via tracked-change acceptance, not just comment metadata), it has its own distinct trigger phrases and deliverable shape (a signature-ready DOCX plus a change summary, versus a hygiene report), and the master-plan's own audit already names it as "materially higher-stakes...hidden inside a lower-stakes skill." Counterweight: it currently reuses this skill's comment inventory, classification system, and Hard Stop protection (Step 1 above and the Guardrails section below), so extraction would need to either duplicate that machinery or have a new skill depend on this one -- non-trivial plumbing for what is today a compact, six-step addition. Recommend deferring extraction until either (a) the Finalize workflow grows further (more execution-prep steps, additional output formats), or (b) discoverability becomes a real problem (users not finding it because it is nested under a comment-hygiene skill name). Until then, the in-file boundary added above should be sufficient containment.
+**B9 DECIDED (Marc, 2026-07-30): KEEP Mode B in this skill. Do not extract it now.**
+
+The question was whether "Finalize for Signature" belongs in its own skill, because it
+operates on a higher-risk surface (the operative contract body text, via tracked-change
+acceptance) than the comment hygiene this skill is named for.
+
+**Why keep it.** The containment B9 asked for already exists, and was verified rather than
+assumed:
+
+1. Mode B has its own distinct trigger phrases, so you cannot fall into it while doing
+   comment hygiene.
+2. A BOUNDARY NOTICE must be read before running it.
+3. **Ambiguity defaults to the SAFER mode.** "Clean this up before we send it" runs Mode A
+   and then separately ASKS whether you also want tracked-change acceptance. The
+   higher-risk path is never the default reading of an unclear request.
+4. The apply gate walks through anything uncertain rather than applying it; fully
+   autonomous apply is an explicit, warned choice.
+5. Kernel-backed decisions refuse rather than guess.
+
+B9's verify was "the risky path cannot be reached without an explicit confirmation step".
+Points 1, 3 and 4 satisfy it.
+
+**What was actually broken was DISCOVERY, and that is now fixed.** THEO routed this skill
+on "clean up the comments" alone. Someone who wanted a signature-ready document had no
+path to it, because nobody looks for that inside a skill called comment-cleanup. Mode B's
+trigger phrases are now in THEO's routing table.
+
+**EXTRACT LATER IF EITHER OF THESE BECOMES TRUE** (a stated trigger, so the deferral is not
+open-ended):
+
+- **(a) the Finalize workflow grows** beyond its current six steps: more execution-prep
+  stages, or an additional output format beyond the DOCX plus change summary; or
+- **(b) discovery fails again** despite the routing aliases: users still cannot find it, or
+  reach it by accident.
+
+Until then the plumbing cost is not justified: Mode B reuses this skill's comment
+inventory, classification and Hard Stop protection, so extraction means duplicating that
+machinery or creating a cross-skill dependency, for what is today a compact addition
+behind real gates.
 
 ## Standalone vs Integrated Use
 

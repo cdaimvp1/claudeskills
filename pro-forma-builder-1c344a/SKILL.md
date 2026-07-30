@@ -274,7 +274,7 @@ Any field with no confirmed value carries `"status": "NEEDS_INPUT"` and is surfa
 
 ## Deliverables
 - `pro_forma_model.xlsx` -- the formula-driven model (Assumptions, Cost Buildup, Scenario Projection, Savings Waterfall, TCO Summary, NPV-ROI-Payback, Sensitivity tabs; Sensitivity's break-even and robustness verdict are computed via Excel's native IRR() on the discount-rate driver, the driver with a closed-form solution in a macro-free workbook). Native deliverable. Produced by calling `pro_forma_generator.py` with the validated Assumptions register (see "Workbook generation wiring" under Deterministic computation), never hand-assembled.
-- Optional `pro_forma_dashboard.jsx` -- Magazine-style dashboard of the headline figures, built to the FIXED canonical tab skeleton (inlined below under "Dashboard canonical tab skeleton"). When the user wants a visual. Clone `examples/pro_forma_canonical_dashboard.jsx` (the canonical reference implementation; full spec in `references/dashboard-canonical.md`) and swap the data; do not redesign the structure per run.
+- Optional `pro_forma_dashboard.jsx` -- Magazine-style dashboard of the headline figures, built to the FIXED canonical tab skeleton (inlined below under "Dashboard canonical tab skeleton"). When the user wants a visual. Clone `examples/pro_forma_canonical_dashboard.jsx` (the canonical reference implementation; full spec in `references/dashboard-canonical.md`). Do NOT hand-author JSX/React or CSS: your only job is the data object; the shipped, locked engine renders every tab; do not redesign the structure per run.
 - A short narrative summary with the key numbers, assumptions, and "what would change this conclusion."
 
 ## Integration

@@ -4842,3 +4842,76 @@ were caught because they came up in conversation. That is not a process. Logged 
 
 31 packages, extract-and-retest verified. Smoke 33/0 (the repo still holds 33 skills; the
 two held-back ones are built and tested, just not packaged).
+
+---
+
+## B9 DONE — keep Mode B, containment confirmed, discovery fixed. (Marc chose "keep + aliases")
+
+### The plan was out of date
+
+B9 asked whether "Finalize for Signature" (which alters operative contract body text by
+accepting tracked changes) should be extracted from a skill named comment-cleanup. Since the
+plan was written, **v1.1.0 already added the containment it asked for.** Verified, not
+assumed:
+
+1. Mode B has its own distinct trigger phrases, so you cannot fall into it doing hygiene
+2. a BOUNDARY NOTICE must be read first
+3. **ambiguity defaults to the SAFER mode**: "clean this up before we send it" runs Mode A
+   and separately ASKS about tracked-change acceptance
+4. the apply gate walks through anything uncertain; autonomous apply is explicit and warned
+5. kernel-backed decisions refuse rather than guess
+
+B9's verify is "the risky path cannot be reached without an explicit confirmation step".
+**Points 1, 3 and 4 satisfy it.**
+
+### What WAS broken was discovery, and the plan did not name it
+
+**THEO routed comment-cleanup on "clean up the comments" alone.** Mode B's trigger phrases
+appeared nowhere in the routing table. Someone wanting a signature-ready document had no
+path to it, because nobody looks for that inside a skill called comment-cleanup. The
+maintainer note had predicted exactly this as extraction trigger (b).
+
+Mode B's triggers are now in the routing table, marked HIGHER-STAKES, with the upload it
+needs and the confirmation it expects. **Deliberately NOT added to the widget:** the
+launcher is a backup surface and Marc has not approved a widget change since the My Work
+episode. Recorded in the manifest as `on_widget: false` with that reason.
+
+### The deferral has a stated trigger, so it is not open-ended
+
+Extract later if EITHER: (a) the Finalize workflow grows beyond its six steps or gains an
+output format, or (b) discovery fails again despite the aliases.
+
+---
+
+## B4 DONE (the 9 skills with engines) — 0 clone/swap instructions remain.
+
+Marc chose the scoped option: sweep the 9 skills that have a deterministic builder, exclude
+lilly-brand-assets, re-file the other 5.
+
+### Polarity mattered more than the count
+
+Of the 27 hits, a substantial share were **prohibitions that had to survive**: "never
+hand-assembled cell by cell", "are BUILT, not hand-assembled". market-rate-benchmarking
+L409 even honestly states a gap ("have no generator and are still hand-assembled"), which is
+a true statement about the world and must not be edited into a lie. Deleting on the pattern
+would have inverted the meaning of the correct lines.
+
+**Result across the 9: 0 clone/swap instructions, 23 prohibitions and historical markers.**
+
+### Large JSX blocks were DEMOTED, not deleted
+
+Four skills carried big inlined JSX reference implementations. Deleting them would have
+removed the only record of what the dashboard contains. Each now carries a header saying it
+is a HISTORICAL REFERENCE, NOT AN INSTRUCTION, that the shipped builder produces the
+dashboard from a data object, and not to clone or restyle it. Same choice B1's plan offered
+("demote to historical or delete"), and the same discipline as B7a: the content record
+survives, the instruction force does not.
+
+### Still open, correctly
+
+5 skills (commercial-negotiation-prep, invoice-rate-card-auditor, meeting-prep-brief,
+negotiation-simulator, timeline-builder) have NO engine. Retiring their hand-authored path
+means building one first. Re-filed rather than pretended-complete.
+`lilly-brand-assets` is untouched: its JSX blocks ARE the shared component library.
+
+Smoke 33/0 - malicious sweep clean - 31 packages extract-and-retest verified.

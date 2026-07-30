@@ -138,6 +138,17 @@
           "on_widget": true,
           "upload": "the commented DOCX",
           "helpful": "who it is going to (supplier vs internal)"
+        },
+        {
+          "trigger": "finalize this for signature",
+          "title": "Finalize for Signature",
+          "what": "Accepts already-agreed tracked changes into the contract body and removes comments, producing an execution-ready document.",
+          "howto": "Upload the redlined DOCX. Higher-stakes: this alters body text, so it walks you through anything uncertain rather than applying it silently.",
+          "output": "A signature-ready DOCX plus a change summary.",
+          "on_widget": false,
+          "upload": "the redlined DOCX with agreed changes",
+          "helpful": "confirmation that the changes really are agreed",
+          "_note": "B9 discovery alias. Routed for conversational intake but deliberately NOT added to the widget: the launcher is a backup surface and Marc has not approved a widget change."
         }
       ],
       "in_teach_mode": true,

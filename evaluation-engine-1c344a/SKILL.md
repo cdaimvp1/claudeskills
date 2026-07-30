@@ -621,7 +621,7 @@ Extend the table when the hub object grows; do not replace it.
 - Evaluation Schemas (inlined below) - Required sections and structures for all outputs, including the `supplier_evaluation_ui.json` canonical dashboard data model
 - Scoring Methodology (inlined below) - Score scale, weighting rules (fractions summing to 1.0), aggregation formulas
 - Upstream Handoff (inlined below) - Rules for consuming `evaluation_engine_handoff.json` from rfp-response-analysis
-- `examples/evaluation_engine_canonical_dashboard.jsx` (companion file, not inlined) - the worked reference implementation of the six-tab canonical dashboard, including the Participation & Scoring Roll-up, the Supplier Scoring Grid, and the Award Scenario modeler. Clone the structure, swap the data; do not redesign per run.
+- `examples/evaluation_engine_canonical_dashboard.jsx` (companion file, not inlined) - the worked reference implementation of the six-tab canonical dashboard, including the Participation & Scoring Roll-up, the Supplier Scoring Grid, and the Award Scenario modeler. Do NOT hand-author JSX/React or CSS: your only job is the data object; the shipped, locked engine renders every tab. Author the data object; do not redesign per run.
 
 ## Skill Chain Position
 

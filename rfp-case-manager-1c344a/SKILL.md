@@ -1015,6 +1015,13 @@ Every tile and section renders on every case, per Rule 8: when a field is absent
 
 **Illustrative reference render.** The JSX below renders one fully worked single-RFx case (`RFP-2026-014`, Enterprise MDM Platform) so every state - populated, pending, and at-risk - is visible in one render: a mid-cycle Post-Submission case with an At-risk deadline read, one open comms-discipline flag, a preliminary (not yet BAFO-adjusted) TCO estimate, and two still-open Q&A items. Replace the `CASE`, `QA`, and `QA_OPEN` constants with the live case file's derived values when using this in a real run; every derivation (`phaseIndex`, `daysBetween`, `deadlineStatus`) is a pure function of the case file, not an LLM judgment call.
 
+
+> **HISTORICAL REFERENCE, NOT AN INSTRUCTION (WS B4, 2026-07-30).** The JSX below
+> records what the dashboard used to contain when it was hand-authored. It is kept so the
+> content record is not lost, and it is NOT a build instruction. This skill's dashboard is
+> now produced by its shipped builder from a data object. Do NOT clone this, do not swap
+> data into it, and do not restyle it per run.
+
 ```jsx
 import { useState, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, LabelList, ComposedChart, Line, ReferenceLine } from "recharts";

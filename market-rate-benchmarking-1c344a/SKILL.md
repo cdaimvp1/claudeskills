@@ -395,7 +395,7 @@ Architect, US Onshore" dataset consistent with the Step 3 summary table example 
 `examples/market_rate_projection_canonical.jsx` (see INLINED REFERENCE FILES). It uses the shared component
 library from `lilly-brand-assets-1c344a/references/dashboard-components.md` (`Metric`, `Card`, `Pillar`,
 `STable`, the Lilly color tokens) plus one skill-local addition, `ConfPill`, the HIGH/MEDIUM/LOW confidence
-analogue of `SevPill`/`PrioPill`. Clone the structure and swap in the researched rate line's own data; do not
+analogue of `SevPill`/`PrioPill`. The generator renders this from the validated rate register; do NOT hand-author it and do not
 redesign the layout, controls, or component choices per run.
 
 #### Step 3: Benchmark Summary Output
@@ -729,7 +729,7 @@ These reference documents are INLINED in this single-file build (see the "INLINE
 
 - External Market Rate Research Guide (inlined below) - market rate research methodology by category, source hierarchy, normalization rules, confidence framework, and the percentile gate.
 - Comparison Frameworks (inlined below) - internal comparison dimensions, scoring methodology for term quality, capability mapping taxonomy, and rationalization scenario modeling.
-- `examples/market_rate_projection_canonical.jsx` (inlined below) - reference implementation of the interactive Rate and Percentile Projection panel described in Mode 1, Step 2b: the `RateProjector` chart/controls panel, the paired `ProjectionNarrative` analysis panel, the shared `computeProjection` recompute function, and an illustrative rate-line dataset. Clone the structure and component choices; swap in the researched data.
+- `examples/market_rate_projection_canonical.jsx` (inlined below) - reference implementation of the interactive Rate and Percentile Projection panel described in Mode 1, Step 2b: the `RateProjector` chart/controls panel, the paired `ProjectionNarrative` analysis panel, the shared `computeProjection` recompute function, and an illustrative rate-line dataset. HISTORICAL reference for the panel's structure and component choices; the generator renders it from the validated rate register, so do not clone or hand-author it.
 
 ---
 
@@ -1279,6 +1279,13 @@ skill-local addition, `ConfPill` (the HIGH/MEDIUM/LOW confidence analogue of `Se
 the same "priority analogue" pattern the shared library already documents for `PrioPill`). Clone the
 structure and swap in the researched rate line's own data; do not redesign the layout, controls, or
 component choices per run.
+
+
+> **HISTORICAL REFERENCE, NOT AN INSTRUCTION (WS B4, 2026-07-30).** The JSX below
+> records what the dashboard used to contain when it was hand-authored. It is kept so the
+> content record is not lost, and it is NOT a build instruction. This skill's dashboard is
+> now produced by its shipped builder from a data object. Do NOT clone this, do not swap
+> data into it, and do not restyle it per run.
 
 ```jsx
 import { useState, useMemo } from "react";

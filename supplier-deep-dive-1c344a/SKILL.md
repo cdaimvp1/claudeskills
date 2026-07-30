@@ -585,7 +585,7 @@ End every run with:
 
 This spec is mandatory. Every dashboard this skill produces, in Standard / Risk-emphasis / Renewal modes and for EVERY category or commodity (IT, professional services, lab, clinical, chemicals, equipment, facilities, logistics, marketing, and any other), follows this exact structure. Only the data and the category-specific research change. Do not redesign the tabs, components, or styling per run or per mode. Quick brief mode skips the dashboard (one-pager only); the other three modes always build it with the same five tabs + recommendation strip. Two runs of the same input produce the same dashboard.
 
-Shared component implementations live in the dashboard-components content inlined inside `lilly-brand-assets-1c344a` (Metric, Card, STable, Pillar, SevPill, StateBanner, Tip, and the color tokens). Copy them verbatim; do not hand-roll equivalents or rename them. The complete reference implementation is the example JSX at the end of this section: clone its structure and swap the data.
+Shared component implementations live in the dashboard-components content inlined inside `lilly-brand-assets-1c344a` (Metric, Card, STable, Pillar, SevPill, StateBanner, Tip, and the color tokens). Copy them verbatim; do not hand-roll equivalents or rename them. The complete reference implementation is the example JSX at the end of this section: it is a RETIRED reference. Do NOT hand-author JSX/React or CSS: your only job is the data object; the shipped, locked engine renders every tab: build via `dashboard/build_profile_dashboard.py`.
 
 ### The determinism guarantee
 
@@ -610,6 +610,13 @@ Shared component implementations live in the dashboard-components content inline
 ### Color tokens (the shared suite palette; do not change)
 
 These match the Canonical Status Palette and chart palette owned by `lilly-brand-assets`. No two status/severity-role tokens share a hex (CARD and BD, and MUT and LT, are intentional neutral-tone pairs that share a hex by design); none is a green.
+
+
+> **HISTORICAL REFERENCE, NOT AN INSTRUCTION (WS B4, 2026-07-30).** The JSX below
+> records what the dashboard used to contain when it was hand-authored. It is kept so the
+> content record is not lost, and it is NOT a build instruction. This skill's dashboard is
+> now produced by its shipped builder from a data object. Do NOT clone this, do not swap
+> data into it, and do not restyle it per run.
 
 ```jsx
 const R = "#E1251B",   // Lilly Red - negative / high-risk / critical
@@ -675,7 +682,14 @@ When you clone the example data object, the illustrative numbers MUST foot: any 
 
 ### Reference implementation (example JSX, neutral illustrative data)
 
-Clone this structure and swap the data. The data here is illustrative and internally consistent (it foots per the assertion above). Built with `create_file` to `/mnt/user-data/outputs/` for shareability.
+RETIRED reference. Do NOT hand-author JSX/React or CSS: your only job is the data object; the shipped, locked engine renders every tab: build via `dashboard/build_profile_dashboard.py`. The data here is illustrative and internally consistent (it foots per the assertion above). Built with `create_file` to `/mnt/user-data/outputs/` for shareability.
+
+
+> **HISTORICAL REFERENCE, NOT AN INSTRUCTION (WS B4, 2026-07-30).** The JSX below
+> records what the dashboard used to contain when it was hand-authored. It is kept so the
+> content record is not lost, and it is NOT a build instruction. This skill's dashboard is
+> now produced by its shipped builder from a data object. Do NOT clone this, do not swap
+> data into it, and do not restyle it per run.
 
 ```jsx
 import { useState } from "react";
