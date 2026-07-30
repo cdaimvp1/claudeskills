@@ -1176,3 +1176,45 @@ The required report sections, their names, and their order are defined once, abo
 - **Decision-oriented** -- frame for procurement decisions
 - **Section transitions** -- each section opens with 1-2 sentences of context before the detail
 
+## Panel data contract: where each panel's data comes from, and what it says when empty
+
+`panel_sources.json` declares, for every panel on this dashboard: the fields it needs,
+**where each field comes from**, and what the panel renders when a field is empty.
+
+```bash
+python panel_contract.py panel_sources.json     # validate + print the retrieval plan
+```
+
+### Two rules, both enforced in code
+
+**1. A panel NEVER disappears when data is missing.** It stays, and it says why it is
+empty. A hidden panel looks like one that was never meant to exist, and the reader cannot
+tell that something is absent. `hide_when_empty` is refused by the validator.
+
+**2. "Searched and found nothing" and "could not reach the source" are different answers.**
+They look identical to a careless reader and mean opposite things. If a connector is down
+and the panel says "no data found", a broken pipe silently becomes a clean finding and
+someone decides on it. The code **refuses to report SEARCHED_NOT_FOUND unless a retrieval
+actually ran and came back empty.**
+
+| State | The panel says | The reader does |
+|---|---|---|
+| NEEDS_INPUT | this has to come from you or the supplier | provide it |
+| SOURCE_UNREACHABLE | could not reach *the named source* | retry, or fix access |
+| NOT_ATTEMPTED | not yet retrieved from *the named source* | run retrieval |
+| SEARCHED_NOT_FOUND | checked *the named source*; not present | nothing, the gap is real |
+| NOT_APPLICABLE | this subject type has no such thing | nothing |
+
+Every message names the source it expected, so "could not reach OFAC SDN" is actionable
+where "unavailable" is not.
+
+### Retrieval goes to the source, not to a search box
+
+`retrieval_plan()` groups every field by source, so retrieval runs **once per source**
+collecting everything that source can answer, rather than once per field.
+
+### Internal sources are flagged, never invented
+
+A source marked `access: internal` without `confirmed_by_owner` is reported as needing
+confirmation. Those names are inferred, and **a confidently wrong internal system name is
+worse than an honest blank**.

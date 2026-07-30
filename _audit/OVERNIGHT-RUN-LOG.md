@@ -4136,3 +4136,61 @@ extract-and-retest verified.
 
 **Next: the same contracts for Landscape and Category Strategy, which are partway there
 (1 file each) rather than starting from nothing.**
+
+---
+
+## Panel data contracts — Landscape and Category Strategy. All four locked dashboards now covered.
+
+| dashboard | panels | fields | source visits | need the user | internal to confirm |
+|---|---|---|---|---|---|
+| Deal | 35 | 59 | 11 | 8 | 5 |
+| RFx | 23 | 42 | 9 | 1 | 12 |
+| Category Strategy | 42 | 50 | 11 | 9 | 53 |
+| Landscape | 35 | 40 | 12 | 4 | 8 |
+| **total** | **135** | **191** | | **22** | **78** |
+
+Panel names were read out of the render code (`csCard(...)` and the pv-07 card helpers),
+not invented, so each contract covers the panels that actually exist.
+
+### The retrieval shape is the point
+
+Category Strategy resolves 72 field lookups into **11 source visits**, and one source
+(Lilly spend data) answers 32 of them. Landscape resolves 58 into 12. Retrieval now knows
+to go to spend data once and take everything it can answer, instead of searching per field.
+
+### 78 internal sources flagged for Marc, not invented
+
+Category Strategy carries 53 of them, which stands to reason: almost everything it renders
+comes from Lilly's own spend, contract, PO and vendor-master systems, and I named those
+from inference. **A confidently wrong internal system name is worse than an honest blank**,
+so every one is reported rather than asserted.
+
+### 22 fields correctly identified as un-retrievable
+
+Not gaps, and not research tasks. Examples: Lilly's WACC, the negotiation stage, who holds
+the pen, what Lilly INTENDED as against what the contract says, which suppliers are
+strategic, where the fit and risk cuts sit, whether a supplier fits Lilly's architecture,
+utilisation and shelfware data, and the prior strategy document. Those are decisions,
+records and systems, not documents to be found.
+
+### A real defect the smoke test caught
+
+The first version of the self-test discovered contracts ONLY as sibling directories. It
+passed in the repo and failed in every installed skill, because **a skill installs as one
+folder with no siblings.** A4 runs each self-test in an isolated copy, which is exactly why
+it fired.
+
+Fixed to work both ways: it reads the contract shipped beside it, adds siblings when they
+exist, and asserts four-dashboard coverage only when the siblings are actually visible.
+Demanding four contracts inside a correctly-installed single skill would have failed a
+skill that was working properly.
+
+Verified both contexts: **56/56 in the repo, 41/41 from an isolated extract.**
+
+### Verified
+
+Smoke 33/0 - kernel manifest 15/16 + 1 held, panel_contract 4 of 4, provenance 5 of 5 -
+malicious sweep SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages
+extract-and-retest verified.
+
+**All four design-locked dashboards now have a panel data contract. 135 panels.**

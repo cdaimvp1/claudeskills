@@ -1,0 +1,980 @@
+{
+  "dashboard": "Category Strategy",
+  "_note": "Panel-source contract. Panels NEVER disappear when data is missing: they stay and state why, naming the source they expected. Sources marked access=internal without confirmed_by_owner are named from inference and must be confirmed by Marc before they are trusted.",
+  "panels": [
+    {
+      "id": "annual_spend_trend",
+      "title": "Annual Spend Trend",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "spend by fiscal year",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "top_suppliers",
+      "title": "Top Suppliers",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "supplier spend and share",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "key_findings",
+      "title": "Key Findings",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "concentration, growth, tail read",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        },
+        {
+          "name": "what it means for the category",
+          "requires_input": true,
+          "note": "the sourcing lead's read; the data supports it but does not state it"
+        }
+      ]
+    },
+    {
+      "id": "spend_under_contract",
+      "title": "Spend Under Contract",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "contracted vs off-contract spend",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "renewal_exposure",
+      "title": "Renewal Exposure",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "value and timing of renewals",
+          "sources": [
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "category_scorecard",
+      "title": "Category Scorecard",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "category health measures",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            }
+          ]
+        },
+        {
+          "name": "targets",
+          "requires_input": true
+        }
+      ]
+    },
+    {
+      "id": "pareto_distribution",
+      "title": "Pareto Distribution",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "cumulative spend by supplier",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tail_analysis",
+      "title": "Tail Analysis",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "low-value supplier count and spend",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Purchase order and invoice data",
+              "access": "internal",
+              "type": "system",
+              "how": "PO and invoice lines for off-contract and tail analysis"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "all_suppliers",
+      "title": "All suppliers",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "supplier register with spend",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "all_subcategories",
+      "title": "All Subcategories",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "spend by subcategory",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "subcategory_detail",
+      "title": "Subcategory Detail",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "drill-down by subcategory",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fragmentation_map",
+      "title": "Fragmentation Map",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "supplier count against spend per subcategory",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "supplier_tiering",
+      "title": "Supplier tiering",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "tier assignment",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            }
+          ]
+        },
+        {
+          "name": "strategic designation",
+          "requires_input": true,
+          "note": "which suppliers are strategic is a decision, not a computed value"
+        }
+      ]
+    },
+    {
+      "id": "geographic_concentration",
+      "title": "Geographic concentration",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "spend by region",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "off_contract_spend_to_route",
+      "title": "Off-contract spend to route",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "spend with no active agreement",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            },
+            {
+              "name": "Purchase order and invoice data",
+              "access": "internal",
+              "type": "system",
+              "how": "PO and invoice lines for off-contract and tail analysis"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "consolidation_opportunities",
+      "title": "Consolidation opportunities",
+      "tab": "Spend & Suppliers",
+      "fields": [
+        {
+          "name": "overlapping suppliers and scope",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spend_trend_and_forecast",
+      "title": "Spend Trend and Forecast",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "historical spend",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        },
+        {
+          "name": "forecast basis",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ],
+          "note": "a forecast is labelled as such and never presented as actuals"
+        }
+      ]
+    },
+    {
+      "id": "change_decomposition",
+      "title": "Change Decomposition",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "drivers of year-on-year change",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rate_vs_volume",
+      "title": "Rate vs Volume",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "rate movement",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        },
+        {
+          "name": "volume movement",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Purchase order and invoice data",
+              "access": "internal",
+              "type": "system",
+              "how": "PO and invoice lines for off-contract and tail analysis"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "top_swing_drivers",
+      "title": "Top Swing Drivers",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "largest movements by supplier",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "what_changed_since_last_strategy",
+      "title": "What Changed Since Last Strategy",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "delta against the prior strategy",
+          "requires_input": true,
+          "note": "requires the prior strategy document, which only the owner can supply"
+        }
+      ]
+    },
+    {
+      "id": "new_large_vendors",
+      "title": "New large vendors",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "suppliers newly material",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exiting_vendors",
+      "title": "Exiting vendors",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "suppliers with spend ending",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "utilization___shelfware",
+      "title": "Utilization / shelfware",
+      "tab": "Trend & Change",
+      "fields": [
+        {
+          "name": "licences or capacity bought against used",
+          "requires_input": true,
+          "note": "utilisation data comes from the owning platform, not from spend data"
+        }
+      ]
+    },
+    {
+      "id": "market_intelligence",
+      "title": "Market intelligence",
+      "tab": "Market & Risk",
+      "fields": [
+        {
+          "name": "category market read",
+          "sources": [
+            {
+              "name": "Analyst market research",
+              "access": "licensed",
+              "type": "research",
+              "how": "Gartner, Forrester or IDC coverage for this category"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "supply_market_forces",
+      "title": "Supply-market forces",
+      "tab": "Market & Risk",
+      "fields": [
+        {
+          "name": "competitive dynamics",
+          "sources": [
+            {
+              "name": "Analyst market research",
+              "access": "licensed",
+              "type": "research",
+              "how": "Gartner, Forrester or IDC coverage for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pricing_environment",
+      "title": "Pricing environment",
+      "tab": "Market & Risk",
+      "fields": [
+        {
+          "name": "price direction",
+          "sources": [
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            },
+            {
+              "name": "Analyst market research",
+              "access": "licensed",
+              "type": "research",
+              "how": "Gartner, Forrester or IDC coverage for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "risk_heatmap",
+      "title": "Risk heatmap",
+      "tab": "Market & Risk",
+      "fields": [
+        {
+          "name": "risk by dimension",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            },
+            {
+              "name": "Public reporting and adverse media",
+              "access": "public",
+              "type": "media",
+              "how": "dated public reporting on the supplier, with the source named"
+            },
+            {
+              "name": "OFAC SDN and equivalent watchlists",
+              "access": "public",
+              "type": "regulator",
+              "how": "sanctions and debarment screen by legal entity"
+            }
+          ]
+        },
+        {
+          "name": "impact and likelihood",
+          "requires_input": true,
+          "note": "scoring both axes is a judgement; unscored risks are shown as unscored"
+        }
+      ]
+    },
+    {
+      "id": "risk_register",
+      "title": "Risk register",
+      "tab": "Market & Risk",
+      "fields": [
+        {
+          "name": "named risks and owners",
+          "sources": [
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            }
+          ]
+        },
+        {
+          "name": "supplier adverse events",
+          "sources": [
+            {
+              "name": "Public reporting and adverse media",
+              "access": "public",
+              "type": "media",
+              "how": "dated public reporting on the supplier, with the source named"
+            },
+            {
+              "name": "Supplier public filings",
+              "access": "public",
+              "type": "filing",
+              "how": "10-K, 10-Q or equivalent via SEC EDGAR, by legal entity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contract_exposure",
+      "title": "Contract exposure",
+      "tab": "Market & Risk",
+      "fields": [
+        {
+          "name": "term, renewal and exit exposure",
+          "sources": [
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "escalation_triggers",
+      "title": "Escalation triggers",
+      "tab": "Market & Risk",
+      "fields": [
+        {
+          "name": "what forces a review",
+          "sources": [
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            },
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "category_position",
+      "title": "Category position",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "position on the category matrix",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Analyst market research",
+              "access": "licensed",
+              "type": "research",
+              "how": "Gartner, Forrester or IDC coverage for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reading_the_position",
+      "title": "Reading the position",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "interpretation",
+          "requires_input": true
+        }
+      ]
+    },
+    {
+      "id": "recommended_plays",
+      "title": "Recommended plays",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "plays and rationale",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            },
+            {
+              "name": "Analyst market research",
+              "access": "licensed",
+              "type": "research",
+              "how": "Gartner, Forrester or IDC coverage for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "action_matrix",
+      "title": "Action matrix",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "action, owner, timing",
+          "requires_input": true,
+          "note": "owners and dates are commitments a person makes"
+        }
+      ]
+    },
+    {
+      "id": "savings_waterfall",
+      "title": "Savings Waterfall",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "savings by lever",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        },
+        {
+          "name": "baseline",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "what_it_is_worth",
+      "title": "What it is worth",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "value of the plays",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "where_to_start",
+      "title": "Where to start",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "sequencing",
+          "requires_input": true
+        }
+      ]
+    },
+    {
+      "id": "renewal_decision_matrix",
+      "title": "Renewal Decision Matrix",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "renewal, renegotiate or exit per agreement",
+          "sources": [
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            },
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "play_to_value_traceability",
+      "title": "Play-to-Value Traceability",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "each play traced to its value",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "capability_coverage",
+      "title": "Capability coverage",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "what the supplier base can and cannot do",
+          "sources": [
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            },
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "what_could_change_the_strategy",
+      "title": "What could change the strategy",
+      "tab": "Strategy & Plays",
+      "fields": [
+        {
+          "name": "watch items",
+          "sources": [
+            {
+              "name": "Analyst market research",
+              "access": "licensed",
+              "type": "research",
+              "how": "Gartner, Forrester or IDC coverage for this category"
+            },
+            {
+              "name": "Public reporting and adverse media",
+              "access": "public",
+              "type": "media",
+              "how": "dated public reporting on the supplier, with the source named"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

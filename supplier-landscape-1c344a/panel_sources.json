@@ -1,0 +1,831 @@
+{
+  "dashboard": "Landscape",
+  "_note": "Panel-source contract. Panels NEVER disappear when data is missing: they stay and state why, naming the source they expected. Sources marked access=internal without confirmed_by_owner are named from inference and must be confirmed by Marc before they are trusted.",
+  "panels": [
+    {
+      "id": "evaluation_summary",
+      "title": "Evaluation Summary",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "field read and front-runner",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "recommendation and next step",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recommendation",
+      "title": "Recommendation",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "ranked shortlist with fit and risk",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "suppliers excluded before assessment",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            }
+          ],
+          "note": "an exclusion must state the criterion it failed"
+        }
+      ]
+    },
+    {
+      "id": "portfolio_summary",
+      "title": "Portfolio summary",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "field composition",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "segmentation_and_differentiators",
+      "title": "Segmentation and Differentiators",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "fit and risk per candidate",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "thresholds",
+          "requires_input": true,
+          "note": "where the fit and risk cuts sit is a decision, not a computed value"
+        }
+      ]
+    },
+    {
+      "id": "firmographics",
+      "title": "Firmographics",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "size, age, footprint",
+          "sources": [
+            {
+              "name": "Supplier public filings",
+              "access": "public",
+              "type": "filing",
+              "how": "10-K, 10-Q or equivalent via SEC EDGAR, by legal entity"
+            },
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            },
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ownership_and_control",
+      "title": "Ownership and Control",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "corporate chain and beneficial ownership",
+          "sources": [
+            {
+              "name": "Supplier public filings",
+              "access": "public",
+              "type": "filing",
+              "how": "10-K, 10-Q or equivalent via SEC EDGAR, by legal entity"
+            },
+            {
+              "name": "Vendor master",
+              "access": "internal",
+              "type": "system",
+              "how": "supplier records, legal entities, parent linkage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "operating_footprint",
+      "title": "Operating Footprint",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "delivery-relevant locations",
+          "sources": [
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ],
+          "note": "country of domicile is not a delivery footprint"
+        }
+      ]
+    },
+    {
+      "id": "financial_health",
+      "title": "Financial Health",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "scale, growth, viability",
+          "sources": [
+            {
+              "name": "Supplier public filings",
+              "access": "public",
+              "type": "filing",
+              "how": "10-K, 10-Q or equivalent via SEC EDGAR, by legal entity"
+            }
+          ]
+        },
+        {
+          "name": "private-company financials",
+          "sources": [
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ],
+          "note": "a private supplier has no filings; this must come from the supplier"
+        }
+      ]
+    },
+    {
+      "id": "financial_health_bridge",
+      "title": "Financial Health Bridge",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "growth, profitability, liquidity, leverage",
+          "sources": [
+            {
+              "name": "Supplier public filings",
+              "access": "public",
+              "type": "filing",
+              "how": "10-K, 10-Q or equivalent via SEC EDGAR, by legal entity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "credit_and_market_enrichment",
+      "title": "Credit and Market Enrichment",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "credit and failure risk",
+          "requires_input": true,
+          "note": "requires a licensed credit provider Lilly must name"
+        }
+      ]
+    },
+    {
+      "id": "peer_position",
+      "title": "Peer Position",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "position against comparable candidates",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Analyst market research",
+              "access": "licensed",
+              "type": "research",
+              "how": "Gartner, Forrester or IDC coverage for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "commercial_model",
+      "title": "Commercial Model",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "pricing structure and cost drivers",
+          "sources": [
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "capability_to_requirement",
+      "title": "Capability to Requirement",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "evidence per requirement",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delivery_readiness",
+      "title": "Delivery Readiness",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "maturity, implementation, capacity, support",
+          "sources": [
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delivery_dependencies",
+      "title": "Delivery Dependencies",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "subcontractors and infrastructure",
+          "sources": [
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            },
+            {
+              "name": "Supplier public filings",
+              "access": "public",
+              "type": "filing",
+              "how": "10-K, 10-Q or equivalent via SEC EDGAR, by legal entity"
+            }
+          ],
+          "note": "an unconfirmed dependency is listed, never drawn as confirmed"
+        }
+      ]
+    },
+    {
+      "id": "reference_relevance",
+      "title": "Reference Relevance",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "named references and comparability",
+          "sources": [
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lilly_specific_fit",
+      "title": "Lilly-Specific Fit",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "architecture and internal compatibility",
+          "requires_input": true,
+          "note": "only Lilly can say whether a supplier fits Lilly's architecture"
+        }
+      ]
+    },
+    {
+      "id": "internal_relationship",
+      "title": "Internal Relationship",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "prior Lilly contracts, spend and performance",
+          "sources": [
+            {
+              "name": "Contract repository",
+              "access": "internal",
+              "type": "system",
+              "how": "active agreements for this category: term, renewal date, value"
+            },
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "spend extract for this category by supplier, subcategory and fiscal year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evidence_confidence",
+      "title": "Evidence Confidence",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "coverage and source quality",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evidence_coverage",
+      "title": "Evidence coverage",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "verified, partial, supplier input, missing",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "opportunities_and_concerns",
+      "title": "Opportunities and concerns",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "what helps and what worries",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "required_diligence",
+      "title": "Required Diligence",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "what must be validated before selection",
+          "sources": [
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            },
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "diligence_funnel",
+      "title": "Diligence Funnel",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "completeness per diligence track",
+          "sources": [
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "action_board",
+      "title": "Action Board",
+      "tab": "Supplier Deep Dive",
+      "fields": [
+        {
+          "name": "action, owner, gate",
+          "sources": [
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            }
+          ],
+          "note": "owners are people, and must be named"
+        }
+      ]
+    },
+    {
+      "id": "head_to_head",
+      "title": "Head-to-Head",
+      "tab": "Head-to-Head",
+      "fields": [
+        {
+          "name": "side-by-side comparison",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "comparison_summary",
+      "title": "Comparison summary",
+      "tab": "Head-to-Head",
+      "fields": [
+        {
+          "name": "where candidates diverge",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "category_delta",
+      "title": "Category delta",
+      "tab": "Head-to-Head",
+      "fields": [
+        {
+          "name": "difference by category",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "risk_difference",
+      "title": "Risk Difference",
+      "tab": "Head-to-Head",
+      "fields": [
+        {
+          "name": "relative risk",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requirements_fit",
+      "title": "Requirements fit",
+      "tab": "Requirements Heatmap",
+      "fields": [
+        {
+          "name": "met, partial, gap per requirement per supplier",
+          "sources": [
+            {
+              "name": "The requirements set for this event",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirement list and weights defined for this sourcing event",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "risk_posture_by_dimension",
+      "title": "Risk Posture by Dimension",
+      "tab": "Risk Assessment",
+      "fields": [
+        {
+          "name": "assessment per risk dimension",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Public reporting and adverse media",
+              "access": "public",
+              "type": "media",
+              "how": "dated public reporting on the supplier, with the source named"
+            },
+            {
+              "name": "OFAC SDN and equivalent watchlists",
+              "access": "public",
+              "type": "regulator",
+              "how": "sanctions and debarment screen by legal entity"
+            },
+            {
+              "name": "Supplier-provided evidence",
+              "access": "supplier",
+              "type": "document",
+              "how": "the supplier's RFI response, trust centre, certifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "impact_times_likelihood",
+      "title": "Impact times Likelihood",
+      "tab": "Risk Assessment",
+      "fields": [
+        {
+          "name": "plotted risks",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "impact and likelihood scores",
+          "requires_input": true,
+          "note": "a risk scored on one axis is shown separately, never plotted"
+        }
+      ]
+    },
+    {
+      "id": "top_material_risks",
+      "title": "Top Material Risks",
+      "tab": "Risk Assessment",
+      "fields": [
+        {
+          "name": "the risks that could stop the deal",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Public reporting and adverse media",
+              "access": "public",
+              "type": "media",
+              "how": "dated public reporting on the supplier, with the source named"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "material_events",
+      "title": "Material Events",
+      "tab": "Risk Assessment",
+      "fields": [
+        {
+          "name": "dated breach, enforcement, distress, litigation",
+          "sources": [
+            {
+              "name": "Public reporting and adverse media",
+              "access": "public",
+              "type": "media",
+              "how": "dated public reporting on the supplier, with the source named"
+            },
+            {
+              "name": "Supplier public filings",
+              "access": "public",
+              "type": "filing",
+              "how": "10-K, 10-Q or equivalent via SEC EDGAR, by legal entity"
+            },
+            {
+              "name": "OFAC SDN and equivalent watchlists",
+              "access": "public",
+              "type": "regulator",
+              "how": "sanctions and debarment screen by legal entity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "risk_mitigation",
+      "title": "Risk Mitigation",
+      "tab": "Risk Assessment",
+      "fields": [
+        {
+          "name": "treatment, status, owner",
+          "sources": [
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "conclusion",
+      "title": "Conclusion",
+      "tab": "Risk Assessment",
+      "fields": [
+        {
+          "name": "overall risk read",
+          "sources": [
+            {
+              "name": "Supplier deep-dive assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-deep-dive skill output for this supplier",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
