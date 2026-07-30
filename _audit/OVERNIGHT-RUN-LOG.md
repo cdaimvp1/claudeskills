@@ -3865,3 +3865,71 @@ new gate now makes that a standing check rather than something noticed by accide
 | A8 Landscape design uplift | outstanding |
 | A9 Landscape engine recolor | outstanding |
 | A11 sign-off | **Marc (M14)** |
+
+---
+
+## A5 Deep Dive dashboard — STAGE 1 BUILT. Awaiting Marc's sign-off before stage 2.
+
+`supplier-deep-dive` was the last skill on the fully-manual path: `SKILL.md:337` told the
+model to hand-author the JSX with `create_file`, so every run produced a differently shaped
+artifact. That is a consistency defect before it is a cost defect, and no better
+instruction fixes it. The model now authors DATA; code assembles the page.
+
+**Stage 1 of 3, deliberately.** `DEEP-DIVE-REDESIGN-SPEC-v3.md:163` places a sign-off gate
+after the Supplier Summary exemplar, before the pattern rolls to the other five subtabs.
+Stopping here is the spec's sequencing, not a shortcut.
+
+### Built
+
+- `dashboard/deepdive_schema.py` — the validator, where the spec's rules live as checks
+- `dashboard/build_profile_dashboard.py` — deterministic assembly, no hand-authored markup
+- `dashboard/assets/seed/snowflake.json` — stage 0 reshape into the normalized 8-dimension
+  evidence model
+- `dashboard/deepdive_schema_selftest.py` — **35/35**
+
+### Stage 0 fixed the two seed defects the spec names by hand
+
+The UNC5537 credential-stuffing incident is now filed under **cyber_privacy_data**, not
+under "ML / data-science depth" where v2 had it. And no composite score is carried at all,
+because v2 emitted 89/100, 90/100 and 4.5/5 for the same supplier.
+
+### The spec is mostly a list of v2's defects, so each is now a refusal
+
+| Refused | Why |
+|---|---|
+| a visible composite score | three different composites for one supplier is what made v2 untrustworthy; the fix is to stop emitting a number that was never supported |
+| a precise $ with no bid / internal / benchmark / prior-spend / contract source | public consumption pricing cannot estimate Lilly TCO, and such a figure reads as a bid |
+| a field with no retrieval status | "no issue found" and "not enough information" must not collapse into each other |
+| a gate folded into the aggregate | folding a hard stop into an average turns a disqualifying finding into a slightly lower score |
+| "Advance" while a HARD STOP is open | a hard stop is the answer until its owner clears it |
+| a confident assessment with no evidence | verified fact and inference may not carry equal authority |
+| a missing dimension | all eight always render, so a weak area cannot be hidden by omitting its row |
+
+**It does not refuse incompleteness.** T21 is the negative control: a supplier with zero
+evidence validates and renders as "Insufficient evidence" throughout. A validator that
+rejected gaps would push an author toward inventing values, which is the failure this
+redesign exists to prevent.
+
+### Design points worth keeping
+
+- **Bar length is a relative position; the label carries the assessment.** A long bar
+  cannot be misread as a score, which is what the removed composite used to invite.
+- **Confidence is the FILL** (solid / striped / dashed outline), so a reader cannot take in
+  an assessment without also taking in how well it is evidenced.
+- **Risk posture in the header is DERIVED from the gates**, not authored. That is what
+  stops the header disagreeing with the chart beneath it, which is the internal-
+  inconsistency class the spec calls out.
+- **The builder refuses invalid data** rather than rendering it, because a rendered page is
+  indistinguishable from a trustworthy one.
+
+### Verified
+
+Selftest 35/35 (20 tamper tests, 2 negative controls) - in-browser 0 console errors -
+suite smoke 33/0 - hub self-containment now **8 built artifacts, 0 findings**, and the
+"Deep Dive NOT SWEPT" warning is gone - malicious sweep SECRETS/BYPASS/OBFUSCATION/
+INJECTION all 0 - 33 packages extract-and-retest verified.
+
+### Next
+
+Stage 2 (the other five subtabs) and stage 3 / A6 (supplier-type adaptation) are held at
+the spec's sign-off gate pending Marc's review of this exemplar.

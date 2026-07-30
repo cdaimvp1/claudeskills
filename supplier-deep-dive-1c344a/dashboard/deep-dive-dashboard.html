@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snowflake Inc. &middot; Supplier Deep Dive</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 "Libre Franklin",-apple-system,Segoe UI,sans-serif;color:#1a1a1a;background:#fff}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 64px}
+h1{font-size:24px;margin:0 0 2px;font-weight:700}
+.sub{color:#5f5f5f;font-size:13px;margin:0 0 22px}
+.strip{display:flex;flex-wrap:wrap;gap:0;border:1px solid #dcdcdc;border-radius:3px;margin-bottom:26px}
+.strip .c{flex:1 1 150px;padding:12px 16px;border-right:1px solid #dcdcdc}
+.strip .c:last-child{border-right:0}
+.strip .k{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#5f5f5f;margin-bottom:4px}
+.strip .v{font-size:15px;font-weight:600;line-height:1.3}
+section{margin:0 0 34px}
+h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#5f5f5f;font-weight:600;
+   margin:0 0 4px;padding-bottom:7px;border-bottom:1px solid #dcdcdc}
+.hint{color:#5f5f5f;font-size:12px;margin:8px 0 16px}
+.dimrow{display:grid;grid-template-columns:210px 1fr 140px 106px;gap:14px;align-items:center;
+        padding:7px 0;border-bottom:1px solid #f0f0f0}
+.dimname{font-size:13px}
+.dimtrack{height:13px;background:#f4f4f4;border-radius:2px;overflow:hidden}
+.dimbar{height:100%;border-radius:2px}
+.dimlabel{font-size:12.5px;font-weight:600}
+.dimev{font-size:11px;color:#5f5f5f;text-align:right}
+.covbar{display:flex;height:22px;border-radius:2px;overflow:hidden;margin-bottom:9px}
+.covlegend{display:flex;flex-wrap:wrap;gap:16px}
+.lg{font-size:11.5px;color:#5f5f5f;display:inline-flex;align-items:center;gap:6px}
+.lg i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.col h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px}
+.vl{margin:0;padding-left:17px}
+.vl li{margin-bottom:7px;font-size:13px}
+.hm2{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px}
+.hcell{border:1px solid #dcdcdc;border-radius:3px;padding:11px 12px}
+.hbar{height:4px;border-radius:2px;margin-bottom:9px}
+.hg{font-size:13px;font-weight:600;margin-bottom:2px}
+.hs{font-size:12px;color:#5f5f5f}
+.hm{font-size:11px;color:#5f5f5f;margin-top:5px}
+.gate{padding:9px 0 9px 13px;margin-bottom:11px}
+.gk{font-size:10px;letter-spacing:.09em;font-weight:700;margin-bottom:3px}
+.gr{font-size:13px;margin-bottom:3px}
+.go{font-size:11.5px;color:#5f5f5f}
+.none{color:#5f5f5f;font-size:13px}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid #dcdcdc;color:#5f5f5f;font-size:11.5px}
+@media(max-width:860px){.dimrow{grid-template-columns:1fr;gap:5px}.dimev,.dimlabel{text-align:left}
+ .cols{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+  <h1>Snowflake Inc.</h1>
+  <p class="sub">Public &middot; NYSE: SNOW &middot; Supplier Summary &middot; should Lilly advance
+     this supplier in this sourcing event, and what must be validated next?</p>
+
+  <div class="strip"><div class="c"><div class="k">Recommendation</div><div class="v">Advance to RFx with conditions</div></div><div class="c"><div class="k">Rank in shortlist</div><div class="v">#1</div></div><div class="c"><div class="k">Requirements fit</div><div class="v">24 of 28 must-haves confirmed</div></div><div class="c"><div class="k">Risk posture</div><div class="v">Conditional &middot; 2 escalations open</div></div><div class="c"><div class="k">Data confidence</div><div class="v">46% verified</div></div><div class="c"><div class="k">Open issues</div><div class="v">2</div></div></div>
+
+  <section>
+    <h2>Assessment by dimension</h2>
+    <p class="hint">Bar length is a relative position within the shortlist, not a score.
+       The label is the assessment. Fill shows how well it is evidenced: solid is verified,
+       striped is partial, dashed outline is insufficient evidence. There is deliberately
+       no single combined figure.</p>
+    <div class="dimrow"><div class="dimname">Identity &amp; ownership</div><div class="dimtrack"><div class="dimbar" style="width:92.0%;background:#0F3A85;"></div></div><div class="dimlabel" style="color:#0F3A85">Strong</div><div class="dimev">2 of 4 sourced</div></div>
+<div class="dimrow"><div class="dimname">Capability &amp; sourcing fit</div><div class="dimtrack"><div class="dimbar" style="width:88.0%;background:#0F3A85;"></div></div><div class="dimlabel" style="color:#0F3A85">Strong</div><div class="dimev">3 of 4 sourced</div></div>
+<div class="dimrow"><div class="dimname">Financial viability</div><div class="dimtrack"><div class="dimbar" style="width:85.0%;background:#0F3A85;"></div></div><div class="dimlabel" style="color:#0F3A85">Strong</div><div class="dimev">3 of 4 sourced</div></div>
+<div class="dimrow"><div class="dimname">Operational resilience</div><div class="dimtrack"><div class="dimbar" style="width:55.0%;background:repeating-linear-gradient(135deg,#5f5f5f,#5f5f5f 5px,rgba(255,255,255,.55) 5px,rgba(255,255,255,.55) 10px);"></div></div><div class="dimlabel" style="color:#5f5f5f">Moderate</div><div class="dimev">2 of 3 sourced</div></div>
+<div class="dimrow"><div class="dimname">Integrity, legal &amp; compliance</div><div class="dimtrack"><div class="dimbar" style="width:70.0%;background:repeating-linear-gradient(135deg,#0F3A85,#0F3A85 5px,rgba(255,255,255,.55) 5px,rgba(255,255,255,.55) 10px);"></div></div><div class="dimlabel" style="color:#0F3A85">Adequate</div><div class="dimev">1 of 3 sourced</div></div>
+<div class="dimrow"><div class="dimname">Quality, regulatory &amp; EHS</div><div class="dimtrack"><div class="dimbar" style="width:25.0%;background:transparent;border:1.5px dashed #B26B00;"></div></div><div class="dimlabel" style="color:#B26B00">Insufficient evidence</div><div class="dimev">0 of 2 sourced</div></div>
+<div class="dimrow"><div class="dimname">Cyber, privacy &amp; data</div><div class="dimtrack"><div class="dimbar" style="width:32.0%;background:repeating-linear-gradient(135deg,#D52B1E,#D52B1E 5px,rgba(255,255,255,.55) 5px,rgba(255,255,255,.55) 10px);"></div></div><div class="dimlabel" style="color:#D52B1E">Weak</div><div class="dimev">2 of 4 sourced</div></div>
+<div class="dimrow"><div class="dimname">Responsible sourcing &amp; evidence</div><div class="dimtrack"><div class="dimbar" style="width:30.0%;background:transparent;border:1.5px dashed #B26B00;"></div></div><div class="dimlabel" style="color:#B26B00">Insufficient evidence</div><div class="dimev">1 of 2 sourced</div></div>
+  </section>
+
+  <section>
+    <h2>Decision gates</h2>
+    <p class="hint">Gates override the assessment above; they are not folded into it.
+       A hard stop is the answer until it is cleared by its owner.</p>
+    <div class="gate" style="border-left:3px solid #B26B00"><div class="gk" style="color:#B26B00">ESCALATION</div><div class="gr">2024 UNC5537 credential-stuffing campaign affected customer tenants; Lilly-scope control adequacy not yet independently confirmed</div><div class="go">Owner: <strong>Cyber (SAE)</strong> &middot; open</div></div>
+<div class="gate" style="border-left:3px solid #B26B00"><div class="gk" style="color:#B26B00">ESCALATION</div><div class="gr">Subprocessor list and data-residency commitments for the in-scope regions not yet supplier-confirmed in writing</div><div class="go">Owner: <strong>Privacy</strong> &middot; open</div></div>
+  </section>
+
+  <section>
+    <h2>Requirements by group</h2>
+    <p class="hint">Group-level only. The full cross-supplier requirements heatmap stays on
+       the Requirements tab rather than being repeated inside every supplier.</p>
+    <div class="hm2"><div class="hcell"><div class="hbar" style="background:#0F3A85"></div><div class="hg">Data platform core</div><div class="hs">Confirmed</div><div class="hm">9 must-haves</div></div><div class="hcell"><div class="hbar" style="background:#B26B00"></div><div class="hg">Security and access</div><div class="hs">Partially confirmed</div><div class="hm">7 must-haves &middot; <strong style='color:#D52B1E'>1 gap</strong></div></div><div class="hcell"><div class="hbar" style="background:#B26B00"></div><div class="hg">Regulated / GxP</div><div class="hs">Partially confirmed</div><div class="hm">5 must-haves &middot; <strong style='color:#D52B1E'>2 gaps</strong></div></div><div class="hcell"><div class="hbar" style="background:#0F3A85"></div><div class="hg">Integration and architecture</div><div class="hs">Confirmed</div><div class="hm">4 must-haves</div></div><div class="hcell"><div class="hbar" style="background:#D52B1E"></div><div class="hg">Commercial and exit</div><div class="hs">Not demonstrated</div><div class="hm">3 must-haves &middot; <strong style='color:#D52B1E'>1 gap</strong></div></div></div>
+  </section>
+
+  <section>
+    <h2>Opportunities and concerns</h2>
+    <div class="cols"><div class="col"><h3 style="color:#0F3A85">Opportunities</h3><ul class="vl"><li>Separated storage and compute allows capacity to track demand rather than peak provisioning</li><li>Existing pharma reference base (Novartis, Sanofi, IQVIA) shortens regulated-environment proving</li><li>Native Iceberg support reduces lock-in exposure at the storage layer</li></ul></div><div class="col"><h3 style="color:#D52B1E">Concerns</h3><ul class="vl"><li>Consumption pricing makes spend a function of workload design, so cost control sits with Lilly, not the contract</li><li>Cyber posture for Lilly scope is not yet independently verified after the 2024 campaign</li><li>Runs on top of AWS, Azure or GCP, so hyperscaler concentration is inherited rather than removed</li></ul></div></div>
+  </section>
+
+  <section>
+    <h2>Evidence coverage</h2>
+    <p class="hint">Share of assessed fields by evidence state. &quot;Missing&quot; means no
+       source was found, which is reported rather than left blank.</p>
+    <div class="covbar"><div style="width:46.00%;background:#0F3A85" title="Verified 46%"></div><div style="width:29.00%;background:#B26B00" title="Partial 29%"></div><div style="width:7.00%;background:#5f5f5f" title="Supplier input 7%"></div><div style="width:18.00%;background:#dcdcdc" title="Missing 18%"></div></div><div class="covlegend"><span class="lg"><i style="background:#0F3A85"></i>Verified 46%</span><span class="lg"><i style="background:#B26B00"></i>Partial 29%</span><span class="lg"><i style="background:#5f5f5f"></i>Supplier input 7%</span><span class="lg"><i style="background:#dcdcdc"></i>Missing 18%</span></div>
+  </section>
+
+  <footer>
+    Reflect-only. 26 evidence items across 8 dimensions; 0 hard stop(s)
+    and 2 escalation(s) open. Every figure on this page is read from validated data
+    or computed at build time. Assessments are not a system of record and do not constitute
+    an award decision.
+  </footer>
+</div></body></html>

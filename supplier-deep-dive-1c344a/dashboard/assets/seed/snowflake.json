@@ -1,0 +1,135 @@
+{
+  "_note": "Stage 0 reshape of the v2 Snowflake deepDive into the normalized 8-dimension evidence model (DEEP-DIVE-REDESIGN-SPEC-v3). Two spec-named seed defects are fixed here: the UNC5537 credential-stuffing incident is filed under cyber_privacy_data, not under 'ML / data-science depth' where v2 had it; and no composite score is carried, because v2 emitted 89/100, 90/100 and 4.5/5 for the same supplier.",
+  "suppliers": [
+    {
+      "name": "Snowflake Inc.",
+      "entity_type": "public",
+      "ticker": "NYSE: SNOW",
+      "rank": 1,
+      "requirements_fit": "24 of 28 must-haves confirmed",
+      "recommendation": {
+        "verdict": "Advance to RFx with conditions",
+        "rationale": "Capability and pharma-relevant reference base are the strongest in the shortlist. Advancement is conditional on the two open ESCALATION gates being cleared by their named owners, not on further desk research.",
+        "source_types": ["internal"]
+      },
+      "gates": [
+        {
+          "kind": "ESCALATION",
+          "reason": "2024 UNC5537 credential-stuffing campaign affected customer tenants; Lilly-scope control adequacy not yet independently confirmed",
+          "owner": "Cyber (SAE)",
+          "status": "open",
+          "counts_toward_aggregate": false
+        },
+        {
+          "kind": "ESCALATION",
+          "reason": "Subprocessor list and data-residency commitments for the in-scope regions not yet supplier-confirmed in writing",
+          "owner": "Privacy",
+          "status": "open",
+          "counts_toward_aggregate": false
+        }
+      ],
+      "evidence_coverage": { "verified": 46, "partial": 29, "supplier_input": 7, "missing": 18 },
+      "opportunities": [
+        "Separated storage and compute allows capacity to track demand rather than peak provisioning",
+        "Existing pharma reference base (Novartis, Sanofi, IQVIA) shortens regulated-environment proving",
+        "Native Iceberg support reduces lock-in exposure at the storage layer"
+      ],
+      "concerns": [
+        "Consumption pricing makes spend a function of workload design, so cost control sits with Lilly, not the contract",
+        "Cyber posture for Lilly scope is not yet independently verified after the 2024 campaign",
+        "Runs on top of AWS, Azure or GCP, so hyperscaler concentration is inherited rather than removed"
+      ],
+      "requirement_groups": [
+        { "group": "Data platform core", "status": "Confirmed", "must_haves": 9, "gaps": 0 },
+        { "group": "Security and access", "status": "Partially confirmed", "must_haves": 7, "gaps": 1 },
+        { "group": "Regulated / GxP", "status": "Partially confirmed", "must_haves": 5, "gaps": 2 },
+        { "group": "Integration and architecture", "status": "Confirmed", "must_haves": 4, "gaps": 0 },
+        { "group": "Commercial and exit", "status": "Not demonstrated", "must_haves": 3, "gaps": 1 }
+      ],
+      "dimensions": {
+        "identity_ownership": {
+          "assessment": "Strong",
+          "confidence": "verified",
+          "position": 92,
+          "evidence": [
+            { "field": "Legal identity", "status": "Verified", "raw_value": "Snowflake Inc., incorporated Delaware, HQ Bozeman, Montana", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
+            { "field": "Public listing", "status": "Verified", "raw_value": "NYSE: SNOW, IPO 16 Sep 2020", "source_name": "SEC EDGAR", "source_type": "filing", "source_date": "2026-03-20" },
+            { "field": "Ultimate beneficial ownership", "status": "Not applicable", "raw_value": "Widely held public company; no UBO determination required", "source_name": "", "source_type": "", "source_date": "" },
+            { "field": "Lilly vendor-master match", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+          ]
+        },
+        "capability_fit": {
+          "assessment": "Strong",
+          "confidence": "verified",
+          "position": 88,
+          "evidence": [
+            { "field": "Relevant products and services", "status": "Verified", "raw_value": "Cloud data platform: warehousing, lakes with native Apache Iceberg, engineering, governed cross-account sharing, Cortex AI layer", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
+            { "field": "Pharma and regulated experience", "status": "Verified", "raw_value": "Named pharma and life-science customers: Novartis, Sanofi, IQVIA", "source_name": "Company customer disclosures", "source_type": "supplier", "source_date": "2026-07-17" },
+            { "field": "Capacity and scalability", "status": "Verified", "raw_value": "Storage and compute separated for independent elastic scaling", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
+            { "field": "Lilly-specific reference", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+          ]
+        },
+        "financial_viability": {
+          "assessment": "Strong",
+          "confidence": "verified",
+          "position": 85,
+          "evidence": [
+            { "field": "Scale", "status": "Verified", "raw_value": "9,060 full-time employees as of 31 Jan 2026", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
+            { "field": "Market capitalisation", "status": "Verified", "raw_value": "Approximately 93.2 billion USD", "source_name": "stockanalysis.com", "source_type": "market", "source_date": "2026-07-17" },
+            { "field": "Failure risk", "status": "Partially verified", "raw_value": "No distress indicators identified in filings or market data", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
+            { "field": "Credit rating", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+          ]
+        },
+        "operational_resilience": {
+          "assessment": "Moderate",
+          "confidence": "partial",
+          "position": 55,
+          "evidence": [
+            { "field": "Critical sub-tier dependency", "status": "Verified", "raw_value": "Platform runs on AWS, Azure or Google Cloud; hyperscaler dependency is structural", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
+            { "field": "Substitutability", "status": "Partially verified", "raw_value": "Native Iceberg support reduces storage-layer lock-in; compute and governance layers remain proprietary", "source_name": "Product documentation", "source_type": "supplier", "source_date": "2026-07-17" },
+            { "field": "Continuity commitments for Lilly scope", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+          ]
+        },
+        "integrity_legal_compliance": {
+          "assessment": "Adequate",
+          "confidence": "partial",
+          "position": 70,
+          "evidence": [
+            { "field": "Direct sanctions or watchlist match", "status": "Not found", "raw_value": "No match identified; formal screen still routes to Compliance", "source_name": "OFAC SDN", "source_type": "regulator", "source_date": "2026-07-17" },
+            { "field": "Material legal events", "status": "Partially verified", "raw_value": "Litigation reported in connection with the 2024 customer-tenant incident", "source_name": "Wikipedia, Snowflake data breach", "source_type": "media", "source_date": "2026-07-17" },
+            { "field": "Trade and sourcing restrictions", "status": "Not applicable", "raw_value": "Software service; no goods-origin restriction in scope", "source_name": "", "source_type": "", "source_date": "" }
+          ]
+        },
+        "quality_regulatory_ehs": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 25,
+          "evidence": [
+            { "field": "GxP qualification package", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" },
+            { "field": "Inspection or enforcement history", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+          ]
+        },
+        "cyber_privacy_data": {
+          "assessment": "Weak",
+          "confidence": "partial",
+          "position": 32,
+          "evidence": [
+            { "field": "Breach and incident history", "status": "Verified", "raw_value": "2024 UNC5537 credential-stuffing campaign against customer tenants; reporting cites 165+ affected organisations. Attributed to customer accounts lacking multi-factor authentication rather than a platform compromise.", "source_name": "Wikipedia, Snowflake data breach", "source_type": "media", "source_date": "2026-07-17" },
+            { "field": "Certifications", "status": "Partially verified", "raw_value": "Trust Center publishes certification coverage", "source_name": "trust.snowflake.com", "source_type": "supplier", "source_date": "2026-07-17" },
+            { "field": "Subprocessors for Lilly scope", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" },
+            { "field": "Data residency commitments", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+          ]
+        },
+        "responsible_sourcing_evidence": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 30,
+          "evidence": [
+            { "field": "Human rights and labour", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" },
+            { "field": "Overall data completeness", "status": "Partially verified", "raw_value": "46 percent of assessed fields verified; 18 percent have no source at all", "source_name": "This assessment", "source_type": "internal", "source_date": "2026-07-29" }
+          ]
+        }
+      }
+    }
+  ]
+}

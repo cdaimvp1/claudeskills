@@ -42,6 +42,7 @@ HUBS = {
     "Category Strategy (demo)":
         "category-strategy-1c344a/dashboard/category-strategy-dashboard-DEMO.html",
     "My Work": "my-work-1c344a/dashboard/my-work-dashboard.html",
+    "Deep Dive": "supplier-deep-dive-1c344a/dashboard/deep-dive-dashboard.html",
 }
 
 # The five Phase 1 hubs per PROGRAM-MASTER-PLAN.md:44-51. Named here so a hub that has not

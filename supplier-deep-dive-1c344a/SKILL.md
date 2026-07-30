@@ -408,6 +408,56 @@ One JSON object per run, on the canonical 0.0-5.0 evaluation scale wherever a fi
 
 A consuming skill should treat any field with `confidence: "Low"` or a `RESEARCH_PENDING` note as provisional and re-verify before a decision. The `staleness` block tells downstream skills when to re-run the profile.
 
+## The Deep Dive dashboard (A5, stage 1)
+
+**Do NOT hand-author the dashboard.** This skill used to instruct the model to write the
+JSX with `create_file`, so every run produced a differently shaped artifact. That is a
+consistency defect before it is a cost defect, and a better instruction cannot fix it.
+The model now authors DATA; code assembles the page.
+
+```bash
+python dashboard/deepdive_schema.py <data.json>   # validate; exits 2 and names the breach
+python dashboard/build_profile_dashboard.py       # build the dashboard
+python dashboard/deepdive_schema_selftest.py      # 35 assertions
+```
+
+Data shape: `dashboard/assets/seed/snowflake.json` is the worked reference.
+
+### What the schema refuses, and why each rule exists
+
+`DEEP-DIVE-REDESIGN-SPEC-v3.md` is mostly a list of what the previous build got wrong.
+Each of those is a DATA defect that a renderer would faithfully display, so the rules are
+code rather than prose:
+
+| Refused | Why |
+|---|---|
+| a visible composite score | the old build showed 89/100, 90/100 and 4.5/5 for one supplier; the fix is not to reconcile them but to stop emitting a number that was never supported |
+| a precise currency figure with no bid, internal, benchmark, prior-spend or contract source | public consumption pricing cannot estimate Lilly TCO, and such a figure reads as a bid |
+| a field with no retrieval status | "no issue found" and "not enough information" are different answers and must not collapse into each other |
+| a gate folded into the aggregate | folding a hard stop into an average turns a disqualifying finding into a slightly lower score |
+| "Advance" while a HARD STOP is open | a hard stop is the answer until its owner clears it, not an input to a judgement call |
+| a confident assessment with no evidence | verified fact and inference may not be shown with equal authority |
+| a missing dimension | all eight always render, so a weak area cannot be hidden by omitting its row |
+
+**It does not refuse incompleteness.** A supplier with no evidence at all validates and
+renders as "Insufficient evidence" throughout. A validator that rejected gaps would push
+an author toward inventing values, which is the failure this redesign exists to prevent.
+
+### What renders
+
+The **Supplier Summary** subtab: decision-header strip, the eight-dimension assessment
+bars, decision gates, requirements by group, opportunities and concerns, and the
+evidence-coverage bar.
+
+Bar length is a RELATIVE position and the label carries the actual assessment, so a long
+bar cannot be misread as a score. Confidence is the FILL: solid is verified, striped is
+partial, dashed outline is insufficient evidence. Risk posture in the header is DERIVED
+from the gates, which is what stops the header disagreeing with the chart beneath it.
+
+**Stage 1 of 3.** The spec places a sign-off gate here before the pattern rolls to the
+other five subtabs (Company & Ownership, Capabilities & Operations, Financial & Market,
+Risk & Resilience, Lilly Fit & Diligence). Supplier-type adaptation is A6.
+
 ## Validate the dossier before delivering it (HARD RULE)
 
 Before the dossier goes to a reader, run the gate over its JSON:
