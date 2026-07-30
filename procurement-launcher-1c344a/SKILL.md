@@ -377,6 +377,31 @@ No ASCII frame, no sprawl. If the user is genuinely unsure which pipeline applie
 
 There is no separate launch card or upload guidance in Theo. The target skill handles upload onboarding via S0.
 
+## Routing manifest (J2: one source of truth, and a check that it stays that way)
+
+`routing-manifest.json` is the single registry. The routing table below, the Markdown
+fallback menu, the widget rows in `assets/theo-widget.html`, the teach-mode lists and the
+chain table in `references/routing-and-chains.md` all derive from it.
+
+```bash
+python theo_routing.py --check    # fail on any disagreement between manifest and surface
+python theo_routing.py --emit     # print what each surface should contain
+```
+
+**Why this exists.** Those surfaces were kept in agreement by hand, and J1 added a fifth.
+Hand-synced routing is the same drift class as a hand-synced schema, and it had already
+drifted: 16 widget rows fired trigger phrases that appeared nowhere in the routing table,
+and two Skill cells held a stray glyph and a whole parenthetical paragraph where a slug
+belonged. The intent was already written down in this file ("widget + Markdown fallback +
+Teach-mode lists all derive from these"); nothing enforced it.
+
+**`--check` is what makes "no hand edits" true.** It fails both ways: a surface edited
+without the manifest, and a manifest change a surface has not picked up.
+
+**It does not rewrite the widget in place.** That file is a design-locked visual artifact,
+and regenerating it silently would put a locked surface under a script's control. `--emit`
+prints what it should contain so a person applies it.
+
 ## Routing table (THEO's only knowledge of the suite; do not load these skills to read it)
 
 This table is THEO's single registry: the six `Pipeline` labels below are exactly the six menu sections (widget + Markdown fallback + Teach-mode lists all derive from these). The suite is **27 routable skills organized into six pipelines**: Contracts & Negotiations (12 rows / 8 distinct skills, lilly-contract-review and negotiation-simulator each fire several artifact-specific rows), Sourcing / RFx (7), Category Strategy (4 rows / 2 skills: category-strategy DEVELOP/MANAGE plus market-rate-benchmarking's external and rationalization modes; its third, internal mode is not surfaced on the menu, per the v1.8 curation pass), Cost & Commercial (3), Executive Summary (1), Personal Command Center (6). Skill count: lilly-contract-review, legal-negotiation-prep, commercial-negotiation-prep, comment-cleanup, negotiation-playbook-learning, negotiation-simulator, scope-sow-architect, deal-room (8); supplier-landscape, supplier-deep-dive, rfp-engine, rfp-case-manager, rfp-response-analysis, evaluation-engine, sole-source-challenge (7); category-strategy, market-rate-benchmarking (2); pro-forma-builder, should-cost-builder, invoice-rate-card-auditor (3); executive-summary-package (1); voice-profile, theos-field-guide, process-navigator, timeline-builder, workflow-map, meeting-prep-brief (6). Total = 27 built routable skills. **Count reconciliation:** a 28th entry, procurement-help-desk (last row below), is a PENDING end-user/stakeholder front door whose content build is network-gated (Stage 7); it is listed so it is not stranded but is NOT counted in the 27 built and is not on the interactive widget yet. The lilly-brand-assets foundation and procurement-launcher (THEO) itself are infrastructure, not menu destinations (THEO surfaces lilly-brand-assets only via the troubleshooting/manual pointer, and THEO is the menu, not a row in it); counting them, the full packaged suite is 29 skills plus the pending help desk. The menu routes to the 27 built specialist skills.

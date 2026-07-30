@@ -1,0 +1,1273 @@
+{
+  "_note": "J2 SINGLE SOURCE OF TRUTH for THEO routing. The widget rows, the SKILL.md routing table and Markdown fallback menu, the teach-mode lists and the chain table are all GENERATED from this file. Do not hand-edit a generated region: theo_routing.py --check will fail.",
+  "pipelines": [
+    "Contracts & Negotiations",
+    "Cost & Commercial",
+    "Sourcing / RFx",
+    "Category Strategy",
+    "Executive Summary",
+    "Personal Command Center"
+  ],
+  "skills": [
+    {
+      "id": "lilly-contract-review",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Review/redline a contract (4 output modes: Full, Redline only, Dashboard only, Briefing only)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "review this contract",
+          "title": "",
+          "what": "Review/redline a contract (4 output modes: Full, Redline only, Dashboard only, Briefing only)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "the contract (PDF/DOCX); the parent MSA if it is a SOW/WO/order form",
+          "helpful": "prior amendments, related SOWs, your specific concerns"
+        },
+        {
+          "trigger": "redline this contract",
+          "title": "Redline a Contract",
+          "what": "Reviews a supplier contract against the Lilly playbook and marks up issues, positions, and proposed changes.",
+          "howto": "Upload the contract DOCX (MSA, SOW, work order, change order, or order form). Claude asks for any supplier context it needs, then runs the four-pass review.",
+          "output": "A marked-up DOCX with tracked changes and inline comments, ready to send back to the supplier.",
+          "on_widget": true,
+          "upload": "the contract (PDF/DOCX); the parent MSA if it is a SOW/WO/order form",
+          "helpful": "prior amendments, related SOWs, your specific concerns"
+        },
+        {
+          "trigger": "build the contract review dashboard",
+          "title": "Contract Review &amp; Negotiation Dashboard",
+          "what": "Builds an interactive 3-panel dashboard from a contract: risk scoring, legal positions and Hard Stops, and commercial terms analysis.",
+          "howto": "Upload the contract DOCX. Claude reads it and assembles the dashboard.",
+          "output": "An interactive HTML dashboard you can use to brief leadership or plan the negotiation.",
+          "on_widget": true,
+          "upload": "the contract (PDF/DOCX); the parent MSA if it is a SOW/WO/order form",
+          "helpful": "prior amendments, related SOWs, your specific concerns"
+        },
+        {
+          "trigger": "build the contract review briefing",
+          "title": "Legal &amp; Commercial Negotiation Briefing",
+          "what": "Builds a written briefing for an upcoming negotiation covering legal positions, predicted supplier pushback, fallback options, and commercial benchmarks.",
+          "howto": "Upload the contract DOCX. Claude reads it and synthesizes the briefing.",
+          "output": "A DOCX briefing for walking-into-the-room prep.",
+          "on_widget": true,
+          "upload": "the contract (PDF/DOCX); the parent MSA if it is a SOW/WO/order form",
+          "helpful": "prior amendments, related SOWs, your specific concerns"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "negotiation-playbook-learning (outcome data if available), market-rate-benchmarking (rate benchmarking if installed)",
+      "successors": "negotiation-playbook-learning (outcomes recorded after negotiation); absorbs the legal-negotiation-prep and commercial-negotiation-prep panels natively when a contract is present"
+    },
+    {
+      "id": "legal-negotiation-prep",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Pre-negotiation legal briefing (no contract yet)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "get me ready to negotiate with [supplier]",
+          "title": "",
+          "what": "Pre-negotiation legal briefing (no contract yet)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - describe the upcoming deal",
+          "helpful": "prior contracts, negotiation history, deal value and strategic context"
+        },
+        {
+          "trigger": "get me ready to negotiate",
+          "title": "Pre-Negotiation Legal Prep",
+          "what": "Builds a pre-negotiation legal briefing when there is no contract yet: playbook positions ordered by priority, predicted supplier pushback, fallback sequencing, and red lines.",
+          "howto": "Describe the upcoming deal and the supplier. No document needed. Claude asks for any strategic context it needs.",
+          "output": "A prep briefing with prioritized legal positions, predicted pushback, fallbacks, and red lines to walk in with.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "lilly-contract-review (playbook positions, Hard Stop definitions, SME matrix, pharma requirements), negotiation-playbook-learning (supplier-specific outcomes, acceptance rates, difficulty scores)",
+      "successors": "lilly-contract-review (informs the eventual contract review), negotiation-simulator (tiered positions and fallback sequencing for rehearsal, optional)"
+    },
+    {
+      "id": "commercial-negotiation-prep",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Pricing analysis / counter-offer (no contract yet)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "benchmark this pricing",
+          "title": "Benchmark Contract Pricing",
+          "what": "Researches market rates for pricing in a contract or rate card and produces a counter-offer with justification.",
+          "howto": "Provide the contract pricing or rate card. Claude researches market rates via the web.",
+          "output": "A counter-offer DOCX with anchors, TCO breakdown, and justification.",
+          "on_widget": true,
+          "upload": "nothing - describe what you are buying",
+          "helpful": "rate card or proposal, current pricing, volumes, competitive quotes"
+        },
+        {
+          "trigger": "what should we pay",
+          "title": "",
+          "what": "Pricing analysis / counter-offer (no contract yet)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - describe what you are buying",
+          "helpful": "rate card or proposal, current pricing, volumes, competitive quotes"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "rfp-engine / evaluation-engine (competitive pricing, supplier ranking), negotiation-playbook-learning (historical commercial outcomes), market-rate-benchmarking (external/internal rate comparisons)",
+      "successors": "legal-negotiation-prep (commercial briefing feeds the legal briefing), pro-forma-builder (full multi-year model), should-cost-builder (bottoms-up cost anchor to bracket the negotiation target)"
+    },
+    {
+      "id": "comment-cleanup",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Clean/strip comments before sending",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "clean up the comments",
+          "title": "Clean Up a Contract Redline",
+          "what": "Removes redundant, internal, or strategy-leaking comments from a redlined contract before you send it back.",
+          "howto": "Upload the commented DOCX. Claude flags comments to remove and asks for your approval.",
+          "output": "A cleaned DOCX ready to send to the supplier.",
+          "on_widget": true,
+          "upload": "the commented DOCX",
+          "helpful": "who it is going to (supplier vs internal)"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "lilly-contract-review (called inline from Step 5D after producing a redline)",
+      "successors": "none stated separately (it is the terminus of that inline call)"
+    },
+    {
+      "id": "negotiation-playbook-learning",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Record outcomes so future reviews get smarter",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "record the [supplier] negotiation outcome",
+          "title": "",
+          "what": "Record outcomes so future reviews get smarter",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - describe what happened",
+          "helpful": "the original redline + the executed version"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "lilly-contract-review (redlined contracts as ideal RECORD-mode input, Hard Stop flags, SME escalation outcomes)",
+      "successors": "lilly-contract-review (feedback loop: acceptance rates, supplier history), evaluation-engine (difficulty score, duration benchmarks, term-structuring patterns)"
+    },
+    {
+      "id": "negotiation-simulator",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Practice (roleplay), Observe (watch both sides), or Drill (single-issue focused); 8 scenario templates; structured coaching debrief with metrics",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "practice the [supplier] negotiation",
+          "title": "",
+          "what": "Practice (roleplay), Observe (watch both sides), or Drill (single-issue focused); 8 scenario templates; structured coaching debrief with metrics",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing",
+          "helpful": "existing supplier: the governing MSA + prior/expiring WOs; playbook history (optional supplier-intel warm-up is off by default)"
+        },
+        {
+          "trigger": "drill the liability cap argument",
+          "title": "",
+          "what": "Practice (roleplay), Observe (watch both sides), or Drill (single-issue focused); 8 scenario templates; structured coaching debrief with metrics",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing",
+          "helpful": "existing supplier: the governing MSA + prior/expiring WOs; playbook history (optional supplier-intel warm-up is off by default)"
+        },
+        {
+          "trigger": "show me how this negotiation should go",
+          "title": "Negotiation Simulation",
+          "what": "Watch-and-learn mode. Claude plays both sides of a negotiation and annotates each tactical move.",
+          "howto": "Describe the negotiation issue or scenario. Claude plays it out.",
+          "output": "An in-chat simulation with tactical analysis. Useful prep before a hard call.",
+          "on_widget": true,
+          "upload": "nothing",
+          "helpful": "existing supplier: the governing MSA + prior/expiring WOs; playbook history (optional supplier-intel warm-up is off by default)"
+        },
+        {
+          "trigger": "practice this negotiation",
+          "title": "Negotiation Roleplay",
+          "what": "Interactive practice mode for an upcoming negotiation. You play Lilly, Claude plays the supplier.",
+          "howto": "Describe the negotiation and the supplier. Claude builds the supplier persona and starts the roleplay.",
+          "output": "A live in-chat roleplay session with a coaching debrief at the end.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        },
+        {
+          "trigger": "drill a negotiation issue",
+          "title": "Negotiation Drill",
+          "what": "Adversarial single-issue practice with simultaneous live coaching. Hardens one specific argument.",
+          "howto": "Pick one issue you want to drill. Claude as supplier refuses to budge until you land an argument that sticks.",
+          "output": "A live in-chat drill with the coach voice explaining your tactics in real time.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        },
+        {
+          "trigger": "record the negotiation outcome",
+          "title": "Record a Negotiation Outcome",
+          "what": "Records how a completed negotiation landed so future reviews and prep with this supplier get smarter.",
+          "howto": "Describe what the supplier accepted, rejected, or countered. Optionally upload the original redline and the executed version.",
+          "output": "An outcome record added to the playbook that later contract reviews and negotiation prep draw on.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "lilly-contract-review (playbook, SME matrix, findings), negotiation-playbook-learning (supplier history, difficulty), legal/commercial-negotiation-prep (the briefing to practice against)",
+      "successors": "the real negotiation; negotiation-playbook-learning (after the actual call, including opt-in simulation-outcome records)"
+    },
+    {
+      "id": "scope-sow-architect",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Diagnose / build / repair a scope document or SOW: a weighted 0-100 Scope Definition Score, the in/out-of-scope boundary, deliverables, RACI, acceptance criteria, SLAs, staffing/rate-card structure, change control, and a rewritten issuance-ready SOW",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "review this sow",
+          "title": "Scope / SOW Architect",
+          "what": "Diagnoses, builds, or repairs a Statement of Work: scores scope quality (0-100), then fixes the in/out-of-scope boundary, deliverables, acceptance criteria, RACI, milestones, SLAs, and the rate-card structure.",
+          "howto": "Upload a draft SOW, a prior SOW, a proposal, or just describe the work. Claude runs the scope-quality diagnostic and rewrites the SOW.",
+          "output": "A Scope Definition Score, a findings list, and an issuance-ready rewritten SOW. Hands off to lilly-contract-review for the legal-protection pass.",
+          "on_widget": true,
+          "upload": "nothing, or a draft/prior SOW, a proposal, or emails",
+          "helpful": "the governing MSA, a rate card, the deliverables list"
+        },
+        {
+          "trigger": "build a statement of work",
+          "title": "",
+          "what": "Diagnose / build / repair a scope document or SOW: a weighted 0-100 Scope Definition Score, the in/out-of-scope boundary, deliverables, RACI, acceptance criteria, SLAs, staffing/rate-card structure, change control, and a rewritten issuance-ready SOW",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or a draft/prior SOW, a proposal, or emails",
+          "helpful": "the governing MSA, a rate card, the deliverables list"
+        },
+        {
+          "trigger": "is this scope well defined",
+          "title": "",
+          "what": "Diagnose / build / repair a scope document or SOW: a weighted 0-100 Scope Definition Score, the in/out-of-scope boundary, deliverables, RACI, acceptance criteria, SLAs, staffing/rate-card structure, change control, and a rewritten issuance-ready SOW",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or a draft/prior SOW, a proposal, or emails",
+          "helpful": "the governing MSA, a rate card, the deliverables list"
+        },
+        {
+          "trigger": "fix this sow",
+          "title": "",
+          "what": "Diagnose / build / repair a scope document or SOW: a weighted 0-100 Scope Definition Score, the in/out-of-scope boundary, deliverables, RACI, acceptance criteria, SLAs, staffing/rate-card structure, change control, and a rewritten issuance-ready SOW",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or a draft/prior SOW, a proposal, or emails",
+          "helpful": "the governing MSA, a rate card, the deliverables list"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "rfp-engine (post-award SOW drafting), supplier-landscape, market-rate-benchmarking (rate context) - all optional/upstream",
+      "successors": "lilly-contract-review (legal-protection pass on the rewritten SOW), rfp-case-manager (case handoff when the SOW is part of an active case), market-rate-benchmarking (external rate comparison on the reconciled rate card). Note: it asks whether the WORK is well-defined; lilly-contract-review asks whether the DOCUMENT legally protects Lilly - complementary passes on the same SOW"
+    },
+    {
+      "id": "deal-room",
+      "pipeline": "Contracts & Negotiations",
+      "helps": "Live negotiation manager (one Claude Project per deal): a persistent round-by-round concession ledger, value-of-movement, next-counter recommendation, next-round brief; at close emits a structured handoff to negotiation-playbook-learning",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "open the deal room",
+          "title": "Deal Room (live negotiation)",
+          "what": "A live negotiation manager for one deal. Tracks a persistent concession ledger round by round: movement, tentative agreements, value of movement, open issues, and the recommended next counter.",
+          "howto": "Run in one Claude Project per negotiation. Seed it with your opening strategy, then paste in what happened after each meeting or email. Claude updates the ledger and drafts your next counter.",
+          "output": "A round-by-round concession ledger, a next-counter recommendation, a next-round brief, and at close a structured handoff to negotiation-playbook-learning.",
+          "on_widget": true,
+          "upload": "nothing - seed with the opening strategy (issues, positions, priorities)",
+          "helpful": "a commercial/legal-negotiation-prep briefing to seed positions; the supplier's opening positions; approval boundaries"
+        },
+        {
+          "trigger": "log this round",
+          "title": "",
+          "what": "Live negotiation manager (one Claude Project per deal): a persistent round-by-round concession ledger, value-of-movement, next-counter recommendation, next-round brief; at close emits a structured handoff to negotiation-playbook-learning",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - seed with the opening strategy (issues, positions, priorities)",
+          "helpful": "a commercial/legal-negotiation-prep briefing to seed positions; the supplier's opening positions; approval boundaries"
+        },
+        {
+          "trigger": "our next counter",
+          "title": "",
+          "what": "Live negotiation manager (one Claude Project per deal): a persistent round-by-round concession ledger, value-of-movement, next-counter recommendation, next-round brief; at close emits a structured handoff to negotiation-playbook-learning",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - seed with the opening strategy (issues, positions, priorities)",
+          "helpful": "a commercial/legal-negotiation-prep briefing to seed positions; the supplier's opening positions; approval boundaries"
+        },
+        {
+          "trigger": "what happened in the meeting",
+          "title": "",
+          "what": "Live negotiation manager (one Claude Project per deal): a persistent round-by-round concession ledger, value-of-movement, next-counter recommendation, next-round brief; at close emits a structured handoff to negotiation-playbook-learning",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - seed with the opening strategy (issues, positions, priorities)",
+          "helpful": "a commercial/legal-negotiation-prep briefing to seed positions; the supplier's opening positions; approval boundaries"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "commercial-negotiation-prep OR legal-negotiation-prep (either seeds the Phase 1 opening strategy at open, the preferred way to open a deal); process-navigator (threshold/FRAP-policy lookup mid-run, a lookup not a sequence step); meeting-prep-brief (complementary for the same meeting, not sequential)",
+      "successors": "negotiation-playbook-learning (at close only: the round-by-round history collapses into a single negotiation_outcome.json record feeding its historical dataset - the one place the two skills touch)"
+    },
+    {
+      "id": "pro-forma-builder",
+      "pipeline": "Cost & Commercial",
+      "helps": "Multi-year financial model: TCO, NPV, ROI, payback, savings",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "build a pro forma / financial model",
+          "title": "",
+          "what": "Multi-year financial model: TCO, NPV, ROI, payback, savings",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "the proposed pricing or a scope",
+          "helpful": "current-state baseline (volumes, term, escalators) for a savings case"
+        },
+        {
+          "trigger": "build a pro forma",
+          "title": "Build a Pro Forma",
+          "what": "Builds a multi-year cost model for a deal with NPV, ROI, and payback analysis.",
+          "howto": "Provide the pricing or scope details. Claude structures the model.",
+          "output": "A formula-driven XLSX with multi-year projection, escalators, volume tiers, NPV, ROI, payback, scenarios, and sensitivity.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "market-rate-benchmarking (external rate anchors), should-cost-builder (bottoms-up cost), commercial-negotiation-prep (counter-offer economics), lilly-contract-review (deal terms), evaluation-engine (shortlisted suppliers/rankings, enriching)",
+      "successors": "executive-summary-package (deal value), commercial-negotiation-prep (TCO/walk-away economics), evaluation-engine (sourced TCO figures; two-way relationship, see note)"
+    },
+    {
+      "id": "should-cost-builder",
+      "pipeline": "Cost & Commercial",
+      "helps": "Bottoms-up should-cost estimate to anchor price",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "what should this cost / build a should-cost model",
+          "title": "",
+          "what": "Bottoms-up should-cost estimate to anchor price",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "the product or service spec",
+          "helpful": "the supplier's proposed price (to compute the gap)"
+        },
+        {
+          "trigger": "build a should-cost model",
+          "title": "Build a Should-Cost Model",
+          "what": "Builds a bottoms-up cost estimate for a product or service to anchor a negotiation.",
+          "howto": "Describe the product or service. Claude breaks down the cost stack.",
+          "output": "An XLSX cost stack (materials, labor, overhead, logistics, margin) with the gap versus the supplier's price.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "market-rate-benchmarking (top-down market range), user spec/price, prior assumption ledgers",
+      "successors": "commercial-negotiation-prep (cost anchor for counter-offers), pro-forma-builder (cost basis), lilly-contract-review (commercial analysis)"
+    },
+    {
+      "id": "invoice-rate-card-auditor",
+      "pipeline": "Cost & Commercial",
+      "helps": "Line-level invoice audit vs the executed contract/SOW, rate card, PO, and timesheets: rate/level mismatch, escalation-cap breach, hours/quantity discrepancy, duplicate/unsupported charges, total questioned amount, and a draft dispute notice (rate and escalation math run through the vendored numeric kernel)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "audit this invoice",
+          "title": "Invoice &amp; Rate-Card Auditor",
+          "what": "Audits a set of invoices against the executed contract/SOW, rate card, PO, and timesheets: rate and role/level mismatches, escalation-cap breaches, hours/quantity discrepancies, duplicates, unsupported charges, and the total questioned amount.",
+          "howto": "Upload the invoices plus the executed contract/SOW, rate card, PO, and timesheets. Rate and escalation math run through the vendored numeric kernel, never guesswork.",
+          "output": "A line-level exception audit with a kernel-verified questioned amount and a draft supplier dispute notice.",
+          "on_widget": true,
+          "upload": "the invoices, plus the executed contract/SOW and rate card",
+          "helpful": "the PO, timesheets/roster, prior invoices (to reach duplicate detection beyond this session)"
+        },
+        {
+          "trigger": "invoice vs contract",
+          "title": "",
+          "what": "Line-level invoice audit vs the executed contract/SOW, rate card, PO, and timesheets: rate/level mismatch, escalation-cap breach, hours/quantity discrepancy, duplicate/unsupported charges, total questioned amount, and a draft dispute notice (rate and escalation math run through the vendored numeric kernel)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "the invoices, plus the executed contract/SOW and rate card",
+          "helpful": "the PO, timesheets/roster, prior invoices (to reach duplicate detection beyond this session)"
+        },
+        {
+          "trigger": "overbilling",
+          "title": "",
+          "what": "Line-level invoice audit vs the executed contract/SOW, rate card, PO, and timesheets: rate/level mismatch, escalation-cap breach, hours/quantity discrepancy, duplicate/unsupported charges, total questioned amount, and a draft dispute notice (rate and escalation math run through the vendored numeric kernel)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "the invoices, plus the executed contract/SOW and rate card",
+          "helpful": "the PO, timesheets/roster, prior invoices (to reach duplicate detection beyond this session)"
+        },
+        {
+          "trigger": "escalation cap check",
+          "title": "",
+          "what": "Line-level invoice audit vs the executed contract/SOW, rate card, PO, and timesheets: rate/level mismatch, escalation-cap breach, hours/quantity discrepancy, duplicate/unsupported charges, total questioned amount, and a draft dispute notice (rate and escalation math run through the vendored numeric kernel)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "the invoices, plus the executed contract/SOW and rate card",
+          "helpful": "the PO, timesheets/roster, prior invoices (to reach duplicate detection beyond this session)"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "none stated (audits a user-supplied invoice population against an ALREADY-EXECUTED contract/rate card/PO/timesheets; no upstream skill feeds it)",
+      "successors": "commercial-negotiation-prep (questioned-amount findings feed a renewal negotiation), market-rate-benchmarking (when a rate is contractually correct but no longer competitive at renewal), executive-summary-package (downstream consumer of the findings ledger for governance approval or executive readout)"
+    },
+    {
+      "id": "supplier-landscape",
+      "pipeline": "Sourcing / RFx",
+      "helps": "Find and shortlist vendors (multi-supplier Top 10)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "find vendors for [need]",
+          "title": "",
+          "what": "Find and shortlist vendors (multi-supplier Top 10)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - a sentence is enough",
+          "helpful": "a requirements doc (Excel/CSV), disqualifiers, budget range"
+        },
+        {
+          "trigger": "find vendors",
+          "title": "Supplier Search",
+          "what": "Researches and shortlists supplier options for a new sourcing need.",
+          "howto": "Describe what you need to source. Claude searches Lilly's existing supplier base plus the broader market.",
+          "output": "A Top-10 shortlist DOCX with capability profiles and fit assessments.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        },
+        {
+          "trigger": "find rationalization opportunities",
+          "title": "Supplier Rationalization",
+          "what": "Identifies redundant suppliers and overlapping commodity codes for portfolio cleanup.",
+          "howto": "Upload a spend file. Claude clusters and analyzes.",
+          "output": "A rationalization register with consolidation opportunities and estimated savings.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "none stated",
+      "successors": "supplier-deep-dive (single-supplier follow-up), rfp-engine (shortlist via landscape_handoff.json; market context enriches the Background section - note: this handoff does not include a requirements grid, see rfp-engine's own requirements-grid workflow added in Stage 1b)"
+    },
+    {
+      "id": "supplier-deep-dive",
+      "pipeline": "Sourcing / RFx",
+      "helps": "Single-supplier deep-dive profile (identity / capability / market / risk / Lilly fit / recommendation)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "deep dive on [supplier]",
+          "title": "",
+          "what": "Single-supplier deep-dive profile (identity / capability / market / risk / Lilly fit / recommendation)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just name the supplier",
+          "helpful": "the Lilly use case / category context; prior contracts or RFP outcomes"
+        },
+        {
+          "trigger": "profile this supplier",
+          "title": "Single-Supplier Deep Dive",
+          "what": "Builds a defensible profile of one supplier across identity, capability, market, risk, and Lilly fit.",
+          "howto": "Name the supplier you want analyzed. Claude does the research.",
+          "output": "A profile DOCX. Useful for sole-source justification or pre-RFx homework.",
+          "on_widget": true,
+          "upload": "nothing - just name the supplier",
+          "helpful": "the Lilly use case / category context; prior contracts or RFP outcomes"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "none stated",
+      "successors": "supplier-landscape (enriched entry), rfp-engine / rfp-response-analysis (advance supplier into RFx), evaluation-engine (risk + capability data as signal only, see Stage 1a boundary), category-strategy (supplier-of-interest)"
+    },
+    {
+      "id": "sole-source-challenge",
+      "pipeline": "Sourcing / RFx",
+      "helps": "Challenge and score ONE already-proposed sole-source pick into a weighted Defensibility verdict, then produce EITHER a defensible justification (evidence + mitigations) OR a weak-rationale finding with ranked alternatives and a next action",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "sole source",
+          "title": "",
+          "what": "Challenge and score ONE already-proposed sole-source pick into a weighted Defensibility verdict, then produce EITHER a defensible justification (evidence + mitigations) OR a weak-rationale finding with ranked alternatives and a next action",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - name the proposed supplier and the need",
+          "helpful": "supplier-landscape excluded-vendors evidence; a market-rate or should-cost price anchor"
+        },
+        {
+          "trigger": "justify this supplier",
+          "title": "",
+          "what": "Challenge and score ONE already-proposed sole-source pick into a weighted Defensibility verdict, then produce EITHER a defensible justification (evidence + mitigations) OR a weak-rationale finding with ranked alternatives and a next action",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - name the proposed supplier and the need",
+          "helpful": "supplier-landscape excluded-vendors evidence; a market-rate or should-cost price anchor"
+        },
+        {
+          "trigger": "why only one vendor",
+          "title": "",
+          "what": "Challenge and score ONE already-proposed sole-source pick into a weighted Defensibility verdict, then produce EITHER a defensible justification (evidence + mitigations) OR a weak-rationale finding with ranked alternatives and a next action",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - name the proposed supplier and the need",
+          "helpful": "supplier-landscape excluded-vendors evidence; a market-rate or should-cost price anchor"
+        },
+        {
+          "trigger": "challenge this sole source",
+          "title": "Sole-Source Challenge",
+          "what": "Challenges a proposed single-supplier pick before it is defended: unique capability, was competition run, real vs self-created urgency, alternatives, the lock-in constraint, and how price is validated without competition. Weighs it into a Defensibility verdict.",
+          "howto": "Name the proposed sole-source supplier and the need. Claude challenges the rationale and, if it is weak, ranks the alternatives.",
+          "output": "A defensibility verdict with a justification packet (if defensible) or ranked alternatives and a next action (if weak). Feeds executive-summary-package, or supplier-landscape/rfp-engine on a weak verdict.",
+          "on_widget": true,
+          "upload": "nothing - name the proposed supplier and the need",
+          "helpful": "supplier-landscape excluded-vendors evidence; a market-rate or should-cost price anchor"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "supplier-landscape (excluded_vendors.csv / supplier_registry.csv seed the alternatives register), market-rate-benchmarking / should-cost-builder (Price Validation Substitute evidence), supplier-deep-dive (dossier findings support the Unique Capability / Constraint Basis dimensions), process-navigator (mid-run threshold/policy lookup)",
+      "successors": "process-navigator (the sole_source_justification_handoff.json is the evidence its New-Supplier Governance widget checks as Filed), commercial-negotiation-prep (on a DEFENSIBLE verdict, the price-validation band becomes the negotiation anchor), executive-summary-package (verdict/evidence populate the ATC/ATS governance fields), rfp-engine / supplier-landscape (on a WEAK verdict, run the competitive process instead)"
+    },
+    {
+      "id": "rfp-engine",
+      "pipeline": "Sourcing / RFx",
+      "helps": "Build an RFP/RFI package",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "create an rfp for [need]",
+          "title": "",
+          "what": "Build an RFP/RFI package",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or the supplier-landscape handoff / a requirements list",
+          "helpful": "Lilly-specific terms or templates, stakeholder roster, vendor contacts"
+        },
+        {
+          "trigger": "create an RFP",
+          "title": "Build an RFx Package",
+          "what": "Generates the full set of artifacts needed to issue an RFx.",
+          "howto": "Describe the sourcing need. Claude asks which artifacts you want (multi-select, All by default).",
+          "output": "Invitations, instructions, requirements matrix, pricing template, demo guide, schedule, post-award timeline, and stakeholder roster.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "supplier-landscape, category-strategy, market-rate-benchmarking (all optional)",
+      "successors": "rfp-case-manager (workflow), rfp-response-analysis (post-submission); produces the scoring scale/requirements grid evaluation-engine applies (see Stage 1c reconciliation)"
+    },
+    {
+      "id": "rfp-case-manager",
+      "pipeline": "Sourcing / RFx",
+      "helps": "Run an active RFx (intent-driven workflows: initialize / status / schedule / ingest / refresh+timeline; Microsoft Team binding OPTIONAL)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "set up a case for [rfx]",
+          "title": "",
+          "what": "Run an active RFx (intent-driven workflows: initialize / status / schedule / ingest / refresh+timeline; Microsoft Team binding OPTIONAL)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing required; works on Project + uploads alone OR with a bound Team",
+          "helpful": "the RFP package + supplier contacts; the Team's SharePoint URL if binding a Team"
+        },
+        {
+          "trigger": "what's the latest on [rfx]",
+          "title": "",
+          "what": "Run an active RFx (intent-driven workflows: initialize / status / schedule / ingest / refresh+timeline; Microsoft Team binding OPTIONAL)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing required; works on Project + uploads alone OR with a bound Team",
+          "helpful": "the RFP package + supplier contacts; the Team's SharePoint URL if binding a Team"
+        },
+        {
+          "trigger": "schedule the demos",
+          "title": "",
+          "what": "Run an active RFx (intent-driven workflows: initialize / status / schedule / ingest / refresh+timeline; Microsoft Team binding OPTIONAL)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing required; works on Project + uploads alone OR with a bound Team",
+          "helpful": "the RFP package + supplier contacts; the Team's SharePoint URL if binding a Team"
+        },
+        {
+          "trigger": "refresh the case",
+          "title": "",
+          "what": "Run an active RFx (intent-driven workflows: initialize / status / schedule / ingest / refresh+timeline; Microsoft Team binding OPTIONAL)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing required; works on Project + uploads alone OR with a bound Team",
+          "helpful": "the RFP package + supplier contacts; the Team's SharePoint URL if binding a Team"
+        },
+        {
+          "trigger": "set up a case for this RFx",
+          "title": "Manage an Active RFx",
+          "what": "Workflow operations for an in-flight RFx case: status, scheduling, comms log ingestion, timeline refresh.",
+          "howto": "Describe what you need (initialize, status, schedule, ingest, refresh). Microsoft Team binding optional.",
+          "output": "Updates to the case file plus either a status report, scheduled meetings, or a refreshed timeline.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "rfp-engine (via case_handoff.json), supplier-landscape, category-strategy",
+      "successors": "rfp-response-analysis, evaluation-engine"
+    },
+    {
+      "id": "rfp-response-analysis",
+      "pipeline": "Sourcing / RFx",
+      "helps": "Analyze supplier responses",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "analyze the supplier responses",
+          "title": "Analyze Supplier Responses",
+          "what": "Builds a comprehensive evaluation of all vendor RFx responses.",
+          "howto": "Upload the vendor submissions. Claude analyzes against requirements.",
+          "output": "A 30-page evaluation DOCX with per-vendor profiles, cross-supplier comparison, gap analysis, and preliminary scoring.",
+          "on_widget": true,
+          "upload": "the supplier submissions (one folder/zip per vendor) + the completed requirements matrix",
+          "helpful": "pricing templates, MSA redlines per vendor"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "rfp-engine (requirements matrix), rfp-case-manager (case file, submissions)",
+      "successors": "evaluation-engine (formal scoring - proposed/preliminary only, see Stage 1a)"
+    },
+    {
+      "id": "evaluation-engine",
+      "pipeline": "Sourcing / RFx",
+      "helps": "Score, recommend, award letters",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "score the proposals",
+          "title": "Score Proposals and Award",
+          "what": "Final evaluation, scoring rollup, and award communications for an RFx.",
+          "howto": "Provide analyzed responses plus stakeholder scorecards. Claude asks which outputs you want.",
+          "output": "Stakeholder rollup, AI scoring with sensitivity, evaluation report, award and non-award letters, BAFO request, debrief prep, and business case deck.",
+          "on_widget": true,
+          "upload": "the response-analysis summary, or the raw submissions",
+          "helpful": "stakeholder scores, the scoring matrix"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "rfp-engine, rfp-response-analysis (handoff payload), rfp-case-manager (case file)",
+      "successors": "commercial-negotiation-prep and lilly-contract-review, via `evaluation_engine_award_handoff.json` (schema owned by evaluation-engine; carries the official award, the scoring grid, negotiation inputs and citation provenance). Never auto-advanced: the payload is emitted and the user is told which skill consumes it."
+    },
+    {
+      "id": "category-strategy",
+      "pipeline": "Category Strategy",
+      "helps": "Category strategy from spend data (DEVELOP / MANAGE)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "develop a category strategy for [commodity]",
+          "title": "",
+          "what": "Category strategy from spend data (DEVELOP / MANAGE)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "a spend file (supplier, amount, date; SHARP/SAP/Ariba best); + the prior PPTX for MANAGE",
+          "helpful": "priorities, constraints, leadership context"
+        },
+        {
+          "trigger": "update the category strategy for [commodity]",
+          "title": "",
+          "what": "Category strategy from spend data (DEVELOP / MANAGE)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "a spend file (supplier, amount, date; SHARP/SAP/Ariba best); + the prior PPTX for MANAGE",
+          "helpful": "priorities, constraints, leadership context"
+        },
+        {
+          "trigger": "develop a category strategy",
+          "title": "Build a New Category Strategy",
+          "what": "Develops a strategic sourcing plan for a procurement category from scratch.",
+          "howto": "Upload spend data for the category. Claude analyzes and structures the strategy.",
+          "output": "An 11-tab interactive dashboard with spend, Pareto, supplier portfolio, Kraljic positioning, risk, and a 12-month action plan.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        },
+        {
+          "trigger": "update the category strategy",
+          "title": "Update a Category Strategy",
+          "what": "Refreshes a prior category strategy with new data and shows what changed.",
+          "howto": "Upload the prior strategy plus new spend or market data. Claude reconciles.",
+          "output": "An updated 11-tab dashboard with a what-changed view. Used for the quarterly or annual category review.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "supplier-landscape (market research/profiles), commercial-negotiation-prep (pricing benchmarks), market-rate-benchmarking (rate benchmarks sizing savings), negotiation-playbook-learning (difficulty scores/patterns)",
+      "successors": "rfp-engine (category, shortlisted suppliers, target events, when competitive sourcing is recommended)"
+    },
+    {
+      "id": "market-rate-benchmarking",
+      "pipeline": "Category Strategy",
+      "helps": "External / internal / rationalization benchmarking",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "benchmark rates for [category]",
+          "title": "",
+          "what": "External / internal / rationalization benchmarking",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "external: nothing; internal: 2+ contracts; rationalization: spend or vendor list",
+          "helpful": "a rate card to benchmark against"
+        },
+        {
+          "trigger": "compare our contracts in [category]",
+          "title": "",
+          "what": "External / internal / rationalization benchmarking",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "external: nothing; internal: 2+ contracts; rationalization: spend or vendor list",
+          "helpful": "a rate card to benchmark against"
+        },
+        {
+          "trigger": "find rationalization opportunities in [category]",
+          "title": "",
+          "what": "External / internal / rationalization benchmarking",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "external: nothing; internal: 2+ contracts; rationalization: spend or vendor list",
+          "helpful": "a rate card to benchmark against"
+        },
+        {
+          "trigger": "benchmark rates",
+          "title": "Market Rate Benchmark",
+          "what": "Researches market rates for a category or rate type and positions your rate against the curve.",
+          "howto": "Name the category or rate type. Claude researches via the web.",
+          "output": "A rate range card with percentile bands and your rate plotted.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "none stated",
+      "successors": "commercial-negotiation-prep (pricing intelligence for counter-offers), rfp-engine (informs RFP pricing evaluation criteria), evaluation-engine (pricing context for scoring), category-strategy (portfolio inconsistencies, rationalization savings), pro-forma-builder (sourced cost anchors)"
+    },
+    {
+      "id": "executive-summary-package",
+      "pipeline": "Executive Summary",
+      "helps": "ATC/ATS approval summary with the FRAP chain",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "atc summary",
+          "title": "Build an ATC Summary",
+          "what": "Generates the executive summary required for the Lilly approval workflow on a contract or work order.",
+          "howto": "Upload the contract or work order. Claude extracts the key terms and risks.",
+          "output": "A 2-page DOCX summary with the FRAP approval chain, key terms, financial impact, and risk highlights.",
+          "on_widget": true,
+          "upload": "the contract/WO/SOW/amendment (amendment: base + amendment)",
+          "helpful": "your grade and the business owner's grade"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "none stated",
+      "successors": "none stated"
+    },
+    {
+      "id": "voice-profile",
+      "pipeline": "Personal Command Center",
+      "helps": "Build a personal writing-voice profile and draft emails / memos in your voice (BUILD / DRAFT / AUDIT / UPDATE modes; layered discipline rules over voice)",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "build my voice profile",
+          "title": "Voice Profile",
+          "what": "Captures your writing voice from sent mail and uses it to draft replies, emails, and messages.",
+          "howto": "First run extracts your voice from Outlook sent mail. Later runs draft or audit content.",
+          "output": "A voice profile artifact plus drafted responses in your style on demand.",
+          "on_widget": true,
+          "upload": "for BUILD: sample of your sent emails (M365 or pasted); for DRAFT: your saved voice_profile.json + draft request",
+          "helpful": "the thread you are replying to; recipient and intent context"
+        },
+        {
+          "trigger": "draft this in my voice",
+          "title": "",
+          "what": "Build a personal writing-voice profile and draft emails / memos in your voice (BUILD / DRAFT / AUDIT / UPDATE modes; layered discipline rules over voice)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "for BUILD: sample of your sent emails (M365 or pasted); for DRAFT: your saved voice_profile.json + draft request",
+          "helpful": "the thread you are replying to; recipient and intent context"
+        },
+        {
+          "trigger": "audit this draft",
+          "title": "",
+          "what": "Build a personal writing-voice profile and draft emails / memos in your voice (BUILD / DRAFT / AUDIT / UPDATE modes; layered discipline rules over voice)",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "for BUILD: sample of your sent emails (M365 or pasted); for DRAFT: your saved voice_profile.json + draft request",
+          "helpful": "the thread you are replying to; recipient and intent context"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "none stated as a predecessor",
+      "successors": "opt-in drafting service for executive-summary-package, rfp-engine (invitation/award emails), commercial/legal-negotiation-prep (talking points), lilly-contract-review (SME escalation emails, opt-in)"
+    },
+    {
+      "id": "theos-field-guide",
+      "pipeline": "Personal Command Center",
+      "helps": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "open my field guide",
+          "title": "🦖 Theo's Field Guide",
+          "what": "The work-graph personal command center. Organizes your work as Issues (not as a flat inbox digest). Tracks state, owners, evidence, and the next move per Issue.",
+          "howto": "Run on demand. Reads your inbox, calendar, and Teams via M365 connector. Optional hashtag protocol for explicit state signaling. Stale-review walkthrough cleans up quiet items in a few taps.",
+          "output": "An inline widget dashboard with 5 fixed sections (Action Needed, Waiting On, Today/Tomorrow, Stale, Snoozed) and real clickable action buttons per Issue.",
+          "on_widget": true,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "field guide",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "what's on my plate",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "end of day",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "weekly review",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "what should i do next",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "quick capture",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "show issues involving [entity]",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "turn this email into an issue",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        },
+        {
+          "trigger": "daily digest",
+          "title": "",
+          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
+          "helpful": "active Issues with stakeholder rosters"
+        }
+      ],
+      "in_teach_mode": false,
+      "_id_cleaned_from": "theos-field-guide 🦖"
+    },
+    {
+      "id": "process-navigator",
+      "pipeline": "Personal Command Center",
+      "helps": "Procurement process / policy / threshold / system-requirement Q&A; live-reads Lilly SharePoint policy sources via M365",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "how do i buy [x]",
+          "title": "",
+          "what": "Procurement process / policy / threshold / system-requirement Q&A; live-reads Lilly SharePoint policy sources via M365",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the question",
+          "helpful": "category / commodity context; dollar value; use-case context"
+        },
+        {
+          "trigger": "do i need tprm / sae / air",
+          "title": "",
+          "what": "Procurement process / policy / threshold / system-requirement Q&A; live-reads Lilly SharePoint policy sources via M365",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the question",
+          "helpful": "category / commodity context; dollar value; use-case context"
+        },
+        {
+          "trigger": "what's the frap threshold",
+          "title": "",
+          "what": "Procurement process / policy / threshold / system-requirement Q&A; live-reads Lilly SharePoint policy sources via M365",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the question",
+          "helpful": "category / commodity context; dollar value; use-case context"
+        },
+        {
+          "trigger": "can i use po t&cs vs full msa",
+          "title": "",
+          "what": "Procurement process / policy / threshold / system-requirement Q&A; live-reads Lilly SharePoint policy sources via M365",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the question",
+          "helpful": "category / commodity context; dollar value; use-case context"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "theos-field-guide (status-request flow), timeline-builder (which review/process factors apply), workflow-map (confirm canonical step order), any skill needing a process/threshold answer",
+      "successors": "offers (default no) to start supplier-landscape, rfp-engine, timeline-builder, or workflow-map after answering"
+    },
+    {
+      "id": "timeline-builder",
+      "pipeline": "Personal Command Center",
+      "helps": "Loose procurement timeline estimates (range + drivers + confidence); first run asks 3 calibration questions only",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "estimate the timeline for [request]",
+          "title": "",
+          "what": "Loose procurement timeline estimates (range + drivers + confidence); first run asks 3 calibration questions only",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or an SOW / proposal the skill can extract from",
+          "helpful": "confirmed contract instrument; risk reviews triggered; new vs existing supplier; deal size for ATC routing"
+        },
+        {
+          "trigger": "how long will this take",
+          "title": "",
+          "what": "Loose procurement timeline estimates (range + drivers + confidence); first run asks 3 calibration questions only",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or an SOW / proposal the skill can extract from",
+          "helpful": "confirmed contract instrument; risk reviews triggered; new vs existing supplier; deal size for ATC routing"
+        },
+        {
+          "trigger": "rough schedule for [request]",
+          "title": "",
+          "what": "Loose procurement timeline estimates (range + drivers + confidence); first run asks 3 calibration questions only",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or an SOW / proposal the skill can extract from",
+          "helpful": "confirmed contract instrument; risk reviews triggered; new vs existing supplier; deal size for ATC routing"
+        },
+        {
+          "trigger": "estimate the timeline for this request",
+          "title": "Timeline Builder",
+          "what": "Estimates the timeline for an upcoming sourcing or contracting effort.",
+          "howto": "Describe the request. First run asks 3 calibration questions to learn your tempo.",
+          "output": "A timeline estimate with key drivers, milestones, and confidence ranges.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "theos-field-guide (status-request compose flow), process-navigator (prerequisite questions feeding factor extraction)",
+      "successors": "voice-profile (drafts a status email from the estimate)"
+    },
+    {
+      "id": "workflow-map",
+      "pipeline": "Personal Command Center",
+      "helps": "Workflow diagram + checklist for any request (3 output modes: in-chat Mermaid, branded artifact, email draft with inline SVG). Optional `issue_id` parameter scopes the map to a specific Field Guide Issue.",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "build a workflow map for [request]",
+          "title": "",
+          "what": "Workflow diagram + checklist for any request (3 output modes: in-chat Mermaid, branded artifact, email draft with inline SVG). Optional `issue_id` parameter scopes the map to a specific Field Guide Issue.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or the request context",
+          "helpful": "stakeholder roster (auto-pulled from Field Guide Issue, project roster, or case file when present)"
+        },
+        {
+          "trigger": "show the workflow",
+          "title": "",
+          "what": "Workflow diagram + checklist for any request (3 output modes: in-chat Mermaid, branded artifact, email draft with inline SVG). Optional `issue_id` parameter scopes the map to a specific Field Guide Issue.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or the request context",
+          "helpful": "stakeholder roster (auto-pulled from Field Guide Issue, project roster, or case file when present)"
+        },
+        {
+          "trigger": "checklist for this request",
+          "title": "",
+          "what": "Workflow diagram + checklist for any request (3 output modes: in-chat Mermaid, branded artifact, email draft with inline SVG). Optional `issue_id` parameter scopes the map to a specific Field Guide Issue.",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing, or the request context",
+          "helpful": "stakeholder roster (auto-pulled from Field Guide Issue, project roster, or case file when present)"
+        },
+        {
+          "trigger": "build a workflow map for this request",
+          "title": "Workflow Map",
+          "what": "Maps out a procurement process or request as a diagram and checklist.",
+          "howto": "Describe the request. Choose output mode: in-chat, branded artifact, or email draft.",
+          "output": "A diagram plus checklist in your chosen format.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "theos-field-guide, rfp-case-manager (Initialize and Refresh workflows)",
+      "successors": "process-navigator (which phases/reviews apply), timeline-builder (duration labels), theos-field-guide / rfp-case-manager (stakeholder roster, read-only)"
+    },
+    {
+      "id": "meeting-prep-brief",
+      "pipeline": "Personal Command Center",
+      "helps": "One-page meeting prep brief (5 fixed sections: who's in the room / what was last discussed / what's open / what to walk in ready to say / suggested agenda); read-only via M365 connector",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "prep me for this meeting",
+          "title": "Meeting Prep Brief",
+          "what": "Assembles a one-page brief for an upcoming meeting by reading the invite, recent email, contracts, and spend.",
+          "howto": "Reference the meeting on your calendar. M365 connector required.",
+          "output": "A one-page brief covering who is in the room, what was last discussed, what is open, and what to say.",
+          "on_widget": true,
+          "upload": "nothing - the calendar event reference (title/date/event-id) OR the supplier name + meeting date",
+          "helpful": "your role in the meeting (lead/participant/observer); topics to emphasize; per-RFx Project context auto-pulled when present"
+        },
+        {
+          "trigger": "prep me for the [supplier] meeting",
+          "title": "",
+          "what": "One-page meeting prep brief (5 fixed sections: who's in the room / what was last discussed / what's open / what to walk in ready to say / suggested agenda); read-only via M365 connector",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - the calendar event reference (title/date/event-id) OR the supplier name + meeting date",
+          "helpful": "your role in the meeting (lead/participant/observer); topics to emphasize; per-RFx Project context auto-pulled when present"
+        },
+        {
+          "trigger": "build a prep brief",
+          "title": "",
+          "what": "One-page meeting prep brief (5 fixed sections: who's in the room / what was last discussed / what's open / what to walk in ready to say / suggested agenda); read-only via M365 connector",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - the calendar event reference (title/date/event-id) OR the supplier name + meeting date",
+          "helpful": "your role in the meeting (lead/participant/observer); topics to emphasize; per-RFx Project context auto-pulled when present"
+        },
+        {
+          "trigger": "what should i bring to this meeting",
+          "title": "",
+          "what": "One-page meeting prep brief (5 fixed sections: who's in the room / what was last discussed / what's open / what to walk in ready to say / suggested agenda); read-only via M365 connector",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - the calendar event reference (title/date/event-id) OR the supplier name + meeting date",
+          "helpful": "your role in the meeting (lead/participant/observer); topics to emphasize; per-RFx Project context auto-pulled when present"
+        }
+      ],
+      "in_teach_mode": true,
+      "predecessors": "theos-field-guide (when a meeting has no prep file), rfp-case-manager Schedule workflow (after drafting an invite)",
+      "successors": "process-navigator (policy/threshold questions), voice-profile (opt-in follow-on drafts), workflow-map (opt-in workflow diagram)"
+    },
+    {
+      "id": "procurement-help-desk",
+      "pipeline": "Personal Command Center",
+      "helps": "End-user \"how do I get this done\" Q&A: onboard/create a supplier, invoice status, open/close a PO, where to start a buy, which form/system, who to contact; BuyLilly-primary, cited and confidence-scored, answer-only (never performs the transaction). Sibling to process-navigator (which serves the procurement rep); this serves stakeholders",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "how do i onboard a supplier",
+          "title": "",
+          "what": "End-user \"how do I get this done\" Q&A: onboard/create a supplier, invoice status, open/close a PO, where to start a buy, which form/system, who to contact; BuyLilly-primary, cited and confidence-scored, answer-only (never performs the transaction). Sibling to process-navigator (which serves the procurement rep); this serves stakeholders",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the stakeholder question",
+          "helpful": "the category/context; the system involved (BuyLilly / Ariba / LEAH / Aravo)"
+        },
+        {
+          "trigger": "how do i check an invoice status",
+          "title": "",
+          "what": "End-user \"how do I get this done\" Q&A: onboard/create a supplier, invoice status, open/close a PO, where to start a buy, which form/system, who to contact; BuyLilly-primary, cited and confidence-scored, answer-only (never performs the transaction). Sibling to process-navigator (which serves the procurement rep); this serves stakeholders",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the stakeholder question",
+          "helpful": "the category/context; the system involved (BuyLilly / Ariba / LEAH / Aravo)"
+        },
+        {
+          "trigger": "where do i start to buy this",
+          "title": "",
+          "what": "End-user \"how do I get this done\" Q&A: onboard/create a supplier, invoice status, open/close a PO, where to start a buy, which form/system, who to contact; BuyLilly-primary, cited and confidence-scored, answer-only (never performs the transaction). Sibling to process-navigator (which serves the procurement rep); this serves stakeholders",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the stakeholder question",
+          "helpful": "the category/context; the system involved (BuyLilly / Ariba / LEAH / Aravo)"
+        },
+        {
+          "trigger": "who do i contact for [need]",
+          "title": "",
+          "what": "End-user \"how do I get this done\" Q&A: onboard/create a supplier, invoice status, open/close a PO, where to start a buy, which form/system, who to contact; BuyLilly-primary, cited and confidence-scored, answer-only (never performs the transaction). Sibling to process-navigator (which serves the procurement rep); this serves stakeholders",
+          "howto": "",
+          "output": "",
+          "on_widget": false,
+          "upload": "nothing - just ask the stakeholder question",
+          "helpful": "the category/context; the system involved (BuyLilly / Ariba / LEAH / Aravo)"
+        },
+        {
+          "trigger": "how do I buy this",
+          "title": "Process Navigator",
+          "what": "Answers any procurement process, threshold, or system-requirement question by reading Lilly policy live.",
+          "howto": "Ask the question.",
+          "output": "An answer with citations to the relevant policy or guidance.",
+          "on_widget": true,
+          "upload": "",
+          "helpful": "",
+          "_attached_by": "widget reconciliation"
+        }
+      ],
+      "in_teach_mode": true,
+      "_id_cleaned_from": "procurement-help-desk (PENDING; stakeholder/end-user help-desk front door, content build network-gated per Stage 7 - not counted in the 27 built, not yet on the interactive widget)"
+    }
+  ],
+  "_not_routed": [
+    "deal-tab",
+    "lilly-brand-assets",
+    "lilly-procurement-kernels",
+    "my-work",
+    "procurement-launcher",
+    "rfx-hub"
+  ]
+}

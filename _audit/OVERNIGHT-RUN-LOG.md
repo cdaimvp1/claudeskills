@@ -4452,3 +4452,57 @@ extract-and-retest verified.
 
 **Next in the chain: J2** (collapse routing into one JSON manifest), which needs no
 decision from Marc.
+
+---
+
+## J2 — routing collapsed into one manifest. DONE.
+
+`procurement-launcher-1c344a/routing-manifest.json` is now the single registry;
+`theo_routing.py --check` fails on any disagreement with it.
+
+**6 pipelines, 28 skills, 77 trigger rows (33 on the widget), 26 with chain data, 19 in
+teach mode.** All 28 resolve to a shipped skill.
+
+### It had already drifted, in three ways
+
+**1. 16 widget rows fired trigger phrases that appeared nowhere in the routing table.**
+The widget's `data-t` is what actually fires when a user taps a row, so for those 16 the
+menu and the documentation disagreed about what the user was invoking. Reconciled and
+attached; none was unresolvable.
+
+**2. Two Skill cells did not contain a skill.** One held `theos-field-guide ?` (a stray
+glyph), the other an entire parenthetical paragraph about pending status where a slug
+belonged. Both would have broken any generator reading the table, and both had been sitting
+in a hand-maintained registry.
+
+**3. Four shipped skills were named on no surface at all**, including **my-work, which I
+built earlier today and never wired into THEO's routing.** That is my own
+integrate-or-don't-ship failure, caught only because this collapse forced a full
+reconciliation.
+
+### The intent already existed; nothing enforced it
+
+`SKILL.md` already said the widget, the Markdown fallback and the teach-mode lists "all
+derive from" the routing table. That sentence had been true as an intention and false as a
+fact. This is the same shape as the H3 finding that a claim-gate was an instruction rather
+than a check.
+
+### Deliberate limit: it does not rewrite the widget
+
+`theo-widget.html` is a design-locked visual artifact. Regenerating it in place would put a
+locked surface under a script's control, which is not what a lock means. `--emit` prints
+what each surface should contain and a person applies it.
+
+### Left for Marc, reported not decided
+
+Six shipped skills are routed by nothing: `deal-tab`, `rfx-hub`, `my-work`,
+`lilly-brand-assets`, `lilly-procurement-kernels`, `procurement-launcher`. The last three
+are infrastructure and correctly not menu destinations. **`my-work` is the live question:**
+it is a user-facing personal workspace, unlike `deal-tab` and `rfx-hub` which render inside
+another skill's flow. Whether THEO should route to it is a judgement, so the check reports
+it rather than failing.
+
+### Verified
+
+manifest check PASS - smoke 33/0 - J1 intake check still PASS - malicious sweep
+SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages extract-and-retest verified.
