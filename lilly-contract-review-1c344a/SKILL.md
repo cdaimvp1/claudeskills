@@ -1937,3 +1937,28 @@ Everything in this section ENRICHES output. None of it is a completion gate. If 
 **Contract Stack Mapper (`Stack Map only` mode, Step 0.5).** A structural sibling to the four substantive-review modes, not a fifth version of them. Input tier for this mode alone: MUST is at least one document from the governing family (not necessarily the MSA); RECOMMENDED is the rest of the family (amendments, SOWs/WOs/order forms, referenced standards) so the map and gap list are complete. Produces the governing-document hierarchy map (.docx) and manifest (.json) per `references/contract-stack-map.md`; never produces findings, a redline, a Protection Score, or negotiation prep, and never runs Steps 1-7.
 
 ---
+
+## Deal-tab hub contribution, output slice
+
+When this skill's findings feed the Deal dashboard, it contributes **only** these
+fields:
+
+> `issues[]`, `documentConflicts[]`, `protection{}`, `obligations[]`, `tacticFlag`
+
+**Do NOT build your own version of the Deal dashboard.** The hub
+(`deal-tab-1c344a`) composes the slices and owns the render. Building a competing
+dashboard is how two artifacts start disagreeing about the same deal.
+
+**Every field carries a `sourceRef`.** A field arriving without one is a BUILD
+FAILURE at the hub, not a gap it renders. The hub is the last place an uncited value
+can be caught before a reader treats a rendered number as established fact.
+
+This skill OWNS `issues[]`. scope-sow-architect appends scope-derived entries to it but does not own it. Each entry must carry a `sourceRef` naming which skill produced it, so an appended entry is attributable.
+
+Enforced by `deal-tab-1c344a/dashboard/schema_check.py`, which refuses a data object
+carrying a field no registered lens skill owns: *"field X is not owned by any
+registered lens skill"*. A renamed field fails the build loudly instead of rendering
+as an empty panel a reader blames on missing data.
+
+**This does not change this skill's standalone outputs.** Everything it produces on
+its own is unchanged; the slice is an additional contribution, not a replacement.

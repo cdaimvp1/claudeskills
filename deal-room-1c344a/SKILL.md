@@ -622,10 +622,58 @@ The single source of truth for `deal_room_state.json`, the persistent work objec
     "legal_protection": "object | null - from lilly-contract-review; feeds Terms & Review > Legal & Protection (protection scorecard + legal navigator). null renders NEEDS_INPUT.",
     "scope_performance": "object | null - from scope-sow-architect; feeds Terms & Review > Scope & Performance (scope, SLAs, performance commitments). null renders NEEDS_INPUT.",
     "landscape": "object | null - supplier landscape context via ARIA when reachable; feeds Overview context. null renders NEEDS_INPUT.",
-    "provenance": { "legal_protection": "string | null - source skill + generatedAt", "scope_performance": "string | null", "landscape": "string | null" }
+    "provenance": { "legal_protection": "object | null - {source_skill, generatedAt} - generatedAt is CHECKED against the staleness window before render, not merely stored; missing generatedAt is treated as STALE", "scope_performance": "object | null - same shape, 30-day window", "landscape": "object | null - same shape, 90-day window" }
   }
 }
 ```
+
+## Slice contracts: what this hub consumes, and what it EXPOSES (WS D5/D6)
+
+This skill is a hub: it CONSUMES slices from sibling skills (`hub_slices` above) and, at
+close, EXPOSES one outward. The inward side was documented; the outward side existed only
+de facto, inside the Phase 8 handoff mapping, unlabelled. It is named here.
+
+### What deal-room EXPOSES (D5)
+
+At close, and **only** at close, Phase 8 emits `negotiation_outcome.json` to
+`negotiation-playbook-learning-1c344a`, formatted to THAT skill's outcome schema.
+
+> The round-by-round concession ledger collapses into a single outcome record: the issues
+> and their final positions, concessions given and received, the kernel-computed value of
+> movement, and the closing Deal Progress Score.
+
+**This is the only point the two skills touch.** deal-room lives inside one still-open
+negotiation and knows nothing about any other; negotiation-playbook-learning is a
+cross-deal historical layer. The live ledger is NOT exposed mid-negotiation, and nothing
+is emitted before close: a deal in progress has no outcome, and publishing one would put a
+provisional position into a historical dataset as though it were settled.
+
+### Slice staleness (D6)
+
+`hub_slices` carries a `provenance` block with each slice's source skill and `generatedAt`.
+**That timestamp must be checked before the slice renders, not merely stored.**
+
+Without the check, a 90-day-old contract-review slice renders silently as current. That is
+worse than an absent slice: an absent slice shows NEEDS_INPUT and the reader knows to go
+and get it, whereas a stale one shows a confident panel of figures describing a contract
+position that has since moved. **Silent staleness is a drift vector, and the numbers-
+reconcile assertion does not catch it, because stale numbers reconcile perfectly with each
+other.**
+
+| slice | source | staleness window | why this window |
+|---|---|---|---|
+| `legal_protection` | lilly-contract-review | **14 days** | redlines move fast in an open negotiation; a two-week-old protection read is likely superseded |
+| `scope_performance` | scope-sow-architect | **30 days** | scope changes more slowly than terms, but a month-old scope predates most re-scoping |
+| `landscape` | supplier-landscape via ARIA | **90 days** | market context ages in quarters, not weeks |
+
+**Render rule.** A slice past its window renders **`STALE, refresh from {skill}`** in place
+of its content, naming the skill to re-run. It does NOT render the stale content with a
+warning attached: a warning beside a full panel of numbers is read as a caveat, and the
+numbers get used anyway.
+
+**A slice with a `provenance` entry but no `generatedAt` is treated as STALE, not as
+current.** An undated slice cannot be shown to be fresh, and defaulting an unknown age to
+"current" is the assumption that makes the whole check pointless.
 
 ## Gap-closed fraction and the Deal Progress Score
 

@@ -792,3 +792,28 @@ structural choices (engagement type, artifact selection, source-document electio
 options.
 
 ---
+
+## Deal-tab hub contribution, output slice
+
+When this skill's findings feed the Deal dashboard, it contributes **only** these
+fields:
+
+> `scope{}`, and scope-derived entries appended to `issues[]`
+
+**Do NOT build your own version of the Deal dashboard.** The hub
+(`deal-tab-1c344a`) composes the slices and owns the render. Building a competing
+dashboard is how two artifacts start disagreeing about the same deal.
+
+**Every field carries a `sourceRef`.** A field arriving without one is a BUILD
+FAILURE at the hub, not a gap it renders. The hub is the last place an uncited value
+can be caught before a reader treats a rendered number as established fact.
+
+It does NOT own `issues[]`; lilly-contract-review does. It appends. The distinction matters because two owners and one-owner-plus-a-contributor fail differently: with two owners, nobody can be told their field broke.
+
+Enforced by `deal-tab-1c344a/dashboard/schema_check.py`, which refuses a data object
+carrying a field no registered lens skill owns: *"field X is not owned by any
+registered lens skill"*. A renamed field fails the build loudly instead of rendering
+as an empty panel a reader blames on missing data.
+
+**This does not change this skill's standalone outputs.** Everything it produces on
+its own is unchanged; the slice is an additional contribution, not a replacement.

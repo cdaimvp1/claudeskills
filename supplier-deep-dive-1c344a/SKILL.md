@@ -487,6 +487,28 @@ researched.
 card is owed the explanation, and it is the fallback being visible that makes it a
 feature rather than a gap.
 
+### Worked examples, one per entity type
+
+Three built renders ship beside the builder, one for each entity type the layout composes
+for. They are **reference output, not input**: nothing reads them, and rebuilding
+regenerates them.
+
+| file | entity type | what it demonstrates |
+|---|---|---|
+| `dashboard/deep-dive-dashboard.html` | public | the default build; all financial panels render |
+| `dashboard/deep-dive-private.html` | private | no market capitalisation, because a private company has none; financial viability reads as insufficient rather than being filled in |
+| `dashboard/deep-dive-hyperscaler.html` | hyperscaler product | the financial panels are omitted BY TRAIT with a stated reason, and viability is assessed at the parent |
+
+Regenerate any of them with `--supplier` and `--out`:
+
+```bash
+python dashboard/build_profile_dashboard.py --supplier Databricks --out dashboard/deep-dive-private.html
+python dashboard/build_profile_dashboard.py --supplier BigQuery  --out dashboard/deep-dive-hyperscaler.html
+```
+
+They are worth keeping because the trait mechanism is easiest to *see*: the same layout,
+composed three ways, with absences that are explained rather than blank.
+
 ### Compose by traits (A6)
 
 There is **one layout**, composed by traits. There is deliberately no "public dashboard"

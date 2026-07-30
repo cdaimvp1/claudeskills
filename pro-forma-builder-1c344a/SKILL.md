@@ -306,3 +306,28 @@ The optional dashboard has a FIXED tab structure. Every tab appears on every run
 - If the `visualize:show_widget` primitive or the JSX/React render path is unavailable, do NOT fail: emit the same five-tab content as a Magazine-style Markdown report (KPI table, scenario table, waterfall table, assumptions table, sensitivity table) and the headline figures inline, and tell the user the interactive dashboard could not render so a static version was produced.
 - The dashboard is OPTIONAL and never blocks the workbook. If the user did not ask for a visual, the XLSX plus narrative is the complete deliverable.
 - Numbers-reconcile assertion: the dashboard's illustrative/data object must foot. Baseline minus the sum of waterfall steps must equal Net Future-State; the per-period NPV table must equal the headline NPV; the Cost Component Buildup's component totals must sum to the headline Net 5-yr TCO; and Net Future-State (from the waterfall) must equal that same Net 5-yr TCO, independently computed. Reconcile before rendering (validation pass).
+
+## Deal-tab hub contribution, output slice
+
+When this skill's findings feed the Deal dashboard, it contributes **only** these
+fields:
+
+> `commercialLines[]`, `scenarios[]`, `assumptions[]`, `proforma{}`, `benchmarks[]`
+
+**Do NOT build your own version of the Deal dashboard.** The hub
+(`deal-tab-1c344a`) composes the slices and owns the render. Building a competing
+dashboard is how two artifacts start disagreeing about the same deal.
+
+**Every field carries a `sourceRef`.** A field arriving without one is a BUILD
+FAILURE at the hub, not a gap it renders. The hub is the last place an uncited value
+can be caught before a reader treats a rendered number as established fact.
+
+Formalises the boundary this skill already stated in prose. The workbook path is untouched: the slice is an ADDITIONAL output, not a replacement.
+
+Enforced by `deal-tab-1c344a/dashboard/schema_check.py`, which refuses a data object
+carrying a field no registered lens skill owns: *"field X is not owned by any
+registered lens skill"*. A renamed field fails the build loudly instead of rendering
+as an empty panel a reader blames on missing data.
+
+**This does not change this skill's standalone outputs.** Everything it produces on
+its own is unchanged; the slice is an additional contribution, not a replacement.

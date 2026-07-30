@@ -4953,3 +4953,89 @@ not.
 Smoke 33/0 - 31 packages extract-and-retest verified.
 
 **WS B is now complete: B1, B2, B3, B4 (scoped), B5-B8, B9.**
+
+---
+
+## CORRECTION to the B4 re-filing: it is THREE skills, not five.
+
+The B4 scoping split skills by whether a deterministic engine existed to point at. The
+detection globbed for `build_*.py` and `*generator*.py` and **missed `*_engine.py`
+entirely.** Two skills were mis-filed as engine-less:
+
+- `invoice-rate-card-auditor` HAS `invoice_audit_engine.py` + selftest
+- `timeline-builder` HAS `timeline_engine.py`
+
+**Ninth occurrence in this programme of a pattern-based check mis-reporting by matching a
+naming convention instead of the mechanism, and the fourth that was mine.**
+
+Corrected scope: **three** skills have no engine (commercial-negotiation-prep,
+negotiation-simulator, meeting-prep-brief), and the gap is narrower than "needs an engine
+built" implied. Each carries ONE optional inlined JSX dashboard; negotiation-simulator has
+none at all. Their primary deliverables are DOCX, XLSX and chat, already deterministic or
+kernel-backed.
+
+So the re-filed item is: three skills, each with one OPTIONAL secondary dashboard lacking a
+builder. Possibly not worth building at all, which is a question for the ship review (#38)
+rather than an assumed to-do.
+
+---
+
+## #22 slice contracts — D1, D2, D3, D5, D6, D7 DONE.
+
+### D7 first, because it makes the contracts checkable
+
+`deal-tab-1c344a/dashboard/schema_check.py`. An unrecognised field is now a BUILD FAILURE
+naming itself: *"field X is not owned by any registered lens skill"*.
+
+Before this, a lens skill could rename a field and **deal-tab would render a gap rather than
+erroring**. That is the dangerous failure: not a broken page, but a complete-looking
+dashboard with one quiet empty panel that a reader attributes to missing data rather than to
+a broken contract.
+
+**Deviation from the plan, deliberate.** It specified `dashboard/_parts/schema_check.py`.
+`_parts` is on the packaging strip list, so a check placed there would be stripped out of
+every shipped skill and only ever run in this repo. **A validation gate that does not ship
+is not a gate.** It lives beside the builder instead.
+
+**It caught a real contract defect on its first run.** The SKILL.md table gives
+scope-sow-architect "`scope{}` and scope `issues[]`", which reads as a SECOND owner of
+`issues[]`. It is not: it contributes scope-derived entries to the array
+lilly-contract-review owns. Recorded as `CO_CONTRIBUTED` rather than resolved silently,
+because **two owners and one-owner-plus-a-contributor fail differently: with two owners,
+nobody can be told their field broke.** If Marc wants scope issues as their own
+`scopeIssues[]` field, that is a contract change, not a code change.
+
+`check_table_matches_skill_md()` asserts the code table and the SKILL.md table agree, so two
+hand-maintained copies of one contract cannot drift.
+
+### D1, D2, D3 — the slice contracts
+
+Authored into lilly-contract-review, scope-sow-architect and pro-forma-builder. Each names
+exactly its fields, forbids building a competing Deal dashboard, states the `sourceRef`
+rule, and says plainly that **standalone outputs are unchanged** - the slice is an
+additional contribution, not a replacement.
+
+### D5 — what deal-room EXPOSES
+
+deal-room documented what it CONSUMES but its outward contract existed only de facto inside
+the Phase 8 handoff mapping. Now named: at close, and only at close, it emits
+`negotiation_outcome.json` to negotiation-playbook-learning. **Nothing is emitted before
+close**, because a deal in progress has no outcome and publishing one would put a
+provisional position into a historical dataset as though it were settled.
+
+### D6 — slice staleness
+
+`hub_slices` stored a provenance timestamp but never checked it, so a 90-day-old
+contract-review slice rendered silently as current. That is worse than an absent slice: an
+absent one shows NEEDS_INPUT and the reader goes and gets it, while a stale one shows a
+confident panel describing a position that has since moved. **The numbers-reconcile
+assertion does not catch it, because stale numbers reconcile perfectly with each other.**
+
+Windows: legal_protection 14 days (redlines move fast), scope_performance 30, landscape 90
+(market context ages in quarters). A stale slice renders `STALE, refresh from {skill}` IN
+PLACE OF its content, not alongside it: a warning beside a full panel of numbers is read as
+a caveat and the numbers get used anyway. **A slice with no `generatedAt` is treated as
+STALE, not current**, because defaulting an unknown age to "current" makes the check
+pointless.
+
+Smoke 33/0 - 31 packages extract-and-retest verified.
