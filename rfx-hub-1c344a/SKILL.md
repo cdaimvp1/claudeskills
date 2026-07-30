@@ -223,3 +223,38 @@ accuracy mechanism (the right source is named up front) and the efficiency one.
 A source marked `access: internal` without `confirmed_by_owner` is reported as needing
 confirmation. Those names are inferred, and **a confidently wrong internal system name is
 worse than an honest blank**, so the code surfaces them rather than quietly asserting them.
+
+## Slice ownership and the proposed-vs-official split (D4)
+
+This hub composes four feeders and **never re-scores**. Each owns a bounded slice, and
+every field carries a `sourceRef`.
+
+| Feeder | Owns |
+|---|---|
+| `rfp-engine-1c344a` | `requirements[]`, `weights`, `pricingTemplate`, `addenda[]` |
+| `rfp-case-manager-1c344a` | `event`, `participation`, `keyDates`, `qa`, `caseHealth` |
+| `rfp-response-analysis-1c344a` | `coverage`, `commercial`, `citations`, and `scores.aiFirstPass` |
+| `evaluation-engine-1c344a` | `ranking`, `sensitivity`, `dispersion`, `calibration`, `auditTrail`, `readiness`, and `scores.panel` |
+
+### `scores` is split, and the split is the accuracy mechanism
+
+- `scores.aiFirstPass` is **PROPOSED**: an AI first pass from rfp-response-analysis.
+- `scores.panel` is **OFFICIAL**: the evaluation panel's decision.
+
+**They are never merged and never averaged.** A first pass read as a panel decision is the
+most consequential misreading this dashboard could invite: an award defended on a machine's
+provisional score. The lens/toggle shows one or the other, labelled; it does not blend
+them into a single number.
+
+An unrecognised `scores.*` key **fails the build** rather than landing in whichever bucket
+looks closest.
+
+### Enforcement
+
+```bash
+python schema_check.py <rfx-data.json>
+```
+
+A field no feeder owns fails with *"field X is not owned by any registered lens skill"*.
+A field with no `sourceRef` fails too. Both are build failures rather than rendered gaps,
+because a gap looks like missing data and hides the fact that a feeder's contract broke.

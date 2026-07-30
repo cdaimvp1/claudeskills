@@ -5090,3 +5090,50 @@ So the fat skills do not need breaking up. They are already becoming lens skills
 dashboards were the vestigial organ of the previous design, and two of them are now gone.
 
 Smoke 33/0 - 31 packages extract-and-retest verified.
+
+---
+
+## D4 / #21 DONE — RFx slice contracts. The "inferred ownership" premise was stale.
+
+**#21 was logged as "confirm D4's inferred ownership column", blocked on Marc. Nothing was
+inferred.** `_redesign_proposals/RFx-REDESIGN-SPEC.md` section D specifies the ownership
+explicitly, feeder by feeder. It was authored from the spec, not guessed, so the block was
+unnecessary.
+
+### The four contracts
+
+| feeder | owns | label |
+|---|---|---|
+| rfp-engine | `requirements[]`, `weights`, `pricingTemplate`, `addenda[]` | - |
+| rfp-case-manager | `event`, `participation`, `keyDates`, `qa`, `caseHealth` | - |
+| rfp-response-analysis | `coverage`, `commercial`, `citations`, `scores.aiFirstPass` | **proposed** |
+| evaluation-engine | `ranking`, `sensitivity`, `dispersion`, `calibration`, `auditTrail`, `readiness`, `scores.panel` | **official** |
+
+Each contract states plainly that standalone deliverables are unchanged, because the
+never-regress rule matters more here than anywhere: `analysis_summary.docx` is a 30-40 page
+primary deliverable and the spec says explicitly it is "never reduced to a pointer".
+
+### `scores` is SPLIT, and the split is the accuracy mechanism
+
+`scores.aiFirstPass` is an AI first pass. `scores.panel` is the panel's decision. **They are
+never merged and never averaged.**
+
+A first pass read as a panel decision is the most consequential misreading this dashboard
+could invite: **an award defended on a machine's provisional score.** So the two sub-keys
+are owned separately, and an unrecognised `scores.*` key **fails the build rather than
+landing in whichever bucket looks closest** - because "closest bucket" is exactly how a
+proposed number becomes an official one.
+
+### Enforcement built (D4's verify, and it mirrors D7)
+
+`rfx-hub-1c344a/schema_check.py`, 5/5 on its checks: unowned field refused by name;
+unrecognised score key refused; proposed and official coexist without merging; a score
+without `sourceRef` is a build failure.
+
+One honest difference from deal-tab's version, made explicit rather than left silent:
+`check_table_matches_skill_md()` is a **stated no-op** here. deal-tab keeps its ownership
+table in its own SKILL.md so the two can be diffed; the RFx ownership lives in the four
+FEEDERS' files, so there is no single table to compare against. A check that quietly does
+nothing is worse than a stated gap.
+
+Smoke 33/0 - 31 packages extract-and-retest verified.

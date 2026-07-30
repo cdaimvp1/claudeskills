@@ -1426,3 +1426,23 @@ Low-confidence items generate a note in the evaluation report: "The following sc
 
 The handoff's `pipeline_metadata.auto_advance` field instructs evaluation-engine on whether to auto-advance downstream when complete. Evaluation-engine's former auto-advance target, decision-deck, has been retired and has no replacement: this skill has no defined downstream skill to auto-invoke today. Regardless of the `auto_advance` value, deliver the evaluation report and all selected outputs, then stop. Do not invoke a downstream skill automatically; if the user wants a downstream artifact built from these results (for example an executive summary or the next stage of a negotiation), point them to it explicitly rather than auto-advancing.
 
+## RFx hub contribution, output slice
+
+When this skill feeds the RFx hub (`rfx-hub-1c344a`), it contributes **only** these
+fields:
+
+> `scores.panel`, `ranking`, `sensitivity`, `dispersion`, `calibration`, `auditTrail`, `readiness`
+
+**Your output is labelled `official` in the hub.**
+
+This is an ACCURACY MECHANISM, not presentation. rfp-response-analysis produces an AI first pass; evaluation-engine produces the panel's decision. Labelling them apart stops a first pass being read as a panel decision, which is the single most consequential misreading this dashboard could invite: an award defended on a machine's provisional score.
+
+**You are the OFFICIAL side.** Yours is the score of record. The hub composes it; it never re-scores and never averages you with the proposed pass.
+
+**Every field carries a `sourceRef`.** A field arriving without one is a build failure at the hub, not a gap it renders.
+
+**The hub composes; it never re-scores.** Do not build a competing RFx dashboard. Two artifacts describing the same event will disagree, and the reader has no way to know which is current.
+
+**A field owned by nobody fails the build**, naming itself, rather than rendering as an empty panel a reader blames on missing data.
+
+**Standalone outputs are unchanged.** `evaluation_report.docx`, all CSVs and the full comms suite (BAFO, award, non-award, debrief) are unchanged.

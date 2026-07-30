@@ -987,3 +987,17 @@ How to detect and use Claude Project files as a peer source.
 > differently-shaped artifact describing the same thing. The dashboard is produced by
 > the rfx-hub dashboard; author the data object, not markup.
 
+## RFx hub contribution, output slice
+
+When this skill feeds the RFx hub (`rfx-hub-1c344a`), it contributes **only** these
+fields:
+
+> `event`, `participation`, `keyDates`, `qa`, `caseHealth`
+
+**Every field carries a `sourceRef`.** A field arriving without one is a build failure at the hub, not a gap it renders.
+
+**The hub composes; it never re-scores.** Do not build a competing RFx dashboard. Two artifacts describing the same event will disagree, and the reader has no way to know which is current.
+
+**A field owned by nobody fails the build**, naming itself, rather than rendering as an empty panel a reader blames on missing data.
+
+**Standalone outputs are unchanged.** You remain the state and orchestration owner: the hub READS your state layer, it does not take it over. `_case_file.json`, status snapshots, meeting drafts and the comms log are unchanged.

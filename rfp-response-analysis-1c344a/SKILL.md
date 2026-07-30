@@ -2343,3 +2343,23 @@ All Low-confidence extractions must be surfaced in `clarification_questions.csv`
 
 `source_location` - page number and/or section heading (e.g., `p.14, Section 3.2 - Integration Architecture`)
 
+## RFx hub contribution, output slice
+
+When this skill feeds the RFx hub (`rfx-hub-1c344a`), it contributes **only** these
+fields:
+
+> `scores.aiFirstPass`, `coverage`, `commercial` (bid-leveling), per-requirement citations
+
+**Your output is labelled `proposed` in the hub.**
+
+This is an ACCURACY MECHANISM, not presentation. rfp-response-analysis produces an AI first pass; evaluation-engine produces the panel's decision. Labelling them apart stops a first pass being read as a panel decision, which is the single most consequential misreading this dashboard could invite: an award defended on a machine's provisional score.
+
+**You are the PROPOSED side.** Never present your scores as settled, and never let the hub imply the panel has ruled.
+
+**Every field carries a `sourceRef`.** A field arriving without one is a build failure at the hub, not a gap it renders.
+
+**The hub composes; it never re-scores.** Do not build a competing RFx dashboard. Two artifacts describing the same event will disagree, and the reader has no way to know which is current.
+
+**A field owned by nobody fails the build**, naming itself, rather than rendering as an empty panel a reader blames on missing data.
+
+**Standalone outputs are unchanged.** `analysis_summary.docx` remains your primary deliverable and is never reduced to a pointer. Debrief drafts and pipeline CSVs are unchanged.

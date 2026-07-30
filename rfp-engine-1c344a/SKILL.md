@@ -775,3 +775,18 @@ Everything in this section ENRICHES output. None of it is a completion gate. If 
 **All domains:** requirement templates must cover professional services, lab, clinical, chemicals, equipment, and facilities - not just software. Ask only the structural choices (RFI vs RFP vs RFQ, single vs multi-round) as tappable options.
 
 ---
+
+## RFx hub contribution, output slice
+
+When this skill feeds the RFx hub (`rfx-hub-1c344a`), it contributes **only** these
+fields:
+
+> `requirements[]`, the criteria weights, the pricing template, `addenda[]`
+
+**Every field carries a `sourceRef`.** A field arriving without one is a build failure at the hub, not a gap it renders.
+
+**The hub composes; it never re-scores.** Do not build a competing RFx dashboard. Two artifacts describing the same event will disagree, and the reader has no way to know which is current.
+
+**A field owned by nobody fails the build**, naming itself, rather than rendering as an empty panel a reader blames on missing data.
+
+**Standalone outputs are unchanged.** The hub consumes these as SOURCE and never rebuilds a competing requirements matrix. Your locked institutional templates, `requirements_matrix.xlsx` and `case_handoff.json` are unchanged.
