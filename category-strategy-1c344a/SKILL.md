@@ -543,6 +543,34 @@ Develop a risk register from current data and market research, not copied from p
 
 After completing Phases 1-5, generate all analytical content that will be embedded in the dashboard's `const D = {...}` data object. This step converts raw data and research into the specific, cited, vendor-named insights that make the dashboard a strategy tool rather than a data display. See `references/dashboard-canonical.md` section "Mandatory Interpretive Content" for the full specification.
 
+#### Four locked ANALYTICAL rules for the data object (WS B3)
+
+These are **analysis rules, not layout**. The engine renders whatever the data object says,
+so if the data contradicts these the dashboard will render a confident, wrong answer. Each
+was locked in `VERSION-LOCK-2026-07-29.md` after being got wrong at least once.
+
+1. **Line-item segmentation is MARKET data, not a Lilly spend split.** It describes what
+   the market for each consumption unit looks like. This was corrected once already; do
+   not reintroduce a Lilly-spend version.
+
+2. **Supply risk is average spend per vendor, LOG-SCALED. It is not vendor count.** Vendor
+   count made Scientific Research look like the safest segment purely because it had the
+   most vendors, which is backwards: many small vendors is not safety. Author the
+   log-scaled average, and never substitute a count.
+
+3. **The type ladder is 11 / 13 / 20 / 28. No 9px anywhere.** Four distinct sizes, zero
+   off-ladder. Note this was verified by a census of RENDERED size, not declared size:
+   SVG text scales with its container, and two charts sit in columns narrower than their
+   viewBox, so the priority plot renders at 0.965 and the risk heatmap at 0.839 and both
+   carry a measured compensation. **Declared size is not sufficient evidence.** Re-measure
+   after any layout change that alters those column widths.
+
+4. **Porter is ONE overlaid pentagon, not three small radars.** Every axis is named on the
+   frame. There is no legend: each read card carries a colour bar in its segment's colour,
+   so the card IS the legend. Segment colour is plum / teal / burnt orange in order, and
+   it is load-bearing rather than decorative, because it is the only thing binding a shape
+   to its read. Author the data so one pentagon can carry all segments.
+
 **CRITICAL: Strategy and Savings content must ALWAYS be generated.** The spend data and web research provide enough information to generate preliminary strategy options (which sourcing approach fits the data), savings estimates (which vendors represent the biggest commercial opportunities based on spend magnitude and market pricing trends), and scorecard KPIs (derived from current metrics). These are always possible. If you find yourself writing a NEEDS_INPUT banner without proposals underneath, you have skipped this phase.
 
 **Generate ALL of the following before writing any JSX:**

@@ -4915,3 +4915,41 @@ means building one first. Re-filed rather than pretended-complete.
 `lilly-brand-assets` is untouched: its JSX blocks ARE the shared component library.
 
 Smoke 33/0 - malicious sweep clean - 31 packages extract-and-retest verified.
+
+---
+
+## B3 DONE — the four locked ANALYTICAL rules carried into category-strategy's SKILL.md.
+
+Verify was "each rule appears once, in the data-authoring section". **All four: exactly
+once.**
+
+### Three of the four were entirely absent
+
+`log-scaled`, the type ladder `11 / 13 / 20 / 28`, and `overlaid pentagon` appeared **zero
+times** in the SKILL.md. The segmentation rule's only near-matches were unrelated prose
+about market research. So the model authoring a data object had no way to know any of them.
+
+**That is the whole point of B3.** These are analysis rules, not layout: the engine renders
+whatever the data object says, so data that contradicts them produces a confident, wrong
+dashboard rather than a broken one. A layout bug is visible; a wrong supply-risk basis is
+not.
+
+### What each rule protects against
+
+1. **Segmentation is MARKET data, not a Lilly spend split.** Corrected once already; the
+   note says so, to stop it being reintroduced a third time.
+2. **Supply risk is log-scaled average spend per vendor, NOT vendor count.** Vendor count
+   made Scientific Research look like the safest segment purely because it had the most
+   vendors. Many small vendors is not safety; it is fragmentation.
+3. **Type ladder 11/13/20/28, no 9px** - and carried with its evidence rule: verified by a
+   census of RENDERED size, not declared size, because SVG text scales with its container
+   and two charts sit in columns narrower than their viewBox (0.965 and 0.839). "Declared
+   size is not sufficient evidence" is the part worth keeping; re-measure after any layout
+   change to those columns.
+4. **Porter is ONE overlaid pentagon.** No legend, because each read card carries a colour
+   bar in its segment's colour, so the card IS the legend. Segment colour is load-bearing
+   rather than decorative: it is the only thing binding a shape to its read.
+
+Smoke 33/0 - 31 packages extract-and-retest verified.
+
+**WS B is now complete: B1, B2, B3, B4 (scoped), B5-B8, B9.**
