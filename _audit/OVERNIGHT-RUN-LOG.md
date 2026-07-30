@@ -4800,3 +4800,45 @@ Smoke 33/0 - manifest check PASS - 33 packages extract-and-retest verified.
 **OPEN, asked and awaiting Marc:** (1) Theo's Field Guide vs the whole Personal Command
 Center section: which comes off? (2) Should my-work ship in the package at all, or be held
 back entirely?
+
+---
+
+## Theo's Field Guide off the launcher; Field Guide AND My Work held back from the package.
+
+Marc, 2026-07-30: take **only** Field Guide off the launcher (not the whole Personal Command
+Center section), and **neither Field Guide nor My Work should ship**.
+
+### Launcher
+
+Field Guide removed from all five surfaces. PCC is now **5 skills** (voice-profile,
+process-navigator, timeline-builder, workflow-map, meeting-prep-brief), all of which are
+finished and stay reachable. Menu totals 27 -> 26. Drift check PASS.
+
+### Package: 33 -> 31
+
+`HELD_BACK` added to `ship_manifest.py` as **data, not logic**, because "why isn't this in
+the package?" must be answerable without reading code. A skill absent from a release with
+no recorded reason gets quietly re-added by the next person who notices it missing, which
+is how an unfinished feature reaches a user.
+
+The packager now PRINTS what it held back and why, every run. A silent omission and a
+deliberate one look identical in a file listing; they should not look identical in the
+build log.
+
+**These are not broken. They are not ready, which is a different thing** and the
+distinction is recorded, so nobody "fixes" them into shipping.
+
+### Why holding back beats shipping-but-unadvertised
+
+My Work renders from data Lilly cannot supply yet. Someone reaching it by trigger phrase
+would get a dashboard of empty panels, which is a worse first impression than the feature
+not existing. The panel-contract work makes those panels *honest* about being empty; it
+does not make them useful.
+
+### Marc's standing instruction, recorded
+
+**Once building is done, run a ship / no-ship review across the whole suite.** Today's two
+were caught because they came up in conversation. That is not a process. Logged as a task.
+
+31 packages, extract-and-retest verified. Smoke 33/0 (the repo still holds 33 skills; the
+two held-back ones are built and tested, just not packaged).

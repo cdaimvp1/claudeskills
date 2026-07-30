@@ -255,7 +255,12 @@ def main(argv):
             return 2
         print("(--force: continuing to show what WOULD be built; nothing will be written)")
 
-    ship, repo_only, anomalies = classify()
+    ship, repo_only, anomalies, held = classify()
+    if held:
+        from ship_manifest import HELD_BACK
+        print("\n  HELD BACK, not packaged (%d):" % len(held))
+        for h in held:
+            print("    %-34s %s" % (h, HELD_BACK[h][:66]))
     print("\n" + "=" * 88)
     print("BUILDING %d PACKAGE(S)" % len(ship))
     print("=" * 88)

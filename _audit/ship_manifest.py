@@ -80,8 +80,28 @@ def kb(path):
     return total // 1024
 
 
+# Skills that BUILD and PASS but are deliberately not shipped yet.
+#
+# This is data, not logic, because "why isn't this in the package?" must be answerable
+# without reading code. A skill absent from a release with no recorded reason gets quietly
+# re-added by the next person who notices it missing, which is how an unfinished feature
+# reaches a user.
+#
+# These are not broken. They are not ready, which is a different thing and the distinction
+# matters: nothing here should be "fixed" to make it ship.
+HELD_BACK = {
+    "my-work-1c344a":
+        "Marc, 2026-07-30: the dashboard and feature are unfinished, and the data needed to "
+        "make them worthwhile is not available yet. Shipping it would put a dashboard of "
+        "empty panels in front of a user, which is a worse first impression than the "
+        "feature not existing.",
+    "theos-field-guide-1c344a":
+        "Marc, 2026-07-30: not ready to ship. Held back with my-work.",
+}
+
+
 def classify():
-    ship, repo_only, anomalies = [], [], []
+    ship, repo_only, anomalies, held = [], [], [], []
 
     for name in sorted(os.listdir(ROOT)):
         p = os.path.join(ROOT, name)
@@ -90,7 +110,9 @@ def classify():
         has_skill = os.path.isfile(os.path.join(p, "SKILL.md"))
         looks_installable = name.endswith("-1c344a")
 
-        if has_skill and looks_installable:
+        if has_skill and looks_installable and name in HELD_BACK:
+            held.append(name)
+        elif has_skill and looks_installable:
             ship.append(name)
         elif not looks_installable:
             repo_only.append((name, "no installable suffix; build/audit/docs tree"))
@@ -98,7 +120,7 @@ def classify():
             # installable NAME but no SKILL.md: the interesting case
             anomalies.append(name)
 
-    return ship, repo_only, anomalies
+    return ship, repo_only, anomalies, held
 
 
 def dead_weight_in(skill):
@@ -135,7 +157,7 @@ def dead_weight_in(skill):
 
 
 def main(argv):
-    ship, repo_only, anomalies = classify()
+    ship, repo_only, anomalies, held = classify()
 
     payload = {"ship": [], "repo_only": [n for n, _ in repo_only],
                "anomalies": anomalies, "dead_weight": []}
@@ -154,6 +176,12 @@ def main(argv):
                              "ship_kb_after_strip": ship_kb - dead_kb}
         print(json.dumps(payload, indent=2))
         return 0
+
+    if held:
+        print("HELD BACK, deliberately not shipped (%d):" % len(held))
+        for h in held:
+            print("  %-34s %s" % (h, HELD_BACK[h][:70]))
+        print()
 
     print("=" * 92)
     print("SHIP MANIFEST: what goes in the package, what stays in the repo")

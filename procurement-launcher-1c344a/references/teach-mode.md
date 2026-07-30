@@ -102,7 +102,7 @@ Present the 27 skills grouped by the six pipelines. The learner selects the ones
 - Category Strategy (2): category strategy, market rate benchmarking
 - Cost & Commercial (3): pro-forma builder, should-cost builder, invoice & rate-card auditor
 - Executive Summary (1): executive summary package
-- Personal Command Center (6): voice profile, Theo's Field Guide, process navigator, timeline builder, workflow map, meeting prep brief
+- Personal Command Center (5): voice profile, process navigator, timeline builder, workflow map, meeting prep brief
 
 That is 27 skills across six pipelines (8 + 7 + 2 + 3 + 1 + 6). (A 28th, procurement-help-desk, an end-user/stakeholder front door, is being scaffolded separately and is not yet live; do not teach it as an available skill until it ships.)
 
@@ -140,7 +140,7 @@ Tappable:
 
 Deliver a focused summary (not the full changelog) covering where the suite is now:
 
-- 27 skills organized into six pipelines: Contracts & Negotiations, Sourcing / RFx, Category Strategy, Cost & Commercial, Executive Summary, Personal Command Center.
+- 26 skills organized into six pipelines: Contracts & Negotiations, Sourcing / RFx, Category Strategy, Cost & Commercial, Executive Summary, Personal Command Center.
 - Newer specialist skills to know: scope-sow-architect (scope/SOW quality diagnostic and rewrite), sole-source-challenge (challenges a single-supplier pick into a Defensibility verdict), deal-room (a live, round-by-round negotiation manager), and invoice-rate-card-auditor (line-level invoice-vs-contract audit with kernel-verified math).
 - THEO can now name a full ordered PATH from a free-text need, not just one skill: it classifies the need, names the path up front (e.g. supplier-landscape -> rfp-engine -> rfp-response-analysis -> evaluation-engine), launches step 1, and primes each next step from the chain data. This is guided handoff (you drive, Theo leads); Theo does not auto-run a whole pipeline for you. (decision-deck and procurement-options-analysis, which previously anchored the ends of this example path, were retired; the suite no longer has a dedicated deck-builder or path-selector skill.)
 - THEO launcher (you're using it right now): split-panel master-detail menu with live search and a three-tier Teach mode.

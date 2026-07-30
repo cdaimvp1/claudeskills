@@ -885,116 +885,6 @@
       "successors": "opt-in drafting service for executive-summary-package, rfp-engine (invitation/award emails), commercial/legal-negotiation-prep (talking points), lilly-contract-review (SME escalation emails, opt-in)"
     },
     {
-      "id": "theos-field-guide",
-      "pipeline": "Personal Command Center",
-      "helps": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-      "shipped": true,
-      "rows": [
-        {
-          "trigger": "open my field guide",
-          "title": "🦖 Theo's Field Guide",
-          "what": "The work-graph personal command center. Organizes your work as Issues (not as a flat inbox digest). Tracks state, owners, evidence, and the next move per Issue.",
-          "howto": "Run on demand. Reads your inbox, calendar, and Teams via M365 connector. Optional hashtag protocol for explicit state signaling. Stale-review walkthrough cleans up quiet items in a few taps.",
-          "output": "An inline widget dashboard with 5 fixed sections (Action Needed, Waiting On, Today/Tomorrow, Stale, Snoozed) and real clickable action buttons per Issue.",
-          "on_widget": true,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "field guide",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "what's on my plate",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "end of day",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "weekly review",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "what should i do next",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "quick capture",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "show issues involving [entity]",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "turn this email into an issue",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        },
-        {
-          "trigger": "daily digest",
-          "title": "",
-          "what": "Work-graph personal command center (v2.2, replaces daily-digest). v2.0: Issues with Tasks/owner/state/evidence; hashtag protocol opt-in; three-tier inference; inline widget dashboard with 5 fixed sections; stale-review walkthrough. v2.1 adds: End-of-day mode (close out today); Weekly review (catch what fell off); \"Now what?\" suggestion engine (highest-leverage next action); Quick capture (single-message Issue creation); OOO-aware inference (annotates Issues waiting on OOO people); Cross-Issue relationship view; Email-to-Issue paste; Owner-handoff drafter. v2.2 adds: terminal-state provenance guard; work-classification vocabulary (ACTIONABLE-ASK / WAITING / FYI-EVIDENCE / NOISE); confirm-required inbound Issue proposals (never auto-create); repeat_request_count and waiting_since fields; object-form history. Migrates legacy daily_digest_state.json on first run.",
-          "howto": "",
-          "output": "",
-          "on_widget": false,
-          "upload": "nothing - reads inbox/calendar/Teams via M365 connector",
-          "helpful": "active Issues with stakeholder rosters"
-        }
-      ],
-      "in_teach_mode": false,
-      "_id_cleaned_from": "theos-field-guide 🦖"
-    },
-    {
       "id": "process-navigator",
       "pipeline": "Personal Command Center",
       "helps": "Procurement process / policy / threshold / system-requirement Q&A; live-reads Lilly SharePoint policy sources via M365",
@@ -1268,9 +1158,11 @@
     "lilly-procurement-kernels",
     "my-work",
     "procurement-launcher",
-    "rfx-hub"
+    "rfx-hub",
+    "theos-field-guide"
   ],
   "_deferred": {
-    "my-work": "Deliberately OFF the launcher (Marc, 2026-07-30): the dashboard and feature are unfinished and the data needed to make them worthwhile is not available yet. The skill still ships; it is simply not advertised on the menu. Do not re-add it to routing without Marc."
+    "my-work": "Deliberately OFF the launcher (Marc, 2026-07-30): the dashboard and feature are unfinished and the data needed to make them worthwhile is not available yet. ALSO held back from the shipped package (Marc, 2026-07-30). Do not re-add it to routing without Marc.",
+    "theos-field-guide": "Deliberately OFF the launcher AND held back from the shipped package (Marc, 2026-07-30), same reason as my-work: not ready. Do not re-add to routing or packaging without Marc."
   }
 }
