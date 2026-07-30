@@ -39,7 +39,7 @@ KERNEL_FILENAME = "numeric_kernel.py"
 # minutes of being introduced: category-strategy received a copy made before
 # validate_rows() existed. One shared module means one drift problem, so it is tracked
 # here rather than trusted to whoever remembers to re-copy.
-EXTRA_VENDORED = ("provenance.py", "panel_contract.py")
+EXTRA_VENDORED = ("provenance.py", "panel_contract.py", "journey_state.py")
 MANIFEST_FILENAME = "kernel_manifest.json"
 
 # Copies that are KNOWINGLY behind the source, with the reason. These report as

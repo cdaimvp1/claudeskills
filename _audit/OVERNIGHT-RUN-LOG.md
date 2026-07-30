@@ -4506,3 +4506,62 @@ it rather than failing.
 
 manifest check PASS - smoke 33/0 - J1 intake check still PASS - malicious sweep
 SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages extract-and-retest verified.
+
+---
+
+## J3 — cross-session journey state. DONE. WS J IS COMPLETE.
+
+`journey_state.py` in the kernels, vendored to `procurement-launcher` and
+`meeting-prep-brief`. Selftest **22/22**.
+
+### Copied, not invented
+
+THEO had no persisted state at all, so it could not tell a first run from a later one
+except by re-reading the chat. Exactly one skill already solved this properly:
+timeline-builder's `timeline_calibration.json` - small, typed, Project knowledge with a
+file fallback, PRESENCE gating first-run behaviour, and a troubleshooting note telling the
+user how to recover it. J3 said copy that shape rather than add a second pattern to the
+suite. This does, down to reusing its recovery wording.
+
+### The one thing it refuses to store
+
+A record carries the request key, the skills run, what each produced **as a name and a
+type**, CONFIRMED-versus-ASSUMED inputs, and the next hop.
+
+**It never stores artifact content, and `validate()` refuses a record that carries any** -
+at the top level, nested at depth, or disguised as a long string under an innocent key. A
+state file accumulating contract text or supplier data becomes a quiet second copy of
+governed material sitting in Project knowledge under nobody's retention rule. "You have
+the shortlist from supplier-landscape" needs a name, not the shortlist.
+
+### CONFIRMED vs ASSUMED is the point of the record
+
+Re-asking something already answered is the friction J3 removes. But carrying an ASSUMPTION
+forward silently is worse than re-asking: **it hardens a guess into a fact across sessions
+and the user never sees the moment it happened.** A later run may skip what was CONFIRMED
+and must SURFACE what was ASSUMED. There is deliberately no third state: "probably" is an
+assumption wearing a confirmation's clothes.
+
+### J3's stated verification, both halves
+
+- **second run detects the file and does not re-ask** (T4-T6): produces primed context
+  naming the last skill, its artifact and the next hop
+- **deleting it returns first-run with a recoverable message** (T7-T8), and the same for a
+  corrupt file (T9) or one from a different schema version (T10), because stale state
+  silently misapplied is worse than no state
+
+### meeting-prep-brief's aspirational claim is now real
+
+Its line "the brief gets richer when state accumulates across meetings with the same
+counterparty" had no file, no schema and no read-back step. It now points at the mechanism,
+and says plainly that absent state this is a first meeting.
+
+### Verified
+
+Selftest 22/22 - smoke 33/0 - J2 manifest check PASS - J1 intake check PASS - kernel
+manifest journey_state 2 of 2, panel_contract 4 of 4, provenance 5 of 5 - malicious sweep
+SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages extract-and-retest verified.
+
+# ============================================================================
+# WS J COMPLETE: J1 conversational intake, J2 routing manifest, J3 journey state.
+# ============================================================================

@@ -377,6 +377,50 @@ No ASCII frame, no sprawl. If the user is genuinely unsure which pipeline applie
 
 There is no separate launch card or upload guidance in Theo. The target skill handles upload onboarding via S0.
 
+## Journey state (J3): telling a first run from a later one
+
+`journey_state.py` persists a small typed record so this skill knows what already happened
+instead of re-reading the chat or re-asking.
+
+```bash
+python journey_state.py <state.json>    # validate and print the resume brief
+```
+
+**The pattern is copied, not invented.** `timeline-builder`'s `timeline_calibration.json`
+already solved this properly: small, typed, saved to Project knowledge with a downloadable
+file fallback, its PRESENCE gating first-run behaviour, and a troubleshooting note telling
+the user how to recover it. J3's instruction was to copy that shape rather than add a
+second one to the suite, and this does.
+
+**Save to** Project knowledge (preferred), or emit as a downloadable file.
+
+### What it stores, and the one thing it refuses to
+
+Request key, the skills already run, what each produced **as a name and a type**, which
+inputs were CONFIRMED versus ASSUMED, and the next suggested hop.
+
+**It never stores artifact content, and the validator refuses a record that carries any.**
+A state file accumulating contract text or supplier data becomes a quiet second copy of
+governed material, sitting in Project knowledge under nobody's retention rule. "You have
+the shortlist from supplier-landscape" needs a name, not the shortlist.
+
+### CONFIRMED versus ASSUMED is the point of the record
+
+Re-asking something already answered is the friction this removes. But carrying an
+ASSUMPTION forward silently is worse than re-asking: it hardens a guess into a fact across
+sessions and the user never sees the moment it happened.
+
+So a later run may skip what was **CONFIRMED**, and must **surface what was ASSUMED** for
+reconfirmation rather than treat it as settled. There is deliberately no third state:
+"probably" is an assumption wearing a confirmation's clothes.
+
+### Absence is never an error
+
+No file means first run. A corrupt file, or one from a different schema version, means
+first run **plus a message saying how to recover it** ("the state file is not in the
+conversation or Project; paste it back to continue where you left off"). The skill proceeds
+either way and never blocks: stale state silently misapplied is worse than no state.
+
 ## Routing manifest (J2: one source of truth, and a check that it stays that way)
 
 `routing-manifest.json` is the single registry. The routing table below, the Markdown
