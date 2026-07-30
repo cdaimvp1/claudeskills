@@ -1,0 +1,801 @@
+{
+  "dashboard": "RFx",
+  "_note": "Panel-source contract. Panels NEVER disappear when data is missing: they stay and state why, naming the source they expected. Sources marked access=internal without confirmed_by_owner are named from inference and must be confirmed by Marc before they are trusted.",
+  "panels": [
+    {
+      "id": "rfx_event_status",
+      "title": "RFx Event & Status",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "event name, stage, estimated TCO",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ]
+        },
+        {
+          "name": "health",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            }
+          ],
+          "note": "derived from open gates and outstanding scores, never asserted"
+        },
+        {
+          "name": "CCI classification",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            }
+          ],
+          "note": "set when the RFx was issued; it is not inferred from the responses"
+        },
+        {
+          "name": "next action",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evaluation_panel",
+      "title": "Evaluation Panel",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "named evaluators and roles",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            }
+          ],
+          "note": "the panel named at issue"
+        },
+        {
+          "name": "scorecards submitted",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "suppliers_contacts",
+      "title": "Suppliers & Contacts",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "invited bidders and contacts",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            }
+          ]
+        },
+        {
+          "name": "gate status per bidder",
+          "sources": [
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evaluation_summary",
+      "title": "Evaluation Summary",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "coverage and leader read",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "non-conformance on must-haves",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blockers",
+      "title": "Delaying Progress & Internal Flags",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "what is holding the event",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            }
+          ]
+        },
+        {
+          "name": "funding confirmation",
+          "sources": [
+            {
+              "name": "Business case funding confirmation",
+              "access": "internal",
+              "type": "system",
+              "how": "Finance confirmation that the work order is funded"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "headline_metrics",
+      "title": "Headline Metrics",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "suppliers evaluated, requirements, coverage",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            }
+          ]
+        },
+        {
+          "name": "scorecards submitted",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "advisory_ranking",
+      "title": "Advisory Ranking",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "weighted fit per bidder",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            }
+          ],
+          "note": "weights come from the issued pack; scores from the panel"
+        },
+        {
+          "name": "coverage per bidder",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "gating flags",
+          "sources": [
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "criteria_weights",
+      "title": "Criteria & Weights",
+      "tab": "Scoring",
+      "fields": [
+        {
+          "name": "criteria, weights, mandatory flags",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scorecard_matrix",
+      "title": "Scorecard Matrix",
+      "tab": "Scoring",
+      "fields": [
+        {
+          "name": "per-evaluator per-criterion scores",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "consensus or variance",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requirements_coverage",
+      "title": "Requirements Coverage",
+      "tab": "Scoring",
+      "fields": [
+        {
+          "name": "met / partial / not met per requirement",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            }
+          ]
+        },
+        {
+          "name": "evidence cited by the bidder",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scoring_gaps",
+      "title": "Scoring Gaps",
+      "tab": "Scoring",
+      "fields": [
+        {
+          "name": "criteria with no score submitted",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ],
+          "note": "an unsubmitted score is NOT_ATTEMPTED, never a low score"
+        }
+      ]
+    },
+    {
+      "id": "bid_leveling",
+      "title": "Bid Leveling",
+      "tab": "Analysis",
+      "fields": [
+        {
+          "name": "normalised price per bidder",
+          "sources": [
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ],
+          "note": "leveling must complete for every priced bidder before scoring uses price"
+        },
+        {
+          "name": "assumptions each bidder priced against",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deal_terms_field",
+      "title": "Deal Terms & The Field",
+      "tab": "Analysis",
+      "fields": [
+        {
+          "name": "term, pricing model, escalator, exit per bidder",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ]
+        },
+        {
+          "name": "market norm",
+          "sources": [
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deal_economics",
+      "title": "Deal Economics",
+      "tab": "Analysis",
+      "fields": [
+        {
+          "name": "annual and 3-year outlay per bidder",
+          "sources": [
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ]
+        },
+        {
+          "name": "prior spend baseline",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "prior-spend extract for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "supplier_comparison",
+      "title": "Supplier Comparison · Terms vs the Field",
+      "tab": "Analysis",
+      "fields": [
+        {
+          "name": "side-by-side terms",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "counter_read",
+      "title": "The Counter-Read",
+      "tab": "Analysis",
+      "fields": [
+        {
+          "name": "where the field is weak and Lilly has room",
+          "sources": [
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "landscape_carryover",
+      "title": "Landscape Carry-Over",
+      "tab": "Analysis",
+      "fields": [
+        {
+          "name": "why each bidder was shortlisted",
+          "sources": [
+            {
+              "name": "Supplier landscape assessment",
+              "access": "internal",
+              "type": "analysis",
+              "how": "the supplier-landscape skill output that produced this shortlist",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recommendation",
+      "title": "Recommendation",
+      "tab": "Recommendation",
+      "fields": [
+        {
+          "name": "recommended bidder and rationale",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ]
+        },
+        {
+          "name": "conditions before award",
+          "sources": [
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            },
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "decision rationale",
+          "sources": [
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ],
+          "note": "advisory; the panel decides and the award stays subject to contract"
+        }
+      ]
+    },
+    {
+      "id": "gate_status",
+      "title": "Gate Status",
+      "tab": "Recommendation",
+      "fields": [
+        {
+          "name": "open gates per bidder and owner",
+          "sources": [
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "award_risks",
+      "title": "Award Risks",
+      "tab": "Recommendation",
+      "fields": [
+        {
+          "name": "what could unwind the award",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "SME gate outcomes",
+              "access": "internal",
+              "type": "review",
+              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+            },
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "business_case",
+      "title": "Business Case",
+      "tab": "Business Case & Approval",
+      "fields": [
+        {
+          "name": "value case and savings basis",
+          "sources": [
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            },
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "prior-spend extract for this category"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking output for this category"
+            }
+          ]
+        },
+        {
+          "name": "funding confirmation",
+          "sources": [
+            {
+              "name": "Business case funding confirmation",
+              "access": "internal",
+              "type": "system",
+              "how": "Finance confirmation that the work order is funded"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "approval_route",
+      "title": "Approval Route",
+      "tab": "Business Case & Approval",
+      "fields": [
+        {
+          "name": "required approvals and thresholds",
+          "sources": [
+            {
+              "name": "The RFx pack Lilly issued",
+              "access": "internal",
+              "type": "document",
+              "how": "the requirements, weights and instructions issued to bidders",
+              "confirmed_by_owner": true
+            }
+          ],
+          "note": "the approval route follows the value and CCI set at issue"
+        },
+        {
+          "name": "approvals obtained",
+          "requires_input": true,
+          "note": "an approval is recorded by a person, not retrieved from a document"
+        }
+      ]
+    },
+    {
+      "id": "handoff_to_deal",
+      "title": "Handoff to Deal",
+      "tab": "Business Case & Approval",
+      "fields": [
+        {
+          "name": "what carries into contract negotiation",
+          "sources": [
+            {
+              "name": "Supplier responses to the RFx",
+              "access": "supplier",
+              "type": "document",
+              "how": "each bidder's submitted response, per requirement"
+            },
+            {
+              "name": "Supplier priced responses",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the pricing schedule each bidder submitted"
+            },
+            {
+              "name": "Evaluation panel scores",
+              "access": "internal",
+              "type": "review",
+              "how": "each named evaluator's submitted scorecard",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

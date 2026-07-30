@@ -4064,3 +4064,75 @@ Selftest 86/86 - 0 console errors on all three - suite smoke 33/0 - hub self-con
 verified.
 
 **A5 and A6 are both complete.** A11 now waits only on A8, A9 and Marc's sign-off.
+
+---
+
+## Panel data contracts — Deal and RFx. (Marc: dashboards DESIGN LOCKED 2026-07-29)
+
+Marc locked the four dashboards' design and named the only two things that still mattered,
+neither of them visual:
+
+1. A panel with no data must NEVER disappear or sit blank. It stays and says why.
+2. Each panel must know its own sources, so retrieval goes to the 10-K or OFAC or the spend
+   data instead of a blind web search.
+
+**A8 (Landscape design uplift) is therefore CLOSED.** A9 (colour tokenising) is deferred,
+since a future redesign may redo it.
+
+### Before this, there was no panel-to-source map anywhere in the suite
+
+Deal: 0 files declaring a source. RFx: 0. The skill genuinely did search blind and hope.
+
+### Built
+
+`panel_contract.py` (shared, vendored, manifest-tracked) plus a contract per dashboard:
+
+| | panels | fields | sources | retrieval |
+|---|---|---|---|---|
+| Deal | 35 | 59 | 79 links | **11 source visits** |
+| RFx | 23 | 42 | 65 links | **9 source visits** |
+
+`retrieval_plan()` groups fields by source, so retrieval runs once per source collecting
+everything that source answers, rather than once per field. 79 lookups become 11 visits.
+That is the accuracy mechanism and the efficiency one at the same time.
+
+### The rule that carries the most weight
+
+Every empty state except one describes OUR PROCESS. `SEARCHED_NOT_FOUND` is the only one
+that makes a claim about the SUPPLIER. So it is the only one gated on evidence:
+**`resolve_state()` refuses to return it unless a retrieval actually ran and came back
+empty.** Absent that, the honest answer is NOT_ATTEMPTED.
+
+If a connector is down and the panel reads "no data found", a broken pipe silently becomes
+a clean finding and someone decides on it. T6 and T7 exist for that and nothing else.
+
+Every message names the source it expected, so "could not reach OFAC SDN" is actionable
+where "unavailable" is not.
+
+### Internal sources are flagged, never invented
+
+17 internal sources across the two contracts are named from inference and reported as
+needing Marc's confirmation rather than asserted: SME review outcomes, prior Lilly
+contracts, Lilly spend data, funding confirmation. **A confidently wrong internal system
+name is worse than an honest blank.**
+
+### It also found what only Marc can supply
+
+9 fields cannot be retrieved from anywhere and are marked `requires_input`, correctly:
+Lilly's WACC, the negotiation stage, who holds the pen, what Lilly intended (as opposed to
+what the contract says), Lilly's trading currency, and approvals obtained. Those are
+decisions and records, not documents.
+
+### Why a data file rather than renderer code
+
+Marc may redesign the dashboards later. The contract is per-panel DATA, so a layout change
+does not throw the work away.
+
+### Verified
+
+Selftest **40/40** - suite smoke 33/0 - kernel manifest: panel_contract 2 of 2, provenance
+5 of 5 - malicious sweep SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages
+extract-and-retest verified.
+
+**Next: the same contracts for Landscape and Category Strategy, which are partway there
+(1 file each) rather than starting from nothing.**

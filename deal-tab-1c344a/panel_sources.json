@@ -1,0 +1,1046 @@
+{
+  "dashboard": "Deal",
+  "_note": "Panel-source contract. Every panel declares what it needs, where each field comes from, and (via panel_contract.py) what it renders when a field is empty. Panels NEVER disappear when data is missing: they stay and state why. Sources marked access=internal without confirmed_by_owner are named from inference and must be confirmed by Marc before they are trusted.",
+  "panels": [
+    {
+      "id": "deal_snapshot",
+      "title": "Deal Snapshot",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "deal name, type, contract set",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "supplier legal entity",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "stage",
+          "requires_input": true,
+          "note": "the negotiation stage is a judgement the owner sets; no document states it"
+        },
+        {
+          "name": "evidence confidence",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ],
+          "note": "derived from how much of the contract set was actually supplied"
+        }
+      ]
+    },
+    {
+      "id": "state_of_play",
+      "title": "State of Play",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "who holds the pen",
+          "requires_input": true
+        },
+        {
+          "name": "last material event",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ],
+          "note": "the most recent dated redline or counter in the document set"
+        },
+        {
+          "name": "next expected move",
+          "requires_input": true
+        }
+      ]
+    },
+    {
+      "id": "next_steps",
+      "title": "Next Steps",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "sequenced packages",
+          "sources": [
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "give / get per package",
+          "sources": [
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            }
+          ]
+        },
+        {
+          "name": "round target",
+          "sources": [
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking skill output for this category and role mix"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recommendation",
+      "title": "Recommendation",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "verdict and rationale",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "signature conditions",
+          "sources": [
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "top5_issues",
+      "title": "Top 5 Issues",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "issue, deviation, impact",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "recommended response",
+          "sources": [
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "commercial_headline",
+      "title": "Commercial Headline & Total-Deal ZOPA",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "ask, target, walk-away",
+          "sources": [
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            },
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking skill output for this category and role mix"
+            }
+          ]
+        },
+        {
+          "name": "TCO",
+          "sources": [
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            },
+            {
+              "name": "Agreed rate card",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the rate-card exhibit in the contract set"
+            }
+          ],
+          "note": "indicative until firm in negotiation; never a fabricated figure"
+        }
+      ]
+    },
+    {
+      "id": "evidence_gaps",
+      "title": "Evidence & Gaps",
+      "tab": "Overview",
+      "fields": [
+        {
+          "name": "documents supplied vs expected",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "missing documents",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ],
+          "note": "absence here is SEARCHED_NOT_FOUND only if the set was actually reviewed"
+        }
+      ]
+    },
+    {
+      "id": "doc_relationship_map",
+      "title": "Document Relationship Map",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "document hierarchy and incorporation",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "doc_family_register",
+      "title": "Document Family Register",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "each document, type, date, status",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "prior agreements in the family",
+          "sources": [
+            {
+              "name": "Prior Lilly contracts for this supplier",
+              "access": "internal",
+              "type": "system",
+              "how": "contract repository lookup by supplier legal entity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cross_doc_conflicts",
+      "title": "Cross-Document Conflicts & Gaps",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "conflicting terms across documents",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "order of precedence",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "playbook_scorecard",
+      "title": "Playbook Alignment Scorecard",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "per-clause position vs playbook",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "AI and privacy standard alignment",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "Lilly AI Standard",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/ai-standard.md",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Lilly Supplier Privacy Standard",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/dpa-review-checklist.md",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "navigator",
+      "title": "Navigator",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "clause index",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "findings_register",
+      "title": "Findings Register",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "finding, severity, clause reference",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "SME routing",
+          "sources": [
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intended_scope_recon",
+      "title": "Intended-Scope Reconciliation",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "what Lilly intended",
+          "requires_input": true,
+          "note": "intent is not in the supplier's paper; it comes from the requester"
+        },
+        {
+          "name": "what the contract says",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "delta",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contract_assumptions",
+      "title": "Contract Assumptions (supplier-stated)",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "assumptions the supplier has written in",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delivery_timeline",
+      "title": "Delivery Timeline",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "dates and milestones",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "raci",
+      "title": "Responsibility (RACI)",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "obligations by party",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "performance_slas",
+      "title": "Performance: SLAs, Acceptance & Change Control",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "SLA, remedy, acceptance, change process",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "market-standard comparison",
+          "sources": [
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking skill output for this category and role mix"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "missing_inputs",
+      "title": "Missing Inputs to Resolve",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "what is required and from whom",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "SME review outcome",
+              "access": "internal",
+              "type": "review",
+              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evidence_provenance",
+      "title": "Evidence Provenance",
+      "tab": "Terms & Review",
+      "fields": [
+        {
+          "name": "per-finding source and capture date",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "where_the_room_is",
+      "title": "Where the Room Is",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "levers and headroom",
+          "sources": [
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            },
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking skill output for this category and role mix"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "renewal_protection",
+      "title": "Renewal & Price Protection",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "escalator, cap, renewal mechanics",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "market norm for caps",
+          "sources": [
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking skill output for this category and role mix"
+            },
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "should_cost",
+      "title": "Should-Cost, Bottoms-Up",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "cost build-up",
+          "sources": [
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "rate inputs",
+          "sources": [
+            {
+              "name": "Agreed rate card",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the rate-card exhibit in the contract set"
+            },
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking skill output for this category and role mix"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zopa_sensitivity",
+      "title": "Total-Deal ZOPA · Sensitivity & Benchmarks",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "range and sensitivity",
+          "sources": [
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            }
+          ]
+        },
+        {
+          "name": "benchmark anchors",
+          "sources": [
+            {
+              "name": "External market benchmark",
+              "access": "licensed",
+              "type": "benchmark",
+              "how": "market-rate-benchmarking skill output for this category and role mix"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "value_ladder",
+      "title": "Ask → Negotiated Value Ladder",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "ask, concession steps, landed value",
+          "sources": [
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            },
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "topline_summary",
+      "title": "Top-Line Summary",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "headline economics",
+          "sources": [
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            },
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "financial_modeling",
+      "title": "Financial Modeling",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "model outputs",
+          "sources": [
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "prior spend baseline",
+          "sources": [
+            {
+              "name": "Lilly spend data",
+              "access": "internal",
+              "type": "system",
+              "how": "prior-spend extract for this supplier and category"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "discount_wacc",
+      "title": "Discount Control · WACC",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "discount rate",
+          "requires_input": true,
+          "note": "Lilly's WACC is a finance input, not a supplier or market figure"
+        }
+      ]
+    },
+    {
+      "id": "npv_curve",
+      "title": "NPV vs Discount Rate",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "cash flows",
+          "sources": [
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            },
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            }
+          ]
+        },
+        {
+          "name": "discount rate",
+          "requires_input": true
+        }
+      ]
+    },
+    {
+      "id": "assumptions_register",
+      "title": "Assumptions Register",
+      "tab": "Economics",
+      "fields": [
+        {
+          "name": "each assumption, owner, basis",
+          "sources": [
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "positions_workbench",
+      "title": "Positions · Per-term Workbench",
+      "tab": "Negotiation",
+      "fields": [
+        {
+          "name": "per-term current, target, fallback",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            },
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payoff",
+      "title": "Payoff · Where the Current Asks Land the Deal",
+      "tab": "Negotiation",
+      "fields": [
+        {
+          "name": "modelled outcome of the current asks",
+          "sources": [
+            {
+              "name": "Should-cost model",
+              "access": "internal",
+              "type": "model",
+              "how": "should-cost-builder skill output for this scope",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "Supplier pricing submission or quote",
+              "access": "supplier",
+              "type": "bid",
+              "how": "the priced response or quote attached to this deal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trading_currency",
+      "title": "What We Can Spend · Our Trading Currency",
+      "tab": "Negotiation",
+      "fields": [
+        {
+          "name": "concessions available to Lilly",
+          "requires_input": true,
+          "note": "what Lilly is willing to give is a decision, not a retrievable fact"
+        }
+      ]
+    },
+    {
+      "id": "the_asks",
+      "title": "The Asks · What We Want & What We Would Trade",
+      "tab": "Negotiation",
+      "fields": [
+        {
+          "name": "asks and trades",
+          "sources": [
+            {
+              "name": "Lilly MPT playbook",
+              "access": "internal",
+              "type": "policy",
+              "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
+              "confirmed_by_owner": true
+            },
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        },
+        {
+          "name": "priority order",
+          "requires_input": true
+        }
+      ]
+    },
+    {
+      "id": "alignment_map",
+      "title": "Alignment Map · Contested Terms",
+      "tab": "Negotiation",
+      "fields": [
+        {
+          "name": "agreed, contested, open terms",
+          "sources": [
+            {
+              "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
+              "access": "supplier",
+              "type": "document",
+              "how": "the documents attached to this analysis; cite clause and section"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
