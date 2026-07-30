@@ -4310,3 +4310,70 @@ outcome 16, contract repository 13, vendor master 8, PO/invoice 3, funding confi
 the contract-review hold.
 
 Startable without Marc: **B7a**, then the WS J chain.
+
+---
+
+## B7a prose prune — DONE. The correct outcome was to remove nothing.
+
+`_audit/prose_prune.py`. 33 SKILL files, **400,728 words**, **words after: 400,728 (+0)**.
+
+### The safety property is machine-checked, because it had to be
+
+B7a's constraint is "no rule deleted, only restated once". At 400k words that cannot be
+eyeballed, so the tool takes a **rule inventory** before and after every removal: every
+normative statement (MUST / NEVER / ALWAYS / HARD RULE / refuse / do not), normalised. If a
+single rule leaves the set, the removal is **reverted and the run refuses**. A rule stated
+three times and left stated once passes, because the SET is unchanged. That is the plan's
+wording turned into a check rather than an intention.
+
+### Finding 1: zero exact duplicate rule blocks across all 33 files
+
+The auto-safe operation ("a rule restated verbatim, keep one copy") found nothing to do.
+The prose is not literally duplicated.
+
+### Finding 2: my own pattern over-reported by 46 hits, and the bug is instructive
+
+First run: 16 mode-picker and 37 superseded blocks. After reading them, **essentially all
+were false positives.**
+
+`MODE_PICKER` matched `which mode` with **no trailing word boundary**, so it fired on
+"which **MODEL** to use (Opus vs Sonnet)" in eight files. It also counted cross-references
+to a "Mode Selection" heading, and a sentence saying the user is explicitly NOT asked to
+pick. `SUPERSEDED` matched any use of the word, but prose DOCUMENTING that one thing
+supersedes another is current prose doing its job.
+
+**Eighth occurrence of pattern-matches-wording-not-mechanism in this programme, and the
+third that was mine.** Patterns narrowed to require the text to be self-describing about
+its own staleness: 53 hits became 7.
+
+### Finding 3: all 7 survivors should stay, and deleting two would cause harm
+
+| file | flagged | what it actually is |
+|---|---|---|
+| deal-room | superseded | current and accurate: the dashboard moved to deal-tab, this skill holds a marker |
+| evaluation-engine | mode picker | the OPPOSITE: it states the user is not asked to pick |
+| evaluation-engine | superseded | a LIVE rule: decision-deck retired, so do not auto-invoke a downstream |
+| lilly-brand-assets | superseded | the single documented no-green allowance. Current rule |
+| lilly-brand-assets | superseded | Slide Template house style, deliberately kept unused, and says so |
+| negotiation-simulator | mode picker | the ANTI-picker rule ("SKIP the picker entirely"). Deleting it would reverse the design principle it exists to enforce |
+| rfp-case-manager | mode picker | a changelog block. False positive |
+
+Removing the negotiation-simulator block would have **reversed** `feedback_skill_design_principles`,
+and removing the evaluation-engine one would have deleted the rule that stops an
+auto-invoke into a retired skill. A tool that deleted on pattern match would have done
+both.
+
+### The one judgement call for Marc
+
+`lilly-brand-assets`: the **Slide Template house style** is documented but used by no
+shipped skill, since its only consumer (decision-deck) was retired. The text says so
+explicitly and keeps it "for any future PPTX-producing skill". That is a deliberate
+decision already recorded in the file, so it is Marc's to reverse, not mine.
+
+### Verdict
+
+**B7a is satisfied by removing nothing.** The deliverable is the check, the recorded
+delta (+0 across every file), and the reasoning above. Manufacturing deletions to look
+productive would have been the actual failure here.
+
+Smoke 33/0. No SKILL file changed, so no repackage was needed.
