@@ -4261,3 +4261,52 @@ blank, and inferring one from a doc search is still inferring.
 
 Selftest **63/63** - smoke 33/0 - manifest panel_contract 4 of 4 - malicious sweep clean -
 33 packages extract-and-retest verified.
+
+---
+
+# ============================================================================
+# A11 LOCKED 2026-07-30. PHASE 1 CLOSES.
+# ============================================================================
+
+Marc confirmed the lock. Tag: `hubs-locked-2026-07-30`.
+
+All five Phase 1 hubs, plus Deep Dive built to the same standard:
+
+| hub | state |
+|---|---|
+| RFx | locked |
+| Category Strategy | locked |
+| Deep Dive | built 2026-07-29 (A5 + A6), locked |
+| My Work | built 2026-07-29 (A7), locked |
+| Landscape | locked as-is |
+| Deal | locked |
+
+**A8 and A9 are disposed of by the lock rather than completed.** A8 was the design uplift
+and A9 the recolor; neither survives a decision to stop changing the appearance. A9 also
+rested on a stale premise: no stoplight palette remains and the dominant colours are
+already MCM. The real residue is 231 distinct hardcoded colours a token swap cannot reach,
+recorded in `_audit/A8-A9-PROPOSALS.md` should a future redesign want it.
+
+### Evidence at lock
+
+hub self-containment **10 built artifacts / 0 findings** - in-browser sweep **0 console
+errors** on every hub - suite smoke **33 skills / 0 failed assertions** - malicious sweep
+SECRETS/BYPASS/OBFUSCATION/INJECTION **all 0** - kernel manifest **no unexplained drift** -
+**33 packages** extract-and-retest verified.
+
+### What this unblocks
+
+A11 was the gate holding WS B through WS H, and the root of the WS J chain:
+
+    A11 -> B7a -> J1 -> J2 -> (B7b, J3)
+
+Also unblocked: the slice contracts (#22) and B4 (#26).
+
+### RESUME POINTER
+
+Open and needing Marc: the **6 internal source names** (spend data 36 rows, SME review
+outcome 16, contract repository 13, vendor master 8, PO/invoice 3, funding confirmation 2);
+**#20** four orphaned dashboard items; **#21** D4 ownership column; **#24** whether to lift
+the contract-review hold.
+
+Startable without Marc: **B7a**, then the WS J chain.
