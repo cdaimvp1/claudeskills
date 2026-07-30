@@ -23,6 +23,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import build_profile_dashboard as BPD                                # noqa: E402
+import deepdive_traits as TR                                         # noqa: E402
 import deepdive_viz as VIZ                                           # noqa: E402
 from deepdive_schema import (                                        # noqa: E402
     CompositeScoreError, DIMENSIONS, FabricatedFigureError, GateError, SchemaError,
@@ -351,8 +352,87 @@ def run():
     ok("T63 the page is still self-contained after stage 2",
        'src="http' not in page and "fetch(" not in page)
 
+
+    # ============================================================================
+    # A6: compose by traits. The verification bar the plan sets is "render one
+    # supplier of each type; assert no panel renders an invented value and every
+    # omitted panel is omitted by TRAIT, not by GAP".
+    # ============================================================================
+    import tempfile
+    pages = {}
+    for name, et in (("Snowflake", "public"), ("Databricks", "private"),
+                     ("BigQuery", "hyperscaler_product")):
+        out = os.path.join(tempfile.mkdtemp(), "d.html")
+        rr = BPD.build(None, out, name)
+        pages[et] = open(out, encoding="utf-8").read()
+        ok("T65 %s renders as entity type %r" % (name, et), rr["entity_type"] == et,
+           "got %s" % rr["entity_type"])
+
+    ok("T66 public and private compose the SAME number of panels, because the layout is "
+       "one base composed by traits rather than a per-type variant",
+       len(TR.layout("public")["panels"]) == len(TR.layout("private")["panels"]))
+    ok("T67 a hyperscaler product composes FEWER panels than a standalone company",
+       len(TR.layout("hyperscaler_product")["panels"])
+       < len(TR.layout("public")["panels"]))
+
+    # The distinction A6 exists for.
+    ok("T68 the hyperscaler product omits the financial trend BY TRAIT",
+       TR.disposition("financial_trend", "hyperscaler_product", True) == "OMIT_BY_TRAIT")
+    ok("T69 and having data does NOT override a trait omission, because a category error "
+       "is not a research action",
+       TR.disposition("financial_trend", "hyperscaler_product", True)
+       == TR.disposition("financial_trend", "hyperscaler_product", False))
+    ok("T70 for a public company the SAME panel with no data is a GAP, not a trait omission",
+       TR.disposition("financial_trend", "public", False) == "GAP")
+    ok("T71 and with data it renders",
+       TR.disposition("financial_trend", "public", True) == "RENDER")
+
+    ok("T72 the hyperscaler page shows a NOT-APPLICABLE card for the omitted financials",
+       "Not applicable to this supplier type" in pages["hyperscaler_product"])
+    ok("T73 and it does NOT present them as information required, which would send "
+       "someone hunting for a document that cannot exist",
+       "Information required" not in pages["hyperscaler_product"].split(
+           "Parent financial position")[0].split("Financial health")[-1])
+    ok("T74 the public page never shows a not-applicable financial card",
+       "no standalone financial history" not in pages["public"])
+    ok("T75 the hyperscaler page states where viability IS assessed instead",
+       "Parent financial position" in pages["hyperscaler_product"]
+       and "Alphabet" in pages["hyperscaler_product"])
+
+    # No invented values.
+    ok("T76 the private company shows NO market capitalisation, because it has none",
+       "market cap" not in pages["private"].lower())
+    ok("T77 the private company's financial viability reads as insufficient rather than "
+       "being filled in", "Insufficient evidence" in pages["private"])
+    ok("T78 the private company's unresolved UBO is stated",
+       "Ultimate beneficial ownership" in pages["private"])
+    ok("T79 the hyperscaler DOES draw an ownership tree, because entity, offering and "
+       "service genuinely differ",
+       VIZ.choose_ownership({"nodes": [{"id": "a"}, {"id": "b"}, {"id": "c"}],
+                             "contracting_entity_differs": True})[0] == "tree")
+    ok("T80 and the page separates ultimate parent, contracting entity and offering",
+       all(w in pages["hyperscaler_product"]
+           for w in ("Ultimate parent", "Contracting entity", "Offering")))
+
+    # Refusals.
+    def unknown_type():
+        TR.traits_for("joint venture")
+    raises("T81 refuses an unknown entity type rather than silently picking a layout that "
+           "would ask for evidence the supplier may not have", TR.TraitError, unknown_type)
+
+    def undeclared_panel():
+        TR.applies("made_up_panel", "public")
+    raises("T82 refuses an undeclared panel, so applicability is declared not assumed",
+           TR.TraitError, undeclared_panel)
+
+    ok("T83 every declared omission carries a reader-facing reason, so no absence is "
+       "unexplained",
+       all(TR.omission_note(p, et)
+           for et in TR.ENTITY_TYPES
+           for p in TR.PANELS if not TR.applies(p, et)))
+
     BPD.build()
-    ok("T64 rebuilds clean after the tamper tests", True)
+    ok("T84 rebuilds clean after the tamper tests", True)
 
     print("=" * 90)
     print("SUMMARY: %d/%d passed, %d failed" % (len(PASS), len(PASS) + len(FAIL), len(FAIL)))

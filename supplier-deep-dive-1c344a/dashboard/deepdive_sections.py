@@ -72,6 +72,18 @@ def _needcard(text):
             '<div>%s</div></div>' % esc(text))
 
 
+def _traitcard(text):
+    """A panel omitted because the supplier TYPE has no such thing.
+
+    Deliberately styled differently from the information-required card. One says "go and
+    find this"; the other says "this does not exist for this kind of supplier". A reader
+    who cannot tell them apart will either hunt for a document that cannot exist or
+    quietly excuse research nobody did.
+    """
+    return ('<div class="trait"><div class="traitk">Not applicable to this supplier '
+            'type</div><div>%s</div></div>' % esc(text))
+
+
 # --------------------------------------------------------------- 1. Company & Ownership
 
 def company_ownership(s, kind, reason, map_kind, map_reason):
@@ -184,7 +196,43 @@ def capabilities(s, net_kind, net_reason):
 
 # --------------------------------------------------------------- 3. Financial & Market
 
-def financial(s, trend_kind, trend_reason, peer_kind, peer_reason):
+def financial(s, trend_kind, trend_reason, peer_kind, peer_reason, traits=None):
+    """Subtab 3. This is the section traits actually change.
+
+    A product inside a hyperscaler has no standalone balance sheet, so the trend, bridge
+    and peer panels are omitted BY TRAIT and the parent's position is assessed instead.
+    Rendering them empty would invite someone to fill them in.
+    """
+    import deepdive_traits as T
+    et = traits or T.traits_for(s.get("entity_type"))
+
+    if not T.applies("financial_trend", et):
+        parent = s.get("parent") or {}
+        parent_block = (
+            '<div class="metric"><div class="mv">%s</div>'
+            '<div class="mk">Parent entity</div><div class="ms">%s</div></div>'
+            % (esc(parent.get("name") or "Parent not identified"),
+               esc(parent.get("assessment") or "Parent financial position not assessed")))
+        return """
+    <section><h2>Financial health</h2>%(t1)s</section>
+    <section><h2>Parent financial position</h2>
+      <p class="hint">Financial viability reads at the parent for a product inside a
+         larger company.</p>%(parent)s</section>
+    <section><h2>Peer position</h2>%(t2)s</section>
+    <section><h2>Commercial model drivers</h2>
+      <p class="hint">What makes the bill move, rather than a single annual figure.</p>
+      <div class="deps">%(drivers)s</div></section>
+    """ % {"t1": _traitcard(T.omission_note("financial_trend", et)),
+           "t2": _traitcard(T.omission_note("peer_position", et)),
+           "parent": parent_block,
+           "drivers": "".join(
+               '<div class="dep" style="border-color:%s"><div class="depk">%s '
+               'variability</div><div class="depn">%s</div><div class="depm">%s</div>'
+               '</div>'
+               % (_c(d.get("variability", "")), esc(d.get("variability")),
+                  esc(d.get("driver")), esc(d.get("note") or "&mdash;"))
+               for d in s.get("commercial_drivers") or [])}
+
     periods = s.get("financial_periods") or []
     if trend_kind == "line":
         pts = " ".join("%d,%d" % (i * 60 + 10, 60) for i in range(len(periods)))
@@ -378,6 +426,9 @@ EXTRA_CSS = """
 .need{border:1px dashed %(amber)s;border-radius:3px;padding:13px 15px;font-size:13px}
 .needk{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:%(amber)s;
        font-weight:700;margin-bottom:5px}
+.trait{border-left:3px solid %(line)s;padding:6px 0 6px 13px;font-size:13px;color:%(mut)s}
+.traitk{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:%(mut)s;
+        font-weight:700;margin-bottom:4px}
 .otree{display:flex;flex-wrap:wrap;gap:12px}
 .onode{border:1px solid %(line)s;border-left:3px solid %(blue)s;border-radius:3px;
        padding:11px 14px;min-width:220px}

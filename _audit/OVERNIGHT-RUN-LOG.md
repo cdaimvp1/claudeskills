@@ -3997,3 +3997,70 @@ Selftest **65/65** (up from 35; T34-T63 cover selection and the six panes) - in-
 
 **A5 is complete.** A6 (supplier-type adaptation: public / private / hyperscaler product)
 is the remaining Deep Dive item and depends on this.
+
+---
+
+## A6 compose-by-traits — DONE. A5 and A6 both complete.
+
+`deepdive_traits.py` + 21 new tests. Selftest **86/86** (was 65).
+
+### The problem, stated as the spec states it
+
+"Lilly contracts an ENTITY, evaluates an OFFERING, depends on specific SERVICES: three
+different things" (spec:36). One layout cannot evaluate Snowflake (public), Databricks
+(private) and BigQuery (a product inside Google). Forced through one template, the private
+company gets empty market-cap fields and the hyperscaler product gets standalone financials
+it does not have.
+
+**An empty field invites someone to fill it. That is how fabrication starts.**
+
+### ONE base, composed by traits
+
+There is no "public dashboard" and "private dashboard" variant, per the LOCKED
+one-base-compose-by-traits rule. Variants drift and then a fix has to be made three times.
+
+| Entity type | Panels | What changes |
+|---|---|---|
+| public | 19 | own financials are the relevant ones |
+| private | 19 | same layout; viability rests on supplier disclosure, not filings |
+| hyperscaler product | 17 | no standalone financials; viability reads at the parent, and the tree separating parent / contracting entity / offering becomes essential |
+
+### The distinction the whole mechanism exists for
+
+A panel can be absent for two completely different reasons, and they must NEVER look alike:
+
+- **OMIT_BY_TRAIT** - this supplier type HAS no such thing. BigQuery has no standalone
+  balance sheet. Asking for one is a category error. The page says *not applicable to this
+  supplier type*, gives the reason, and points at where viability IS assessed.
+- **GAP** - it exists and nobody found it. That is a research action, rendered as a stated
+  information requirement.
+
+Collapsing them fails in both directions. Show a gap where there is a trait omission and
+you send someone hunting for a document that cannot exist. Show a trait omission where
+there is a gap and you quietly excuse missing work.
+
+`disposition()` therefore returns THREE values, not two, and T69 asserts that having data
+can never turn a trait omission into a gap.
+
+### Refuses rather than guesses
+
+An unknown entity type is refused (T81): guessing would silently pick a layout that asks
+for evidence the supplier may not have, which is the failure this exists to prevent. An
+undeclared panel is refused (T82) so applicability is declared rather than assumed. And
+T83 asserts every declared omission carries a reader-facing reason, because an unexplained
+absence is indistinguishable from an oversight.
+
+### Verified against the plan's own bar
+
+The plan requires "render one supplier of each type; assert no panel renders an invented
+value and every omitted panel is omitted by trait, not by gap". All three render (T65).
+The private company shows **no market capitalisation** because it has none (T76), and its
+financial viability reads as insufficient rather than being filled in (T77). The
+hyperscaler shows the not-applicable card rather than an information-required card (T72,
+T73) and names Alphabet as where viability is assessed (T75).
+
+Selftest 86/86 - 0 console errors on all three - suite smoke 33/0 - hub self-containment
+**10 artifacts, 0 findings** - malicious sweep clean - 33 packages extract-and-retest
+verified.
+
+**A5 and A6 are both complete.** A11 now waits only on A8, A9 and Marc's sign-off.

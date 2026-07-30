@@ -418,7 +418,7 @@ The model now authors DATA; code assembles the page.
 ```bash
 python dashboard/deepdive_schema.py <data.json>   # validate; exits 2 and names the breach
 python dashboard/build_profile_dashboard.py       # build the dashboard
-python dashboard/deepdive_schema_selftest.py      # 65 assertions
+python dashboard/deepdive_schema_selftest.py      # 86 assertions
 ```
 
 Data shape: `dashboard/assets/seed/snowflake.json` is the worked reference.
@@ -487,7 +487,44 @@ researched.
 card is owed the explanation, and it is the fallback being visible that makes it a
 feature rather than a gap.
 
-Supplier-type adaptation (public / private / hyperscaler product) is **A6**.
+### Compose by traits (A6)
+
+There is **one layout**, composed by traits. There is deliberately no "public dashboard"
+and "private dashboard" variant, because variants drift apart and a fix then has to be
+made three times.
+
+Lilly contracts an ENTITY, evaluates an OFFERING and depends on SERVICES, and those are
+three different things. Forced through one template, a private company gets empty
+market-cap fields and a product inside a hyperscaler gets standalone financials it does
+not have. **An empty field invites someone to fill it, and that is how fabrication
+starts.**
+
+| Entity type | Panels | What changes |
+|---|---|---|
+| public | 19 | own financials are the relevant ones |
+| private | 19 | same layout; viability rests on supplier disclosure, not filings |
+| hyperscaler product | 17 | no standalone financials; viability reads at the parent, and the ownership tree separating parent, contracting entity and offering becomes essential |
+
+#### The distinction the whole mechanism exists for
+
+A panel can be absent for two completely different reasons, and they must never look
+alike:
+
+- **OMIT_BY_TRAIT** - this supplier type HAS no such thing. BigQuery has no standalone
+  balance sheet. Asking for one is a category error, and the page says *not applicable to
+  this supplier type* with the reason.
+- **GAP** - the thing exists and nobody has found it. That is a research action, and it
+  renders as a stated information requirement.
+
+Collapsing them fails in both directions. Show a gap where there is a trait omission and
+you send someone hunting for a document that cannot exist. Show a trait omission where
+there is a gap and you quietly excuse missing work. `disposition()` returns three values,
+not two, and having data can never turn a trait omission into a gap.
+
+An unknown entity type is **refused**, not guessed: guessing would silently pick a layout
+that asks for evidence the supplier may not have. Every declared omission must carry a
+reader-facing reason, because an unexplained absence is indistinguishable from an
+oversight.
 
 ## Validate the dossier before delivering it (HARD RULE)
 

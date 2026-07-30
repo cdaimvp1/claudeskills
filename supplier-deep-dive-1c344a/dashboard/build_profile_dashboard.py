@@ -47,6 +47,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import deepdive_sections as SEC                                      # noqa: E402
+import deepdive_traits as TRAITS                                     # noqa: E402
 import deepdive_viz as VIZ                                           # noqa: E402
 from deepdive_schema import (                                        # noqa: E402
     ASSESSMENTS, DIMENSIONS, DeepDiveError, validate_dataset,
@@ -282,6 +283,7 @@ def render(s, summary):
     # Every dominant visual is CHOSEN from what the data supports, and each choice carries
     # its reason to the page. Nothing here decides to draw a shape the evidence cannot
     # carry; that decision lives in deepdive_viz and is tested separately.
+    et = TRAITS.traits_for(s.get("entity_type"))
     own_kind, own_why = VIZ.choose_ownership(s.get("ownership"))
     map_kind, map_why = VIZ.choose_map(s.get("locations"))
     net_kind, net_why = VIZ.choose_network(s.get("dependencies"))
@@ -292,7 +294,7 @@ def render(s, summary):
     panes = {
         "company": SEC.company_ownership(s, own_kind, own_why, map_kind, map_why),
         "capabilities": SEC.capabilities(s, net_kind, net_why),
-        "financial": SEC.financial(s, tr_kind, tr_why, peer_kind, peer_why),
+        "financial": SEC.financial(s, tr_kind, tr_why, peer_kind, peer_why, et),
         "risk": SEC.risk(s, rm_kind, rm_why),
         "fit": SEC.lilly_fit(s),
     }
@@ -402,7 +404,7 @@ function dd(t){
     }
 
 
-def build(seed_path=None, out_path=None):
+def build(seed_path=None, out_path=None, which=None):
     seed_path = seed_path or DEFAULT_SEED
     out_path = out_path or OUT
     with open(seed_path, encoding="utf-8") as fh:
@@ -410,20 +412,37 @@ def build(seed_path=None, out_path=None):
     # Validation is a GATE, not a warning. An invalid record is not rendered at all,
     # because a rendered page is indistinguishable from a trustworthy one.
     summaries = validate_dataset(data)
-    s, summary = data["suppliers"][0], summaries[0]
+    idx = 0
+    if which is not None:
+        matches = [i for i, x in enumerate(data["suppliers"])
+                   if str(which) == str(i)
+                   or which.lower() in (x.get("name") or "").lower()]
+        if not matches:
+            raise BuildError(
+                "no supplier matches %r in %s. Available: %s"
+                % (which, seed_path,
+                   ", ".join(x.get("name", "?") for x in data["suppliers"])))
+        idx = matches[0]
+    s, summary = data["suppliers"][idx], summaries[idx]
     page = render(s, summary)
     with open(out_path, "w", encoding="utf-8") as fh:
         fh.write(page)
+    lay = TRAITS.layout(s.get("entity_type"))
     return {"out": out_path, "bytes": len(page.encode("utf-8")), "supplier": s["name"],
-            "summary": summary}
+            "summary": summary, "entity_type": lay["entity_type"],
+            "panels": len(lay["panels"]), "omitted": lay["omitted"]}
 
 
 def main(argv):
-    seed = None
+    seed = which = out = None
     if "--seed" in argv:
         seed = argv[argv.index("--seed") + 1]
+    if "--supplier" in argv:
+        which = argv[argv.index("--supplier") + 1]
+    if "--out" in argv:
+        out = argv[argv.index("--out") + 1]
     try:
-        r = build(seed)
+        r = build(seed, out, which)
     except DeepDiveError as e:
         print("REFUSED: %s: %s" % (type(e).__name__, e), file=sys.stderr)
         return 2
@@ -436,6 +455,10 @@ def main(argv):
     print("  evidence items: %d" % r["summary"]["evidence_items"])
     print("  gates         : %d hard stop(s), %d total"
           % (r["summary"]["hard_stops"], r["summary"]["gates"]))
+    print("  entity type   : %s -> %d panel(s) composed"
+          % (r["entity_type"], r["panels"]))
+    for panel, reason in r["omitted"]:
+        print("    omitted by TRAIT (not a gap): %-20s %s" % (panel, reason[:64]))
     return 0
 
 

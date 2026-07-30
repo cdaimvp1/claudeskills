@@ -744,6 +744,1090 @@
           "status": "open"
         }
       ]
+    },
+    {
+      "name": "Databricks, Inc.",
+      "entity_type": "private",
+      "rank": 2,
+      "requirements_fit": "21 of 28 must-haves confirmed",
+      "recommendation": {
+        "verdict": "Advance to RFx with conditions",
+        "rationale": "Capability is comparable to the leader. Private ownership means financial viability rests on disclosure the supplier must provide rather than on filings.",
+        "source_types": [
+          "internal"
+        ]
+      },
+      "gates": [
+        {
+          "kind": "ESCALATION",
+          "reason": "No audited financial statements available; viability cannot be assessed from public sources for a private company",
+          "owner": "Finance / TPRM",
+          "status": "open",
+          "counts_toward_aggregate": false
+        }
+      ],
+      "evidence_coverage": {
+        "verified": 24,
+        "partial": 31,
+        "supplier_input": 15,
+        "missing": 30
+      },
+      "opportunities": [
+        "Unified lakehouse architecture reduces the number of moving parts",
+        "Strong open-source lineage lowers proprietary-format exposure"
+      ],
+      "concerns": [
+        "No public filings, so financial viability depends on supplier disclosure",
+        "Valuation is a funding-round figure, not an audited position"
+      ],
+      "requirement_groups": [
+        {
+          "group": "Data platform core",
+          "status": "Confirmed",
+          "must_haves": 9,
+          "gaps": 0
+        },
+        {
+          "group": "Security and access",
+          "status": "Partially confirmed",
+          "must_haves": 7,
+          "gaps": 1
+        },
+        {
+          "group": "Regulated / GxP",
+          "status": "Partially confirmed",
+          "must_haves": 5,
+          "gaps": 2
+        },
+        {
+          "group": "Integration and architecture",
+          "status": "Confirmed",
+          "must_haves": 4,
+          "gaps": 0
+        },
+        {
+          "group": "Commercial and exit",
+          "status": "Not demonstrated",
+          "must_haves": 3,
+          "gaps": 1
+        }
+      ],
+      "dimensions": {
+        "identity_ownership": {
+          "assessment": "Adequate",
+          "confidence": "partial",
+          "position": 65,
+          "evidence": [
+            {
+              "field": "Legal identity",
+              "status": "Verified",
+              "raw_value": "Databricks, Inc., Delaware",
+              "source_name": "Company registration",
+              "source_type": "filing",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Ultimate beneficial ownership",
+              "status": "Data source required",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
+          ]
+        },
+        "capability_fit": {
+          "assessment": "Strong",
+          "confidence": "partial",
+          "position": 82,
+          "evidence": [
+            {
+              "field": "Relevant products",
+              "status": "Partially verified",
+              "raw_value": "Unified lakehouse platform",
+              "source_name": "Product documentation",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            }
+          ]
+        },
+        "financial_viability": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 20,
+          "evidence": [
+            {
+              "field": "Any",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
+          ]
+        },
+        "operational_resilience": {
+          "assessment": "Moderate",
+          "confidence": "partial",
+          "position": 50,
+          "evidence": [
+            {
+              "field": "Cloud dependency",
+              "status": "Partially verified",
+              "raw_value": "Runs on major hyperscalers",
+              "source_name": "Product documentation",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            }
+          ]
+        },
+        "integrity_legal_compliance": {
+          "assessment": "Adequate",
+          "confidence": "partial",
+          "position": 68,
+          "evidence": [
+            {
+              "field": "Sanctions screen",
+              "status": "Not found",
+              "raw_value": "No match identified",
+              "source_name": "OFAC SDN",
+              "source_type": "regulator",
+              "source_date": "2026-07-17"
+            }
+          ]
+        },
+        "quality_regulatory_ehs": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 20,
+          "evidence": [
+            {
+              "field": "Any",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
+          ]
+        },
+        "cyber_privacy_data": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 30,
+          "evidence": [
+            {
+              "field": "Any",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
+          ]
+        },
+        "responsible_sourcing_evidence": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 25,
+          "evidence": [
+            {
+              "field": "Any",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
+          ]
+        }
+      },
+      "company_scale": {
+        "founded": "2013",
+        "employees": "Not established",
+        "revenue_range": "Not publicly reported",
+        "countries": "Not established",
+        "relevant_facilities": "Not established",
+        "listing": "Private"
+      },
+      "ownership": {
+        "nodes": [
+          {
+            "id": "db",
+            "label": "Databricks, Inc.",
+            "role": "Contracting entity",
+            "status": "Verified",
+            "note": "Delaware incorporated"
+          },
+          {
+            "id": "inv",
+            "label": "Institutional investors",
+            "role": "Significant holders",
+            "status": "Partially verified",
+            "note": "Venture and growth investors"
+          }
+        ],
+        "contracting_entity_differs": false,
+        "ubo_required": true,
+        "ubo_status": "Data source required",
+        "subsidiaries_status": "Data source required"
+      },
+      "identity_matrix": [
+        {
+          "element": "Legal name",
+          "status": "Verified",
+          "source": "Company registration"
+        },
+        {
+          "element": "Incorporation",
+          "status": "Verified",
+          "source": "Company registration"
+        },
+        {
+          "element": "Ultimate beneficial ownership",
+          "status": "Data source required",
+          "source": ""
+        },
+        {
+          "element": "Audited financial statements",
+          "status": "Data source required",
+          "source": ""
+        }
+      ],
+      "locations": {
+        "status": "Data source required",
+        "note": "Delivery-relevant data-centre regions for Lilly scope are not confirmed. Country of domicile is not a substitute.",
+        "entries": []
+      },
+      "capability_matrix": [
+        {
+          "requirement": "Elastic compute separation",
+          "result": "Confirmed",
+          "evidence": "FY2026 10-K"
+        },
+        {
+          "requirement": "Open table format support",
+          "result": "Confirmed",
+          "evidence": "Native Apache Iceberg, FY2026 10-K"
+        },
+        {
+          "requirement": "Governed cross-account sharing",
+          "result": "Confirmed",
+          "evidence": "FY2026 10-K"
+        },
+        {
+          "requirement": "Pharma-regulated deployment",
+          "result": "Partially confirmed",
+          "evidence": "Named pharma customers; no qualification package"
+        },
+        {
+          "requirement": "GxP qualification package",
+          "result": "Gap",
+          "evidence": ""
+        },
+        {
+          "requirement": "In-region data residency",
+          "result": "Not demonstrated",
+          "evidence": ""
+        },
+        {
+          "requirement": "Exit and data portability",
+          "result": "Partially confirmed",
+          "evidence": "Iceberg reduces storage-layer lock-in only"
+        }
+      ],
+      "delivery_readiness": [
+        {
+          "stage": "Product maturity",
+          "level": "Strong",
+          "pct": 90
+        },
+        {
+          "stage": "Implementation path",
+          "level": "Moderate",
+          "pct": 55
+        },
+        {
+          "stage": "Lilly architecture fit",
+          "level": "Insufficient evidence",
+          "pct": 20
+        },
+        {
+          "stage": "Capacity",
+          "level": "Strong",
+          "pct": 85
+        },
+        {
+          "stage": "Support model",
+          "level": "Insufficient evidence",
+          "pct": 25
+        }
+      ],
+      "references": [
+        {
+          "customer": "Novartis",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        },
+        {
+          "customer": "Sanofi",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        },
+        {
+          "customer": "IQVIA",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        }
+      ],
+      "dependencies": [
+        {
+          "name": "AWS / Azure / Google Cloud",
+          "kind": "Infrastructure",
+          "criticality": "Critical",
+          "substitutability": "Portable across the three, not away from all three",
+          "confidence": "Verified"
+        },
+        {
+          "name": "Implementation partner",
+          "kind": "Services",
+          "criticality": "Not established",
+          "substitutability": "Not established",
+          "confidence": "Data source required"
+        }
+      ],
+      "financial_periods": [],
+      "financial_bridge": [
+        {
+          "driver": "Growth",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        },
+        {
+          "driver": "Profitability",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        },
+        {
+          "driver": "Liquidity",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        },
+        {
+          "driver": "Leverage",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        }
+      ],
+      "commercial_drivers": [
+        {
+          "driver": "Compute",
+          "variability": "High",
+          "note": "Scales with workload design and concurrency"
+        },
+        {
+          "driver": "Storage",
+          "variability": "Low",
+          "note": "Broadly predictable per TB"
+        },
+        {
+          "driver": "Data transfer",
+          "variability": "Medium",
+          "note": "Cross-region and egress dependent"
+        },
+        {
+          "driver": "Implementation",
+          "variability": "Not established",
+          "note": ""
+        },
+        {
+          "driver": "Exit",
+          "variability": "Medium",
+          "note": "Iceberg reduces storage-layer cost only"
+        }
+      ],
+      "peers": [],
+      "risks": [
+        {
+          "risk": "Financial viability unverifiable from public sources",
+          "impact": 4,
+          "likelihood": 3,
+          "confidence": "partial",
+          "mitigation": "proposed",
+          "owner": "Finance / TPRM",
+          "gate": true
+        }
+      ],
+      "material_events": [],
+      "mitigations": [
+        {
+          "risk": "Financial viability unverifiable from public sources",
+          "treatment": "Request audited statements under NDA",
+          "status": "proposed",
+          "owner": "Finance / TPRM"
+        }
+      ],
+      "lilly_fit": [
+        {
+          "factor": "Architecture alignment",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Pharma experience",
+          "fit": "Strong",
+          "confidence": "partial"
+        },
+        {
+          "factor": "Internal compatibility",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Existing relationship",
+          "fit": "None found",
+          "confidence": "verified"
+        },
+        {
+          "factor": "Regulatory fit",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Implementation readiness",
+          "fit": "Moderate",
+          "confidence": "partial"
+        },
+        {
+          "factor": "Commercial leverage",
+          "fit": "Moderate",
+          "confidence": "partial"
+        }
+      ],
+      "internal_history": {
+        "status": "Not found",
+        "note": "No Lilly history located.",
+        "entries": []
+      },
+      "diligence": [
+        {
+          "track": "Desk research",
+          "pct": 80
+        },
+        {
+          "track": "Supplier evidence",
+          "pct": 25
+        },
+        {
+          "track": "Security review",
+          "pct": 10
+        },
+        {
+          "track": "Quality / GxP",
+          "pct": 0
+        },
+        {
+          "track": "Financial / TPRM",
+          "pct": 40
+        },
+        {
+          "track": "References",
+          "pct": 15
+        },
+        {
+          "track": "Contract readiness",
+          "pct": 0
+        }
+      ],
+      "actions": [
+        {
+          "action": "Confirm Lilly-scope controls and MFA enforcement after the 2024 campaign",
+          "owner": "Cyber (SAE)",
+          "gate": true,
+          "status": "open"
+        },
+        {
+          "action": "Obtain written subprocessor list and data-residency commitments",
+          "owner": "Privacy",
+          "gate": true,
+          "status": "open"
+        },
+        {
+          "action": "Request the GxP qualification package",
+          "owner": "Quality",
+          "gate": false,
+          "status": "open"
+        },
+        {
+          "action": "Confirm contracting entity and Lilly vendor-master match",
+          "owner": "Procurement",
+          "gate": false,
+          "status": "open"
+        },
+        {
+          "action": "Obtain reference calls with a comparable pharma deployment",
+          "owner": "Procurement",
+          "gate": false,
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "name": "Google BigQuery",
+      "entity_type": "hyperscaler_product",
+      "rank": 3,
+      "requirements_fit": "22 of 28 must-haves confirmed",
+      "recommendation": {
+        "verdict": "Advance to RFx with conditions",
+        "rationale": "Lilly would contract with the parent entity for a product, so entity, offering and service must be separated before scope is fixed.",
+        "source_types": [
+          "internal"
+        ]
+      },
+      "gates": [
+        {
+          "kind": "ESCALATION",
+          "reason": "Contracting entity, product scope and the specific services in scope are not yet separated; Lilly contracts an entity but depends on services",
+          "owner": "Procurement",
+          "status": "open",
+          "counts_toward_aggregate": false
+        }
+      ],
+      "evidence_coverage": {
+        "verified": 38,
+        "partial": 27,
+        "supplier_input": 10,
+        "missing": 25
+      },
+      "opportunities": [
+        "Parent financial strength removes supplier-failure risk at the entity level",
+        "Serverless model removes capacity planning from Lilly's scope"
+      ],
+      "concerns": [
+        "The product has no standalone financials, so entity-level assessment says little about the offering",
+        "Service-level commitments attach to the parent's terms, not to a negotiated contract"
+      ],
+      "requirement_groups": [
+        {
+          "group": "Data platform core",
+          "status": "Confirmed",
+          "must_haves": 9,
+          "gaps": 0
+        },
+        {
+          "group": "Security and access",
+          "status": "Partially confirmed",
+          "must_haves": 7,
+          "gaps": 1
+        },
+        {
+          "group": "Regulated / GxP",
+          "status": "Partially confirmed",
+          "must_haves": 5,
+          "gaps": 2
+        },
+        {
+          "group": "Integration and architecture",
+          "status": "Confirmed",
+          "must_haves": 4,
+          "gaps": 0
+        },
+        {
+          "group": "Commercial and exit",
+          "status": "Not demonstrated",
+          "must_haves": 3,
+          "gaps": 1
+        }
+      ],
+      "dimensions": {
+        "identity_ownership": {
+          "assessment": "Strong",
+          "confidence": "verified",
+          "position": 90,
+          "evidence": [
+            {
+              "field": "Corporate chain",
+              "status": "Verified",
+              "raw_value": "Alphabet Inc. -> Google LLC -> BigQuery",
+              "source_name": "SEC EDGAR",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            }
+          ]
+        },
+        "capability_fit": {
+          "assessment": "Strong",
+          "confidence": "verified",
+          "position": 86,
+          "evidence": [
+            {
+              "field": "Relevant products",
+              "status": "Verified",
+              "raw_value": "Serverless cloud data warehouse",
+              "source_name": "Product documentation",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            }
+          ]
+        },
+        "financial_viability": {
+          "assessment": "Strong",
+          "confidence": "verified",
+          "position": 95,
+          "evidence": [
+            {
+              "field": "Parent financial position",
+              "status": "Verified",
+              "raw_value": "Assessed at Alphabet Inc.; the product has no separate balance sheet",
+              "source_name": "SEC EDGAR",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            }
+          ]
+        },
+        "operational_resilience": {
+          "assessment": "Adequate",
+          "confidence": "partial",
+          "position": 70,
+          "evidence": [
+            {
+              "field": "Parent infrastructure",
+              "status": "Partially verified",
+              "raw_value": "Google Cloud regions",
+              "source_name": "Product documentation",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            }
+          ]
+        },
+        "integrity_legal_compliance": {
+          "assessment": "Adequate",
+          "confidence": "partial",
+          "position": 72,
+          "evidence": [
+            {
+              "field": "Sanctions screen",
+              "status": "Not found",
+              "raw_value": "No match identified at parent",
+              "source_name": "OFAC SDN",
+              "source_type": "regulator",
+              "source_date": "2026-07-17"
+            }
+          ]
+        },
+        "quality_regulatory_ehs": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 25,
+          "evidence": [
+            {
+              "field": "Any",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
+          ]
+        },
+        "cyber_privacy_data": {
+          "assessment": "Moderate",
+          "confidence": "partial",
+          "position": 58,
+          "evidence": [
+            {
+              "field": "Certifications",
+              "status": "Partially verified",
+              "raw_value": "Parent trust documentation",
+              "source_name": "Product documentation",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            }
+          ]
+        },
+        "responsible_sourcing_evidence": {
+          "assessment": "Insufficient evidence",
+          "confidence": "insufficient",
+          "position": 30,
+          "evidence": [
+            {
+              "field": "Any",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
+          ]
+        }
+      },
+      "company_scale": {
+        "founded": "2011 (product)",
+        "employees": "Parent level only",
+        "revenue_range": "Not separately reported",
+        "countries": "Parent global footprint",
+        "relevant_facilities": "Parent data-centre regions",
+        "listing": "Parent is public"
+      },
+      "ownership": {
+        "nodes": [
+          {
+            "id": "alpha",
+            "label": "Alphabet Inc.",
+            "role": "Ultimate parent",
+            "status": "Verified",
+            "note": "NASDAQ: GOOGL"
+          },
+          {
+            "id": "goog",
+            "label": "Google LLC",
+            "role": "Contracting entity",
+            "status": "Verified",
+            "note": "The entity Lilly would contract with"
+          },
+          {
+            "id": "bq",
+            "label": "BigQuery",
+            "role": "Offering",
+            "status": "Verified",
+            "note": "The product being evaluated"
+          }
+        ],
+        "contracting_entity_differs": true,
+        "ubo_required": false,
+        "ubo_status": "Not applicable",
+        "subsidiaries_status": "Verified"
+      },
+      "identity_matrix": [
+        {
+          "element": "Ultimate parent",
+          "status": "Verified",
+          "source": "SEC EDGAR"
+        },
+        {
+          "element": "Contracting entity",
+          "status": "Verified",
+          "source": "Parent terms"
+        },
+        {
+          "element": "Offering identified",
+          "status": "Verified",
+          "source": "Product docs"
+        },
+        {
+          "element": "Specific services in scope",
+          "status": "Data source required",
+          "source": ""
+        }
+      ],
+      "locations": {
+        "status": "Data source required",
+        "note": "Delivery-relevant data-centre regions for Lilly scope are not confirmed. Country of domicile is not a substitute.",
+        "entries": []
+      },
+      "capability_matrix": [
+        {
+          "requirement": "Elastic compute separation",
+          "result": "Confirmed",
+          "evidence": "FY2026 10-K"
+        },
+        {
+          "requirement": "Open table format support",
+          "result": "Confirmed",
+          "evidence": "Native Apache Iceberg, FY2026 10-K"
+        },
+        {
+          "requirement": "Governed cross-account sharing",
+          "result": "Confirmed",
+          "evidence": "FY2026 10-K"
+        },
+        {
+          "requirement": "Pharma-regulated deployment",
+          "result": "Partially confirmed",
+          "evidence": "Named pharma customers; no qualification package"
+        },
+        {
+          "requirement": "GxP qualification package",
+          "result": "Gap",
+          "evidence": ""
+        },
+        {
+          "requirement": "In-region data residency",
+          "result": "Not demonstrated",
+          "evidence": ""
+        },
+        {
+          "requirement": "Exit and data portability",
+          "result": "Partially confirmed",
+          "evidence": "Iceberg reduces storage-layer lock-in only"
+        }
+      ],
+      "delivery_readiness": [
+        {
+          "stage": "Product maturity",
+          "level": "Strong",
+          "pct": 90
+        },
+        {
+          "stage": "Implementation path",
+          "level": "Moderate",
+          "pct": 55
+        },
+        {
+          "stage": "Lilly architecture fit",
+          "level": "Insufficient evidence",
+          "pct": 20
+        },
+        {
+          "stage": "Capacity",
+          "level": "Strong",
+          "pct": 85
+        },
+        {
+          "stage": "Support model",
+          "level": "Insufficient evidence",
+          "pct": 25
+        }
+      ],
+      "references": [
+        {
+          "customer": "Novartis",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        },
+        {
+          "customer": "Sanofi",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        },
+        {
+          "customer": "IQVIA",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        }
+      ],
+      "dependencies": [
+        {
+          "name": "AWS / Azure / Google Cloud",
+          "kind": "Infrastructure",
+          "criticality": "Critical",
+          "substitutability": "Portable across the three, not away from all three",
+          "confidence": "Verified"
+        },
+        {
+          "name": "Implementation partner",
+          "kind": "Services",
+          "criticality": "Not established",
+          "substitutability": "Not established",
+          "confidence": "Data source required"
+        }
+      ],
+      "financial_periods": [],
+      "financial_bridge": [
+        {
+          "driver": "Growth",
+          "assessment": "Strong",
+          "evidence": "Revenue growth reported in FY2026 10-K"
+        },
+        {
+          "driver": "Profitability",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        },
+        {
+          "driver": "Liquidity",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        },
+        {
+          "driver": "Leverage",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        }
+      ],
+      "commercial_drivers": [
+        {
+          "driver": "Compute",
+          "variability": "High",
+          "note": "Scales with workload design and concurrency"
+        },
+        {
+          "driver": "Storage",
+          "variability": "Low",
+          "note": "Broadly predictable per TB"
+        },
+        {
+          "driver": "Data transfer",
+          "variability": "Medium",
+          "note": "Cross-region and egress dependent"
+        },
+        {
+          "driver": "Implementation",
+          "variability": "Not established",
+          "note": ""
+        },
+        {
+          "driver": "Exit",
+          "variability": "Medium",
+          "note": "Iceberg reduces storage-layer cost only"
+        }
+      ],
+      "peers": [],
+      "risks": [
+        {
+          "risk": "Entity, offering and service not separated before scope is fixed",
+          "impact": 4,
+          "likelihood": 3,
+          "confidence": "verified",
+          "mitigation": "proposed",
+          "owner": "Procurement",
+          "gate": true
+        },
+        {
+          "risk": "Standard parent terms limit negotiated remedies",
+          "impact": 3,
+          "likelihood": 4,
+          "confidence": "partial",
+          "mitigation": "not-started",
+          "owner": "Legal",
+          "gate": false
+        }
+      ],
+      "material_events": [],
+      "mitigations": [
+        {
+          "risk": "Entity, offering and service not separated before scope is fixed",
+          "treatment": "Produce an entity/offering/service map before RFx scope is fixed",
+          "status": "proposed",
+          "owner": "Procurement"
+        },
+        {
+          "risk": "Standard parent terms limit negotiated remedies",
+          "treatment": "Not started",
+          "status": "not-started",
+          "owner": "Legal"
+        }
+      ],
+      "lilly_fit": [
+        {
+          "factor": "Architecture alignment",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Pharma experience",
+          "fit": "Strong",
+          "confidence": "partial"
+        },
+        {
+          "factor": "Internal compatibility",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Existing relationship",
+          "fit": "None found",
+          "confidence": "verified"
+        },
+        {
+          "factor": "Regulatory fit",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Implementation readiness",
+          "fit": "Moderate",
+          "confidence": "partial"
+        },
+        {
+          "factor": "Commercial leverage",
+          "fit": "Moderate",
+          "confidence": "partial"
+        }
+      ],
+      "internal_history": {
+        "status": "Not found",
+        "note": "No Lilly history located for this offering.",
+        "entries": []
+      },
+      "diligence": [
+        {
+          "track": "Desk research",
+          "pct": 80
+        },
+        {
+          "track": "Supplier evidence",
+          "pct": 25
+        },
+        {
+          "track": "Security review",
+          "pct": 10
+        },
+        {
+          "track": "Quality / GxP",
+          "pct": 0
+        },
+        {
+          "track": "Financial / TPRM",
+          "pct": 40
+        },
+        {
+          "track": "References",
+          "pct": 15
+        },
+        {
+          "track": "Contract readiness",
+          "pct": 0
+        }
+      ],
+      "actions": [
+        {
+          "action": "Confirm Lilly-scope controls and MFA enforcement after the 2024 campaign",
+          "owner": "Cyber (SAE)",
+          "gate": true,
+          "status": "open"
+        },
+        {
+          "action": "Obtain written subprocessor list and data-residency commitments",
+          "owner": "Privacy",
+          "gate": true,
+          "status": "open"
+        },
+        {
+          "action": "Request the GxP qualification package",
+          "owner": "Quality",
+          "gate": false,
+          "status": "open"
+        },
+        {
+          "action": "Confirm contracting entity and Lilly vendor-master match",
+          "owner": "Procurement",
+          "gate": false,
+          "status": "open"
+        },
+        {
+          "action": "Obtain reference calls with a comparable pharma deployment",
+          "owner": "Procurement",
+          "gate": false,
+          "status": "open"
+        }
+      ],
+      "parent": {
+        "name": "Alphabet Inc. (NASDAQ: GOOGL)",
+        "assessment": "Parent financial position assessed as Strong; the product itself has no separate balance sheet, so viability reads at the parent."
+      }
     }
   ]
 }
