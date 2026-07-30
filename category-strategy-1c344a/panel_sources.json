@@ -85,7 +85,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             }
           ]
         }
@@ -103,7 +103,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             }
           ]
         }
@@ -127,7 +127,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             }
           ]
         },
@@ -275,7 +275,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             }
           ]
         },
@@ -328,7 +328,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             },
             {
               "name": "Purchase order and invoice data",
@@ -525,7 +525,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             }
           ]
         }
@@ -627,7 +627,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             },
             {
               "name": "Public reporting and adverse media",
@@ -662,7 +662,7 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         },
@@ -697,7 +697,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             }
           ]
         }
@@ -715,7 +715,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             },
             {
               "name": "Lilly spend data",
@@ -780,7 +780,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             },
             {
               "name": "External market benchmark",
@@ -892,7 +892,7 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active agreements for this category: term, renewal date, value"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             },
             {
               "name": "Lilly spend data",

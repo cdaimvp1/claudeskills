@@ -36,10 +36,10 @@
               "confirmed_by_owner": true
             },
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ],
           "note": "derived from open gates and outstanding scores, never asserted"
@@ -68,10 +68,10 @@
               "confirmed_by_owner": true
             },
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         }
@@ -136,10 +136,10 @@
           "name": "gate status per bidder",
           "sources": [
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         }
@@ -204,10 +204,10 @@
               "confirmed_by_owner": true
             },
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         },
@@ -308,10 +308,10 @@
           "name": "gating flags",
           "sources": [
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         }
@@ -623,10 +623,10 @@
           "name": "conditions before award",
           "sources": [
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             },
             {
               "name": "The RFx pack Lilly issued",
@@ -661,10 +661,10 @@
           "name": "open gates per bidder and owner",
           "sources": [
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         }
@@ -685,10 +685,10 @@
               "how": "each bidder's submitted response, per requirement"
             },
             {
-              "name": "SME gate outcomes",
+              "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the written outcome from Cyber, Privacy, Quality or Legal for each bidder"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             },
             {
               "name": "Supplier priced responses",

@@ -19,7 +19,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from panel_contract import (                                        # noqa: E402
-    ACCESS, ContractError, STATES, empty_message, resolve_state, retrieval_plan,
+    ACCESS, ContractError, LIBRARY_STATES, STATES, empty_message, resolve_state,
+    retrieval_plan,
     unconfirmed_internal, validate_contract, validate_panel,
 )
 
@@ -59,8 +60,9 @@ def run():
     print("=" * 88)
 
     # --- the state rule ------------------------------------------------------------
-    ok("T1  never attempted -> NOT_ATTEMPTED",
-       resolve_state("f", attempted=False) == "NOT_ATTEMPTED")
+    ok("T1  never attempted -> RESEARCH_PENDING (the component library's existing "
+       "name, not a new one)",
+       resolve_state("f", attempted=False) == "RESEARCH_PENDING")
     ok("T2  attempted but not reached -> SOURCE_UNREACHABLE",
        resolve_state("f", attempted=True, reached=False) == "SOURCE_UNREACHABLE")
     ok("T3  attempted, reached, empty -> SEARCHED_NOT_FOUND",
@@ -224,6 +226,34 @@ def run():
        all(len(f.get("note", "")) > 20
            for d in shipped.values() for p in d["panels"] for f in p["fields"]
            if f.get("note")))
+
+
+    # --- reconciliation with the existing component library ---------------------------
+    ok("T41 the three states the shared StateBanner already had are reused, not renamed",
+       all(k in STATES for k in LIBRARY_STATES))
+    ok("T42 and their labels are the library's words verbatim",
+       [__import__("panel_contract").STATE_LABEL[k] for k in LIBRARY_STATES]
+       == ["Needs input", "Not applicable", "Research pending"])
+    ok("T43 exactly two states are new, and they are the two the library could not express",
+       sorted(set(STATES) - set(LIBRARY_STATES))
+       == ["SEARCHED_NOT_FOUND", "SOURCE_UNREACHABLE"])
+    ok("T44 the old invented name is gone", "NOT_ATTEMPTED" not in STATES)
+
+    # --- the merges --------------------------------------------------------------------
+    names = set()
+    for d in shipped.values():
+        for pan in d["panels"]:
+            for fl in pan["fields"]:
+                for src in fl.get("sources") or []:
+                    names.add(src["name"])
+    ok("T45 'SME gate outcomes' was merged into 'SME review outcome'",
+       "SME gate outcomes" not in names and "SME review outcome" in names)
+    ok("T46 'Prior Lilly contracts for this supplier' was merged into 'Contract repository'",
+       "Prior Lilly contracts for this supplier" not in names)
+    ok("T47 no field lists the same source twice after the merge",
+       all(len(set(s["name"] for s in (fl.get("sources") or [])))
+           == len(fl.get("sources") or [])
+           for d in shipped.values() for pan in d["panels"] for fl in pan["fields"]))
 
     print("=" * 88)
     print("SUMMARY: %d/%d passed, %d failed" % (len(PASS), len(PASS) + len(FAIL), len(FAIL)))

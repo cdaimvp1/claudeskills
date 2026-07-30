@@ -23,7 +23,7 @@ you are careless, and they mean opposite things. If a connector is down and the 
 someone makes a decision on it.
 
 So `resolve_state()` REFUSES to return SEARCHED_NOT_FOUND unless a retrieval actually ran
-and came back empty. Absent that evidence the honest answer is NOT_ATTEMPTED. A panel may
+and came back empty. Absent that evidence the honest answer is RESEARCH_PENDING. A panel may
 under-claim; it may never over-claim.
 
 WHY A DATA FILE AND NOT RENDERER CODE
@@ -41,29 +41,41 @@ import sys
 # ---------------------------------------------------------------- the five empty states
 
 # Ordered from "someone must act" to "nothing to do".
+# THREE of these already existed in the shared component library as
+# StateBanner({kind,msg}): NEEDS_INPUT, NOT_APPLICABLE and RESEARCH_PENDING. This module
+# originally invented parallel names for them, which is the drift class the suite has been
+# removing. The library's names and labels WIN; only the two states it cannot express are
+# new, and they are the two that matter most here.
 STATES = (
-    "NEEDS_INPUT",         # must come from the user or the supplier
-    "SOURCE_UNREACHABLE",  # we tried and could not get there
-    "NOT_ATTEMPTED",       # retrieval has not run
-    "SEARCHED_NOT_FOUND",  # we looked in the right place; it genuinely is not there
-    "NOT_APPLICABLE",      # this subject type has no such thing
+    "NEEDS_INPUT",         # (existing) must come from the user or the supplier
+    "SOURCE_UNREACHABLE",  # (NEW) we tried and could not get there
+    "RESEARCH_PENDING",    # (existing) retrieval has not run
+    "SEARCHED_NOT_FOUND",  # (NEW) we looked in the right place; it genuinely is not there
+    "NOT_APPLICABLE",      # (existing) this subject type has no such thing
 )
+
+# The library had no way to say "the source was unreachable" or "we checked and it is not
+# there", so both collapsed into RESEARCH_PENDING. That is precisely the conflation this
+# module exists to break: a failed connector and a real absence are opposite findings.
+LIBRARY_STATES = ("NEEDS_INPUT", "NOT_APPLICABLE", "RESEARCH_PENDING")
 
 # Reader-facing wording. The dashboards are locked, so this is the text a panel shows in
 # place of content, not a redesign of the panel.
 STATE_LABEL = {
-    "NEEDS_INPUT": "Needs your input",
-    "SOURCE_UNREACHABLE": "Source unreachable",
-    "NOT_ATTEMPTED": "Not retrieved yet",
-    "SEARCHED_NOT_FOUND": "Searched, not found",
+    # The three shared labels are copied VERBATIM from the component library so a reader
+    # sees the same words here as everywhere else in the suite.
+    "NEEDS_INPUT": "Needs input",
     "NOT_APPLICABLE": "Not applicable",
+    "RESEARCH_PENDING": "Research pending",
+    "SOURCE_UNREACHABLE": "Source unreachable",
+    "SEARCHED_NOT_FOUND": "Searched, not found",
 }
 
 # What the reader is being asked to DO. An empty state with no action is just a nicer blank.
 STATE_ACTION = {
     "NEEDS_INPUT": "Provide this, or request it from the supplier.",
     "SOURCE_UNREACHABLE": "Retry, or check access to the source.",
-    "NOT_ATTEMPTED": "Run this panel's retrieval.",
+    "RESEARCH_PENDING": "Run this panel's retrieval.",
     "SEARCHED_NOT_FOUND": "No action. The gap is real and is recorded as one.",
     "NOT_APPLICABLE": "No action. This does not exist for this subject.",
 }
@@ -91,7 +103,7 @@ def resolve_state(field, attempted=False, reached=False, found=False,
 
       not applicable  -> NOT_APPLICABLE   (a category error; nothing to retrieve)
       requires input  -> NEEDS_INPUT      (no amount of searching produces it)
-      never attempted -> NOT_ATTEMPTED
+      never attempted -> RESEARCH_PENDING
       attempted, could not reach -> SOURCE_UNREACHABLE
       attempted, reached, empty  -> SEARCHED_NOT_FOUND
 
@@ -104,7 +116,7 @@ def resolve_state(field, attempted=False, reached=False, found=False,
     if requires_input:
         return "NEEDS_INPUT"
     if not attempted:
-        return "NOT_ATTEMPTED"
+        return "RESEARCH_PENDING"
     if not reached:
         return "SOURCE_UNREACHABLE"
     if found:
@@ -134,7 +146,7 @@ def empty_message(field, state, sources=None, detail=""):
     elif state == "NEEDS_INPUT":
         msg["text"] = ("This has to come from you or the supplier%s."
                        % ((": " + names) if names else ""))
-    elif state == "NOT_ATTEMPTED" and names:
+    elif state == "RESEARCH_PENDING" and names:
         msg["text"] = "Not yet retrieved from %s." % names
     else:
         msg["text"] = STATE_LABEL[state] + "." + ((" " + detail) if detail else "")

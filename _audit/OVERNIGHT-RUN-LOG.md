@@ -4194,3 +4194,70 @@ malicious sweep SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages
 extract-and-retest verified.
 
 **All four design-locked dashboards now have a panel data contract. 135 panels.**
+
+---
+
+## Merges + state reconciliation. A vocabulary I invented already existed.
+
+### The mistake
+
+`StateBanner({kind, msg})` already existed in the shared component library with three
+states: **NEEDS_INPUT, NOT_APPLICABLE, RESEARCH_PENDING**. I built a five-state vocabulary
+without checking, so three of mine were duplicates under different names. That is precisely
+the drift class this programme has spent weeks removing, and this one was mine.
+
+**The library's names and labels win.** `NOT_ATTEMPTED` is gone; it is `RESEARCH_PENDING`,
+and the three shared labels are now copied verbatim ("Needs input", "Not applicable",
+"Research pending") so a reader sees the same words here as everywhere else in the suite.
+
+### What survives, and why it should
+
+Two states are genuinely new, and they are the two Marc actually asked for:
+
+- **SOURCE_UNREACHABLE** - the connection-failing case
+- **SEARCHED_NOT_FOUND** - checked the right place, genuinely absent
+
+The library had no way to say either, so both collapsed into RESEARCH_PENDING. That is the
+exact conflation this module exists to break: **a failed connector and a real absence are
+opposite findings.** T43 asserts that exactly these two are new, so the reconciliation
+cannot silently regrow.
+
+### The merges
+
+Two sources were the same thing named twice by me:
+
+- `SME gate outcomes` -> **SME review outcome** (8 rows in RFx)
+- `Prior Lilly contracts for this supplier` -> **Contract repository** (1 row in Deal)
+
+Fields that ended up listing a source twice were de-duplicated. T45, T46 and T47 hold it.
+
+### Result: 78 rows, 6 systems
+
+| system | rows | dashboards |
+|---|---|---|
+| Lilly spend data | 36 | Category 32, RFx 2, Deal 1, Landscape 1 |
+| SME review outcome | 16 | RFx 8, Landscape 4, Deal 3, Category 1 |
+| Contract repository | 13 | Category 11, Deal 1, Landscape 1 |
+| Vendor master | 8 | Category 6, Landscape 2 |
+| Purchase order and invoice data | 3 | Category 3 |
+| Business case funding confirmation | 2 | RFx 2 |
+
+### What the suite already names, and what it does not
+
+Searching the suite's own docs turned up the enterprise systems it already references:
+ARIA (609 mentions), ATC (146), Ariba (132), ATS (126), LEAH (82), Fabric (62), BuyLilly
+(59), SAP (41), CLM (19).
+
+Two candidate mappings emerged that are worth putting to Marc rather than adopting:
+
+- **Lilly spend data -> SHARP, reached via Fabric.** The suite contains literal
+  `SHARP_Finance view[...]` and `SHARP_Procurement view[...]` references, and elsewhere
+  "Spend data unavailable this session: Fabric was not reachable."
+- **Vendor master -> the supplier master.** The suite phrase is "SAP, Ariba, SHARP, or the
+  supplier master", which reads as four distinct things.
+
+These are NOT applied. A confidently wrong internal system name is worse than an honest
+blank, and inferring one from a doc search is still inferring.
+
+Selftest **63/63** - smoke 33/0 - manifest panel_contract 4 of 4 - malicious sweep clean -
+33 packages extract-and-retest verified.

@@ -205,7 +205,7 @@ SEARCHED_NOT_FOUND unless a retrieval actually ran and came back empty.**
 |---|---|---|
 | NEEDS_INPUT | this has to come from you or the supplier | provide it |
 | SOURCE_UNREACHABLE | could not reach *the named source* | retry, or fix access |
-| NOT_ATTEMPTED | not yet retrieved from *the named source* | run retrieval |
+| RESEARCH_PENDING | not yet retrieved from *the named source* | run retrieval |
 | SEARCHED_NOT_FOUND | checked *the named source*; not present | nothing, the gap is real |
 | NOT_APPLICABLE | this subject type has no such thing | nothing |
 

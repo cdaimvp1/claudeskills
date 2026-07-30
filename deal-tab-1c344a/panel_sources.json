@@ -173,7 +173,7 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         }
@@ -333,10 +333,10 @@
           "name": "prior agreements in the family",
           "sources": [
             {
-              "name": "Prior Lilly contracts for this supplier",
+              "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "contract repository lookup by supplier legal entity"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
             }
           ]
         }
@@ -476,7 +476,7 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         }
@@ -624,7 +624,7 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
             }
           ]
         }
