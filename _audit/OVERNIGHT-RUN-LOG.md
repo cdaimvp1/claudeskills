@@ -3615,3 +3615,60 @@ pros and cons, a recommendation, then ASK before proceeding.
 **Recurring lesson, six occurrences:** a pattern list under-reports. Every "missing
 mechanism" finding in this programme that turned out false was a skill wording something
 differently. Treat an ABSENT from any text audit as a prompt to read the skill.
+
+---
+
+## #28 WS J triage — DONE. All three blocked, and the plan contains a CIRCULAR dependency.
+
+J1-J3 had never been triaged. They are not startable, and one reason is a defect in the
+plan itself rather than a missing decision.
+
+### Declared dependencies, as written
+
+| item | depends on |
+|---|---|
+| J1 rebuild THEO as conversational intake | **A11, B7** |
+| J2 collapse routing into one JSON manifest | J1 |
+| J3 cross-session journey state | J2 |
+| B7 prune stale instructions | **A11; routing lists depend on J2** |
+| A11 lock all five hubs | A1, A3-A5, **A7-A10** |
+| A7 build the My Work dashboard and hub | nothing |
+
+### Finding 1: the whole workstream is transitively blocked on ONE unbuilt thing
+
+A7 -> A11 -> B7 -> J1 -> J2 -> J3. A7 is the last unbuilt Phase 1 hub and depends on
+nothing. It is the single root block for WS J, WS B's B7, and #22 and #25. Effort L.
+
+### Finding 2: J1 -> B7 -> J2 -> J1 is CIRCULAR
+
+J1 depends on B7. B7's routing lists depend on J2. J2 depends on J1. As written this can
+never start, no matter what is decided or built.
+
+**Recommended fix, which is a plan edit and not a build:** split B7.
+- **B7a** prune stale prose and old mode pickers. Depends on A11 only.
+- **B7b** regenerate routing lists from the manifest. Depends on J2.
+
+Then J1 depends on A11 + B7a and the chain is linear:
+A7 -> A11 -> B7a -> J1 -> J2 -> (B7b, J3). The cycle disappears without weakening any
+dependency, because the two halves of B7 genuinely have different inputs: pruning prose
+needs the hubs locked, regenerating routing lists needs the manifest to exist.
+
+### Finding 3: J1 also carries an un-taken Marc decision
+
+`PROGRAM-MASTER-PLAN.md:117` gates J1. Even with A7 built and the cycle fixed, J1 needs a
+go-ahead. J2 and J3 need no decision (J3 is merely sequenced "after hubs").
+
+### What is NOT wrong
+
+J1's honesty about auto-dispatch is deliberate and must be preserved:
+`procurement-launcher-1c344a/SKILL.md:205-215` states plainly that auto-dispatch does not
+exist in stock Desktop. The plan already flags that as an accuracy property to keep. Any
+J1 rebuild that quietly starts implying dispatch works would be a regression.
+
+J3's design is already specified and sound: copy `timeline_calibration.json`, the one place
+the persisted-state pattern is actually implemented, rather than inventing a new one. It
+also correctly catches that meeting-prep-brief's "gets richer across meetings"
+(`SKILL.md:97`) is aspirational prose with no file, no schema and no read-back step.
+
+**Net: #28 is now triaged. It moves from "never looked at" to "blocked on A7, plus one
+plan edit and one decision." No code is startable today.**
