@@ -3672,3 +3672,66 @@ also correctly catches that meeting-prep-brief's "gets richer across meetings"
 
 **Net: #28 is now triaged. It moves from "never looked at" to "blocked on A7, plus one
 plan edit and one decision." No code is startable today.**
+
+---
+
+## #23 retrieval indexing — BUILT. And it caught a defect in its own spec on the first run.
+
+`lilly-contract-review-1c344a/retrieval_index.py` + selftest (**42/42**).
+
+**Scope, stated plainly:** this BUILDS and VERIFIES the index. It does NOT rewire the review
+passes. That is F1 (#24), which stays on hold. The index is separable, checkable today, and
+when F1 lifts it is already proven rather than written under time pressure.
+
+### The finding: the spec prose under-reports the table it is describing
+
+`F1-COVERAGE-MATRIX-PART2-judgment.md:85,103` said an Order Form "only needs categories 1
+and 6". The actual applicability matrix at `vendor-tactics.md:288-301` marks **1, 6 AND 8**.
+Category 8 is **Compliance/Security Gaps**, and it is the one category marked applicable to
+all six document types.
+
+Anyone hand-authoring the index from the spec prose, which is exactly what the prose
+invites, would have silently dropped compliance and security tactic detection from every
+Order Form review. Corrected in three places across the two matrix documents.
+
+This is the sixth occurrence of the same failure mode, and the first where it bit the
+PLAN rather than a skill. It is also the direct payoff of deriving the index from the
+corpus instead of transcribing it.
+
+### Three load-bearing properties
+
+1. **A retrieval miss NEVER means skip the check.** `select()` returns an explicit
+   `fallback` flag, not a possibly-empty list. An empty list read as "nothing to check"
+   would turn a token saving into an accuracy regression. Today the full corpus always
+   loads, so narrowing can only ever LOSE coverage, never gain it. Tests T13-T17 and
+   T22-T27 exist for this and nothing else.
+2. **All six Hard Stops load unconditionally**, whatever topics were requested. Making the
+   most consequential checks depend on clause tagging would put them behind the least
+   reliable step (T20, T28).
+3. **Derived at run time, never hand-maintained.** A copy reads as correct right up until
+   someone edits the corpus and not the index. Same drift class as B7b and E1.
+
+### The numeric section label is an alias, never the key
+
+The playbook records its own numbering as unstable ("S14 Insurance (S16 in some templates)",
+`playbook.md:152`), and S26 is BOTH Governing Law and the section HS-2 cites for debarment
+certification. Keying on the number would merge two unrelated topics. T5 and T6 assert this
+against the real file rather than trusting the reasoning.
+
+### Built index
+
+playbook: 27 sections, 6 Hard Stops, **0 untagged**.
+vendor-tactics: Change Order and Amendment all 12 - SOW and Work Order 11 - Order Form 3 -
+MSA 2 (category 1 keeping its "Rate card only" qualifier rather than being flattened).
+
+### Also in this increment
+
+**B7 split applied**, breaking the circular dependency #28 found. B7a (prune prose, depends
+A11) and B7b (routing lists, depends J2). J1 now depends on A11 + B7a. Chain is linear:
+A7 -> A11 -> B7a -> J1 -> J2 -> (B7b, J3).
+
+**Malicious-code review:** SECRETS 0, BYPASS 0, OBFUSCATION 0, INJECTION 0. EGRESS 1
+(pre-existing, reviewed benign). EXEC rose 23 -> 41; `retrieval_index.py` contributed zero,
+and the increase is `provenance.py:278-280` replicated across the 5 vendored copies. Those
+lines are regex literals naming followable citation shapes (`10-K`, `OFAC`, `SAP`, `SOC 2`)
+inside a validator. No execution, no dynamic dispatch. Benign.

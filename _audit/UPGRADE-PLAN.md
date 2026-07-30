@@ -353,14 +353,26 @@ Change: confirm reference-only, then delete.
 Verify: no SKILL.md references any deleted path.
 Effort: S. Marc decision: call out before deleting. Depends on: A11.
 
-**B7. Prune stale instructions and superseded prose.**
+**B7a. Prune stale instructions and superseded prose.**
 Skills: all 31.
 Why: `PROGRAM-MASTER-PLAN.md:102`. Also `feedback_skill_design_principles`: no up-front
 mode pickers.
-Change: remove old mode pickers, superseded IA prose, routing lists that will be generated
-from the JSON manifest once J2 lands.
+Change: remove old mode pickers and superseded IA prose. Routing lists are NOT in scope
+here; they are B7b.
 Verify: word-count delta per file recorded; no rule deleted, only restated once.
-Effort: M. Marc decision: no. Depends on: A11; routing lists depend on J2.
+Effort: M. Marc decision: no. Depends on: A11.
+
+**B7b. Regenerate the routing lists from the JSON manifest.**
+Why: split out of B7 on 2026-07-29 to break a circular dependency. As written, J1 depended
+on B7, B7's routing lists depended on J2, and J2 depended on J1, so WS J could never start
+regardless of what was decided or built.
+Change: replace the hand-maintained routing lists with output generated from J2's manifest.
+Verify: regenerate; diff against the manifest; no hand edits possible.
+Effort: S. Marc decision: no. Depends on: J2.
+
+The split weakens no dependency. The two halves genuinely have different inputs: pruning
+prose needs the hubs locked (A11), regenerating routing lists needs the manifest to exist
+(J2). With the split the chain is linear: A7 -> A11 -> B7a -> J1 -> J2 -> (B7b, J3).
 
 **B8. Update the guardrail numbering references.**
 Skills: commercial-negotiation-prep SKILL.md:150 says "G1-G10 apply suite-wide";
@@ -1129,7 +1141,7 @@ Change: as specified. Do not claim auto-dispatch; `procurement-launcher-1c344a/S
 is honest that it does not exist in stock Desktop, and that honesty is an accuracy property
 to preserve.
 Verify: live smoke test (G7); a free-text need produces the correct ordered path.
-Effort: L. Marc decision: gate at `PROGRAM-MASTER-PLAN.md:117`. Depends on: A11, B7.
+Effort: L. Marc decision: gate at `PROGRAM-MASTER-PLAN.md:117`. Depends on: A11, B7a.
 
 **J2. Collapse routing into one JSON manifest.**
 Why: #110, `PROGRAM-MASTER-PLAN.md:119`: today 4-5 hand-synced files. Hand-synced routing

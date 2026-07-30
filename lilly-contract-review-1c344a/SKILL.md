@@ -1735,6 +1735,36 @@ When reviewing a SOW under an existing MSA:
 - `references/dashboard-canonical.md` -- 3-panel dashboard structure spec v3.2 (when dashboard output selected)
 - `references/contract-stack-map.md` -- Contract Stack Mapper content spec, DOCX layout, and manifest JSON schema (when `Stack Map only` mode is selected, or a stack map is requested alongside another mode)
 
+**Corpus retrieval index (`retrieval_index.py`), built not hand-authored.**
+`playbook.md` and `pharma-requirements.md` are loaded in full on every run with no
+narrowing, and `vendor-tactics.md` is loaded whole even for an Order Form its own
+applicability matrix says needs 3 of its 12 categories. `retrieval_index.py` derives a
+topic-keyed index from the corpora so a pass can load the relevant slice.
+
+Run `python retrieval_index.py` to build and inspect it; `retrieval_index_selftest.py`
+covers it (42 checks).
+
+Three properties are load-bearing:
+
+1. **A retrieval miss NEVER means skip the check.** It falls back to loading the full
+   corpus. `select()` returns an explicit `fallback` flag rather than a possibly-empty
+   list, because an empty list read as "nothing to check" would turn a token saving into
+   an accuracy regression. Today the full corpus always loads, so narrowing can only ever
+   LOSE coverage, never gain it.
+2. **All six Hard Stop sections load unconditionally**, whatever topics were requested.
+   Making the most consequential checks depend on clause tagging would put them behind
+   the least reliable step.
+3. **The index is derived from the corpora at run time, never hand-maintained.** A copy
+   reads as correct right up until someone edits the corpus and not the index.
+
+The numeric section label is an ALIAS, never the key. The playbook records its own
+numbering as unstable ("S14 Insurance (S16 in some templates)", `playbook.md:152`) and
+S26 is both Governing Law and the section HS-2 cites for debarment certification. Keying
+on the number would merge two unrelated topics.
+
+**It does not rewire the review passes.** That is F1, which is on hold. The index is
+buildable, checkable and useful on its own.
+
 **Source documents (`templates/`), consult to verify a distilled figure:** the raw Lilly standards and templates behind several reference files above ship in `templates/` for cross-checking: `Artificial_Intelligence_Standard_09_03_24__4_.docx` (source for ai-standard.md), `Supplier_Privacy_Standard__rev__5_16_25__FINAL__1_.docx` (source for the SPS positions cited in dpa-review-checklist.md, pharma-requirements.md, and playbook.md), `Information_Security_Standard_2025_03_06_v1_0__2_.docx`, `General_MPT_Playbook_.xlsx`, `MPT_5_1_Guide_Final__2_.docx`, and `US_PO_Terms_and_Conditions.pdf`. Not loaded by default; open the relevant source file to confirm a distilled threshold, timeline, or defined term whenever a finding hinges on getting it exactly right or the user disputes it.
 
 ## Risk Heatmap Output
