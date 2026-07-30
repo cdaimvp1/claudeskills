@@ -5039,3 +5039,54 @@ STALE, not current**, because defaulting an unknown age to "current" makes the c
 pointless.
 
 Smoke 33/0 - 31 packages extract-and-retest verified.
+
+---
+
+## Redundant hand-authored dashboards DELETED (Marc, 2026-07-30). 863 lines.
+
+Marc's question: now that the hubs render significantly better locked dashboards, do the
+per-skill JSX dashboards need to exist at all?
+
+Mostly no. But the answer is three different situations, not one:
+
+| situation | skills | verdict |
+|---|---|---|
+| a locked hub already renders this ground | supplier-deep-dive, rfp-case-manager | **redundant, deleted** |
+| no hub covers it | commercial-negotiation-prep, invoice-rate-card-auditor, meeting-prep-brief, timeline-builder, market-rate-benchmarking | a real choice for the ship review |
+| it IS the component library | lilly-brand-assets (16 blocks) | keep; everything points at it |
+
+### Deleted: 863 lines
+
+- `supplier-deep-dive` reference implementation, **487 lines**. Demoted to "historical" only
+  this morning, which was right BEFORE its hub existed. Its hub now exists and is locked, so
+  the block stopped being a content record and became dead weight.
+- `rfp-case-manager` Case Status Visual, **376 lines**. Verified redundant before cutting:
+  the built rfx-hub dashboard contains "event strip" and "status strip", so the ground is
+  genuinely covered.
+
+### Two corrections to my own recommendation, caught by looking before cutting
+
+1. **I said three blocks; it is two.** `supplier-deep-dive` L643 is not a dashboard, it is a
+   13-line colour-token block under "the shared suite palette; do not change". Deleting it
+   would have removed a palette reference on the strength of a fence label.
+2. **My "preserved rules" extraction produced fragments, not rules** ("- Do NOT", "- do
+   not"), because the regex captured the match rather than the line. It inserted noise into
+   two shipped skills. Replaced with an accurate note saying what was removed and why.
+
+### Verified, not asserted
+
+Diffed the normative lines (MUST / NEVER / ALWAYS / HARD RULE / REFUSE) of both files
+against the previous commit: **0 lost in each.** Same discipline as B7a: the rules survive,
+the instruction to hand-build does not.
+
+### The architectural read Marc asked for
+
+The fat-skill design ("one skill, several output formats") has ALREADY been superseded, and
+not by a plan: by the hubs. The shape now is **lens skills do the analysis and own a slice;
+hubs own the render** - which is exactly what the D1-D7 slice contracts made explicit and
+enforceable today.
+
+So the fat skills do not need breaking up. They are already becoming lens skills. The JSX
+dashboards were the vestigial organ of the previous design, and two of them are now gone.
+
+Smoke 33/0 - 31 packages extract-and-retest verified.
