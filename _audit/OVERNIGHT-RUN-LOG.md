@@ -4565,3 +4565,48 @@ SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages extract-and-retest veri
 # ============================================================================
 # WS J COMPLETE: J1 conversational intake, J2 routing manifest, J3 journey state.
 # ============================================================================
+
+---
+
+## THEO now routes to my-work (Marc, 2026-07-30)
+
+The gap J2 surfaced is closed. Applied across all five surfaces in one pass, which is the
+point of having a manifest:
+
+| surface | change |
+|---|---|
+| `routing-manifest.json` | my-work added; removed from `_not_routed` |
+| `SKILL.md` routing table | new Personal Command Center row, trigger `"show me my work"` |
+| `SKILL.md` prose counts | 27 -> 28 routable, PCC 6 -> 7, both totals |
+| `assets/theo-widget.html` | row appended to PCC, section count 6 -> 7 |
+| `references/routing-and-chains.md` | added as a **stated terminal** |
+
+### The chain entry states "none", it does not invent one
+
+my-work has no predecessors and no successors: it reads the rep's own book and is a
+personal workspace, not a producer in a sourcing chain. Both cells say so explicitly.
+Inventing a plausible hop here would have been the exact fabrication the grounding rule
+exists to prevent, and it would have been easy: "my-work feeds meeting-prep-brief" reads
+fine and is not true.
+
+### The hand-maintained counts were the real risk
+
+`SKILL.md` carries prose counts ("27 routable skills", "Personal Command Center (6)",
+"Total = 27") in four places, and the widget carries a section count of its own. A routing
+addition that updated the table but not the prose would have left the file contradicting
+itself. All five were updated together.
+
+### Still not routed, and correctly so
+
+`deal-tab`, `rfx-hub` render inside another skill's flow. `lilly-brand-assets`,
+`lilly-procurement-kernels` and `procurement-launcher` are infrastructure. The check
+reports them without failing, because whether each belongs on a menu is a judgement.
+
+### One thing NOT done, flagged rather than assumed
+
+my-work is not in teach-mode. The drift check is consistent either way, so it passes. But a
+newly routable skill arguably belongs in the teach-mode walkthrough, and adding it is a
+content decision rather than a routing one. Left for Marc.
+
+Smoke 33/0 - manifest check PASS - J1 check PASS - malicious sweep clean - 33 packages
+extract-and-retest verified.

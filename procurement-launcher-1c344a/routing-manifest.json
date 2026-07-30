@@ -1260,13 +1260,33 @@
       ],
       "in_teach_mode": true,
       "_id_cleaned_from": "procurement-help-desk (PENDING; stakeholder/end-user help-desk front door, content build network-gated per Stage 7 - not counted in the 27 built, not yet on the interactive widget)"
+    },
+    {
+      "id": "my-work",
+      "pipeline": "Personal Command Center",
+      "helps": "See your own workload, performance, supplier book and handover position",
+      "shipped": true,
+      "rows": [
+        {
+          "trigger": "show me my work",
+          "title": "My Work",
+          "what": "Your personal workspace: what you are carrying, how you are tracking against your own targets, the suppliers in your book, and your handover position.",
+          "howto": "Just ask. Renders from your book; panels with no data say what is missing and who can supply it rather than sitting blank.",
+          "output": "A dashboard covering workload, report card, the suppliers you manage, savings, spend beneath you, handover and delegation.",
+          "on_widget": true,
+          "upload": "nothing",
+          "helpful": "your current project list, if it is not already in the Project"
+        }
+      ],
+      "in_teach_mode": false,
+      "predecessors": "none stated (it reads the rep's own book, it is not fed by another skill)",
+      "successors": "none stated (it is a personal workspace, not a producer in a sourcing chain)"
     }
   ],
   "_not_routed": [
     "deal-tab",
     "lilly-brand-assets",
     "lilly-procurement-kernels",
-    "my-work",
     "procurement-launcher",
     "rfx-hub"
   ]
