@@ -232,7 +232,7 @@ Change: deterministic port of the platform My Work page, plus the #44 handover/c
 brief which is GREEN LIT to live here (`PROGRAM-MASTER-PLAN.md:86`).
 Verify: as A1. Effort: L. Marc decision: no. Depends on: nothing.
 
-**A8. Landscape design uplift to Deal/RFx caliber.**
+**A8. Landscape design uplift. CLOSED 2026-07-30 - superseded by Marc's design lock.**
 Skills: supplier-landscape.
 Why: `PROGRAM-MASTER-PLAN.md:89` records this as the real WS2 driver, a caliber gap not a
 breakage. Phase 1 does not close until Landscape locks.
@@ -243,7 +243,7 @@ Verify: in-browser per tab; diff against the two locked dashboards as the calibe
 Effort: L. Marc decision: several sub-items (M10, M11, M12 in `MASTER-REMAINING-WORK.md:374-376`).
 Depends on: nothing.
 
-**A9. Landscape engine recolor to MCM.**
+**A9. Landscape engine recolor. DEFERRED 2026-07-30 - the stoplight premise was stale (no green remains; the palette is already MCM). The real residue is 231 distinct hardcoded colours that a token swap will not reach. Deferred because a future redesign may redo it.**
 Skills: supplier-landscape.
 Why: hardcoded stoplight hex literals in `pv-07-landscape-render.js`, `pv-07a-assess-model.js`,
 `pv-07b-deepdive.js`, `pv.css` bypass the CSS-var layer, so a token swap does not fully
@@ -265,6 +265,20 @@ code file. Nothing to remove. See `_audit/A10-LANDSCAPE-FINDINGS.md`.)
 Verify: one score scale rendered suite-wide on the dashboard; grep confirms removed
 functions have no call sites.
 Effort: M. Marc decision: no. Depends on: nothing.
+
+**A11. Lock all five hubs. LOCKED 2026-07-30 (Marc confirmed).**
+
+Design lock declared by Marc 2026-07-29 across Landscape, Deal, RFx and Category
+Strategy; Deep Dive (A5) and My Work (A7) were built to it. **A8 and A9 are disposed of
+by the lock**: A8 was the design uplift and A9 the recolor, and neither survives a
+decision to stop changing the appearance. Tag `hubs-locked-2026-07-30`.
+
+Evidence at lock: hub self-containment 10 built artifacts / 0 findings - in-browser sweep
+0 console errors on every hub - suite smoke 33 skills / 0 failed assertions - malicious
+sweep SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - kernel manifest no unexplained drift -
+33 packages extract-and-retest verified.
+
+ORIGINAL ENTRY BELOW.
 
 **A11. Lock all five hubs.**
 Why: `PROGRAM-MASTER-PLAN.md:51`: "all five hub dashboards LOCKED before Phase 2." This
