@@ -4377,3 +4377,78 @@ delta (+0 across every file), and the reasoning above. Manufacturing deletions t
 productive would have been the actual failure here.
 
 Smoke 33/0. No SKILL file changed, so no repackage was needed.
+
+---
+
+## J1 — THEO rebuilt as conversational intake. DONE. (Marc opened the gate 2026-07-30)
+
+Dependencies were A11 (locked) and B7a (done). Both cleared first.
+
+### What changed
+
+**The menu is no longer the default.** It was: THEO opened with a split-panel widget
+listing 33 skills. A menu asks the user to already know which skill they need, which is the
+thing they came to THEO because they do not know.
+
+Now the default is **diagnose -> recommend -> confirm -> hand off**:
+
+- **DIAGNOSE** from what they said. If their words already identify the work, do not ask a
+  question you have the answer to. If genuinely unclear, **at most one** question, and the
+  one that changes the answer most.
+- **RECOMMEND one path**, not a shortlist. If two are plausible, pick the better one and
+  say what would change your mind. *Presenting three options and asking the user to pick is
+  a mode picker wearing a conversation's clothes* - it hands the judgement back to the
+  person who came here precisely because they did not have it.
+- **CONFIRM before launching**, because launching loads a skill and commits the
+  conversation, and a wrong first hop costs a restart. Skipped when the user was already
+  explicit: someone who says "review this contract" has confirmed by saying it.
+- **HAND OFF** with one line of primed context, then step aside.
+
+The widget spec is untouched. Only what triggers it changed: on request, on genuine
+diagnosis failure, or when the user wants to browse. It is explicitly NOT a fallback for
+when diagnosing felt like work.
+
+### The accuracy property the plan told J1 not to break
+
+`procurement-launcher SKILL.md` is honest that **auto-dispatch does not exist in stock
+Claude Desktop**. A rebuild that quietly started implying THEO can run a chain would be a
+regression dressed as a feature. `_audit/j1_intake_check.py` asserts all three survived the
+rewrite: the auto-dispatch honesty, the no-auto-invoke rule, and the dispatcher boundary.
+
+### Verification (`_audit/j1_intake_check.py`)
+
+The grounding rule says every hop must trace to `routing-and-chains.md` and never be
+stitched from plausibility. That is exactly the kind of prose rule this programme keeps
+finding was never enforced, so it is now checked:
+
+- intake specified, all four steps present, menu demoted        **ok**
+- the three honesty properties survived                         **ok**
+- direct trigger phrases still bypass intake entirely           **ok**
+- chain table: **29 rows, every one a shipped skill**           **ok**
+- **72 documented successor hops**, every one resolving         **ok**
+- 3 stated terminals (comment-cleanup, executive-summary-package, lilly-brand-assets)
+
+Longest documented path, built by walking the table rather than asserted:
+
+    category-strategy -> rfp-engine -> rfp-response-analysis -> evaluation-engine ->
+    commercial-negotiation-prep -> should-cost-builder -> lilly-contract-review ->
+    legal-negotiation-prep -> negotiation-simulator -> negotiation-playbook-learning
+
+### Two defects in my own checker, caught by running it
+
+1. It reported `procurement-launcher (THEO)` as a skill that does not ship. The row name
+   carries a friendly parenthetical and my match choked on it. The launcher obviously
+   ships.
+2. The path walker appended the node that CLOSES a cycle, so the printed path showed one
+   skill twice and read as a real loop in the data when it was only the walker turning
+   around.
+
+Both fixed. Neither was a defect in the skill.
+
+### Verified
+
+Smoke 33/0 - malicious sweep SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 - 33 packages
+extract-and-retest verified.
+
+**Next in the chain: J2** (collapse routing into one JSON manifest), which needs no
+decision from Marc.
