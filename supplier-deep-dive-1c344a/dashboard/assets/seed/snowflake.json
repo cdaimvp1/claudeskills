@@ -10,7 +10,9 @@
       "recommendation": {
         "verdict": "Advance to RFx with conditions",
         "rationale": "Capability and pharma-relevant reference base are the strongest in the shortlist. Advancement is conditional on the two open ESCALATION gates being cleared by their named owners, not on further desk research.",
-        "source_types": ["internal"]
+        "source_types": [
+          "internal"
+        ]
       },
       "gates": [
         {
@@ -28,7 +30,12 @@
           "counts_toward_aggregate": false
         }
       ],
-      "evidence_coverage": { "verified": 46, "partial": 29, "supplier_input": 7, "missing": 18 },
+      "evidence_coverage": {
+        "verified": 46,
+        "partial": 29,
+        "supplier_input": 7,
+        "missing": 18
+      },
       "opportunities": [
         "Separated storage and compute allows capacity to track demand rather than peak provisioning",
         "Existing pharma reference base (Novartis, Sanofi, IQVIA) shortens regulated-environment proving",
@@ -40,11 +47,36 @@
         "Runs on top of AWS, Azure or GCP, so hyperscaler concentration is inherited rather than removed"
       ],
       "requirement_groups": [
-        { "group": "Data platform core", "status": "Confirmed", "must_haves": 9, "gaps": 0 },
-        { "group": "Security and access", "status": "Partially confirmed", "must_haves": 7, "gaps": 1 },
-        { "group": "Regulated / GxP", "status": "Partially confirmed", "must_haves": 5, "gaps": 2 },
-        { "group": "Integration and architecture", "status": "Confirmed", "must_haves": 4, "gaps": 0 },
-        { "group": "Commercial and exit", "status": "Not demonstrated", "must_haves": 3, "gaps": 1 }
+        {
+          "group": "Data platform core",
+          "status": "Confirmed",
+          "must_haves": 9,
+          "gaps": 0
+        },
+        {
+          "group": "Security and access",
+          "status": "Partially confirmed",
+          "must_haves": 7,
+          "gaps": 1
+        },
+        {
+          "group": "Regulated / GxP",
+          "status": "Partially confirmed",
+          "must_haves": 5,
+          "gaps": 2
+        },
+        {
+          "group": "Integration and architecture",
+          "status": "Confirmed",
+          "must_haves": 4,
+          "gaps": 0
+        },
+        {
+          "group": "Commercial and exit",
+          "status": "Not demonstrated",
+          "must_haves": 3,
+          "gaps": 1
+        }
       ],
       "dimensions": {
         "identity_ownership": {
@@ -52,10 +84,38 @@
           "confidence": "verified",
           "position": 92,
           "evidence": [
-            { "field": "Legal identity", "status": "Verified", "raw_value": "Snowflake Inc., incorporated Delaware, HQ Bozeman, Montana", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
-            { "field": "Public listing", "status": "Verified", "raw_value": "NYSE: SNOW, IPO 16 Sep 2020", "source_name": "SEC EDGAR", "source_type": "filing", "source_date": "2026-03-20" },
-            { "field": "Ultimate beneficial ownership", "status": "Not applicable", "raw_value": "Widely held public company; no UBO determination required", "source_name": "", "source_type": "", "source_date": "" },
-            { "field": "Lilly vendor-master match", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+            {
+              "field": "Legal identity",
+              "status": "Verified",
+              "raw_value": "Snowflake Inc., incorporated Delaware, HQ Bozeman, Montana",
+              "source_name": "FY2026 10-K",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            },
+            {
+              "field": "Public listing",
+              "status": "Verified",
+              "raw_value": "NYSE: SNOW, IPO 16 Sep 2020",
+              "source_name": "SEC EDGAR",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            },
+            {
+              "field": "Ultimate beneficial ownership",
+              "status": "Not applicable",
+              "raw_value": "Widely held public company; no UBO determination required",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            },
+            {
+              "field": "Lilly vendor-master match",
+              "status": "Data source required",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
           ]
         },
         "capability_fit": {
@@ -63,10 +123,38 @@
           "confidence": "verified",
           "position": 88,
           "evidence": [
-            { "field": "Relevant products and services", "status": "Verified", "raw_value": "Cloud data platform: warehousing, lakes with native Apache Iceberg, engineering, governed cross-account sharing, Cortex AI layer", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
-            { "field": "Pharma and regulated experience", "status": "Verified", "raw_value": "Named pharma and life-science customers: Novartis, Sanofi, IQVIA", "source_name": "Company customer disclosures", "source_type": "supplier", "source_date": "2026-07-17" },
-            { "field": "Capacity and scalability", "status": "Verified", "raw_value": "Storage and compute separated for independent elastic scaling", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
-            { "field": "Lilly-specific reference", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+            {
+              "field": "Relevant products and services",
+              "status": "Verified",
+              "raw_value": "Cloud data platform: warehousing, lakes with native Apache Iceberg, engineering, governed cross-account sharing, Cortex AI layer",
+              "source_name": "FY2026 10-K",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            },
+            {
+              "field": "Pharma and regulated experience",
+              "status": "Verified",
+              "raw_value": "Named pharma and life-science customers: Novartis, Sanofi, IQVIA",
+              "source_name": "Company customer disclosures",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Capacity and scalability",
+              "status": "Verified",
+              "raw_value": "Storage and compute separated for independent elastic scaling",
+              "source_name": "FY2026 10-K",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            },
+            {
+              "field": "Lilly-specific reference",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
           ]
         },
         "financial_viability": {
@@ -74,10 +162,38 @@
           "confidence": "verified",
           "position": 85,
           "evidence": [
-            { "field": "Scale", "status": "Verified", "raw_value": "9,060 full-time employees as of 31 Jan 2026", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
-            { "field": "Market capitalisation", "status": "Verified", "raw_value": "Approximately 93.2 billion USD", "source_name": "stockanalysis.com", "source_type": "market", "source_date": "2026-07-17" },
-            { "field": "Failure risk", "status": "Partially verified", "raw_value": "No distress indicators identified in filings or market data", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
-            { "field": "Credit rating", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+            {
+              "field": "Scale",
+              "status": "Verified",
+              "raw_value": "9,060 full-time employees as of 31 Jan 2026",
+              "source_name": "FY2026 10-K",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            },
+            {
+              "field": "Market capitalisation",
+              "status": "Verified",
+              "raw_value": "Approximately 93.2 billion USD",
+              "source_name": "stockanalysis.com",
+              "source_type": "market",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Failure risk",
+              "status": "Partially verified",
+              "raw_value": "No distress indicators identified in filings or market data",
+              "source_name": "FY2026 10-K",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            },
+            {
+              "field": "Credit rating",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
           ]
         },
         "operational_resilience": {
@@ -85,9 +201,30 @@
           "confidence": "partial",
           "position": 55,
           "evidence": [
-            { "field": "Critical sub-tier dependency", "status": "Verified", "raw_value": "Platform runs on AWS, Azure or Google Cloud; hyperscaler dependency is structural", "source_name": "FY2026 10-K", "source_type": "filing", "source_date": "2026-03-20" },
-            { "field": "Substitutability", "status": "Partially verified", "raw_value": "Native Iceberg support reduces storage-layer lock-in; compute and governance layers remain proprietary", "source_name": "Product documentation", "source_type": "supplier", "source_date": "2026-07-17" },
-            { "field": "Continuity commitments for Lilly scope", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+            {
+              "field": "Critical sub-tier dependency",
+              "status": "Verified",
+              "raw_value": "Platform runs on AWS, Azure or Google Cloud; hyperscaler dependency is structural",
+              "source_name": "FY2026 10-K",
+              "source_type": "filing",
+              "source_date": "2026-03-20"
+            },
+            {
+              "field": "Substitutability",
+              "status": "Partially verified",
+              "raw_value": "Native Iceberg support reduces storage-layer lock-in; compute and governance layers remain proprietary",
+              "source_name": "Product documentation",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Continuity commitments for Lilly scope",
+              "status": "Data source required",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
           ]
         },
         "integrity_legal_compliance": {
@@ -95,9 +232,30 @@
           "confidence": "partial",
           "position": 70,
           "evidence": [
-            { "field": "Direct sanctions or watchlist match", "status": "Not found", "raw_value": "No match identified; formal screen still routes to Compliance", "source_name": "OFAC SDN", "source_type": "regulator", "source_date": "2026-07-17" },
-            { "field": "Material legal events", "status": "Partially verified", "raw_value": "Litigation reported in connection with the 2024 customer-tenant incident", "source_name": "Wikipedia, Snowflake data breach", "source_type": "media", "source_date": "2026-07-17" },
-            { "field": "Trade and sourcing restrictions", "status": "Not applicable", "raw_value": "Software service; no goods-origin restriction in scope", "source_name": "", "source_type": "", "source_date": "" }
+            {
+              "field": "Direct sanctions or watchlist match",
+              "status": "Not found",
+              "raw_value": "No match identified; formal screen still routes to Compliance",
+              "source_name": "OFAC SDN",
+              "source_type": "regulator",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Material legal events",
+              "status": "Partially verified",
+              "raw_value": "Litigation reported in connection with the 2024 customer-tenant incident",
+              "source_name": "Wikipedia, Snowflake data breach",
+              "source_type": "media",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Trade and sourcing restrictions",
+              "status": "Not applicable",
+              "raw_value": "Software service; no goods-origin restriction in scope",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
           ]
         },
         "quality_regulatory_ehs": {
@@ -105,8 +263,22 @@
           "confidence": "insufficient",
           "position": 25,
           "evidence": [
-            { "field": "GxP qualification package", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" },
-            { "field": "Inspection or enforcement history", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+            {
+              "field": "GxP qualification package",
+              "status": "Data source required",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            },
+            {
+              "field": "Inspection or enforcement history",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
           ]
         },
         "cyber_privacy_data": {
@@ -114,10 +286,38 @@
           "confidence": "partial",
           "position": 32,
           "evidence": [
-            { "field": "Breach and incident history", "status": "Verified", "raw_value": "2024 UNC5537 credential-stuffing campaign against customer tenants; reporting cites 165+ affected organisations. Attributed to customer accounts lacking multi-factor authentication rather than a platform compromise.", "source_name": "Wikipedia, Snowflake data breach", "source_type": "media", "source_date": "2026-07-17" },
-            { "field": "Certifications", "status": "Partially verified", "raw_value": "Trust Center publishes certification coverage", "source_name": "trust.snowflake.com", "source_type": "supplier", "source_date": "2026-07-17" },
-            { "field": "Subprocessors for Lilly scope", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" },
-            { "field": "Data residency commitments", "status": "Data source required", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" }
+            {
+              "field": "Breach and incident history",
+              "status": "Verified",
+              "raw_value": "2024 UNC5537 credential-stuffing campaign against customer tenants; reporting cites 165+ affected organisations. Attributed to customer accounts lacking multi-factor authentication rather than a platform compromise.",
+              "source_name": "Wikipedia, Snowflake data breach",
+              "source_type": "media",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Certifications",
+              "status": "Partially verified",
+              "raw_value": "Trust Center publishes certification coverage",
+              "source_name": "trust.snowflake.com",
+              "source_type": "supplier",
+              "source_date": "2026-07-17"
+            },
+            {
+              "field": "Subprocessors for Lilly scope",
+              "status": "Data source required",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            },
+            {
+              "field": "Data residency commitments",
+              "status": "Data source required",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            }
           ]
         },
         "responsible_sourcing_evidence": {
@@ -125,11 +325,425 @@
           "confidence": "insufficient",
           "position": 30,
           "evidence": [
-            { "field": "Human rights and labour", "status": "Not found", "raw_value": "", "source_name": "", "source_type": "", "source_date": "" },
-            { "field": "Overall data completeness", "status": "Partially verified", "raw_value": "46 percent of assessed fields verified; 18 percent have no source at all", "source_name": "This assessment", "source_type": "internal", "source_date": "2026-07-29" }
+            {
+              "field": "Human rights and labour",
+              "status": "Not found",
+              "raw_value": "",
+              "source_name": "",
+              "source_type": "",
+              "source_date": ""
+            },
+            {
+              "field": "Overall data completeness",
+              "status": "Partially verified",
+              "raw_value": "46 percent of assessed fields verified; 18 percent have no source at all",
+              "source_name": "This assessment",
+              "source_type": "internal",
+              "source_date": "2026-07-29"
+            }
           ]
         }
-      }
+      },
+      "company_scale": {
+        "founded": "2012",
+        "employees": "9,060 (31 Jan 2026)",
+        "revenue_range": "Public reporting; market cap approx 93.2B USD (17 Jul 2026)",
+        "countries": "Not established",
+        "relevant_facilities": "Not established",
+        "listing": "Public, NYSE: SNOW"
+      },
+      "ownership": {
+        "nodes": [
+          {
+            "id": "snow",
+            "label": "Snowflake Inc.",
+            "role": "Contracting entity",
+            "status": "Verified",
+            "note": "Delaware incorporated, NYSE listed"
+          }
+        ],
+        "contracting_entity_differs": false,
+        "ubo_required": false,
+        "ubo_status": "Not applicable",
+        "subsidiaries_status": "Data source required"
+      },
+      "identity_matrix": [
+        {
+          "element": "Legal name",
+          "status": "Verified",
+          "source": "FY2026 10-K"
+        },
+        {
+          "element": "Incorporation",
+          "status": "Verified",
+          "source": "FY2026 10-K"
+        },
+        {
+          "element": "Public listing",
+          "status": "Verified",
+          "source": "SEC EDGAR"
+        },
+        {
+          "element": "Contracting entity confirmed for this event",
+          "status": "Data source required",
+          "source": ""
+        },
+        {
+          "element": "Lilly vendor-master match",
+          "status": "Data source required",
+          "source": ""
+        },
+        {
+          "element": "Ultimate beneficial ownership",
+          "status": "Not applicable",
+          "source": "Widely held public company"
+        }
+      ],
+      "locations": {
+        "status": "Data source required",
+        "note": "Delivery-relevant data-centre regions for Lilly scope are not confirmed. Country of domicile is not a substitute.",
+        "entries": []
+      },
+      "capability_matrix": [
+        {
+          "requirement": "Elastic compute separation",
+          "result": "Confirmed",
+          "evidence": "FY2026 10-K"
+        },
+        {
+          "requirement": "Open table format support",
+          "result": "Confirmed",
+          "evidence": "Native Apache Iceberg, FY2026 10-K"
+        },
+        {
+          "requirement": "Governed cross-account sharing",
+          "result": "Confirmed",
+          "evidence": "FY2026 10-K"
+        },
+        {
+          "requirement": "Pharma-regulated deployment",
+          "result": "Partially confirmed",
+          "evidence": "Named pharma customers; no qualification package"
+        },
+        {
+          "requirement": "GxP qualification package",
+          "result": "Gap",
+          "evidence": ""
+        },
+        {
+          "requirement": "In-region data residency",
+          "result": "Not demonstrated",
+          "evidence": ""
+        },
+        {
+          "requirement": "Exit and data portability",
+          "result": "Partially confirmed",
+          "evidence": "Iceberg reduces storage-layer lock-in only"
+        }
+      ],
+      "delivery_readiness": [
+        {
+          "stage": "Product maturity",
+          "level": "Strong",
+          "pct": 90
+        },
+        {
+          "stage": "Implementation path",
+          "level": "Moderate",
+          "pct": 55
+        },
+        {
+          "stage": "Lilly architecture fit",
+          "level": "Insufficient evidence",
+          "pct": 20
+        },
+        {
+          "stage": "Capacity",
+          "level": "Strong",
+          "pct": 85
+        },
+        {
+          "stage": "Support model",
+          "level": "Insufficient evidence",
+          "pct": 25
+        }
+      ],
+      "references": [
+        {
+          "customer": "Novartis",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        },
+        {
+          "customer": "Sanofi",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        },
+        {
+          "customer": "IQVIA",
+          "pharma": true,
+          "similar_scale": null,
+          "similar_use_case": null,
+          "independently_verified": false
+        }
+      ],
+      "dependencies": [
+        {
+          "name": "AWS / Azure / Google Cloud",
+          "kind": "Infrastructure",
+          "criticality": "Critical",
+          "substitutability": "Portable across the three, not away from all three",
+          "confidence": "Verified"
+        },
+        {
+          "name": "Implementation partner",
+          "kind": "Services",
+          "criticality": "Not established",
+          "substitutability": "Not established",
+          "confidence": "Data source required"
+        }
+      ],
+      "financial_periods": [
+        {
+          "period": "FY2026",
+          "metric": "Market capitalisation",
+          "value": "approx 93.2B USD",
+          "source": "stockanalysis.com",
+          "source_date": "2026-07-17"
+        }
+      ],
+      "financial_bridge": [
+        {
+          "driver": "Growth",
+          "assessment": "Strong",
+          "evidence": "Revenue growth reported in FY2026 10-K"
+        },
+        {
+          "driver": "Profitability",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        },
+        {
+          "driver": "Liquidity",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        },
+        {
+          "driver": "Leverage",
+          "assessment": "Insufficient evidence",
+          "evidence": ""
+        }
+      ],
+      "commercial_drivers": [
+        {
+          "driver": "Compute",
+          "variability": "High",
+          "note": "Scales with workload design and concurrency"
+        },
+        {
+          "driver": "Storage",
+          "variability": "Low",
+          "note": "Broadly predictable per TB"
+        },
+        {
+          "driver": "Data transfer",
+          "variability": "Medium",
+          "note": "Cross-region and egress dependent"
+        },
+        {
+          "driver": "Implementation",
+          "variability": "Not established",
+          "note": ""
+        },
+        {
+          "driver": "Exit",
+          "variability": "Medium",
+          "note": "Iceberg reduces storage-layer cost only"
+        }
+      ],
+      "peers": [],
+      "risks": [
+        {
+          "risk": "Customer-tenant credential compromise recurrence",
+          "impact": 4,
+          "likelihood": 3,
+          "confidence": "partial",
+          "mitigation": "proposed",
+          "owner": "Cyber (SAE)",
+          "gate": true
+        },
+        {
+          "risk": "Consumption cost overrun",
+          "impact": 3,
+          "likelihood": 4,
+          "confidence": "verified",
+          "mitigation": "proposed",
+          "owner": "Procurement",
+          "gate": false
+        },
+        {
+          "risk": "Hyperscaler concentration",
+          "impact": 4,
+          "likelihood": 2,
+          "confidence": "verified",
+          "mitigation": "not-started",
+          "owner": "Architecture",
+          "gate": false
+        },
+        {
+          "risk": "GxP qualification shortfall",
+          "impact": 5,
+          "likelihood": null,
+          "confidence": "insufficient",
+          "mitigation": "not-started",
+          "owner": "Quality",
+          "gate": true
+        }
+      ],
+      "material_events": [
+        {
+          "date": "2024",
+          "event": "UNC5537 credential-stuffing campaign against customer tenants",
+          "impact": "165+ organisations reported affected",
+          "resolution": "Attributed to customer accounts without MFA; platform compromise not established",
+          "confidence": "partial",
+          "source": "Wikipedia, Snowflake data breach"
+        }
+      ],
+      "mitigations": [
+        {
+          "risk": "Customer-tenant credential compromise recurrence",
+          "treatment": "Mandatory MFA and network policy for the Lilly tenant",
+          "status": "proposed",
+          "owner": "Cyber (SAE)"
+        },
+        {
+          "risk": "Consumption cost overrun",
+          "treatment": "Committed-spend structure with guardrails and alerting",
+          "status": "proposed",
+          "owner": "Procurement"
+        },
+        {
+          "risk": "Hyperscaler concentration",
+          "treatment": "Not started",
+          "status": "not-started",
+          "owner": "Architecture"
+        },
+        {
+          "risk": "GxP qualification shortfall",
+          "treatment": "Not started",
+          "status": "not-started",
+          "owner": "Quality"
+        }
+      ],
+      "lilly_fit": [
+        {
+          "factor": "Architecture alignment",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Pharma experience",
+          "fit": "Strong",
+          "confidence": "partial"
+        },
+        {
+          "factor": "Internal compatibility",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Existing relationship",
+          "fit": "None found",
+          "confidence": "verified"
+        },
+        {
+          "factor": "Regulatory fit",
+          "fit": "Insufficient evidence",
+          "confidence": "insufficient"
+        },
+        {
+          "factor": "Implementation readiness",
+          "fit": "Moderate",
+          "confidence": "partial"
+        },
+        {
+          "factor": "Commercial leverage",
+          "fit": "Moderate",
+          "confidence": "partial"
+        }
+      ],
+      "internal_history": {
+        "status": "Not found",
+        "note": "No Lilly contractual, spend or performance history located for this supplier.",
+        "entries": []
+      },
+      "diligence": [
+        {
+          "track": "Desk research",
+          "pct": 80
+        },
+        {
+          "track": "Supplier evidence",
+          "pct": 25
+        },
+        {
+          "track": "Security review",
+          "pct": 10
+        },
+        {
+          "track": "Quality / GxP",
+          "pct": 0
+        },
+        {
+          "track": "Financial / TPRM",
+          "pct": 40
+        },
+        {
+          "track": "References",
+          "pct": 15
+        },
+        {
+          "track": "Contract readiness",
+          "pct": 0
+        }
+      ],
+      "actions": [
+        {
+          "action": "Confirm Lilly-scope controls and MFA enforcement after the 2024 campaign",
+          "owner": "Cyber (SAE)",
+          "gate": true,
+          "status": "open"
+        },
+        {
+          "action": "Obtain written subprocessor list and data-residency commitments",
+          "owner": "Privacy",
+          "gate": true,
+          "status": "open"
+        },
+        {
+          "action": "Request the GxP qualification package",
+          "owner": "Quality",
+          "gate": false,
+          "status": "open"
+        },
+        {
+          "action": "Confirm contracting entity and Lilly vendor-master match",
+          "owner": "Procurement",
+          "gate": false,
+          "status": "open"
+        },
+        {
+          "action": "Obtain reference calls with a comparable pharma deployment",
+          "owner": "Procurement",
+          "gate": false,
+          "status": "open"
+        }
+      ]
     }
   ]
 }

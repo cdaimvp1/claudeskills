@@ -23,6 +23,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import build_profile_dashboard as BPD                                # noqa: E402
+import deepdive_viz as VIZ                                           # noqa: E402
 from deepdive_schema import (                                        # noqa: E402
     CompositeScoreError, DIMENSIONS, FabricatedFigureError, GateError, SchemaError,
     validate_supplier,
@@ -262,8 +263,96 @@ def run():
            "rendered page is indistinguishable from a trustworthy one",
            CompositeScoreError, builder_refuses_bad_seed)
 
+
+    # ============================================================================
+    # STAGE 2: visualization selection (spec:136-145). These are the checks that
+    # stop the dashboard drawing a shape the evidence cannot carry, which is the
+    # spec's closing instruction and the most likely way this page lies.
+    # ============================================================================
+    ok("T34 trend: 3+ comparable dated periods gives a LINE",
+       VIZ.choose_trend([{"metric": "Revenue", "source_date": "2024"},
+                         {"metric": "Revenue", "source_date": "2025"},
+                         {"metric": "Revenue", "source_date": "2026"}])[0] == "line")
+    ok("T35 trend: 3 periods of MIXED metrics does NOT give a line, because a trend "
+       "line would imply a comparability the data lacks",
+       VIZ.choose_trend([{"metric": "Revenue", "source_date": "2024"},
+                         {"metric": "Headcount", "source_date": "2025"},
+                         {"metric": "Revenue", "source_date": "2026"}])[0] == "bars")
+    ok("T36 trend: 2 periods gives bars, not a line",
+       VIZ.choose_trend([{"metric": "R", "source_date": "2025"},
+                         {"metric": "R", "source_date": "2026"}])[0] == "bars")
+    k, r = VIZ.choose_trend([{"metric": "R", "source_date": "2026"}])
+    ok("T37 trend: ONE period gives a metric card", k == "card")
+    ok("T38 and says a line through one point would invent a direction",
+       "invent a direction" in r)
+    ok("T39 trend: no periods gives a stated information requirement",
+       VIZ.choose_trend([])[0] == "required")
+    ok("T40 trend: an UNDATED period cannot form a line",
+       VIZ.choose_trend([{"metric": "R", "source_date": ""},
+                         {"metric": "R", "source_date": "2025"},
+                         {"metric": "R", "source_date": "2026"}])[0] == "bars")
+
+    ok("T41 ownership: a single node does NOT draw a tree",
+       VIZ.choose_ownership({"nodes": [{"id": "a"}]})[0] == "matrix-only")
+    ok("T42 ownership: two nodes DO draw a tree",
+       VIZ.choose_ownership({"nodes": [{"id": "a"}, {"id": "b"}]})[0] == "tree")
+    ok("T43 ownership: one node draws a tree when the contracting entity differs",
+       VIZ.choose_ownership({"nodes": [{"id": "a"}],
+                             "contracting_entity_differs": True})[0] == "tree")
+    ok("T44 ownership: one node draws a tree when UBO is required and unresolved",
+       VIZ.choose_ownership({"nodes": [{"id": "a"}], "ubo_required": True,
+                             "ubo_status": "Data source required"})[0] == "tree")
+
+    ok("T45 map: no confirmed locations gives a requirement, never a country outline",
+       VIZ.choose_map({"entries": []})[0] == "required")
+    ok("T46 map: real locations give a schematic",
+       VIZ.choose_map({"entries": [{"site": "x"}]})[0] == "schematic")
+
+    k, r = VIZ.choose_network([{"name": "AWS", "confidence": "Verified"},
+                               {"name": "Partner", "confidence": "Data source required"}])
+    ok("T47 network: confirmed dependencies are drawn", k == "diagram")
+    ok("T48 and unconfirmed ones are counted as NOT drawn, because a node on a diagram "
+       "reads as a confirmed relationship", "not drawn" in r)
+    ok("T49 network: dependencies that are ALL unconfirmed are listed, not drawn",
+       VIZ.choose_network([{"name": "x", "confidence": "Data source required"}])[0]
+       == "list")
+    ok("T50 network: none disclosed gives a requirement",
+       VIZ.choose_network([])[0] == "required")
+
+    k, r = VIZ.choose_risk_matrix([{"impact": 3, "likelihood": 2},
+                                   {"impact": 5, "likelihood": None}])
+    ok("T51 risk: risks scored on both axes are plotted", k == "matrix")
+    ok("T52 and an unscored risk is listed separately rather than dropped, so the "
+       "matrix is not mistaken for the whole picture", "listed separately" in r)
+    ok("T53 risk: nothing scored on both axes gives a list, not a matrix on axes that "
+       "were never scored",
+       VIZ.choose_risk_matrix([{"impact": 3, "likelihood": None}])[0] == "list")
+
+    ok("T54 peers: none captured gives a requirement, because a single point shows "
+       "position relative to nothing", VIZ.choose_peer_scatter([])[0] == "required")
+    ok("T55 peers: 3 or more give a scatter",
+       VIZ.choose_peer_scatter([1, 2, 3])[0] == "scatter")
+
+    # --- the six subtabs render -----------------------------------------------------
+    ok("T56 all six subtabs are present",
+       all(('id="p-%s"' % t) in page for t, _ in BPD.SUBTABS))
+    ok("T57 every subtab pane carries content",
+       all(len(page.split('id="p-%s"' % t)[1][:400]) > 200 for t, _ in BPD.SUBTABS))
+    ok("T58 the chosen-visual REASON is rendered on the page, not just decided in code",
+       page.count('class="why"') >= 4)
+    ok("T59 the ownership tree is NOT drawn for this public single-entity supplier",
+       "one-node tree would imply" in page)
+    ok("T60 the financial trend fell back to a metric card and said why",
+       "invent a direction" in page)
+    ok("T61 the unplottable GxP risk is named rather than dropped",
+       "GxP qualification shortfall" in page)
+    ok("T62 no double negative survives in the generated prose",
+       "cannot not" not in page)
+    ok("T63 the page is still self-contained after stage 2",
+       'src="http' not in page and "fetch(" not in page)
+
     BPD.build()
-    ok("T33 rebuilds clean after the tamper tests", True)
+    ok("T64 rebuilds clean after the tamper tests", True)
 
     print("=" * 90)
     print("SUMMARY: %d/%d passed, %d failed" % (len(PASS), len(PASS) + len(FAIL), len(FAIL)))

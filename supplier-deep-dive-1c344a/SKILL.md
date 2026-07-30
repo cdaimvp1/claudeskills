@@ -408,7 +408,7 @@ One JSON object per run, on the canonical 0.0-5.0 evaluation scale wherever a fi
 
 A consuming skill should treat any field with `confidence: "Low"` or a `RESEARCH_PENDING` note as provisional and re-verify before a decision. The `staleness` block tells downstream skills when to re-run the profile.
 
-## The Deep Dive dashboard (A5, stage 1)
+## The Deep Dive dashboard (A5)
 
 **Do NOT hand-author the dashboard.** This skill used to instruct the model to write the
 JSX with `create_file`, so every run produced a differently shaped artifact. That is a
@@ -418,7 +418,7 @@ The model now authors DATA; code assembles the page.
 ```bash
 python dashboard/deepdive_schema.py <data.json>   # validate; exits 2 and names the breach
 python dashboard/build_profile_dashboard.py       # build the dashboard
-python dashboard/deepdive_schema_selftest.py      # 35 assertions
+python dashboard/deepdive_schema_selftest.py      # 65 assertions
 ```
 
 Data shape: `dashboard/assets/seed/snowflake.json` is the worked reference.
@@ -454,9 +454,40 @@ bar cannot be misread as a score. Confidence is the FILL: solid is verified, str
 partial, dashed outline is insufficient evidence. Risk posture in the header is DERIVED
 from the gates, which is what stops the header disagreeing with the chart beneath it.
 
-**Stage 1 of 3.** The spec places a sign-off gate here before the pattern rolls to the
-other five subtabs (Company & Ownership, Capabilities & Operations, Financial & Market,
-Risk & Resilience, Lilly Fit & Diligence). Supplier-type adaptation is A6.
+### All six subtabs
+
+| # | Subtab | Dominant visual |
+|---|---|---|
+| 0 | Supplier Summary (default) | eight-dimension assessment bars |
+| 1 | Company & Ownership | corporate structure, or the identity matrix when a tree is not warranted |
+| 2 | Capabilities & Operations | capability-against-requirement matrix |
+| 3 | Financial & Market | financial health, at whatever depth the data supports |
+| 4 | Risk & Resilience | impact by likelihood matrix |
+| 5 | Lilly Fit & Diligence | fit matrix, diligence completeness, actions by owner |
+
+### The visual is CHOSEN from the data, and the reason is printed
+
+`deepdive_viz.py` decides every dominant visual from what the evidence can carry. This is
+the spec's closing instruction as code: *never fabricate a network, trend or map from weak
+references*. The danger is not a wrong fact, it is a SHAPE that implies evidence nobody
+has. A line through one point invents a direction. A map drawn from a country of domicile
+invents a delivery footprint. A one-node ownership tree invents a structure never
+researched.
+
+| Visual | Requires | Otherwise |
+|---|---|---|
+| trend line | 3+ comparable dated periods of one metric | 2 gives bars, 1 gives a metric card, 0 gives a stated requirement |
+| ownership tree | more than one entity, a differing contracting entity, or unresolved UBO | the identity-verification matrix carries the section |
+| footprint map | real delivery-relevant locations | a stated requirement; domicile is not a footprint |
+| dependency diagram | dependencies whose existence is confirmed | unconfirmed ones are listed, never drawn, because a node reads as a confirmed relationship |
+| risk matrix | impact AND likelihood scored separately | risks scored on one axis are listed separately, never dropped, so the matrix is not mistaken for the whole picture |
+| peer scatter | 3+ comparable candidates | a stated requirement; one point shows position relative to nothing |
+
+**Each choice prints its reason on the page.** A reader who expected a chart and finds a
+card is owed the explanation, and it is the fallback being visible that makes it a
+feature rather than a gap.
+
+Supplier-type adaptation (public / private / hyperscaler product) is **A6**.
 
 ## Validate the dossier before delivering it (HARD RULE)
 

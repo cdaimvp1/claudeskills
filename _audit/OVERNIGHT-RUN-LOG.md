@@ -3933,3 +3933,67 @@ INJECTION all 0 - 33 packages extract-and-retest verified.
 
 Stage 2 (the other five subtabs) and stage 3 / A6 (supplier-type adaptation) are held at
 the spec's sign-off gate pending Marc's review of this exemplar.
+
+---
+
+## A5 STAGE 2 — the pattern rolled out to all five remaining subtabs. Marc signed off the exemplar.
+
+All six subtabs now render from validated data: Supplier Summary, Company & Ownership,
+Capabilities & Operations, Financial & Market, Risk & Resilience, Lilly Fit & Diligence.
+
+### The important piece is `deepdive_viz.py`, not the markup
+
+The spec's closing instruction is "never fabricate a network/trend/map from weak web
+references" (spec:145). That is the most likely way this dashboard produces something
+false: **not by stating a wrong fact, but by drawing a SHAPE that implies evidence nobody
+has.** A line through one point invents a direction. A map drawn from a country of domicile
+invents a delivery footprint. A one-node ownership tree invents a structure never
+researched.
+
+So the dominant visual for every subtab is CHOSEN from what the data can carry, and the
+reason is printed on the page.
+
+| Visual | Requires | Otherwise |
+|---|---|---|
+| trend line | 3+ comparable dated periods of one metric | 2 bars, 1 metric card, 0 stated requirement |
+| ownership tree | >1 entity, differing contracting entity, or unresolved UBO | identity matrix carries the section |
+| footprint map | real delivery-relevant locations | stated requirement; domicile is not a footprint |
+| dependency diagram | confirmed existence | unconfirmed listed, never drawn: a node reads as a confirmed relationship |
+| risk matrix | impact AND likelihood scored separately | one-axis risks listed separately, never dropped |
+| peer scatter | 3+ comparable candidates | stated requirement; one point is position relative to nothing |
+
+### On the real Snowflake data, four of six fell back, and said why
+
+This is the mechanism working, not a shortfall:
+
+- **ownership** -> matrix only. "A one-node tree would imply a structure that was never
+  researched; the subsidiary structure is stated as required, not drawn."
+- **trend** -> metric card. "A line through one point would invent a direction."
+- **map** -> stated requirement. Delivery-relevant regions are unconfirmed, and country of
+  domicile is not a substitute.
+- **peer scatter** -> stated requirement. No comparable peer data captured.
+- **dependency diagram** -> drawn, with AWS/Azure/GCP confirmed and the implementation
+  partner **listed but not drawn** because its existence is unconfirmed.
+- **risk matrix** -> drawn with 3 of 4 risks. The GxP shortfall has an impact but no
+  likelihood, so it is **named beneath the matrix rather than dropped**, which stops the
+  matrix being mistaken for the whole picture.
+
+### Also
+
+The risk matrix gained gridlines, axis ticks and a confidence legend. Without a scale it
+looked quantitative while being unreadable, which is the worst of both: it implies
+precision and delivers none.
+
+Two user-visible grammar defects were caught in generated prose and fixed: "1 identified
+dependency(ies)" and a "cannot not be plotted" double negative. T62 now asserts against the
+latter, because generated prose is still prose a reader has to trust.
+
+### Verified
+
+Selftest **65/65** (up from 35; T34-T63 cover selection and the six panes) - in-browser
+0 console errors, all six panes populated - suite smoke 33/0 - hub self-containment
+8 artifacts 0 findings - malicious sweep SECRETS/BYPASS/OBFUSCATION/INJECTION all 0 -
+33 packages extract-and-retest verified.
+
+**A5 is complete.** A6 (supplier-type adaptation: public / private / hyperscaler product)
+is the remaining Deep Dive item and depends on this.

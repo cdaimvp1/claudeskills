@@ -46,6 +46,64 @@ h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#5f5f5f;fon
 footer{margin-top:40px;padding-top:14px;border-top:1px solid #dcdcdc;color:#5f5f5f;font-size:11.5px}
 @media(max-width:860px){.dimrow{grid-template-columns:1fr;gap:5px}.dimev,.dimlabel{text-align:left}
  .cols{grid-template-columns:1fr}}
+
+.tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid #dcdcdc;margin-bottom:24px}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;
+     padding:9px 15px;font:inherit;font-size:13px;color:#5f5f5f;cursor:pointer}
+.tab.on{color:#0F3A85;border-bottom-color:#0F3A85;font-weight:600}
+.tab:hover{color:#1a1a1a}
+.pane{display:none}
+.pane.on{display:block}
+
+.why{color:#5f5f5f;font-size:12px;margin:6px 0 14px;font-style:normal}
+.t{width:100%;border-collapse:collapse;font-size:13px}
+.t th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+      color:#5f5f5f;font-weight:600;padding:6px 10px 6px 0;border-bottom:1px solid #dcdcdc}
+.t td{padding:7px 10px 7px 0;border-bottom:1px solid #f2f2f2;vertical-align:top}
+.t td.mut{color:#5f5f5f;font-size:12px}
+.pill{display:inline-block;font-size:11px;padding:1px 8px;border:1px solid;border-radius:20px}
+.need{border:1px dashed #B26B00;border-radius:3px;padding:13px 15px;font-size:13px}
+.needk{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#B26B00;
+       font-weight:700;margin-bottom:5px}
+.otree{display:flex;flex-wrap:wrap;gap:12px}
+.onode{border:1px solid #dcdcdc;border-left:3px solid #0F3A85;border-radius:3px;
+       padding:11px 14px;min-width:220px}
+.onode.solo{max-width:380px}
+.orole{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#5f5f5f}
+.olabel{font-size:15px;font-weight:600;margin:2px 0}
+.onote{font-size:12px;color:#5f5f5f}
+.scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;
+       background:#dcdcdc;border:1px solid #dcdcdc}
+.sc{background:#fff;padding:10px 13px}
+.sc .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#5f5f5f}
+.sc .v{font-size:13px;font-weight:600;margin-top:2px}
+.deps{display:flex;flex-wrap:wrap;gap:11px}
+.dep{border:1px solid #dcdcdc;border-left-width:3px;border-radius:3px;padding:10px 13px;
+     min-width:210px;flex:1 1 210px}
+.depk{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#5f5f5f}
+.depn{font-size:13.5px;font-weight:600;margin:2px 0}
+.depm{font-size:11.5px;color:#5f5f5f}
+.metric{border:1px solid #dcdcdc;border-radius:3px;padding:16px 18px;max-width:400px}
+.mv{font-size:26px;font-weight:700}
+.mk{font-size:12px;color:#5f5f5f;margin-top:2px}
+.ms{font-size:11px;color:#5f5f5f;margin-top:6px}
+.fbar{display:inline-block;margin-right:26px}
+.fk{font-size:11px;color:#5f5f5f}.fv{font-size:17px;font-weight:600}
+.rmatrix{position:relative;height:250px;border-left:1px solid #dcdcdc;
+         border-bottom:1px solid #dcdcdc;margin:8px 0 6px}
+.rdot{position:absolute;width:15px;height:15px;border-radius:50%}
+.rdot.gate{border-radius:2px;outline:2px solid #D52B1E;outline-offset:2px}
+.rx{position:absolute;bottom:-34px;right:0;font-size:10.5px;color:#5f5f5f}
+.ry{position:absolute;top:-4px;left:6px;font-size:10.5px;color:#5f5f5f}
+.gl{position:absolute;left:0;right:0;height:1px;background:#f1f1f1}
+.gv{position:absolute;top:0;bottom:0;width:1px;background:#f1f1f1}
+.tk{position:absolute;left:-16px;font-size:10px;color:#5f5f5f}
+.tkx{position:absolute;bottom:-17px;font-size:10px;color:#5f5f5f}
+.rleg{display:flex;flex-wrap:wrap;gap:16px;margin:26px 0 6px}
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:22px}
+.board h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 7px;
+          color:#0F3A85}
+.spark{width:100%;max-width:420px;height:80px}
 </style></head><body>
 <div class="wrap">
   <h1>Snowflake Inc.</h1>
@@ -54,6 +112,9 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid #dcdcdc;color:#5f5f
 
   <div class="strip"><div class="c"><div class="k">Recommendation</div><div class="v">Advance to RFx with conditions</div></div><div class="c"><div class="k">Rank in shortlist</div><div class="v">#1</div></div><div class="c"><div class="k">Requirements fit</div><div class="v">24 of 28 must-haves confirmed</div></div><div class="c"><div class="k">Risk posture</div><div class="v">Conditional &middot; 2 escalations open</div></div><div class="c"><div class="k">Data confidence</div><div class="v">46% verified</div></div><div class="c"><div class="k">Open issues</div><div class="v">2</div></div></div>
 
+  <nav class="tabs"><button class="tab on" data-t="summary" onclick="dd('summary')">Supplier Summary</button><button class="tab" data-t="company" onclick="dd('company')">Company &amp; Ownership</button><button class="tab" data-t="capabilities" onclick="dd('capabilities')">Capabilities &amp; Operations</button><button class="tab" data-t="financial" onclick="dd('financial')">Financial &amp; Market</button><button class="tab" data-t="risk" onclick="dd('risk')">Risk &amp; Resilience</button><button class="tab" data-t="fit" onclick="dd('fit')">Lilly Fit &amp; Diligence</button></nav>
+
+  <div class="pane on" id="p-summary">
   <section>
     <h2>Assessment by dimension</h2>
     <p class="hint">Bar length is a relative position within the shortlist, not a score.
@@ -96,6 +157,49 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid #dcdcdc;color:#5f5f
        source was found, which is reported rather than left blank.</p>
     <div class="covbar"><div style="width:46.00%;background:#0F3A85" title="Verified 46%"></div><div style="width:29.00%;background:#B26B00" title="Partial 29%"></div><div style="width:7.00%;background:#5f5f5f" title="Supplier input 7%"></div><div style="width:18.00%;background:#dcdcdc" title="Missing 18%"></div></div><div class="covlegend"><span class="lg"><i style="background:#0F3A85"></i>Verified 46%</span><span class="lg"><i style="background:#B26B00"></i>Partial 29%</span><span class="lg"><i style="background:#5f5f5f"></i>Supplier input 7%</span><span class="lg"><i style="background:#dcdcdc"></i>Missing 18%</span></div>
   </section>
+  </div>
+
+  <div class="pane" id="p-company">
+    <section><h2>Corporate structure</h2><p class="why">Chosen from the data available: a single known entity with no unresolved beneficial ownership. A one-node tree would imply a structure that was never researched; the subsidiary structure is stated as required, not drawn.</p><div class="onode solo"><div class="orole">Contracting entity</div><div class="olabel">Snowflake Inc.</div><div class="onote">Delaware incorporated, NYSE listed</div></div></section>
+    <section><h2>Company scale</h2><div class="scale"><div class="sc"><div class="k">Founded</div><div class="v">2012</div></div><div class="sc"><div class="k">Employees</div><div class="v">9,060 (31 Jan 2026)</div></div><div class="sc"><div class="k">Revenue range</div><div class="v">Public reporting; market cap approx 93.2B USD (17 Jul 2026)</div></div><div class="sc"><div class="k">Countries</div><div class="v">Not established</div></div><div class="sc"><div class="k">Relevant facilities</div><div class="v">Not established</div></div><div class="sc"><div class="k">Listing</div><div class="v">Public, NYSE: SNOW</div></div></div></section>
+    <section><h2>Identity verification</h2><table class="t"><thead><tr><th>Identity element</th><th>Status</th><th>Source</th></tr></thead><tbody><tr><td>Legal name</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Verified</span></td><td class='mut'>FY2026 10-K</td></tr><tr><td>Incorporation</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Verified</span></td><td class='mut'>FY2026 10-K</td></tr><tr><td>Public listing</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Verified</span></td><td class='mut'>SEC EDGAR</td></tr><tr><td>Contracting entity confirmed for this event</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Data source required</span></td><td class='mut'>&amp;mdash;</td></tr><tr><td>Lilly vendor-master match</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Data source required</span></td><td class='mut'>&amp;mdash;</td></tr><tr><td>Ultimate beneficial ownership</td><td><span class="pill" style="color:#dcdcdc;border-color:#dcdcdc">Not applicable</span></td><td class='mut'>Widely held public company</td></tr></tbody></table></section>
+    <section><h2>Operating footprint</h2><div class="need"><div class="needk">Information required</div><div>Delivery-relevant data-centre regions for Lilly scope are not confirmed. Country of domicile is not a substitute.</div></div></section>
+    </div>
+  <div class="pane" id="p-capabilities">
+    <section><h2>Capability against requirement</h2>
+      <p class="hint">Evidence-based. A requirement with no evidence reads as a gap, not
+         as a pass.</p><table class="t"><thead><tr><th>Requirement</th><th>Result</th><th>Evidence</th></tr></thead><tbody><tr><td>Elastic compute separation</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Confirmed</span></td><td class='mut'>FY2026 10-K</td></tr><tr><td>Open table format support</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Confirmed</span></td><td class='mut'>Native Apache Iceberg, FY2026 10-K</td></tr><tr><td>Governed cross-account sharing</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Confirmed</span></td><td class='mut'>FY2026 10-K</td></tr><tr><td>Pharma-regulated deployment</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Partially confirmed</span></td><td class='mut'>Named pharma customers; no qualification package</td></tr><tr><td>GxP qualification package</td><td><span class="pill" style="color:#D52B1E;border-color:#D52B1E">Gap</span></td><td class='mut'>&amp;mdash;</td></tr><tr><td>In-region data residency</td><td><span class="pill" style="color:#D52B1E;border-color:#D52B1E">Not demonstrated</span></td><td class='mut'>&amp;mdash;</td></tr><tr><td>Exit and data portability</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Partially confirmed</span></td><td class='mut'>Iceberg reduces storage-layer lock-in only</td></tr></tbody></table></section>
+    <section><h2>Delivery readiness</h2><div class="dimrow"><div class="dimname">Product maturity</div><div class="dimtrack"><div class="dimbar" style="width:90%;background:#0F3A85"></div></div><div class="dimlabel" style="color:#0F3A85">Strong</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Implementation path</div><div class="dimtrack"><div class="dimbar" style="width:55%;background:#5f5f5f"></div></div><div class="dimlabel" style="color:#5f5f5f">Moderate</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Lilly architecture fit</div><div class="dimtrack"><div class="dimbar" style="width:20%;background:#B26B00"></div></div><div class="dimlabel" style="color:#B26B00">Insufficient evidence</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Capacity</div><div class="dimtrack"><div class="dimbar" style="width:85%;background:#0F3A85"></div></div><div class="dimlabel" style="color:#0F3A85">Strong</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Support model</div><div class="dimtrack"><div class="dimbar" style="width:25%;background:#B26B00"></div></div><div class="dimlabel" style="color:#B26B00">Insufficient evidence</div><div class="dimev"></div></div></section>
+    <section><h2>Reference relevance</h2>
+      <p class="hint">A named customer is not a reference until it is comparable and
+         independently verified.</p><table class="t"><thead><tr><th>Reference</th><th>Pharma</th><th>Similar scale</th><th>Similar use case</th><th>Independently verified</th></tr></thead><tbody><tr><td>Novartis</td><td style="color:#0F3A85">Yes</td><td class="mut">Not established</td><td class="mut">Not established</td><td style="color:#D52B1E">No</td></tr><tr><td>Sanofi</td><td style="color:#0F3A85">Yes</td><td class="mut">Not established</td><td class="mut">Not established</td><td style="color:#D52B1E">No</td></tr><tr><td>IQVIA</td><td style="color:#0F3A85">Yes</td><td class="mut">Not established</td><td class="mut">Not established</td><td style="color:#D52B1E">No</td></tr></tbody></table></section>
+    <section><h2>Critical dependencies</h2><p class="why">Chosen from the data available: 1 identified dependency with confirmed existence; 1 further listed as unconfirmed and not drawn.</p><div class="deps"><div class="dep" style="border-color:#0F3A85"><div class="depk">Infrastructure</div><div class="depn">AWS / Azure / Google Cloud</div><div class="depm">Critical &middot; Portable across the three, not away from all three</div></div></div><p class="why">Listed but not drawn, because their existence is not confirmed: Implementation partner.</p></section>
+    </div>
+  <div class="pane" id="p-financial">
+    <section><h2>Financial health</h2><p class="why">Chosen from the data available: a single data point. A line through one point would invent a direction.</p><div class="metric"><div class="mv">approx 93.2B USD</div><div class="mk">Market capitalisation &middot; FY2026</div><div class="ms">stockanalysis.com, captured 2026-07-17</div></div></section>
+    <section><h2>Financial bridge</h2><table class="t"><thead><tr><th>Driver</th><th>Assessment</th><th>Evidence</th></tr></thead><tbody><tr><td>Growth</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Strong</span></td><td class='mut'>Revenue growth reported in FY2026 10-K</td></tr><tr><td>Profitability</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Insufficient evidence</span></td><td class='mut'>&amp;mdash;</td></tr><tr><td>Liquidity</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Insufficient evidence</span></td><td class='mut'>&amp;mdash;</td></tr><tr><td>Leverage</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Insufficient evidence</span></td><td class='mut'>&amp;mdash;</td></tr></tbody></table></section>
+    <section><h2>Peer position</h2><div class="need"><div class="needk">Information required</div><div>no comparable peer data captured; a scatter with a single point shows position relative to nothing</div></div></section>
+    <section><h2>Commercial model drivers</h2>
+      <p class="hint">What makes the bill move, rather than a single annual figure. A
+         precise total is only shown where a bid, internal figure or benchmark supports
+         it.</p>
+      <div class="deps"><div class="dep" style="border-color:#5f5f5f"><div class="depk">High variability</div><div class="depn">Compute</div><div class="depm">Scales with workload design and concurrency</div></div><div class="dep" style="border-color:#5f5f5f"><div class="depk">Low variability</div><div class="depn">Storage</div><div class="depm">Broadly predictable per TB</div></div><div class="dep" style="border-color:#5f5f5f"><div class="depk">Medium variability</div><div class="depn">Data transfer</div><div class="depm">Cross-region and egress dependent</div></div><div class="dep" style="border-color:#5f5f5f"><div class="depk">Not established variability</div><div class="depn">Implementation</div><div class="depm">&amp;mdash;</div></div><div class="dep" style="border-color:#5f5f5f"><div class="depk">Medium variability</div><div class="depn">Exit</div><div class="depm">Iceberg reduces storage-layer cost only</div></div></div></section>
+    </div>
+  <div class="pane" id="p-risk">
+    <section><h2>Impact and likelihood</h2><p class="why">Chosen from the data available: 3 risks with both impact and likelihood assessed; 1 cannot be plotted and is listed separately rather than dropped.</p><div class="rmatrix"><div class="gl" style="bottom:20%"></div><div class="gv" style="left:20%"></div><div class="gl" style="bottom:40%"></div><div class="gv" style="left:40%"></div><div class="gl" style="bottom:60%"></div><div class="gv" style="left:60%"></div><div class="gl" style="bottom:80%"></div><div class="gv" style="left:80%"></div><div class="tk" style="bottom:18%">1</div><div class="tk" style="bottom:35%">2</div><div class="tk" style="bottom:52%">3</div><div class="tk" style="bottom:69%">4</div><div class="tk" style="bottom:86%">5</div><div class="tkx" style="left:19%">1</div><div class="tkx" style="left:37%">2</div><div class="tkx" style="left:55%">3</div><div class="tkx" style="left:73%">4</div><div class="tkx" style="left:91%">5</div><div class="rx">Likelihood &rarr;</div><div class="ry">Impact &rarr;</div><div class="rdot gate" style="left:58%;bottom:72%;background:repeating-linear-gradient(135deg,#B26B00,#B26B00 4px,#fff 4px,#fff 8px)" title="Customer-tenant credential compromise recurrence"></div><div class="rdot" style="left:76%;bottom:55%;background:#0F3A85" title="Consumption cost overrun"></div><div class="rdot" style="left:40%;bottom:72%;background:#0F3A85" title="Hyperscaler concentration"></div></div><div class="rleg"><span class="lg"><i style="background:#0F3A85"></i>verified</span><span class="lg"><i style="background:repeating-linear-gradient(135deg,#B26B00,#B26B00 3px,#fff 3px,#fff 6px)"></i>partial</span><span class="lg"><i style="border:1.5px dashed #5f5f5f"></i>insufficient</span><span class="lg"><i style="outline:2px solid #D52B1E;outline-offset:1px"></i>decision gate</span></div><p class="why">Not plotted, because they were not scored on both axes. They are listed here rather than dropped, so the matrix is not mistaken for the whole picture: GxP qualification shortfall.</p></section>
+    <section><h2>Material events</h2><table class="t"><thead><tr><th>Date</th><th>Event</th><th>Impact</th><th>Resolution</th><th>Confidence</th></tr></thead><tbody><tr><td>2024</td><td>UNC5537 credential-stuffing campaign against customer tenants</td><td class='mut'>165+ organisations reported affected</td><td class='mut'>Attributed to customer accounts without MFA; platform compromise not established</td><td>partial</td></tr></tbody></table></section>
+    <section><h2>Mitigation status</h2>
+      <p class="hint">Risk becomes a workplan here, or it stays an observation.</p>
+      <table class="t"><thead><tr><th>Risk</th><th>Treatment</th><th>Status</th><th>Owner</th></tr></thead><tbody><tr><td>Customer-tenant credential compromise recurrence</td><td class='mut'>Mandatory MFA and network policy for the Lilly tenant</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Partially confirmed</span></td><td>Cyber (SAE)</td></tr><tr><td>Consumption cost overrun</td><td class='mut'>Committed-spend structure with guardrails and alerting</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Partially confirmed</span></td><td>Procurement</td></tr><tr><td>Hyperscaler concentration</td><td class='mut'>Not started</td><td><span class="pill" style="color:#D52B1E;border-color:#D52B1E">Not demonstrated</span></td><td>Architecture</td></tr><tr><td>GxP qualification shortfall</td><td class='mut'>Not started</td><td><span class="pill" style="color:#D52B1E;border-color:#D52B1E">Not demonstrated</span></td><td>Quality</td></tr></tbody></table></section>
+    </div>
+  <div class="pane" id="p-fit">
+    <section><h2>Lilly fit</h2><table class="t"><thead><tr><th>Factor</th><th>Fit</th><th>Confidence</th></tr></thead><tbody><tr><td>Architecture alignment</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Insufficient evidence</span></td><td class='mut'>insufficient</td></tr><tr><td>Pharma experience</td><td><span class="pill" style="color:#0F3A85;border-color:#0F3A85">Strong</span></td><td class='mut'>partial</td></tr><tr><td>Internal compatibility</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Insufficient evidence</span></td><td class='mut'>insufficient</td></tr><tr><td>Existing relationship</td><td><span class="pill" style="color:#5f5f5f;border-color:#5f5f5f">None found</span></td><td class='mut'>verified</td></tr><tr><td>Regulatory fit</td><td><span class="pill" style="color:#B26B00;border-color:#B26B00">Insufficient evidence</span></td><td class='mut'>insufficient</td></tr><tr><td>Implementation readiness</td><td><span class="pill" style="color:#5f5f5f;border-color:#5f5f5f">Moderate</span></td><td class='mut'>partial</td></tr><tr><td>Commercial leverage</td><td><span class="pill" style="color:#5f5f5f;border-color:#5f5f5f">Moderate</span></td><td class='mut'>partial</td></tr></tbody></table></section>
+    <section><h2>Internal relationship history</h2><p class="none">No Lilly contractual, spend or performance history located for this supplier.</p></section>
+    <section><h2>Diligence completeness</h2>
+      <p class="hint">Percent complete per track, which replaces an open-questions
+         list.</p><div class="dimrow"><div class="dimname">Desk research</div><div class="dimtrack"><div class="dimbar" style="width:80%;background:#0F3A85"></div></div><div class="dimlabel" style="color:#5f5f5f">80%</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Supplier evidence</div><div class="dimtrack"><div class="dimbar" style="width:25%;background:#B26B00"></div></div><div class="dimlabel" style="color:#5f5f5f">25%</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Security review</div><div class="dimtrack"><div class="dimbar" style="width:10%;background:#B26B00"></div></div><div class="dimlabel" style="color:#5f5f5f">10%</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Quality / GxP</div><div class="dimtrack"><div class="dimbar" style="width:0%;background:#dcdcdc"></div></div><div class="dimlabel" style="color:#5f5f5f">0%</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Financial / TPRM</div><div class="dimtrack"><div class="dimbar" style="width:40%;background:#B26B00"></div></div><div class="dimlabel" style="color:#5f5f5f">40%</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">References</div><div class="dimtrack"><div class="dimbar" style="width:15%;background:#B26B00"></div></div><div class="dimlabel" style="color:#5f5f5f">15%</div><div class="dimev"></div></div><div class="dimrow"><div class="dimname">Contract readiness</div><div class="dimtrack"><div class="dimbar" style="width:0%;background:#dcdcdc"></div></div><div class="dimlabel" style="color:#5f5f5f">0%</div><div class="dimev"></div></div></section>
+    <section><h2>Actions by owner</h2><div class="boards"><div class="board"><h3>Cyber (SAE)</h3><ul class="vl"><li>Confirm Lilly-scope controls and MFA enforcement after the 2024 campaign <strong style="color:#D52B1E">gate</strong></li></ul></div><div class="board"><h3>Privacy</h3><ul class="vl"><li>Obtain written subprocessor list and data-residency commitments <strong style="color:#D52B1E">gate</strong></li></ul></div><div class="board"><h3>Procurement</h3><ul class="vl"><li>Confirm contracting entity and Lilly vendor-master match</li><li>Obtain reference calls with a comparable pharma deployment</li></ul></div><div class="board"><h3>Quality</h3><ul class="vl"><li>Request the GxP qualification package</li></ul></div></div></section>
+    </div>
 
   <footer>
     Reflect-only. 26 evidence items across 8 dimensions; 0 hard stop(s)
@@ -103,4 +207,14 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid #dcdcdc;color:#5f5f
     or computed at build time. Assessments are not a system of record and do not constitute
     an award decision.
   </footer>
-</div></body></html>
+</div>
+<script>
+/* Subtab switching. Vanilla, no dependency, and every pane is already in the document,
+   so the page works with scripting disabled apart from the tab control itself. */
+function dd(t){
+  var i,p=document.querySelectorAll('.pane'),b=document.querySelectorAll('.tab');
+  for(i=0;i<p.length;i++){p[i].className='pane'+(p[i].id==='p-'+t?' on':'');}
+  for(i=0;i<b.length;i++){b[i].className='tab'+(b[i].getAttribute('data-t')===t?' on':'');}
+}
+</script>
+</body></html>

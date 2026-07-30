@@ -46,8 +46,20 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
+import deepdive_sections as SEC                                      # noqa: E402
+import deepdive_viz as VIZ                                           # noqa: E402
 from deepdive_schema import (                                        # noqa: E402
     ASSESSMENTS, DIMENSIONS, DeepDiveError, validate_dataset,
+)
+
+# spec:75. The six subtabs, in order. Subtab 0 is the default.
+SUBTABS = (
+    ("summary", "Supplier Summary"),
+    ("company", "Company &amp; Ownership"),
+    ("capabilities", "Capabilities &amp; Operations"),
+    ("financial", "Financial &amp; Market"),
+    ("risk", "Risk &amp; Resilience"),
+    ("fit", "Lilly Fit &amp; Diligence"),
 )
 
 DEFAULT_SEED = os.path.join(HERE, "assets", "seed", "snowflake.json")
@@ -226,6 +238,17 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid %(line)s;color:%(mu
 """ % {"ink": INK, "mut": MUT, "line": LINE}
 
 
+TAB_CSS = """
+.tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid %(line)s;margin-bottom:24px}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;
+     padding:9px 15px;font:inherit;font-size:13px;color:%(mut)s;cursor:pointer}
+.tab.on{color:%(blue)s;border-bottom-color:%(blue)s;font-weight:600}
+.tab:hover{color:%(ink)s}
+.pane{display:none}
+.pane.on{display:block}
+""" % {"line": LINE, "mut": MUT, "blue": BLUE, "ink": INK}
+
+
 def render(s, summary):
     hard = [g for g in (s.get("gates") or []) if g["kind"] == "HARD_STOP"]
     esc_g = [g for g in (s.get("gates") or []) if g["kind"] == "ESCALATION"]
@@ -256,6 +279,31 @@ def render(s, summary):
         '<div class="c"><div class="k">%s</div><div class="v">%s</div></div>' % (k, v)
         for k, v in strip)
 
+    # Every dominant visual is CHOSEN from what the data supports, and each choice carries
+    # its reason to the page. Nothing here decides to draw a shape the evidence cannot
+    # carry; that decision lives in deepdive_viz and is tested separately.
+    own_kind, own_why = VIZ.choose_ownership(s.get("ownership"))
+    map_kind, map_why = VIZ.choose_map(s.get("locations"))
+    net_kind, net_why = VIZ.choose_network(s.get("dependencies"))
+    tr_kind, tr_why = VIZ.choose_trend(s.get("financial_periods"))
+    peer_kind, peer_why = VIZ.choose_peer_scatter(s.get("peers"))
+    rm_kind, rm_why = VIZ.choose_risk_matrix(s.get("risks"))
+
+    panes = {
+        "company": SEC.company_ownership(s, own_kind, own_why, map_kind, map_why),
+        "capabilities": SEC.capabilities(s, net_kind, net_why),
+        "financial": SEC.financial(s, tr_kind, tr_why, peer_kind, peer_why),
+        "risk": SEC.risk(s, rm_kind, rm_why),
+        "fit": SEC.lilly_fit(s),
+    }
+    chosen = {"ownership": own_kind, "map": map_kind, "network": net_kind,
+              "trend": tr_kind, "peer_scatter": peer_kind, "risk_matrix": rm_kind}
+
+    nav = "".join(
+        '<button class="tab%s" data-t="%s" onclick="dd(\'%s\')">%s</button>'
+        % (" on" if i == 0 else "", tid, tid, label)
+        for i, (tid, label) in enumerate(SUBTABS))
+
     return """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -268,6 +316,9 @@ def render(s, summary):
 
   <div class="strip">%(strip)s</div>
 
+  <nav class="tabs">%(nav)s</nav>
+
+  <div class="pane on" id="p-summary">
   <section>
     <h2>Assessment by dimension</h2>
     <p class="hint">Bar length is a relative position within the shortlist, not a score.
@@ -302,6 +353,13 @@ def render(s, summary):
        source was found, which is reported rather than left blank.</p>
     %(cov)s
   </section>
+  </div>
+
+  <div class="pane" id="p-company">%(pane_company)s</div>
+  <div class="pane" id="p-capabilities">%(pane_capabilities)s</div>
+  <div class="pane" id="p-financial">%(pane_financial)s</div>
+  <div class="pane" id="p-risk">%(pane_risk)s</div>
+  <div class="pane" id="p-fit">%(pane_fit)s</div>
 
   <footer>
     Reflect-only. %(nev)s evidence items across %(ndim)s dimensions; %(nhard)s hard stop(s)
@@ -309,11 +367,27 @@ def render(s, summary):
     or computed at build time. Assessments are not a system of record and do not constitute
     an award decision.
   </footer>
-</div></body></html>""" % {
+</div>
+<script>
+/* Subtab switching. Vanilla, no dependency, and every pane is already in the document,
+   so the page works with scripting disabled apart from the tab control itself. */
+function dd(t){
+  var i,p=document.querySelectorAll('.pane'),b=document.querySelectorAll('.tab');
+  for(i=0;i<p.length;i++){p[i].className='pane'+(p[i].id==='p-'+t?' on':'');}
+  for(i=0;i<b.length;i++){b[i].className='tab'+(b[i].getAttribute('data-t')===t?' on':'');}
+}
+</script>
+</body></html>""" % {
         "name": esc(s["name"]),
+        "nav": nav,
+        "pane_company": panes["company"],
+        "pane_capabilities": panes["capabilities"],
+        "pane_financial": panes["financial"],
+        "pane_risk": panes["risk"],
+        "pane_fit": panes["fit"],
         "etype": esc(s.get("entity_type", "").capitalize()),
         "ticker": (" &middot; " + esc(s["ticker"])) if s.get("ticker") else "",
-        "css": CSS,
+        "css": CSS + TAB_CSS + SEC.EXTRA_CSS,
         "strip": strip_html,
         "dims": dimension_bars(s),
         "gates": gates_block(s.get("gates") or []),
