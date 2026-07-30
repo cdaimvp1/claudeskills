@@ -9,7 +9,7 @@ Tags: `[now]` active · `[next]` queued · `[Marc]` needs your decision · `[blo
 - **Deal dashboard** — LOCKED (design of record).
 - **RFx dashboard** — finishing now (feedback round 2 build in flight).
 - **Landscape dashboard** — functionally built + was the exemplar, BUT has an in-progress redesign/fix batch (NOT fully locked).
-- **3 dashboards still to build** — Category Strategy, Deep Dive, My Work.
+- **2 dashboards still to build** — Category Strategy, Deep Dive. **My Work BUILT 2026-07-29 (A7)**, including the #44 handover brief.
 - **PCC dashboard** — RETIRED; PCC becomes a conversation-led skill.
 - **31 skills** — all mature (no stubs, no missing data-source/output); enhancement pass owed.
 - **Theo / routing** — still a static menu router; the conversational intake + orchestration web are planned, not built.

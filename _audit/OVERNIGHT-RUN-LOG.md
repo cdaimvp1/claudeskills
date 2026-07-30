@@ -3735,3 +3735,76 @@ A7 -> A11 -> B7a -> J1 -> J2 -> (B7b, J3).
 and the increase is `provenance.py:278-280` replicated across the 5 vendored copies. Those
 lines are regex literals naming followable citation shapes (`10-K`, `OFAC`, `SAP`, `SOC 2`)
 inside a validator. No execution, no dynamic dispatch. Benign.
+
+---
+
+## A7 My Work hub — BUILT. The last Phase 1 hub. (Marc approved Option B, 2026-07-29)
+
+New skill `my-work-1c344a`. Suite is now **33 skills**.
+
+### The decision that shaped it
+
+The plan said "deterministic port of the platform My Work page". The existing
+`build_my_work.py` in the platform build tree is not a port: it reads `my-work.html` and
+its assets out of the LIVE Theo directory on the Desktop at build time. Marc chose
+Option B: use the platform page as a READ-ONLY SPEC, vendor its render chain
+byte-identical, and build to the hub pattern Landscape/Deal/RFx already use. A live
+reach-through would have put a frozen copy of a separately-owned, actively developed
+product inside a shipped skill, with no drift detection.
+
+Correction on the record: I told Marc the page pulled voice, mentions, connectors and
+approval-chain. That was wrong. I had listed the platform's whole assets directory rather
+than the page's actual imports. Option B still held on the separation and drift arguments.
+
+Vendored: the six-module my-work chain (setup/metrics/SLA, timeline, suppliers, report
+card, delegation/org boot, handover) plus people, seed, theo-data, demo-data, provenance.
+**`my-work-06-handover.js` IS the #44 handover/custody brief, already built in the
+platform**, which is why #44 lands with this hub rather than after it.
+
+### Three defects found and fixed during the build
+
+**1. My own no-network assertion checked the MARKUP, not the mechanism.** The first build
+reported a confident "0 external references" while the rendered page pulled four scripts
+and an image and issued a fetch. `theo-brand.js` injected them from JavaScript, and the
+handover module called fetch directly, so a `<script src>` scan saw nothing. **Seventh
+occurrence of the pattern-matches-wording-not-mechanism failure, and the first that was
+mine.** The check now looks for fetch, XMLHttpRequest, WebSocket, dynamic import, `.src =`
+assignment and bundle-path string literals, over a comment-stripped copy. The stripper
+deliberately UNDER-strips: one that guessed harder could delete real code and hide a real
+call.
+
+**2. Dropping a feature is not the same as removing it.** Dropping the task drawer's
+script and stylesheet left its markup rendering as unstyled text at the foot of the page
+and left a Tasks button in the topbar whose onclick called an undefined `mqOpen()`. A dead
+control is not a stated gap. The builder now removes the panel and its trigger and asserts
+exactly one of each.
+
+**3. The handover fetch needed neutralising without breaking drift detection.** Solved
+with a declared build-time patch that PINS its exact expected text. The vendored file
+stays byte-identical so drift is still detectable; if the platform rewrites that line the
+patch stops matching and the build REFUSES rather than silently restoring a network call.
+
+### Verified
+
+- builder selftest **29/29**, including 5 tamper tests that plant each failure mode and
+  assert the build refuses
+- rendered in-browser: **0 console errors**, all 8 sections populated, Handover renders
+  1,969 chars offline from the seed
+- suite smoke test **33 skills, 0 failed assertions**
+- **builds from an isolated extract in a temp dir with no repo and no siblings**, which is
+  the Claude Desktop install contract proven rather than asserted
+- 33 packages, every one extract-and-retest verified
+
+### Malicious-code review
+
+13 EGRESS hits in my-work. Twelve are comments, the no-network check's own regex patterns,
+or tamper-test payloads. One is real: the vendored handover module's fetch, on disk by
+design, removed at build time by the pinned patch, and proven absent from the built page by
+selftest T5/T20/T22. All five judgements recorded in the sweep's reviewed list so they are
+not re-litigated. SECRETS 0, BYPASS 0, OBFUSCATION 0, INJECTION 0.
+
+### What A7 unblocks
+
+A7 was the root block for three items. **A11 can now be attempted** (it needed A7 among
+A1/A3-A5/A7-A10), and A11 unblocks B7a -> J1 -> J2 -> (B7b, J3) plus #22 and #25.
+A11 still needs Marc's sign-off, and A5/A6 Deep Dive and A8/A9 Landscape remain.

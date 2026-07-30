@@ -100,6 +100,27 @@ ALLOWLIST = {
     ("_audit/package_skills.py", "EXEC"): (
         "subprocess.run is how the packager executes the integrity sweep; it runs only "
         "sys.executable against paths inside this repo, with no user-supplied argument"),
+    ("my-work-1c344a/dashboard/assets/my-work/my-work-06-handover.js", "EGRESS"): (
+        "REAL fetch, and the only one in the skill. It is vendored byte-identical from "
+        "the platform ON PURPOSE so drift stays detectable, and it is removed at build "
+        "time by a patch that pins its exact expected text: if the platform rewrites the "
+        "line the patch stops matching and the build REFUSES rather than silently "
+        "restoring the call. The built page is proven free of it by the builder's "
+        "runtime scan and by selftest T5, T20 and T22. The module is a build input; the "
+        "shipped dashboard is a single self-contained file that never loads it"),
+    ("my-work-1c344a/dashboard/build_my_work_dashboard.py", "EGRESS"): (
+        "these ARE the anti-egress machinery: the regex patterns the no-network check "
+        "searches for, the pinned text of the handover patch, and comments explaining "
+        "both. No call"),
+    ("my-work-1c344a/dashboard/build_my_work_selftest.py", "EGRESS"): (
+        "tamper-test payloads that deliberately plant a fetch to prove the build refuses "
+        "it, plus the assertions naming what they look for. No call"),
+    ("my-work-1c344a/dashboard/assets/lilly-api-offline.js", "EGRESS"): (
+        "a comment explaining why the platform's api.js and its fetch were NOT vendored. "
+        "This file is the offline replacement; it makes no request of any kind"),
+    ("my-work-1c344a/dashboard/my-work-dashboard.html", "EGRESS"): (
+        "the built page. Its single hit is the offline shim's explanatory comment, "
+        "inlined verbatim. The comment-stripped scan finds nothing"),
 }
 
 # Third-party imports that are expected. Anything else is reported for a human to judge.
