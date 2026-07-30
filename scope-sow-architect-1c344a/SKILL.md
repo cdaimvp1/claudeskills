@@ -810,6 +810,8 @@ can be caught before a reader treats a rendered number as established fact.
 
 It does NOT own `issues[]`; lilly-contract-review does. It appends. The distinction matters because two owners and one-owner-plus-a-contributor fail differently: with two owners, nobody can be told their field broke.
 
+**Decided 2026-07-30: there is ONE issues array, and no `scopeIssues[]`.** A reader asking "what are the issues on this deal?" wants one list, not two panels to cross-check. Tag each entry you append with a `sourceRef` naming this skill; that is what makes your contribution attributable without splitting the structure.
+
 Enforced by `deal-tab-1c344a/dashboard/schema_check.py`, which refuses a data object
 carrying a field no registered lens skill owns: *"field X is not owned by any
 registered lens skill"*. A renamed field fails the build loudly instead of rendering

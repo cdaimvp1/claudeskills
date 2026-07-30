@@ -62,8 +62,15 @@ OWNERSHIP = {
 # distinction matters, because "two owners" and "one owner plus a contributor" fail
 # differently. Two owners means nobody can be told their field broke.
 #
-# Recorded here rather than resolved silently: if Marc decides scope issues should be their
-# own field (`scopeIssues[]`), that is a contract change, not a code change.
+# DECIDED (Marc, 2026-07-30): ONE array. There is no `scopeIssues[]` and there should not
+# be one. The reader's question is "what are the issues on this deal?", and that is one
+# list. Splitting it means two panels, or a merge at render time, and a reader who has to
+# look in two places to be sure they have seen everything.
+#
+# The concern that prompted the question -- who gets told when the field breaks -- is
+# solved without splitting: one owner, one declared contributor, and every entry carrying a
+# `sourceRef` naming the skill that produced it. Origin is recoverable per entry, so the
+# structure does not have to carry it.
 CO_CONTRIBUTED = {
     "issues": {"owner": "lilly-contract-review-1c344a",
                "contributors": ["scope-sow-architect-1c344a"],

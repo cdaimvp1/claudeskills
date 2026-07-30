@@ -5137,3 +5137,50 @@ FEEDERS' files, so there is no single table to compare against. A check that qui
 nothing is worse than a stated gap.
 
 Smoke 33/0 - 31 packages extract-and-retest verified.
+
+---
+
+## Two optional dashboards dropped (892 lines) + scopeIssues closed. (Marc, 2026-07-30)
+
+### Another count correction: it was TWO skills, not three
+
+`negotiation-simulator` has **zero** JSX blocks. My earlier figure of three was wrong for
+the second time on this question. The real set was `commercial-negotiation-prep` (492 lines)
+and `meeting-prep-brief` (400 lines).
+
+### Why dropped rather than engine-built
+
+- `commercial-negotiation-prep`'s own file called it **"the OPTIONAL interactive Negotiation
+  Prep dashboard"**. A secondary artifact, not the deliverable.
+- Hand-authored means **differently shaped every run**. For a DECISION artifact that is
+  worse than not having one: an inconsistent dashboard invites a reader to trust a layout
+  that was invented that morning.
+- The surface is not unserved: commercial-negotiation-prep seeds deal-room's opening
+  strategy, and deal-room renders a locked dashboard.
+- `meeting-prep-brief`'s deliverable is a one-page brief with a fixed five-section
+  skeleton. That is a document; a dashboard was the wrong shape for it.
+
+Building two engines for optional secondary artifacts would have been real F-series work
+that has to earn its place ahead of the source-name problem. It does not.
+
+**Rule-loss verified against HEAD: 1 normative line lost in commercial-negotiation-prep, and
+it was a clone/swap instruction. Zero non-instruction rules lost in either file.**
+
+### scopeIssues: CLOSED. One array, no new field.
+
+The question was whether scope-derived issues should become their own `scopeIssues[]`.
+
+**They should not.** The reader's question is "what are the issues on this deal?", and that
+is ONE list. Splitting it means two panels, or a merge at render time, and a reader who has
+to look in two places to be sure they have seen everything.
+
+The concern that prompted it - **who gets told when the field breaks** - is solved without
+splitting: one owner (lilly-contract-review), one declared contributor
+(scope-sow-architect), and every entry carrying a `sourceRef` naming the skill that
+produced it. **Origin is recoverable per entry, so the structure does not have to carry
+it.**
+
+Recorded in three places: the enforcement (`schema_check.py`'s CO_CONTRIBUTED note) and both
+lens contracts, so the next person finds the decision where they would ask the question.
+
+Smoke 33/0 - 31 packages extract-and-retest verified.

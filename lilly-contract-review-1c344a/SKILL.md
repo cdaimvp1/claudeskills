@@ -1953,7 +1953,7 @@ dashboard is how two artifacts start disagreeing about the same deal.
 FAILURE at the hub, not a gap it renders. The hub is the last place an uncited value
 can be caught before a reader treats a rendered number as established fact.
 
-This skill OWNS `issues[]`. scope-sow-architect appends scope-derived entries to it but does not own it. Each entry must carry a `sourceRef` naming which skill produced it, so an appended entry is attributable.
+This skill OWNS `issues[]`. scope-sow-architect appends scope-derived entries to it but does not own it. **Decided 2026-07-30: one array, no `scopeIssues[]`.** Every entry carries a `sourceRef`, so an appended entry is attributable without a second field. Each entry must carry a `sourceRef` naming which skill produced it, so an appended entry is attributable.
 
 Enforced by `deal-tab-1c344a/dashboard/schema_check.py`, which refuses a data object
 carrying a field no registered lens skill owns: *"field X is not owned by any
