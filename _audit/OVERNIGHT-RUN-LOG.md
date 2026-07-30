@@ -5184,3 +5184,39 @@ Recorded in three places: the enforcement (`schema_check.py`'s CO_CONTRIBUTED no
 lens contracts, so the next person finds the decision where they would ask the question.
 
 Smoke 33/0 - 31 packages extract-and-retest verified.
+
+---
+
+## START-HERE.md — the handover front door for a fresh session on another machine.
+
+Marc is moving this repo to a machine with real data-source access, in a new Claude session.
+Everything needed already lives in git; what was missing was a single entry point, so a
+fresh session does not reconstruct the state by reading 4,000 lines of run log or, worse,
+reopen decisions that are closed.
+
+`START-HERE.md` at the repo root. Eight sections, in the order a fresh session needs them:
+
+1. **Prove the repo is intact first** - five gate commands with expected output, and the
+   instruction "if any fail on a clean checkout, stop and report it; do not fix it by
+   changing the gate."
+2. **What this is**, including the one-folder-no-siblings install constraint and the
+   settled architecture (lens skills own slices, hubs own the render).
+3. **LOCKED, do not reverse** - the dashboards, the two held-back skills, the launcher as a
+   backup surface, 5 tabs, one issues array, the brand-assets JSX, and delete-nothing.
+4. **How Marc works** - decisions come to him with pros, cons and a recommendation; accuracy
+   before cost; no em dashes; never reverse a documented decision to make something work.
+5. **THE IMMEDIATE NEXT TASK**: the six internal source names, as a table with row counts,
+   where each is used, and the candidate mappings that are NOT applied. Plus how to apply an
+   answer and re-verify.
+6. Everything else still open.
+7. Where the detail lives.
+8. **The recurring lesson**, stated plainly: nine times a pattern-based check has
+   mis-reported by matching wording instead of mechanism, four of them mine in one day.
+   "When a pattern search returns a count, read the hits before acting on them. An ABSENT
+   result is a prompt to go and look, not a finding."
+
+**Every command in it was executed before committing.** A handover document with a command
+that does not run is worse than none, because it teaches the reader to distrust the rest.
+
+The two held-back skills get explicit "do not re-add them because they look missing"
+treatment, since that is precisely the mistake a fresh session would make.
