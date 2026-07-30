@@ -4713,3 +4713,46 @@ the reconciliation would have corrupted a working spec to satisfy a grep. The de
 record now says so explicitly, so the next person does not repeat the temptation.
 
 Smoke 33/0 - 33 packages extract-and-retest verified.
+
+---
+
+## B4 scoping — the sweep is right for 9 skills and MIS-SPECIFIED for 6. Analysis only, no edits.
+
+B4 says "sweep reference-JSX out of the remaining lens skills". Before sweeping, I counted
+what is actually there and split it by whether the skill has anything to point at.
+
+### 55 instruction-shaped hits, and the polarity matters
+
+A naive grep found 20 skills. Most "hand-author" hits are the **prohibition** ("Do NOT
+hand-author JSX") which is the correct language and must stay. Separating instruction-shaped
+from prohibition-shaped leaves **55 real hits across 15 skills**. Same lesson as B7a: the
+pattern finds the word, not the mechanism.
+
+### The split
+
+| | skills | hits | can B4 apply? |
+|---|---|---|---|
+| has a deterministic engine to point at | 9 | 27 | **yes, actionable now** |
+| no engine exists | 6 | 28 | **no: this would be a BUILD, not a sweep** |
+
+**Actionable (9):** category-strategy, supplier-deep-dive, evaluation-engine,
+market-rate-benchmarking, negotiation-playbook-learning, pro-forma-builder, rfp-case-manager,
+rfp-response-analysis, should-cost-builder.
+
+**Cannot be swept (6):** commercial-negotiation-prep, invoice-rate-card-auditor,
+meeting-prep-brief, negotiation-simulator, timeline-builder, and **lilly-brand-assets**.
+
+### lilly-brand-assets' 17 hits are the component library itself, and must NOT be touched
+
+Its 16 JSX blocks sit under headings like **Required Imports, Color Token Declarations,
+Chart Palette, Currency Helpers, Metric (KPI Card)**. That is the shared component library
+the whole suite references. "Sweeping reference-JSX" out of the foundation would gut the
+thing every other skill points AT. It is the single largest hit count in the sweep and the
+one place the sweep would do the most damage.
+
+### The other 5 have no engine
+
+They emit chat and DOCX outputs. For them, "retire the hand-authored path" means "build a
+deterministic engine first", which is F-series work, not B4.
+
+**No edits made. B4 needs a scope decision from Marc before proceeding.**
