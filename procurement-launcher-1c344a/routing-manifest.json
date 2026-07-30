@@ -1278,7 +1278,7 @@
           "helpful": "your current project list, if it is not already in the Project"
         }
       ],
-      "in_teach_mode": false,
+      "in_teach_mode": true,
       "predecessors": "none stated (it reads the rep's own book, it is not fed by another skill)",
       "successors": "none stated (it is a personal workspace, not a producer in a sourcing chain)"
     }

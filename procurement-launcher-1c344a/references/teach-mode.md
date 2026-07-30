@@ -102,7 +102,7 @@ Present the 27 skills grouped by the six pipelines. The learner selects the ones
 - Category Strategy (2): category strategy, market rate benchmarking
 - Cost & Commercial (3): pro-forma builder, should-cost builder, invoice & rate-card auditor
 - Executive Summary (1): executive summary package
-- Personal Command Center (6): voice profile, Theo's Field Guide, process navigator, timeline builder, workflow map, meeting prep brief
+- Personal Command Center (7): voice profile, Theo's Field Guide, process navigator, timeline builder, workflow map, meeting prep brief, my work
 
 That is 27 skills across six pipelines (8 + 7 + 2 + 3 + 1 + 6). (A 28th, procurement-help-desk, an end-user/stakeholder front door, is being scaffolded separately and is not yet live; do not teach it as an available skill until it ships.)
 
@@ -140,11 +140,11 @@ Tappable:
 
 Deliver a focused summary (not the full changelog) covering where the suite is now:
 
-- 27 skills organized into six pipelines: Contracts & Negotiations, Sourcing / RFx, Category Strategy, Cost & Commercial, Executive Summary, Personal Command Center.
+- 28 skills organized into six pipelines: Contracts & Negotiations, Sourcing / RFx, Category Strategy, Cost & Commercial, Executive Summary, Personal Command Center.
 - Newer specialist skills to know: scope-sow-architect (scope/SOW quality diagnostic and rewrite), sole-source-challenge (challenges a single-supplier pick into a Defensibility verdict), deal-room (a live, round-by-round negotiation manager), and invoice-rate-card-auditor (line-level invoice-vs-contract audit with kernel-verified math).
 - THEO can now name a full ordered PATH from a free-text need, not just one skill: it classifies the need, names the path up front (e.g. supplier-landscape -> rfp-engine -> rfp-response-analysis -> evaluation-engine), launches step 1, and primes each next step from the chain data. This is guided handoff (you drive, Theo leads); Theo does not auto-run a whole pipeline for you. (decision-deck and procurement-options-analysis, which previously anchored the ends of this example path, were retired; the suite no longer has a dedicated deck-builder or path-selector skill.)
 - THEO launcher (you're using it right now): split-panel master-detail menu with live search and a three-tier Teach mode.
-- Personal Command Center pipeline (six skills): Theo's Field Guide (the work-graph command center, v2.2, replacing the old daily digest, with End-of-day, Weekly review, "Now what?" suggestions, Quick capture, OOO-aware inference, Cross-Issue view, Email-to-Issue, and Owner-handoff drafter, plus the v2.2 terminal-state provenance guard, work-classification vocabulary, and confirm-required Issue proposals), plus voice-profile, process-navigator, timeline-builder, workflow-map, and meeting-prep-brief.
+- Personal Command Center pipeline (six skills): Theo's Field Guide (the work-graph command center, v2.2, replacing the old daily digest, with End-of-day, Weekly review, "Now what?" suggestions, Quick capture, OOO-aware inference, Cross-Issue view, Email-to-Issue, and Owner-handoff drafter, plus the v2.2 terminal-state provenance guard, work-classification vocabulary, and confirm-required Issue proposals), plus voice-profile, process-navigator, timeline-builder, workflow-map, meeting-prep-brief, and my-work (your own workload, report card, supplier book, savings and handover position; say "show me my work").
 - supplier-deep-dive (single-supplier profile) sits in Sourcing / RFx alongside supplier-landscape (multi-supplier shortlist).
 - negotiation-simulator (three modes: Practice roleplay, Observe both sides, Drill a single issue; 8 scenario templates; structured debrief), pro-forma-builder (multi-year financial model), should-cost-builder (bottoms-up cost anchor).
 - One canonical evaluation scale across the suite: 0.0 to 5.0, tied to the five-tier requirements mapping. evaluation-engine is the sole owner of the official score and award recommendation; rfp-response-analysis and supplier-deep-dive provide descriptive, proposed signal that evaluation-engine consumes, they do not settle the award.

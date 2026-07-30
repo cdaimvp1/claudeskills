@@ -4610,3 +4610,25 @@ content decision rather than a routing one. Left for Marc.
 
 Smoke 33/0 - manifest check PASS - J1 check PASS - malicious sweep clean - 33 packages
 extract-and-retest verified.
+
+---
+
+## my-work added to teach-mode (Marc, 2026-07-30)
+
+Three places in `references/teach-mode.md`, plus the manifest flag:
+
+- the Personal Command Center roster used in the walkthrough: **(6) -> (7)**, my-work added
+- the suite headline count: **27 -> 28 skills**
+- the detailed pipeline description, with the trigger phrase so a learner can act on it
+
+`in_teach_mode` set to True in the manifest. That is not bookkeeping: the drift check
+compares the flag against the file both ways, so a teach-mode edit without the manifest
+fails, and so does a manifest flag the file does not back up.
+
+**A second stale count found while doing it.** teach-mode carried "27 skills organized into
+six pipelines" independently of the four counts in SKILL.md and the widget's own section
+count. Six hand-maintained totals for one number, across three files. Every one is now
+correct, and every one would have gone stale again on the next routing change if the
+manifest were not the source they are checked against.
+
+Smoke 33/0 - manifest check PASS - J1 check PASS - 33 packages extract-and-retest verified.
