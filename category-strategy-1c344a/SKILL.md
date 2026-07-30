@@ -411,7 +411,7 @@ Web research is NOT optional. The analytical depth of the dashboard depends on c
 
 **Total: 14-21 web searches minimum per category.** For multi-category dashboards, run separate research for each category. Track search count and cite sources with publication dates.
 
-**Effort tiers.** The 14-21 search minimum applies to a full DEVELOP or MANAGE strategy (the locked 11-tab dashboard deliverable). For a quick directional gut-check explicitly requested as quick or directional, run the minimum targeted searches sufficient to support the recommendation and label the output lower-confidence / directional rather than a full strategy. If web search is unavailable, proceed internal-data-only and label the result 'internal-data-only / not market-verified.'
+**Effort tiers.** The 14-21 search minimum applies to a full DEVELOP or MANAGE strategy (the locked 5-tab dashboard deliverable). For a quick directional gut-check explicitly requested as quick or directional, run the minimum targeted searches sufficient to support the recommendation and label the output lower-confidence / directional rather than a full strategy. If web search is unavailable, proceed internal-data-only and label the result 'internal-data-only / not market-verified.'
 
 **2.1 Market Context**
 - Market size and growth rate (cite source, date, and forecast period)
@@ -583,10 +583,38 @@ skill-local path. Verified: building from a directory containing only a copy of 
 
 **Data contract: the model authors ONLY the data object; the builder renders.** Do not
 hand-clone JSX per run. This build tree is the current locked structure. **WS B1 landed 2026-07-30:** the retired pre-deterministic JSX build
-instructions below have been replaced with the deterministic ones. **Still open (WS B2):**
-the canonical spec inlined at the end of this file states an 11-tab structure, which
-conflicts with the locked 5 tabs in `VERSION-LOCK-2026-07-29.md`. Until B2 lands, the
-locked 5-tab structure wins over any tab count stated further down.
+instructions below have been replaced with the deterministic ones. **WS B2 landed 2026-07-30:** the tab count is settled at
+5 everywhere, with the 11-to-5 consolidation mapping recorded below. Any 11-tab wording
+remaining further down is historical changelog only.
+
+#### Tab structure: LOCKED AT 5 (decision record, WS B2, Marc confirmed 2026-07-30)
+
+The dashboard has **five** tabs, and the shipped engine (`dashboard/assets/pv/cs-render.js`)
+is the authority:
+
+**Overview · Spend & Suppliers · Trend & Change · Market & Risk · Strategy & Plays**
+
+An earlier canonical spec described **11** tabs. Those 11 were not deleted, they were
+CONSOLIDATED. Every one has a home, and no analysis was dropped:
+
+| the old 11 | now lives in |
+|---|---|
+| Overview | Overview |
+| Pareto & Tail | Spend & Suppliers (Pareto Distribution, Tail Analysis) |
+| Suppliers | Spend & Suppliers (Top Suppliers, All suppliers, Supplier tiering) |
+| Subcategories | Spend & Suppliers (All Subcategories, Subcategory Detail, Fragmentation Map) |
+| Rationalization | Spend & Suppliers (Consolidation opportunities, Off-contract spend to route) |
+| Supplier Development | Spend & Suppliers (Capability coverage, Geographic concentration) |
+| Trend & Change | Trend & Change |
+| Market & Kraljic | Market & Risk (Market intelligence, Supply-market forces, Pricing environment, Category position) |
+| Risk | Market & Risk (Risk heatmap, Risk register, Contract exposure, Escalation triggers) |
+| Strategy | Strategy & Plays (Recommended plays, Action matrix, Where to start) |
+| Savings & Scorecard | Strategy & Plays (Savings Waterfall, Play-to-Value Traceability, Category Scorecard) |
+
+**A 7 also appears in this file and is NOT a dashboard tab count.** PREPARE mode emits a
+7-SHEET Excel workbook (README, Cleaned Data, Exception Log, Dedup Report, Column Mapping
+Log, Supplier Normalization Log, Data Quality Scorecard). That 7 is correct and must not be
+reconciled to 5: it is a different artifact entirely.
 
 #### Single Deliverable: Category Strategy Dashboard (BUILT, not hand-authored)
 
@@ -620,7 +648,7 @@ Key requirements:
 
 **Multi-category support:** When the user requests analysis for multiple categories, produce ONE dashboard file with a category dropdown at the top. Each category is processed independently. Switching the dropdown reloads all tabs with that category's data. Structure is identical for every category. Nothing merges between categories.
 
-**Historical deck incorporation:** When the user uploads prior category strategy decks (PPTX), read them, extract content, compare against the 11 standard tabs. Category-specific content not covered by the standard structure gets added as a section within the most relevant existing tab. Flag unmapped content to the user for placement.
+**Historical deck incorporation:** When the user uploads prior category strategy decks (PPTX), read them, extract content, compare against the 5 standard tabs. Category-specific content not covered by the standard structure gets added as a section within the most relevant existing tab. Flag unmapped content to the user for placement.
 
 Canonical tab structure (all 11, every mode):
 1. Overview (KPIs, annual trend, top suppliers, key data-driven findings, concentration snapshot, geographic distribution section, data quality card)
@@ -652,7 +680,7 @@ Same as DEVELOP but with additional emphasis on:
 
 ## Workflow -- PREPARE Mode
 
-Mode 3 has a different job than Modes 1 and 2: it does not build or refresh a strategy, and it does not produce the 11-tab dashboard. It exists to turn a messy raw spend extract into a clean, reusable, well-documented dataset that DEVELOP, MANAGE, and any downstream skill (`market-rate-benchmarking-1c344a`, `supplier-landscape-1c344a`, `rfp-engine-1c344a`) can consume with confidence. Use PREPARE mode when the ask is "clean this spend file," "normalize this extract," "get this ready for analysis," or as a standalone data-hygiene pass ahead of a category strategy engagement.
+Mode 3 has a different job than Modes 1 and 2: it does not build or refresh a strategy, and it does not produce the 5-tab dashboard. It exists to turn a messy raw spend extract into a clean, reusable, well-documented dataset that DEVELOP, MANAGE, and any downstream skill (`market-rate-benchmarking-1c344a`, `supplier-landscape-1c344a`, `rfp-engine-1c344a`) can consume with confidence. Use PREPARE mode when the ask is "clean this spend file," "normalize this extract," "get this ready for analysis," or as a standalone data-hygiene pass ahead of a category strategy engagement.
 
 ### Boundary (HARD RULE)
 
@@ -704,7 +732,7 @@ Apply section 8 (Data Quality Scoring) to compute the composite score (Completen
 
 #### Single Deliverable: Cleaned Spend Workbook (XLSX) + Exception Log
 
-PREPARE mode's output is a standalone Excel workbook. This is the ONE deliverable of this mode; it is not a dashboard and does not touch the 11-tab canonical structure used by DEVELOP and MANAGE (see Phase 6 and `references/dashboard-canonical.md`, both unchanged by this mode). **MUST be created using `create_file`** (not bash/cat) to ensure shareability, and assembled per Execution Guardrail G10 (build the workbook sheet by sheet, not as a single oversized write).
+PREPARE mode's output is a standalone Excel workbook. This is the ONE deliverable of this mode; it is not a dashboard and does not touch the 5-tab dashboard structure used by DEVELOP and MANAGE (see Phase 6 and `references/dashboard-canonical.md`, both unchanged by this mode). **MUST be created using `create_file`** (not bash/cat) to ensure shareability, and assembled per Execution Guardrail G10 (build the workbook sheet by sheet, not as a single oversized write).
 
 Workbook tabs (fixed order, every run):
 1. **README** -- source file name, run date, rows in / rows out / rows quarantined, composite DQ score, currency assumptions, and the Boundary statement verbatim (this workbook is a project-specific analytical dataset; it does not modify SAP, Ariba, SHARP, or the enterprise supplier master).
@@ -808,7 +836,7 @@ deliverable built on it must say so.
 
 Of the five category-strategy reference files, two are still INLINED at the end of this document (single-file install): `dashboard-canonical.md` and `strategy-template.md` -- read every run, so they stay inline. The other three -- `analysis-frameworks.md`, `analysis-methodology.md`, and `data-quality-rules.md` -- are generic reference/methodology material, not needed on every run, so they now load as companion files from `references/` instead, on the load condition named for each below. Where the workflow says "read references/X.md" or "see references/X.md" for the two inlined files, the content is inlined below under the matching `## INLINED:` heading; do not attempt to read them from disk. For the three companion files, load the actual file from `references/` per its stated condition; do not expect their content inlined below (each has a short pointer stub at its old `## INLINED:` heading instead).
 
-- `references/dashboard-canonical.md` (inlined below) -- **Read before building any dashboard.** The LOCKED dashboard structure (all 11 tabs, components, tokens, formatting rules), mandatory in every mode
+- `references/dashboard-canonical.md` (inlined below) -- **Read before building any dashboard.** The LOCKED dashboard structure (all 5 tabs, components, tokens, formatting rules), mandatory in every mode
 - `references/data-quality-rules.md` (companion file; load when ingesting raw spend data) -- **Read before ingesting raw spend data.** Adaptive format detection (SHARP and SAP-derived), column mapping, supplier name normalization, fuzzy matching, deduplication, currency handling, data quality scoring. DEVELOP and MANAGE load it for ingestion; PREPARE mode (Mode 3) loads it end to end as its full operating spec, see "Workflow -- PREPARE Mode"
 - `references/analysis-methodology.md` (companion file; load during Phase 1 Data Analysis or whenever a derived metric's calculation method is needed) -- Spend cube construction, Pareto methodology, HHI calculation, tail spend framework, trend decomposition, rate-vs-volume analysis, contract coverage, BU fragmentation
 - `references/strategy-template.md` (inlined below) -- Narrative content source that maps onto the dashboard tabs (and the Word fallback rendering); NOT a separate DOCX deliverable
@@ -828,8 +856,8 @@ This skill works across ALL procurement categories. Frameworks are commodity-agn
 
 ## SUITE INTEGRATION & ENHANCEMENTS
 
-- **Native deliverable (DEVELOP / MANAGE):** 11-tab interactive dashboard (JSX) as the sole output. Multi-category dropdown when multiple categories are analyzed. Historical deck content incorporated into relevant tabs.
-- **Native deliverable (PREPARE):** cleaned spend workbook (XLSX) plus exception log as the sole output, per "Workflow -- PREPARE Mode." Does not touch the 11-tab dashboard structure.
+- **Native deliverable (DEVELOP / MANAGE):** 5-tab interactive dashboard (built HTML) as the sole output. Multi-category dropdown when multiple categories are analyzed. Historical deck content incorporated into relevant tabs.
+- **Native deliverable (PREPARE):** cleaned spend workbook (XLSX) plus exception log as the sole output, per "Workflow -- PREPARE Mode." Does not touch the 5-tab dashboard structure.
 - **Action plan format:** the 12-month plan's actions each carry description, impact (H/M/L), effort (H/M/L), and rationale.
 - **Hand-off:** draw benchmarks from market-rate-benchmarking-1c344a if available rather than regenerating them; name the sourcing events the strategy implies and hand off to rfp-engine-1c344a for competitive sourcing. A PREPARE-mode cleaned workbook is a valid, preferred input to a following DEVELOP or MANAGE run.
 
@@ -891,7 +919,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ComposedChar
 // ---------------------------------------------------------------------------
 // Category Strategy - CANONICAL DASHBOARD (reference implementation)
 // LOCKED structure. See references/dashboard-canonical.md.
-// 11 tabs, identical in DEVELOP and MANAGE modes and for every category or
+// 5 tabs, identical in DEVELOP and MANAGE modes and for every category or
 // commodity. Only the data and category-specific research change per run.
 // Data below is NEUTRAL and ILLUSTRATIVE (Supplier Alpha/Beta/Gamma, generic
 // subcategories). Clone the structure, swap the data.
@@ -1664,10 +1692,10 @@ Every tab must contain interpretive analysis, not just data display. If a tab on
 - Annual metrics only. Headline KPI = most recent COMPLETE year. Current partial year shown as YTD with annualized run rate and YTD-vs-same-window YoY.
 
 ## Multi-Category Support
-When the user requests analysis for multiple categories, produce ONE dashboard file with a category dropdown at the top of the header bar. Each category is processed independently (separate analysis per category). Switching the dropdown reloads all tabs with that category's data. The 11-tab structure is identical for every category. Nothing merges between categories. If only one category is analyzed, the dropdown is omitted.
+When the user requests analysis for multiple categories, produce ONE dashboard file with a category dropdown at the top of the header bar. Each category is processed independently (separate analysis per category). Switching the dropdown reloads all tabs with that category's data. The 5-tab structure is identical for every category. Nothing merges between categories. If only one category is analyzed, the dropdown is omitted.
 
 ## Historical Deck Incorporation
-When the user uploads prior category strategy decks (PPTX), the skill reads them, extracts content from each slide, and compares against the 11 standard tabs. Category-specific content from historical decks that is not covered by the standard structure gets added as a section within the most relevant existing tab. Flag any content that does not map to a standard tab and ask the user where to place it. The 11-tab structure is the minimum; individual categories may have richer content in specific tabs based on what their category manager has historically tracked.
+When the user uploads prior category strategy decks (PPTX), the skill reads them, extracts content from each slide, and compares against the 5 standard tabs. Category-specific content from historical decks that is not covered by the standard structure gets added as a section within the most relevant existing tab. Flag any content that does not map to a standard tab and ask the user where to place it. The 5-tab structure is the minimum; individual categories may have richer content in specific tabs based on what their category manager has historically tracked.
 
 ## Layout shell
 - **Header bar:** dark (`#212121`) background, 4px red (`#E1251B`) left rule, uppercase red eyebrow "Category Strategy - {MODE} mode", Georgia serif category title "{code} - {name}", right-aligned date + period coverage line. Multi-category: dropdown selector between eyebrow and title.
@@ -1773,7 +1801,7 @@ Web search is mandatory before building the dashboard. The following minimum sea
 
 Total: 14-21 web searches minimum per category. For multi-category dashboards, run separate research for each category.
 
-**Effort tiers.** The 14-21 search minimum applies to a full DEVELOP or MANAGE strategy (the locked 11-tab dashboard deliverable). For a quick directional gut-check explicitly requested as quick or directional, run the minimum targeted searches sufficient to support the recommendation and label the output lower-confidence / directional rather than a full strategy. If web search is unavailable, proceed internal-data-only and label the result 'internal-data-only / not market-verified.'
+**Effort tiers.** The 14-21 search minimum applies to a full DEVELOP or MANAGE strategy (the locked 5-tab dashboard deliverable). For a quick directional gut-check explicitly requested as quick or directional, run the minimum targeted searches sufficient to support the recommendation and label the output lower-confidence / directional rather than a full strategy. If web search is unavailable, proceed internal-data-only and label the result 'internal-data-only / not market-verified.'
 
 ---
 
@@ -1839,7 +1867,7 @@ Each with: current value from data, proposed target, measurement cadence. Exampl
 
 ## Mode differences (content only, not structure)
 - **DEVELOP:** all tabs populated from current data + research; Strategy/Savings carry data-derived proposals flagged for confirmation.
-- **MANAGE:** same 11 tabs, but Overview and relevant tabs add prior-vs-current deltas, the Strategy tab adds a prior-strategy evaluation, and Savings tracks target vs realized. The layout, components, and tab set are identical. The Risk tab's top-movers note (v4.2) is the one place a MANAGE-mode prior snapshot activates a comparison that DEVELOP mode cannot show.
+- **MANAGE:** same 5 tabs, but Overview and relevant tabs add prior-vs-current deltas, the Strategy tab adds a prior-strategy evaluation, and Savings tracks target vs realized. The layout, components, and tab set are identical. The Risk tab's top-movers note (v4.2) is the one place a MANAGE-mode prior snapshot activates a comparison that DEVELOP mode cannot show.
 
 ---
 
@@ -1853,7 +1881,7 @@ Adaptive format detection (SHARP and SAP-derived), the column mapping alias dict
 
 # Category Strategy Narrative Template
 
-**What this template is.** This is the NARRATIVE CONTENT SOURCE for the strategy. The single deliverable of this skill is the 11-tab interactive dashboard (JSX). This template does NOT define a separate `.docx` deliverable. Use the section content below in two ways:
+**What this template is.** This is the NARRATIVE CONTENT SOURCE for the strategy. The single deliverable of this skill is the 5-tab interactive dashboard, built by the engine. This template does NOT define a separate `.docx` deliverable. Use the section content below in two ways:
 1. **Primary path (JSX dashboard):** map each section here onto its canonical dashboard tab (Executive Summary and Category Definition feed the Overview tab; Spend Analysis feeds Overview, Pareto and Tail, Suppliers, Subcategories; Market Dynamics feeds Market and Kraljic; Supplier Assessment feeds Suppliers and Strategy; Risk Assessment feeds Risk; Sourcing Strategy feeds Strategy; Value Targets feed Savings and Scorecard; Action Plan and Governance feed Strategy and Savings and Scorecard). The narrative depth specified here is the bar each tab must meet.
 2. **Word fallback path only:** when JSX cannot render (for example when running inside Word with no code execution), produce the SAME content as in-document headings, tables, and narrative covering every section below. This in-document version is a fallback rendering of the one deliverable, not an additional `category_strategy.docx` output produced alongside the dashboard. Do NOT emit both a dashboard and a separate strategy document on the JSX path.
 
@@ -2304,7 +2332,7 @@ The dashboard footer's sources/confidence area MUST surface the actual web searc
 
 This is the inline fallback the shared block points to when `lilly-brand-assets-1c344a/references/user-manual.md` cannot be read. Answer from here in that case, and tell the user you are answering without the shared manual.
 
-- **What this skill produces:** ONE interactive 11-tab React dashboard (JSX), or, when JSX cannot render (for example inside Word with no code execution), the same content as in-document headings, tables, and narrative. There is no separate `.docx` deliverable.
+- **What this skill produces:** ONE interactive 5-tab dashboard, built by the engine, or, when it cannot be built or rendered (for example inside Word with no code execution), the same content as in-document headings, tables, and narrative. There is no separate `.docx` deliverable.
 - **Which model:** use the suite default (Opus) for the analysis and synthesis passes; extraction and formatting sub-steps may run on Sonnet. Onboarding-style runs stay on Opus.
 - **Dashboard not loading / blank screen:** confirm the artifact was created with `create_file` (not bash/cat) so it is shareable; confirm the single default export is a React component; check the browser console for a syntax error in the `const D = {...}` data object.
 - **React errors / "useMemo is not defined" or chart errors:** the JSX imports `useState, useMemo` from react and `BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ComposedChart, Line, ReferenceLine, Cell, ScatterChart, Scatter, ZAxis, CartesianGrid` from recharts. Every imported symbol is used (the Subcategories tab uses ScatterChart/Scatter/ZAxis). If a chart is empty, check that the `D` arrays are populated, not that a library is missing.

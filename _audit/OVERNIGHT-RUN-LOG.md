@@ -4681,3 +4681,35 @@ until B2 lands. Removing the marker entirely would have hidden a live conflict.
 Smoke 33/0 - malicious sweep clean - 33 packages extract-and-retest verified.
 
 **B2 needs one word from Marc: confirm Category Strategy is 5 tabs.**
+
+---
+
+## B2 — Category Strategy tab count settled at 5 everywhere. DONE. (Marc confirmed 5)
+
+**16 live sites** corrected, plus a decision record written into the file. The plan's verify
+is "grep for 11 tab / 7 tab returns only historical changelog lines": **it now returns 0
+non-changelog hits.**
+
+### The 11 were consolidated, not deleted, and the record says where each went
+
+An 11-tab canonical spec was still being read every run against a shipped 5-tab engine. The
+decision record maps every one of the 11 into its home so no analysis was dropped:
+
+Pareto & Tail, Suppliers, Subcategories, Rationalization and Supplier Development all fold
+into **Spend & Suppliers**. Market & Kraljic and Risk fold into **Market & Risk**. Strategy
+and Savings & Scorecard fold into **Strategy & Plays**. Overview and Trend & Change keep
+their own tabs.
+
+That mapping is checkable against the shipped engine: every panel named in it exists in
+`dashboard/assets/pv/cs-render.js`.
+
+### The "7 tab" in the plan is not a tab count, and reconciling it would have been wrong
+
+The plan described "three tab counts in three places". Two are dashboard counts (11 vs the
+locked 5). **The third is PREPARE mode's 7-SHEET Excel workbook** (README, Cleaned Data,
+Exception Log, Dedup Report, Column Mapping Log, Supplier Normalization Log, Data Quality
+Scorecard). That 7 is correct and describes a different artifact entirely. Folding it into
+the reconciliation would have corrupted a working spec to satisfy a grep. The decision
+record now says so explicitly, so the next person does not repeat the temptation.
+
+Smoke 33/0 - 33 packages extract-and-retest verified.
