@@ -4,17 +4,16 @@ description: >
   Deal tab: the static, single-file analytical dashboard for a Lilly procurement deal under
   review. Assembles one self-contained HTML artifact from a single data object, on the
   platform chrome, across four tabs: Overview, Terms & Review, Economics, Negotiation. It is
-  the convergence point for three lens skills, which own the content: contract-review supplies
-  issues, document conflicts, protection and obligations; scope-sow-architect supplies scope
-  and its issues; pro-forma-builder supplies commercial lines, scenarios, assumptions and
-  benchmarks. Deterministic: the same data object in produces a byte-identical dashboard out.
-  REFLECT-ONLY, and static: no state, no persistence, no sends, no writes. Triggers: "deal
-  tab", "deal dashboard", "build the deal dashboard".
-  BOUNDARY: deal-room-1c344a is a DIFFERENT product, a live negotiation manager that keeps a
-  persistent concession ledger across a negotiation. This skill produces a static artifact and
-  keeps nothing. The two were previously in one directory, which is the name collision that
-  created this skill.
+  the convergence point for three lens skills: contract-review (issues, document conflicts,
+  protection, obligations), scope-sow-architect (scope and its issues), and pro-forma-builder
+  (commercial lines, scenarios, assumptions, benchmarks). Deterministic: the same data object
+  in produces a byte-identical dashboard out. REFLECT-ONLY and static: no state, no
+  persistence, no sends, no writes. Triggers: deal tab, deal dashboard, build the deal
+  dashboard. BOUNDARY: deal-room-1c344a is a DIFFERENT product, a live negotiation manager
+  with a persistent concession ledger; this skill produces a static artifact and keeps
+  nothing.
 metadata:
+  suite: v10.7.0
   owner: Lilly Global Procurement
   status: LOCKED 2026-07-29
 ---

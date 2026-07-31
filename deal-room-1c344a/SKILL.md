@@ -3,18 +3,16 @@ name: deal-room-1c344a
 description: >
   Deal Room: a live negotiation manager for Eli Lilly procurement, run in one Claude Project
   per negotiation. Ingests the opening strategy (issues, positions, priorities, approval
-  boundaries, packages); after each meeting or email the user pastes in, updates a persistent
+  boundaries, packages); after each meeting or email pasted in, updates a persistent
   deal_room_state.json concession ledger: movement, concessions, tentative agreements,
-  conditional trades, value of movement, open issues, approvals needed, and next counter. At
+  conditional trades, value of movement, open issues, approvals needed, next counter. At
   close, emits a structured handoff to negotiation-playbook-learning-1c344a. REFLECT-ONLY:
   drafts, never sends or writes to any system. Single-user, single Project. Triggers: "deal
-  room", "log this round", "what happened in the meeting", "our next counter". BOUNDARY: the static Deal-tab dashboard is NOT this skill (it moved to
-  deal-tab-1c344a on 2026-07-29; the stale copy under dashboard/ is marked superseded and
-  awaiting deletion);
-  commercial/legal-negotiation-prep-1c344a give ONE-TIME pre-talks prep and can seed this
-  skill (the former's dashboard is also named "Deal Room" but is static); negotiation-
-  playbook-learning-1c344a analyzes patterns across CLOSED deals and is fed by this skill at
-  close.
+  room", "log this round", "what happened in the meeting", "our next counter". BOUNDARY:
+  deal-tab-1c344a is the separate static Deal-tab dashboard (moved out 2026-07-29);
+  commercial/legal-negotiation-prep-1c344a give one-time pre-talks prep and can seed this
+  skill; negotiation-playbook-learning-1c344a analyzes closed deals and is fed by this skill
+  at close.
 metadata:
   suite: v10.7.0
 ---

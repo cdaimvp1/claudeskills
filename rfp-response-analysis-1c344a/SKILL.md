@@ -8,10 +8,10 @@ description: >
   "compare what each vendor said", "analyze supplier responses against the requirements",
   "what did each vendor say about [topic]", "where do the suppliers differ", "show me the
   gaps in supplier coverage", "extract pricing from the responses", "evaluate the RFP responses",
-  "produce the supplier evaluation report". Produces a comprehensive analysis_summary.docx
-  (the primary, standalone deliverable) and pipeline artifacts for evaluation-engine. This skill's
-  cross-vendor data (coverage, commercial, citations, an AI first-pass score) renders in the
-  suite's locked rfx-hub-1c344a dashboard, not in a standalone dashboard of its own.
+  "produce the supplier evaluation report". Produces analysis_summary.docx (the primary,
+  standalone deliverable) and pipeline artifacts for evaluation-engine. Cross-vendor data
+  (coverage, commercial, citations, an AI first-pass score) renders in the suite's locked
+  rfx-hub-1c344a dashboard, not a standalone dashboard of its own.
 metadata:
   suite: v10.7.0
 ---
