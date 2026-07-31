@@ -59,7 +59,21 @@ status itself (the M365 connector cannot reach Ariba or SAP). Always answer
 "here is where to check" or "here is who to ask," never a live status pull,
 unless the stakeholder pastes in what the system already shows them.
 
+## Real status-lookup URL found (2026-07-31, via the Source to Pay Home page)
+`https://srvs4pweb.aws.lilly.com/sap/bc/webdynpro/sap/zwd_arb_inquiry` -- labeled
+on the S2P Home page (`https://collab.lilly.com/sites/Global_Procurement/
+SitePages/Home.aspx`, confirmed by Marc as real and distinct from the Playbook)
+as "Access SAP Supplier, Purchase Order, Invoice or Payment information." This
+is very likely the actual tool behind the "Status Hub" name used elsewhere in
+BuyLilly's own pages, though the two have not been independently confirmed
+identical. It is SAP-login-gated, so this skill can name and link it but
+cannot fetch or read its content.
+
 ## Gaps
-- The Status Hub's own direct link/URL was not captured this pass (found via a
-  page that references it, not the tool's own landing page). Confirm live.
+- The exact relationship between this SAP inquiry tool and the "Status Hub"
+  name used on the BuyLilly "Purchase Requisition Create or Maintain" page is
+  not fully confirmed (same tool under two names, vs. two related but
+  different tools). Say "the Status Hub" to a stakeholder per BuyLilly's own
+  language, and offer this SAP URL as an alternate direct route if they have
+  SAP access.
 - The PO Cheat Sheet's line-item tips were not read this pass.

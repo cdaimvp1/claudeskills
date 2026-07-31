@@ -19,15 +19,25 @@ Full detail: `references/buylilly-supplier-onboarding.md`.
 
 ## The systems map (what each system is actually for)
 
+Real, direct system URLs below were found and confirmed 2026-07-31 via the
+**Source to Pay Home page** (`https://collab.lilly.com/sites/Global_Procurement/
+SitePages/Home.aspx`, confirmed by Marc as a genuine, distinct site from the
+Playbook -- read live, "SOURCE TO PAY | Supports for Suppliers" hub with quick-
+link tiles to BUYING / SUPPLIER LIFECYCLE / INVOICING / PAYMENTS / FRAP POLICY
+/ CONTACT PROCUREMENT). This is the richest real systems-map source found so
+far; add it as Knowledge Source 6 in both process-navigator and procurement-
+help-desk (see each SKILL.md's Knowledge Sources section).
+
 | System | What it does | Who touches it | Connector-reachable? |
 |---|---|---|---|
 | **BuyLilly** (Ariba front end) | Stakeholder front door: guided buying, PO/requisition creation, PO increase, "Your Requests"/"Your Approvals," Status Hub | Any employee with a buying need; ATC/ATS approvers | Yes, live-read this session |
-| **Ariba** (SLP + sourcing + invoicing) | Supplier registration (SLP), RFI/RFP/RFQ events, PO issuance, invoice matching, invoice/PO status | Sourcing reps, requisitioners, suppliers | No -- the M365 connector cannot read Ariba's own transactional data; only BuyLilly's SharePoint-hosted guidance pages are reachable |
-| **SAP (vendor master, older POs)** | Vendor master record (created after SLP registration approval), legacy (pre-Buy@Lilly) PO tracking | Finance, Supplier Management/VMD, requisitioners with SAP access | No -- not M365; requires direct SAP access |
-| **LEAH (CLM)** | Contract Lifecycle Management: drafting, redlining, executing MSAs/WOs/SOWs/Order Forms | Sourcing, Legal (Digital Legal Office) | No -- not M365 |
-| **Aravo (TPRM)** | Third-party record + engagement + Inherent Risk Questionnaire (IRQ); scores inherent risk Limited-to-Significant; assigns due-diligence by domain | Business/Engagement Owner (submits), TPMO + Risk Domain Partners (manage) | No -- not M365; the TPRM Front Door page itself was not independently verified reachable this pass |
-| **ServiceNow (AI Registry / AIR)** | Registers AI/ML use cases, flags vendor-product AI | Business/requester, AI Center / IBU-GenAI | Not tested this pass |
+| **Ariba** (SLP + sourcing + invoicing) | Supplier registration (SLP), RFI/RFP/RFQ events, PO issuance, invoice matching, invoice/PO status. Real guided-buying/sourcing entry points confirmed on the S2P Home page: `https://s1.ariba.com/gb/?realm=lilly-1&locale=en_US` (guided buying) and `https://s3.ariba.com/Sourcing/Main/aw?...&realm=lilly` (sourcing) | Sourcing reps, requisitioners, suppliers | No -- the M365 connector cannot read Ariba's own transactional data; the realm URLs above are real login-gated Ariba entry points, not connector-readable content |
+| **SAP** (vendor master, PO/invoice/payment inquiry) | Vendor master record (created after SLP registration approval); legacy (pre-Buy@Lilly) PO tracking. **Real, named inquiry tool confirmed:** `https://srvs4pweb.aws.lilly.com/sap/bc/webdynpro/sap/zwd_arb_inquiry` -- the S2P Home page's own label for this link is "Access SAP Supplier, Purchase Order, Invoice or Payment information," which is very likely the actual tool behind the "Status Hub" name used elsewhere; not independently confirmed identical, but the label match is strong. Also a general SAP Fiori launchpad: `https://srvs4pweb.aws.lilly.com/sap/bc/ui2/flp?sap-client=100#Shell-home`. | Finance, Supplier Management/VMD, requisitioners with SAP access | No -- not M365; these are direct SAP login-gated URLs, named here for completeness, not fetchable as content |
+| **LEAH (CLM)** | Contract Lifecycle Management: drafting, redlining, executing MSAs/WOs/SOWs/Order Forms. **Likely real URL found:** `https://cloud22.contractpod.com/elililly/vue-app/index.aspx#/` (ContractPod is a common CLM platform; this was linked from the S2P Home page's contracting area). Not independently confirmed to be branded "LEAH" internally -- flag for confirmation before treating as certain. | Sourcing, Legal (Digital Legal Office) | No -- not M365; login-gated |
+| **Aravo (TPRM)** | Third-party record + engagement + Inherent Risk Questionnaire (IRQ); scores inherent risk Limited-to-Significant; assigns due-diligence by domain. **Real buyer-login URL confirmed:** `https://elilillysso.aravo.com/aems/home/buyer/buyerhome.do` | Business/Engagement Owner (submits), TPMO + Risk Domain Partners (manage) | No -- not M365; login-gated. The WwTP "front door" page itself is confirmed on now.lilly.com (`https://now.lilly.com/page/global-working-with-third-parties`, found on the S2P Home page) -- same unreachable-by-connector category as ProtectLilly, not previously confirmed. |
+| **ServiceNow** (AI Registry / AIR; also general procurement support) | Registers AI/ML use cases, flags vendor-product AI. **Real Buy@Lilly support-case URL confirmed:** `https://lillygbs.service-now.com/buy_lilly?id=csm_get_help&sys_id=330187591ba2a810a8b033fe034bcb71` -- this is the actual "create a CSM case" / "Get Support" link the Buy@Lilly FAQ referred to only by name. | Business/requester, AI Center / IBU-GenAI; any stakeholder needing support | The support-case URL is login-gated, not fetchable as content, but is a real, correct link to hand a stakeholder |
 | **Protect Lilly Chatbot KB** | The actual answer source behind Lilly's CI/PI/data-classification/third-party-security chatbot | Any employee via now.lilly.com's chatbot | The chatbot's own now.lilly.com page is NOT reachable, but its backing SharePoint CSV IS -- see `references/protectlilly-fallback-notes.md` |
+| **Adobe Sign / Yammer** | Adobe Sign (`lilly.na2.adobesign.com`) for e-signature; Yammer/Viva Engage groups for Buy@Lilly and general procurement community support | Anyone signing a document; anyone posting a support question in the community | Not tested this pass -- Yammer/Viva Engage content is a different connector surface than SharePoint search and was not attempted |
 
 ## The FRAP financial-authorization layer (governs every transaction regardless of system)
 

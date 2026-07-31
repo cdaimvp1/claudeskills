@@ -108,3 +108,12 @@ This snapshot did not independently re-verify each named front-door link
 ai.lilly.com) resolves; it reports what the source document names. Prefer a live
 read to confirm a specific link still works before telling a stakeholder to go
 there.
+
+## Real URLs confirmed 2026-07-31 (via the Source to Pay Home page)
+`https://collab.lilly.com/sites/Global_Procurement/SitePages/Home.aspx`
+(confirmed by Marc as a real, distinct site from the Playbook) links directly to:
+- **Aravo buyer login (TPRM):** `https://elilillysso.aravo.com/aems/home/buyer/buyerhome.do`
+- **WwTP front door itself is on now.lilly.com, not SharePoint:** `https://now.lilly.com/page/global-working-with-third-parties` -- same unreachable-by-M365-connector category as ProtectLilly (confirmed, not previously known). Name this link for a stakeholder; do not expect to fetch its content live.
+- **Likely LEAH/CLM:** `https://cloud22.contractpod.com/elililly/vue-app/index.aspx#/` (ContractPod-branded; not independently confirmed as the internally-branded "LEAH," flag before stating this with certainty).
+- **Buy@Lilly support-case creation:** `https://lillygbs.service-now.com/buy_lilly?id=csm_get_help&sys_id=330187591ba2a810a8b033fe034bcb71`
+All of the above are login-gated transactional systems: this skill can name and link them, never fetch their content (see Out of Scope in SKILL.md).

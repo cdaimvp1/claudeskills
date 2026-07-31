@@ -3,6 +3,13 @@
 Captured 2026-07-31 via live M365 connector read. Use this when the live connector
 is unavailable; prefer a fresh live read when possible (policy and thresholds change).
 
+## "Buy@Lilly Support" IS this site (confirmed by Marc 2026-07-31)
+"Buy@Lilly Support" is not a separate site from BuyLilly -- it is
+`https://collab.lilly.com/sites/Buylilly` itself. Earlier passes treated the
+name as possibly pointing to a distinct Yammer community or support portal
+referenced inside the FAQ document; Marc confirmed directly it is this same
+site. Do not search for a separate "Buy@Lilly Support" destination.
+
 ## Source: BuyLilly "How to buy goods or services"
 `https://collab.lilly.com/sites/Buylilly/SitePages/How-to-buy-goods-or-services.aspx`
 Read 2026-07-31 (page last modified 2026-07-20).
