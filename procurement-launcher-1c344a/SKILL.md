@@ -116,12 +116,13 @@ Drafting outbound communications that are NOT this skill's primary requested del
 
 # Version
 - **Skill:** Procurement Launcher (THEO)
-- **Version:** 2.10
+- **Version:** 2.12
 - **Suite:** v10.7.0
-- **Last Updated:** July 22, 2026
+- **Last Updated:** July 31, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation); lilly-contract-review v3.5+; negotiation-simulator v2.3+ (for phrase-carried mode detection); rfp-engine v2.3+; evaluation-engine v2.2+; rfp-case-manager v2.2+
 - **Changelog:**
+  - v2.12 (July 31, 2026): **Pricing/cost trigger-collision fix, found by live conversation simulation.** An open-ended pricing question ("is this a fair price", "can you check this pricing") is genuinely ambiguous across three skills (should-cost-builder / commercial-negotiation-prep / market-rate-benchmarking) and the generic new-buy/renewal/problem clarifying question does not resolve it -- confirmed by simulating the exact exchange and watching it fail to disambiguate. Added a second, targeted DIAGNOSE question for this specific case ("do you already have a price or rate to evaluate, or are you starting from scratch") that cleanly routes: a price in hand points to commercial-negotiation-prep (or market-rate-benchmarking for a pure external comparison with no negotiation plan needed); starting from scratch points to should-cost-builder. Still one question, still asked only when the phrasing is genuinely open-ended. Re-simulated after the fix; resolves cleanly. (v2.10 -> v2.11 also fixed a stale Version-field/changelog mismatch: the header said 2.10 while the changelog's top entry was already v2.11.)
   - v2.11 (July 2026): **theos-field-guide held back, not routed.** Marc held theos-field-guide-1c344a out of the shipping package 2026-07-30 (not ready to ship). Removed it from the Section 6 widget summary and Markdown fallback menu, where it was still listed as a live, tappable "open my field guide" option even though the skill is not installed -- a user who tapped it or said the trigger phrase would hit a skill that does not exist. It was never actually in the routing table (the "single registry" this file's own text calls authoritative), only in the widget/fallback summary lines, so removing it there brings those two surfaces back into agreement with the registry rather than adding a new PENDING row. Removed the stale `theos-field-guide v2.2+ (replaces daily-digest)` line from Requires above. Also removed the theos-field-guide chain-partner entries from `references/routing-and-chains.md`'s meeting-prep-brief, process-navigator, timeline-builder, and workflow-map rows. Left those four skills' own SKILL.md files untouched: each already reads Field Guide state as an optional, gracefully-degrading enhancement ("when present," falls back cleanly otherwise), so nothing there actively misleads a user or breaks when Field Guide is absent. If Marc lifts the hold, re-add theos-field-guide to the widget/fallback/registry/chain-data surfaces removed here.
   - v2.10 (July 2026): **Roster cut: decision-deck and procurement-options-analysis retired.** Both skills removed suite-wide (owner-approved; decision-deck could not be made to work reliably, its deck output need is covered by sole-source-challenge's PPTX option; procurement-options-analysis overlapped intake/triage and its chosen path was usually already known). Removed both from the routing table, the widget menu, the Markdown fallback, the Guided path canonical paths, and Teach mode. The Decision Deck pipeline is retired entirely (it held only the one skill); Executive Summary and Personal Command Center renumber from 6/7 to 5/6. Routable-skill count reconciled 29 -> 27; widget rows 35 -> 33 across 6 sections (was 7). No other menu, widget, or routing-table changes.
   - v2.9 (July 2026): **Stage 8 orchestration capstone: 5 new skills wired in + a guided-path capability + count reconciliation.** (1) Added the five new specialist skills to the routing table, the widget menu, the Markdown fallback, and Teach mode so none is stranded: scope-sow-architect and deal-room (Contracts & Negotiations), procurement-options-analysis and sole-source-challenge (Sourcing / RFx), invoice-rate-card-auditor (Cost & Commercial). Routable-skill count reconciled 24 -> 29 across all surfaces; widget grows 30 -> 35 rows (section counts 12/8/4/3/1/1/6). (2) Added a "Guided path" section: THEO can take a free-text need, classify it, name the FULL ordered path up front, prime step 1, and after each step surface and prime the next, grounded strictly in references/routing-and-chains.md (re-derived from the corrected suite: evaluation-engine is sole scoring owner; rfp-engine builds the requirements grid; the 5 new skills slotted per their OWN stated handoffs). This is GUIDED HANDOFF (human-in-the-loop); auto-dispatch is not available in stock Desktop and is not claimed, though the chain data is structured to become dispatch-ready. (3) Added procurement-help-desk as a PENDING end-user/stakeholder front-door entry in the routing registry and fallbacks (content build network-gated per Stage 7), marked pending and not counted in the 29 built. (4) Footer version stamp v2.7 -> v2.9. No change to the seven-pipeline structure, the split-panel layout, or any existing trigger phrase.
@@ -171,6 +172,19 @@ already identify the work, you are done diagnosing: do not ask a question you al
 the answer to. If they are genuinely unclear, ask **at most one** question, and make it the
 question that changes the answer most (usually "is this a new buy, a renewal, or a problem
 with something you already have?"). Never open with a list of 33 options.
+
+**Pricing/cost questions need a different disambiguator.** An open-ended phrase like "is
+this a fair price" or "can you check this pricing" is genuinely ambiguous across three
+different skills (should-cost-builder: bottoms-up cost anchor with no price to react to yet;
+commercial-negotiation-prep: full negotiation strategy reacting to a price already in hand;
+market-rate-benchmarking: an external/internal rate comparison, not a negotiation plan) and
+the generic new-buy/renewal/problem question does not resolve it. When the diagnosed need is
+about cost, price, or rate with no clear anchor in what the user said, ask instead: "do you
+already have a price or rate to evaluate, or are you starting from scratch to figure out what
+something should cost?" A price/rate already in hand points to commercial-negotiation-prep
+(or market-rate-benchmarking if they only want the external comparison, not a negotiation
+plan); starting from scratch points to should-cost-builder. Still one question, still asked
+only when the phrasing is genuinely open-ended, per the same rule above.
 
 **2. RECOMMEND.** Name **one** path, drawn only from `references/routing-and-chains.md`,
 and say in a line why it fits what they described. Not a shortlist to choose from. If two
