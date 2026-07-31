@@ -64,6 +64,26 @@ SUPERSEDED_ARTIFACTS = {
         "build the superseded marker verified. Neither file is referenced by SKILL.md; "
         "only v2 is reproducible from the builder.",
     ),
+    "category-strategy-1c344a/dashboard/category-strategy-dashboard.html": (
+        "4c68f42f313403810934fac434599bcd03645eccf93d6d29e72dc7b4d28ab874",
+        "Pre-built reference output of build_dashboard_category.py, not consulted by the "
+        "live workflow (SKILL.md: Claude authors a fresh data object every run and builds "
+        "the real deliverable from it; this file is never read). Stripped from the "
+        "shipped package 2026-07-31 because its underlying seed carries 170 stub:true "
+        "citations styled identically to real ARIA citations with no visible marker -- a "
+        "user who opened this file directly would see what looks like a real, populated "
+        "dashboard for a real category. build_dashboard_category.py now refuses "
+        "(StubDataError) to reproduce this file without --allow-stub, so it can only be "
+        "regenerated deliberately, never accidentally.",
+    ),
+    "category-strategy-1c344a/dashboard/category-strategy-dashboard-DEMO.html": (
+        "dd029ccdc4146687e12e1994036719dae2f042954bd3347c97fa6382f6622ab4",
+        "Same reasoning as the non-demo file above: a pre-built reference output not "
+        "consulted by the live workflow. This one IS visibly banner-marked as "
+        "illustrative when opened, so the risk is lower, but it still serves no runtime "
+        "purpose for an installed skill (Claude always builds fresh) and is pure "
+        "shipped weight. Reproducible any time via --demo.",
+    ),
 }
 
 

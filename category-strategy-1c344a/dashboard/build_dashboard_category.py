@@ -37,12 +37,36 @@ def safe_for_script(text):
     return text.replace('</script>', '<\\/script>')
 
 
-def build(out_path, demo=False):
+class StubDataError(RuntimeError):
+    """Raised when a non-demo build would ship stub-flagged data unlabeled.
+
+    The shipped assets/seed/category-data.js is the platform page's own DEMO
+    data (see its own leading comment), carrying `"stub":true` on every
+    citation. cs-render.js never reads that flag, so a build made from an
+    un-replaced seed looks identical to one built from real, live-sourced
+    data: same "ARIA S2P, PO Product pull" citation styling, no visible
+    marker. Refusing here is the backstop for the case where the seed was
+    not actually replaced with real gathered data before building, per the
+    same no-fabrication discipline the rest of the suite enforces with
+    ReconciliationError-style gates.
+    """
+
+
+def build(out_path, demo=False, allow_stub=False):
     seed = read(os.path.join(ASSETS, 'seed', 'category-data.js'))
     # Externally sourced market research. Real and cited, so it loads in BOTH builds.
     seed += '\n' + read(os.path.join(ASSETS, 'seed', 'category-market-intel.js'))
     # Market structure per consumption unit. Market data, not Lilly data.
     seed += '\n' + read(os.path.join(ASSETS, 'seed', 'category-line-items.js'))
+    if not demo and not allow_stub and '"stub":true' in seed:
+        raise StubDataError(
+            "assets/seed/category-data.js still carries stub:true citations (the "
+            "shipped platform-page demo data). This is a non-demo build, so it must "
+            "be built from a fully replaced data object with real, gathered figures, "
+            "not the shipped demo seed. Author category-data.js fresh from real ARIA/ "
+            "SharePoint/web-research data per this skill's workflow, then rebuild. "
+            "(Maintainer reference builds that intentionally reproduce the shipped "
+            "demo content pass allow_stub=True / --allow-stub.)")
     if demo:
         # Narrows the seed to Software and adds the structures the real data does
         # not carry, so every panel renders populated. Clearly banner-marked.
@@ -97,15 +121,76 @@ def build(out_path, demo=False):
     return len(html)
 
 
+def _self_test():
+    """Verify the stub-data refusal gate actually fires, and that the two
+    legitimate paths around it (demo build; explicit maintainer override)
+    still succeed. Uses the real shipped seed files, no fixtures."""
+    import tempfile
+    passed = failed = 0
+
+    def check(label, cond):
+        nonlocal passed, failed
+        if cond:
+            passed += 1
+            print('[PASS]', label)
+        else:
+            failed += 1
+            print('[FAIL]', label)
+
+    tmp = tempfile.mkdtemp(prefix='cs_build_selftest_')
+    non_demo_out = os.path.join(tmp, 'out.html')
+    demo_out = os.path.join(tmp, 'out-demo.html')
+
+    raised = False
+    try:
+        build(non_demo_out, demo=False)
+    except StubDataError:
+        raised = True
+    check('non-demo build with un-replaced stub seed raises StubDataError', raised)
+    check('non-demo build did not write a file when it raised',
+          not os.path.exists(non_demo_out))
+
+    ok = False
+    try:
+        n = build(non_demo_out, demo=False, allow_stub=True)
+        ok = n > 0 and os.path.exists(non_demo_out)
+    except StubDataError:
+        ok = False
+    check('non-demo build with allow_stub=True succeeds (maintainer override)', ok)
+
+    ok = False
+    try:
+        n = build(demo_out, demo=True)
+        ok = n > 0 and os.path.exists(demo_out)
+    except StubDataError:
+        ok = False
+    check('demo build succeeds without needing allow_stub (stub data is expected there)', ok)
+
+    print()
+    print('SUMMARY: {}/{} passed, {}/{} failed'.format(
+        passed, passed + failed, failed, passed + failed))
+    return failed == 0
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--out', default=None)
     ap.add_argument('--demo', action='store_true',
                     help='Software only, every panel populated with illustrative data.')
+    ap.add_argument('--allow-stub', action='store_true',
+                    help='Maintainer override: build a non-demo artifact even though '
+                         'the seed still carries stub:true citations. Never pass this '
+                         'when building from real gathered data.')
+    ap.add_argument('--self-test', action='store_true')
     args = ap.parse_args()
+    if args.self_test or len(sys.argv) == 1:
+        # No args at all -> self-test, matching this suite's convention (e.g.
+        # rfp_analysis_report_generator.py: "no args -> also runs the self-test").
+        # A bare build here would now hit StubDataError against the shipped seed.
+        sys.exit(0 if _self_test() else 1)
     out = args.out or os.path.join(
         BUILD_DIR, 'category-strategy-dashboard-DEMO.html' if args.demo
         else 'category-strategy-dashboard.html')
-    n = build(out, demo=args.demo)
+    n = build(out, demo=args.demo, allow_stub=args.allow_stub)
     print('wrote {} ({} bytes, {:.2f} MB){}'.format(
         out, n, n / 1048576.0, ' [ILLUSTRATIVE DATA]' if args.demo else ''))
