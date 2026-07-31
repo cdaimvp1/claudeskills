@@ -1,6 +1,46 @@
 # Session handoff — read this first on resume
 
-## LATEST: 2026-07-30 (session after START-HERE.md). If you're resuming cold, start HERE, not below.
+## LATEST: 2026-07-31. Dashboard-cleanup queue CLOSED OUT. If resuming cold, start HERE.
+
+All 6 items in the standalone lens-skill dashboard-cleanup queue (see the
+2026-07-30 section directly below) are now resolved:
+
+- **Removed** (redundant standalone dashboard, hub or DOCX already carries the
+  analysis, verified before removing): `should-cost-builder`, `market-rate-benchmarking`,
+  `rfp-response-analysis` (commit `294efe1` — its 6-tab dashboard duplicated
+  what `rfx-hub-1c344a` already composes as one of its four feeder slices, per
+  the hub's own rule "No lens skill builds its own version of this dashboard";
+  every tab had a DOCX Section equivalent, so nothing analytical was lost),
+  `evaluation-engine` (commit `f064de8` — architecturally different from the
+  others: used the suite-standard `visualize:show_widget` primitive, not a
+  bespoke JSX, and its Award Scenario tab was a genuinely unique live
+  split-award slider modeler with no static equivalent anywhere else. Flagged
+  this to Marc rather than assuming the same pattern applied; Marc chose to
+  remove it anyway, so the Award Scenario analysis was relocated into
+  `evaluation_report.docx` Section 7 as a new static "Award Scenario
+  Comparison" subsection rather than silently dropped).
+- **Deferred by Marc's own explicit choice, not resolved:** `scope-sow-architect`
+  — has a real, independently-requestable "Dashboard only" output mode with
+  its own reconciliation discipline, unlike the others. Revisit only if Marc
+  brings it back up.
+- **Confirmed not-applicable (correctly, no action taken):** `deal-room` — it
+  IS the mechanism that builds the Deal hub's dashboard, not a redundant
+  standalone one.
+
+Established pattern for any future dashboard-cleanup candidate: check for (a)
+a load-bearing hub-building role (deal-room), (b) a genuinely independent
+"dashboard only" mode (scope-sow-architect), (c) a suite-standard primitive
+with unique live functionality (evaluation-engine) — any of these means STOP
+and ask before removing — before treating a standalone dashboard as safe,
+redundant dead weight (should-cost-builder / market-rate-benchmarking /
+rfp-response-analysis pattern). Always verify every removed tab's analytical
+content has a home elsewhere (DOCX section, CSV artifact, or the hub) before
+deleting; if one doesn't, relocate that content into the DOCX as static
+content rather than dropping it (the Award Scenario Comparison precedent).
+
+---
+
+## 2026-07-30 (session after START-HERE.md).
 
 Everything below this section (including the 2026-07-28 content and its own
 "superseded" layers) is prior history, kept for the traps and the record. This
