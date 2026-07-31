@@ -94,9 +94,20 @@ HELD_BACK = {
         "Marc, 2026-07-30: the dashboard and feature are unfinished, and the data needed to "
         "make them worthwhile is not available yet. Shipping it would put a dashboard of "
         "empty panels in front of a user, which is a worse first impression than the "
-        "feature not existing.",
+        "feature not existing. "
+        "Reinforced by the 2026-07-30 data-source audit: dashboard/assets/people.js:33 "
+        "hardcodes Marc's own real name and Lilly email onto fabricated Workday ID and "
+        "performance figures in the demo seed. Confirm every name in people.js is fictional "
+        "(and swap Marc's own identity out) before this is reconsidered for shipping.",
     "theos-field-guide-1c344a":
-        "Marc, 2026-07-30: not ready to ship. Held back with my-work.",
+        "Marc, 2026-07-30: not ready to ship. Held back with my-work. "
+        "Reinforced by the 2026-07-30 data-source audit: the 'My Savings' and 'Report Card' "
+        "panels render specific-looking dollar figures and a GPA that are, by the skill's own "
+        "text, 'model-populated per run' with no real source (not ARIA, not SHARP, not a "
+        "user upload) -- only internal arithmetic consistency is checked, not truthfulness. "
+        "Before shipping: either wire savings{}/reportCard{} to a real Lilly source or make "
+        "clear in the rendered UI (not just the SKILL.md) that these two panels are "
+        "illustrative.",
 }
 
 

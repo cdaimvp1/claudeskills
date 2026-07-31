@@ -118,6 +118,22 @@ class Finding:
     resolution_status: str
     detail: str
     kernel_call: Optional[str] = None
+    # F5 fields: carried directly off the line at the point the finding is
+    # created (not re-derived later from `detail`'s prose), so the F5
+    # generator can build the documented ledger schema and the DOCX report
+    # by reading this object, never by re-parsing a sentence.
+    invoice_number: Optional[str] = None
+    line_no: Optional[Any] = None
+    resource: Optional[str] = None
+    role_billed: Optional[str] = None
+    contracted_rate: Optional[float] = None
+    invoiced_rate: Optional[float] = None
+    escalation_cap_rate: Optional[float] = None
+    hours_invoiced: Optional[float] = None
+    hours_approved: Optional[float] = None
+    stated_total: Optional[float] = None
+    expected_total: Optional[float] = None
+    recommended_action: Optional[str] = None
 
 
 @dataclass
@@ -297,7 +313,15 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                         "CONFIRMED_OVERCHARGE",
                         f"billed {rate_billed} against allowed {allowed:.2f} "
                         f"for {ln['role_billed']} in contract year {contract_year}",
-                        kernel_note))
+                        kernel_note,
+                        invoice_number=ln["invoice_number"], line_no=ln.get("line_no"),
+                        resource=ln.get("resource"), role_billed=ln["role_billed"],
+                        contracted_rate=base, invoiced_rate=rate_billed,
+                        escalation_cap_rate=(cap if contract_year >= 2 else None),
+                        stated_total=stated_total, expected_total=round(allowed * qty, 2),
+                        recommended_action=(
+                            f"Issue credit of {q:,.2f}: rebill at the allowed rate "
+                            f"{allowed:.2f}/unit instead of the billed {rate_billed}.")))
 
         try:
             math_ok = verify_line_math(rate_billed, qty, stated_total)
@@ -315,7 +339,14 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                     "CONFIRMED_OVERCHARGE",
                     f"stated {stated_total} against {rate_billed} x {qty} = "
                     f"{rate_billed * qty}",
-                    f"verify_line_math({rate_billed}, {qty}, {stated_total}) -> False"))
+                    f"verify_line_math({rate_billed}, {qty}, {stated_total}) -> False",
+                    invoice_number=ln["invoice_number"], line_no=ln.get("line_no"),
+                    resource=ln.get("resource"), role_billed=ln["role_billed"],
+                    invoiced_rate=rate_billed, stated_total=stated_total,
+                    expected_total=round(rate_billed * qty, 2),
+                    recommended_action=(
+                        f"Correct the line total to {rate_billed * qty:,.2f} "
+                        f"({rate_billed} x {qty}); issue credit of {q:,.2f}.")))
 
         # ---- 3C escalation cap breach ----------------------------------
         if rc != "NOT_FOUND" and contract_year >= 2 and esc and cap is not None:
@@ -329,7 +360,15 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                         lid, CATEGORY_ESCALATION, "ESCALATION_CAP_BREACH", sev,
                         round(q, 2), "CONFIRMED_OVERCHARGE",
                         f"billed {rate_billed} against kernel cap {cap:.4f}",
-                        kernel_note))
+                        kernel_note,
+                        invoice_number=ln["invoice_number"], line_no=ln.get("line_no"),
+                        resource=ln.get("resource"), role_billed=ln["role_billed"],
+                        contracted_rate=base, invoiced_rate=rate_billed,
+                        escalation_cap_rate=cap, stated_total=stated_total,
+                        expected_total=round(cap * qty, 2),
+                        recommended_action=(
+                            f"Cap the rate at {cap:.2f}/unit per the escalation clause; "
+                            f"issue credit of {q:,.2f}.")))
 
         # ---- 3B role/level mismatch -------------------------------------
         ts = m["timesheet_match"]
@@ -349,7 +388,17 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                         line_findings.append(Finding(
                             lid, CATEGORY_ROLE, "ROLE_LEVEL_MISMATCH", sev,
                             round(q, 2), "PENDING_SUPPLIER_RESPONSE",
-                            f"billed as {ln['role_billed']}, roster shows {roster_role}"))
+                            f"billed as {ln['role_billed']}, roster shows {roster_role}",
+                            invoice_number=ln["invoice_number"], line_no=ln.get("line_no"),
+                            resource=ln.get("resource"), role_billed=ln["role_billed"],
+                            contracted_rate=float(roster_rate_card["base_rate"]),
+                            invoiced_rate=float(billed_rate_card["base_rate"]),
+                            hours_invoiced=qty, stated_total=stated_total,
+                            expected_total=round(float(roster_rate_card["base_rate"]) * qty, 2),
+                            recommended_action=(
+                                f"Ask the supplier to confirm the role actually performed; if the "
+                                f"roster-confirmed role ({roster_role}) stands, issue credit of "
+                                f"{q:,.2f}.")))
                 else:
                     # Roster level HIGHER than billed: favourable variance, logged
                     # per Rule 7, never a questioned amount.
@@ -376,7 +425,16 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                         lid, CATEGORY_HOURS, "HOURS_DISCREPANCY", sev, round(q, 2),
                         "PENDING_SUPPLIER_RESPONSE",
                         f"billed {qty} against {approved} approved, at the lower "
-                        f"defensible rate {rate_for_hours:.2f}"))
+                        f"defensible rate {rate_for_hours:.2f}",
+                        invoice_number=ln["invoice_number"], line_no=ln.get("line_no"),
+                        resource=ln.get("resource"), role_billed=ln["role_billed"],
+                        invoiced_rate=rate_for_hours, hours_invoiced=qty,
+                        hours_approved=approved, stated_total=stated_total,
+                        expected_total=round(approved * rate_for_hours, 2),
+                        recommended_action=(
+                            f"Request timesheet substantiation for the {disc:.1f}-unit gap "
+                            f"({qty} billed vs {approved} approved); {q:,.2f} questioned "
+                            "pending supplier response.")))
 
         # ---- 3E duplicate / unsupported ---------------------------------
         if lid in duplicate_ids:
@@ -384,7 +442,12 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                 lid, CATEGORY_DUPLICATE, "DUPLICATE", "Critical",
                 round(stated_total, 2), "CONFIRMED_OVERCHARGE",
                 "identical signature (resource, role, period, rate, quantity) on a "
-                "different invoice number; this is the later occurrence"))
+                "different invoice number; this is the later occurrence",
+                invoice_number=ln["invoice_number"], line_no=ln.get("line_no"),
+                resource=ln.get("resource"), role_billed=ln["role_billed"],
+                invoiced_rate=rate_billed, hours_invoiced=qty,
+                stated_total=stated_total, expected_total=0.0,
+                recommended_action=f"Reverse this duplicate charge in full: {stated_total:,.2f}."))
         elif ts == "NOT_FOUND" and m["po_match"] == "NOT_FOUND":
             sev = _DEFAULT_SEVERITY[CATEGORY_UNSUPPORTED]
             if stated_total >= 10000:
@@ -394,7 +457,13 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                 round(stated_total, 2), "PENDING_SUPPLIER_RESPONSE",
                 "the supplied documents contain no substantiating record for this "
                 "charge. This is a documentation gap, not an assertion of "
-                "wrongdoing (Rule 6)"))
+                "wrongdoing (Rule 6)",
+                invoice_number=ln["invoice_number"], line_no=ln.get("line_no"),
+                resource=ln.get("resource"), role_billed=ln["role_billed"],
+                invoiced_rate=rate_billed, hours_invoiced=qty, stated_total=stated_total,
+                recommended_action=(
+                    "Request supplier substantiation (a timesheet or PO reference) for "
+                    "this charge before it is treated as a confirmed credit.")))
         elif ts == "NO_TIMESHEETS_SUPPLIED":
             res.needs_input.append({
                 "line_id": lid,
@@ -426,7 +495,11 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                     ms.get("milestone_id", ms.get("name", "milestone")),
                     CATEGORY_MILESTONE, "MILESTONE_OVERBILL", sev, round(q, 2),
                     "CONFIRMED_OVERCHARGE",
-                    f"invoiced {invoiced} against contracted {contracted}"))
+                    f"invoiced {invoiced} against contracted {contracted}",
+                    stated_total=invoiced, expected_total=contracted,
+                    recommended_action=(
+                        f"Adjust the milestone payment to {contracted:,.2f}; issue credit "
+                        f"of {q:,.2f}.")))
 
     # PO NTE tracker
     po = inp.get("po")
@@ -440,7 +513,11 @@ def audit(inp: Dict[str, Any]) -> AuditResult:
                 "CONFIRMED_OVERCHARGE",
                 f"cumulative invoiced {cumulative:,.2f} exceeds PO NTE "
                 f"{float(po['nte']):,.2f}. A payment-authorization problem, not a "
-                "rate problem, flagged even where no single line is wrong"))
+                "rate problem, flagged even where no single line is wrong",
+                stated_total=cumulative, expected_total=float(po["nte"]),
+                recommended_action=(
+                    "Halt further invoicing against this PO pending an NTE amendment or "
+                    "written authorization for the overage.")))
 
     # ---- Phase 4 rollup -------------------------------------------------
     by_cat: Dict[str, float] = {}

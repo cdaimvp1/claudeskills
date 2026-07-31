@@ -1689,3 +1689,31 @@ on demand by the 15 gated skills that carry the ARIA-ENRICHMENT pointer block. T
 duplicate inlined copy has been removed; the companion file is the single source of truth.
 If a skill's own pointer says 'search INLINED: references/aria-enrichment.md' and it is
 not found here, read the companion file directly instead.
+
+---
+
+## INLINED: references/sharepoint-search-and-extract.md
+
+Added 2026-07-30. The full spec lives only in `references/sharepoint-search-and-extract.md`,
+loaded on demand by skills that need to find a governing contract document or a rate-card
+exhibit via the M365 connector. Read it before searching SharePoint for either need: it
+covers active search vs. waiting to be pointed at a file, how to filter candidates before
+opening them, and what to do when the user's procurement area has no equivalent repository
+(contracts in Ariba or on an individual desktop, neither reachable by Claude). Consuming
+skills: `lilly-contract-review`, `deal-room` (contract text); `commercial-negotiation-prep`,
+`market-rate-benchmarking` (rate-card extraction, as Tier 0 ahead of external benchmarks).
+
+---
+
+## INLINED: references/rfx-teams-site-binding.md
+
+Added 2026-07-30. The full spec lives only in `references/rfx-teams-site-binding.md`,
+loaded on demand by the RFx-family skills. Generalizes the Teams-site binding
+`rfp-case-manager` already built: bind a Microsoft Team's SharePoint site once per RFx
+event, check for an existing binding (in `_case_file.json` or `case_handoff.json`) before
+asking again, and scope every subsequent search to that one site rather than searching
+broadly. This is a bind-once mode, distinct from `sharepoint-search-and-extract.md`'s
+active-search mode -- an RFx event has one bounded collection point by design. Consuming
+skills: `rfp-case-manager` (built this), `rfp-engine`, `evaluation-engine`,
+`rfp-response-analysis`. (`rfx-hub` is dashboard-only -- it renders what these feed it and
+does not search anything itself, so it does not need this.)

@@ -15,13 +15,21 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             },
             {
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         },
@@ -33,13 +41,21 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             },
             {
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ],
           "note": "derived from open gates and outstanding scores, never asserted"
@@ -52,7 +68,11 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             }
           ],
           "note": "set when the RFx was issued; it is not inferred from the responses"
@@ -65,13 +85,21 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             },
             {
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         }
@@ -90,7 +118,11 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             }
           ],
           "note": "the panel named at issue"
@@ -103,7 +135,11 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ]
         }
@@ -122,13 +158,21 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             },
             {
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         },
@@ -139,7 +183,11 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         }
@@ -157,14 +205,22 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Evaluation panel scores",
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ]
         },
@@ -176,13 +232,21 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             },
             {
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         }
@@ -201,13 +265,21 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             },
             {
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         },
@@ -218,7 +290,11 @@
               "name": "Business case funding confirmation",
               "access": "internal",
               "type": "system",
-              "how": "Finance confirmation that the work order is funded"
+              "how": "Finance confirmation that the work order is funded",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "Finance's confirmation that the work is funded. No system found; ask the user directly or ask them to attach the confirmation email/document."
+              }
             }
           ]
         }
@@ -237,13 +313,21 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             },
             {
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         },
@@ -255,7 +339,11 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ]
         }
@@ -274,14 +362,22 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             },
             {
               "name": "The RFx pack Lilly issued",
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             }
           ],
           "note": "weights come from the issued pack; scores from the panel"
@@ -293,14 +389,22 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "The RFx pack Lilly issued",
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             }
           ]
         },
@@ -311,7 +415,11 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         }
@@ -330,7 +438,11 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             }
           ]
         }
@@ -349,7 +461,11 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ]
         },
@@ -361,7 +477,11 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ]
         }
@@ -380,13 +500,21 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             },
             {
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         },
@@ -397,7 +525,11 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         }
@@ -416,7 +548,11 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ],
           "note": "an unsubmitted score is NOT_ATTEMPTED, never a low score"
@@ -435,7 +571,11 @@
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ],
           "note": "leveling must complete for every priced bidder before scoring uses price"
@@ -447,13 +587,21 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         }
@@ -471,13 +619,21 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         },
@@ -488,7 +644,26 @@
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking output for this category"
+              "how": "market-rate-benchmarking output for this category",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -506,7 +681,11 @@
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         },
@@ -517,7 +696,26 @@
               "name": "Lilly spend data",
               "access": "internal",
               "type": "system",
-              "how": "prior-spend extract for this category"
+              "how": "prior-spend extract for this category",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "aria",
+                    "detail": "aria_fabric_* against Fabric semantic model 'S2P Purchase Order Product' (dataset f2ed9c34-f699-4874-b6ab-b7216fa2dbc0, workspace 4f1d3ee9-1b8e-4f73-a594-c598fdafaf54). Filter by Commodity Codes + Fiscal Year; use prebuilt measures, never custom DAX SUM."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "m365_search",
+                    "detail": "sharepoint_search for an existing spend extract (SHARP/SAP/Ariba export) the user has already saved. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 3,
+                    "method": "user_upload",
+                    "detail": "Ask for a spend extract (Excel/CSV) with columns: Vendor Name (or VENDOR_PARENT2 if rolling up to parent), Commodity Code Name, Cost Center, Fiscal Year, Net Spend (NET_SPEND_IN_USD -- already USD-normalized, do not mix with INVOICE_LOC_AMOUNT)."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -535,13 +733,21 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         }
@@ -559,13 +765,36 @@
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking output for this category"
+              "how": "market-rate-benchmarking output for this category",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -584,7 +813,11 @@
               "access": "internal",
               "type": "analysis",
               "how": "the supplier-landscape skill output that produced this shortlist",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "supplier-landscape-1c344a"
+              }
             }
           ]
         }
@@ -603,19 +836,31 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             },
             {
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         },
@@ -626,14 +871,22 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             },
             {
               "name": "The RFx pack Lilly issued",
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             }
           ]
         },
@@ -645,7 +898,11 @@
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ],
           "note": "advisory; the panel decides and the award stays subject to contract"
@@ -664,7 +921,11 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         }
@@ -682,19 +943,31 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             },
             {
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ]
         }
@@ -712,19 +985,61 @@
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Lilly spend data",
               "access": "internal",
               "type": "system",
-              "how": "prior-spend extract for this category"
+              "how": "prior-spend extract for this category",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "aria",
+                    "detail": "aria_fabric_* against Fabric semantic model 'S2P Purchase Order Product' (dataset f2ed9c34-f699-4874-b6ab-b7216fa2dbc0, workspace 4f1d3ee9-1b8e-4f73-a594-c598fdafaf54). Filter by Commodity Codes + Fiscal Year; use prebuilt measures, never custom DAX SUM."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "m365_search",
+                    "detail": "sharepoint_search for an existing spend extract (SHARP/SAP/Ariba export) the user has already saved. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 3,
+                    "method": "user_upload",
+                    "detail": "Ask for a spend extract (Excel/CSV) with columns: Vendor Name (or VENDOR_PARENT2 if rolling up to parent), Commodity Code Name, Cost Center, Fiscal Year, Net Spend (NET_SPEND_IN_USD -- already USD-normalized, do not mix with INVOICE_LOC_AMOUNT)."
+                  }
+                ]
+              }
             },
             {
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking output for this category"
+              "how": "market-rate-benchmarking output for this category",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -735,7 +1050,11 @@
               "name": "Business case funding confirmation",
               "access": "internal",
               "type": "system",
-              "how": "Finance confirmation that the work order is funded"
+              "how": "Finance confirmation that the work order is funded",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "Finance's confirmation that the work is funded. No system found; ask the user directly or ask them to attach the confirmation email/document."
+              }
             }
           ]
         }
@@ -754,7 +1073,11 @@
               "access": "internal",
               "type": "document",
               "how": "the requirements, weights and instructions issued to bidders",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "rfp-engine-1c344a"
+              }
             }
           ],
           "note": "the approval route follows the value and CCI set at issue"
@@ -778,20 +1101,32 @@
               "name": "Supplier responses to the RFx",
               "access": "supplier",
               "type": "document",
-              "how": "each bidder's submitted response, per requirement"
+              "how": "each bidder's submitted response, per requirement",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Supplier priced responses",
               "access": "supplier",
               "type": "bid",
-              "how": "the pricing schedule each bidder submitted"
+              "how": "the pricing schedule each bidder submitted",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "Evaluation panel scores",
               "access": "internal",
               "type": "review",
               "how": "each named evaluator's submitted scorecard",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "evaluation-engine-1c344a"
+              }
             }
           ]
         }

@@ -20,7 +20,7 @@ metadata:
 
 <!-- Suite: v10.7.0 -->
 
-<!-- MERGED PACKAGE (v10.7.0): This is a single-file install. The canonical dashboard reference implementation is inlined at the end of this document under "## INLINED: examples/invoice_rate_card_auditor_canonical_dashboard.jsx". The one file this skill does NOT inline is its vendored numeric kernel: `numeric_kernel.py` ships as a real, importable/runnable companion file at this skill's own root (`invoice-rate-card-auditor-1c344a/numeric_kernel.py`) because it is executed code, not reference prose. Shared suite references (guardrails, color palette, dashboard components, DOCX design system) live in `lilly-brand-assets-1c344a/SKILL.md`; read them from there, do not look for local copies. -->
+<!-- MERGED PACKAGE (v10.7.0): This is a single-file install. The canonical dashboard reference implementation is inlined at the end of this document under "## INLINED: examples/invoice_rate_card_auditor_canonical_dashboard.jsx". The files this skill does NOT inline are its real, importable/runnable companion code, all at this skill's own root because they are executed, not reference prose: `numeric_kernel.py` (vendored from lilly-procurement-kernels-1c344a), `invoice_audit_engine.py` and its `invoice_audit_selftest.py` (F4, Phases 2-4 in one execution), and `invoice_audit_report_generator.py` and its `invoice_audit_report_generator_selftest.py` (F5, the ledger and DOCX generator). Shared suite references (guardrails, color palette, dashboard components, DOCX design system) live in `lilly-brand-assets-1c344a/SKILL.md`; read them from there, do not look for local copies. -->
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-07-22) -->
 ## ARIA ENRICHMENT (optional, suite-wide)
@@ -148,11 +148,12 @@ Drafting outbound communications that are NOT this skill's primary requested del
 # Version
 - **Skill:** Invoice & Rate-Card Auditor
 - **Suite:** v10.7.0
-- **Version:** 1.0
-- **Last Updated:** July 22, 2026
+- **Version:** 1.1
+- **Last Updated:** July 30, 2026
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
-- **Requires:** lilly-brand-assets v10.0+ (shared foundation); lilly-procurement-kernels-1c344a (numeric_kernel.py source of truth for the vendored copy in this skill's own directory)
+- **Requires:** lilly-brand-assets v10.0+ (shared foundation); lilly-procurement-kernels-1c344a (numeric_kernel.py source of truth for the vendored copy in this skill's own directory); `python-docx` for `invoice_audit_report_generator.py`'s DOCX output (the JSON ledger still generates without it; the DOCX step raises `DocxUnavailableError` rather than silently skipping if it is missing, per this skill's own fail-closed discipline)
 - **Changelog:**
+  - v1.1 (July 2026, F4/F5): Batched Phases 2-4 (entity resolution, all six check families, severity/rollup) into one deterministic execution, `invoice_audit_engine.py`, instead of a per-line model loop (F4); this is a completeness fix (a model loop over a large invoice population can silently skip a line, code cannot), not primarily a cost fix. Added `invoice_audit_report_generator.py` (F5), which builds the Findings Ledger (.json) and the Line-Level Audit Report (.docx) mechanically from that engine's own output object, so neither is model-assembled from per-line kernel outputs anymore; the DOCX is asserted traceable back to the ledger (every rendered dollar figure must already exist in the ledger object) before it is saved. `Finding` gained the fields (`invoice_number`, `line_no`, `resource`, `role_billed`, `contracted_rate`, `invoiced_rate`, `escalation_cap_rate`, `hours_invoiced`, `hours_approved`, `stated_total`, `expected_total`, `recommended_action`) the generator needs, populated at the point each finding is created rather than re-parsed from prose. Two self-tests now ship: `invoice_audit_selftest.py` (engine, 26/26) and `invoice_audit_report_generator.py --selftest` (generator, 19/19).
   - v1.0 (July 2026): Initial release. Line-level audit of a supplied invoice population against the contract/SOW, rate card, PO, and timesheets/roster, across six finding categories: Rate Mismatch (including line-item math), Role/Level Mismatch, Escalation Cap Breach, Hours/Quantity Discrepancy, Duplicate/Unsupported Charge, and Milestone/Payment Mismatch. All rate, line-total, and escalation arithmetic wired to the vendored `numeric_kernel.py` (`verify_line_math`, `escalate`) per G11, no exceptions. 7-tab locked dashboard (Overview, Line-Level Exceptions, Rate & Escalation, Hours & Quantity, Duplicate & Unsupported, Category Rollup & Credits, Dispute Notice & Ledger), a DOCX audit report in the Magazine Report house style, a portable JSON findings ledger, and a draft supplier dispute notice with a 3-option tone picker. Reflect-only throughout: audits the supplied population as of the session it runs in, never writes back to AP, an ERP, or Ariba, and does not monitor future invoices. Added the suite-version stamp.
 
 # Invoice & Rate-Card Auditor
@@ -232,16 +233,23 @@ resolution (Phase 2), all six check families (Phase 3), and the severity table a
 internally.
 
 ```
-python invoice_audit_engine.py audit_input.json --ledger findings_ledger.json
+python invoice_audit_engine.py audit_input.json --ledger findings_ledger_raw.json
 ```
 
 or in-process:
 
 ```
-from invoice_audit_engine import audit, build_ledger
-result = audit(audit_input)          # PASS_2 through PASS_4
-ledger = build_ledger(result)        # the JSON ledger, F5
+from invoice_audit_engine import audit
+result = audit(audit_input)          # PASS_2 through PASS_4, one execution
 ```
+
+`result` (an `AuditResult`) IS the completed output object: every line's findings or
+clear status, `needs_model_review`, `needs_input`, the category rollup, and the
+row-count/rollup reconciliation, all produced in this one call. Do not re-derive any of
+these by hand-looping the lines again; that would be exactly the per-line model loop this
+HARD RULE exists to remove. `invoice_audit_engine.py`'s own `--ledger` flag or
+`build_ledger()` produce a lightweight internal-shape ledger useful for debugging or
+re-entry; it is NOT the Findings Ledger deliverable, see Phase 5 below.
 
 **This is a COMPLETENESS fix before it is a cost fix.** Invoice populations are the
 largest-N input in this suite. A model loop over several thousand lines can skip one and
@@ -270,7 +278,8 @@ It also REFUSES rather than assuming in three cases:
 **Self-test before trusting a run:**
 
 ```
-python invoice_audit_selftest.py        # 26/26 expected
+python invoice_audit_selftest.py                    # engine, 26/26 expected
+python invoice_audit_report_generator.py --selftest  # generator, 19/19 expected
 ```
 
 It runs a golden invoice set with six seeded defects (rate above contract, line-item math
@@ -369,7 +378,46 @@ Roll up: `total_questioned = sum(all finding questioned_amount)`; `confirmed_cre
 - [ ] `confirmed_credit_total + pending_total` sums exactly to `total_questioned`
 - [ ] The PO NTE tracker (cumulative invoiced vs NTE) is finalized if a PO was supplied
 
-### Phase 5: Output Generation -> PASS_5_OUTPUT
+### Phase 5: Output Generation -> PASS_5_OUTPUT (F5, code-generated, not model-assembled)
+
+**Call `invoice_audit_report_generator.py` in this skill's own directory.** It takes the
+`AuditResult` object Phase 2-4's engine already produced (never re-run, never
+hand-re-derived) and mechanically produces the two deliverables that were previously
+model-assembled from per-line kernel outputs: the Findings Ledger (.json) and the Line-Level
+Audit Report (.docx).
+
+```
+python invoice_audit_report_generator.py audit_input.json \
+    --ledger findings_ledger.json --docx audit_report.docx [--header header.json]
+```
+
+or in-process:
+
+```
+from invoice_audit_engine import audit
+from invoice_audit_report_generator import build_full_ledger, write_ledger_json, build_document
+
+result = audit(audit_input)                                  # Phase 2-4, one execution
+ledger = build_full_ledger(audit_input, result, header=header)  # F5: the documented ledger schema
+write_ledger_json(ledger, "findings_ledger.json")
+doc = build_document(ledger)                                  # reads ONLY the ledger object
+doc.save("audit_report.docx")
+```
+
+`header` supplies the engagement facts the flattened `audit_input` does not itself carry
+(`supplier`, `contract_reference`, `rate_card_reference`, `audit_period`, `as_of_date`); any
+field omitted is rendered `"NOT PROVIDED"` rather than guessed, per Rule 3. `build_full_ledger`
+raises `ReconciliationError` if any invoice line does not appear in EXACTLY ONE of (a finding)
+or (the clear-lines list): the same row-count reconciliation F4 verifies, checked again at the
+ledger boundary. `build_document` reads only the ledger dict it is handed, so every figure the
+DOCX renders is, by construction, a figure the ledger already carries; this is asserted by a
+post-build scan (`_assert_docx_traceable_to_ledger`) that raises if a rendered dollar figure
+cannot be matched back to the ledger, and by `_assert_no_forbidden_content` (no em dash
+anywhere in the rendered text, Operating Rule 7), before the file is saved.
+
+The dashboard (.jsx) and the dispute notice remain model-assembled from the same ledger object
+(the dashboard per "Dashboard (LOCKED structure)" below, the dispute notice per Deliverables
+item 4); only the ledger and the DOCX report have a code generator as of F5.
 
 Produce the deliverables selected in Output Selection below. See Deliverables for the full spec of each.
 
@@ -485,11 +533,11 @@ Component registry: reuse `Metric`, `Card`, `STable`, `SevPill`, `Tip`, `StateBa
 
 ## Deliverables
 
-**1. Line-Level Audit Report (.docx, Magazine Report house style).** Title page per `docx-title-page-spec.md` (title "INVOICE & RATE-CARD AUDIT", subtitle = supplier name + audit period, red rule, scope line = "N invoices | N lines audited | N exceptions | $X questioned", prepared-by, confidential notice, a 2-3 sentence abstract). Table of contents. Numbered sections: 01 Executive Summary; 02 Population & Methodology (what was audited, date range, documents used, the Single-User/Reflect-Only Scope statement, the kernel-wiring disclosure); 03 Rate & Line-Math Findings; 04 Role & Level Findings; 05 Escalation Cap Findings; 06 Hours & Quantity Findings; 07 Duplicate & Unsupported Charges; 08 Milestone & PO/NTE Findings; 09 Category Rollup & Recommended Actions; Appendix A, the full line-level ledger table (every audited line, exceptions and clean); Appendix B, assumptions and data gaps. Pull every color, font, table, and callout style from the inlined `docx-design-system.md` and `docx-title-page-spec.md`; do not invent formatting.
+**1. Line-Level Audit Report (.docx, Magazine Report house style).** **F5: generated by `build_document()` in `invoice_audit_report_generator.py`, not model-assembled.** The generator reads only the Findings Ledger object (item 3 below), so every figure it renders is a figure the ledger already carries; this is asserted by a post-build scan before the file is saved (`_assert_docx_traceable_to_ledger`, `_assert_no_forbidden_content`), not left to the model to get right by eye. Title page (title "INVOICE & RATE-CARD AUDIT", subtitle = supplier name + audit period, red rule, scope line = "N invoices | N lines audited | N exceptions | $X questioned", prepared-by, confidential notice, a 2-3 sentence abstract). Table of contents. Numbered sections: 01 Executive Summary; 02 Population & Methodology (what was audited, date range, documents used, the Single-User/Reflect-Only Scope statement, the kernel-wiring disclosure); 03 Rate & Line-Math Findings; 04 Role & Level Findings; 05 Escalation Cap Findings; 06 Hours & Quantity Findings; 07 Duplicate & Unsupported Charges; 08 Milestone & PO/NTE Findings; 09 Category Rollup & Recommended Actions; Appendix A, the full line-level ledger table (every audited line, exceptions and clean); Appendix B, assumptions and data gaps. Colors and fonts follow the Magazine Report palette (Lilly Red #E1251B, Lilly Black #212121, Bold Blue #0F3A85, Bold Brown #521207, Muted Grey #8A969E for footer text), copied verbatim from the inlined `docx-design-system.md` / `brand-colors.md` values; do not invent formatting.
 
 **2. Interactive Dashboard (.jsx).** Per "Dashboard (LOCKED structure)" above. Emitted for `Dashboard only` and `Full audit`.
 
-**3. Findings Ledger (.json).** Machine-readable sidecar mirroring the dashboard's data object, generated from the already-built `PASS_4_FINDINGS` object, never authored separately (so it cannot drift from the human-readable artifacts). Schema:
+**3. Findings Ledger (.json).** **F5: generated by `build_full_ledger()` in `invoice_audit_report_generator.py`**, directly from the engine's `AuditResult` object (Phase 2-4, one execution), never authored separately and never re-derived by re-walking the lines by hand (so it cannot drift from the human-readable artifacts). `build_full_ledger` raises `ReconciliationError` if any invoice line does not land in EXACTLY ONE of (a finding) or (the clear-lines list), which is F4/F5's shared row-count reconciliation criterion enforced a second time at the ledger boundary. Each finding also carries an additive `line_id` and `is_invoice_line` field beyond the schema below (useful for grouping a line's multiple findings and for tracing Appendix A's line count; harmless to a consumer reading only the named fields). Schema:
 
 ```
 {

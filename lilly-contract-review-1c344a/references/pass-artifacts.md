@@ -2,6 +2,10 @@
 
 **Each pass must produce a named working artifact before the next pass begins.** This prevents the most common failure mode: collapsing four analytical passes into a single shallow read that generates surface-level findings without cross-reference reasoning.
 
+**Stage 0 input (v3.8, item F1).** Before Pass 1, `CLAUSE_REGISTER` is built once (SKILL.md Phase 0A.5) by `contract_segmenter.py` and is the structured input every pass below reads clauses from by `clause_id`, instead of each pass independently re-parsing the raw contract text or .docx XML. This changes where each pass gets its text, not what each pass below decides; the four artifacts, their contents, and their gate checks are otherwise exactly as documented below, unchanged.
+
+**Persistence (v3.8, item F1).** `PASS_4_PREP`, as specified below, is the single persistent findings register: `contract_review_generator.py` reads this exact object (not a re-narrated summary of it) to produce the findings ledger and the redline instruction set. The shape below is used verbatim; nothing about `PASS_4_PREP`'s own contents changed to accommodate the generator.
+
 ## Why This Exists
 
 The contract review workflow specifies 3-4 passes for a reason. Each pass builds on the previous one:

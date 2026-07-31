@@ -78,6 +78,7 @@ These rules govern HOW this skill behaves. They are shared across all Lilly proc
 
 **9. Follow the Execution Guardrails. (HARD RULE, suite-wide.)**
 - Read and follow `the "## INLINED: references/execution-guardrails.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` before every run. It contains the full text of the mandatory tool-selection rules, gate checks, anti-collapse signals, cross-reference tracing requirements, and pre-delivery self-tests.
+- Before asking the user anything about where this RFx's documents live, check for an existing Teams-site binding first (rfp-case-manager's `_case_file.json` or a `case_handoff.json` this skill already produced). Read `the "## INLINED: references/rfx-teams-site-binding.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` and follow it -- bind once per RFx event, reuse across every skill that touches it.
 - When this skill produces an analytical document, deck, or dashboard, also read `the "## INLINED: references/narrative-standards.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (output must read as connected analysis, not a key-value dump or bullet fragments), `the "## INLINED: references/validation-checklist.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (re-verify numbers, sources, and cross-artifact consistency before delivering), and `the "## INLINED: references/house-styles.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (use the correct one of the three named house styles; pull exact values from brand-colors.md / dashboard-components.md / docx-design-system.md; never invent off-style palettes, fonts, or components).
 - When this skill assesses a supplier's risk (financial, cyber, data, geopolitical, operational, or pharma gates like debarment/sanctions/GxP), also read `the "## INLINED: references/supplier-risk.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` and follow its hard anti-fabrication rules: never assert a debarment, sanctions, breach, or financial-distress status without a cited source; "not verified, requires a formal screen" is the answer, and gating items route to the SME.
 - **Foundation dependency / graceful degradation:** these references live in the shared `lilly-brand-assets` skill (v10.0+ expected). If a `lilly-brand-assets-1c344a/references/...` file or asset cannot be read (the foundation is missing, corrupted, or older than this skill expects), do NOT fail: proceed using the rule summary inlined below, tell the user you are running without the shared references (so styling/depth may be reduced), and ask them to confirm lilly-brand-assets v10.0+ is installed and current.
@@ -391,7 +392,14 @@ Before delivering, verify:
 - **Evaluation-weight sanity check (run before emitting `requirements_matrix.xlsx` and Section 1.7).** **HARD RULE, kernel usage (per Execution Guardrails G11):** run this check by calling `assert_weight_sum(category_weights, expected=100.0)` in the vendored `numeric_kernel.py`, once per category and once across the category structure, not by adding the column up by hand. It raises `WeightSumError` naming the over- or under-allocation, which is the "surface the discrepancy" behavior this rule already requires, and it never normalizes. It also rejects a negative weight even when the set foots to 100 (for example 110 and -10), which a sum check alone would pass and which inverts a criterion rather than de-emphasizing it. Within each category, the `Evaluation_Weight` values must sum to 100% (no over- or under-allocation); the category weights disclosed in Section 1.7 must match the category structure in the matrix; and the scoring scale must be the suite-canonical 0.0-5.0 / 5-tier scale (Meets OOB through Does Not Meet) so that downstream rfp-response-analysis and evaluation-engine consume it without rescaling. If any category does not sum to 100%, or weights were not user-provided, label them "DRAFT - confirm with evaluation team" per Accuracy Rule 2 and surface the discrepancy rather than silently normalizing. **Ownership direction:** this skill builds and confirms the requirements grid and evaluation criteria weights before any response exists; evaluation-engine applies those same weights to score actual responses once they arrive. It does not rebuild a competing matrix from scratch when this skill's matrix is available (see evaluation-engine's own Scoring Matrix Source rule).
 - **Addendum reconciliation (if any addendum has been issued):** every `Req_ID` referenced in an addendum's Section C exists in `requirements_matrix.xlsx` with a matching `Amendment_Ref`, and category weights are re-summed to 100% for any category touched by an amendment.
 
-## Building the XLSX artifacts
+## Building the XLSX artifacts (HARD RULE: call the vendored generator, never hand-assemble the workbook)
+
+`requirements_matrix.xlsx` and `pricing_template.xlsx` are produced by calling the vendored
+`rfp_xlsx_generator.py` (this skill's own directory) with the validated requirements rows
+(and, for pricing, any domain tabs) as input, never by hand-assembling either workbook
+cell-by-cell in the moment. The 5-tier `Supplier_Response` dropdown, the per-tier
+conditional formatting, sheet protection and the locked structure columns ARE the artifact;
+a hand-made sheet can look identical while carrying none of them.
 
 ```bash
 python rfp_xlsx_selftest.py      # 39 assertions, run after any edit
@@ -402,6 +410,13 @@ from rfp_xlsx_generator import build_requirements_matrix, build_pricing_template
 build_requirements_matrix(rows, 'requirements_matrix.xlsx', package='full')  # or 'brief'
 build_pricing_template('pricing_template.xlsx', domain_tabs=[...])
 ```
+
+If `rfp_xlsx_generator.py` raises `SchemaError` or `WeightSumError`, do not deliver a
+workbook: surface the raised message and resolve the underlying data problem rather than
+hand-patching around the failure. If `rfp_xlsx_generator.py` cannot be read (missing or
+corrupted) or `openpyxl` is unavailable (`XlsxUnavailableError`), do not silently fall back
+to a CSV or a hand-built sheet: tell the user the vendored generator is unavailable this run
+and that the dropdowns and conditional formatting cannot be produced without it.
 
 The schema is owned by `references/artifact-schemas.md` sections 3 and 7. The generator
 implements it; it does not redefine it, and the five tier hexes are the named ones from

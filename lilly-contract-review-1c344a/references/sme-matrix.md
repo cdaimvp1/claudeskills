@@ -2,6 +2,8 @@
 
 Complete directory of subject matter experts for contract review escalations. Each SME entry includes trigger conditions, scope of review, expected turnaround, and escalation format.
 
+**Source of truth:** the live SharePoint list at `collab.lilly.com/sites/GlobalProcurement/Lists/MPT  Functional SMEs`. Reconciled against that list (via its OneDrive mirror, `SME Escalation List.xlsx`) on 2026-07-30 — every name/email/confirmation-date below was cross-checked, not assumed. Two entries that look like non-standard email formats (`mike.boland@lilly.com`, `lina.polimeni@lilly.com`) were specifically re-verified against the live list and are correct as written (confirmed 1/7/2026 and 3/26/2024 respectively) — do not "fix" them to the `lastname_firstname@` pattern used elsewhere.
+
 ## Escalation Comment Format
 
 Insert this comment format in the contract document at the relevant clause:
@@ -55,16 +57,18 @@ Urgency: [Standard / Urgent - with reason if urgent]
 
 ### Adverse Events - Merry Chu
 - **Email:** chu_merry@lilly.com
+- **Co-contact:** Jennifer Elaine Wilson (wilson_jennifer_elaine@lilly.com) — same topic, same confirmation date (4/15/2024); CC both on any AE escalation.
 - **Triggers:** adverse event, AE, product complaint, pharmacovigilance, safety reporting, medical information, product safety, patient safety
 - **Scope:** Adverse event reporting provisions, reporting timelines, Lilly Answers Center contact requirements. Owns Hard Stop on AE reporting timeline (HS-4).
 - **Common issues:** Supplier modifying reporting timelines (must be 1 business day); supplier deleting AE section entirely; supplier not including Lilly Answers Center contact information
 - **Turnaround:** 2-3 business days
 - **Escalation threshold:** Any modification to AE provisions - this is a regulatory requirement
 
-### Trade Sanctions - Alessandro Curti
+### Trade Sanctions / Export & Import Compliance - Alessandro Curti (primary)
 - **Email:** curti_alessandro@lilly.com
-- **Triggers:** sanctions, OFAC, export control, embargo, restricted party, denied party, specially designated national, SDN, trade compliance, anti-money laundering
-- **Scope:** All trade sanctions and export control provisions. Owns Hard Stop on sanctions modifications (HS-1).
+- **Co-contacts:** Mary Elizabeth Marbaugh (marbaugh_mary_e@lilly.com) and Debra M Roehrdanz (roehrdanz_debra_m@lilly.com) also cover Export/Trade Sanctions on the live SME list; Curti and Nicole Lea Pierce (pierce_nicole@lilly.com) additionally cover **Import** specifically; Marbaugh and Roehrdanz also cover **Subcontractor Requirements (government restrictions)** under this same Import/Export Compliance function. Curti remains primary POC per the live list's own notes.
+- **Triggers:** sanctions, OFAC, export control, import, embargo, restricted party, denied party, specially designated national, SDN, trade compliance, anti-money laundering, subcontractor government restrictions
+- **Scope:** All trade sanctions, export control, and import compliance provisions. Owns Hard Stop on sanctions modifications (HS-1).
 - **Common issues:** Supplier attempting to modify or limit sanctions representations; supplier in a sanctioned or high-risk jurisdiction; contract scope involving export-controlled technology
 - **Turnaround:** 3-5 business days (standard), 1 business day (sanctions flag on new supplier)
 - **Escalation threshold:** ANY modification to sanctions provisions. Zero tolerance.
@@ -79,6 +83,7 @@ Urgency: [Standard / Urgent - with reason if urgent]
 
 ### HSE - Donna U Carroll
 - **Email:** carroll_donna_u@lilly.com
+- **Co-contact:** Prem Pyreddy (premchandra.pyreddy@lilly.com) — backup resource for the same topic, same confirmation date (6/26/2025); CC as backup.
 - **Triggers:** health and safety, environmental, OSHA, EHS, workplace safety, hazardous materials, environmental compliance, on-site work, contractor safety
 - **Scope:** Health, safety, and environmental provisions for suppliers performing on-site work at Lilly facilities
 - **Common issues:** Supplier not meeting Lilly's contractor safety requirements; missing HSE pre-qualification; inadequate environmental compliance provisions
@@ -87,10 +92,56 @@ Urgency: [Standard / Urgent - with reason if urgent]
 
 ### Payment Terms - Diane Elizabeth Coey
 - **Email:** coey_diane@lilly.com
+- **Co-contact:** Brid Creedon (creedon_brid@lilly.com) — same topic, same confirmation date (3/26/2024).
 - **Triggers:** payment terms, invoice, net 30, net 45, net 60, early payment, payment discount, prompt payment
 - **Scope:** Payment term negotiations, early payment discount programs, small/diverse supplier accommodations
 - **Turnaround:** 1-2 business days
 - **Escalation threshold:** Payment terms shorter than Net-45 (except small/diverse suppliers)
+
+### Global Transparency (Covered Recipients / Open Payments Law, Subcontractor Requirements) - Brenda Kay Dalton
+- **Email:** dalton_brenda@lilly.com
+- **Triggers:** covered recipient, open payments, sunshine act, transparency reporting, HCP payment disclosure, government transparency subcontractor requirements
+- **Scope:** Covered Recipients & Open Payments Law provisions, and subcontractor-requirement clauses filed under Global Transparency. Confirmed 4/4/2024 on the live SME list; not previously in this matrix.
+- **Turnaround:** not stated on the live list — confirm directly with Brenda before committing a timeline to the user.
+- **Escalation threshold:** Any HCP/covered-recipient payment or transparency-reporting obligation in the contract.
+
+### Logistics - David M Wadsworth
+- **Email:** wadsworth_david_m@lilly.com
+- **Triggers:** warehousing, trucking, freight, carrier, logistics, shipping terms, Incoterms, distribution
+- **Scope:** Can assist with understanding Lilly security policy SEC STD 200 as it relates to warehousing and trucking in manufacturing/logistics agreements. Confirmed 3/26/2024; not previously in this matrix.
+- **Turnaround:** not stated on the live list.
+- **Escalation threshold:** Any warehousing/trucking/logistics-specific security or operational provision.
+
+### Accessibility / Diversity - Jamie N Samuels
+- **Email:** samuels_jamie_n@lilly.com
+- **Triggers:** accessibility, WCAG, ADA, Section 508, supplier diversity, diverse-owned business
+- **Scope:** Covers both Accessibility and Diversity under Procurement per the live SME list (same person, both confirmed 3/26/2024 and 4/15/2024 respectively); not previously in this matrix.
+- **Turnaround:** not stated on the live list.
+- **Escalation threshold:** Any accessibility-standard commitment or supplier-diversity representation in the contract.
+
+### Code of Conduct (PSCI) - John A. Hamilton
+- **Email:** hamilton_john_a@lilly.com
+- **Triggers:** PSCI, Pharmaceutical Supply Chain Initiative, supplier code of conduct, ethical sourcing
+- **Scope:** Can explain PSCI background for Code of Conduct provisions under Procurement. Confirmed 3/26/2024; not previously in this matrix.
+- **Turnaround:** not stated on the live list.
+- **Escalation threshold:** Any PSCI/supplier code-of-conduct provision.
+
+### AI Registry Use Case Submission - Alicia M Sunga
+- **Email:** sunga_alicia_m@lilly.com
+- **Triggers:** AI registry, AI use case submission, Protect Lilly AI intake
+- **Scope:** Supports AI registry use-case submissions under Protect Lilly. Distinct from the AI/Privacy (Legal AIPC) entry above — this is the intake/registry process, not the contractual DPA/AI-governance review. Confirmation date blank on the live list; not previously in this matrix.
+- **Turnaround:** not stated on the live list.
+- **Escalation threshold:** Any new AI use case that needs registry submission alongside the contract review.
+
+### Travel Services - Karen Sue Morgan
+- **Email:** morgan_karen_sue@lilly.com
+- **Triggers:** travel services, corporate travel, travel booking, travel policy
+- **Scope:** Global Business Solutions travel-services provisions. Confirmed 3/26/2024; not previously in this matrix.
+- **Turnaround:** not stated on the live list.
+- **Escalation threshold:** Any travel-services-specific contract provision.
+
+### Subcontractor Requirements (Affirmative Action / EEO) - UNASSIGNED
+- **Scope:** Human Resources subject area. The live SME list shows no name or email assigned to this topic (confirmed 3/9/2022, oldest entry on the list — likely stale). **Do not invent a contact.** Route as "no SME currently assigned per the live list — confirm with HR directly" until this is filled in at the source.
 
 ### Records Retention - Mike Boland
 - **Email:** mike.boland@lilly.com

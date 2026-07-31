@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-rfp_xlsx_generator.py — real builders for `requirements_matrix.xlsx` and
+rfp_xlsx_generator.py - real builders for `requirements_matrix.xlsx` and
 `pricing_template.xlsx` (E4).
 
 WHY THIS EXISTS

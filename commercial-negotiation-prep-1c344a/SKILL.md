@@ -83,6 +83,7 @@ These rules govern HOW this skill behaves. They are shared across all Lilly proc
 
 **9. Follow the Execution Guardrails. (HARD RULE, suite-wide.)**
 - Read and follow `the "## INLINED: references/execution-guardrails.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` before every run. It contains the full text of the mandatory tool-selection rules, gate checks, anti-collapse signals, cross-reference tracing requirements, and pre-delivery self-tests.
+- **Tier 0, before any external rate research:** search SharePoint for a prior executed rate card in this category/supplier. Read `the "## INLINED: references/sharepoint-search-and-extract.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` and follow it. Lilly's own negotiated rate is stronger evidence than any external benchmark. Only fall to the external Tier 1 sources below when this turns up nothing (including when the user's procurement area has no equivalent repository -- the reference explains what to do then).
 - When this skill produces an analytical document, deck, or dashboard, also read `the "## INLINED: references/narrative-standards.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (output must read as connected analysis, not a key-value dump or bullet fragments), `the "## INLINED: references/validation-checklist.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (re-verify numbers, sources, and cross-artifact consistency before delivering), and `the "## INLINED: references/house-styles.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` (use the correct one of the three named house styles; pull exact values from brand-colors.md / dashboard-components.md / docx-design-system.md; never invent off-style palettes, fonts, or components).
 - When this skill assesses a supplier's risk (financial, cyber, data, geopolitical, operational, or pharma gates like debarment/sanctions/GxP), also read `the "## INLINED: references/supplier-risk.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` and follow its hard anti-fabrication rules: never assert a debarment, sanctions, breach, or financial-distress status without a cited source; "not verified, requires a formal screen" is the answer, and gating items route to the SME.
 - **Foundation dependency / graceful degradation:** these references live in the shared `lilly-brand-assets` skill (v10.0+ expected). If a `lilly-brand-assets-1c344a/references/...` file or asset cannot be read (the foundation is missing, corrupted, or older than this skill expects), do NOT fail: proceed using the rule summary inlined below, tell the user you are running without the shared references (so styling/depth may be reduced), and ask them to confirm lilly-brand-assets v10.0+ is installed and current.
@@ -319,9 +320,11 @@ Use web search to gather external pricing benchmarks. Follow the benchmarking me
 
 ### Role-family deduplication and dated benchmark cache (per Execution Guardrails G7, F3)
 
-The research minimums above are a floor, not a target. This mechanism removes duplicated search effort; it does not remove search, and it does not lower the floor.
+The research minimums above are a floor, not a target. This mechanism removes duplicated search effort; it does not remove search, and it does not lower the floor. **This is a cost-avoidance mechanism, not a depth cap:** it targets redundant search/token spend across near-duplicate lines that genuinely share a market, never a reduction in how much evidence any single distinct line needs. A rate line that does not genuinely share a market with anything else still gets its own full research pass to its own 5-point floor, exactly as if clustering did not exist.
 
 **(a) Deduplicate by role family, not by line.** Before running Phase 1 searches, cluster rate lines that resolve to the same role/market family: same role or service, same seniority/spec tier, same geography, same delivery model (onshore/nearshore/offshore). Three supplier rate lines that are all genuinely "Senior Java Developer, offshore" are one family; research the family once via Phase 1's search strategy and apply the result to every member. A line that differs on any family-defining dimension is its own family and gets its own full research pass. Points-per-line does not fall: if a family yields fewer than 5 usable points, that family gets additional searches, exactly as a standalone distinct line would. On a rate card of genuinely distinct roles, clustering finds no families and this saves nothing, which is correct.
+
+**Illustrative savings (a worked example, not a promise).** A 30-line rate card that resolves into 6 genuine role families (5 near-identical lines per family) needs roughly 6 x 3-5 = 18-30 searches under clustering, versus 30 x 3-5 = 90-150 without it: about a 75-80% cut in redundant search/token spend, with the same 5-point floor still enforced per family, not per line. A 30-line card of 30 genuinely distinct roles clusters into 30 families of one and still runs the full 90-150 searches either way, which is correct: there is nothing duplicated to avoid paying for. On a same-supplier/same-category re-run inside the 90-day cache window (below), every family with a fresh `fetched_date` recalls instead of re-searching, cutting that re-run's external search volume to zero for the families that hit.
 
 **Forbidding double-count against the percentile gate.** `percentile_gate(n_points, min_points=5)` (in `numeric_kernel.py`, see market-rate-benchmarking's Rule 2 and Rule 5) is evaluated once per family, using that family's actual usable point count. Every member line of the family reports that same `n_points` and the same percentile band or range/median resolution. Do NOT sum a family's point count across its member lines, whether at the gate check or in any portfolio-level evidence rollup: a family with 5 usable points and 3 member lines is 5 points of evidence, not 15. Summing would let duplicated evidence clear a floor it has not actually cleared, which is the main accuracy risk in this change. It is closed by keeping exactly one point set per family (see the cache below) and having every consumer, the gate, the confidence label, and any rollup, read that one set.
 
@@ -410,6 +413,18 @@ Premium (>P85):         [N] ([X]%)
 Weighted Avg Position:  [band, or P[XX] only when the per-line samples support that resolution; volume-weighted by Lilly's expected utilization]
 Total Annual Exposure:  $[amount above Lilly target, if applicable]
 ```
+
+**HARD RULE (kernel-backed computation, never model arithmetic).** The Pricing Position
+Summary's counts and percentages by band (Below/At/Above/Premium), the Weighted Avg
+Position, and Total Annual Exposure must be produced by calling the vendored
+`commercial_negotiation_generator.py` (this skill's own directory) against the validated
+rate register, never estimated by eye or hand-summed across the rate lines. Its
+`compute_ground_truth()` classifies every line's band, blends the Weighted Avg Position via
+`weighted_score()` in `numeric_kernel.py` (weighted by each line's share of total annual
+proposed spend), gates P[XX] reportability per line via `percentile_gate()`, and verifies
+Total Annual Exposure against its own per-line components via `assert_reconciles()`. See
+"Building the XLSX artifacts" (Phase 9 below) for the full wiring contract, refusal
+behavior, and self-test invocation.
 
 ### GATE CHECK: Phase 3 Complete (per Execution Guardrails G2)
 
@@ -500,6 +515,14 @@ Opportunity 1: [Description]
 
 TOTAL LEVERAGE VALUE: $[sum of all opportunities]
 ```
+
+**HARD RULE (kernel-backed reconciliation, never model arithmetic).** TOTAL LEVERAGE VALUE
+must be produced by calling `commercial_negotiation_generator.py`, which sums the
+opportunities' `estimated_savings` and verifies that sum against the stated total via
+`assert_reconciles()` in `numeric_kernel.py`, the same reconciliation discipline Phase 6
+already requires for the TCO rollups. Being a plain sum does not make it safe to hand-add:
+a total typed separately from the opportunities it claims to summarize is exactly the drift
+class this call prevents.
 
 ### GATE CHECK: Phase 5 Complete (per Execution Guardrails G2)
 
@@ -599,6 +622,15 @@ For each rate line where the supplier is above target:
 ```
 The confidence badge on each counter-offer line comes straight from the BENCHMARK RESEARCH LOG above: a target you can defend with 3+ independent sources is HIGH; one resting on a single data point is LOW and should be framed as directional, not firm.
 
+**HARD RULE (kernel-backed computation, never model arithmetic).** Every per-line ZOPA
+(opening/target/walkaway), the SAVINGS SUMMARY aggregate at each of OPENING/TARGET/
+WALK-AWAY, and the flag for a supplier proposal that exceeds walk-away, must be produced by
+calling `commercial_negotiation_generator.py`, never freehand. It refuses to proceed
+(`ZopaOrderError`) if any line's stack is not `opening <= target <= walkaway`, since that is
+not a coherent Zone of Possible Agreement, and it verifies each aggregate savings figure
+against its own per-line components via `assert_reconciles()` in `numeric_kernel.py`, the
+same discipline as Total Annual Exposure and Total Leverage Value above.
+
 ### GATE CHECK: Phase 7 Complete (per Execution Guardrails G2)
 
 Before proceeding to Phase 8 (Commercial Concession Framework), confirm:
@@ -657,9 +689,56 @@ Produce the briefing document using the `docx` skill. Use the full design specif
 
 **Output:** `[Supplier]_Commercial_Briefing_v[N].docx`
 
-Additionally produce:
-- `rate_comparison.xlsx` - detailed rate-by-rate benchmark table (using `xlsx` skill)
-- `counter_offer.xlsx` - formatted counter-offer with opening/target/walk-away columns
+Additionally produce `rate_comparison.xlsx` and `counter_offer.xlsx` per the HARD RULE below.
+
+## Building the XLSX artifacts (HARD RULE: call the vendored generator, never hand-assemble the workbook)
+
+`rate_comparison.xlsx` and `counter_offer.xlsx` are produced by calling the vendored
+`commercial_negotiation_generator.py` (this skill's own directory) with the validated rate
+register (every rate line's proposed rate, benchmark P25/P50/P75, Lilly internal figures,
+and opening/target/walkaway negotiation stack, assembled per Phases 1-3 and 7) as input,
+never by hand-assembling either workbook cell-by-cell in the moment. The Pricing Position
+Summary counts/percentages, the Weighted Avg Position, Total Annual Exposure, the Volume
+Leverage total, and every per-line ZOPA figure ARE the artifact; a hand-typed table can look
+identical while carrying none of the reconciliation guarantees below.
+
+```python
+from commercial_negotiation_generator import generate_commercial_negotiation_workbooks
+generate_commercial_negotiation_workbooks(
+    rate_register,                # validated dict: currency, rate_lines[], leverage_opportunities[]
+    "rate_comparison.xlsx",
+    "counter_offer.xlsx",
+)
+```
+
+```bash
+python commercial_negotiation_generator.py     # runs the built-in self-test, run after any edit
+```
+
+If `commercial_negotiation_generator.py` raises `RateRegisterValidationError`,
+`ZopaOrderError`, `WeightedPositionMismatchError`, or a `numeric_kernel` error
+(`WeightSumError`, `ReconciliationError`, `InvalidInputError`, `UnknownUnitError`), do not
+deliver a workbook: surface the raised message and resolve the underlying data problem
+rather than hand-patching around the failure. If `commercial_negotiation_generator.py`
+cannot be read (missing or corrupted) or `openpyxl` is unavailable, do not silently fall
+back to a hand-built table: tell the user the vendored generator is unavailable this run and
+that the Pricing Position Summary, Weighted Avg Position, Total Annual Exposure, Volume
+Leverage total, and ZOPA figures cannot be produced with kernel-verified reconciliation
+without it.
+
+**It refuses rather than emitting a workbook that looks right.**
+
+| refusal | why a default would be wrong |
+|---|---|
+| a rate line's opening/target/walkaway not in that order | `ZopaOrderError`: a stack out of order is not a coherent Zone of Possible Agreement |
+| a stated rollup total (exposure, leverage, savings) that does not equal the sum of its own components | the kernel's `ReconciliationError` via `assert_reconciles()`; a hand-typed total silently drifting from its own lines is the single most common way a deck stops footing |
+| non-monotonic P25/P50/P75 in a rate line's benchmark | `RateRegisterValidationError`; the band classification has no meaning against a malformed distribution |
+| a Weighted Avg Position whose kernel-computed value disagrees with an independent manual re-derivation | `WeightedPositionMismatchError`; catches a scores/weights assembly bug before it reaches a supplier-facing number |
+| an unknown rate unit | the kernel's `UnknownUnitError` via `to_hourly()`; refuses to invent a conversion factor |
+
+This overlaps F9 (the workbook-generator initiative that closed the same gap for
+pro-forma-builder and rfp-engine); this is this skill's own instance of that same discipline,
+scoped to the five figures above.
 
 **Briefing length guidance:**
 - Simple (< 10 rate lines, single category): 4-6 pages
@@ -958,29 +1037,14 @@ Market leaders discount less. Challengers discount more.
 - GSA Professional Services Schedule (government rates - floor reference)
 - Glassdoor/Levels.fyi for salary-to-rate conversion
 
-**Typical rate ranges (US, 2024-2025):**
-```
-                    Daily Rate (8hr)      Hourly Rate
-MBB:
-  Analyst:          $3,500 - $5,000       $435 - $625
-  Engagement Mgr:  $6,000 - $9,000       $750 - $1,125
-  Partner:          $10,000 - $18,000     $1,250 - $2,250
-
-Big 4:
-  Consultant:       $2,000 - $3,500       $250 - $435
-  Manager:          $3,500 - $5,500       $435 - $690
-  Director:         $5,000 - $8,000       $625 - $1,000
-  Partner:          $7,000 - $12,000      $875 - $1,500
-
-Tier 2:
-  Consultant:       $1,500 - $2,500       $190 - $310
-  Manager:          $2,500 - $4,000       $310 - $500
-  Director:         $3,500 - $6,000       $435 - $750
-
-Boutique/Specialty:
-  Wide range - depends on niche and demand
-  Typically 10-30% below Big 4 for comparable capability
-```
+**No pre-loaded rate table.** A static table here would read as authoritative and would
+sit as a shortcut around the Tier 0/Tier 1 process this skill actually requires (see the
+suite-wide guardrails note above). Instead: (1) search SharePoint for a prior executed
+consulting engagement in this firm tier/specialty via the shared search-and-extract
+mechanism -- Lilly's own negotiated rate beats any published range; (2) if nothing exists
+internally, run the search queries above against the named benchmark sources, minimum 3
+independent searches per rate line per G7, and cite what you actually find with source and
+date. Never substitute a memorized or assumed range for either step.
 
 ### Lab Services / CRO
 
@@ -1004,7 +1068,12 @@ Boutique/Specialty:
 - Outsourced Pharma / Contract Pharma rate discussions
 - ISR Reports CRO analytics
 
-**GLP premium:** GLP-compliant work typically carries 25-50% premium over non-GLP equivalent.
+**GLP premium: no public benchmark exists for this figure** (checked 2026-07-30 -- web
+search turned up nothing citable). This is exactly the case Tier 0 exists for: GLP premium
+is Lilly's own negotiated experience, not a market-wide stat, so derive it from Lilly's
+executed CRO/lab-services contracts via the shared search-and-extract mechanism (compare
+GLP vs. non-GLP line-item pricing in the same or a comparable contract). If no internal
+contract has both GLP and non-GLP pricing to compare, say so and do not estimate a premium.
 
 ### Hardware / Equipment
 

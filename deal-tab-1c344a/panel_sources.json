@@ -14,7 +14,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -25,7 +39,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -41,7 +69,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ],
           "note": "derived from how much of the contract set was actually supplied"
@@ -64,7 +106,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ],
           "note": "the most recent dated redline or counter in the document set"
@@ -88,13 +144,31 @@
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             },
             {
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -106,13 +180,31 @@
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             },
             {
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -124,13 +216,36 @@
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             },
             {
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking skill output for this category and role mix"
+              "how": "market-rate-benchmarking skill output for this category and role mix",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -148,14 +263,32 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly MPT playbook",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         },
@@ -167,13 +300,21 @@
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             },
             {
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         }
@@ -191,14 +332,32 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly MPT playbook",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         },
@@ -210,7 +369,11 @@
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         }
@@ -228,20 +391,57 @@
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             },
             {
               "name": "Should-cost model",
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             },
             {
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking skill output for this category and role mix"
+              "how": "market-rate-benchmarking skill output for this category and role mix",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -252,13 +452,31 @@
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             },
             {
               "name": "Agreed rate card",
               "access": "supplier",
               "type": "bid",
-              "how": "the rate-card exhibit in the contract set"
+              "how": "the rate-card exhibit in the contract set",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             }
           ],
           "note": "indicative until firm in negotiation; never a fabricated figure"
@@ -277,7 +495,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -288,7 +520,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ],
           "note": "absence here is SEARCHED_NOT_FOUND only if the set was actually reviewed"
@@ -307,7 +553,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -325,7 +585,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -336,7 +610,21 @@
               "name": "Contract repository",
               "access": "internal",
               "type": "system",
-              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity"
+              "how": "active and prior agreements: term, renewal date, value, by supplier legal entity",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "m365_search",
+                    "detail": "sharepoint_folder_search / sharepoint_search by supplier name. Confirmed working path for IT Procurement: collab.lilly.com/sites/ITSMOGeneral/Shared Documents/General/1.2 IT Vendors/{Vendor}/{Vendor}_Contracts -- other procurement areas likely have a different (or no) equivalent repository; do not assume this exact path applies outside IT Procurement. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the specific MSA / SOW / Order Form / amendment directly. If they say their contracts are in Ariba or on their own desktop, say plainly that Claude cannot reach either and the file needs to be attached here."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -354,7 +642,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -365,14 +667,32 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly MPT playbook",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         }
@@ -390,14 +710,32 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly MPT playbook",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         },
@@ -408,21 +746,43 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly AI Standard",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/ai-standard.md",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/ai-standard.md -- always available, no retrieval needed."
+              }
             },
             {
               "name": "Lilly Supplier Privacy Standard",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/dpa-review-checklist.md",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/dpa-review-checklist.md -- always available, no retrieval needed."
+              }
             }
           ]
         }
@@ -440,7 +800,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -458,14 +832,32 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly MPT playbook",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         },
@@ -476,7 +868,11 @@
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         }
@@ -499,7 +895,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -510,7 +920,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -528,7 +952,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -546,7 +984,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -564,7 +1016,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -582,7 +1048,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -594,13 +1074,36 @@
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             },
             {
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking skill output for this category and role mix"
+              "how": "market-rate-benchmarking skill output for this category and role mix",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -618,13 +1121,31 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "SME review outcome",
               "access": "internal",
               "type": "review",
-              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)"
+              "how": "the named SME function's written response for this subject (Cyber, Privacy, Quality, Legal)",
+              "resolution": {
+                "kind": "human_only",
+                "detail": "No system holds this -- it is the named SME's own written response (Cyber/Privacy/Quality/Legal). Route to the SME per lilly-brand-assets' sme-matrix.md / supplier-risk.md and ask the user to paste or attach the SME's response when it comes back. Never simulate what an SME would say."
+              }
             }
           ]
         }
@@ -642,7 +1163,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -660,20 +1195,57 @@
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             },
             {
               "name": "Should-cost model",
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             },
             {
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking skill output for this category and role mix"
+              "how": "market-rate-benchmarking skill output for this category and role mix",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -691,7 +1263,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -702,14 +1288,37 @@
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking skill output for this category and role mix"
+              "how": "market-rate-benchmarking skill output for this category and role mix",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly MPT playbook",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         }
@@ -728,7 +1337,11 @@
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             }
           ]
         },
@@ -739,13 +1352,36 @@
               "name": "Agreed rate card",
               "access": "supplier",
               "type": "bid",
-              "how": "the rate-card exhibit in the contract set"
+              "how": "the rate-card exhibit in the contract set",
+              "resolution": {
+                "kind": "rfx_bound_or_upload",
+                "detail": "This is the counterparty's/bidder's own document, not a Lilly-internal system. For an RFx event with a Teams site or channel identified (see the RFx Teams-site binding pattern), check there first via the M365 connector. Otherwise ask the user to attach it directly."
+              }
             },
             {
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking skill output for this category and role mix"
+              "how": "market-rate-benchmarking skill output for this category and role mix",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -764,13 +1400,31 @@
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             },
             {
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -781,7 +1435,26 @@
               "name": "External market benchmark",
               "access": "licensed",
               "type": "benchmark",
-              "how": "market-rate-benchmarking skill output for this category and role mix"
+              "how": "market-rate-benchmarking skill output for this category and role mix",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "Lilly's own executed rate cards for this category, via the shared search-and-extract mechanism (see lilly-brand-assets-1c344a/references/sharepoint-search-and-extract.md). This is the BEST source when it exists: Lilly's own negotiated position, not an industry guess. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "web_search",
+                    "detail": "Live web search against the verified Tier-1/2 whitelist (Janco Associates e-janco.com, Foote Partners footepartners.com, BLS OES bls.gov/oes, Robert Half roberthalf.com, GSA Advantage gsaadvantage.gov, plus category-specific sources in market-rate-benchmarking's external-research-guide.md). Minimum 3 independent searches per rate line per G7; label 'RESEARCH PENDING' if the floor is not met, never present a single data point as a firm benchmark."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "suppress",
+                    "detail": "If neither tier produces enough points to pass percentile_gate(min_points=5), suppress the band per G7/H9 rather than estimating it. State the minimum and what was actually achieved."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -799,14 +1472,32 @@
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             },
             {
               "name": "Should-cost model",
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             }
           ]
         }
@@ -824,14 +1515,32 @@
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             },
             {
               "name": "Should-cost model",
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             }
           ]
         }
@@ -850,7 +1559,11 @@
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             }
           ]
         },
@@ -861,7 +1574,26 @@
               "name": "Lilly spend data",
               "access": "internal",
               "type": "system",
-              "how": "prior-spend extract for this supplier and category"
+              "how": "prior-spend extract for this supplier and category",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "aria",
+                    "detail": "aria_fabric_* against Fabric semantic model 'S2P Purchase Order Product' (dataset f2ed9c34-f699-4874-b6ab-b7216fa2dbc0, workspace 4f1d3ee9-1b8e-4f73-a594-c598fdafaf54). Filter by Commodity Codes + Fiscal Year; use prebuilt measures, never custom DAX SUM."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "m365_search",
+                    "detail": "sharepoint_search for an existing spend extract (SHARP/SAP/Ariba export) the user has already saved. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 3,
+                    "method": "user_upload",
+                    "detail": "Ask for a spend extract (Excel/CSV) with columns: Vendor Name (or VENDOR_PARENT2 if rolling up to parent), Commodity Code Name, Cost Center, Fiscal Year, Net Spend (NET_SPEND_IN_USD -- already USD-normalized, do not mix with INVOICE_LOC_AMOUNT)."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -891,14 +1623,32 @@
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             },
             {
               "name": "Should-cost model",
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             }
           ]
         },
@@ -921,13 +1671,31 @@
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             },
             {
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -945,14 +1713,32 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             },
             {
               "name": "Lilly MPT playbook",
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             }
           ]
         }
@@ -971,13 +1757,31 @@
               "access": "internal",
               "type": "model",
               "how": "should-cost-builder skill output for this scope",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "another_skill_output",
+                "producing_skill": "should-cost-builder-1c344a"
+              }
             },
             {
               "name": "Supplier pricing submission or quote",
               "access": "supplier",
               "type": "bid",
-              "how": "the priced response or quote attached to this deal"
+              "how": "the priced response or quote attached to this deal",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 0,
+                    "method": "sharepoint_search_and_extract",
+                    "detail": "If a prior rate card/quote from this same supplier exists in the contract repository, surface it as prior-negotiated context (not a substitute for the current live quote). Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 1,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the current quote/priced response directly -- this is the supplier's own document, not something Claude can search for."
+                  }
+                ]
+              }
             }
           ]
         }
@@ -1008,13 +1812,31 @@
               "access": "internal",
               "type": "policy",
               "how": "lilly-contract-review references/playbook.md, keyed on clause topic",
-              "confirmed_by_owner": true
+              "confirmed_by_owner": true,
+              "resolution": {
+                "kind": "bundled_reference",
+                "detail": "lilly-contract-review-1c344a/references/playbook.md -- always available, no retrieval needed."
+              }
             },
             {
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         },
@@ -1036,7 +1858,21 @@
               "name": "The contract set under review (MSA, SOW, Order Form, exhibits)",
               "access": "supplier",
               "type": "document",
-              "how": "the documents attached to this analysis; cite clause and section"
+              "how": "the documents attached to this analysis; cite clause and section",
+              "resolution": {
+                "tiers": [
+                  {
+                    "tier": 1,
+                    "method": "teams_site_or_m365_search",
+                    "detail": "If this is part of an RFx event with a bound Teams site (see the RFx Teams-site binding pattern), check there first. Otherwise sharepoint_search by supplier name where a contract repository exists. Not every procurement area has a searchable contract/spend repository the way IT Procurement does. If SharePoint search returns nothing, do not assume the data does not exist -- Claude cannot reach Ariba or a file sitting on someone's own desktop. Ask the user directly whether their documents live in one of those places, and if so, ask them to attach the specific file(s)."
+                  },
+                  {
+                    "tier": 2,
+                    "method": "user_upload",
+                    "detail": "Ask the user to attach the documents directly; this is normal and expected for most users."
+                  }
+                ]
+              }
             }
           ]
         }
