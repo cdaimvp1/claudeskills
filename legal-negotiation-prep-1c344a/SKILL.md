@@ -558,7 +558,7 @@ Everything in this section ENRICHES output. None of it is a completion gate. If 
 **Limitations note.** Analytical deliverables close with a short "What would change this conclusion" - the key assumptions or missing data that, if different, would move the recommendation.
 
 **Capability-based adaptation (adapt to what is available; do not try to detect which product you are in).**
-- *Deliverable format:* if file-creation and code execution are available, produce the rich artifacts this skill specifies (JSX dashboard, XLSX, PPTX). If they are not - e.g. running inside Word - produce the in-document equivalent: structured tables, headings, and summaries that live in the document. A missing renderer never means no deliverable.
+- *Deliverable format:* if file-creation and code execution are available, produce the DOCX briefing packet via `briefing_skeleton_generator.py` (this skill's only native deliverable; no JSX dashboard, XLSX, or PPTX is produced). If they are not - e.g. running inside Word - produce the in-document equivalent: structured tables, headings, and summaries that live in the document. A missing renderer never means no deliverable.
 - *Question mechanism:* use the tappable option-picker when available; degrade to one concise inline question when it is not.
 - *Web research:* if web search is unavailable, say so and proceed on provided data, or recommend running that step in standalone - never silently present a thin benchmark as if it were complete.
 - *Projects / multi-user:* look for existing project artifacts and build on them instead of regenerating; stamp outputs with date, author, and the inputs used; do not promote one rep's working assumptions into project-wide truth.
