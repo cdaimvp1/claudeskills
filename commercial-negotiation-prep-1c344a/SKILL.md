@@ -745,20 +745,15 @@ scoped to the five figures above.
 - Standard (10-50 rate lines, clear category): 8-12 pages
 - Complex (50+ rate lines, multi-category, TCO): 12-18 pages
 
-### Phase 10: Interactive Negotiation Prep Dashboard - optional companion output
+### Phase 10: BATNA, escalation-cap economics, and commitment-integrity check (folded into the DOCX briefing)
 
-When file-creation and code execution are available, also offer an interactive HTML/JSX dashboard as a companion to the DOCX briefing and the two XLSX workbooks (never a replacement for them; the DOCX remains the primary, portable, send-to-legal artifact). Offer this as a distinct deliverable, the same way the send-ready counter email is offered separately: "Also build the interactive Negotiation Prep dashboard so you can model the escalation cap and walk through the ZOPA live in the negotiation prep session?"
+No standalone interactive dashboard is produced by this skill (removed 2026-07-30; see the closing note at the end of this file). The analysis that used to render as a dashboard tab still runs -- it is folded into the DOCX briefing as its own section instead of a separate rendered artifact:
 
-**LOCKED skeleton (4 tabs, identical structure every run; only the data changes):**
+- **BATNA:** the best realistic alternative, its value, switching cost, break-even, and the walk-away trigger.
+- **Escalation-cap economics:** Year 2/Year 3 base fees, 3-year nominal TCO, escalation impact versus a flat baseline, and 3-year NPV, each figure produced by calling this skill's `escalate()`/`npv()` kernel functions (never freehand arithmetic) -- presented as a table with the stated assumptions, not a live slider.
+- **Commitment-integrity check:** a dual-quote diff per topic mined from the rep's own Outlook/Teams history with the supplier (or pasted correspondence when M365 is unavailable), each topic marked DISPUTED or ALIGNED with the two conflicting (or confirming) statements side by side and a stated implication. Always include at least one ALIGNED topic when one exists, so the check reads as balanced review, not a hunt for bad news only.
 
-1. **Overview** - the KPI Card Row (Weighted Position, Proposed Annual Cost, Target Savings, Rate Lines Analyzed) plus the Negotiation Prep Summary card: Should-Cost Anchor / Market Benchmark (blended P50) / Recommended Model / Combined Target, with the Combined Target explicitly stated as the number that sets the ZOPA opening on the next tab. Pair with a narrative card explaining what the blended target implies (does the bottom-up per-line rollup and the top-down blend agree, and by how much).
-2. **Benchmarks & ZOPA** - the per-rate-line ZOPA chart (market range, target-to-walk-away band, market median, Lilly's suggested opening, and the supplier's proposed-rate marker, flagged when it exceeds walk-away) plus the whole-deal Total-Deal ZOPA/TCO band, paired with a narrative card. On the same tab, directly beneath, the escalation-cap negotiation lever: a slider (0-8%, default at the supplier's working assumption) with Target-cap and Walk-away-cap reference marks, a compounding/simple toggle, and live-recomputed Year 2/Year 3 base fees, 3-year nominal TCO, escalation impact versus a flat baseline, and 3-year NPV - each figure produced by calling this skill's `escalate()`/`npv()` kernel functions (mirrored faithfully in JS; never freehand arithmetic), paired with its own narrative card.
-3. **Concessions & BATNA** - the Commercial Concession Ranking (Hold Firm / Strategic Trade / Concede, each term with its annual dollar impact) plus the concession-sequencing negotiation rounds (objective / moves / risk per round), paired with a BATNA card (best realistic alternative, its value, switching cost, break-even, and the walk-away trigger) and a narrative card.
-4. **Communication Alignment** - the commitment-integrity check: a dual-quote diff per topic mined from the rep's own Outlook/Teams history with the supplier (or pasted correspondence when M365 is unavailable), each topic marked DISPUTED or ALIGNED with the two conflicting (or confirming) statements side by side and a stated implication, paired with a narrative card. Always include at least one ALIGNED topic when one exists, so the check reads as balanced review, not a hunt for bad news only.
-
-**Design requirements (same as every suite dashboard):** reuse the shared component library verbatim (`Metric`, `Card`, `Pillar`, `SevPill`, `StateBanner`) from lilly-brand-assets' `dashboard-components.md`, the canonical color tokens from `brand-colors.md` (no green in any status role), and Georgia-serif titles/numbers on Arial body. Every chart is paired with a narrative analysis card, never shown naked. Use left/right layout for a visualization beside its narrative, or two related panels side by side, in preference to stacking everything vertically. The reference implementation is inlined below under "INLINED: examples/commercial_negotiation_dashboard.jsx"; the illustrative data (supplier "Nimbus Cloud Technologies") is neutral and swappable, but the 4-tab structure, the component reuse, and the live-recomputing escalation lever are locked.
-
-**Output:** `[Supplier]_Negotiation_Dashboard.jsx` (or rendered directly as an artifact when the surface supports it).
+If a rendered visual is wanted for any of this, route to Deal Room (which this skill already seeds at Phase 1) rather than building a second, redundant one here -- the locked hubs own the render; this skill owns the analysis.
 
 ## Savings Target Integration
 
@@ -828,12 +823,11 @@ Commercial briefing feeds into the legal briefing - pricing positions inform the
 
 ## Reference Files
 
-All four reference/example files are inlined at the end of this SKILL.md (single-file install). Do not attempt to read them from disk; scroll to the matching "INLINED: ..." heading below.
+All three reference/example files are inlined at the end of this SKILL.md (single-file install). Do not attempt to read them from disk; scroll to the matching "INLINED: ..." heading below.
 
 - `commercial-briefing-template.md` (inlined below) - Complete content template for the commercial briefing document: section structure, field definitions, rate comparison format, counter-offer structure
 - `commercial-briefing-design.md` (inlined below) - Document design specification: Lilly-branded marketing-piece-quality layout with color palette, typography, section number badges, KPI cards, percentile-colored benchmark tables, counter-offer strategy tables, TCO projections, quick reference card, and anti-patterns
 - `benchmarking-guide.md` (inlined below) - Market rate research methodology by procurement category with search strategies, source hierarchy, and normalization rules
-- `examples/commercial_negotiation_dashboard.jsx` (inlined below) - Reference implementation of the optional interactive Negotiation Prep dashboard (Phase 10): the locked 4-tab skeleton, the shared component library, and the live escalation-cap/TCO negotiation lever
 
 ## Negotiation Persona Integration
 
@@ -877,7 +871,7 @@ Everything in this section ENRICHES output. None of it is a completion gate. If 
 **Limitations note.** Analytical deliverables close with a short "What would change this conclusion" - the key assumptions or missing data that, if different, would move the recommendation.
 
 **Capability-based adaptation (adapt to what is available; do not try to detect which product you are in).**
-- *Deliverable format:* if file-creation and code execution are available, produce the rich artifacts this skill specifies (the magazine-quality `docx` commercial briefing plus the `xlsx` rate-comparison and counter-offer workbooks); these three remain the PRIMARY, native deliverable. The interactive Negotiation Prep dashboard (Phase 10) is an OPTIONAL companion offered on top of them, never a substitute - offer it, do not default to it. This skill does NOT produce a PPTX. If file-creation is not available (for example, running inside Word) produce the in-document equivalent: structured tables, headings, and summaries that live in the document, and skip the dashboard offer entirely (it has no in-document equivalent). A missing renderer never means no deliverable.
+- *Deliverable format:* if file-creation and code execution are available, produce the rich artifacts this skill specifies (the magazine-quality `docx` commercial briefing plus the `xlsx` rate-comparison and counter-offer workbooks); these three are the PRIMARY, native deliverable, and the only ones this skill produces (no standalone dashboard; see Phase 10). This skill does NOT produce a PPTX. If file-creation is not available (for example, running inside Word) produce the in-document equivalent: structured tables, headings, and summaries that live in the document. A missing renderer never means no deliverable.
 - *Question mechanism:* use the tappable option-picker (`ask_user_input_v0`) when available; degrade to one concise inline question when it is not.
 - *Web research:* if web search is unavailable, say so and proceed on provided data, or recommend running that step in standalone - never silently present a thin benchmark as if it were complete.
 - *Outbound email:* the send-ready counter email is a DRAFT only. If a `message_compose` primitive is available, hand the draft into it; if it is unavailable, emit the email as a labeled text/Markdown block in chat or as a `[Supplier]_Counter_Email.md` file. Never claim to have sent it (read-and-draft only, per the Suite Interaction Protocol).
@@ -890,8 +884,8 @@ Everything in this section ENRICHES output. None of it is a completion gate. If 
 **Benchmarking:** pull the two-sweep external research (named suppliers + substitutes/adjacent market) via market-rate-benchmarking; attribute and date every external figure.
 **Negotiation tactics view (commercial terms).** Surface a per-term tactics view covering pricing, payment terms, termination for convenience and early-termination fees, auto-renewal, and volume commitments. Each term is structured as: your position → argument options (more than one) → likely supplier pushback → your rebuttal → fallback. Pricing and TfC are first-class named entries.
 **Send-ready supplier counter email (new explicit output).** In addition to the counter-offer analysis, draft a concise, send-ready counter email to the supplier - tone-matched, summarizing the counter, the key asks, and the rationale a rep can stand behind. Offer it as a distinct deliverable.
-**Interactive Negotiation Prep dashboard (optional companion output, Phase 10).** When file-creation and code execution are available, offer the interactive dashboard alongside the DOCX/XLSX: per-line ZOPA visualization, the escalation-cap live TCO negotiation lever (kernel-backed, `escalate()`/`npv()`), concession sequencing with BATNA, and the commitment-integrity communication-alignment check. See Phase 10 above and the inlined reference implementation.
-**Depth aims:** rate-by-rate benchmark with percentile positioning, pricing-model analysis, volume leverage, TCO decomposition, counter-offer (opening / target / walk-away), a concession framework, and (when the dashboard is produced) BATNA and communication-alignment findings.
+**BATNA, escalation-cap economics, and commitment-integrity check.** Folded into the DOCX as its own section, not a separate rendered dashboard (kernel-backed math via `escalate()`/`npv()`; see Phase 10 above).
+**Depth aims:** rate-by-rate benchmark with percentile positioning, pricing-model analysis, volume leverage, TCO decomposition, counter-offer (opening / target / walk-away), a concession framework, BATNA, and commitment-integrity/communication-alignment findings.
 
 ---
 
