@@ -1,5 +1,79 @@
 # Session handoff — read this first on resume
 
+## LATEST: 2026-07-30 (session after START-HERE.md). If you're resuming cold, start HERE, not below.
+
+Everything below this section (including the 2026-07-28 content and its own
+"superseded" layers) is prior history, kept for the traps and the record. This
+section is current as of the commit at the top of `git log`.
+
+**What happened this session, in order (full detail in `git log`, one
+well-documented commit per change — read the commit messages, they're
+thorough):**
+
+1. **Data-source audit + fixes** across all 33 skills and all 135 panels in the
+   4 locked dashboards: reconciled `lilly-contract-review`'s `sme-matrix.md`
+   against the live SME list; extracted `execution-guardrails.md` to a real
+   file in `lilly-brand-assets` (canonical copy is still the SKILL.md-inlined
+   section); added resolution tiers (ARIA -> SharePoint search -> user upload)
+   to all 274 source entries in the 4 `panel_sources.json` files; built two new
+   shared mechanisms in `lilly-brand-assets`: `sharepoint-search-and-extract.md`
+   and `rfx-teams-site-binding.md`; removed `commercial-negotiation-prep`'s
+   uncited rate tables in favor of a Tier-0 (Lilly's own contracts) then Tier-1
+   (live external search) process.
+
+2. **Workstream F (all 9 items, F1-F9) closed out.** Real finding: 5-6 of the
+   9 items were *already done* in a prior session while `_audit/UPGRADE-PLAN.md`
+   still listed them as open (same pattern `START-HERE.md` already flagged for
+   workstreams A/B/D/G/H/J/K — the plan doc is stale, not the repo). Genuine new
+   builds this session: F1 (`lilly-contract-review`'s pass/assembly separation —
+   `contract_segmenter.py` + `contract_review_generator.py`, golden-contract
+   parity verified 36/36 findings with zero drift), F5 (invoice-rate-card-auditor's
+   report generator, reconciliation + DOCX-traceability guards), and C8/F9
+   (`commercial-negotiation-prep`'s missing kernel binding + XLSX generator).
+
+3. **Standalone lens-skill dashboard cleanup, in progress** (Marc's call: the 4
+   locked hubs — Deal, RFx, Category Strategy, Landscape — are the real
+   deliverables; most lens skills' own optional dashboards are redundant with
+   them and nobody looks at them). Done so far: `commercial-negotiation-prep`
+   (fixed a genuine dangling reference — Phase 10 offered a dashboard whose
+   inlined reference implementation didn't exist), `legal-negotiation-prep`
+   (one line of stale boilerplate, never a real dashboard), `should-cost-builder`
+   (real removal: deleted `references/dashboard-canonical.md` (176 lines) and
+   `examples/should_cost_canonical_dashboard.jsx` (675 lines), confirmed its
+   reconciliation invariants were already independently enforced in the XLSX
+   generator so nothing analytical was lost).
+   **Deferred, needs a decision, not a mechanical cleanup:** `scope-sow-architect`
+   — its dashboard is a real, independently-requestable "Dashboard only" output
+   mode with its own reconciliation discipline, not dead/dangling like the
+   others. Marc chose to skip it for now rather than decide.
+   **Still queued:** `market-rate-benchmarking`, `deal-room`, `rfp-response-analysis`,
+   `evaluation-engine` — same treatment (check for a real independent dashboard
+   mode first per the scope-sow-architect lesson; if none, drop the standalone
+   dashboard, verify self-tests + the 5 integrity gates including
+   `hub_selfcontainment`, commit, push).
+
+**Resolves the old "ONE LOOSE END" note below** (`deal-room-1c344a/dashboard/`):
+already deleted this session, confirmed byte-identical migration, verified
+clean via all 5 integrity gates before committing.
+
+**New tool, keep it:** `_audit/reachability_sweep.py` — read-only (cannot
+delete anything, same discipline as `ship_manifest.py`), finds unreferenced
+files and dangling filename references per skill. Iterated through several
+false-positive categories this session (vendored-kernel citation comments,
+generic shared boilerplate, cross-directory `_audit/`-root citations, inlined
+sections mistaken for missing standalone files) — read its own docstring
+before trusting its raw output, and always verify a candidate (git history +
+context) before acting on it.
+
+**Standing instructions for this thread:** commit each skill's cleanup as its
+own isolated, revertable commit with a thorough message (not batched); run
+that skill's own self-test plus the 5 integrity gates before every commit;
+push immediately after each commit (Marc asked for this explicitly, given the
+scratchpad clone is on a temp path that a computer restart could wipe --
+`origin/main` is the durable copy, not this working directory).
+
+---
+
 > **VERSION LOCKED 2026-07-29.** Read `VERSION-LOCK-2026-07-29.md` first: it
 > records what is locked, the decisions that must not be quietly reversed, the
 > four known gaps, and the seven traps. This file is the working detail beneath it.
