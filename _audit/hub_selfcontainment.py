@@ -52,6 +52,22 @@ HUBS = {
 # been built yet is REPORTED, not quietly omitted from a green result.
 PHASE1_HUBS = ("RFx", "Category Strategy", "Deep Dive", "My Work", "Landscape")
 
+# Hubs whose absence from disk is BY DESIGN, not an unbuilt gap. Checked 2026-07-31:
+# supplier-landscape-1c344a/dashboard/.gitignore excludes *.html outright, and the builder's
+# own README documents writing to an external --out path per run, never back into the repo
+# (unlike Deal/RFx/Category Strategy, which do ship a committed reference build). Landing
+# here every run as "NOT BUILT" read like an open defect; it is a different, equally valid
+# design choice (build-fresh-only, never a static demo copy that can go stale against the
+# live generator -- see category-strategy's own StubDataError fix for why a stale committed
+# demo copy is the greater risk). Each entry: hub name -> the reason, so a future maintainer
+# does not have to re-derive it.
+BUILD_FRESH_ONLY = {
+    "Landscape": (
+        "dashboard/.gitignore excludes *.html; build_dashboard.py writes to an external "
+        "--out path per run by design (see dashboard/README.md), never a committed copy."
+    ),
+}
+
 PATTERNS = (
     (r"\bfetch\s*\(", "fetch() call"),
     (r"\bXMLHttpRequest\b", "XMLHttpRequest"),
@@ -95,10 +111,14 @@ def main(argv):
     print("hub self-containment sweep")
     print("=" * 92)
 
-    total, missing_files, unbuilt = 0, [], []
+    total, missing_files, unbuilt, build_fresh = 0, [], [], []
     for name, rel in sorted(HUBS.items()):
         path = os.path.join(ROOT, rel.replace("/", os.sep))
         if not os.path.isfile(path):
+            if name in BUILD_FRESH_ONLY:
+                build_fresh.append((name, BUILD_FRESH_ONLY[name]))
+                print("  %-28s build-fresh-only (by design)" % name)
+                continue
             missing_files.append((name, rel))
             print("  %-28s NOT BUILT  %s" % (name, rel))
             continue
@@ -123,11 +143,14 @@ def main(argv):
         print("NOT SWEPT, because no dashboard artifact exists yet: %s"
               % ", ".join(unbuilt))
         print("  These are Phase 1 hubs. A11 cannot lock a hub that has not been built.")
+    if build_fresh:
+        print("Build-fresh-only (by design, not a gap): %s"
+              % ", ".join("%s -- %s" % (n, r) for n, r in build_fresh))
     if missing_files:
         print("Declared but absent: %s"
               % ", ".join("%s (%s)" % (n, r) for n, r in missing_files))
-    print("%d finding(s) across %d built artifact(s)."
-          % (total, len(HUBS) - len(missing_files)))
+    print("%d finding(s) across %d built artifact(s), %d build-fresh-only by design."
+          % (total, len(HUBS) - len(missing_files) - len(build_fresh), len(build_fresh)))
     print("A clean result proves these pages make no request. It does NOT prove they")
     print("render correctly or that their figures reconcile; that is the in-browser")
     print("sweep and the generator self-tests.")

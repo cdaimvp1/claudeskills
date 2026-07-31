@@ -33,9 +33,9 @@ requirements grid built inside rfp-engine per Stage 1b). If a skill's own
 Integration/Consumes/Feeds text changes in a later edit, re-derive the affected row
 here rather than letting this file drift from the skills it describes.
 
-The pending procurement-help-desk (Stage 7, network-gated content build) is an end-user
-front door, not a link in these producer/consumer chains; it is intentionally NOT given
-a chain row until it ships and states its own handoffs.
+procurement-help-desk was folded into process-navigator as a second, stakeholder-facing
+mode on 2026-07-31 rather than shipped as its own skill; it never appears here as a
+separate producer/consumer, and process-navigator's own row below covers both audiences.
 
 ## How THEO uses this file
 
@@ -84,7 +84,7 @@ section naming a relationship in that direction.
 | negotiation-simulator | lilly-contract-review (playbook, SME matrix, findings), negotiation-playbook-learning (supplier history, difficulty), legal/commercial-negotiation-prep (the briefing to practice against) | the real negotiation; negotiation-playbook-learning (after the actual call, including opt-in simulation-outcome records) |
 | pro-forma-builder | market-rate-benchmarking (external rate anchors), should-cost-builder (bottoms-up cost), commercial-negotiation-prep (counter-offer economics), lilly-contract-review (deal terms), evaluation-engine (shortlisted suppliers/rankings, enriching) | executive-summary-package (deal value), commercial-negotiation-prep (TCO/walk-away economics), evaluation-engine (sourced TCO figures; two-way relationship, see note) |
 | process-navigator | timeline-builder (which review/process factors apply), workflow-map (confirm canonical step order), any skill needing a process/threshold answer | offers (default no) to start supplier-landscape, rfp-engine, timeline-builder, or workflow-map after answering |
-| procurement-launcher (THEO) | none stated (user-invoked, not called by other skills) | routes to all 27 built routable skills via the routing table (plus the pending procurement-help-desk once it ships); explicitly a dispatcher, not an orchestrator - it names paths and hands off one skill at a time, it does not itself call or run another skill |
+| procurement-launcher (THEO) | none stated (user-invoked, not called by other skills) | routes to all 26 built routable skills via the routing table; explicitly a dispatcher, not an orchestrator - it names paths and hands off one skill at a time, it does not itself call or run another skill |
 | rfp-case-manager | rfp-engine (via case_handoff.json), supplier-landscape, category-strategy | rfp-response-analysis, evaluation-engine |
 | rfp-engine | supplier-landscape, category-strategy, market-rate-benchmarking (all optional) | rfp-case-manager (workflow), rfp-response-analysis (post-submission); produces the scoring scale/requirements grid evaluation-engine applies (see Stage 1c reconciliation) |
 | rfp-response-analysis | rfp-engine (requirements matrix), rfp-case-manager (case file, submissions) | evaluation-engine (formal scoring - proposed/preliminary only, see Stage 1a) |

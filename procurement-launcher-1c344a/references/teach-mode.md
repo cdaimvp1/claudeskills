@@ -104,7 +104,7 @@ Present the 27 skills grouped by the six pipelines. The learner selects the ones
 - Executive Summary (1): executive summary package
 - Personal Command Center (5): voice profile, process navigator, timeline builder, workflow map, meeting prep brief
 
-That is 27 skills across six pipelines (8 + 7 + 2 + 3 + 1 + 6). (A 28th, procurement-help-desk, an end-user/stakeholder front door, is being scaffolded separately and is not yet live; do not teach it as an available skill until it ships.)
+That is 26 skills across six pipelines (8 + 7 + 2 + 3 + 1 + 5). procurement-help-desk was folded into process-navigator as a second, stakeholder-facing mode on 2026-07-31 rather than shipped as its own skill, so process-navigator's teach-mode description should mention both audiences.
 
 **Step M2: Pipeline context for what they know.**
 
