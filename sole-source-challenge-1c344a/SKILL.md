@@ -17,7 +17,7 @@ metadata:
   suite: v10.7.0
 ---
 
-> **Build discipline (G10):** This skill's optional dashboard is a single-file JSX artifact. Assemble it across multiple writes, never one create_file call: scaffold first (imports, component shell, export), then append one section per write to /mnt/user-data/outputs, and run a structural self-test before present_files. Full rule: lilly-brand-assets guardrail G10.
+> This skill does not produce a JSX dashboard; its DOCX/PPTX deliverable is generated in one call by `sole_source_generator.py`, not assembled via chunked `create_file` writes.
 
 <!-- ARIA-ENRICHMENT:START (optional capability layer; safe to remove; added 2026-07-22) -->
 ## ARIA ENRICHMENT (optional, suite-wide)
@@ -40,7 +40,7 @@ This skill runs fully without ARIA. ARIA is an optional internal-data layer. Whe
 
 Suite: v10.7.0
 
-<!-- MERGED PACKAGE (v10.7.0): This is a single-file install. The vendored `numeric_kernel.py` and the reference dashboard `examples/sole_source_challenge_canonical_dashboard.jsx` ship as companion files in this skill's own directory; every other reference this skill needs (guardrails, house styles, dashboard components, brand colors, scoring scales) is inlined in the shared foundation, `lilly-brand-assets-1c344a/SKILL.md`. When this file says "read the foundation" or "per lilly-brand-assets", read that skill's inlined sections; do not look for separate files on disk for that content. -->
+<!-- MERGED PACKAGE (v10.7.0): This is a single-file install. The vendored `numeric_kernel.py` ships as a companion file in this skill's own directory; every other reference this skill needs (guardrails, house styles, brand colors, scoring scales) is inlined in the shared foundation, `lilly-brand-assets-1c344a/SKILL.md`. When this file says "read the foundation" or "per lilly-brand-assets", read that skill's inlined sections; do not look for separate files on disk for that content. -->
 
 <!-- SHARED-BLOCK:START (generated; do not hand-edit) -->
 > **Troubleshooting and usage guidance:** If the user asks how to use this skill, what output to expect, which model to use (Opus vs Sonnet), or reports an error (dashboard not loading, React errors, share button missing, output too thin), consult the shared user manual in lilly-brand-assets: in the inlined bundle, read the `## INLINED: references/user-manual.md` section inside `lilly-brand-assets-1c344a/SKILL.md`; in the un-inlined bundle, read `lilly-brand-assets-1c344a/references/user-manual.md`. If neither is available, answer from this skill's own instructions and say the shared manual was unavailable.
@@ -77,7 +77,7 @@ These rules govern HOW this skill behaves. They are shared across all Lilly proc
 - In generated dashboards, JSX, and any code artifact, NEVER output literal backslash-u escape sequences or HTML entities in any position that renders as visible text.
 
 **8. Deliverable structure is deterministic across modes and categories. (HARD RULE, suite-wide.)**
-- The seven challenge dimensions, their weights, and the verdict skeleton (DOCX sections, dashboard tabs) are FIXED. They do not change by category, mode, or how thin the input is. Only the content changes. For interactive dashboards specifically: every canonical tab appears on every run and ALWAYS renders; a tab less applicable to the input in hand shows a labeled state (NEEDS_INPUT / NOT APPLICABLE / RESEARCH PENDING) rather than being dropped.
+- The seven challenge dimensions, their weights, and the verdict skeleton (DOCX sections) are FIXED. They do not change by category, mode, or how thin the input is. Only the content changes.
 
 **9. Follow the Execution Guardrails. (HARD RULE, suite-wide.)**
 - Read and follow `the "## INLINED: references/execution-guardrails.md" section inside /mnt/skills/user/lilly-brand-assets-1c344a/SKILL.md` before every run. It contains the full text of the mandatory tool-selection rules, gate checks, anti-collapse signals, cross-reference tracing requirements, kernel-backed computation, and pre-delivery self-tests.
@@ -89,12 +89,12 @@ These rules govern HOW this skill behaves. They are shared across all Lilly proc
   - **G2 (Gate Checks):** Every multi-phase workflow has mandatory gate checks. Produce the intermediate artifact from each phase before proceeding to the next.
   - **G3 (Existing Context First):** For documents with existing tracked changes or comments (a prior justification memo under review, an audit request with margin notes), read and respond to them BEFORE adding new analysis.
   - **G4 (Definition Tracing):** When a finding involves a defined contractual term (IP ownership, exclusivity, a continuity clause), trace the relevant definition through the governing document and state which definition applies and why.
-  - **G5 (Data Model First):** For the dashboard, build the complete data object before writing any rendering code.
+  - **G5 (Data Model First):** Build the complete sole-source register (all seven scored dimensions, mitigations, alternatives, price validation) before generating the DOCX or PPTX.
   - **G6 (Pre-Delivery Self-Test):** Run the skill-specific delivery checklist before producing final output.
   - **G7 (Research Minimums):** Any web-research phase (the light market-check in Phase 3) must meet a stated minimum search count, keep a research log, and label output "RESEARCH PENDING" when minimums are not met.
   - **G8 (Pass Artifact Enforcement):** Confirm each named pass artifact (SSC_1 through SSC_4, see Workflow) exists before starting the next pass.
   - **G9 (Anti-Collapse Signal):** A finding that asserts "no alternative exists" without a checked source, or a Defensibility Score with no visible per-dimension calc table, is shallow. Stop and re-run the missing analysis.
-  - **G10 (Chunked Artifact Assembly):** Scaffold the dashboard first, then append it section by section, and run a structural self-test before presenting the file.
+  - **G10 (Chunked Artifact Assembly):** Not applicable to this skill's own artifacts: `sole_source_generator.py` builds the DOCX/PPTX in one call from the validated register, not via chunked `create_file` writes.
   - **G11 (Kernel-Backed Computation):** This skill vendors `numeric_kernel.py`. The Sole-Source Defensibility Score is computed ONLY by calling `weighted_score()` in that kernel, never by model arithmetic. See Phase 4 below.
 
 ## SUITE INTERACTION PROTOCOL (apply at the start of every run, when relevant)
@@ -133,6 +133,7 @@ Drafting an SME escalation (Compliance for a gating screen, the category lead fo
 - **Author:** Marc Lane, Associate Director, Global IT Procurement
 - **Requires:** lilly-brand-assets v10.0+ (shared foundation). Vendors its own copy of `numeric_kernel.py` (from lilly-procurement-kernels-1c344a) for the kernel-computed Defensibility Score (G11).
 - **Changelog:**
+  - v1.1 (July 2026): Removed the standalone four-tab dashboard (`examples/sole_source_challenge_canonical_dashboard.jsx`) and its canonical tab-skeleton spec. SKILL.md's own text already said the DOCX + CSVs + handoff JSON "are the primary deliverable and stand alone" and the dashboard was "optional visual companion" -- every tab (Challenge and Verdict, Scorecard, Alternatives and Price Check, Evidence and Handoff) mapped one-to-one to a DOCX section, `challenge_scorecard.csv`, or `alternatives_register.csv` that already carried the same content. No analytical content was removed; nothing in the DOCX changed. Fixed the deliverables list (renumbered), the pass-artifact gate checks, the guardrail summary's G5/G10 lines, and the Section 8 "deliverable structure is deterministic" line to no longer reference the removed dashboard.
   - v1.0 (July 22, 2026): Initial release. Seven-dimension weighted Challenge (uniqueness, constraint basis, competition history, requirements separability, alternative availability, urgency legitimacy, price-validation substitute), kernel-computed Sole-Source Defensibility Score via `weighted_score()`, a DEFENSIBLE / DEFENSIBLE WITH MITIGATIONS / WEAK verdict, a competitive-alternatives register that consumes supplier-landscape's `excluded_vendors.csv`, a price-validation panel that consumes market-rate-benchmarking and should-cost-builder output, the four-tab canonical dashboard, and the DOCX justification/finding report. Locked the canonical dashboard tab skeleton and shipped `examples/sole_source_challenge_canonical_dashboard.jsx` as the reference implementation.
 - **Suite-wide guardrails note:** The shared Execution Guardrails G1-G13 apply to every run of this skill; see GLOBAL OPERATING RULES Rule 9 above for the full text.
 
@@ -142,7 +143,7 @@ Drafting an SME escalation (Compliance for a gating screen, the category lead fo
 
 You are the skeptic in the room before a sole-source decision is defended or approved. A requester (or a category lead, or Compliance, on renewal) brings you a supplier and a reason. Your job is to interrogate that reason with the same rigor a hostile auditor would apply, gather the evidence that either supports or undercuts it, and produce one of two honest outcomes: a defensible justification the requester can actually submit, or a clear-eyed finding that the case is weak, with the competitive alternatives that should be considered instead.
 
-**What this is:** a structured, evidence-based challenge of ONE proposed or already-in-place sole-source supplier pick, scored across seven fixed dimensions into a weighted Defensibility verdict, with a DOCX report, a light interactive dashboard, and a machine-readable handoff for the skills downstream of this decision.
+**What this is:** a structured, evidence-based challenge of ONE proposed or already-in-place sole-source supplier pick, scored across seven fixed dimensions into a weighted Defensibility verdict, with a DOCX report and a machine-readable handoff for the skills downstream of this decision.
 
 **What this is not:** an approval. This skill produces a recommendation and an evidence trail, not a governance decision. The actual FRAP/threshold routing and sign-off remain Lilly's sourcing governance process (route the policy question to process-navigator; never assert an approval threshold or an approval as settled here). It is also not a market-shortlist tool (that is supplier-landscape), a single-vendor risk dossier (that is supplier-deep-dive), a pricing benchmark engine (that is market-rate-benchmarking / should-cost-builder, which this skill consumes rather than replicates), or a negotiation-prep tool (that is commercial-negotiation-prep, which this skill feeds once the sole-source decision is made).
 
@@ -184,7 +185,7 @@ You are the skeptic in the room before a sole-source decision is defended or app
 
 ## Workflow
 
-Pass artifacts (per Execution Guardrail G8). Each phase produces a named artifact that must exist before the next begins: **SSC_1_CHALLENGE** (the seven-dimension answer set, each item labeled VERIFIED/ASSERTED/INFERRED, plus the list of dimensions still unresolved after research), **SSC_2_EVIDENCE** (the research log, consumed CSVs/handoffs, and citations), **SSC_3_SCORE** (the kernel calc table), **SSC_4_VERDICT** (the branch decision and its narrative). If you are producing the DOCX or dashboard without all four, STOP, you collapsed the workflow, go back.
+Pass artifacts (per Execution Guardrail G8). Each phase produces a named artifact that must exist before the next begins: **SSC_1_CHALLENGE** (the seven-dimension answer set, each item labeled VERIFIED/ASSERTED/INFERRED, plus the list of dimensions still unresolved after research), **SSC_2_EVIDENCE** (the research log, consumed CSVs/handoffs, and citations), **SSC_3_SCORE** (the kernel calc table), **SSC_4_VERDICT** (the branch decision and its narrative). If you are producing the DOCX without all four, STOP, you collapsed the workflow, go back.
 
 ### Phase 0: Intake and Mode Classification (S0)
 
@@ -299,7 +300,7 @@ Map the kernel-computed score to a verdict band. These bands govern this skill's
 - **RENEWAL:** open the next renewal cycle to competition; commission a supplier-landscape shortlist now so it is ready before the renewal date.
 - **AUDIT:** flag the arrangement for a remediation plan and route to the category lead / Compliance per `sme-matrix.md`; this skill does not unilaterally terminate or flag an arrangement as non-compliant, it surfaces the finding for the governance owner to act on.
 
-This is SSC_4_VERDICT. Confirm SSC_1 through SSC_4 all exist before generating the DOCX or dashboard (G2/G8 gate check).
+This is SSC_4_VERDICT. Confirm SSC_1 through SSC_4 all exist before generating the DOCX (G2/G8 gate check).
 
 ### Phase 6: Deliverables and Handoffs
 
@@ -308,10 +309,9 @@ Generate the deliverables below. Run the Pre-Delivery Self-Test (Deliverables se
 ## Deliverables
 
 1. **`sole_source_challenge_report.docx`** - Magazine Report house style (per `house-styles.md`), Lilly-branded, following `docx-design-system.md` and `docx-title-page-spec.md`. Sections: 01 Request Summary (need, supplier, mode, value/term, requester), 02 The Challenge (the seven-dimension table with evidence and VERIFIED/ASSERTED/INFERRED labels), 03 Evidence and Price Validation (research log, consumed artifacts, the price-validation comparison), 04 Verdict and Recommendation (the branch: justification with mitigations, or finding with ranked alternatives), 05 Next Steps and SME Routing, 06 Research Methodology, Appendix (raw scorecard). Same skeleton every run regardless of mode or verdict; only the content and the 04 branch content vary.
-2. **`sole_source_challenge_dashboard.jsx`** - the four-tab canonical dashboard (see below). Optional visual companion; the DOCX stands alone.
-3. **`challenge_scorecard.csv`** - columns: `dimension,weight,score_0_to_5,weighted_contribution,rationale,evidence,label,confidence`. One row per dimension plus a total row (weighted_contribution sums to the kernel's `defensibility_score`).
-4. **`alternatives_register.csv`** - columns: `candidate_name,origin,original_exclusion_reason,capability_gap,reassessed_viability,confidence,source,date`. `origin` is one of `supplier-landscape-excluded`, `market-check`, `user-provided`, `aria-shared-incumbent-history`. If no alternatives were evaluated (a genuinely thin market), emit the file with a single row stating "no alternatives evaluated" and why.
-5. **`sole_source_justification_handoff.json`** - the structured handoff object:
+2. **`challenge_scorecard.csv`** - columns: `dimension,weight,score_0_to_5,weighted_contribution,rationale,evidence,label,confidence`. One row per dimension plus a total row (weighted_contribution sums to the kernel's `defensibility_score`).
+3. **`alternatives_register.csv`** - columns: `candidate_name,origin,original_exclusion_reason,capability_gap,reassessed_viability,confidence,source,date`. `origin` is one of `supplier-landscape-excluded`, `market-check`, `user-provided`, `aria-shared-incumbent-history`. If no alternatives were evaluated (a genuinely thin market), emit the file with a single row stating "no alternatives evaluated" and why.
+4. **`sole_source_justification_handoff.json`** - the structured handoff object:
    ```json
    {
      "request": {"supplier": "", "need_description": "", "category": "", "est_value_usd": null, "term": "", "mode": "NEW|RENEWAL|AUDIT", "requester": "", "date": ""},
@@ -353,24 +353,15 @@ The Defensibility Score (via `weighted_score()`, G11), the verdict band and the 
 - [ ] All seven dimensions scored, each with a VERIFIED/ASSERTED/INFERRED label and named evidence or an explicit gap.
 - [ ] The Defensibility Score is the kernel's `weighted_score()` return value, shown with the full calc table; weighted_contribution values sum to it.
 - [ ] The verdict band matches the score, with the Hard Rule 2 ASSERTED-majority cap applied where it applies.
-- [ ] `alternatives_register.csv` reconciles with the dashboard's Alternatives tab and the DOCX section 04 (WEAK verdict) or is explicitly empty with a stated reason.
+- [ ] `alternatives_register.csv` reconciles with the DOCX section 04 (WEAK verdict) or is explicitly empty with a stated reason.
 - [ ] Every gating item (debarment/sanctions/GxP) is flagged and routed, never asserted clear.
 - [ ] No em dashes; no literal escape codes or HTML entities rendered as visible text.
 
-## Dashboard canonical tab skeleton
-
-The optional dashboard has a FIXED four-tab structure (light, per this skill's own scope). Every tab appears on every run and ALWAYS renders; a tab less applicable to the input shows a labeled state rather than being dropped. Build the complete data object before rendering any code (G5). Reference implementation: `examples/sole_source_challenge_canonical_dashboard.jsx`.
-
-| # | Tab | Contents | Empty / pending state |
-|---|-----|----------|------------------------|
-| 1 | Challenge and Verdict | Verdict Pillar (DEFENSIBLE / DEFENSIBLE WITH MITIGATIONS / WEAK), KPI row (Defensibility Score /5.0, weakest dimension, alternatives identified, price-validation confidence, mode). Left: Request Summary card (need, supplier, value, term, requester, urgency). Right, paired: **Verdict Read** narrative synthesizing across all seven dimensions and naming the deciding factor. | If Phase 2 answers are incomplete, the KPI row shows NEEDS_INPUT for the affected dimensions; the rest of the tab still renders with what is known. |
-| 2 | Scorecard | Left: the seven-dimension STable (dimension, weight, score with ScoreCell coloring, weighted contribution, evidence, confidence). A small horizontal bar chart of per-dimension weighted contribution. Right, paired: **Scorecard Read** narrative naming the two weakest dimensions and what evidence would move them. | Renders always; dimensions still unresolved after Phase 3 show RESEARCH PENDING in the evidence column, never a fabricated score. |
-| 3 | Alternatives and Price Check | Left: the alternatives STable (candidate, origin, capability gap, reassessed viability, confidence) sourced from `alternatives_register.csv`. Right, paired: a price-validation RangeGauge (should-cost/market-rate band vs. the sole-source price) with a **Price Validation Read** narrative on whether the price is validated. | NOT APPLICABLE ("no alternatives evaluated for this run") when `alternatives_register.csv` is the single-row "none evaluated" case; the price panel shows NEEDS_INPUT when no should-cost/market-rate source exists. |
-| 4 | Evidence and Handoff | Left: the research log (query/source/date) and citation list with VERIFIED/ASSERTED/INFERRED counts. Right, paired: an SME routing panel (per `sme-matrix.md`) and a "what this feeds" panel naming process-navigator, commercial-negotiation-prep, and executive-summary-package, plus a copyable preview of `sole_source_justification_handoff.json`. | RESEARCH PENDING banner when the Phase 3 search-effort minimum (2 searches) was not met. |
-
-**House style and palette.** Magazine Report house style (per `house-styles.md`). Canonical non-green status palette only: positive text Bold Blue `#0F3A85` on Neutral Sky `#D4E5F7`; warning text Amber `#B45309` on Neutral Cream `#FFF0D8`; negative text Lilly Red `#E1251B` on Neutral Rose `#FDE8E5`; neutral/N-A Bold Grey `#8A969E`; section headers Bold Blue; cards/borders Neutral Stone `#E4EBF1`; header bar Lilly Black `#212121`. No green or teal anywhere. Georgia titles on Arial body; components copied verbatim from `dashboard-components.md` (Metric, Card, STable, Pillar, ScoreCell, StateBanner, Tip). Verdict Pillar colors: DEFENSIBLE = Bold Blue/Neutral Sky, DEFENSIBLE WITH MITIGATIONS = Amber/Neutral Cream, WEAK = Lilly Red/Neutral Rose.
-
-**Graceful degradation.** If the `visualize:show_widget`/JSX render path is unavailable, do not fail: emit the same four-tab content as a Magazine-style Markdown report (scorecard table, alternatives table, price-validation comparison, research log) and tell the user the interactive view was skipped. The DOCX + CSVs + handoff JSON are the primary deliverable and stand alone.
+This skill does not build a standalone interactive dashboard. All of its analysis -- the
+verdict and its rationale, the seven-dimension scorecard, alternatives and price validation,
+and the evidence/SME-routing trail -- is produced as static content in
+`sole_source_challenge_report.docx` (Sections 01-06 and the Appendix), `challenge_scorecard.csv`,
+and `alternatives_register.csv`, all of which are already standalone and complete.
 
 ## BOUNDARY (read before invoking an adjacent skill)
 
