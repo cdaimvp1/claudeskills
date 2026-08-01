@@ -14,6 +14,7 @@ description: >
   "challenge my recommendation before I present it", "prep for the CPO review", "internal
   executive challenge".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

@@ -12,6 +12,7 @@ description: >
   Work dashboard", "My Work hub", "my workload", "my report card", "handover brief",
   "build the My Work dashboard".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   owner: Lilly Global Procurement
   status: built 2026-07-29 (A7, the last Phase 1 hub; includes the #44 handover/custody
     brief, green-lit to live here)

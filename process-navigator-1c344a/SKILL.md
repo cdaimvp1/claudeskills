@@ -14,6 +14,7 @@ description: >
   a supplier record. BOUNDARY: workflow-map DRAWS a process diagram, timeline-builder ESTIMATES
   durations.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

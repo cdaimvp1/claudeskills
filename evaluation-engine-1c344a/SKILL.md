@@ -8,6 +8,7 @@ description: >
   packages, applies scoring (AI and/or stakeholder), produces defensible recommendations, and
   generates all RFP communications from Q&A through award notification.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

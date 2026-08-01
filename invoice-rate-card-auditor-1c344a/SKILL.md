@@ -13,6 +13,7 @@ description: >
   vs an EXECUTED contract; redline via lilly-contract-review, rate-vs-market via
   market-rate-benchmarking, should-cost via should-cost-builder.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

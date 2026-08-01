@@ -14,6 +14,7 @@ description: >
   deliver, accept, and govern. Route legal/redline/Protection-Score questions to
   lilly-contract-review.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
   version: "1.0"
 ---

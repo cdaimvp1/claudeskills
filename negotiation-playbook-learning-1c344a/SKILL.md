@@ -12,6 +12,7 @@ description: >
   or "negotiation intelligence". Produces outcome records, pattern reports, and playbook amendment
   recommendations. Feeds back into lilly-contract-review to make future redlines smarter.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

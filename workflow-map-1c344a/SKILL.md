@@ -12,6 +12,7 @@ description: >
   BOUNDARY: process-navigator ANSWERS the rule questions (need TPRM, which threshold, PO vs MSA);
   workflow-map DRAWS the resulting phases and tasks. Want a picture or task list, use this skill.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

@@ -14,6 +14,7 @@ description: >
   in my voice", "personal writing style", "audit this against my voice profile", "update my
   voice profile".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

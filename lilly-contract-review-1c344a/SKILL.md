@@ -13,6 +13,7 @@ description: >
   review", "contract analysis", "Hard Stop check", "review this order form", "review this SOW",
   "map the contract stack", "what governs this SOW", "contract stack mapper".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

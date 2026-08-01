@@ -13,6 +13,7 @@ description: >
   BOUNDARY: produces the rate/market evidence; for building a negotiation plan,
   counter-offer, or TCO walkaway from that evidence, use commercial-negotiation-prep.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

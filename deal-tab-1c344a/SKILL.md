@@ -13,6 +13,7 @@ description: >
   with a persistent concession ledger; this skill produces a static artifact and keeps
   nothing.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
   owner: Lilly Global Procurement
   status: LOCKED 2026-07-29

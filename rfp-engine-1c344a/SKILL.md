@@ -9,6 +9,7 @@ description: >
   issuance-ready RFP packages with cross-referenced artifacts. Works across all sourcing domains:
   software, professional services, lab services, chemicals, equipment, facilities, and more.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

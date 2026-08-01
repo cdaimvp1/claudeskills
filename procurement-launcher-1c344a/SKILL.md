@@ -13,6 +13,7 @@ description: >
   which skill should I use / get me started / teach me the suite"; lilly-brand-assets owns only
   brand tokens, the user manual, and troubleshooting, not menu routing.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

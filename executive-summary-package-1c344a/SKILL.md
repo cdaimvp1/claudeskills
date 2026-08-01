@@ -7,6 +7,7 @@ description: >
   Analyzes uploaded contracts/work orders and generates professional, decision-focused summaries
   ready for direct submission to the Lilly approval workflow.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

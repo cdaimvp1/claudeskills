@@ -13,6 +13,7 @@ description: >
   "prepare spend data", "normalize spend extract", "classify this spend file", "spend data
   cleanup".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

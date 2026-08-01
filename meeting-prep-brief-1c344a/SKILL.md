@@ -14,6 +14,7 @@ description: >
   is out of scope (no dedicated agenda skill exists in this suite), and for daily triage across
   all meetings use theos-field-guide.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

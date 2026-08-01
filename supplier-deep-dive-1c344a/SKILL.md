@@ -12,6 +12,7 @@ description: >
   BOUNDARY: this skill profiles ONE named supplier in depth. For a market-wide "who are the top
   suppliers for X" comparison across many vendors, use supplier-landscape instead.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

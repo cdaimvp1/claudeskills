@@ -11,6 +11,7 @@ description: >
   REFLECT-ONLY, and static: no state, no persistence, no sends, no writes. Triggers: "RFx
   dashboard", "RFx tab", "build the RFx dashboard", "RFx hub".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
   owner: Lilly Global Procurement
   status: rehomed 2026-07-29 (build tree moved from repo-root `_rfx_build/`; the dashboard

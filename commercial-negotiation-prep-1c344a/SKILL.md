@@ -13,6 +13,7 @@ description: >
   full negotiation plan. BOUNDARY: for a bottoms-up "what should it cost" teardown
   use should-cost-builder-1c344a; this skill is the top-down market view that brackets both.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

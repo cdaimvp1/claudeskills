@@ -11,6 +11,7 @@ description: >
   "TCO model", "NPV / ROI / payback", "savings model", "model the financials", "cost model for this
   deal", "five-year cost projection".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

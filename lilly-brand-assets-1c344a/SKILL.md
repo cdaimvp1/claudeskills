@@ -11,6 +11,7 @@ description: >
   passive shared foundation. For a launch menu, "what skills do I have", "what can these skills do", or
   "what should I do next", route to procurement-launcher (THEO).
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
   version: "2.1"
 ---

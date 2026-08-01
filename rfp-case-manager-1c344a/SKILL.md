@@ -12,6 +12,7 @@ description: >
   case", "what's the latest on the [vendor] RFP", "where are we with the [category] sourcing",
   "schedule the demos", "ingest emails from this RFP", "refresh the case".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

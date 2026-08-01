@@ -9,6 +9,7 @@ description: >
   comments", "comment cleanup", "reduce the comments", "comments are too verbose",
   "strip internal comments", "prepare these comments for the supplier".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

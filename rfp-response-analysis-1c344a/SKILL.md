@@ -13,6 +13,7 @@ description: >
   (coverage, commercial, citations, an AI first-pass score) renders in the suite's locked
   rfx-hub-1c344a dashboard, not a standalone dashboard of its own.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

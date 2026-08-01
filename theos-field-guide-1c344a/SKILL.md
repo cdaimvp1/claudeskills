@@ -13,6 +13,7 @@ description: >
   alias). BOUNDARY: personal work tracker; for the skills catalog use procurement-launcher, for
   Lilly policy use process-navigator.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

@@ -13,6 +13,7 @@ description: >
   an RFP. For a deep single-supplier profile or due-diligence dossier on ONE named vendor, use
   supplier-deep-dive instead.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

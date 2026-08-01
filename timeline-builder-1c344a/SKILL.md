@@ -12,6 +12,7 @@ description: >
   request", "estimate remaining weeks", "draft a status timeline". BOUNDARY: estimates DURATION only;
   use workflow-map for the phase diagram and process-navigator for "what process applies".
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

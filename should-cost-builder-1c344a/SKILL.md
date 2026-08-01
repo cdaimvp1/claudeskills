@@ -11,6 +11,7 @@ description: >
   market-rate-benchmarking; for the full negotiation brief, TCO, and counter-offer strategy use
   commercial-negotiation-prep, which consumes this skill's cost anchor.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

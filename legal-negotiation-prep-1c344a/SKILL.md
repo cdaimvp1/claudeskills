@@ -11,6 +11,7 @@ description: >
   briefing", "legal prep for", "prepare me for the negotiation with", "negotiation strategy for",
   "get me ready to negotiate" -- ONLY when no contract document is uploaded.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

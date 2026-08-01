@@ -14,6 +14,7 @@ description: >
   skill; negotiation-playbook-learning-1c344a analyzes closed deals and is fed by this skill
   at close.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 

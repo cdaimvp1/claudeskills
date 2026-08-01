@@ -14,6 +14,7 @@ description: >
   single-vendor dossier use supplier-deep-dive, for negotiation strategy use
   commercial-negotiation-prep.
 metadata:
+  author: "Marc Lane, Associate Director, Global IT Procurement"
   suite: v10.7.0
 ---
 
